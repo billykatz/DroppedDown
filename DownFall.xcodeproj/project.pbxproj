@@ -1,0 +1,601 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		3DF2924E20A37FEE006671AC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2924D20A37FEE006671AC /* AppDelegate.swift */; };
+		3DF2925020A37FEE006671AC /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3DF2924F20A37FEE006671AC /* GameScene.sks */; };
+		3DF2925220A37FEE006671AC /* Actions.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3DF2925120A37FEE006671AC /* Actions.sks */; };
+		3DF2925420A37FEE006671AC /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2925320A37FEE006671AC /* GameScene.swift */; };
+		3DF2925620A37FEE006671AC /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2925520A37FEE006671AC /* GameViewController.swift */; };
+		3DF2925920A37FEE006671AC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3DF2925720A37FEE006671AC /* Main.storyboard */; };
+		3DF2925B20A37FF0006671AC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3DF2925A20A37FF0006671AC /* Assets.xcassets */; };
+		3DF2925E20A37FF0006671AC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3DF2925C20A37FF0006671AC /* LaunchScreen.storyboard */; };
+		3DF2926920A37FF0006671AC /* DownFallTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2926820A37FF0006671AC /* DownFallTests.swift */; };
+		3DF2927420A37FF0006671AC /* DownFallUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2927320A37FF0006671AC /* DownFallUITests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		3DF2926520A37FF0006671AC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DF2924220A37FEE006671AC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3DF2924920A37FEE006671AC;
+			remoteInfo = DownFall;
+		};
+		3DF2927020A37FF0006671AC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DF2924220A37FEE006671AC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3DF2924920A37FEE006671AC;
+			remoteInfo = DownFall;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		3DF2924A20A37FEE006671AC /* DownFall.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DownFall.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3DF2924D20A37FEE006671AC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		3DF2924F20A37FEE006671AC /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
+		3DF2925120A37FEE006671AC /* Actions.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Actions.sks; sourceTree = "<group>"; };
+		3DF2925320A37FEE006671AC /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
+		3DF2925520A37FEE006671AC /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
+		3DF2925820A37FEE006671AC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		3DF2925A20A37FF0006671AC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		3DF2925D20A37FF0006671AC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		3DF2925F20A37FF0006671AC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3DF2926420A37FF0006671AC /* DownFallTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DownFallTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		3DF2926820A37FF0006671AC /* DownFallTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownFallTests.swift; sourceTree = "<group>"; };
+		3DF2926A20A37FF0006671AC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3DF2926F20A37FF0006671AC /* DownFallUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DownFallUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		3DF2927320A37FF0006671AC /* DownFallUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownFallUITests.swift; sourceTree = "<group>"; };
+		3DF2927520A37FF0006671AC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		3DF2924720A37FEE006671AC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3DF2926120A37FF0006671AC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3DF2926C20A37FF0006671AC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		3DF2924120A37FEE006671AC = {
+			isa = PBXGroup;
+			children = (
+				3DF2924C20A37FEE006671AC /* DownFall */,
+				3DF2926720A37FF0006671AC /* DownFallTests */,
+				3DF2927220A37FF0006671AC /* DownFallUITests */,
+				3DF2924B20A37FEE006671AC /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		3DF2924B20A37FEE006671AC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3DF2924A20A37FEE006671AC /* DownFall.app */,
+				3DF2926420A37FF0006671AC /* DownFallTests.xctest */,
+				3DF2926F20A37FF0006671AC /* DownFallUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		3DF2924C20A37FEE006671AC /* DownFall */ = {
+			isa = PBXGroup;
+			children = (
+				3DF2924D20A37FEE006671AC /* AppDelegate.swift */,
+				3DF2924F20A37FEE006671AC /* GameScene.sks */,
+				3DF2925120A37FEE006671AC /* Actions.sks */,
+				3DF2925320A37FEE006671AC /* GameScene.swift */,
+				3DF2925520A37FEE006671AC /* GameViewController.swift */,
+				3DF2925720A37FEE006671AC /* Main.storyboard */,
+				3DF2925A20A37FF0006671AC /* Assets.xcassets */,
+				3DF2925C20A37FF0006671AC /* LaunchScreen.storyboard */,
+				3DF2925F20A37FF0006671AC /* Info.plist */,
+			);
+			path = DownFall;
+			sourceTree = "<group>";
+		};
+		3DF2926720A37FF0006671AC /* DownFallTests */ = {
+			isa = PBXGroup;
+			children = (
+				3DF2926820A37FF0006671AC /* DownFallTests.swift */,
+				3DF2926A20A37FF0006671AC /* Info.plist */,
+			);
+			path = DownFallTests;
+			sourceTree = "<group>";
+		};
+		3DF2927220A37FF0006671AC /* DownFallUITests */ = {
+			isa = PBXGroup;
+			children = (
+				3DF2927320A37FF0006671AC /* DownFallUITests.swift */,
+				3DF2927520A37FF0006671AC /* Info.plist */,
+			);
+			path = DownFallUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		3DF2924920A37FEE006671AC /* DownFall */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3DF2927820A37FF0006671AC /* Build configuration list for PBXNativeTarget "DownFall" */;
+			buildPhases = (
+				3DF2924620A37FEE006671AC /* Sources */,
+				3DF2924720A37FEE006671AC /* Frameworks */,
+				3DF2924820A37FEE006671AC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DownFall;
+			productName = DownFall;
+			productReference = 3DF2924A20A37FEE006671AC /* DownFall.app */;
+			productType = "com.apple.product-type.application";
+		};
+		3DF2926320A37FF0006671AC /* DownFallTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3DF2927B20A37FF0006671AC /* Build configuration list for PBXNativeTarget "DownFallTests" */;
+			buildPhases = (
+				3DF2926020A37FF0006671AC /* Sources */,
+				3DF2926120A37FF0006671AC /* Frameworks */,
+				3DF2926220A37FF0006671AC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3DF2926620A37FF0006671AC /* PBXTargetDependency */,
+			);
+			name = DownFallTests;
+			productName = DownFallTests;
+			productReference = 3DF2926420A37FF0006671AC /* DownFallTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		3DF2926E20A37FF0006671AC /* DownFallUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3DF2927E20A37FF0006671AC /* Build configuration list for PBXNativeTarget "DownFallUITests" */;
+			buildPhases = (
+				3DF2926B20A37FF0006671AC /* Sources */,
+				3DF2926C20A37FF0006671AC /* Frameworks */,
+				3DF2926D20A37FF0006671AC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3DF2927120A37FF0006671AC /* PBXTargetDependency */,
+			);
+			name = DownFallUITests;
+			productName = DownFallUITests;
+			productReference = 3DF2926F20A37FF0006671AC /* DownFallUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		3DF2924220A37FEE006671AC /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0930;
+				LastUpgradeCheck = 0930;
+				ORGANIZATIONNAME = "William Katz LLC";
+				TargetAttributes = {
+					3DF2924920A37FEE006671AC = {
+						CreatedOnToolsVersion = 9.3;
+					};
+					3DF2926320A37FF0006671AC = {
+						CreatedOnToolsVersion = 9.3;
+						TestTargetID = 3DF2924920A37FEE006671AC;
+					};
+					3DF2926E20A37FF0006671AC = {
+						CreatedOnToolsVersion = 9.3;
+						TestTargetID = 3DF2924920A37FEE006671AC;
+					};
+				};
+			};
+			buildConfigurationList = 3DF2924520A37FEE006671AC /* Build configuration list for PBXProject "DownFall" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 3DF2924120A37FEE006671AC;
+			productRefGroup = 3DF2924B20A37FEE006671AC /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				3DF2924920A37FEE006671AC /* DownFall */,
+				3DF2926320A37FF0006671AC /* DownFallTests */,
+				3DF2926E20A37FF0006671AC /* DownFallUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		3DF2924820A37FEE006671AC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3DF2925920A37FEE006671AC /* Main.storyboard in Resources */,
+				3DF2925020A37FEE006671AC /* GameScene.sks in Resources */,
+				3DF2925B20A37FF0006671AC /* Assets.xcassets in Resources */,
+				3DF2925E20A37FF0006671AC /* LaunchScreen.storyboard in Resources */,
+				3DF2925220A37FEE006671AC /* Actions.sks in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3DF2926220A37FF0006671AC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3DF2926D20A37FF0006671AC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		3DF2924620A37FEE006671AC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3DF2925420A37FEE006671AC /* GameScene.swift in Sources */,
+				3DF2925620A37FEE006671AC /* GameViewController.swift in Sources */,
+				3DF2924E20A37FEE006671AC /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3DF2926020A37FF0006671AC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3DF2926920A37FF0006671AC /* DownFallTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3DF2926B20A37FF0006671AC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3DF2927420A37FF0006671AC /* DownFallUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		3DF2926620A37FF0006671AC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3DF2924920A37FEE006671AC /* DownFall */;
+			targetProxy = 3DF2926520A37FF0006671AC /* PBXContainerItemProxy */;
+		};
+		3DF2927120A37FF0006671AC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3DF2924920A37FEE006671AC /* DownFall */;
+			targetProxy = 3DF2927020A37FF0006671AC /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		3DF2925720A37FEE006671AC /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				3DF2925820A37FEE006671AC /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		3DF2925C20A37FF0006671AC /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				3DF2925D20A37FF0006671AC /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		3DF2927620A37FF0006671AC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.3;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		3DF2927720A37FF0006671AC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.3;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		3DF2927920A37FF0006671AC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = G6N5X5RF9Q;
+				INFOPLIST_FILE = DownFall/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.williamKatz.DownFall;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		3DF2927A20A37FF0006671AC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = G6N5X5RF9Q;
+				INFOPLIST_FILE = DownFall/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.williamKatz.DownFall;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		3DF2927C20A37FF0006671AC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = G6N5X5RF9Q;
+				INFOPLIST_FILE = DownFallTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.williamKatz.DownFallTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DownFall.app/DownFall";
+			};
+			name = Debug;
+		};
+		3DF2927D20A37FF0006671AC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = G6N5X5RF9Q;
+				INFOPLIST_FILE = DownFallTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.williamKatz.DownFallTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DownFall.app/DownFall";
+			};
+			name = Release;
+		};
+		3DF2927F20A37FF0006671AC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = G6N5X5RF9Q;
+				INFOPLIST_FILE = DownFallUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.williamKatz.DownFallUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = DownFall;
+			};
+			name = Debug;
+		};
+		3DF2928020A37FF0006671AC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = G6N5X5RF9Q;
+				INFOPLIST_FILE = DownFallUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.williamKatz.DownFallUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = DownFall;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		3DF2924520A37FEE006671AC /* Build configuration list for PBXProject "DownFall" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3DF2927620A37FF0006671AC /* Debug */,
+				3DF2927720A37FF0006671AC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3DF2927820A37FF0006671AC /* Build configuration list for PBXNativeTarget "DownFall" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3DF2927920A37FF0006671AC /* Debug */,
+				3DF2927A20A37FF0006671AC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3DF2927B20A37FF0006671AC /* Build configuration list for PBXNativeTarget "DownFallTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3DF2927C20A37FF0006671AC /* Debug */,
+				3DF2927D20A37FF0006671AC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3DF2927E20A37FF0006671AC /* Build configuration list for PBXNativeTarget "DownFallUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3DF2927F20A37FF0006671AC /* Debug */,
+				3DF2928020A37FF0006671AC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 3DF2924220A37FEE006671AC /* Project object */;
+}

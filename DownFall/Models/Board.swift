@@ -6,7 +6,7 @@
 //  Copyright © 2018 William Katz LLC. All rights reserved.
 //
 
-import Foundation
+
 import SpriteKit
 
 extension Notification.Name {
@@ -18,7 +18,6 @@ extension Notification.Name {
     static let neighborsFound = Notification.Name("neighborsFound")
     static let rotated = Notification.Name("rotated")
 }
-typealias TileCoord = (Int, Int)
 
 struct Transformation {
     let initial : (Int, Int)
@@ -33,20 +32,20 @@ class Board {
     private var transformation : [Transformation]
     
     private var bottomLeft : (Int, Int) = (0,0)
+    private var boardSize: Int = 0
     
+    private var tileSize = 50
     
-    var tileSize = 50
-    
-    init(_ tiles: [[DFTileSpriteNode]]) {
-        self.spriteNodes = tiles
-        self.selectedTiles = []
-        self.newTiles = []
-        self.transformation = []
-        bottomLeft = (-1 * tileSize/2 * spriteNodes.count, -1 * tileSize/2 * spriteNodes[0].count )
+    init(_ tiles: [[DFTileSpriteNode]], size : Int) {
+        spriteNodes = tiles
+        selectedTiles = []
+        newTiles = []
+        transformation = []
+        boardSize = size
+        bottomLeft = (-1 * tileSize/2 * boardSize, -1 * tileSize/2 * boardSize )
     }
     
     func findNeighbors(_ x: Int, _ y: Int){
-        //consider saving space by keep track of head of queue, then just return the whole queue
         var queue : [(Int, Int)] = [(x, y)]
         var head = 0
         
@@ -80,7 +79,7 @@ class Board {
     func valid(neighbor : (Int, Int), for DFTileSpriteNode: (Int, Int)) -> Bool {
         let (neighborRow, neighborCol) = neighbor
         let (tileRow, tileCol) = DFTileSpriteNode
-        guard neighborRow >= 0 && neighborRow < spriteNodes.count && neighborCol >= 0 && neighborCol < spriteNodes[neighborRow].count else {
+        guard neighborRow >= 0 && neighborRow < boardSize && neighborCol >= 0 && neighborCol < spriteNodes[neighborRow].count else {
             return false
         }
         let tileSum = tileRow + tileCol
@@ -91,14 +90,10 @@ class Board {
     }
     
     func resetVisited() {
-        for i in 0..<spriteNodes.count {
-            for j in 0..<spriteNodes[i].count {
-                spriteNodes[i][j].search = .white
-            }
+        for (row, col) in selectedTiles {
+            spriteNodes[row][col].search = .white
         }
-        
         selectedTiles = []
-        
     }
 
     
@@ -110,15 +105,6 @@ class Board {
         }
     }
     
-    func shiftReplaceTiles() {
-        removeTiles()
-        //reflect the shift down
-//        fillEmpty()
-//        NotificationCenter.default.post(name: .shiftReplace, object: nil)
-
-    }
-    
-    
     func removeTiles() {
         for (row, col) in selectedTiles {
             spriteNodes[row][col] = DFTileSpriteNode.init(color: .empty)
@@ -129,7 +115,8 @@ class Board {
     
     func shiftDown() {
         transformation = []
-        for col in 0..<spriteNodes.count {
+        newTiles = []
+        for col in 0..<boardSize {
             var shift = 0
             for row in 0..<spriteNodes[col].count {
                 if spriteNodes[row][col].rockColor == .empty {
@@ -144,20 +131,17 @@ class Board {
                     }
                 }
             }
-            //could create newTiles array here
+            //create new tiles here as we know the most we can about the columns
+            for i in 0..<shift {
+                newTiles.append(((spriteNodes[col].count-i-1, col)))
+            }
         }
         NotificationCenter.default.post(name: .shiftDown, object: nil, userInfo: ["transformation": transformation])
     }
     
     func fillEmpty() {
-        newTiles = []
-        for col in 0..<spriteNodes.count {
-            for row in 0..<spriteNodes[col].count {
-                if spriteNodes[row][col].rockColor == .empty {
-                    newTiles.append((row, col))
-                    spriteNodes[row][col] = DFTileSpriteNode.randomTile()
-                }
-            }
+        for (row, col) in newTiles {
+            spriteNodes[row][col] = DFTileSpriteNode.randomTile()
         }
         NotificationCenter.default.post(name: .newTiles, object: nil, userInfo: ["newTiles": newTiles])
     }
@@ -167,7 +151,7 @@ class Board {
 extension Board {
     
     func removeActions() {
-        for i in 0..<spriteNodes.count {
+        for i in 0..<boardSize {
             for j in 0..<spriteNodes[i].count {
                 spriteNodes[i][j].removeAllActions()
                 spriteNodes[i][j].run(SKAction.fadeIn(withDuration: 0.2))
@@ -187,19 +171,18 @@ extension Board {
 
 }
 
+//MARK: Factory
 extension Board {
-    // class functions
+
     class func build(size: Int) -> Board {
-        var tiles : [[DFTileSpriteNode]] = [[]]
-        
+        var tiles : [[DFTileSpriteNode]] = []
         for row in 0..<size {
-            if row != 0 { tiles.append([]) }
+            tiles.append([])
             for _ in 0..<size {
                 tiles[row].append(DFTileSpriteNode.randomTile())
             }
         }
-        
-        return Board.init(tiles)
+        return Board.init(tiles, size: size)
     }
 }
 
@@ -216,11 +199,11 @@ extension Board {
         var intermediateBoard : [[DFTileSpriteNode]] = []
         switch direction {
         case .left:
-            let numCols = spriteNodes[0].count - 1
-            for colIdx in 0..<spriteNodes[0].count {
+            let numCols = boardSize - 1
+            for colIdx in 0..<boardSize {
                 var count = 0
                 var column : [DFTileSpriteNode] = []
-                for rowIdx in 0..<spriteNodes.count {
+                for rowIdx in 0..<boardSize {
                     column.insert(spriteNodes[rowIdx][colIdx], at: 0)
                     let trans = Transformation.init(initial: (rowIdx, colIdx), end: (colIdx, numCols - count))
                     transformation.append(trans)
@@ -230,11 +213,10 @@ extension Board {
             }
             spriteNodes = intermediateBoard
         case .right:
-            let numRows = spriteNodes.count - 1
-            let numCols = spriteNodes[0].count - 1
-            for colIdx in (0..<spriteNodes[0].count).reversed() {
+            let numCols = boardSize - 1
+            for colIdx in (0..<boardSize).reversed() {
                 var column : [DFTileSpriteNode] = []
-                for rowIdx in 0..<spriteNodes.count {
+                for rowIdx in 0..<boardSize {
                     column.append(spriteNodes[rowIdx][colIdx])
                     let endRow = numCols - colIdx
                     let trans = Transformation.init(initial: (rowIdx, colIdx), end: (endRow, rowIdx))
@@ -250,6 +232,8 @@ extension Board {
     }
 }
 
+
+//MARK: Private Getters
 extension Board {
     func sprites() -> [[DFTileSpriteNode]] {
         return self.spriteNodes
@@ -267,12 +251,3 @@ extension Board {
         return self.selectedTiles
     }
 }
-
-////MARK: CGPoint Helper
-//
-//extension Board {
-//    func convert(point: CGPoint) -> CGPoint {
-//        //convert a point to the foreground using the bottomLeft property
-//
-//    }
-//}

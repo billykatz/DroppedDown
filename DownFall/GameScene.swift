@@ -11,20 +11,25 @@ import SpriteKit
 
 enum BoardChange {
     case findNeighbors(Int, Int)
-    case shiftReplace
+    case remove
 }
 
 class GameScene: SKScene {
     
     let boardSize = 9
     
-    internal var foreground : SKNode!
-    internal var board : Board
+    private var foreground : SKNode!
+    private var board : Board
     
     //buttons
-    var left : SKNode!
-    var right: SKNode!
+    private var left : SKNode!
+    private var right: SKNode!
 
+    required init?(coder aDecoder: NSCoder) {
+        self.board = Board.build(size: boardSize)
+        super.init(coder: aDecoder)
+        commonInit()
+    }
     
     override func didMove(to view: SKView) {
         foreground = self.childNode(withName: "foreground")!
@@ -33,16 +38,9 @@ class GameScene: SKScene {
         addTileNodes(board.sprites())
     }
     
-    required init?(coder aDecoder: NSCoder) {
-        self.board = Board.build(size: boardSize)
-        super.init(coder: aDecoder)
-        commonInit()
-    }
-    
     func commonInit(){
         NotificationCenter.default.addObserver(self, selector: #selector(newTiles), name: .newTiles, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(removeTiles), name: .removeTiles, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(shiftReplace), name: .shiftReplace, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(shiftDown), name: .shiftDown, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(neighborsFound), name: .neighborsFound, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(rotated), name: .rotated, object: nil)
@@ -55,45 +53,14 @@ class GameScene: SKScene {
 }
 
 extension GameScene {
-    func registerTouch(_ touch: UITouch) {
-        let touchPoint = touch.location(in: self)
-        for col in 0..<board.sprites().count {
-            for row in 0..<board.sprites()[col].count {
-                if board.sprites()[col][row].contains(touchPoint) {
-                    if board.getSelectedTiles().contains(where: { (locale) -> Bool in
-                        return (col, row) == locale
-                    }) {
-                        boardChanged(BoardChange.shiftReplace)
-                    } else {
-                        boardChanged(BoardChange.findNeighbors(col, row))
-                    }
-                }
-            }
-        }
-        if left.contains(touchPoint) {
-            board.rotate(.left)
-        }
-        
-        if right.contains(touchPoint) {
-            board.rotate(.right)
-        }
-    }
-}
-
-// MARK: SpriteMediator
-extension GameScene {
-    
-    func sprites() -> [[DFTileSpriteNode]] {
-        return board.sprites()
-    }
     
     func boardChanged(_ reason: BoardChange) {
         switch reason {
         case .findNeighbors(let x, let y):
             board.removeActions()
             board.findNeighbors(x, y)
-        case .shiftReplace:
-            board.shiftReplaceTiles()
+        case .remove:
+            board.removeTiles()
         }
     }
     
@@ -117,92 +84,79 @@ extension GameScene {
 
     
 }
-// MARK: Board notifications
 
+// MARK: Board notifications
 
 extension GameScene {
     @objc func removeTiles(notification: NSNotification) {
-        //show that tiles have been remove before shifting
-        //this could be a good time to animate the rock destruction
+        //Remove all tiles
+        //reload the view with empty tiles shown
+        //then shift down
         foreground.removeAllChildren()
         addTileNodes(board.sprites())
         board.shiftDown()
     }
     
     @objc func shiftDown(notification: NSNotification) {
-        //animate the shifting of tiles that were previously on the board
-        //that are now above empty spaces
-        //does that mean board is responsible for animation?
         guard let transformation = notification.userInfo?["transformation"] as? [Transformation] else { fatalError() }
-        
-        for trans in transformation {
-            let tileSize = board.tileSize
-            let point = CGPoint.init(x: tileSize*trans.initial.1+board.getBottomLeft().1, y: tileSize*trans.initial.0+board.getBottomLeft().1)
-            for child in foreground.children {
-                if child.contains(point) {
-                    let endPoint = CGPoint.init(x: tileSize*trans.end.1+board.getBottomLeft().1, y: tileSize*trans.end.0+board.getBottomLeft().0)
-                    let animation = SKAction.move(to: endPoint, duration: 0.2)
-                    child.run(animation)
-                }
-            }
-        }
+        animate(transformation)
         board.fillEmpty()
     }
     
     @objc func newTiles(notification: NSNotification) {
         guard let newTiles = notification.userInfo?["newTiles"] as? [(Int, Int)] else { fatalError("No new DFTileSpriteNode information") }
-        
+        let tileSize = board.getTileSize()
         for (row, col) in newTiles {
             let sprite = board.sprites()[row][col]
             //animate
-            let x = board.tileSize * boardSize + ( row * board.tileSize ) + board.getBottomLeft().0
-            let y = board.tileSize * col + board.getBottomLeft().1
+            let x = tileSize * boardSize + ( row * tileSize ) + board.getBottomLeft().0
+            let y = tileSize * col + board.getBottomLeft().1
             sprite.position = CGPoint.init(x: y, y: x)
             sprite.removeFromParent()
             foreground.addChild(sprite)
-            let targetPosition = CGPoint.init(x: board.tileSize*col+board.getBottomLeft().0, y: board.tileSize*row+board.getBottomLeft().1)
-            let moveTo = SKAction.move(to: targetPosition, duration: 0.2)
+            let targetPosition = CGPoint.init(x: tileSize*col+board.getBottomLeft().0, y: tileSize*row+board.getBottomLeft().1)
+            let moveTo = SKAction.move(to: targetPosition, duration: AnimationSettings.fallSpeed)
             sprite.run(moveTo)
             
         }
         
     }
     
-    @objc func shiftReplace(notification: NSNotification) {
-        //update scene
-        foreground.removeAllChildren()
-        addTileNodes(board.sprites())
-        
-    }
-    
     @objc func neighborsFound(notification: NSNotification) {
-        //update Sprites
+        //neighbors found means a new search was started, so remove blinking from other groups
         board.removeActions()
         guard let tiles = notification.userInfo?["tiles"] as? [(Int, Int)] else { fatalError("No tiles in notification") }
         board.blinkTiles(at: tiles)
-        //update Scene
     }
     
     @objc func rotated(notification: NSNotification) {
         guard let transformation = notification.userInfo?["transformation"] as? [Transformation] else { fatalError("No transformations provided for rotate") }
-        
+        animate(transformation)
+    }
+    
+}
+
+//MARK: Transformation Animation
+
+extension GameScene {
+    func animate(_ transformation: [Transformation]) {
         for trans in transformation {
-            let tileSize = board.tileSize
+            let tileSize = board.getTileSize()
             let point = CGPoint.init(x: tileSize*trans.initial.1+board.getBottomLeft().1, y: tileSize*trans.initial.0+board.getBottomLeft().1)
             for child in foreground.children {
                 if child.contains(point) {
                     let endPoint = CGPoint.init(x: tileSize*trans.end.1+board.getBottomLeft().1, y: tileSize*trans.end.0+board.getBottomLeft().0)
-                    let animation = SKAction.move(to: endPoint, duration: 0.4)
+                    let animation = SKAction.move(to: endPoint, duration: AnimationSettings.fallSpeed)
                     child.run(animation)
+                    continue
                 }
             }
-
+            
         }
     }
 }
 
 // MARK: Touch Relay
-
 
 extension GameScene {
     
@@ -210,4 +164,29 @@ extension GameScene {
         guard let touch = touches.first else { return }
         registerTouch(touch)
     }
+    
+    func registerTouch(_ touch: UITouch) {
+        let touchPoint = touch.location(in: self)
+        for col in 0..<board.sprites().count {
+            for row in 0..<board.sprites()[col].count {
+                if board.sprites()[col][row].contains(touchPoint) {
+                    if board.getSelectedTiles().contains(where: { (locale) -> Bool in
+                        return (col, row) == locale
+                    }) {
+                        boardChanged(BoardChange.remove)
+                    } else {
+                        boardChanged(BoardChange.findNeighbors(col, row))
+                    }
+                }
+            }
+        }
+        if left.contains(touchPoint) {
+            board.rotate(.left)
+        }
+        
+        if right.contains(touchPoint) {
+            board.rotate(.right)
+        }
+    }
+
 }

@@ -29,6 +29,7 @@ class DFTileSpriteNode : SKSpriteNode {
     
     var rockColor : Color
     var search : Search
+    var selected : Bool = false
     
     init(color: Color, search: Search = .white, texture: SKTexture = SKTexture.init(imageNamed: "emptyTexture")) {
         self.rockColor = color

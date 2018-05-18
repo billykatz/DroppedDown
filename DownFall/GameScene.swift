@@ -131,7 +131,11 @@ extension GameScene {
     
     @objc func rotated(notification: NSNotification) {
         guard let transformation = notification.userInfo?["transformation"] as? [Transformation] else { fatalError("No transformations provided for rotate") }
-        animate(transformation)
+        animate(transformation) { [weak self] (lastAnimation) in
+            guard let strongSelf = self else { return }
+            strongSelf.board.allowRotation(lastAnimation)
+        }
+        
     }
     
 }
@@ -139,19 +143,23 @@ extension GameScene {
 //MARK: Transformation Animation
 
 extension GameScene {
-    func animate(_ transformation: [Transformation]) {
-        for trans in transformation {
+    func animate(_ transformation: [Transformation], _ completion: ((Bool) -> Void)? = nil) {
+        var animationCount = 0
+        for transIdx in 0..<transformation.count {
+            let trans = transformation[transIdx]
             let tileSize = board.getTileSize()
             let point = CGPoint.init(x: tileSize*trans.initial.1+board.getBottomLeft().1, y: tileSize*trans.initial.0+board.getBottomLeft().1)
             for child in foreground.children {
                 if child.contains(point) {
                     let endPoint = CGPoint.init(x: tileSize*trans.end.1+board.getBottomLeft().1, y: tileSize*trans.end.0+board.getBottomLeft().0)
                     let animation = SKAction.move(to: endPoint, duration: AnimationSettings.fallSpeed)
-                    child.run(animation)
+                    child.run(animation) {
+                        completion?(animationCount == transformation.count - 1)
+                        animationCount += 1
+                    }
                     continue
                 }
             }
-            
         }
     }
 }
@@ -169,10 +177,8 @@ extension GameScene {
         let touchPoint = touch.location(in: self)
         for col in 0..<board.sprites().count {
             for row in 0..<board.sprites()[col].count {
-                if board.sprites()[col][row].contains(touchPoint) {
-                    if board.getSelectedTiles().contains(where: { (locale) -> Bool in
-                        return (col, row) == locale
-                    }) {
+                if board.sprites()[row][col].contains(touchPoint) {
+                    if board.sprites()[row][col].selected {
                         boardChanged(BoardChange.remove)
                     } else {
                         boardChanged(BoardChange.findNeighbors(col, row))

@@ -1,5 +1,5 @@
 //
-//  Tile.swift
+//  DFTileSpriteNode.swift
 //  DownFall
 //
 //  Created by William Katz on 5/11/18.
@@ -24,24 +24,26 @@ enum Color : String {
     static let allValues = [blue, black, green, empty]
 }
 
-class Tile {
+class DFTileSpriteNode : SKSpriteNode {
     
-    static let tileSize = 50
     
-    var color : Color
+    var rockColor : Color
     var search : Search
-    var texture : SKTexture
     
     init(color: Color, search: Search = .white, texture: SKTexture = SKTexture.init(imageNamed: "emptyTexture")) {
-        self.color = color
+        self.rockColor = color
         self.search = search
-        self.texture = texture
+        super.init(texture: texture, color: .clear, size: texture.size())
     }
 
-    class func randomTile() -> Tile {
+    class func randomTile() -> DFTileSpriteNode {
         let randomNumber = Int(arc4random() % 3)
         let newColor = Color.allValues[randomNumber]
         let texture = SKTexture.init(imageNamed: "\(newColor)Rock")
-        return Tile.init(color: newColor, texture: texture)
+        return DFTileSpriteNode.init(color: newColor, texture: texture)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("Aint implemented")
     }
 }

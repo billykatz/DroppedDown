@@ -27,13 +27,12 @@ struct Transformation {
 
 class Board {
     
-    var spriteNodes : [[DFTileSpriteNode]]
-    var selectedTiles : [(Int, Int)]
-    var newTiles : [(Int, Int)]
-    var coordsToFill : [(Int, Int)]
-    var transformation : [Transformation]
+    private var spriteNodes : [[DFTileSpriteNode]]
+    private var selectedTiles : [(Int, Int)]
+    private var newTiles : [(Int, Int)]
+    private var transformation : [Transformation]
     
-    var bottomLeft : (Int, Int) = (0,0)
+    private var bottomLeft : (Int, Int) = (0,0)
     
     
     var tileSize = 50
@@ -41,7 +40,6 @@ class Board {
     init(_ tiles: [[DFTileSpriteNode]]) {
         self.spriteNodes = tiles
         self.selectedTiles = []
-        self.coordsToFill = []
         self.newTiles = []
         self.transformation = []
         bottomLeft = (-1 * tileSize/2 * spriteNodes.count, -1 * tileSize/2 * spriteNodes[0].count )
@@ -238,7 +236,6 @@ extension Board {
                 var column : [DFTileSpriteNode] = []
                 for rowIdx in 0..<spriteNodes.count {
                     column.append(spriteNodes[rowIdx][colIdx])
-                    let endCol = numRows - rowIdx
                     let endRow = numCols - colIdx
                     let trans = Transformation.init(initial: (rowIdx, colIdx), end: (endRow, rowIdx))
                     transformation.append(trans)
@@ -250,6 +247,24 @@ extension Board {
         
         NotificationCenter.default.post(name: .rotated, object: nil, userInfo: ["transformation": transformation])
     
+    }
+}
+
+extension Board {
+    func sprites() -> [[DFTileSpriteNode]] {
+        return self.spriteNodes
+    }
+    
+    func getTileSize() -> Int {
+        return self.tileSize
+    }
+    
+    func getBottomLeft() -> (Int, Int) {
+        return self.bottomLeft
+    }
+    
+    func getSelectedTiles() -> [(Int, Int)] {
+        return self.selectedTiles
     }
 }
 

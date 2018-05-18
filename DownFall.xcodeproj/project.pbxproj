@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3D12F37120AE0C24003DBA17 /* SceneBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D12F37020AE0C24003DBA17 /* SceneBuilder.swift */; };
 		3DF2924E20A37FEE006671AC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2924D20A37FEE006671AC /* AppDelegate.swift */; };
 		3DF2925020A37FEE006671AC /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3DF2924F20A37FEE006671AC /* GameScene.sks */; };
 		3DF2925220A37FEE006671AC /* Actions.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3DF2925120A37FEE006671AC /* Actions.sks */; };
@@ -40,7 +39,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		3D12F37020AE0C24003DBA17 /* SceneBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneBuilder.swift; sourceTree = "<group>"; };
 		3DF2924A20A37FEE006671AC /* DownFall.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DownFall.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3DF2924D20A37FEE006671AC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		3DF2924F20A37FEE006671AC /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
@@ -86,14 +84,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		3D12F37220AE0D97003DBA17 /* Builders */ = {
-			isa = PBXGroup;
-			children = (
-				3D12F37020AE0C24003DBA17 /* SceneBuilder.swift */,
-			);
-			path = Builders;
-			sourceTree = "<group>";
-		};
 		3DF2924120A37FEE006671AC = {
 			isa = PBXGroup;
 			children = (
@@ -121,7 +111,6 @@
 				3DF2924F20A37FEE006671AC /* GameScene.sks */,
 				3DF2925120A37FEE006671AC /* Actions.sks */,
 				3DF2925320A37FEE006671AC /* GameScene.swift */,
-				3D12F37220AE0D97003DBA17 /* Builders */,
 				3DF2928120A66A4E006671AC /* Models */,
 				3DF2925520A37FEE006671AC /* GameViewController.swift */,
 				3DF2925720A37FEE006671AC /* Main.storyboard */,
@@ -294,7 +283,6 @@
 			files = (
 				3DF2925420A37FEE006671AC /* GameScene.swift in Sources */,
 				3DF2925620A37FEE006671AC /* GameViewController.swift in Sources */,
-				3D12F37120AE0C24003DBA17 /* SceneBuilder.swift in Sources */,
 				3DF2928520A76242006671AC /* Board.swift in Sources */,
 				3DF2924E20A37FEE006671AC /* AppDelegate.swift in Sources */,
 				3DF2928320A66BEB006671AC /* Tile.swift in Sources */,

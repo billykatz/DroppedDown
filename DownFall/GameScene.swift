@@ -14,17 +14,10 @@ enum BoardChange {
     case shiftReplace
 }
 
-protocol SpriteMediator {
-    func sprites() -> [[DFTileSpriteNode]]
-    func boardChanged(_ reason : BoardChange)
-    func getBoard() -> Board
-}
-
-class GameScene: SKScene, SceneBuilder, SpriteMediator {
+class GameScene: SKScene {
     
     let boardSize = 9
     
-    internal var mediator: SpriteMediator?
     internal var foreground : SKNode!
     internal var board : Board
     
@@ -37,7 +30,7 @@ class GameScene: SKScene, SceneBuilder, SpriteMediator {
         foreground = self.childNode(withName: "foreground")!
         left = self.childNode(withName: "left")!
         right = self.childNode(withName: "right")!
-        addTileNodes(board.spriteNodes)
+        addTileNodes(board.sprites())
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -53,7 +46,6 @@ class GameScene: SKScene, SceneBuilder, SpriteMediator {
         NotificationCenter.default.addObserver(self, selector: #selector(shiftDown), name: .shiftDown, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(neighborsFound), name: .neighborsFound, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(rotated), name: .rotated, object: nil)
-        mediator = self
     }
     
     deinit {
@@ -65,10 +57,10 @@ class GameScene: SKScene, SceneBuilder, SpriteMediator {
 extension GameScene {
     func registerTouch(_ touch: UITouch) {
         let touchPoint = touch.location(in: self)
-        for col in 0..<board.spriteNodes.count {
-            for row in 0..<board.spriteNodes[col].count {
-                if board.spriteNodes[col][row].contains(touchPoint) {
-                    if board.selectedTiles.contains(where: { (locale) -> Bool in
+        for col in 0..<board.sprites().count {
+            for row in 0..<board.sprites()[col].count {
+                if board.sprites()[col][row].contains(touchPoint) {
+                    if board.getSelectedTiles().contains(where: { (locale) -> Bool in
                         return (col, row) == locale
                     }) {
                         boardChanged(BoardChange.shiftReplace)
@@ -92,7 +84,7 @@ extension GameScene {
 extension GameScene {
     
     func sprites() -> [[DFTileSpriteNode]] {
-        return board.spriteNodes
+        return board.sprites()
     }
     
     func boardChanged(_ reason: BoardChange) {
@@ -109,6 +101,21 @@ extension GameScene {
         return self.board
     }
     
+    func addTileNodes(_ given : [[DFTileSpriteNode]]) {
+        let tileSize = board.getTileSize()
+        var x : Int = 0
+        var y : Int = 0
+        for row in 0..<given.count {
+            y = row * tileSize + board.getBottomLeft().0
+            for col in 0..<given.count {
+                x = col * tileSize + board.getBottomLeft().1
+                given[row][col].position = CGPoint.init(x: x, y: y)
+                foreground.addChild(given[row][col])
+            }
+        }
+    }
+
+    
 }
 // MARK: Board notifications
 
@@ -118,7 +125,7 @@ extension GameScene {
         //show that tiles have been remove before shifting
         //this could be a good time to animate the rock destruction
         foreground.removeAllChildren()
-        addTileNodes(board.spriteNodes)
+        addTileNodes(board.sprites())
         board.shiftDown()
     }
     
@@ -130,10 +137,10 @@ extension GameScene {
         
         for trans in transformation {
             let tileSize = board.tileSize
-            let point = CGPoint.init(x: tileSize*trans.initial.1+board.bottomLeft.1, y: tileSize*trans.initial.0+board.bottomLeft.1)
+            let point = CGPoint.init(x: tileSize*trans.initial.1+board.getBottomLeft().1, y: tileSize*trans.initial.0+board.getBottomLeft().1)
             for child in foreground.children {
                 if child.contains(point) {
-                    let endPoint = CGPoint.init(x: tileSize*trans.end.1+board.bottomLeft.1, y: tileSize*trans.end.0+board.bottomLeft.0)
+                    let endPoint = CGPoint.init(x: tileSize*trans.end.1+board.getBottomLeft().1, y: tileSize*trans.end.0+board.getBottomLeft().0)
                     let animation = SKAction.move(to: endPoint, duration: 0.2)
                     child.run(animation)
                 }
@@ -146,14 +153,14 @@ extension GameScene {
         guard let newTiles = notification.userInfo?["newTiles"] as? [(Int, Int)] else { fatalError("No new DFTileSpriteNode information") }
         
         for (row, col) in newTiles {
-            let sprite = board.spriteNodes[row][col]
+            let sprite = board.sprites()[row][col]
             //animate
-            let x = board.tileSize * boardSize + ( row * board.tileSize ) + board.bottomLeft.0
-            let y = board.tileSize * col + board.bottomLeft.1
+            let x = board.tileSize * boardSize + ( row * board.tileSize ) + board.getBottomLeft().0
+            let y = board.tileSize * col + board.getBottomLeft().1
             sprite.position = CGPoint.init(x: y, y: x)
             sprite.removeFromParent()
             foreground.addChild(sprite)
-            let targetPosition = CGPoint.init(x: board.tileSize*col+board.bottomLeft.0, y: board.tileSize*row+board.bottomLeft.1)
+            let targetPosition = CGPoint.init(x: board.tileSize*col+board.getBottomLeft().0, y: board.tileSize*row+board.getBottomLeft().1)
             let moveTo = SKAction.move(to: targetPosition, duration: 0.2)
             sprite.run(moveTo)
             
@@ -164,7 +171,7 @@ extension GameScene {
     @objc func shiftReplace(notification: NSNotification) {
         //update scene
         foreground.removeAllChildren()
-        addTileNodes(board.spriteNodes)
+        addTileNodes(board.sprites())
         
     }
     
@@ -181,10 +188,10 @@ extension GameScene {
         
         for trans in transformation {
             let tileSize = board.tileSize
-            let point = CGPoint.init(x: tileSize*trans.initial.1+board.bottomLeft.1, y: tileSize*trans.initial.0+board.bottomLeft.1)
+            let point = CGPoint.init(x: tileSize*trans.initial.1+board.getBottomLeft().1, y: tileSize*trans.initial.0+board.getBottomLeft().1)
             for child in foreground.children {
                 if child.contains(point) {
-                    let endPoint = CGPoint.init(x: tileSize*trans.end.1+board.bottomLeft.1, y: tileSize*trans.end.0+board.bottomLeft.0)
+                    let endPoint = CGPoint.init(x: tileSize*trans.end.1+board.getBottomLeft().1, y: tileSize*trans.end.0+board.getBottomLeft().0)
                     let animation = SKAction.move(to: endPoint, duration: 0.4)
                     child.run(animation)
                 }

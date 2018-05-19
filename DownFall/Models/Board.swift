@@ -29,12 +29,11 @@ class Board {
     private var spriteNodes : [[DFTileSpriteNode]]
     private var selectedTiles : [(Int, Int)]
     private var newTiles : [(Int, Int)]
-    private var transformation : [Transformation]
     
     private var bottomLeft : (Int, Int) = (0,0)
     private var boardSize: Int = 0
     
-    private var tileSize = 50
+    private var tileSize = 75
     
     private var rotating : Bool  = false
     
@@ -42,7 +41,6 @@ class Board {
         spriteNodes = tiles
         selectedTiles = []
         newTiles = []
-        transformation = []
         boardSize = size
         bottomLeft = (-1 * tileSize/2 * boardSize, -1 * tileSize/2 * boardSize )
     }
@@ -121,14 +119,12 @@ class Board {
                 }
             }
         }
-//        for (row, col) in selectedTiles {
-//            spriteNodes[row][col] = DFTileSpriteNode.init(color: .empty)
-//        }
+        selectedTiles = []
         NotificationCenter.default.post(name: .removeTiles, object: nil)
     }
     
     func shiftDown() {
-        transformation = []
+        var transformations : [Transformation] = []
         newTiles = []
         for col in 0..<boardSize {
             var shift = 0
@@ -138,7 +134,7 @@ class Board {
                 } else {
                     if shift != 0 {
                         let trans = Transformation.init(initial: (row, col), end: (row-shift, col))
-                        transformation.append(trans)
+                        transformations.append(trans)
                         let intermediateTile = spriteNodes[row][col]
                         spriteNodes[row][col] = spriteNodes[row-shift][col]
                         spriteNodes[row-shift][col] = intermediateTile
@@ -150,14 +146,17 @@ class Board {
                 newTiles.append(((spriteNodes[col].count-i-1, col)))
             }
         }
-        NotificationCenter.default.post(name: .shiftDown, object: nil, userInfo: ["transformation": transformation])
+        NotificationCenter.default.post(name: .shiftDown, object: nil, userInfo: ["transformation": transformations])
     }
     
     func fillEmpty() {
+        var transformations : [Transformation] = []
         for (row, col) in newTiles {
+            let trans = Transformation.init(initial: (boardSize + row, col), end: (row, col))
+            transformations.append(trans)
             spriteNodes[row][col] = DFTileSpriteNode.randomTile()
         }
-        NotificationCenter.default.post(name: .newTiles, object: nil, userInfo: ["newTiles": newTiles])
+        NotificationCenter.default.post(name: .newTiles, object: nil, userInfo: ["transformation": transformations])
     }
     
 }
@@ -209,9 +208,7 @@ extension Board {
     }
     
     func rotate(_ direction: Direction) {
-        guard !rotating else { return }
-        rotating = true
-        transformation = []
+        var transformation : [Transformation] = []
         var intermediateBoard : [[DFTileSpriteNode]] = []
         switch direction {
         case .left:
@@ -242,14 +239,9 @@ extension Board {
             }
             spriteNodes = intermediateBoard
         }
-        
         NotificationCenter.default.post(name: .rotated, object: nil, userInfo: ["transformation": transformation])
-    
     }
-    
-    func allowRotation(_ yesNo: Bool) {
-        rotating = !yesNo
-    }
+
 }
 
 
@@ -265,5 +257,9 @@ extension Board {
     
     func getBottomLeft() -> (Int, Int) {
         return self.bottomLeft
+    }
+    
+    func getSelectedTiles() -> [(Int, Int)] {
+        return self.selectedTiles
     }
 }

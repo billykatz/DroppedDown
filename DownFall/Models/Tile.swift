@@ -34,7 +34,7 @@ class DFTileSpriteNode : SKSpriteNode {
     init(color: Color, search: Search = .white, texture: SKTexture = SKTexture.init(imageNamed: "emptyTexture")) {
         self.rockColor = color
         self.search = search
-        super.init(texture: texture, color: .clear, size: texture.size())
+        super.init(texture: texture, color: .clear, size: CGSize.init(width: 75.0, height: 75.0))
     }
 
     class func randomTile() -> DFTileSpriteNode {

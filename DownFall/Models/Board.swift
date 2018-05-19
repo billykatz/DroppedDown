@@ -34,7 +34,7 @@ class Board {
     private var bottomLeft : (Int, Int) = (0,0)
     private var boardSize: Int = 0
     
-    private var tileSize = 50
+    private var tileSize = 75
     
     init(_ tiles: [[DFTileSpriteNode]], size : Int) {
         spriteNodes = tiles
@@ -61,7 +61,7 @@ class Board {
                         //potential neighbor within bounds
                         let neighbor = spriteNodes[i][j]
                         if neighbor.search == .white {
-                            if neighbor.rockColor == tileSpriteNode.rockColor {
+                            if neighbor == tileSpriteNode {
                                 neighbor.search = .gray
                                 queue.append((i,j))
                             }
@@ -100,14 +100,14 @@ class Board {
     func reset(size: Int) {
         for row in 0..<size {
             for col in 0..<size {
-                spriteNodes[row][col] = DFTileSpriteNode.randomTile()
+                spriteNodes[row][col] = DFTileSpriteNode.randomRock()
             }
         }
     }
     
     func removeTiles() {
         for (row, col) in selectedTiles {
-            spriteNodes[row][col] = DFTileSpriteNode.init(color: .empty)
+            spriteNodes[row][col] = DFTileSpriteNode.init(type: .empty)
         }
         NotificationCenter.default.post(name: .removeTiles, object: nil)
         selectedTiles = []
@@ -119,9 +119,10 @@ class Board {
         for col in 0..<boardSize {
             var shift = 0
             for row in 0..<spriteNodes[col].count {
-                if spriteNodes[row][col].rockColor == .empty {
+                switch spriteNodes[row][col].type {
+                case .empty:
                     shift += 1
-                } else {
+                default:
                     if shift != 0 {
                         let trans = Transformation.init(initial: (row, col), end: (row-shift, col))
                         transformation.append(trans)
@@ -141,7 +142,7 @@ class Board {
     
     func fillEmpty() {
         for (row, col) in newTiles {
-            spriteNodes[row][col] = DFTileSpriteNode.randomTile()
+            spriteNodes[row][col] = DFTileSpriteNode.randomRock()
         }
         NotificationCenter.default.post(name: .newTiles, object: nil, userInfo: ["newTiles": newTiles])
     }
@@ -179,9 +180,12 @@ extension Board {
         for row in 0..<size {
             tiles.append([])
             for _ in 0..<size {
-                tiles[row].append(DFTileSpriteNode.randomTile())
+                tiles[row].append(DFTileSpriteNode.randomRock())
             }
         }
+        let row = Int.random(size)
+        let col = Int.random(size)
+        tiles[row][col] = DFTileSpriteNode.init(type: .player)
         return Board.init(tiles, size: size)
     }
 }

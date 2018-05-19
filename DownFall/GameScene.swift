@@ -16,7 +16,7 @@ enum BoardChange {
 
 class GameScene: SKScene {
     
-    let boardSize = 9
+    let boardSize = 6
     
     private var foreground : SKNode!
     private var board : Board
@@ -175,7 +175,9 @@ extension GameScene {
                     }) {
                         boardChanged(BoardChange.remove)
                     } else {
-                        boardChanged(BoardChange.findNeighbors(col, row))
+                        if board.sprites()[col][row].type != .player {
+                            boardChanged(BoardChange.findNeighbors(col, row))
+                        }
                     }
                 }
             }

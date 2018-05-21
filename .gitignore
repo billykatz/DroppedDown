@@ -132,6 +132,7 @@ build/
 #
 # NB: this is exclusive with OPTION 2 below
 xcuserdata/
+DownFall.xcodeproj/xcuserdata/William.xcuserdatad/xcdebugger/*
 xcuserdata/William.xcuserdatad/xcdebugger/Breakpoints_v2.xcbkptlist
 
 # OPTION 2: ---------------------------------

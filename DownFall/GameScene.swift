@@ -210,6 +210,8 @@ extension GameScene {
                     } else {
                         if board.sprites()[col][row].type != .player {
                             boardChanged(BoardChange.findNeighbors(col, row))
+                        } else {
+                            self.isUserInteractionEnabled = true
                         }
                     }
                 }

@@ -10,12 +10,28 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "DownFall/Models/Board.swift"
-            timestampString = "548455961.003204"
+            timestampString = "548620563.032101"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "112"
-            endingLineNumber = "112"
-            landmarkName = "removeTiles()"
+            startingLineNumber = "102"
+            endingLineNumber = "102"
+            landmarkName = "Board"
+            landmarkType = "3">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DownFall/Models/Board.swift"
+            timestampString = "548620563.032548"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "43"
+            endingLineNumber = "43"
+            landmarkName = "init(_:size:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -26,7 +42,23 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "DownFall/Models/Board.swift"
-            timestampString = "548455961.004132"
+            timestampString = "548620563.032793"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "69"
+            endingLineNumber = "69"
+            landmarkName = "findNeighbors(_:_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DownFall/Models/Board.swift"
+            timestampString = "548620563.033033"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "48"
@@ -41,40 +73,8 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "DownFall/Models/Board.swift"
-            timestampString = "548455961.004526"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "79"
-            endingLineNumber = "79"
-            landmarkName = "valid(neighbor:for:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "DownFall/Models/Board.swift"
-            timestampString = "548455961.005989"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "53"
-            endingLineNumber = "53"
-            landmarkName = "findNeighbors(_:_:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
             filePath = "DownFall/GameScene.swift"
-            timestampString = "548453683.084259"
+            timestampString = "548620563.033264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "92"
@@ -90,7 +90,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "DownFall/GameScene.swift"
-            timestampString = "548453683.084349"
+            timestampString = "548620563.033318"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "70"
@@ -106,11 +106,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "DownFall/Models/Board.swift"
-            timestampString = "548455961.0064729"
+            timestampString = "548620563.033363"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "62"
-            endingLineNumber = "62"
+            startingLineNumber = "57"
+            endingLineNumber = "57"
             landmarkName = "findNeighbors(_:_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -122,7 +122,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "DownFall/GameScene.swift"
-            timestampString = "548453683.08454"
+            timestampString = "548620563.033574"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "58"
@@ -138,7 +138,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "DownFall/GameScene.swift"
-            timestampString = "548453683.084653"
+            timestampString = "548620563.033617"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "64"
@@ -154,11 +154,27 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "DownFall/Models/Board.swift"
-            timestampString = "548455961.006887"
+            timestampString = "548620563.033658"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "47"
-            endingLineNumber = "47"
+            startingLineNumber = "42"
+            endingLineNumber = "42"
+            landmarkName = "init(_:size:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DownFall/Models/Board.swift"
+            timestampString = "548620563.033855"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "63"
+            endingLineNumber = "63"
             landmarkName = "findNeighbors(_:_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -170,11 +186,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "DownFall/Models/Board.swift"
-            timestampString = "548455961.007248"
+            timestampString = "548620563.0340559"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "68"
-            endingLineNumber = "68"
+            startingLineNumber = "60"
+            endingLineNumber = "60"
             landmarkName = "findNeighbors(_:_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -186,27 +202,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "DownFall/Models/Board.swift"
-            timestampString = "548455961.007627"
+            timestampString = "548620563.034253"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "65"
-            endingLineNumber = "65"
-            landmarkName = "findNeighbors(_:_:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "DownFall/Models/Board.swift"
-            timestampString = "548455961.008"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "234"
-            endingLineNumber = "234"
+            startingLineNumber = "211"
+            endingLineNumber = "211"
             landmarkName = "rotate(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -219,7 +219,7 @@
             condition = "lastAnimation == true"
             continueAfterRunningActions = "No"
             filePath = "DownFall/GameScene.swift"
-            timestampString = "548453683.085263"
+            timestampString = "548620563.034454"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "144"
@@ -243,7 +243,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "DownFall/GameScene.swift"
-            timestampString = "548453683.085385"
+            timestampString = "548620563.0344959"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "195"
@@ -259,7 +259,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "DownFall/GameScene.swift"
-            timestampString = "548453683.085505"
+            timestampString = "548620563.034536"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "141"
@@ -275,12 +275,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "DownFall/Models/Board.swift"
-            timestampString = "548455961.0084389"
+            timestampString = "548620563.034573"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "219"
-            endingLineNumber = "219"
-            landmarkName = "rotate(_:)"
+            startingLineNumber = "196"
+            endingLineNumber = "196"
+            landmarkName = "build(size:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -291,7 +291,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "DownFall/GameScene.swift"
-            timestampString = "548453683.085721"
+            timestampString = "548620563.034784"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "118"
@@ -307,7 +307,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "DownFall/GameScene.swift"
-            timestampString = "548453683.085813"
+            timestampString = "548620563.0348279"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "181"
@@ -323,7 +323,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "DownFall/GameScene.swift"
-            timestampString = "548453683.085901"
+            timestampString = "548620563.034867"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "156"
@@ -339,7 +339,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "DownFall/GameScene.swift"
-            timestampString = "548453683.085987"
+            timestampString = "548620563.034906"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "183"
@@ -355,12 +355,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "DownFall/Models/Board.swift"
-            timestampString = "548455961.008895"
+            timestampString = "548620563.034945"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "177"
-            endingLineNumber = "177"
-            landmarkName = "blinkTiles(at:)"
+            startingLineNumber = "154"
+            endingLineNumber = "154"
+            landmarkName = "fillEmpty()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -371,13 +371,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "DownFall/Models/Board.swift"
-            timestampString = "548455961.009279"
+            timestampString = "548620563.035144"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "178"
-            endingLineNumber = "178"
+            startingLineNumber = "155"
+            endingLineNumber = "155"
             landmarkName = "Board"
-            landmarkType = "21">
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -387,11 +387,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "DownFall/Models/Tile.swift"
-            timestampString = "548453683.087195"
+            timestampString = "548620563.0353431"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "80"
-            endingLineNumber = "80"
+            startingLineNumber = "79"
+            endingLineNumber = "79"
             landmarkName = "init(type:search:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -403,12 +403,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "DownFall/Models/Tile.swift"
-            timestampString = "548453683.087937"
+            timestampString = "548620563.035579"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "87"
-            endingLineNumber = "87"
-            landmarkName = "randomRock()"
+            startingLineNumber = "83"
+            endingLineNumber = "83"
+            landmarkName = "init(type:search:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -419,7 +419,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "DownFall/Models/Tile.swift"
-            timestampString = "548453683.089325"
+            timestampString = "548620563.035779"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "35"
@@ -435,11 +435,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "DownFall/Models/Board.swift"
-            timestampString = "548455961.009801"
+            timestampString = "548620563.035974"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "64"
-            endingLineNumber = "64"
+            startingLineNumber = "59"
+            endingLineNumber = "59"
             landmarkName = "findNeighbors(_:_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -451,7 +451,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "DownFall/Models/Tile.swift"
-            timestampString = "548453683.0900429"
+            timestampString = "548620563.036185"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "32"
@@ -467,7 +467,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "DownFall/Models/Tile.swift"
-            timestampString = "548453683.090567"
+            timestampString = "548620563.036381"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "30"

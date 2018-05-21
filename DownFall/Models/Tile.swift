@@ -65,6 +65,7 @@ class DFTileSpriteNode : SKSpriteNode {
     
     var type : Type
     var search : Search
+    var selected : Bool = false
     
     init(type: Type, search: Search = .white) {
         self.type = type
@@ -78,7 +79,7 @@ class DFTileSpriteNode : SKSpriteNode {
         case .player:
             texture = SKTexture.init(imageNamed: TextureName.allValues[4].rawValue)
         }
-        super.init(texture: texture, color: .clear, size: CGSize.init(width: 75, height: 75))
+        super.init(texture: texture, color: .clear, size: CGSize.init(width: 75.0, height: 75.0))
     }
 
     class func randomRock() -> DFTileSpriteNode {

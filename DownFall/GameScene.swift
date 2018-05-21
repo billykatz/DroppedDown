@@ -96,6 +96,14 @@ extension GameScene {
         addTileNodes(board.sprites())
         board.shiftDown()
     }
+
+    @objc func neighborsFound(notification: NSNotification) {
+        //neighbors found means a new search was started, so remove blinking from other groups
+        board.removeActions()
+        guard let tiles = notification.userInfo?["tiles"] as? [(Int, Int)] else { fatalError("No tiles in notification") }
+        board.blinkTiles(at: tiles)
+        self.isUserInteractionEnabled = true
+    }
     
     @objc func shiftDown(notification: NSNotification) {
         guard let transformation = notification.userInfo?["transformation"] as? [Transformation] else { fatalError() }
@@ -104,34 +112,38 @@ extension GameScene {
     }
     
     @objc func newTiles(notification: NSNotification) {
-        guard let newTiles = notification.userInfo?["newTiles"] as? [(Int, Int)] else { fatalError("No new DFTileSpriteNode information") }
+        guard let transformation = notification.userInfo?["transformation"] as? [Transformation] else { fatalError("No new DFTileSpriteNode information") }
         let tileSize = board.getTileSize()
-        for (row, col) in newTiles {
-            let sprite = board.sprites()[row][col]
-            //animate
-            let x = tileSize * boardSize + ( row * tileSize ) + board.getBottomLeft().0
-            let y = tileSize * col + board.getBottomLeft().1
-            sprite.position = CGPoint.init(x: y, y: x)
-            sprite.removeFromParent()
-            foreground.addChild(sprite)
-            let targetPosition = CGPoint.init(x: tileSize*col+board.getBottomLeft().0, y: tileSize*row+board.getBottomLeft().1)
-            let moveTo = SKAction.move(to: targetPosition, duration: AnimationSettings.fallSpeed)
-            sprite.run(moveTo)
-            
-        }
+        var count = 0
         
+        for trans in transformation {
+            let (endRow, endCol) = trans.end
+            let sprite = board.sprites()[endRow][endCol]
+            sprite.removeFromParent()
+            let x = tileSize * boardSize + ( endRow * tileSize ) + board.getBottomLeft().0
+            let y = tileSize * endCol + board.getBottomLeft().1
+            sprite.position = CGPoint.init(x: y, y: x)
+            foreground.addChild(sprite)
+            animate(trans) {
+                count += 1
+                if count == transformation.count {
+                    self.isUserInteractionEnabled = true
+                }
+            }
+        }
     }
     
-    @objc func neighborsFound(notification: NSNotification) {
-        //neighbors found means a new search was started, so remove blinking from other groups
-        board.removeActions()
-        guard let tiles = notification.userInfo?["tiles"] as? [(Int, Int)] else { fatalError("No tiles in notification") }
-        board.blinkTiles(at: tiles)
-    }
     
     @objc func rotated(notification: NSNotification) {
         guard let transformation = notification.userInfo?["transformation"] as? [Transformation] else { fatalError("No transformations provided for rotate") }
-        animate(transformation)
+        var animationCount = 0
+        animate(transformation) { [weak self] in
+            guard let strongSelf = self else { return }
+            animationCount += 1
+            if animationCount == transformation.count {
+                strongSelf.isUserInteractionEnabled = true
+            }
+        }
     }
     
 }
@@ -139,21 +151,42 @@ extension GameScene {
 //MARK: Transformation Animation
 
 extension GameScene {
-    func animate(_ transformation: [Transformation]) {
-        for trans in transformation {
+    func animate(_ transformation: [Transformation], _ completion: (() -> Void)? = nil) {
+        for transIdx in 0..<transformation.count {
+            let trans = transformation[transIdx]
             let tileSize = board.getTileSize()
             let point = CGPoint.init(x: tileSize*trans.initial.1+board.getBottomLeft().1, y: tileSize*trans.initial.0+board.getBottomLeft().1)
             for child in foreground.children {
                 if child.contains(point) {
                     let endPoint = CGPoint.init(x: tileSize*trans.end.1+board.getBottomLeft().1, y: tileSize*trans.end.0+board.getBottomLeft().0)
                     let animation = SKAction.move(to: endPoint, duration: AnimationSettings.fallSpeed)
-                    child.run(animation)
+                    child.run(animation) {
+                        completion?()
+                    }
                     continue
                 }
             }
-            
         }
     }
+    
+    
+    func animate(_ transformation: Transformation, _ completion: (() -> Void)? = nil) {
+        let trans = transformation
+        let tileSize = board.getTileSize()
+        let point = CGPoint.init(x: tileSize*trans.initial.1+board.getBottomLeft().1, y: tileSize*trans.initial.0+board.getBottomLeft().1)
+        
+        for child in foreground.children {
+            if child.contains(point) {
+                let endPoint = CGPoint.init(x: tileSize*trans.end.1+board.getBottomLeft().1, y: tileSize*trans.end.0+board.getBottomLeft().0)
+                let animation = SKAction.move(to: endPoint, duration: AnimationSettings.fallSpeed)
+                child.run(animation) {
+                    completion?()
+                }
+                return
+            }
+        }
+    }
+
 }
 
 // MARK: Touch Relay
@@ -162,6 +195,8 @@ extension GameScene {
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
+        guard self.isUserInteractionEnabled else { return }
+        self.isUserInteractionEnabled = false
         registerTouch(touch)
     }
     
@@ -170,9 +205,7 @@ extension GameScene {
         for col in 0..<board.sprites().count {
             for row in 0..<board.sprites()[col].count {
                 if board.sprites()[col][row].contains(touchPoint) {
-                    if board.getSelectedTiles().contains(where: { (locale) -> Bool in
-                        return (col, row) == locale
-                    }) {
+                    if board.sprites()[col][row].selected{
                         boardChanged(BoardChange.remove)
                     } else {
                         if board.sprites()[col][row].type != .player {

@@ -29,7 +29,6 @@ class Board {
     private var spriteNodes : [[DFTileSpriteNode]]
     private var selectedTiles : [(Int, Int)]
     private var newTiles : [(Int, Int)]
-    private var transformation : [Transformation]
     
     private var bottomLeft : (Int, Int) = (0,0)
     private var boardSize: Int = 0
@@ -40,17 +39,18 @@ class Board {
         spriteNodes = tiles
         selectedTiles = []
         newTiles = []
-        transformation = []
         boardSize = size
         bottomLeft = (-1 * tileSize/2 * boardSize, -1 * tileSize/2 * boardSize )
     }
     
     func findNeighbors(_ x: Int, _ y: Int){
+        resetVisited()
         var queue : [(Int, Int)] = [(x, y)]
         var head = 0
         
         while head < queue.count {
             let (tileRow, tileCol) = queue[head]
+            spriteNodes[tileRow][tileCol].selected = true
             let tileSpriteNode = spriteNodes[tileRow][tileCol]
             tileSpriteNode.search = .black
             head += 1
@@ -62,6 +62,7 @@ class Board {
                         let neighbor = spriteNodes[i][j]
                         if neighbor.search == .white {
                             if neighbor == tileSpriteNode {
+                                spriteNodes[i][j].selected = true
                                 neighbor.search = .gray
                                 queue.append((i,j))
                             }
@@ -70,7 +71,6 @@ class Board {
                 }
             }
         }
-        resetVisited()
         selectedTiles = queue
         let note = Notification.init(name: .neighborsFound, object: nil, userInfo: ["tiles":selectedTiles])
         NotificationCenter.default.post(note)
@@ -90,10 +90,13 @@ class Board {
     }
     
     func resetVisited() {
-        for (row, col) in selectedTiles {
-            spriteNodes[row][col].search = .white
+        for row in 0..<boardSize {
+            for col in 0..<boardSize {
+                spriteNodes[row][col].selected = false
+                spriteNodes[row][col].search = .white
+            }
         }
-        selectedTiles = []
+        
     }
 
     
@@ -109,12 +112,12 @@ class Board {
         for (row, col) in selectedTiles {
             spriteNodes[row][col] = DFTileSpriteNode.init(type: .empty)
         }
-        NotificationCenter.default.post(name: .removeTiles, object: nil)
         selectedTiles = []
+        NotificationCenter.default.post(name: .removeTiles, object: nil)
     }
     
     func shiftDown() {
-        transformation = []
+        var transformations : [Transformation] = []
         newTiles = []
         for col in 0..<boardSize {
             var shift = 0
@@ -125,7 +128,7 @@ class Board {
                 default:
                     if shift != 0 {
                         let trans = Transformation.init(initial: (row, col), end: (row-shift, col))
-                        transformation.append(trans)
+                        transformations.append(trans)
                         let intermediateTile = spriteNodes[row][col]
                         spriteNodes[row][col] = spriteNodes[row-shift][col]
                         spriteNodes[row-shift][col] = intermediateTile
@@ -137,14 +140,17 @@ class Board {
                 newTiles.append(((spriteNodes[col].count-i-1, col)))
             }
         }
-        NotificationCenter.default.post(name: .shiftDown, object: nil, userInfo: ["transformation": transformation])
+        NotificationCenter.default.post(name: .shiftDown, object: nil, userInfo: ["transformation": transformations])
     }
     
     func fillEmpty() {
+        var transformations : [Transformation] = []
         for (row, col) in newTiles {
+            let trans = Transformation.init(initial: (boardSize + row, col), end: (row, col))
+            transformations.append(trans)
             spriteNodes[row][col] = DFTileSpriteNode.randomRock()
         }
-        NotificationCenter.default.post(name: .newTiles, object: nil, userInfo: ["newTiles": newTiles])
+        NotificationCenter.default.post(name: .newTiles, object: nil, userInfo: ["transformation": transformations])
     }
     
 }
@@ -199,7 +205,7 @@ extension Board {
     }
     
     func rotate(_ direction: Direction) {
-        transformation = []
+        var transformation : [Transformation] = []
         var intermediateBoard : [[DFTileSpriteNode]] = []
         switch direction {
         case .left:
@@ -230,10 +236,9 @@ extension Board {
             }
             spriteNodes = intermediateBoard
         }
-        
         NotificationCenter.default.post(name: .rotated, object: nil, userInfo: ["transformation": transformation])
-    
     }
+
 }
 
 

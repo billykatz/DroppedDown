@@ -17,4 +17,15 @@ public extension Int {
     public static func random(_ n: Int) -> Int {
         return Int(arc4random_uniform(UInt32(n)))
     }
+    
+    /**
+     Returns a random integer between 0 and n-1 that is not the given number
+     */
+    public static func random(_ n: Int, not: Int) -> Int {
+        var retVal = random(n)
+        while retVal == not {
+            retVal = random(n)
+        }
+        return retVal
+    }
 }

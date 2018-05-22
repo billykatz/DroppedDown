@@ -24,6 +24,7 @@ enum Type {
     case rock(RockData)
     case player
     case empty
+    case exit
 }
 
 extension Type: Equatable {
@@ -46,7 +47,13 @@ extension Type: Equatable {
             case .empty: return true
             default: return false
             }
+        case .exit:
+            switch rhs{
+            case .exit: return true
+            default: return false
+            }
         }
+
     }
 }
 
@@ -56,8 +63,9 @@ enum TextureName : String {
     case green = "greenRock"
     case empty = "emptyTexture"
     case player = "player"
+    case exit = "exit"
     
-    static let allValues = [blue, black, green, empty, player]
+    static let allValues = [blue, black, green, empty, player, exit]
 }
 
 class DFTileSpriteNode : SKSpriteNode {
@@ -78,6 +86,8 @@ class DFTileSpriteNode : SKSpriteNode {
             texture = SKTexture.init(imageNamed: TextureName.allValues[3].rawValue)
         case .player:
             texture = SKTexture.init(imageNamed: TextureName.allValues[4].rawValue)
+        case .exit:
+            texture = SKTexture.init(imageNamed: TextureName.allValues[5].rawValue)
         }
         super.init(texture: texture, color: .clear, size: CGSize.init(width: 75.0, height: 75.0))
     }

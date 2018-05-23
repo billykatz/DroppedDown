@@ -100,8 +100,9 @@ class Board {
         
     }
 
-    func removeAndRefill(_ remove: [TileCoord]) {
-        for (row, col) in remove {
+    func removeAndRefill() {
+        let selectedTiles = getSelectedTiles()
+        for (row, col) in selectedTiles {
             spriteNodes[row][col] = DFTileSpriteNode.init(type: .empty)
         }
 
@@ -160,12 +161,23 @@ class Board {
         }
         
         //build notification dictionary
-        let newBoardDictionary = ["removed": remove,
+        let newBoardDictionary = ["removed": selectedTiles,
                                   "newTiles": newTiles,
                                   "shiftDown": shiftDown] as [String : Any]
         NotificationCenter.default.post(name:.computeNewBoard, object: nil, userInfo: newBoardDictionary)
     }
     
+    func getSelectedTiles() -> [TileCoord] {
+        var selected : [TileCoord] = []
+        for col in 0..<boardSize {
+            for row in 0..<boardSize {
+                if spriteNodes[row][col].selected {
+                    selected.append((row, col))
+                }
+            }
+        }
+        return selected
+    }
 }
 
 extension Board {
@@ -298,9 +310,9 @@ extension Board {
         return self.tileSize
     }
     
-    func getSelectedTiles() -> [(Int, Int)] {
-        return self.selectedTiles
-    }
+//    func getSelectedTiles() -> [(Int, Int)] {
+//        return self.selectedTiles
+//    }
     
     func getPlayerPosition() -> TileCoord {
         return self.playerPosition

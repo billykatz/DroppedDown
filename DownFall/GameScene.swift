@@ -28,9 +28,6 @@ class GameScene: SKScene {
     //animating
     private var animating: Bool = false
     
-    //save to pass to model
-    private var selectedTiles: [(Int, Int)] = []
-    
     //coordinates
     private var bottomLeft : (Int, Int)
 
@@ -66,12 +63,13 @@ extension GameScene {
     func boardChanged(_ reason: BoardChange) {
         switch reason {
         case .findNeighbors(let x, let y):
-            if board.getSelectedTiles().count > 0 {
+            let selectedTileCount = board.getSelectedTiles().count
+            if selectedTileCount > 0 {
                 var count = 0
                 board.removeActions() { [weak self] in
                     guard let strongSelf = self else { return }
                     count += 1
-                    if count == strongSelf.board.getSelectedTiles().count {
+                    if count == selectedTileCount {
                         strongSelf.board.findNeighbors(x, y)
                     }
                 }
@@ -79,7 +77,7 @@ extension GameScene {
                 board.findNeighbors(x, y)
             }
         case .remove:
-            board.removeAndRefill(selectedTiles)
+            board.removeAndRefill()
         }
     }
     
@@ -160,7 +158,6 @@ extension GameScene {
         //neighbors found means a new search was started, so remove blinking from other groups
         board.removeActions()
         guard let tiles = notification.userInfo?["tiles"] as? [(Int, Int)] else { fatalError("No tiles in notification") }
-        selectedTiles = tiles
         board.blinkTiles(at: tiles)
         animating = false
     }

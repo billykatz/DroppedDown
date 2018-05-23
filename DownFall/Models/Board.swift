@@ -314,10 +314,6 @@ extension Board {
 //        return self.selectedTiles
 //    }
     
-    func getPlayerPosition() -> TileCoord {
-        return self.playerPosition
-    }
-    
     func getExitPosition() -> TileCoord {
         return self.exitPosition
     }

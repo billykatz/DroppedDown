@@ -12,6 +12,8 @@ import GameplayKit
 
 class GameViewController: UIViewController {
 
+    private var gameSceneNode: GameScene?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -21,10 +23,12 @@ class GameViewController: UIViewController {
             
             // Get the SKScene from the loaded GKScene
             if let sceneNode = scene.rootNode as! GameScene? {
-                
+                gameSceneNode = sceneNode
                 // Copy gameplay related content over to the scene
                 // Set the scale mode to scale to fit the window
-                sceneNode.scaleMode = .aspectFill
+                gameSceneNode!.scaleMode = .aspectFill
+                
+                gameSceneNode!.gameSceneDelegate = self
                 
                 // Present the scene
                 if let view = self.view as! SKView? {
@@ -34,6 +38,7 @@ class GameViewController: UIViewController {
                     
                     view.showsFPS = true
                     view.showsNodeCount = true
+                    
                 }
             }
         }
@@ -58,5 +63,13 @@ class GameViewController: UIViewController {
 
     override var prefersStatusBarHidden: Bool {
         return true
+    }
+}
+
+extension GameViewController: GameSceneDelegate {
+    func display(alert: UIAlertController) {
+        self.present(alert, animated: true) {
+            self.gameSceneNode?.reset()
+        }
     }
 }

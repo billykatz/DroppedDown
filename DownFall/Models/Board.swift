@@ -13,6 +13,7 @@ extension Notification.Name {
     static let neighborsFound = Notification.Name("neighborsFound")
     static let rotated = Notification.Name("rotated")
     static let computeNewBoard = Notification.Name("computeNewBoard")
+    static let lessThanThreeNeighborsFound = Notification.Name("lessThanThreeNeighborsFound")
 }
 
 struct Transformation {
@@ -73,8 +74,20 @@ class Board {
             }
         }
         selectedTiles = queue
-        let note = Notification.init(name: .neighborsFound, object: nil, userInfo: ["tiles":selectedTiles])
-        NotificationCenter.default.post(note)
+        if queue.count >= 3 {
+            let note = Notification.init(name: .neighborsFound, object: nil, userInfo: ["tiles":selectedTiles])
+            NotificationCenter.default.post(note)
+        } else {
+            //clear selectedTiles so that tiles in groups of 1 or 2 do not think they are selected
+            for (row, col) in selectedTiles {
+                spriteNodes[row][col].selected = false
+            }
+            
+            //let anyone listening know that we did not find enough neighbors
+            let note = Notification.init(name: .lessThanThreeNeighborsFound, object: nil, userInfo: nil)
+            NotificationCenter.default.post(note)
+            
+        }
     }
     
     func valid(neighbor : (Int, Int), for DFTileSpriteNode: (Int, Int)) -> Bool {

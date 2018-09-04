@@ -48,6 +48,7 @@ class GameScene: SKScene {
     
     func commonInit(){
         NotificationCenter.default.addObserver(self, selector: #selector(neighborsFound), name: .neighborsFound, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(lessThanThreeNeighborsFound), name: .lessThanThreeNeighborsFound, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(rotated), name: .rotated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(computeNewBoard), name: .computeNewBoard, object: nil)
     }
@@ -162,6 +163,11 @@ extension GameScene {
         animating = false
     }
     
+    @objc func lessThanThreeNeighborsFound(notification: NSNotification) {
+        //player touched a non-blinking tile, remove blinking from other groups
+        board.removeActions()
+        animating = false
+    }
     
     @objc func rotated(notification: NSNotification) {
         guard let transformation = notification.userInfo?["transformation"] as? [Transformation] else { fatalError("No transformations provided for rotate") }

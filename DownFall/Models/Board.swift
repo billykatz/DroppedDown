@@ -13,6 +13,8 @@ extension Notification.Name {
     static let neighborsFound = Notification.Name("neighborsFound")
     static let rotated = Notification.Name("rotated")
     static let computeNewBoard = Notification.Name("computeNewBoard")
+    static let lessThanThreeNeighborsFound = Notification.Name("lessThanThreeNeighborsFound")
+    static let boardStateChange = Notification.Name("boardStateChange")
 }
 
 struct Transformation {
@@ -23,17 +25,22 @@ struct Transformation {
 typealias TileCoord = (Int, Int)
 
 class Board {
+
     
-    private var spriteNodes : [[DFTileSpriteNode]]
-    private var selectedTiles : [(Int, Int)]
-    private var newTiles : [(Int, Int)]
+    //  MARK: - Public
     
-    private var boardSize: Int = 0
-    
-    private var tileSize = 75
-    
-    private var playerPosition : TileCoord
-    private var exitPosition : TileCoord
+    /// After every move we want to check the State of the board
+    /// It is possible that we have won (reached the exit)
+    /// Lost, by losing health or running out of turns
+    /// have no moves left
+    /// or we are still playing
+    /// purposely public, so that GameScene can switch on board states
+    enum State {
+        case win
+        case lose
+        case noMovesLeft
+        case playing
+    }
     
     init(_ tiles: [[DFTileSpriteNode]], size : Int, playerPosition: TileCoord, exitPosition: TileCoord) {
         spriteNodes = tiles
@@ -73,31 +80,20 @@ class Board {
             }
         }
         selectedTiles = queue
-        let note = Notification.init(name: .neighborsFound, object: nil, userInfo: ["tiles":selectedTiles])
-        NotificationCenter.default.post(note)
-    }
-    
-    func valid(neighbor : (Int, Int), for DFTileSpriteNode: (Int, Int)) -> Bool {
-        let (neighborRow, neighborCol) = neighbor
-        let (tileRow, tileCol) = DFTileSpriteNode
-        guard neighborRow >= 0 && neighborRow < boardSize && neighborCol >= 0 && neighborCol < spriteNodes[neighborRow].count else {
-            return false
-        }
-        let tileSum = tileRow + tileCol
-        let neighborSum = neighborRow + neighborCol
-        guard neighbor != DFTileSpriteNode else { return false }
-        guard (tileSum % 2 == 0  && neighborSum % 2 == 1) || (tileSum % 2 == 1 && neighborSum % 2 == 0) else { return false }
-        return true
-    }
-    
-    func resetVisited() {
-        for row in 0..<boardSize {
-            for col in 0..<boardSize {
+        if queue.count >= 3 {
+            let note = Notification.init(name: .neighborsFound, object: nil, userInfo: ["tiles":selectedTiles])
+            NotificationCenter.default.post(note)
+        } else {
+            //clear selectedTiles so that tiles in groups of 1 or 2 do not think they are selected
+            for (row, col) in selectedTiles {
                 spriteNodes[row][col].selected = false
-                spriteNodes[row][col].search = .white
             }
+            
+            //let anyone listening know that we did not find enough neighbors
+            let note = Notification.init(name: .lessThanThreeNeighborsFound, object: nil, userInfo: nil)
+            NotificationCenter.default.post(note)
+            
         }
-        
     }
 
     func removeAndRefill() {
@@ -178,10 +174,63 @@ class Board {
         }
         return selected
     }
+    
+    //  MARK: - Private
+    
+    private var spriteNodes : [[DFTileSpriteNode]]
+    private var selectedTiles : [(Int, Int)]
+    private var newTiles : [(Int, Int)]
+    
+    private var boardSize: Int = 0
+    
+    private var tileSize = 75
+    
+    private var playerPosition : TileCoord
+    private var exitPosition : TileCoord
+    
+    private var _state: State = .playing {
+        didSet {
+            //alert listeners that the state has changed
+            NotificationCenter.default.post(Notification(name: .boardStateChange, object: nil, userInfo: ["boardState" : _state]))
+        }
+    }
+    private var state: State {
+        set {
+            guard _state != newValue else { return }
+            _state = newValue
+        }
+        get { return _state }
+    }
+    
+
+    private func valid(neighbor : (Int, Int), for DFTileSpriteNode: (Int, Int)) -> Bool {
+        let (neighborRow, neighborCol) = neighbor
+        let (tileRow, tileCol) = DFTileSpriteNode
+        guard neighborRow >= 0 && neighborRow < boardSize && neighborCol >= 0 && neighborCol < spriteNodes[neighborRow].count else {
+            return false
+        }
+        let tileSum = tileRow + tileCol
+        let neighborSum = neighborRow + neighborCol
+        guard neighbor != DFTileSpriteNode else { return false }
+        guard (tileSum % 2 == 0  && neighborSum % 2 == 1) || (tileSum % 2 == 1 && neighborSum % 2 == 0) else { return false }
+        return true
+    }
+    
+    private func resetVisited() {
+        for row in 0..<boardSize {
+            for col in 0..<boardSize {
+                spriteNodes[row][col].selected = false
+                spriteNodes[row][col].search = .white
+            }
+        }
+        
+    }
 }
 
 extension Board {
     
+    /// Public API that removes SKActions such as blinking and creates SKActions suckh as. blinking
+    /// TODO: Consider making these private to reduce exposure of Model beahvior to client
     func removeActions(_ completion: (()-> Void)? = nil) {
         for i in 0..<boardSize {
             for j in 0..<spriteNodes[i].count {
@@ -208,7 +257,7 @@ extension Board {
 //MARK: Factory
 extension Board {
 
-    class func build(size: Int) -> Board {
+    class func build(size: Int, playerPosition: TileCoord? = nil, exitPosition: TileCoord? = nil) -> Board {
         var tiles : [[DFTileSpriteNode]] = []
         for row in 0..<size {
             tiles.append([])
@@ -216,18 +265,37 @@ extension Board {
                 tiles[row].append(DFTileSpriteNode.randomRock())
             }
         }
-        let playerRow = Int.random(size)
-        let playerCol = Int.random(size)
+        let playerRow: Int
+        let playerCol: Int
+        if let playerPos = playerPosition {
+            playerRow = playerPos.0
+            playerCol = playerPos.1
+        } else {
+            playerRow = Int.random(size)
+            playerCol = Int.random(size)
+        }
         tiles[playerRow][playerCol] = DFTileSpriteNode.init(type: .player)
         
-        let exitRow = Int.random(size, not: playerRow)
-        let exitCol = Int.random(size, not: playerCol)
+        let exitRow: Int
+        let exitCol: Int
+        if let exitPos = exitPosition {
+            exitRow = exitPos.0
+            exitCol = exitPos.0
+        } else {
+            exitRow = Int.random(size, not: playerRow)
+            exitCol = Int.random(size, not: playerCol)
+        }
         tiles[exitRow][exitCol] = DFTileSpriteNode.init(type: .exit)
         
         return Board.init(tiles,
                           size: size,
                           playerPosition: (playerRow, playerCol),
                           exitPosition: (exitRow, exitCol) )
+    }
+    
+    
+    func reset() -> Board {
+        return Board.build(size: boardSize, playerPosition: playerPosition, exitPosition: exitPosition)
     }
 }
 
@@ -289,13 +357,65 @@ extension Board {
 
 }
 
-//MARK: check for win
+//MARK: - Check Board Game State
 
 extension Board {
-    func checkWinCondition() -> Bool {
+    func checkGameState() {
+        if checkWinCondition() {
+            //send game win notification
+            _state = .win
+        } else if !boardHasMoreMoves() {
+            //send no more moves notification
+            _state = .noMovesLeft
+        }
+        //if nothing else, then we are just playing
+        _state = .playing
+    }
+    
+    private func checkWinCondition() -> Bool {
         let (playerRow, playerCol) = playerPosition
         let (exitRow, exitCol) = exitPosition
         return playerRow == exitRow + 1 && playerCol == exitCol
+    }
+    
+    //TODO: refactor DFS so taht we don't have this code written twice in the model
+    private func boardHasMoreMoves() -> Bool {
+        defer { resetVisited() } // reset the visited nodes so we dont desync the store and UI
+        for row in 0..<boardSize {
+            for col in 0..<boardSize {
+                resetVisited()
+                var queue : [(Int, Int)] = [(row, col)]
+                var head = 0
+                var neighbors = 0
+                while head < queue.count {
+                    guard neighbors < 2 else { return true } // once neighbors is 2, then we know that the original tile + these two neighbors means there is a legal move left
+                    let (tileRow, tileCol) = queue[head]
+                    spriteNodes[tileRow][tileCol].selected = true
+                    let tileSpriteNode = spriteNodes[tileRow][tileCol]
+                    tileSpriteNode.search = .black
+                    head += 1
+                    //add neighbors to queue
+                    for i in tileRow-1...tileRow+1 {
+                        for j in tileCol-1...tileCol+1 {
+                            if valid(neighbor: (i,j), for: (tileRow, tileCol)) {
+                                //potential neighbor within bounds
+                                let neighbor = spriteNodes[i][j]
+                                if neighbor.search == .white {
+                                    if neighbor == tileSpriteNode {
+                                        spriteNodes[i][j].selected = true
+                                        neighbor.search = .gray
+                                        neighbors += 1
+                                        queue.append((i,j))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if queue.count >= 3 { return true }
+            }
+        }
+        return false
     }
 }
 
@@ -308,14 +428,6 @@ extension Board {
     
     func getTileSize() -> Int {
         return self.tileSize
-    }
-    
-//    func getSelectedTiles() -> [(Int, Int)] {
-//        return self.selectedTiles
-//    }
-    
-    func getPlayerPosition() -> TileCoord {
-        return self.playerPosition
     }
     
     func getExitPosition() -> TileCoord {

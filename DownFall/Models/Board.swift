@@ -26,7 +26,6 @@ typealias TileCoord = (Int, Int)
 
 class Board {
 
-    
     //  MARK: - Public
     
     /// After every move we want to check the State of the board
@@ -177,7 +176,8 @@ class Board {
     
     //  MARK: - Private
     
-    private var spriteNodes : [[DFTileSpriteNode]]
+
+    private(set) var spriteNodes : [[DFTileSpriteNode]]
     private var selectedTiles : [(Int, Int)]
     private var newTiles : [(Int, Int)]
     
@@ -254,7 +254,7 @@ extension Board {
 
 }
 
-//MARK: Factory
+//MARK: - Factory
 extension Board {
 
     class func build(size: Int, playerPosition: TileCoord? = nil, exitPosition: TileCoord? = nil) -> Board {
@@ -299,7 +299,7 @@ extension Board {
     }
 }
 
-// MARK: Rotation
+// MARK: - Rotation
 
 extension Board {
     enum Direction {
@@ -356,6 +356,7 @@ extension Board {
     }
 
 }
+
 
 //MARK: - Check Board Game State
 
@@ -420,11 +421,9 @@ extension Board {
 }
 
 
-//MARK: Getters for private instance members
+//MARK: - Getters for private instance members
+
 extension Board {
-    func sprites() -> [[DFTileSpriteNode]] {
-        return self.spriteNodes
-    }
     
     func getTileSize() -> Int {
         return self.tileSize

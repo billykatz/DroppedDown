@@ -9,6 +9,10 @@
 import Foundation
 import SpriteKit
 
+protocol Tappable {
+    func isTappable() -> Bool
+}
+
 enum Search : Int {
     case white
     case gray
@@ -66,6 +70,12 @@ enum TextureName : String {
     case exit = "exit"
     
     static let allValues = [blue, black, green, empty, player, exit]
+}
+
+extension DFTileSpriteNode: Tappable {
+    func isTappable() -> Bool {
+        return type != .player && type != .exit
+    }
 }
 
 class DFTileSpriteNode : SKSpriteNode {

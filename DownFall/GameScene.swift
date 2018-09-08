@@ -51,7 +51,7 @@ class GameScene: SKScene {
         foreground = self.childNode(withName: "foreground")!
         left = self.childNode(withName: "left")!
         right = self.childNode(withName: "right")!
-        addTileNodes(board.sprites())
+        addTileNodes(board.spriteNodes)
     }
     
     private func commonInit(){
@@ -107,7 +107,7 @@ extension GameScene {
             }
         }
         
-        addTileNodes(self.board.sprites())
+        addTileNodes(self.board.spriteNodes)
     }
     
     private func addTileNodes(_ given : [[DFTileSpriteNode]]) {
@@ -157,7 +157,7 @@ extension GameScene {
         for trans in newTiles {
             let (startRow, startCol) = trans.initial
             let (endRow, endCol) = trans.end
-            let sprite = board.sprites()[endRow][endCol]
+            let sprite = board.spriteNodes[endRow][endCol]
             let x = tileSize * boardSize + ( startRow * tileSize ) + bottomLeft.0
             let y = tileSize * startCol + bottomLeft.1
             sprite.position = CGPoint.init(x: y, y: x)
@@ -279,28 +279,27 @@ extension GameScene {
     }
     
     func registerTouch(_ touch: UITouch) {
-        let touchPoint = touch.location(in: self)
         var handledTouch = false
-        for col in 0..<board.sprites().count {
-            for row in 0..<board.sprites()[col].count {
-                if board.sprites()[col][row].contains(touchPoint) {
-                    if board.sprites()[col][row].selected{
-                        boardChanged(BoardChange.remove)
-                        handledTouch = true
-                    } else {
-                        if board.sprites()[col][row].type != .player &&
-                            board.sprites()[col][row].type != .exit {
-                            boardChanged(BoardChange.findNeighbors(col, row))
-                            handledTouch = true
-                        } else {
-                            handledTouch = false
-                            
-                        }
-                    }
-                }
+        defer {
+            if !handledTouch {
+                animating = false
             }
         }
-    
+        let touchPoint = touch.location(in: self)
+        
+        for index in 0..<board.spriteNodes.reduce([],+).count {
+            let row = index / boardSize
+            let col = (index - row * boardSize) % boardSize
+            let tile = board.spriteNodes[col][row]
+            guard tile.contains(touchPoint), tile.isTappable() else { continue }
+            if tile.selected {
+                boardChanged(BoardChange.remove)
+            } else {
+                boardChanged(BoardChange.findNeighbors(col, row))
+            }
+            handledTouch = true
+        }
+
         if left.contains(touchPoint) {
             board.rotate(.left)
             handledTouch = true
@@ -309,9 +308,6 @@ extension GameScene {
         if right.contains(touchPoint) {
             board.rotate(.right)
             handledTouch = true
-        }
-        if !handledTouch {
-            animating = false
         }
     }
 }

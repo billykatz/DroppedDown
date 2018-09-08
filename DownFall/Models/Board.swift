@@ -24,7 +24,8 @@ typealias TileCoord = (Int, Int)
 
 class Board {
     
-    private var spriteNodes : [[DFTileSpriteNode]]
+    
+    private(set) var spriteNodes : [[DFTileSpriteNode]]
     private var selectedTiles : [(Int, Int)]
     private var newTiles : [(Int, Int)]
     
@@ -91,6 +92,7 @@ class Board {
     }
     
     func resetVisited() {
+        //TODO: REFACTOR 2D into 1D
         for row in 0..<boardSize {
             for col in 0..<boardSize {
                 spriteNodes[row][col].selected = false
@@ -205,7 +207,7 @@ extension Board {
 
 }
 
-//MARK: Factory
+//MARK: - Factory
 extension Board {
 
     class func build(size: Int) -> Board {
@@ -231,7 +233,7 @@ extension Board {
     }
 }
 
-// MARK: Rotation
+// MARK: - Rotation
 
 extension Board {
     enum Direction {
@@ -289,7 +291,7 @@ extension Board {
 
 }
 
-//MARK: check for win
+//MARK: - check for win
 
 extension Board {
     func checkWinCondition() -> Bool {
@@ -300,19 +302,13 @@ extension Board {
 }
 
 
-//MARK: Getters for private instance members
+//MARK: - Getters for private instance members
+
 extension Board {
-    func sprites() -> [[DFTileSpriteNode]] {
-        return self.spriteNodes
-    }
     
     func getTileSize() -> Int {
         return self.tileSize
     }
-    
-//    func getSelectedTiles() -> [(Int, Int)] {
-//        return self.selectedTiles
-//    }
     
     func getExitPosition() -> TileCoord {
         return self.exitPosition

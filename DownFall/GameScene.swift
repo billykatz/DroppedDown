@@ -12,11 +12,16 @@ import SpriteKit
 enum BoardChange {
     case findNeighbors(Int, Int)
     case remove
+    //TODO: refactor this to either include all possible actions taken on the board, or indicate that this is only actions that the model cares about.  ie why isnt rotate in this?
+}
+
+protocol GameSceneDelegate: class {
+    func display(alert: UIAlertController)
 }
 
 class GameScene: SKScene {
     
-    let boardSize = 6
+    let boardSize = 4
     
     private var foreground : SKNode!
     private var board : Board
@@ -30,6 +35,9 @@ class GameScene: SKScene {
     
     //coordinates
     private var bottomLeft : (Int, Int)
+    
+    //deleagte
+    weak var gameSceneDelegate: GameSceneDelegate?
 
     required init?(coder aDecoder: NSCoder) {
         self.board = Board.build(size: boardSize)
@@ -46,10 +54,12 @@ class GameScene: SKScene {
         addTileNodes(board.spriteNodes)
     }
     
-    func commonInit(){
+    private func commonInit(){
         NotificationCenter.default.addObserver(self, selector: #selector(neighborsFound), name: .neighborsFound, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(lessThanThreeNeighborsFound), name: .lessThanThreeNeighborsFound, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(rotated), name: .rotated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(computeNewBoard), name: .computeNewBoard, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(boardStateChange), name: .boardStateChange, object: nil)
     }
     
     deinit {
@@ -80,12 +90,27 @@ extension GameScene {
             board.removeAndRefill()
         }
     }
-    
-    func getBoard() -> Board {
-        return self.board
+
+    private func resetBoardUI() {
+        let tileSize = board.getTileSize()
+        
+        //remove all tiles
+        for row in 0..<boardSize {
+            for col in 0..<boardSize {
+                let point = CGPoint.init(x: tileSize*col+bottomLeft.1, y: tileSize*row+bottomLeft.1)
+                for child in foreground.children {
+                    if child.contains(point) {
+                        child.removeFromParent()
+                        break
+                    }
+                }
+            }
+        }
+        
+        addTileNodes(self.board.spriteNodes)
     }
     
-    func addTileNodes(_ given : [[DFTileSpriteNode]]) {
+    private func addTileNodes(_ given : [[DFTileSpriteNode]]) {
         let tileSize = board.getTileSize()
         var x : Int = 0
         var y : Int = 0
@@ -99,10 +124,8 @@ extension GameScene {
         }
     }
     
-    func checkForWin() {
-        if (board.checkWinCondition()) {
-            print("youwin")
-        }
+    private func checkBoardState() {
+        board.checkGameState()
     }
 
     
@@ -147,7 +170,7 @@ extension GameScene {
             guard let strongSelf = self else { return }
             count -= 1
             if count == 0 {
-                strongSelf.checkForWin()
+                strongSelf.checkBoardState()
                 strongSelf.animating = false
             }
         }
@@ -162,6 +185,11 @@ extension GameScene {
         animating = false
     }
     
+    @objc func lessThanThreeNeighborsFound(notification: NSNotification) {
+        //player touched a non-blinking tile, remove blinking from other groups
+        board.removeActions()
+        animating = false
+    }
     
     @objc func rotated(notification: NSNotification) {
         guard let transformation = notification.userInfo?["transformation"] as? [Transformation] else { fatalError("No transformations provided for rotate") }
@@ -170,9 +198,23 @@ extension GameScene {
             guard let strongSelf = self else { return }
             animationCount += 1
             if animationCount == transformation.count {
-                strongSelf.checkForWin()
+                strongSelf.checkBoardState()
                 strongSelf.animating = false
             }
+        }
+    }
+    
+    @objc func boardStateChange(notification: NSNotification) {
+        guard let note = notification.userInfo?["boardState"] as? Board.State else { fatalError("Incorrect key in board state change notification")}
+        switch note {
+        case .noMovesLeft:
+            let alert = UIAlertAction(title: "No Moves Left", style: .default)
+            let alertController = UIAlertController()
+            alertController.addAction(alert)
+            self.gameSceneDelegate?.display(alert: alertController)
+        default:
+            //TODO: implement other swithc statements
+            return
         }
     }
     
@@ -268,5 +310,14 @@ extension GameScene {
             handledTouch = true
         }
     }
-
 }
+
+//MARK: - Communication from VC
+extension GameScene {
+    //TODO: figure out a way to not expose a reset function publically
+    func reset() {
+        self.board = self.board.reset() // this should likely be triggered by anothing notification
+        self.resetBoardUI()
+    }
+}
+

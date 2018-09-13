@@ -379,44 +379,55 @@ extension Board {
         return playerRow == exitRow + 1 && playerCol == exitCol
     }
     
-    //TODO: refactor DFS so taht we don't have this code written twice in the model
-    private func boardHasMoreMoves() -> Bool {
-        defer { resetVisited() } // reset the visited nodes so we dont desync the store and UI
-        for row in 0..<boardSize {
-            for col in 0..<boardSize {
-                resetVisited()
-                var queue : [(Int, Int)] = [(row, col)]
-                var head = 0
-                var neighbors = 0
-                while head < queue.count {
-                    guard neighbors < 2 else { return true } // once neighbors is 2, then we know that the original tile + these two neighbors means there is a legal move left
-                    let (tileRow, tileCol) = queue[head]
-                    spriteNodes[tileRow][tileCol].selected = true
-                    let tileSpriteNode = spriteNodes[tileRow][tileCol]
-                    tileSpriteNode.search = .black
-                    head += 1
-                    //add neighbors to queue
-                    for i in tileRow-1...tileRow+1 {
-                        for j in tileCol-1...tileCol+1 {
-                            if valid(neighbor: (i,j), for: (tileRow, tileCol)) {
-                                //potential neighbor within bounds
-                                let neighbor = spriteNodes[i][j]
-                                if neighbor.search == .white {
-                                    if neighbor == tileSpriteNode {
-                                        spriteNodes[i][j].selected = true
-                                        neighbor.search = .gray
-                                        neighbors += 1
-                                        queue.append((i,j))
-                                    }
-                                }
-                            }
-                        }
+    private func dfs() -> [TileCoord]? {
+        
+        func similarNeighborsOf(coords: TileCoord) -> [TileCoord] {
+            var neighborCoords: [TileCoord] = []
+            let currentNode = spriteNodes[coords.0][coords.1]
+            for i in coords.0-1...coords.0+1 {
+                for j in coords.1-1...coords.1+1 {
+                    guard valid(neighbor: (i,j), for: (coords.0, coords.1)) else { continue }
+                    let neighbor = spriteNodes[i][j]
+                    if neighbor.search == .white && neighbor == currentNode {
+                        //only add neighbors that are in a cardinal direction, not out of bounds, haven't been searched and re the same as the currentNode
+                        neighborCoords.append((i, j))
                     }
                 }
-                if queue.count >= 3 { return true }
+            }
+            return neighborCoords
+        }
+        
+        defer { resetVisited() } // reset the visited nodes so we dont desync the store and UI
+        
+        for index in 0..<spriteNodes.reduce([],+).count {
+            let row = index / boardSize // get the row
+            let col = (index - row * boardSize) % boardSize // get the column
+            resetVisited()
+            var queue : [(Int, Int)] = [(row, col)]
+            var head = 0
+            while head < queue.count {
+                guard queue.count < 3 else { return queue } // once neighbors is more than 3, then we know that the original tile + these two neighbors means there is a legal move left
+                let (tileRow, tileCol) = queue[head]
+                spriteNodes[tileRow][tileCol].selected = true
+                let tileSpriteNode = spriteNodes[tileRow][tileCol]
+                tileSpriteNode.search = .black
+                head += 1
+                //add neighbors to queue
+                for (i, j) in similarNeighborsOf(coords: (tileRow, tileCol)) {
+                    spriteNodes[i][j].selected = true
+                    spriteNodes[i][j].search = .gray
+                    queue.append((i,j))
+                }
+                if queue.count >= 3 { return queue }
             }
         }
-        return false
+        return nil
+    }
+    
+    //TODO: refactor DFS so taht we don't have this code written twice in the model
+    private func boardHasMoreMoves() -> Bool {
+        let count = dfs()?.count ?? 0
+        return count > 2
     }
 }
 

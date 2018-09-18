@@ -9,13 +9,6 @@
 
 import SpriteKit
 
-extension Notification.Name {
-    static let neighborsFound = Notification.Name("neighborsFound")
-    static let rotated = Notification.Name("rotated")
-    static let computeNewBoard = Notification.Name("computeNewBoard")
-    static let lessThanThreeNeighborsFound = Notification.Name("lessThanThreeNeighborsFound")
-    static let boardStateChange = Notification.Name("boardStateChange")
-}
 
 struct Transformation {
     let initial : (Int, Int)
@@ -34,23 +27,39 @@ class Board {
     /// have no moves left
     /// or we are still playing
     /// purposely public, so that GameScene can switch on board states
-    enum State {
-        case win
-        case lose
-        case noMovesLeft
-        case playing
+
+    private var states : [BoardState] = []
+    private var _state: BoardState? {
+        didSet {
+            //TODO: check for no moves, a win, maybe attacks?
+        }
     }
     
-    init(_ tiles: [[DFTileSpriteNode]], size : Int, playerPosition: TileCoord, exitPosition: TileCoord) {
+    var state: BoardState? {
+        set {
+            guard let newValue = newValue else { return }
+            states.append(newValue)
+            _state = newValue
+        }
+        get { return _state }
+    }
+    
+    func handleInput(_ point: CGPoint) {
+        guard let newState = state?.handleInput(point, in: self) else { return }
+        state = newState
+    }
+    
+    init(_ tiles: [[DFTileSpriteNode]], size : Int,playerPosition playerPos: TileCoord,exitPosition exitPos: TileCoord) {
         spriteNodes = tiles
         selectedTiles = []
         newTiles = []
         boardSize = size
-        self.playerPosition = playerPosition
-        self.exitPosition = exitPosition
+        playerPosition = playerPos
+        exitPosition = exitPos
+        state = UnselectedState(currentBoard: tiles)
     }
     
-    func findNeighbors(_ x: Int, _ y: Int){
+    func findNeighbors(_ x: Int, _ y: Int) -> [TileCoord] {
         resetVisited()
         var queue : [(Int, Int)] = [(x, y)]
         var head = 0
@@ -93,10 +102,21 @@ class Board {
             NotificationCenter.default.post(note)
             
         }
+        
+        return queue
     }
+    
+    
+    /*
+     * Remove and refill selected tiles from the current board
+     *
+     *  - replaces each selected tile with an Empty sprite placeholder
+     *  - loops through each column starting an at row 0 and increments a shift counter when it encounters an Empty sprite placeholder
+     *  - updates the board store [[DFTileSpriteNdes]]
+     *  - sends Notification with three dictionarys, removed tiles, new tiles, and which have shifted down
+    */
 
-    func removeAndRefill() {
-        let selectedTiles = getSelectedTiles()
+    func removeAndRefill(selectedTiles: [TileCoord]) -> [[DFTileSpriteNode]] {
         for (row, col) in selectedTiles {
             spriteNodes[row][col] = DFTileSpriteNode.init(type: .empty)
         }
@@ -160,6 +180,8 @@ class Board {
                                   "newTiles": newTiles,
                                   "shiftDown": shiftDown] as [String : Any]
         NotificationCenter.default.post(name:.computeNewBoard, object: nil, userInfo: newBoardDictionary)
+        
+        return spriteNodes
     }
     
     func getSelectedTiles() -> [TileCoord] {
@@ -181,27 +203,12 @@ class Board {
     private var selectedTiles : [(Int, Int)]
     private var newTiles : [(Int, Int)]
     
-    private var boardSize: Int = 0
+    private(set) var boardSize: Int = 0
     
     private var tileSize = 75
     
     private var playerPosition : TileCoord
     private var exitPosition : TileCoord
-    
-    private var _state: State = .playing {
-        didSet {
-            //alert listeners that the state has changed
-            NotificationCenter.default.post(Notification(name: .boardStateChange, object: nil, userInfo: ["boardState" : _state]))
-        }
-    }
-    private var state: State {
-        set {
-            guard _state != newValue else { return }
-            _state = newValue
-        }
-        get { return _state }
-    }
-    
 
     private func valid(neighbor : (Int, Int), for DFTileSpriteNode: (Int, Int)) -> Bool {
         let (neighborRow, neighborCol) = neighbor
@@ -362,15 +369,15 @@ extension Board {
 
 extension Board {
     func checkGameState() {
-        if checkWinCondition() {
-            //send game win notification
-            _state = .win
-        } else if !boardHasMoreMoves() {
-            //send no more moves notification
-            _state = .noMovesLeft
-        }
-        //if nothing else, then we are just playing
-        _state = .playing
+//        if checkWinCondition() {
+//            //send game win notification
+//            _state = .win
+//        } else if !boardHasMoreMoves() {
+//            //send no more moves notification
+//            _state = .noMovesLeft
+//        }
+//        //if nothing else, then we are just playing
+//        _state = .playing
     }
     
     private func checkWinCondition() -> Bool {

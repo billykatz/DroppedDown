@@ -59,7 +59,7 @@ class GameScene: SKScene {
         NotificationCenter.default.addObserver(self, selector: #selector(lessThanThreeNeighborsFound), name: .lessThanThreeNeighborsFound, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(rotated), name: .rotated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(computeNewBoard), name: .computeNewBoard, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(boardStateChange), name: .boardStateChange, object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(boardStateChange), name: .boardStateChange, object: nil)
     }
     
     deinit {
@@ -204,19 +204,19 @@ extension GameScene {
         }
     }
     
-    @objc func boardStateChange(notification: NSNotification) {
-        guard let note = notification.userInfo?["boardState"] as? Board.State else { fatalError("Incorrect key in board state change notification")}
-        switch note {
-        case .noMovesLeft:
-            let alert = UIAlertAction(title: "No Moves Left", style: .default)
-            let alertController = UIAlertController()
-            alertController.addAction(alert)
-            self.gameSceneDelegate?.display(alert: alertController)
-        default:
-            //TODO: implement other swithc statements
-            return
-        }
-    }
+//    @objc func boardStateChange(notification: NSNotification) {
+//        guard let note = notification.userInfo?["boardState"] as? Board.BoardState else { fatalError("Incorrect key in board state change notification")}
+//        switch note {
+//        case .noMovesLeft:
+//            let alert = UIAlertAction(title: "No Moves Left", style: .default)
+//            let alertController = UIAlertController()
+//            alertController.addAction(alert)
+//            self.gameSceneDelegate?.display(alert: alertController)
+//        default:
+//            //TODO: implement other swithc statements
+//            return
+//        }
+//    }
     
 }
 
@@ -285,30 +285,8 @@ extension GameScene {
                 animating = false
             }
         }
-        let touchPoint = touch.location(in: self)
-        
-        for index in 0..<board.spriteNodes.reduce([],+).count {
-            let row = index / boardSize
-            let col = (index - row * boardSize) % boardSize
-            let tile = board.spriteNodes[col][row]
-            guard tile.contains(touchPoint), tile.isTappable() else { continue }
-            if tile.selected {
-                boardChanged(BoardChange.remove)
-            } else {
-                boardChanged(BoardChange.findNeighbors(col, row))
-            }
-            handledTouch = true
-        }
-
-        if left.contains(touchPoint) {
-            board.rotate(.left)
-            handledTouch = true
-        }
-        
-        if right.contains(touchPoint) {
-            board.rotate(.right)
-            handledTouch = true
-        }
+        board.handleInput(touch.location(in: self))
+        //TODO: handle rotate
     }
 }
 

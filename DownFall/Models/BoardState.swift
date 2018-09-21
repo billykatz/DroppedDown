@@ -16,6 +16,9 @@ struct SelectedState : BoardState {
     let selectedTiles: [TileCoord]
     
     func handleInput(_ point: CGPoint, in board: Board) -> BoardState? {
+        if let direction = board.shouldRotateDirection(point: point) {
+            return UnselectedState(currentBoard: board.rotate(direction))
+        }
         return traverse(board: board) { (tile, coord) in
             guard tile.contains(point), tile.isTappable() else { return nil }
             if tile.selected {
@@ -44,6 +47,9 @@ func traverse(board: Board,_ work: (DFTileSpriteNode, TileCoord) -> BoardState?)
 struct UnselectedState : BoardState {
     let currentBoard : [[DFTileSpriteNode]]?
     func handleInput(_ point: CGPoint, in board: Board) -> BoardState? {
+        if let direction = board.shouldRotateDirection(point: point) {
+            return UnselectedState(currentBoard: board.rotate(direction))
+        }
         return traverse(board: board) { (tile, coord) in
             guard tile.contains(point), tile.isTappable() else { return nil }
             if !tile.selected {

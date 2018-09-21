@@ -28,6 +28,7 @@ class Board {
     /// or we are still playing
     /// purposely public, so that GameScene can switch on board states
 
+    // TODO: Push new states onto top of our stack.  Undo = pop. Woo!
     private var states : [BoardState] = []
     private var _state: BoardState? {
         didSet {
@@ -44,22 +45,31 @@ class Board {
         get { return _state }
     }
     
-    func handleInput(_ point: CGPoint) {
-        guard let newState = state?.handleInput(point, in: self) else { return }
+    func handledInput(_ point: CGPoint) -> Bool {
+        guard let newState = state?.handleInput(point, in: self) else { return false }
         state = newState
+        return true
     }
     
-    init(_ tiles: [[DFTileSpriteNode]], size : Int,playerPosition playerPos: TileCoord,exitPosition exitPos: TileCoord) {
+    init(_ tiles: [[DFTileSpriteNode]],
+         size: Int,
+         playerPosition playerPos: TileCoord,
+         exitPosition exitPos: TileCoord,
+         buttons: [SKSpriteNode]) {
         spriteNodes = tiles
         selectedTiles = []
         newTiles = []
         boardSize = size
         playerPosition = playerPos
         exitPosition = exitPos
+        self.buttons = buttons
         state = UnselectedState(currentBoard: tiles)
     }
     
+    // MARK: - Notification Senders
+    
     func findNeighbors(_ x: Int, _ y: Int) -> [TileCoord] {
+        self.removeActions()
         resetVisited()
         var queue : [(Int, Int)] = [(x, y)]
         var head = 0
@@ -179,26 +189,14 @@ class Board {
         let newBoardDictionary = ["removed": selectedTiles,
                                   "newTiles": newTiles,
                                   "shiftDown": shiftDown] as [String : Any]
-        NotificationCenter.default.post(name:.computeNewBoard, object: nil, userInfo: newBoardDictionary)
+        NotificationCenter.default.post(name: .computeNewBoard, object: nil, userInfo: newBoardDictionary)
         
         return spriteNodes
     }
     
-    func getSelectedTiles() -> [TileCoord] {
-        var selected : [TileCoord] = []
-        for col in 0..<boardSize {
-            for row in 0..<boardSize {
-                if spriteNodes[row][col].selected {
-                    selected.append((row, col))
-                }
-            }
-        }
-        return selected
-    }
-    
     //  MARK: - Private
-    
 
+    private(set) var buttons: [SKSpriteNode]
     private(set) var spriteNodes : [[DFTileSpriteNode]]
     private var selectedTiles : [(Int, Int)]
     private var newTiles : [(Int, Int)]
@@ -232,13 +230,8 @@ class Board {
         }
         
     }
-}
-
-extension Board {
     
-    /// Public API that removes SKActions such as blinking and creates SKActions suckh as. blinking
-    /// TODO: Consider making these private to reduce exposure of Model beahvior to client
-    func removeActions(_ completion: (()-> Void)? = nil) {
+    private func removeActions(_ completion: (()-> Void)? = nil) {
         for i in 0..<boardSize {
             for j in 0..<spriteNodes[i].count {
                 spriteNodes[i][j].removeAllActions()
@@ -248,6 +241,11 @@ extension Board {
             }
         }
     }
+}
+
+extension Board {
+    
+    // MARK: - Public API
     
     func blinkTiles(at locations: [(Int, Int)]) {
         let blinkOff = SKAction.fadeOut(withDuration: 0.2)
@@ -294,10 +292,18 @@ extension Board {
         }
         tiles[exitRow][exitCol] = DFTileSpriteNode.init(type: .exit)
         
+        // create left and right buttons
+        let leftButton = SKSpriteNode.init(texture: SKTexture(imageNamed: "rotateLeft"))
+        leftButton.name = "leftRotate"
+        let rightButton = SKSpriteNode.init(texture: SKTexture(imageNamed: "rotateRight"))
+        rightButton.name = "rightRotate"
+        let buttons = [leftButton, rightButton]
+        
         return Board.init(tiles,
                           size: size,
                           playerPosition: (playerRow, playerCol),
-                          exitPosition: (exitRow, exitCol) )
+                          exitPosition: (exitRow, exitCol),
+                          buttons: buttons)
     }
     
     
@@ -309,12 +315,15 @@ extension Board {
 // MARK: - Rotation
 
 extension Board {
+    
     enum Direction {
         case left
         case right
     }
     
-    func rotate(_ direction: Direction) {
+    func rotate(_ direction: Direction) -> [[DFTileSpriteNode]] {
+        self.resetVisited()
+        self.removeActions()
         var transformation : [Transformation] = []
         var intermediateBoard : [[DFTileSpriteNode]] = []
         switch direction {
@@ -360,8 +369,26 @@ extension Board {
             spriteNodes = intermediateBoard
         }
         NotificationCenter.default.post(name: .rotated, object: nil, userInfo: ["transformation": transformation])
+        return intermediateBoard
     }
 
+    func shouldRotateDirection(point: CGPoint) -> Direction? {
+        for button in buttons {
+            if button.contains(point) {
+                switch button.name {
+                case "leftRotate":
+                    return .left
+                case "rightRotate":
+                    return .right
+                case .none:
+                    return nil
+                case .some(_):
+                    return nil
+                }
+            }
+        }
+        return nil
+    }
 }
 
 
@@ -431,7 +458,6 @@ extension Board {
         return nil
     }
     
-    //TODO: refactor DFS so taht we don't have this code written twice in the model
     private func boardHasMoreMoves() -> Bool {
         let count = dfs()?.count ?? 0
         return count > 2
@@ -445,9 +471,5 @@ extension Board {
     
     func getTileSize() -> Int {
         return self.tileSize
-    }
-    
-    func getExitPosition() -> TileCoord {
-        return self.exitPosition
     }
 }

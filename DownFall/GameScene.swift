@@ -49,8 +49,6 @@ class GameScene: SKScene {
     
     override func didMove(to view: SKView) {
         foreground = self.childNode(withName: "foreground")!
-        left = self.childNode(withName: "left")!
-        right = self.childNode(withName: "right")!
         addTileNodes(board.spriteNodes)
     }
     
@@ -69,27 +67,6 @@ class GameScene: SKScene {
 }
 
 extension GameScene {
-    
-    func boardChanged(_ reason: BoardChange) {
-        switch reason {
-        case .findNeighbors(let x, let y):
-            let selectedTileCount = board.getSelectedTiles().count
-            if selectedTileCount > 0 {
-                var count = 0
-                board.removeActions() { [weak self] in
-                    guard let strongSelf = self else { return }
-                    count += 1
-                    if count == selectedTileCount {
-                        strongSelf.board.findNeighbors(x, y)
-                    }
-                }
-            } else {
-                board.findNeighbors(x, y)
-            }
-        case .remove:
-            board.removeAndRefill()
-        }
-    }
 
     private func resetBoardUI() {
         let tileSize = board.getTileSize()
@@ -106,7 +83,6 @@ extension GameScene {
                 }
             }
         }
-        
         addTileNodes(self.board.spriteNodes)
     }
     
@@ -121,6 +97,15 @@ extension GameScene {
                 given[row][col].position = CGPoint.init(x: x, y: y)
                 foreground.addChild(given[row][col])
             }
+        }
+        
+        for buttonIdx in 0..<board.buttons.count {
+            //TODO: make this device indifferent
+            let button = board.buttons[buttonIdx]
+            let x = bottomLeft.0 + (300 * buttonIdx)
+            let y = bottomLeft.1 - 300
+            button.position = CGPoint.init(x: x, y: y)
+            foreground.addChild(button)
         }
     }
     
@@ -179,7 +164,6 @@ extension GameScene {
 
     @objc func neighborsFound(notification: NSNotification) {
         //neighbors found means a new search was started, so remove blinking from other groups
-        board.removeActions()
         guard let tiles = notification.userInfo?["tiles"] as? [(Int, Int)] else { fatalError("No tiles in notification") }
         board.blinkTiles(at: tiles)
         animating = false
@@ -187,7 +171,6 @@ extension GameScene {
     
     @objc func lessThanThreeNeighborsFound(notification: NSNotification) {
         //player touched a non-blinking tile, remove blinking from other groups
-        board.removeActions()
         animating = false
     }
     
@@ -285,8 +268,7 @@ extension GameScene {
                 animating = false
             }
         }
-        board.handleInput(touch.location(in: self))
-        //TODO: handle rotate
+        handledTouch = board.handledInput(touch.location(in: self))
     }
 }
 

@@ -49,8 +49,6 @@ class GameScene: SKScene {
     
     override func didMove(to view: SKView) {
         foreground = self.childNode(withName: "foreground")!
-        left = self.childNode(withName: "left")!
-        right = self.childNode(withName: "right")!
         addTileNodes(board.spriteNodes)
     }
     
@@ -59,7 +57,9 @@ class GameScene: SKScene {
         NotificationCenter.default.addObserver(self, selector: #selector(lessThanThreeNeighborsFound), name: .lessThanThreeNeighborsFound, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(rotated), name: .rotated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(computeNewBoard), name: .computeNewBoard, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(boardStateChange), name: .boardStateChange, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(gameWin), name: .gameWin, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(noMovesLeft), name: .noMovesLeft, object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(boardStateChange), name: .boardStateChange, object: nil)
     }
     
     deinit {
@@ -69,27 +69,6 @@ class GameScene: SKScene {
 }
 
 extension GameScene {
-    
-    func boardChanged(_ reason: BoardChange) {
-        switch reason {
-        case .findNeighbors(let x, let y):
-            let selectedTileCount = board.getSelectedTiles().count
-            if selectedTileCount > 0 {
-                var count = 0
-                board.removeActions() { [weak self] in
-                    guard let strongSelf = self else { return }
-                    count += 1
-                    if count == selectedTileCount {
-                        strongSelf.board.findNeighbors(x, y)
-                    }
-                }
-            } else {
-                board.findNeighbors(x, y)
-            }
-        case .remove:
-            board.removeAndRefill()
-        }
-    }
 
     private func resetBoardUI() {
         let tileSize = board.getTileSize()
@@ -106,7 +85,6 @@ extension GameScene {
                 }
             }
         }
-        
         addTileNodes(self.board.spriteNodes)
     }
     
@@ -122,6 +100,15 @@ extension GameScene {
                 foreground.addChild(given[row][col])
             }
         }
+        
+        for buttonIdx in 0..<board.buttons.count {
+            //TODO: make this device indifferent
+            let button = board.buttons[buttonIdx]
+            let x = bottomLeft.0 + (300 * buttonIdx)
+            let y = bottomLeft.1 - 300
+            button.position = CGPoint.init(x: x, y: y)
+            foreground.addChild(button)
+        }
     }
     
     private func checkBoardState() {
@@ -134,7 +121,7 @@ extension GameScene {
 // MARK: Board notifications
 
 extension GameScene {
-    @objc func computeNewBoard(notification: NSNotification) {
+    @objc private func computeNewBoard(notification: NSNotification) {
         guard let removed = notification.userInfo?["removed"] as? [TileCoord],
             let newTiles = notification.userInfo?["newTiles"] as? [Transformation],
             let shiftDown = notification.userInfo?["shiftDown"] as? [Transformation] else { fatalError("Unable to parse computed new board") }
@@ -177,21 +164,19 @@ extension GameScene {
 
     }
 
-    @objc func neighborsFound(notification: NSNotification) {
+    @objc private func neighborsFound(notification: NSNotification) {
         //neighbors found means a new search was started, so remove blinking from other groups
-        board.removeActions()
         guard let tiles = notification.userInfo?["tiles"] as? [(Int, Int)] else { fatalError("No tiles in notification") }
         board.blinkTiles(at: tiles)
         animating = false
     }
     
-    @objc func lessThanThreeNeighborsFound(notification: NSNotification) {
+    @objc private func lessThanThreeNeighborsFound(notification: NSNotification) {
         //player touched a non-blinking tile, remove blinking from other groups
-        board.removeActions()
         animating = false
     }
     
-    @objc func rotated(notification: NSNotification) {
+    @objc private func rotated(notification: NSNotification) {
         guard let transformation = notification.userInfo?["transformation"] as? [Transformation] else { fatalError("No transformations provided for rotate") }
         var animationCount = 0
         animate(transformation) { [weak self] in
@@ -204,19 +189,28 @@ extension GameScene {
         }
     }
     
-    @objc func boardStateChange(notification: NSNotification) {
-        guard let note = notification.userInfo?["boardState"] as? Board.State else { fatalError("Incorrect key in board state change notification")}
-        switch note {
-        case .noMovesLeft:
-            let alert = UIAlertAction(title: "No Moves Left", style: .default)
-            let alertController = UIAlertController()
-            alertController.addAction(alert)
-            self.gameSceneDelegate?.display(alert: alertController)
-        default:
-            //TODO: implement other swithc statements
-            return
-        }
+    @objc private func gameWin(notification: NSNotification) {
+//        guard let transformation = notification.userInfo?["transformation"] as? [Transformation] else { fatalError("No transformations provided for game win") }
+        //TODO: animate the actaull win, show a pop up and reset the board on click
     }
+    
+    @objc private func noMovesLeft(notification: NSNotification) {
+        //TODO: show a pop that no moves left and reset boar don click
+    }
+    
+//    @objc func boardStateChange(notification: NSNotification) {
+//        guard let note = notification.userInfo?["boardState"] as? Board.BoardState else { fatalError("Incorrect key in board state change notification")}
+//        switch note {
+//        case .noMovesLeft:
+//            let alert = UIAlertAction(title: "No Moves Left", style: .default)
+//            let alertController = UIAlertController()
+//            alertController.addAction(alert)
+//            self.gameSceneDelegate?.display(alert: alertController)
+//        default:
+//            //TODO: implement other swithc statements
+//            return
+//        }
+//    }
     
 }
 
@@ -285,30 +279,7 @@ extension GameScene {
                 animating = false
             }
         }
-        let touchPoint = touch.location(in: self)
-        
-        for index in 0..<board.spriteNodes.reduce([],+).count {
-            let row = index / boardSize
-            let col = (index - row * boardSize) % boardSize
-            let tile = board.spriteNodes[col][row]
-            guard tile.contains(touchPoint), tile.isTappable() else { continue }
-            if tile.selected {
-                boardChanged(BoardChange.remove)
-            } else {
-                boardChanged(BoardChange.findNeighbors(col, row))
-            }
-            handledTouch = true
-        }
-
-        if left.contains(touchPoint) {
-            board.rotate(.left)
-            handledTouch = true
-        }
-        
-        if right.contains(touchPoint) {
-            board.rotate(.right)
-            handledTouch = true
-        }
+        handledTouch = board.handledInput(touch.location(in: self))
     }
 }
 

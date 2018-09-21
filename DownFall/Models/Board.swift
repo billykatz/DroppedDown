@@ -32,7 +32,14 @@ class Board {
     private var states : [BoardState] = []
     private var _state: BoardState? {
         didSet {
-            checkGameState()
+            switch _state {
+            case .some(let state):
+                if state is UnselectedState {
+                    checkGameState()
+                }
+            case .none:
+                fatalError("This cant be")
+            }
         }
     }
     

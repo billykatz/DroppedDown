@@ -10,6 +10,7 @@
 		3D528FD22150A53600EF65CA /* BoardState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D528FD12150A53600EF65CA /* BoardState.swift */; };
 		3D528FD42150A56500EF65CA /* Notification+DF.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D528FD32150A56500EF65CA /* Notification+DF.swift */; };
 		3D528FD62154A50300EF65CA /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3D528FD52154A50300EF65CA /* GameScene.sks */; };
+		3D528FD82154B99100EF65CA /* InformationalPopUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D528FD72154B99100EF65CA /* InformationalPopUp.swift */; };
 		3D5FB09420AE768700ACD716 /* AnimationSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D5FB09320AE768700ACD716 /* AnimationSettings.swift */; };
 		3DE657CD20B0AFD2003492DA /* Int+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE657CC20B0AFD2003492DA /* Int+Extensions.swift */; };
 		3DF2924E20A37FEE006671AC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2924D20A37FEE006671AC /* AppDelegate.swift */; };
@@ -46,6 +47,7 @@
 		3D528FD12150A53600EF65CA /* BoardState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardState.swift; sourceTree = "<group>"; };
 		3D528FD32150A56500EF65CA /* Notification+DF.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notification+DF.swift"; sourceTree = "<group>"; };
 		3D528FD52154A50300EF65CA /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
+		3D528FD72154B99100EF65CA /* InformationalPopUp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InformationalPopUp.swift; sourceTree = "<group>"; };
 		3D5FB09320AE768700ACD716 /* AnimationSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationSettings.swift; sourceTree = "<group>"; };
 		3DE657CC20B0AFD2003492DA /* Int+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int+Extensions.swift"; sourceTree = "<group>"; };
 		3DF2924A20A37FEE006671AC /* DownFall.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DownFall.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -119,6 +121,7 @@
 				3DF2925120A37FEE006671AC /* Actions.sks */,
 				3D528FD52154A50300EF65CA /* GameScene.sks */,
 				3DF2925320A37FEE006671AC /* GameScene.swift */,
+				3D528FD72154B99100EF65CA /* InformationalPopUp.swift */,
 				3D5FB09320AE768700ACD716 /* AnimationSettings.swift */,
 				3DE657CC20B0AFD2003492DA /* Int+Extensions.swift */,
 				3DF2928120A66A4E006671AC /* Models */,
@@ -299,6 +302,7 @@
 				3DF2928520A76242006671AC /* Board.swift in Sources */,
 				3D528FD22150A53600EF65CA /* BoardState.swift in Sources */,
 				3D528FD42150A56500EF65CA /* Notification+DF.swift in Sources */,
+				3D528FD82154B99100EF65CA /* InformationalPopUp.swift in Sources */,
 				3DE657CD20B0AFD2003492DA /* Int+Extensions.swift in Sources */,
 				3DF2924E20A37FEE006671AC /* AppDelegate.swift in Sources */,
 				3DF2928320A66BEB006671AC /* Tile.swift in Sources */,

@@ -59,7 +59,6 @@ class GameScene: SKScene {
         NotificationCenter.default.addObserver(self, selector: #selector(computeNewBoard), name: .computeNewBoard, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(gameWin), name: .gameWin, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(noMovesLeft), name: .noMovesLeft, object: nil)
-//        NotificationCenter.default.addObserver(self, selector: #selector(boardStateChange), name: .boardStateChange, object: nil)
     }
     
     deinit {
@@ -197,21 +196,6 @@ extension GameScene {
     @objc private func noMovesLeft(notification: NSNotification) {
         //TODO: show a pop that no moves left and reset boar don click
     }
-    
-//    @objc func boardStateChange(notification: NSNotification) {
-//        guard let note = notification.userInfo?["boardState"] as? Board.BoardState else { fatalError("Incorrect key in board state change notification")}
-//        switch note {
-//        case .noMovesLeft:
-//            let alert = UIAlertAction(title: "No Moves Left", style: .default)
-//            let alertController = UIAlertController()
-//            alertController.addAction(alert)
-//            self.gameSceneDelegate?.display(alert: alertController)
-//        default:
-//            //TODO: implement other swithc statements
-//            return
-//        }
-//    }
-    
 }
 
 //MARK: Transformation Animation

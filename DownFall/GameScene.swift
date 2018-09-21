@@ -57,6 +57,8 @@ class GameScene: SKScene {
         NotificationCenter.default.addObserver(self, selector: #selector(lessThanThreeNeighborsFound), name: .lessThanThreeNeighborsFound, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(rotated), name: .rotated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(computeNewBoard), name: .computeNewBoard, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(gameWin), name: .gameWin, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(noMovesLeft), name: .noMovesLeft, object: nil)
 //        NotificationCenter.default.addObserver(self, selector: #selector(boardStateChange), name: .boardStateChange, object: nil)
     }
     
@@ -119,7 +121,7 @@ extension GameScene {
 // MARK: Board notifications
 
 extension GameScene {
-    @objc func computeNewBoard(notification: NSNotification) {
+    @objc private func computeNewBoard(notification: NSNotification) {
         guard let removed = notification.userInfo?["removed"] as? [TileCoord],
             let newTiles = notification.userInfo?["newTiles"] as? [Transformation],
             let shiftDown = notification.userInfo?["shiftDown"] as? [Transformation] else { fatalError("Unable to parse computed new board") }
@@ -162,19 +164,19 @@ extension GameScene {
 
     }
 
-    @objc func neighborsFound(notification: NSNotification) {
+    @objc private func neighborsFound(notification: NSNotification) {
         //neighbors found means a new search was started, so remove blinking from other groups
         guard let tiles = notification.userInfo?["tiles"] as? [(Int, Int)] else { fatalError("No tiles in notification") }
         board.blinkTiles(at: tiles)
         animating = false
     }
     
-    @objc func lessThanThreeNeighborsFound(notification: NSNotification) {
+    @objc private func lessThanThreeNeighborsFound(notification: NSNotification) {
         //player touched a non-blinking tile, remove blinking from other groups
         animating = false
     }
     
-    @objc func rotated(notification: NSNotification) {
+    @objc private func rotated(notification: NSNotification) {
         guard let transformation = notification.userInfo?["transformation"] as? [Transformation] else { fatalError("No transformations provided for rotate") }
         var animationCount = 0
         animate(transformation) { [weak self] in
@@ -185,6 +187,15 @@ extension GameScene {
                 strongSelf.animating = false
             }
         }
+    }
+    
+    @objc private func gameWin(notification: NSNotification) {
+//        guard let transformation = notification.userInfo?["transformation"] as? [Transformation] else { fatalError("No transformations provided for game win") }
+        //TODO: animate the actaull win, show a pop up and reset the board on click
+    }
+    
+    @objc private func noMovesLeft(notification: NSNotification) {
+        //TODO: show a pop that no moves left and reset boar don click
     }
     
 //    @objc func boardStateChange(notification: NSNotification) {

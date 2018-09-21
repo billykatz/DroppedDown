@@ -32,7 +32,7 @@ class Board {
     private var states : [BoardState] = []
     private var _state: BoardState? {
         didSet {
-            //TODO: check for no moves, a win, maybe attacks?
+            checkGameState()
         }
     }
     
@@ -396,15 +396,14 @@ extension Board {
 
 extension Board {
     func checkGameState() {
-//        if checkWinCondition() {
-//            //send game win notification
-//            _state = .win
-//        } else if !boardHasMoreMoves() {
-//            //send no more moves notification
-//            _state = .noMovesLeft
-//        }
-//        //if nothing else, then we are just playing
-//        _state = .playing
+        if checkWinCondition() {
+            //send game win notification
+            let trans = Transformation(initial: playerPosition, end: exitPosition)
+            NotificationCenter.default.post(name: .gameWin, object: nil, userInfo: ["transformation": [trans]])
+        } else if !boardHasMoreMoves() {
+            //send no more moves notification
+            NotificationCenter.default.post(name: .noMovesLeft, object: nil)
+        }
     }
     
     private func checkWinCondition() -> Bool {

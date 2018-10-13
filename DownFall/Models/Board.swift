@@ -314,7 +314,10 @@ extension Board {
     }
     
     
-    func reset() -> Board {
+    /*
+     Only to be used by settings button.  This is a quick reset for debugging purposes
+     */
+    func resetNoMoreMoves() -> Board {
         return Board.build(size: boardSize, playerPosition: playerPosition, exitPosition: exitPosition)
     }
 }

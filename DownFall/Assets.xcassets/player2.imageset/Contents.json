@@ -2,17 +2,17 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "arrow-right.png",
+      "filename" : "Burly-person-v2-2.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
-      "filename" : "arrow-right@2x.png",
+      "filename" : "Burly-person-v2-2@2x.png",
       "scale" : "2x"
     },
     {
       "idiom" : "universal",
-      "filename" : "arrow-right@3x.png",
+      "filename" : "Burly-person-v2-2@3x.png",
       "scale" : "3x"
     }
   ],

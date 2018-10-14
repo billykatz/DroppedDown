@@ -13,35 +13,12 @@ import GameplayKit
 class GameViewController: UIViewController {
 
     private var gameSceneNode: GameScene?
+    private var menuScene: Menu?
+    private var boardSize = 4
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        // Load 'GameScene.sks' as a GKScene. This provides gameplay related content
-        // including entities and graphs.
-        if let scene = GKScene(fileNamed: "GameScene") {
-            
-            // Get the SKScene from the loaded GKScene
-            if let sceneNode = scene.rootNode as! GameScene? {
-                gameSceneNode = sceneNode
-                // Copy gameplay related content over to the scene
-                // Set the scale mode to scale to fit the window
-                gameSceneNode!.scaleMode = .aspectFill
-                
-                gameSceneNode!.gameSceneDelegate = self
-                
-                // Present the scene
-                if let view = self.view as! SKView? {
-                    view.presentScene(sceneNode)
-                    
-                    view.ignoresSiblingOrder = true
-                    
-                    view.showsFPS = true
-                    view.showsNodeCount = true
-                    
-                }
-            }
-        }
+        startLevel()
     }
 
     override var shouldAutorotate: Bool {
@@ -66,10 +43,58 @@ class GameViewController: UIViewController {
     }
 }
 
+extension GameViewController {
+    func startLevel() {
+        if let scene = GKScene(fileNamed: "GameScene")?.rootNode as? GameScene {
+            gameSceneNode = scene
+            gameSceneNode!.scaleMode = .aspectFill
+            gameSceneNode!.gameSceneDelegate = self
+            gameSceneNode!.commonInit(boardSize: boardSize)
+            
+            if let view = self.view as! SKView? {
+                view.presentScene(gameSceneNode)
+                view.ignoresSiblingOrder = true
+                
+                //Debug settings
+                //TODO: remove for release
+                view.showsFPS = true
+                view.showsNodeCount = true
+                
+            }
+        }
+    }
+}
+
+
+// MARK: - MenuDelegate
+extension GameViewController: MenuDelegate {
+    func didTapPrimary() {
+        startLevel()
+    }
+    
+    func didTapSecondary() {
+        //TODO: implement secondary button
+        print("did tap secondary")
+    }
+}
+
 extension GameViewController: GameSceneDelegate {
-    func display(alert: UIAlertController) {
-        self.present(alert, animated: true) {
-            self.gameSceneNode?.reset()
+    func shouldShowMenu(win: Bool) {
+        menuScene = nil
+        gameSceneNode = nil
+        guard let view = self.view as? SKView else { return }
+        if win {
+            boardSize += 1
+            let menu = SKScene(fileNamed: "Menu") as! Menu
+            menu.menuDelegate = self
+            menuScene = menu
+            view.presentScene(menuScene)
+            menuScene?.configure(title: "You Won :)", primary: "Play Again?", secondary: nil, delegate: self)
+        } else {
+            boardSize -= 1
+            view.presentScene(menuScene)
+            gameSceneNode = nil
+            menuScene?.configure(title: "You Lost :(", primary: "Play Again?", secondary: nil, delegate: self)
         }
     }
 }

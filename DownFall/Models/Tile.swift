@@ -66,7 +66,7 @@ enum TextureName : String {
     case black = "blackRock"
     case green = "greenRock"
     case empty = "emptyTexture"
-    case player = "player"
+    case player = "player2"
     case exit = "exit"
     
     static let allValues = [blue, black, green, empty, player, exit]

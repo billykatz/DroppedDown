@@ -83,7 +83,6 @@ class Board {
         
         while head < queue.count {
             let (tileRow, tileCol) = queue[head]
-            spriteNodes[tileRow][tileCol].selected = true
             let tileSpriteNode = spriteNodes[tileRow][tileCol]
             tileSpriteNode.search = .black
             head += 1
@@ -95,7 +94,6 @@ class Board {
                         let neighbor = spriteNodes[i][j]
                         if neighbor.search == .white {
                             if neighbor == tileSpriteNode {
-                                spriteNodes[i][j].selected = true
                                 neighbor.search = .gray
                                 queue.append((i,j))
                             }
@@ -108,16 +106,6 @@ class Board {
         if queue.count >= 3 {
             let note = Notification.init(name: .neighborsFound, object: nil, userInfo: ["tiles":selectedTiles])
             NotificationCenter.default.post(note)
-        } else {
-            //clear selectedTiles so that tiles in groups of 1 or 2 do not think they are selected
-            for (row, col) in selectedTiles {
-                spriteNodes[row][col].selected = false
-            }
-            
-            //let anyone listening know that we did not find enough neighbors
-            let note = Notification.init(name: .lessThanThreeNeighborsFound, object: nil, userInfo: nil)
-            NotificationCenter.default.post(note)
-            
         }
         
         return queue
@@ -231,7 +219,6 @@ class Board {
     private func resetVisited() {
         for row in 0..<boardSize {
             for col in 0..<boardSize {
-                spriteNodes[row][col].selected = false
                 spriteNodes[row][col].search = .white
             }
         }
@@ -451,13 +438,11 @@ extension Board {
             while head < queue.count {
                 guard queue.count < 3 else { return queue } // once neighbors is more than 3, then we know that the original tile + these two neighbors means there is a legal move left
                 let (tileRow, tileCol) = queue[head]
-                spriteNodes[tileRow][tileCol].selected = true
                 let tileSpriteNode = spriteNodes[tileRow][tileCol]
                 tileSpriteNode.search = .black
                 head += 1
                 //add neighbors to queue
                 for (i, j) in similarNeighborsOf(coords: (tileRow, tileCol)) {
-                    spriteNodes[i][j].selected = true
                     spriteNodes[i][j].search = .gray
                     queue.append((i,j))
                 }

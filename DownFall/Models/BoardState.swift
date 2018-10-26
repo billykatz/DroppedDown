@@ -12,26 +12,6 @@ protocol BoardState {
     func handleInput(_ point: CGPoint, in board: Board) -> BoardState?
 }
 
-struct SelectedState : BoardState {
-    let selectedTiles: [TileCoord]
-    
-    func handleInput(_ point: CGPoint, in board: Board) -> BoardState? {
-        if let direction = board.shouldRotateDirection(point: point) {
-            return UnselectedState(currentBoard: board.rotate(direction))
-        }
-        return traverse(board: board) { (tile, coord) in
-            guard tile.contains(point), tile.isTappable() else { return nil }
-            if tile.selected {
-                //return a standard state after removing and refilling
-                return UnselectedState(currentBoard: board.removeAndRefill(selectedTiles: selectedTiles))
-            } else {
-                //return a new Selected State with new selected tiles
-                return SelectedState(selectedTiles: board.findNeighbors(coord.0, coord.1))
-            }
-        }
-    }
-}
-
 func traverse(board: Board,_ work: (DFTileSpriteNode, TileCoord) -> BoardState?) -> BoardState? {
     for index in 0..<board.spriteNodes.reduce([],+).count {
         let row = index / board.boardSize
@@ -52,9 +32,10 @@ struct UnselectedState : BoardState {
         }
         return traverse(board: board) { (tile, coord) in
             guard tile.contains(point), tile.isTappable() else { return nil }
-            if !tile.selected {
+            let neighbors = board.findNeighbors(coord.0, coord.1)
+            if neighbors.count > 2 {
                 //return a standard state after removing and refilling
-                return SelectedState(selectedTiles: board.findNeighbors(coord.0, coord.1))
+                return UnselectedState(currentBoard: board.removeAndRefill(selectedTiles: neighbors))
             }
             return nil
         }

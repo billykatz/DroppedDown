@@ -80,10 +80,8 @@ extension DFTileSpriteNode: Tappable {
 
 class DFTileSpriteNode : SKSpriteNode {
     
-    
     var type : Type
     var search : Search
-    var selected : Bool = false
     
     init(type: Type, search: Search = .white) {
         self.type = type

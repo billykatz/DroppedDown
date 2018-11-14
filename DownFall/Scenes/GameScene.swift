@@ -15,7 +15,11 @@ protocol GameSceneDelegate: class {
 class GameScene: SKScene {
     
     private var boardSize: Int?
-    private var board: Board?
+    private var board: Board? {
+        didSet {
+            // TODO: animate change render board
+        }
+    }
     
     //coordinates
     private var bottomLeft: (Int, Int)?
@@ -51,7 +55,6 @@ class GameScene: SKScene {
         bottomLeft = (-1 * tileSize/2 * bsize, -1 * tileSize/2 * bsize )
         self.boardSize = bsize
         
-        NotificationCenter.default.addObserver(self, selector: #selector(neighborsFound), name: .neighborsFound, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(lessThanThreeNeighborsFound), name: .lessThanThreeNeighborsFound, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(rotated), name: .rotated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(computeNewBoard), name: .computeNewBoard, object: nil)
@@ -169,13 +172,6 @@ extension GameScene {
             }
         }
 
-    }
-
-    @objc private func neighborsFound(notification: NSNotification) {
-        //neighbors found means a new search was started, so remove blinking from other groups
-        guard let tiles = notification.userInfo?["tiles"] as? [(Int, Int)] else { fatalError("No tiles in notification") }
-        board?.blinkTiles(at: tiles)
-        animating = false
     }
     
     @objc private func lessThanThreeNeighborsFound(notification: NSNotification) {
@@ -296,7 +292,7 @@ extension GameScene {
             self.reset()
             return
         }
-        handledTouch = board?.handledInput(touch.location(in: self)) ?? false
+        board = board?.handledInput(touch.location(in: self))
     }
 }
 

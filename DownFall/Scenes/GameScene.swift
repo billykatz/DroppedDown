@@ -28,8 +28,8 @@ class GameScene: SKScene {
     private var foreground: SKNode!
     
     //buttons
-    private var left: SKNode!
-    private var right: SKNode!
+    private var rotateLeft: SKNode!
+    private var rotateRight: SKNode!
     private var setting: SKNode!
 
     //animating
@@ -46,6 +46,8 @@ class GameScene: SKScene {
     override func didMove(to view: SKView) {
         foreground = self.childNode(withName: "foreground")!
         setting = self.childNode(withName: "setting")!
+        rotateRight = self.childNode(withName: "rotateRight")!
+        rotateLeft = self.childNode(withName: "rotateLeft")!
         addTileNodes()
     }
     
@@ -106,15 +108,6 @@ extension GameScene {
                 spriteNodes[row][col].position = CGPoint.init(x: x, y: y)
                 foreground.addChild(spriteNodes[row][col])
             }
-        }
-        
-        for buttonIdx in 0..<board.buttons.count {
-            //TODO: make this device indifferent
-            let button = board.buttons[buttonIdx]
-            let x = bottomLeft.0 + (300 * buttonIdx)
-            let y = bottomLeft.1 - 300
-            button.position = CGPoint.init(x: x, y: y)
-            foreground.addChild(button)
         }
     }
     
@@ -291,8 +284,14 @@ extension GameScene {
         if setting.contains(touch.location(in: self)) {
             self.reset()
             return
+        } else if rotateRight.contains(touch.location(in: self)) {
+            board = board?.rotate(.right)
+            return
+        } else if rotateLeft.contains(touch.location(in:self)) {
+            board = board?.rotate(.left)
+            return
         }
-        board = board?.handledInput(touch.location(in: self))
+        board = board?.handleInput(touch.location(in: self))
     }
 }
 

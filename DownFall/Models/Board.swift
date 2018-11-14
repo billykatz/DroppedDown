@@ -17,39 +17,6 @@ struct Transformation {
 typealias TileCoord = (Int, Int)
 
 struct Board {
-
-    //  MARK: - Public
-    
-    /// After every move we want to check the State of the board
-    /// It is possible that we have won (reached the exit)
-    /// Lost, by losing health or running out of turns
-    /// have no moves left
-    /// or we are still playing
-    /// purposely public, so that GameScene can switch on board states
-
-    // TODO: Push new states onto top of our stack.  Undo = pop. Woo!
-    private var states : [BoardState] = []
-    private var _state: BoardState? {
-        didSet {
-            switch _state {
-            case .some(let state):
-                if state is UnselectedState {
-                    checkGameState()
-                }
-            case .none:
-                fatalError("This cant be")
-            }
-        }
-    }
-    
-    var state: BoardState? {
-        set {
-            guard let newValue = newValue else { return }
-            states.append(newValue)
-            _state = newValue
-        }
-        get { return _state }
-    }
     
     func traverse(board: Board,_ work: (DFTileSpriteNode, TileCoord) -> Board?) -> Board? {
         for index in 0..<board.spriteNodes.reduce([],+).count {

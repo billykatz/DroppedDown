@@ -7,7 +7,6 @@
 //
 
 import NotificationCenter
-import SpriteKit
 
 struct Transformation {
     let initial : (Int, Int)
@@ -31,9 +30,6 @@ struct Board {
     }
     
     func handleInputHelper(_ point: CGPoint) -> Board? {
-        if let direction = self.shouldRotateDirection(point: point) {
-            return self.rotate(direction)
-        }
         return traverse(board: self) { (tile, coord) in
             guard tile.contains(point), tile.isTappable() else { return nil }
             return self.findNeighbors(coord.0, coord.1)
@@ -41,7 +37,7 @@ struct Board {
     }
 
     
-    func handledInput(_ point: CGPoint) -> Board {
+    func handleInput(_ point: CGPoint) -> Board {
         return handleInputHelper(point) ?? self
     }
     
@@ -49,7 +45,6 @@ struct Board {
          size: Int,
          playerPosition playerPos: TileCoord,
          exitPosition exitPos: TileCoord,
-         buttons: [SKSpriteNode],
          selectedTiles: [(TileCoord)]) {
         spriteNodes = tiles
         self.selectedTiles = selectedTiles
@@ -57,7 +52,6 @@ struct Board {
         boardSize = size
         playerPosition = playerPos
         exitPosition = exitPos
-        self.buttons = buttons
     }
     
     /// This method is mostly for convenience and allows us to carry state over
@@ -65,13 +59,11 @@ struct Board {
                    size: Int? = nil,
                    playerPosition: TileCoord? = nil,
                    exitPosition: TileCoord? = nil,
-                   buttons: [SKSpriteNode]? = nil,
                    selectedTiles: [(TileCoord)]? = nil) -> Board {
         return Board.init(tiles ?? self.spriteNodes,
                           size: size ?? self.boardSize,
                           playerPosition: playerPosition ?? self.playerPosition,
                           exitPosition: exitPosition ?? self.exitPosition,
-                          buttons: buttons ?? self.buttons,
                           selectedTiles: selectedTiles ?? self.selectedTiles)
     }
     
@@ -196,7 +188,6 @@ struct Board {
     
     //  MARK: - Private
 
-    private(set) var buttons: [SKSpriteNode]
     private(set) var spriteNodes : [[DFTileSpriteNode]]
     public var selectedTiles : [(Int, Int)]
     private var newTiles : [(Int, Int)]
@@ -229,33 +220,6 @@ struct Board {
         }
         
     }
-    
-    private func removeActions(_ completion: (()-> Void)? = nil) {
-        for i in 0..<boardSize {
-            for j in 0..<spriteNodes[i].count {
-                spriteNodes[i][j].removeAllActions()
-                spriteNodes[i][j].run(SKAction.fadeIn(withDuration: 0.2)) {
-                    completion?()
-                }
-            }
-        }
-    }
-}
-
-extension Board {
-    
-    // MARK: - Public API
-    
-    func blinkTiles(at locations: [(Int, Int)]) {
-        let blinkOff = SKAction.fadeOut(withDuration: 0.2)
-        let blinkOn = SKAction.fadeIn(withDuration: 0.2)
-        let blink = SKAction.repeatForever(SKAction.sequence([blinkOn, blinkOff]))
-        
-        for locale in locations {
-            spriteNodes[locale.0][locale.1].run(blink)
-        }
-    }
-
 }
 
 //MARK: - Factory
@@ -291,18 +255,10 @@ extension Board {
         }
         tiles[exitRow][exitCol] = DFTileSpriteNode.init(type: .exit)
         
-        // create left and right buttons
-        let leftButton = SKSpriteNode.init(texture: SKTexture(imageNamed: "rotateLeft"))
-        leftButton.name = "leftRotate"
-        let rightButton = SKSpriteNode.init(texture: SKTexture(imageNamed: "rotateRight"))
-        rightButton.name = "rightRotate"
-        let buttons = [leftButton, rightButton]
-        
         return Board.init(tiles,
                           size: size,
                           playerPosition: (playerRow, playerCol),
                           exitPosition: (exitRow, exitCol),
-                          buttons: buttons,
                           selectedTiles: [])
     }
     
@@ -325,8 +281,6 @@ extension Board {
     }
     
     func rotate(_ direction: Direction) -> Board {
-        self.resetVisited()
-        self.removeActions()
         var transformation: [Transformation] = []
         var intermediateBoard: [[DFTileSpriteNode]] = []
         
@@ -379,24 +333,7 @@ extension Board {
                               selectedTiles: [])
     }
 
-    func shouldRotateDirection(point: CGPoint) -> Direction? {
-        for button in buttons {
-            if button.contains(point) {
-                switch button.name {
-                case "leftRotate":
-                    return .left
-                case "rightRotate":
-                    return .right
-                case .none:
-                    return nil
-                case .some(_):
-                    return nil
-                }
-            }
-        }
-        return nil
     }
-}
 
 
 //MARK: - Check Board Game State

@@ -98,7 +98,6 @@ class DownFallTests: XCTestCase {
                                size: 3,
                                playerPosition: (0,0),
                                exitPosition: (0,1),
-                               buttons: [],
                                selectedTiles: [])
         
         let newBoard = board.findNeighbors(1,1)
@@ -115,7 +114,6 @@ class DownFallTests: XCTestCase {
                                size: tiles.count,
                                playerPosition: (0,0),
                                exitPosition: (0,1),
-                               buttons: [],
                                selectedTiles: [])
         let newBoard = board.findNeighbors(1,1)
         XCTAssert(board == newBoard, "No neighbors found, inital and after board should be equal")
@@ -130,7 +128,6 @@ class DownFallTests: XCTestCase {
                                size: tiles.count,
                                playerPosition: (0,0),
                                exitPosition: (0,1),
-                               buttons: [],
                                selectedTiles: [])
         let newBoard = board.findNeighbors(-1,-1)
         XCTAssert(board == newBoard, "Invalid input, inital and after board should be equal")
@@ -150,14 +147,12 @@ class DownFallTests: XCTestCase {
                                      size: tiles.count,
                                      playerPosition: (0,0),
                                      exitPosition: (0,1),
-                                     buttons: [],
                                      selectedTiles: [])
         
         let expectedRotatedBoard = Board.init(mockTiles(rotatedTiles),
                                               size: rotatedTiles.count,
                                               playerPosition: (0,2),
                                               exitPosition: (1,2),
-                                              buttons: [],
                                               selectedTiles: [])
         
         let acutalRotatedBoard = initalBoard.rotate(.left)
@@ -179,14 +174,12 @@ class DownFallTests: XCTestCase {
                                      size: tiles.count,
                                      playerPosition: (0,0),
                                      exitPosition: (0,1),
-                                     buttons: [],
                                      selectedTiles: [])
         
         let expectedRotatedBoard = Board.init(mockTiles(rotatedTiles),
                                               size: rotatedTiles.count,
                                               playerPosition: (2,0),
                                               exitPosition: (1,0),
-                                              buttons: [],
                                               selectedTiles: [])
         
         let acutalRotatedBoard = initalBoard.rotate(.right)

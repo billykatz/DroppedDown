@@ -9,7 +9,6 @@
 import Foundation
 
 extension Notification.Name {
-    static let neighborsFound = Notification.Name("neighborsFound")
     static let rotated = Notification.Name("rotated")
     static let computeNewBoard = Notification.Name("computeNewBoard")
     static let lessThanThreeNeighborsFound = Notification.Name("lessThanThreeNeighborsFound")

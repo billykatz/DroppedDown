@@ -9,6 +9,11 @@
 import NotificationCenter
 
 struct Transformation {
+    let endBoard: Board
+    var tileTransformation: [[TileTransformation]]?
+}
+
+struct TileTransformation {
     let initial : (Int, Int)
     let end : (Int, Int)
 }
@@ -17,28 +22,37 @@ typealias TileCoord = (Int, Int)
 
 struct Board {
     
-    func traverse(board: Board,_ work: (DFTileSpriteNode, TileCoord) -> Board?) -> Board? {
-        for index in 0..<board.spriteNodes.reduce([],+).count {
-            let row = index / board.boardSize
-            let col = (index - row * board.boardSize) % board.boardSize
-            let tile = board.spriteNodes[row][col]
-            if let board = work(tile, (row, col)) {
-                return board
+//    private func traverse(board: Board,_ work: (DFTileSpriteNode, TileCoord) -> Transformation?) {
+//        for index in 0..<board.spriteNodes.reduce([],+).count {
+//            let row = index / board.boardSize
+//            let col = (index - row * board.boardSize) % board.boardSize
+//            let tile = board.spriteNodes[row][col]
+//            work(tile, (row, col))
+//        }
+//    }
+//
+    private func handleInputHelper(_ point: CGPoint) -> Transformation {
+        var outs: Transformation?
+        for index in 0..<self.spriteNodes.reduce([],+).count {
+            let row = index / boardSize
+            let col = (index - row * boardSize) % boardSize
+            let tile = spriteNodes[row][col]
+            if tile.contains(point), tile.isTappable() {
+                outs = self.removeAndReplace(row: row, col: col)
             }
         }
-        return nil
+        return outs ?? Transformation(endBoard: self, tileTransformation: nil)
     }
     
-    func handleInputHelper(_ point: CGPoint) -> Board? {
-        return traverse(board: self) { (tile, coord) in
-            guard tile.contains(point), tile.isTappable() else { return nil }
-            return self.findNeighbors(coord.0, coord.1)
+    func handle(input: Input) -> Transformation {
+        switch input {
+        case .rotateLeft:
+            return self.rotate(.left)
+        case .rotateRight:
+            return self.rotate(.right)
+        case .touch(let point):
+            return handleInputHelper(point)
         }
-    }
-
-    
-    func handleInput(_ point: CGPoint) -> Board {
-        return handleInputHelper(point) ?? self
     }
     
     init(_ tiles: [[DFTileSpriteNode]],
@@ -55,7 +69,7 @@ struct Board {
     }
     
     /// This method is mostly for convenience and allows us to carry state over
-    func mergeInit(tiles: [[DFTileSpriteNode]]? = nil,
+    private func mergeInit(tiles: [[DFTileSpriteNode]]? = nil,
                    size: Int? = nil,
                    playerPosition: TileCoord? = nil,
                    exitPosition: TileCoord? = nil,
@@ -67,13 +81,13 @@ struct Board {
                           selectedTiles: selectedTiles ?? self.selectedTiles)
     }
     
-    // MARK: - Notification Senders
-    
     /// Find all contiguous neighbors of the same color as the tile that was tapped
     /// Return a new board with the selectedTiles updated
     
-    func findNeighbors(_ x: Int, _ y: Int) -> Board {
-        guard x > 0 && x < boardSize && y > 0 && y < boardSize else { return self }
+    private func findNeighbors(_ x: Int, _ y: Int) -> [TileCoord]? {
+        guard x > 0 && x < boardSize && y > 0 && y < boardSize else {
+            return nil
+        }
         var queue : [(Int, Int)] = [(x, y)]
         var head = 0
         
@@ -98,7 +112,7 @@ struct Board {
                 }
             }
         }
-        return self.mergeInit(selectedTiles: queue)
+        return queue
     }
     
     
@@ -111,8 +125,11 @@ struct Board {
      *  - sends Notification with three dictionarys, removed tiles, new tiles, and which have shifted down
     */
 
-    func removeAndRefill() -> Board {
-        guard selectedTiles.count > 2 else { return self }
+    func removeAndReplace(row x: Int, col y: Int) -> Transformation {
+        guard let selectedTiles = self.findNeighbors(x, y),
+            selectedTiles.count > 2 else {
+            return Transformation(endBoard: self, tileTransformation: nil)
+        }
         var intermediateSpriteNodes = spriteNodes
         for (row, col) in selectedTiles {
             intermediateSpriteNodes[row][col] = DFTileSpriteNode.init(type: .empty)
@@ -121,8 +138,8 @@ struct Board {
         var newPlayerPosition: TileCoord?
         var newExitPosition: TileCoord?
         
-        var shiftDown : [Transformation] = []
-        var newTiles : [Transformation] = []
+        var shiftDown : [TileTransformation] = []
+        var newTiles : [TileTransformation] = []
         for col in 0..<boardSize {
             var shift = 0
             for row in 0..<boardSize {
@@ -138,7 +155,7 @@ struct Board {
                         } else if spriteNodes[row][col].type == .exit {
                             newExitPosition = (endRow, endCol)
                         }
-                        let trans = Transformation.init(initial: (row, col), end: (endRow, endCol))
+                        let trans = TileTransformation.init(initial: (row, col), end: (endRow, endCol))
                         shiftDown.append(trans)
 
                         //update sprite storage
@@ -163,27 +180,22 @@ struct Board {
                 intermediateSpriteNodes[endRow][endCol] = DFTileSpriteNode.randomRock()
                 
                 //append to shift dictionary
-                var trans = Transformation.init(initial: (startRow, startCol),
+                var trans = TileTransformation.init(initial: (startRow, startCol),
                                                 end: (endRow, endCol))
                 shiftDown.append(trans)
                 
                 //update new tiles
-                trans = Transformation.init(initial: (startRow, startCol),
+                trans = TileTransformation.init(initial: (startRow, startCol),
                                             end: (endRow, endCol))
                 newTiles.append(trans)
             }
         }
-        
-        //build notification dictionary
-        let newBoardDictionary = ["removed": selectedTiles,
-                                  "newTiles": newTiles,
-                                  "shiftDown": shiftDown] as [String : Any]
-        NotificationCenter.default.post(name: .computeNewBoard, object: nil, userInfo: newBoardDictionary)
-        
-        return self.mergeInit(tiles: intermediateSpriteNodes,
-                              playerPosition: newPlayerPosition,
-                              exitPosition: newExitPosition,
-                              selectedTiles: [])
+        let selectedTilesTransformation = selectedTiles.map { TileTransformation(initial: ($0.0, $0.1), end: ($0.0, $0.1)) }
+        return Transformation(endBoard: self.mergeInit(tiles: intermediateSpriteNodes,
+                                                       playerPosition: newPlayerPosition,
+                                                       exitPosition: newExitPosition,
+                                                       selectedTiles: []),
+                              tileTransformation: [selectedTilesTransformation, newTiles, shiftDown])
     }
     
     //  MARK: - Private
@@ -192,7 +204,7 @@ struct Board {
     public var selectedTiles : [(Int, Int)]
     private var newTiles : [(Int, Int)]
     
-    private(set) var boardSize: Int = 0
+    private var boardSize: Int = 0
     
     private var tileSize = 75
     
@@ -280,8 +292,8 @@ extension Board {
         case right
     }
     
-    func rotate(_ direction: Direction) -> Board {
-        var transformation: [Transformation] = []
+    private func rotate(_ direction: Direction) -> Transformation {
+        var transformation: [TileTransformation] = []
         var intermediateBoard: [[DFTileSpriteNode]] = []
         
         var newPlayerPosition: (TileCoord)?
@@ -301,7 +313,7 @@ extension Board {
                         newExitPosition = (endRow, endCol)
                     }
                     column.insert(spriteNodes[rowIdx][colIdx], at: 0)
-                    let trans = Transformation.init(initial: (rowIdx, colIdx), end: (endRow, endCol))
+                    let trans = TileTransformation.init(initial: (rowIdx, colIdx), end: (endRow, endCol))
                     transformation.append(trans)
                     count += 1
                 }
@@ -320,20 +332,20 @@ extension Board {
                         newExitPosition = (endRow, endCol)
                     }
                     column.append(spriteNodes[rowIdx][colIdx])
-                    let trans = Transformation.init(initial: (rowIdx, colIdx), end: (endRow, endCol))
+                    let trans = TileTransformation.init(initial: (rowIdx, colIdx), end: (endRow, endCol))
                     transformation.append(trans)
                 }
                 intermediateBoard.append(column)
             }
         }
-        NotificationCenter.default.post(name: .rotated, object: nil, userInfo: ["transformation": transformation])
-        return self.mergeInit(tiles: intermediateBoard,
+        let board = self.mergeInit(tiles: intermediateBoard,
                               playerPosition: newPlayerPosition,
                               exitPosition: newExitPosition,
                               selectedTiles: [])
-    }
+        return Transformation(endBoard: board, tileTransformation: [transformation])
 
     }
+}
 
 
 //MARK: - Check Board Game State
@@ -342,7 +354,7 @@ extension Board {
     func checkGameState() {
         if checkWinCondition() {
             //send game win notification
-            let trans = Transformation(initial: playerPosition, end: exitPosition)
+            let trans = TileTransformation(initial: playerPosition, end: exitPosition)
             NotificationCenter.default.post(name: .gameWin, object: nil, userInfo: ["transformation": [trans]])
         } else if !boardHasMoreMoves() {
             //send no more moves notification

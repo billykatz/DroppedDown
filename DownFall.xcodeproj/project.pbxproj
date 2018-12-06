@@ -13,6 +13,7 @@
 		3D528FDC2155B15D00EF65CA /* Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D528FDB2155B15D00EF65CA /* Menu.swift */; };
 		3D528FDF2155BD7300EF65CA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3D528FDE2155BD7200EF65CA /* Assets.xcassets */; };
 		3D5FB09420AE768700ACD716 /* AnimationSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D5FB09320AE768700ACD716 /* AnimationSettings.swift */; };
+		3DAFBD3721B8E6E7009B116A /* InputQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DAFBD3621B8E6E7009B116A /* InputQueue.swift */; };
 		3DE657CD20B0AFD2003492DA /* Int+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE657CC20B0AFD2003492DA /* Int+Extensions.swift */; };
 		3DF2924E20A37FEE006671AC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2924D20A37FEE006671AC /* AppDelegate.swift */; };
 		3DF2925420A37FEE006671AC /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2925320A37FEE006671AC /* GameScene.swift */; };
@@ -49,6 +50,7 @@
 		3D528FDB2155B15D00EF65CA /* Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Menu.swift; sourceTree = "<group>"; };
 		3D528FDE2155BD7200EF65CA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3D5FB09320AE768700ACD716 /* AnimationSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationSettings.swift; sourceTree = "<group>"; };
+		3DAFBD3621B8E6E7009B116A /* InputQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = InputQueue.swift; path = DownFall/Models/InputQueue.swift; sourceTree = SOURCE_ROOT; };
 		3DE657CC20B0AFD2003492DA /* Int+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int+Extensions.swift"; sourceTree = "<group>"; };
 		3DF2924A20A37FEE006671AC /* DownFall.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DownFall.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3DF2924D20A37FEE006671AC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -99,6 +101,7 @@
 				3D528FDB2155B15D00EF65CA /* Menu.swift */,
 				3D528FD52154A50300EF65CA /* GameScene.sks */,
 				3DF2925320A37FEE006671AC /* GameScene.swift */,
+				3DAFBD3621B8E6E7009B116A /* InputQueue.swift */,
 			);
 			path = Scenes;
 			sourceTree = "<group>";
@@ -305,6 +308,7 @@
 				3D5FB09420AE768700ACD716 /* AnimationSettings.swift in Sources */,
 				3DF2925620A37FEE006671AC /* GameViewController.swift in Sources */,
 				3DF2928520A76242006671AC /* Board.swift in Sources */,
+				3DAFBD3721B8E6E7009B116A /* InputQueue.swift in Sources */,
 				3D528FDC2155B15D00EF65CA /* Menu.swift in Sources */,
 				3D528FD42150A56500EF65CA /* Notification+DF.swift in Sources */,
 				3DE657CD20B0AFD2003492DA /* Int+Extensions.swift in Sources */,

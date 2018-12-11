@@ -66,6 +66,7 @@ class GameScene: SKScene {
         guard let trans = transformation else { return }
         switch input{
         case .touch(_):
+            board = trans.endBoard
             computeNewBoard(for: trans)
         case .rotateLeft, .rotateRight:
             rotate(for: trans)

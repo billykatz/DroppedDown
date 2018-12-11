@@ -39,6 +39,7 @@ struct Board {
             let tile = spriteNodes[row][col]
             if tile.contains(point), tile.isTappable() {
                 outs = self.removeAndReplace(row: row, col: col)
+                break
             }
         }
         return outs ?? Transformation(endBoard: self, tileTransformation: nil)
@@ -84,8 +85,8 @@ struct Board {
     /// Find all contiguous neighbors of the same color as the tile that was tapped
     /// Return a new board with the selectedTiles updated
     
-    private func findNeighbors(_ x: Int, _ y: Int) -> [TileCoord]? {
-        guard x > 0 && x < boardSize && y > 0 && y < boardSize else {
+    func findNeighbors(_ x: Int, _ y: Int) -> [TileCoord]? {
+        guard x >= 0 && x < boardSize && y >= 0 && y < boardSize else {
             return nil
         }
         var queue : [(Int, Int)] = [(x, y)]
@@ -143,24 +144,25 @@ struct Board {
         for col in 0..<boardSize {
             var shift = 0
             for row in 0..<boardSize {
-                switch spriteNodes[row][col].type {
+                switch intermediateSpriteNodes[row][col].type {
                 case .empty:
                     shift += 1
                 default:
                     if shift != 0 {
                         let endRow = row-shift
-                        let endCol = col
-                        if spriteNodes[row][col].type == .player {
-                            newPlayerPosition = (endRow, endCol)
-                        } else if spriteNodes[row][col].type == .exit {
-                            newExitPosition = (endRow, endCol)
+                        if intermediateSpriteNodes[row][col].type == .player {
+                            newPlayerPosition = (endRow, col)
+                        } else if intermediateSpriteNodes[row][col].type == .exit {
+                            newExitPosition = (endRow, col)
                         }
-                        let trans = TileTransformation.init(initial: (row, col), end: (endRow, endCol))
+                        let trans = TileTransformation.init(initial: (row, col), end: (endRow, col))
                         shiftDown.append(trans)
 
                         //update sprite storage
                         let intermediateTile = intermediateSpriteNodes[row][col]
+                        // move the empty tile up
                         intermediateSpriteNodes[row][col] = intermediateSpriteNodes[row-shift][col]
+                        // move the non-empty tile down
                         intermediateSpriteNodes[row-shift][col] = intermediateTile
                     }
                 }

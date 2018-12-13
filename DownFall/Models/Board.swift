@@ -7,6 +7,7 @@
 //
 
 import NotificationCenter
+import SpriteKit
 
 struct Transformation {
     let endBoard: Board
@@ -59,10 +60,8 @@ struct Board {
     init(_ tiles: [[DFTileSpriteNode]],
          size: Int,
          playerPosition playerPos: TileCoord,
-         exitPosition exitPos: TileCoord,
-         selectedTiles: [(TileCoord)]) {
+         exitPosition exitPos: TileCoord) {
         spriteNodes = tiles
-        self.selectedTiles = selectedTiles
         newTiles = []
         boardSize = size
         playerPosition = playerPos
@@ -73,13 +72,11 @@ struct Board {
     private func mergeInit(tiles: [[DFTileSpriteNode]]? = nil,
                    size: Int? = nil,
                    playerPosition: TileCoord? = nil,
-                   exitPosition: TileCoord? = nil,
-                   selectedTiles: [(TileCoord)]? = nil) -> Board {
+                   exitPosition: TileCoord? = nil) -> Board {
         return Board.init(tiles ?? self.spriteNodes,
                           size: size ?? self.boardSize,
                           playerPosition: playerPosition ?? self.playerPosition,
-                          exitPosition: exitPosition ?? self.exitPosition,
-                          selectedTiles: selectedTiles ?? self.selectedTiles)
+                          exitPosition: exitPosition ?? self.exitPosition)
     }
     
     /// Find all contiguous neighbors of the same color as the tile that was tapped
@@ -195,18 +192,16 @@ struct Board {
         let selectedTilesTransformation = selectedTiles.map { TileTransformation(initial: ($0.0, $0.1), end: ($0.0, $0.1)) }
         return Transformation(endBoard: self.mergeInit(tiles: intermediateSpriteNodes,
                                                        playerPosition: newPlayerPosition,
-                                                       exitPosition: newExitPosition,
-                                                       selectedTiles: []),
+                                                       exitPosition: newExitPosition),
                               tileTransformation: [selectedTilesTransformation, newTiles, shiftDown])
     }
     
     //  MARK: - Private
 
     private(set) var spriteNodes : [[DFTileSpriteNode]]
-    public var selectedTiles : [(Int, Int)]
     private var newTiles : [(Int, Int)]
     
-    private var boardSize: Int = 0
+    private(set) var boardSize: Int = 0
     
     private var tileSize = 75
     
@@ -272,8 +267,7 @@ extension Board {
         return Board.init(tiles,
                           size: size,
                           playerPosition: (playerRow, playerCol),
-                          exitPosition: (exitRow, exitCol),
-                          selectedTiles: [])
+                          exitPosition: (exitRow, exitCol))
     }
     
     
@@ -294,7 +288,7 @@ extension Board {
         case right
     }
     
-    private func rotate(_ direction: Direction) -> Transformation {
+    func rotate(_ direction: Direction) -> Transformation {
         var transformation: [TileTransformation] = []
         var intermediateBoard: [[DFTileSpriteNode]] = []
         
@@ -342,8 +336,7 @@ extension Board {
         }
         let board = self.mergeInit(tiles: intermediateBoard,
                               playerPosition: newPlayerPosition,
-                              exitPosition: newExitPosition,
-                              selectedTiles: [])
+                              exitPosition: newExitPosition)
         return Transformation(endBoard: board, tileTransformation: [transformation])
 
     }

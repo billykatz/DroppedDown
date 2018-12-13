@@ -53,9 +53,16 @@ extension Board: Equatable {
 
 class DownFallTests: XCTestCase {
     
+    var tiles: [[MockTile]]!
+    var board: Board!
+    
     override func setUp() {
         super.setUp()
         // Put setup code here. This method is called before the invocation of each test method in the class.
+        self.tiles = [[.player2, .exit, .blueRock],
+                  [.blueRock, .blueRock, .blueRock],
+                  [.blueRock, .blueRock, .blueRock]]
+        self.board = Board.init(mockTiles(tiles), size: tiles.count, playerPosition: (0,0), exitPosition: (0,1))
     }
     
     override func tearDown() {
@@ -89,48 +96,36 @@ class DownFallTests: XCTestCase {
     }
     
     func testFindNeighbors () {
-        let tiles: [[MockTile]] =
-            [[.player2, .exit, .blueRock],
-             [.blueRock, .blueRock, .blueRock],
-             [.blueRock, .blueRock, .blueRock]]
         
         let board = Board.init(mockTiles(tiles),
                                size: 3,
                                playerPosition: (0,0),
-                               exitPosition: (0,1),
-                               selectedTiles: [])
+                               exitPosition: (0,1))
         
-        let newBoard = board.findNeighbors(1,1)
-        XCTAssert(compareTuples(newBoard.selectedTiles, [(0,2), (1,0), (1,1), (1, 2), (2,0), (2,1) ,(2,2)]), "Neighbors found do not match")
+        let expectedNeighbors = [(0,2), (1,2), (2,2), (1,1), (1,0), (2,0), (2,1)]
+        guard let actualNeighbors = board.findNeighbors(1, 1) else { XCTFail("UNable to find neighbors"); return }
+        XCTAssert(compareTuples(actualNeighbors, expectedNeighbors), "Neighbors found do not match")
         
     }
     
     func testFindNoNeighbots() {
+        
+        
         let tiles: [[MockTile]] = [[.player2, .exit, .blueRock],
-                                   [.greenRock, .blueRock, .blackRock],
-                                   [.blueRock, .greenRock, .blueRock]]
+                                   [.blackRock, .greenRock, .blackRock],
+                                   [.blueRock, .blackRock, .blueRock]]
         
         let board = Board.init(mockTiles(tiles),
                                size: tiles.count,
                                playerPosition: (0,0),
-                               exitPosition: (0,1),
-                               selectedTiles: [])
-        let newBoard = board.findNeighbors(1,1)
-        XCTAssert(board == newBoard, "No neighbors found, inital and after board should be equal")
+                               exitPosition: (0,1))
+        let actualFoundNeighbors = board.findNeighbors(1,1)
+        XCTAssertTrue(actualFoundNeighbors?.count ?? nil == 1, "No neighbors found, inital and after board should be equal")
     }
     
     func testInvalidInputFindNeighbors() {
-        let tiles: [[MockTile]] = [[.player2, .exit, .blueRock],
-                                   [.greenRock, .blueRock, .blackRock],
-                                   [.blueRock, .greenRock, .blueRock]]
-        
-        let board = Board.init(mockTiles(tiles),
-                               size: tiles.count,
-                               playerPosition: (0,0),
-                               exitPosition: (0,1),
-                               selectedTiles: [])
-        let newBoard = board.findNeighbors(-1,-1)
-        XCTAssert(board == newBoard, "Invalid input, inital and after board should be equal")
+        let actualFoundNeighbors = board.findNeighbors(-1,-1)
+        XCTAssertNil(actualFoundNeighbors, "Invalid input, inital and after board should be equal")
     }
     
     func testRotateLeft() {
@@ -146,16 +141,14 @@ class DownFallTests: XCTestCase {
         let initalBoard = Board.init(mockTiles(tiles),
                                      size: tiles.count,
                                      playerPosition: (0,0),
-                                     exitPosition: (0,1),
-                                     selectedTiles: [])
+                                     exitPosition: (0,1))
         
         let expectedRotatedBoard = Board.init(mockTiles(rotatedTiles),
                                               size: rotatedTiles.count,
                                               playerPosition: (0,2),
-                                              exitPosition: (1,2),
-                                              selectedTiles: [])
+                                              exitPosition: (1,2))
         
-        let acutalRotatedBoard = initalBoard.rotate(.left)
+        let acutalRotatedBoard = initalBoard.rotate(.left).endBoard
         XCTAssert(acutalRotatedBoard == expectedRotatedBoard, "Inital board should match expected result board after 90 degree rotate left")
         
         
@@ -173,16 +166,14 @@ class DownFallTests: XCTestCase {
         let initalBoard = Board.init(mockTiles(tiles),
                                      size: tiles.count,
                                      playerPosition: (0,0),
-                                     exitPosition: (0,1),
-                                     selectedTiles: [])
+                                     exitPosition: (0,1))
         
         let expectedRotatedBoard = Board.init(mockTiles(rotatedTiles),
                                               size: rotatedTiles.count,
                                               playerPosition: (2,0),
-                                              exitPosition: (1,0),
-                                              selectedTiles: [])
+                                              exitPosition: (1,0))
         
-        let acutalRotatedBoard = initalBoard.rotate(.right)
+        let acutalRotatedBoard = initalBoard.rotate(.right).endBoard
         XCTAssert(acutalRotatedBoard == expectedRotatedBoard, "Inital board should match expected result board after 90 degree rotate right")
     }
 }

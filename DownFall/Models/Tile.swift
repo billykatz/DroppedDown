@@ -62,14 +62,14 @@ extension Type: Equatable {
 }
 
 enum TextureName : String {
-    case blue = "blueRock"
-    case black = "blackRock"
-    case green = "greenRock"
-    case empty = "emptyTexture"
-    case player = "player2"
-    case exit = "exit"
+    case blueRock
+    case blackRock
+    case greenRock
+    case emptyTexture
+    case player2
+    case exit
     
-    static let allValues = [blue, black, green, empty, player, exit]
+    static let allValues = [blueRock, blackRock, greenRock, emptyTexture, player2, exit]
 }
 
 extension DFTileSpriteNode: Tappable {

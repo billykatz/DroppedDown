@@ -24,6 +24,7 @@
 		3DF2927420A37FF0006671AC /* DownFallUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2927320A37FF0006671AC /* DownFallUITests.swift */; };
 		3DF2928320A66BEB006671AC /* Tile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2928220A66BEB006671AC /* Tile.swift */; };
 		3DF2928520A76242006671AC /* Board.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2928420A76242006671AC /* Board.swift */; };
+		5605D6D321CC2DF400C1C5C2 /* DFTileSpriteNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5605D6D221CC2DF400C1C5C2 /* DFTileSpriteNode.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,6 +68,7 @@
 		3DF2927520A37FF0006671AC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3DF2928220A66BEB006671AC /* Tile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tile.swift; sourceTree = "<group>"; };
 		3DF2928420A76242006671AC /* Board.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Board.swift; sourceTree = "<group>"; };
+		5605D6D221CC2DF400C1C5C2 /* DFTileSpriteNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DFTileSpriteNode.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -167,6 +169,7 @@
 			children = (
 				3DF2928220A66BEB006671AC /* Tile.swift */,
 				3DF2928420A76242006671AC /* Board.swift */,
+				5605D6D221CC2DF400C1C5C2 /* DFTileSpriteNode.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -313,6 +316,7 @@
 				3DF2925620A37FEE006671AC /* GameViewController.swift in Sources */,
 				3DF2928520A76242006671AC /* Board.swift in Sources */,
 				3DAFBD3721B8E6E7009B116A /* InputQueue.swift in Sources */,
+				5605D6D321CC2DF400C1C5C2 /* DFTileSpriteNode.swift in Sources */,
 				3D528FDC2155B15D00EF65CA /* Menu.swift in Sources */,
 				3DE657CD20B0AFD2003492DA /* Int+Extensions.swift in Sources */,
 				3DF2924E20A37FEE006671AC /* AppDelegate.swift in Sources */,

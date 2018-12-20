@@ -20,11 +20,12 @@
 		3DF2925620A37FEE006671AC /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2925520A37FEE006671AC /* GameViewController.swift */; };
 		3DF2925920A37FEE006671AC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3DF2925720A37FEE006671AC /* Main.storyboard */; };
 		3DF2925E20A37FF0006671AC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3DF2925C20A37FF0006671AC /* LaunchScreen.storyboard */; };
-		3DF2926920A37FF0006671AC /* DownFallTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2926820A37FF0006671AC /* DownFallTests.swift */; };
+		3DF2926920A37FF0006671AC /* DownFallBoardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2926820A37FF0006671AC /* DownFallBoardTests.swift */; };
 		3DF2927420A37FF0006671AC /* DownFallUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2927320A37FF0006671AC /* DownFallUITests.swift */; };
 		3DF2928320A66BEB006671AC /* Tile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2928220A66BEB006671AC /* Tile.swift */; };
 		3DF2928520A76242006671AC /* Board.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2928420A76242006671AC /* Board.swift */; };
 		5605D6D321CC2DF400C1C5C2 /* DFTileSpriteNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5605D6D221CC2DF400C1C5C2 /* DFTileSpriteNode.swift */; };
+		5605D6D521CC2EA400C1C5C2 /* GameSceneTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5605D6D421CC2EA400C1C5C2 /* GameSceneTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,7 +62,7 @@
 		3DF2925D20A37FF0006671AC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		3DF2925F20A37FF0006671AC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3DF2926420A37FF0006671AC /* DownFallTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DownFallTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		3DF2926820A37FF0006671AC /* DownFallTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownFallTests.swift; sourceTree = "<group>"; };
+		3DF2926820A37FF0006671AC /* DownFallBoardTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownFallBoardTests.swift; sourceTree = "<group>"; };
 		3DF2926A20A37FF0006671AC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3DF2926F20A37FF0006671AC /* DownFallUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DownFallUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3DF2927320A37FF0006671AC /* DownFallUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownFallUITests.swift; sourceTree = "<group>"; };
@@ -69,6 +70,7 @@
 		3DF2928220A66BEB006671AC /* Tile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tile.swift; sourceTree = "<group>"; };
 		3DF2928420A76242006671AC /* Board.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Board.swift; sourceTree = "<group>"; };
 		5605D6D221CC2DF400C1C5C2 /* DFTileSpriteNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DFTileSpriteNode.swift; sourceTree = "<group>"; };
+		5605D6D421CC2EA400C1C5C2 /* GameSceneTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSceneTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -149,7 +151,8 @@
 		3DF2926720A37FF0006671AC /* DownFallTests */ = {
 			isa = PBXGroup;
 			children = (
-				3DF2926820A37FF0006671AC /* DownFallTests.swift */,
+				3DF2926820A37FF0006671AC /* DownFallBoardTests.swift */,
+				5605D6D421CC2EA400C1C5C2 /* GameSceneTests.swift */,
 				3DF2926A20A37FF0006671AC /* Info.plist */,
 			);
 			path = DownFallTests;
@@ -328,7 +331,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3DF2926920A37FF0006671AC /* DownFallTests.swift in Sources */,
+				5605D6D521CC2EA400C1C5C2 /* GameSceneTests.swift in Sources */,
+				3DF2926920A37FF0006671AC /* DownFallBoardTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

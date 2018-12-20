@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3D528FD42150A56500EF65CA /* Notification+DF.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D528FD32150A56500EF65CA /* Notification+DF.swift */; };
 		3D528FD62154A50300EF65CA /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3D528FD52154A50300EF65CA /* GameScene.sks */; };
 		3D528FDA2155AC8800EF65CA /* Menu.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3D528FD92155AC8800EF65CA /* Menu.sks */; };
 		3D528FDC2155B15D00EF65CA /* Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D528FDB2155B15D00EF65CA /* Menu.swift */; };
@@ -45,7 +44,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		3D528FD32150A56500EF65CA /* Notification+DF.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notification+DF.swift"; sourceTree = "<group>"; };
 		3D528FD52154A50300EF65CA /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
 		3D528FD92155AC8800EF65CA /* Menu.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Menu.sks; sourceTree = "<group>"; };
 		3D528FDB2155B15D00EF65CA /* Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Menu.swift; sourceTree = "<group>"; };
@@ -139,7 +137,6 @@
 				3D528FDE2155BD7200EF65CA /* Assets.xcassets */,
 				3DF2928120A66A4E006671AC /* Models */,
 				3DF2925520A37FEE006671AC /* GameViewController.swift */,
-				3D528FD32150A56500EF65CA /* Notification+DF.swift */,
 				3DF2925720A37FEE006671AC /* Main.storyboard */,
 				3DF2925C20A37FF0006671AC /* LaunchScreen.storyboard */,
 				3DF2925F20A37FF0006671AC /* Info.plist */,
@@ -317,7 +314,6 @@
 				3DF2928520A76242006671AC /* Board.swift in Sources */,
 				3DAFBD3721B8E6E7009B116A /* InputQueue.swift in Sources */,
 				3D528FDC2155B15D00EF65CA /* Menu.swift in Sources */,
-				3D528FD42150A56500EF65CA /* Notification+DF.swift in Sources */,
 				3DE657CD20B0AFD2003492DA /* Int+Extensions.swift in Sources */,
 				3DF2924E20A37FEE006671AC /* AppDelegate.swift in Sources */,
 				3DF2928320A66BEB006671AC /* Tile.swift in Sources */,

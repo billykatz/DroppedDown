@@ -12,15 +12,12 @@ protocol GameSceneDelegate: class {
     func shouldShowMenu(win: Bool)
 }
 
-
 class GameScene: SKScene {
     
+    private var tileSize = 75
     private var boardSize: Int?
-    private var board: Board? {
-        didSet {
-            // TODO: animate change render board
-        }
-    }
+    private var board: Board?
+    private var spriteNodes: [[DFTileSpriteNode]]?
     
     //coordinates
     private var bottomLeft: (Int, Int)?
@@ -42,8 +39,15 @@ class GameScene: SKScene {
     //deleagte
     weak var gameSceneDelegate: GameSceneDelegate?
 
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
+    required init?(coder aDecoder: NSCoder) { super.init(coder: aDecoder) }
+    
+    /// Creates an instance of board and does preparationg necessary for didMove(to:) to be called
+    public func commonInit(boardSize bsize: Int){
+        //TODO: the  order of the following lines of code matter.  (bottom left has to happen before create and position. Consider refactoring
+        board = Board.build(size: bsize)
+        self.boardSize = bsize
+        bottomLeft = (-1 * tileSize/2 * bsize, -1 * tileSize/2 * bsize )
+        spriteNodes = createAndPositionSprites(from: self.board!.tiles)
     }
     
     override func didMove(to view: SKView) {
@@ -52,7 +56,7 @@ class GameScene: SKScene {
         rotateRight = self.childNode(withName: "rotateRight")!
         rotateLeft = self.childNode(withName: "rotateLeft")!
         inputQueue = InputQueue(queue: [])
-        addTileNodes()
+        addSpriteTilesToScene()
     }
     
     override func update(_ currentTime: TimeInterval) {
@@ -69,180 +73,149 @@ class GameScene: SKScene {
             board = trans.endBoard
             computeNewBoard(for: trans)
         case .rotateLeft, .rotateRight:
+            board = trans.endBoard
             rotate(for: trans)
         }
     }
-    
-    public func commonInit(boardSize bsize: Int){
-        board = Board.build(size: bsize)
-        let tileSize = board!.getTileSize()
-        bottomLeft = (-1 * tileSize/2 * bsize, -1 * tileSize/2 * bsize )
-        self.boardSize = bsize
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(gameWin), name: .gameWin, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(noMovesLeft), name: .noMovesLeft, object: nil)
-    }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-    
 }
+
+
+//MARK: - Adding and Calculating Sprite Tiles
 
 extension GameScene {
-
-    private func resetBoardUI() {
-        guard let tileSize = board?.getTileSize(),
-            let boardSize = boardSize,
-            let bottomLeftX = bottomLeft?.1,
-            let bottomLeftY = bottomLeft?.0 else { fatalError("No board") }
-        
-        //remove all tiles
-        for row in 0..<boardSize {
-            for col in 0..<boardSize {
-                let point = CGPoint.init(x: tileSize*col+bottomLeftX, y: tileSize*row+bottomLeftY)
-                for child in foreground.children {
-                    if child.contains(point) {
-                        child.removeFromParent()
-                        break
-                    }
-                }
-            }
-        }
-        addTileNodes()
+    
+    /// Adds all sprite nodes from the store of [[DFTileSpriteNodes]] to the foreground
+    private func addSpriteTilesToScene() {
+        spriteNodes?.forEach { $0.forEach { foreground.addChild($0) } }
     }
     
-    private func addTileNodes() {
-        guard let board = board,
-            let boardSize = boardSize,
-            let bottomLeft = bottomLeft else { fatalError("no board/bottomLeft given") }
-        let tileSize = board.getTileSize()
-        let spriteNodes = board.spriteNodes
+    /// Create sprite nodes from a 2d list of TileTypes and calculates their positions
+    private func createAndPositionSprites(from tiles: [[TileType]]?) -> [[DFTileSpriteNode]]? {
+        guard let tiles = tiles,
+            let bottomLeftX = bottomLeft?.1,
+            let bottomLeftY = bottomLeft?.0,
+            let boardSize = boardSize else { return nil }
         var x : Int = 0
         var y : Int = 0
+        var sprites: [[DFTileSpriteNode]] = []
         for row in 0..<boardSize {
-            y = row * tileSize + bottomLeft.0
+            y = row * tileSize + bottomLeftY
+            sprites.append([])
             for col in 0..<boardSize {
-                x = col * tileSize + bottomLeft.1
-                spriteNodes[row][col].position = CGPoint.init(x: x, y: y)
-                foreground.addChild(spriteNodes[row][col])
+                x = col * tileSize + bottomLeftX
+                sprites[row].append(DFTileSpriteNode(type: tiles[row][col]))
+                sprites[row][col].position = CGPoint.init(x: x, y: y)
             }
         }
+        return sprites
     }
-    
-    private func checkBoardState() {
-        board?.checkGameState()
-    }
-
-    
 }
 
-// MARK: Board notifications
+// MARK: -  Board Transformations
 
 extension GameScene {
     private func computeNewBoard(for transformation: Transformation) {
         guard let transformations = transformation.tileTransformation,
-            let tileSize = board?.getTileSize(),
             let bottomLeftX = bottomLeft?.1,
             let bottomLeftY = bottomLeft?.0,
-            let spriteNodes = board?.spriteNodes,
+            let spriteNodes = createAndPositionSprites(from: transformation.endTiles),
             let boardSize = boardSize else { return }
         //TODO: don't hardcode this
         let removed = transformations[0]
         let newTiles = transformations[1]
         let shiftDown = transformations[2]
         
-        //remove "removed" tiles
+        //remove "removed" tiles from sprite storage
         for tileTrans in removed {
-            let row = tileTrans.initial.0
-            let col = tileTrans.initial.1
-            let point = CGPoint.init(x: tileSize*col+bottomLeftX, y: tileSize*row+bottomLeftY)
-            for child in foreground.children {
-                if child.contains(point) {
-                    child.removeFromParent()
-                    break
-                }
-            }
+            self.spriteNodes?[tileTrans.end.x][tileTrans.end.y].removeFromParent()
         }
         
         //add new tiles "newTiles"
         for trans in newTiles {
-            let (startRow, startCol) = trans.initial
-            let (endRow, endCol) = trans.end
-            let sprite = spriteNodes[endRow][endCol]
+            guard let newRockType = trans.endTileType else { assertionFailure("Transformation of new tile has no nil value for endTileType."); return }
+            let (startRow, startCol) = trans.initial.tuple
+            let (endRow, endCol) = trans.end.tuple
+            
+            // create a sprite based on the endTileType injected into this method
+            let sprite = DFTileSpriteNode(type: newRockType)
+            
+            // place the tile at the "start" which is above the visible board
+            // the animation will then move them to the correct place in the foreground
             let x = tileSize * boardSize + ( startRow * tileSize ) + bottomLeftX
             let y = tileSize * startCol + bottomLeftY
             sprite.position = CGPoint.init(x: y, y: x)
+            
+            //add it to the scene
             foreground.addChild(sprite)
+            
+            //place the sprite in the appropriate place within the sprite storage
+            self.spriteNodes?[endRow][endCol] = sprite
+            
         }
         
         //animation "shiftDown" transformation
         var count = shiftDown.count
         animate(shiftDown) { [weak self] in
-            guard let strongSelf = self else { return }
+            guard let strongSelf = self,
+                let bottomLeft = strongSelf.bottomLeft else { return }
             count -= 1
             if count == 0 {
-                strongSelf.checkBoardState()
+                // the animations are done
+                // we can remove all the children and redraw
+                // set out sprites to reflect the new state
+                strongSelf.foreground.removeAllChildren()
+                
+                //TODO: figure out why i cant use addSpriteNodes here
+                strongSelf.spriteNodes = spriteNodes
+                var x : Int = 0
+                var y : Int = 0
+                for row in 0..<boardSize {
+                    y = row * strongSelf.tileSize + bottomLeft.0
+                    for col in 0..<boardSize {
+                        x = col * strongSelf.tileSize + bottomLeft.1
+                        strongSelf.spriteNodes?[row][col].position = CGPoint.init(x: x, y: y)
+                        strongSelf.foreground.addChild(spriteNodes[row][col])
+                    }
+                }
+                strongSelf.checkGameState()
                 strongSelf.animating = false
             }
         }
-
     }
     
     private func rotate(for transformation: Transformation) {
         var animationCount = 0
-        guard let trans = transformation.tileTransformation?[0] else { return }
+        guard let trans = transformation.tileTransformation?.first,
+            let spriteNodes = createAndPositionSprites(from: transformation.endTiles) else { return }
         animate(trans) { [weak self] in
             guard let strongSelf = self else { return }
             animationCount += 1
             if animationCount == trans.count {
-                strongSelf.checkBoardState()
+                strongSelf.foreground.removeAllChildren()
+                strongSelf.spriteNodes = spriteNodes
+                strongSelf.addSpriteTilesToScene()
+                strongSelf.checkGameState()
                 strongSelf.animating = false
             }
         }
     }
-    
-    @objc private func gameWin(notification: NSNotification) {
-        guard let transformation = notification.userInfo?["transformation"] as? [TileTransformation] else { fatalError("No transformations provided for game win") }
-        //TODO: can we do this without closures?
-        animate(transformation) { [weak self] in
-            guard let strongSelf = self else { return }
-            let wait = SKAction.wait(forDuration:0.5)
-            let action = SKAction.run { [weak self] in
-                guard let strongSelf = self else { return }
-                strongSelf.gameSceneDelegate?.shouldShowMenu(win: true)
-            }
-            strongSelf.run(SKAction.sequence([wait,action]))
-        }
-    }
-    
-    @objc private func noMovesLeft(notification: NSNotification) {
-        let wait = SKAction.wait(forDuration:0.5)
-        let action = SKAction.run { [weak self] in
-            guard let strongSelf = self else { return }
-            strongSelf.gameSceneDelegate?.shouldShowMenu(win: false)
-        }
-        self.run(SKAction.sequence([wait,action]))
-        
-    }
 }
 
-//MARK: Transformation Animation
+//MARK: -  Animation
 
 extension GameScene {
     func animate(_ transformation: [TileTransformation], _ completion: (() -> Void)? = nil) {
-        guard let tileSize = board?.getTileSize(),
-            let boardSize = boardSize,
+        guard let boardSize = boardSize,
             let bottomLeftX = bottomLeft?.1,
             let bottomLeftY = bottomLeft?.0 else { fatalError("no board") }
         var childActionDict : [SKNode : SKAction] = [:]
         for transIdx in 0..<transformation.count {
             let trans = transformation[transIdx]
-            let outOfBounds = trans.initial.0 >= boardSize ? tileSize * boardSize : 0
-            let point = CGPoint.init(x: tileSize*trans.initial.1+bottomLeftX, y: outOfBounds + tileSize*trans.initial.0+bottomLeftY)
+            let outOfBounds = trans.initial.x >= boardSize ? tileSize * boardSize : 0
+            let point = CGPoint.init(x: tileSize*trans.initial.tuple.1+bottomLeftX, y: outOfBounds + tileSize*trans.initial.x+bottomLeftY)
             for child in foreground.children {
                 if child.contains(point) {
-                    let endPoint = CGPoint.init(x: tileSize*trans.end.1+bottomLeftX, y: tileSize*trans.end.0+bottomLeftY)
+                    let endPoint = CGPoint.init(x: tileSize*trans.end.y+bottomLeftX, y: tileSize*trans.end.x+bottomLeftY)
                     let animation = SKAction.move(to: endPoint, duration: AnimationSettings.fallSpeed)
                     childActionDict[child] = animation
                     break
@@ -256,30 +229,9 @@ extension GameScene {
             }
         }
     }
-    
-//    func animate(_ transformation: TileTransformation, _ completion: (() -> Void)? = nil) {
-//        //TODO: pass tileSize into all of these or make it a global static variable
-//        guard let tileSize = board?.getTileSize(),
-//            let bottomLeftX = bottomLeft?.1,
-//            let bottomLeftY = bottomLeft?.0 else { fatalError("no board") }
-//        let trans = transformation
-//        let point = CGPoint.init(x: tileSize*trans.initial.1+bottomLeftX, y: tileSize*trans.initial.0+bottomLeftY)
-//        
-//        for child in foreground.children {
-//            if child.contains(point) {
-//                let endPoint = CGPoint.init(x: tileSize*trans.end.1+bottomLeftX, y: tileSize*trans.end.0+bottomLeftY)
-//                let animation = SKAction.move(to: endPoint, duration: AnimationSettings.fallSpeed)
-//                child.run(animation) {
-//                    completion?()
-//                }
-//                return
-//            }
-//        }
-//    }
-
 }
 
-// MARK: Touch Relay
+// MARK: - Touch Relay
 
 extension GameScene {
     
@@ -295,20 +247,95 @@ extension GameScene {
                 animating = false
             }
         }
-        let input : Input
+        var input: Input? = nil
         if setting.contains(touch.location(in: self)) {
-            self.reset()
+            //self.reset()
+            print(self.board as Any)
+            print(self.debugBoardSprites())
             return
         } else if rotateRight.contains(touch.location(in: self)) {
             input = Input.rotateRight
         } else if rotateLeft.contains(touch.location(in:self)) {
             input = Input.rotateLeft
         } else {
-            input = Input.touch(touch.location(in: self))
+            for index in 0..<spriteNodes!.reduce([],+).count {
+                let row = index / boardSize!
+                let col = (index - row * boardSize!) % boardSize!
+                let tile = spriteNodes![row][col]
+                if tile.contains(touch.location(in: self.foreground)), tile.isTappable() {
+                    input = Input.touch(TileCoord(row, col))
+                    break
+                }
+            }
         }
         handledTouch = true
-        inputQueue.append(input)
-        print(inputQueue)
+        guard let inputReal = input else { return }
+        inputQueue.append(inputReal)
+    }
+}
+
+//MARK: - Game win and Game loss
+
+extension GameScene {
+    func checkGameState() {
+        if checkWinCondition() {
+            //send game win notification
+            guard let playerPosition = board?.playerPosition,
+                let exitPosition = board?.exitPosition else { return }
+            let trans = TileTransformation(playerPosition, exitPosition)
+            animate([trans]) { [weak self] in
+                guard let strongSelf = self else { return }
+                let wait = SKAction.wait(forDuration:0.5)
+                let action = SKAction.run { [weak self] in
+                    guard let strongSelf = self else { return }
+                    strongSelf.gameSceneDelegate?.shouldShowMenu(win: true)
+                }
+                strongSelf.run(SKAction.sequence([wait,action]))
+            }
+        } else if !boardHasMoreMoves() {
+            let wait = SKAction.wait(forDuration:0.5)
+            let action = SKAction.run { [weak self] in
+                guard let strongSelf = self else { return }
+                strongSelf.gameSceneDelegate?.shouldShowMenu(win: false)
+            }
+            self.run(SKAction.sequence([wait,action]))
+        }
+    }
+    
+    private func checkWinCondition() -> Bool {
+        guard let playerRow = board?.playerPosition?.x,
+            let playerCol = board?.playerPosition?.y,
+            let exitRow = board?.exitPosition?.x,
+            let exitCol = board?.exitPosition?.y else { return false }
+        return playerRow == exitRow + 1 && playerCol == exitCol
+    }
+    
+    func boardHasMoreMoves() -> Bool {
+        guard let tiles = board?.tiles,
+            let exitPosition = board?.exitPosition,
+            let playerPosition = board?.playerPosition else { return false }
+        for (i, row) in tiles.enumerated() {
+            for (j, _) in row.enumerated() {
+                if board?.findNeighbors(i, j)?.count ?? 0 > 2 || board?.valid(neighbor: exitPosition, for: playerPosition) ?? false {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+}
+
+extension GameScene {
+    func debugBoardSprites() -> String {
+        var outs = "\nTop of SpriteNodes"
+        for (i, _) in spriteNodes!.enumerated().reversed() {
+            outs += "\n"
+            for (j, _) in spriteNodes![i].enumerated() {
+                outs += "\t\(spriteNodes![i][j].type)"
+            }
+        }
+        outs += "\nbottom of SpriteNodes"
+        return outs
     }
 }
 
@@ -316,8 +343,10 @@ extension GameScene {
 extension GameScene {
     //TODO: figure out a way to not expose a reset function publically
     // this should onyl be called the settings button as a debug quick restart
-    func reset() {
-        self.board = self.board?.resetNoMoreMoves() // this should likely be triggered by anothing notification
-        self.resetBoardUI()
+    private func reset() {
+        self.board = Board.build(size: boardSize!) // this should likely be triggered by anothing notification
+        self.spriteNodes = createAndPositionSprites(from: board!.tiles)
+        foreground.removeAllChildren()
+        addSpriteTilesToScene()
     }
 }

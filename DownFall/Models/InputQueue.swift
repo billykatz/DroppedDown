@@ -9,7 +9,7 @@
 import SpriteKit
 
 enum Input {
-    case touch(CGPoint)
+    case touch(TileCoord)
     case rotateLeft
     case rotateRight
 }

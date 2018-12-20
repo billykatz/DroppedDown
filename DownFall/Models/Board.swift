@@ -7,44 +7,47 @@
 //
 
 import NotificationCenter
-import SpriteKit
 
 struct Transformation {
     let endBoard: Board
+    let endTiles: [[TileType]]?
     var tileTransformation: [[TileTransformation]]?
+    
+    init(board endBoard: Board, tiles endTiles: [[TileType]]? = nil, transformation tileTransformation: [[TileTransformation]]? = nil) {
+        self.endBoard = endBoard
+        self.endTiles = endTiles
+        self.tileTransformation = tileTransformation
+    }
 }
 
 struct TileTransformation {
-    let initial : (Int, Int)
-    let end : (Int, Int)
+    let initial : TileCoord
+    let end : TileCoord
+    let endTileType: TileType?
+    
+    init(_ initial: TileCoord, _ end: TileCoord, _ endTileType: TileType? = nil) {
+        self.initial = initial
+        self.end = end
+        self.endTileType = endTileType
+    }
 }
 
-typealias TileCoord = (Int, Int)
-
-struct Board {
+struct TileCoord: Hashable {
+    let x, y: Int
+    var tuple : (Int, Int) { return (x, y) }
     
-//    private func traverse(board: Board,_ work: (DFTileSpriteNode, TileCoord) -> Transformation?) {
-//        for index in 0..<board.spriteNodes.reduce([],+).count {
-//            let row = index / board.boardSize
-//            let col = (index - row * board.boardSize) % board.boardSize
-//            let tile = board.spriteNodes[row][col]
-//            work(tile, (row, col))
-//        }
-//    }
-//
-    private func handleInputHelper(_ point: CGPoint) -> Transformation {
-        var outs: Transformation?
-        for index in 0..<self.spriteNodes.reduce([],+).count {
-            let row = index / boardSize
-            let col = (index - row * boardSize) % boardSize
-            let tile = spriteNodes[row][col]
-            if tile.contains(point), tile.isTappable() {
-                outs = self.removeAndReplace(row: row, col: col)
-                break
-            }
-        }
-        return outs ?? Transformation(endBoard: self, tileTransformation: nil)
+    init(_ x: Int, _ y: Int) {
+        self.x = x
+        self.y = y
     }
+}
+
+struct Board: Equatable {
+    private(set) var tiles: [[TileType]]
+    private(set) var playerPosition : TileCoord?
+    private(set) var exitPosition : TileCoord?
+    private var boardSize: Int { return tiles.count }
+    
     
     func handle(input: Input) -> Transformation {
         switch input {
@@ -52,61 +55,82 @@ struct Board {
             return self.rotate(.left)
         case .rotateRight:
             return self.rotate(.right)
-        case .touch(let point):
-            return handleInputHelper(point)
+        case .touch(let tileCoord):
+            return self.removeAndReplace(row: tileCoord.x, col: tileCoord.y)
         }
     }
     
-    init(_ tiles: [[DFTileSpriteNode]],
-         size: Int,
-         playerPosition playerPos: TileCoord,
-         exitPosition exitPos: TileCoord) {
-        spriteNodes = tiles
-        newTiles = []
-        boardSize = size
-        playerPosition = playerPos
-        exitPosition = exitPos
+    init(tiles: [[TileType]],
+         playerPosition playerPos: TileCoord?,
+         exitPosition exitPos: TileCoord?) {
+        self.tiles = tiles
+        playerPosition = playerPos ?? getTilePosition(.player)
+        exitPosition = exitPos ?? getTilePosition(.exit)
     }
     
-    /// This method is mostly for convenience and allows us to carry state over
-    private func mergeInit(tiles: [[DFTileSpriteNode]]? = nil,
-                   size: Int? = nil,
-                   playerPosition: TileCoord? = nil,
-                   exitPosition: TileCoord? = nil) -> Board {
-        return Board.init(tiles ?? self.spriteNodes,
-                          size: size ?? self.boardSize,
-                          playerPosition: playerPosition ?? self.playerPosition,
-                          exitPosition: exitPosition ?? self.exitPosition)
+    // MARK: - Helpers
+    private func getTilePosition(_ type: TileType) -> TileCoord? {
+        for i in 0..<tiles.count {
+            for j in 0..<tiles[i].count {
+                if tiles[i][j] == type {
+                    return TileCoord(i,j)
+                }
+            }
+        }
+        return nil
     }
+}
+
+// MARK: - Find Neighbors Remove and Replace
+
+extension Board {
+    
+    /// Return true if a neighbor coord is within the bounds of the board
+    /// within one tile in a cardinal direction of the currCoord
+    /// and not equal to the currCoord
+    func valid(neighbor: TileCoord?, for currCoord: TileCoord?) -> Bool {
+        guard let (neighborRow, neighborCol) = neighbor?.tuple,
+            let (tileRow, tileCol) = currCoord?.tuple else { return false }
+        guard neighborRow >= 0, //lower bound
+            neighborCol >= 0, // lower bound
+            neighborRow < boardSize, // upper bound
+            neighborCol < boardSize, // upper bound
+            neighbor != currCoord // not the same coord
+            else { return false }
+        let tileSum = tileRow + tileCol
+        let neighborSum = neighborRow + neighborCol
+        guard (tileSum % 2 == 0  && neighborSum % 2 == 1) || (tileSum % 2 == 1 && neighborSum % 2 == 0) else { return false }
+        return true
+    }
+    
     
     /// Find all contiguous neighbors of the same color as the tile that was tapped
     /// Return a new board with the selectedTiles updated
     
     func findNeighbors(_ x: Int, _ y: Int) -> [TileCoord]? {
-        guard x >= 0 && x < boardSize && y >= 0 && y < boardSize else {
-            return nil
-        }
-        var queue : [(Int, Int)] = [(x, y)]
+        guard x >= 0,
+            x < boardSize,
+            y >= 0,
+            y < boardSize else { return nil }
+        var queue = [TileCoord(x, y)]
+        var tileCoordSet = Set(queue)
         var head = 0
         
         while head < queue.count {
-            let (tileRow, tileCol) = queue[head]
-            let tileSpriteNode = spriteNodes[tileRow][tileCol]
-            tileSpriteNode.search = .black
+            let tileRow = queue[head].x
+            let tileCol = queue[head].y
+            let currTile = tiles[tileRow][tileCol]
             head += 1
             //add neighbors to queue
             for i in tileRow-1...tileRow+1 {
                 for j in tileCol-1...tileCol+1 {
-                    if valid(neighbor: (i,j), for: (tileRow, tileCol)) {
-                        //potential neighbor within bounds
-                        let neighbor = spriteNodes[i][j]
-                        if neighbor.search == .white {
-                            if neighbor == tileSpriteNode {
-                                neighbor.search = .gray
-                                queue.append((i,j))
-                            }
-                        }
-                    }
+                    //check that it is within bounds, that we havent visited it before, and it's the same type as us
+                    guard valid(neighbor: TileCoord(i,j), for: TileCoord(tileRow, tileCol)),
+                        !tileCoordSet.contains(TileCoord(i,j)),
+                        tiles[i][j] == currTile else { continue }
+                    //valid neighbor within bounds
+                    queue.append(TileCoord(i,j))
+                    tileCoordSet.insert(TileCoord(i,j))
                 }
             }
         }
@@ -115,167 +139,132 @@ struct Board {
     
     
     /*
-     * Remove and refill selected tiles from the current board
+     * Remove and refill tiles from the current board
      *
-     *  - replaces each selected tile with an Empty sprite placeholder
-     *  - loops through each column starting an at row 0 and increments a shift counter when it encounters an Empty sprite placeholder
-     *  - updates the board store [[DFTileSpriteNdes]]
-     *  - sends Notification with three dictionarys, removed tiles, new tiles, and which have shifted down
-    */
-
+     *  - replaces each tile in the contiguous group of same-colored tiles with an Empty tile type
+     *  - iterates through each column starting an at row 0 and ending at row n-1, and increments a shift counter by 1 when it encounters an Empty sprite placeholder
+     *  - swaps the current empty tile at index i with the tile at index i+1, thusly all empty tiles end up near at the "top" of each column
+     *  - returns a transformation with the tiles that have been removed, added, and shifted down
+     */
+    
     func removeAndReplace(row x: Int, col y: Int) -> Transformation {
+        // Check that the tile group at row, col has more than 3 tiles
         guard let selectedTiles = self.findNeighbors(x, y),
             selectedTiles.count > 2 else {
-            return Transformation(endBoard: self, tileTransformation: nil)
+            return Transformation(board: self, transformation: nil)
         }
-        var intermediateSpriteNodes = spriteNodes
-        for (row, col) in selectedTiles {
-            intermediateSpriteNodes[row][col] = DFTileSpriteNode.init(type: .empty)
+        
+        // set the tiles to be removed as Empty placeholder
+        var intermediateTiles = tiles
+        for coord in selectedTiles {
+            intermediateTiles[coord.x][coord.y] = TileType.empty
         }
-
-        var newPlayerPosition: TileCoord?
-        var newExitPosition: TileCoord?
+        
+        // keep track of the new player position and exit position after shifting
+        // in case the positions don't shift, initiate to the current player and exit position
+        var newPlayerPosition: TileCoord? = playerPosition
+        var newExitPosition: TileCoord? = exitPosition
         
         var shiftDown : [TileTransformation] = []
         var newTiles : [TileTransformation] = []
         for col in 0..<boardSize {
             var shift = 0
             for row in 0..<boardSize {
-                switch intermediateSpriteNodes[row][col].type {
+                switch intermediateTiles[row][col] {
                 case .empty:
                     shift += 1
                 default:
                     if shift != 0 {
                         let endRow = row-shift
-                        if intermediateSpriteNodes[row][col].type == .player {
-                            newPlayerPosition = (endRow, col)
-                        } else if intermediateSpriteNodes[row][col].type == .exit {
-                            newExitPosition = (endRow, col)
+                        // keep track of player position and exit position so we don't have to later
+                        if intermediateTiles[row][col] == .player {
+                            newPlayerPosition = TileCoord(endRow, col)
+                        } else if intermediateTiles[row][col] == .exit {
+                            newExitPosition = TileCoord(endRow, col)
                         }
-                        let trans = TileTransformation.init(initial: (row, col), end: (endRow, col))
+                        
+                        let trans = TileTransformation.init(TileCoord(row, col), TileCoord(endRow, col))
                         shiftDown.append(trans)
-
-                        //update sprite storage
-                        let intermediateTile = intermediateSpriteNodes[row][col]
+                        
+                        //update tile storage
+                        let intermediateTile = intermediateTiles[row][col]
+                        
                         // move the empty tile up
-                        intermediateSpriteNodes[row][col] = intermediateSpriteNodes[row-shift][col]
+                        intermediateTiles[row][col] = intermediateTiles[row-shift][col]
                         // move the non-empty tile down
-                        intermediateSpriteNodes[row-shift][col] = intermediateTile
+                        intermediateTiles[row-shift][col] = intermediateTile
                     }
                 }
             }
             
-            //create new tiles here as we know the most we can about the columns
+            //create new tiles here as we know the shiftIdx for the columns
             for shiftIdx in 0..<shift {
                 let startRow = boardSize + shiftIdx
                 let startCol = col
                 let endRow = boardSize - shiftIdx - 1
                 let endCol = col
                 
-                //update sprite storage
-                //remove empty one
-                intermediateSpriteNodes[endRow][endCol].removeFromParent()
-                //add random one
-                intermediateSpriteNodes[endRow][endCol] = DFTileSpriteNode.randomRock()
+                //add a random rock to the Tile storage
+                let randomType = TileType.randomRock()
+                intermediateTiles[endRow][endCol] = randomType
                 
                 //append to shift dictionary
-                var trans = TileTransformation.init(initial: (startRow, startCol),
-                                                end: (endRow, endCol))
+                var trans = TileTransformation(TileCoord(startRow, startCol),
+                                               TileCoord(endRow, endCol))
                 shiftDown.append(trans)
                 
                 //update new tiles
-                trans = TileTransformation.init(initial: (startRow, startCol),
-                                            end: (endRow, endCol))
+                trans = TileTransformation(TileCoord(startRow, startCol),
+                                           TileCoord(endRow, endCol),
+                                           randomType)
                 newTiles.append(trans)
             }
-        }
-        let selectedTilesTransformation = selectedTiles.map { TileTransformation(initial: ($0.0, $0.1), end: ($0.0, $0.1)) }
-        return Transformation(endBoard: self.mergeInit(tiles: intermediateSpriteNodes,
-                                                       playerPosition: newPlayerPosition,
-                                                       exitPosition: newExitPosition),
-                              tileTransformation: [selectedTilesTransformation, newTiles, shiftDown])
-    }
-    
-    //  MARK: - Private
-
-    private(set) var spriteNodes : [[DFTileSpriteNode]]
-    private var newTiles : [(Int, Int)]
-    
-    private(set) var boardSize: Int = 0
-    
-    private var tileSize = 75
-    
-    private var playerPosition : TileCoord
-    private var exitPosition : TileCoord
-
-    private func valid(neighbor : (Int, Int), for DFTileSpriteNode: (Int, Int)) -> Bool {
-        let (neighborRow, neighborCol) = neighbor
-        let (tileRow, tileCol) = DFTileSpriteNode
-        guard neighborRow >= 0 && neighborRow < boardSize && neighborCol >= 0 && neighborCol < spriteNodes[neighborRow].count else {
-            return false
-        }
-        let tileSum = tileRow + tileCol
-        let neighborSum = neighborRow + neighborCol
-        guard neighbor != DFTileSpriteNode else { return false }
-        guard (tileSum % 2 == 0  && neighborSum % 2 == 1) || (tileSum % 2 == 1 && neighborSum % 2 == 0) else { return false }
-        return true
-    }
-    
-    private func resetVisited() {
-        for row in 0..<boardSize {
-            for col in 0..<boardSize {
-                spriteNodes[row][col].search = .white
-            }
-        }
-        
+        } // end column for loop
+        let selectedTilesTransformation = selectedTiles.map { TileTransformation($0, $0) }
+        return Transformation(board: Board.init(tiles: intermediateTiles,
+                                                playerPosition: newPlayerPosition,
+                                                exitPosition: newExitPosition),
+                              tiles: intermediateTiles,
+                              transformation: [selectedTilesTransformation, newTiles, shiftDown])
     }
 }
 
-//MARK: - Factory
-extension Board {
+// MARK: - Factory
 
+extension Board {
     static func build(size: Int, playerPosition: TileCoord? = nil, exitPosition: TileCoord? = nil) -> Board {
-        var tiles : [[DFTileSpriteNode]] = []
+        var tiles: [[TileType]] = []
         for row in 0..<size {
             tiles.append([])
             for _ in 0..<size {
-                tiles[row].append(DFTileSpriteNode.randomRock())
+                tiles[row].append(TileType.randomRock())
             }
         }
         let playerRow: Int
         let playerCol: Int
         if let playerPos = playerPosition {
-            playerRow = playerPos.0
-            playerCol = playerPos.1
+            playerRow = playerPos.x
+            playerCol = playerPos.y
         } else {
             playerRow = Int.random(size)
             playerCol = Int.random(size)
         }
-        tiles[playerRow][playerCol] = DFTileSpriteNode.init(type: .player)
+        tiles[playerRow][playerCol] = TileType.player
         
         let exitRow: Int
         let exitCol: Int
         if let exitPos = exitPosition {
-            exitRow = exitPos.0
-            exitCol = exitPos.0
+            exitRow = exitPos.x
+            exitCol = exitPos.y
         } else {
             exitRow = Int.random(size, not: playerRow)
             exitCol = Int.random(size, not: playerCol)
         }
-        tiles[exitRow][exitCol] = DFTileSpriteNode.init(type: .exit)
+        tiles[exitRow][exitCol] = TileType.exit
         
-        return Board.init(tiles,
-                          size: size,
-                          playerPosition: (playerRow, playerCol),
-                          exitPosition: (exitRow, exitCol))
-    }
-    
-    
-    /*
-     Only to be used by settings button.  This is a quick reset for debugging purposes
-     */
-    func resetNoMoreMoves() -> Board {
-        return Board.build(size: boardSize, playerPosition: playerPosition, exitPosition: exitPosition)
+        return Board.init(tiles: tiles,
+                          playerPosition: TileCoord(playerRow, playerCol),
+                          exitPosition: TileCoord(exitRow, exitCol))
     }
 }
 
@@ -290,134 +279,68 @@ extension Board {
     
     func rotate(_ direction: Direction) -> Transformation {
         var transformation: [TileTransformation] = []
-        var intermediateBoard: [[DFTileSpriteNode]] = []
+        var intermediateTiles: [[TileType]] = []
         
-        var newPlayerPosition: (TileCoord)?
-        var newExitPosition: (TileCoord)?
+        var newPlayerPosition: TileCoord? = playerPosition
+        var newExitPosition: TileCoord? = exitPosition
+        let numCols = boardSize - 1
         switch direction {
         case .left:
-            let numCols = boardSize - 1
             for colIdx in 0..<boardSize {
-                var count = 0
-                var column : [DFTileSpriteNode] = []
+                var column : [TileType] = []
                 for rowIdx in 0..<boardSize {
                     let endRow = colIdx
-                    let endCol = numCols - count
-                    if spriteNodes[rowIdx][colIdx].type == .player {
-                        newPlayerPosition = (endRow, endCol)
-                    } else if spriteNodes[rowIdx][colIdx].type == .exit {
-                        newExitPosition = (endRow, endCol)
+                    let endCol = numCols - rowIdx
+                    if tiles[rowIdx][colIdx] == .player {
+                        newPlayerPosition = TileCoord(endRow, endCol)
+                    } else if tiles[rowIdx][colIdx] == .exit {
+                        newExitPosition = TileCoord(endRow, endCol)
                     }
-                    column.insert(spriteNodes[rowIdx][colIdx], at: 0)
-                    let trans = TileTransformation.init(initial: (rowIdx, colIdx), end: (endRow, endCol))
+                    column.insert(tiles[rowIdx][colIdx], at: 0)
+                    let trans = TileTransformation(TileCoord(rowIdx, colIdx),
+                                                   TileCoord(endRow, endCol))
                     transformation.append(trans)
-                    count += 1
                 }
-                intermediateBoard.append(column)
+                intermediateTiles.append(column)
             }
         case .right:
-            let numCols = boardSize - 1
             for colIdx in (0..<boardSize).reversed() {
-                var column : [DFTileSpriteNode] = []
+                var column : [TileType] = []
                 for rowIdx in 0..<boardSize {
                     let endRow = numCols - colIdx
                     let endCol = rowIdx
-                    if spriteNodes[rowIdx][colIdx].type == .player {
-                        newPlayerPosition = (endRow, endCol)
-                    } else if spriteNodes[rowIdx][colIdx].type == .exit {
-                        newExitPosition = (endRow, endCol)
+                    if tiles[rowIdx][colIdx] == .player {
+                        newPlayerPosition = TileCoord(endRow, endCol)
+                    } else if tiles[rowIdx][colIdx] == .exit {
+                        newExitPosition = TileCoord(endRow, endCol)
                     }
-                    column.append(spriteNodes[rowIdx][colIdx])
-                    let trans = TileTransformation.init(initial: (rowIdx, colIdx), end: (endRow, endCol))
+                    column.append(tiles[rowIdx][colIdx])
+                    let trans = TileTransformation(TileCoord(rowIdx, colIdx),
+                                                   TileCoord(endRow, endCol))
                     transformation.append(trans)
                 }
-                intermediateBoard.append(column)
+                intermediateTiles.append(column)
             }
         }
-        let board = self.mergeInit(tiles: intermediateBoard,
-                              playerPosition: newPlayerPosition,
-                              exitPosition: newExitPosition)
-        return Transformation(endBoard: board, tileTransformation: [transformation])
-
+        return Transformation(board: Board.init(tiles: intermediateTiles,
+                                                playerPosition: newPlayerPosition,
+                                                exitPosition: newExitPosition),
+                              tiles: intermediateTiles,
+                              transformation: [transformation])
     }
 }
 
+// MARK: - CustomDebugStringConvertible
 
-//MARK: - Check Board Game State
-
-extension Board {
-    func checkGameState() {
-        if checkWinCondition() {
-            //send game win notification
-            let trans = TileTransformation(initial: playerPosition, end: exitPosition)
-            NotificationCenter.default.post(name: .gameWin, object: nil, userInfo: ["transformation": [trans]])
-        } else if !boardHasMoreMoves() {
-            //send no more moves notification
-            NotificationCenter.default.post(name: .noMovesLeft, object: nil)
+extension Board : CustomDebugStringConvertible {
+    var debugDescription: String {
+        var outs = "\ntop (of Tiles)"
+        for (i, _) in tiles.enumerated().reversed() {
+            outs += "\n\(tiles[i])"
         }
+        outs += "\nbottom"
+        return outs
     }
     
-    private func checkWinCondition() -> Bool {
-        let (playerRow, playerCol) = playerPosition
-        let (exitRow, exitCol) = exitPosition
-        return playerRow == exitRow + 1 && playerCol == exitCol
-    }
-    
-    private func dfs() -> [TileCoord]? {
-        
-        func similarNeighborsOf(coords: TileCoord) -> [TileCoord] {
-            var neighborCoords: [TileCoord] = []
-            let currentNode = spriteNodes[coords.0][coords.1]
-            for i in coords.0-1...coords.0+1 {
-                for j in coords.1-1...coords.1+1 {
-                    guard valid(neighbor: (i,j), for: (coords.0, coords.1)) else { continue }
-                    let neighbor = spriteNodes[i][j]
-                    if neighbor.search == .white && neighbor == currentNode {
-                        //only add neighbors that are in a cardinal direction, not out of bounds, haven't been searched and re the same as the currentNode
-                        neighborCoords.append((i, j))
-                    }
-                }
-            }
-            return neighborCoords
-        }
-        
-        defer { resetVisited() } // reset the visited nodes so we dont desync the store and UI
-        
-        for index in 0..<spriteNodes.reduce([],+).count {
-            let row = index / boardSize // get the row
-            let col = (index - row * boardSize) % boardSize // get the column
-            resetVisited()
-            var queue : [(Int, Int)] = [(row, col)]
-            var head = 0
-            while head < queue.count {
-                guard queue.count < 3 else { return queue } // once neighbors is more than 3, then we know that the original tile + these two neighbors means there is a legal move left
-                let (tileRow, tileCol) = queue[head]
-                let tileSpriteNode = spriteNodes[tileRow][tileCol]
-                tileSpriteNode.search = .black
-                head += 1
-                //add neighbors to queue
-                for (i, j) in similarNeighborsOf(coords: (tileRow, tileCol)) {
-                    spriteNodes[i][j].search = .gray
-                    queue.append((i,j))
-                }
-                if queue.count >= 3 { return queue }
-            }
-        }
-        return nil
-    }
-    
-    private func boardHasMoreMoves() -> Bool {
-        let count = dfs()?.count ?? 0
-        return count > 2
-    }
 }
 
-
-//MARK: - Getters for private instance members
-
-extension Board {
-    
-    func getTileSize() -> Int {
-        return self.tileSize
-    }
-}

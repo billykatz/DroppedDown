@@ -7,23 +7,27 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3D528FD22150A53600EF65CA /* BoardState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D528FD12150A53600EF65CA /* BoardState.swift */; };
-		3D528FD42150A56500EF65CA /* Notification+DF.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D528FD32150A56500EF65CA /* Notification+DF.swift */; };
 		3D528FD62154A50300EF65CA /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3D528FD52154A50300EF65CA /* GameScene.sks */; };
 		3D528FDA2155AC8800EF65CA /* Menu.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3D528FD92155AC8800EF65CA /* Menu.sks */; };
 		3D528FDC2155B15D00EF65CA /* Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D528FDB2155B15D00EF65CA /* Menu.swift */; };
 		3D528FDF2155BD7300EF65CA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3D528FDE2155BD7200EF65CA /* Assets.xcassets */; };
 		3D5FB09420AE768700ACD716 /* AnimationSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D5FB09320AE768700ACD716 /* AnimationSettings.swift */; };
+		3D73D2E621C2226F00DB6FB7 /* PlayerWait.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3D73D2E521C2226F00DB6FB7 /* PlayerWait.sks */; };
+		3D7EF45C21D18D9000A2D9E8 /* Transformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D7EF45B21D18D9000A2D9E8 /* Transformation.swift */; };
+		3D7EF45E21D18DAB00A2D9E8 /* TileTransformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D7EF45D21D18DAB00A2D9E8 /* TileTransformation.swift */; };
+		3DAFBD3721B8E6E7009B116A /* InputQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DAFBD3621B8E6E7009B116A /* InputQueue.swift */; };
 		3DE657CD20B0AFD2003492DA /* Int+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE657CC20B0AFD2003492DA /* Int+Extensions.swift */; };
 		3DF2924E20A37FEE006671AC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2924D20A37FEE006671AC /* AppDelegate.swift */; };
 		3DF2925420A37FEE006671AC /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2925320A37FEE006671AC /* GameScene.swift */; };
 		3DF2925620A37FEE006671AC /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2925520A37FEE006671AC /* GameViewController.swift */; };
 		3DF2925920A37FEE006671AC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3DF2925720A37FEE006671AC /* Main.storyboard */; };
 		3DF2925E20A37FF0006671AC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3DF2925C20A37FF0006671AC /* LaunchScreen.storyboard */; };
-		3DF2926920A37FF0006671AC /* DownFallTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2926820A37FF0006671AC /* DownFallTests.swift */; };
+		3DF2926920A37FF0006671AC /* DownFallBoardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2926820A37FF0006671AC /* DownFallBoardTests.swift */; };
 		3DF2927420A37FF0006671AC /* DownFallUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2927320A37FF0006671AC /* DownFallUITests.swift */; };
 		3DF2928320A66BEB006671AC /* Tile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2928220A66BEB006671AC /* Tile.swift */; };
 		3DF2928520A76242006671AC /* Board.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2928420A76242006671AC /* Board.swift */; };
+		5605D6D321CC2DF400C1C5C2 /* DFTileSpriteNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5605D6D221CC2DF400C1C5C2 /* DFTileSpriteNode.swift */; };
+		5605D6D521CC2EA400C1C5C2 /* GameSceneTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5605D6D421CC2EA400C1C5C2 /* GameSceneTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,13 +48,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		3D528FD12150A53600EF65CA /* BoardState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardState.swift; sourceTree = "<group>"; };
-		3D528FD32150A56500EF65CA /* Notification+DF.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notification+DF.swift"; sourceTree = "<group>"; };
 		3D528FD52154A50300EF65CA /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
 		3D528FD92155AC8800EF65CA /* Menu.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Menu.sks; sourceTree = "<group>"; };
 		3D528FDB2155B15D00EF65CA /* Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Menu.swift; sourceTree = "<group>"; };
 		3D528FDE2155BD7200EF65CA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3D5FB09320AE768700ACD716 /* AnimationSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationSettings.swift; sourceTree = "<group>"; };
+		3D73D2E521C2226F00DB6FB7 /* PlayerWait.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = PlayerWait.sks; sourceTree = "<group>"; };
+		3D7EF45B21D18D9000A2D9E8 /* Transformation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transformation.swift; sourceTree = "<group>"; };
+		3D7EF45D21D18DAB00A2D9E8 /* TileTransformation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileTransformation.swift; sourceTree = "<group>"; };
+		3DAFBD3621B8E6E7009B116A /* InputQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = InputQueue.swift; path = DownFall/Models/InputQueue.swift; sourceTree = SOURCE_ROOT; };
 		3DE657CC20B0AFD2003492DA /* Int+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int+Extensions.swift"; sourceTree = "<group>"; };
 		3DF2924A20A37FEE006671AC /* DownFall.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DownFall.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3DF2924D20A37FEE006671AC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -60,13 +66,15 @@
 		3DF2925D20A37FF0006671AC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		3DF2925F20A37FF0006671AC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3DF2926420A37FF0006671AC /* DownFallTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DownFallTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		3DF2926820A37FF0006671AC /* DownFallTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownFallTests.swift; sourceTree = "<group>"; };
+		3DF2926820A37FF0006671AC /* DownFallBoardTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownFallBoardTests.swift; sourceTree = "<group>"; };
 		3DF2926A20A37FF0006671AC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3DF2926F20A37FF0006671AC /* DownFallUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DownFallUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3DF2927320A37FF0006671AC /* DownFallUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownFallUITests.swift; sourceTree = "<group>"; };
 		3DF2927520A37FF0006671AC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3DF2928220A66BEB006671AC /* Tile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tile.swift; sourceTree = "<group>"; };
 		3DF2928420A76242006671AC /* Board.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Board.swift; sourceTree = "<group>"; };
+		5605D6D221CC2DF400C1C5C2 /* DFTileSpriteNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DFTileSpriteNode.swift; sourceTree = "<group>"; };
+		5605D6D421CC2EA400C1C5C2 /* GameSceneTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSceneTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,6 +109,8 @@
 				3D528FDB2155B15D00EF65CA /* Menu.swift */,
 				3D528FD52154A50300EF65CA /* GameScene.sks */,
 				3DF2925320A37FEE006671AC /* GameScene.swift */,
+				3D73D2E521C2226F00DB6FB7 /* PlayerWait.sks */,
+				3DAFBD3621B8E6E7009B116A /* InputQueue.swift */,
 			);
 			path = Scenes;
 			sourceTree = "<group>";
@@ -135,7 +145,6 @@
 				3D528FDE2155BD7200EF65CA /* Assets.xcassets */,
 				3DF2928120A66A4E006671AC /* Models */,
 				3DF2925520A37FEE006671AC /* GameViewController.swift */,
-				3D528FD32150A56500EF65CA /* Notification+DF.swift */,
 				3DF2925720A37FEE006671AC /* Main.storyboard */,
 				3DF2925C20A37FF0006671AC /* LaunchScreen.storyboard */,
 				3DF2925F20A37FF0006671AC /* Info.plist */,
@@ -146,7 +155,8 @@
 		3DF2926720A37FF0006671AC /* DownFallTests */ = {
 			isa = PBXGroup;
 			children = (
-				3DF2926820A37FF0006671AC /* DownFallTests.swift */,
+				3DF2926820A37FF0006671AC /* DownFallBoardTests.swift */,
+				5605D6D421CC2EA400C1C5C2 /* GameSceneTests.swift */,
 				3DF2926A20A37FF0006671AC /* Info.plist */,
 			);
 			path = DownFallTests;
@@ -166,7 +176,9 @@
 			children = (
 				3DF2928220A66BEB006671AC /* Tile.swift */,
 				3DF2928420A76242006671AC /* Board.swift */,
-				3D528FD12150A53600EF65CA /* BoardState.swift */,
+				3D7EF45D21D18DAB00A2D9E8 /* TileTransformation.swift */,
+				3D7EF45B21D18D9000A2D9E8 /* Transformation.swift */,
+				5605D6D221CC2DF400C1C5C2 /* DFTileSpriteNode.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -239,13 +251,16 @@
 				TargetAttributes = {
 					3DF2924920A37FEE006671AC = {
 						CreatedOnToolsVersion = 9.3;
+						LastSwiftMigration = 1000;
 					};
 					3DF2926320A37FF0006671AC = {
 						CreatedOnToolsVersion = 9.3;
+						LastSwiftMigration = 1000;
 						TestTargetID = 3DF2924920A37FEE006671AC;
 					};
 					3DF2926E20A37FF0006671AC = {
 						CreatedOnToolsVersion = 9.3;
+						LastSwiftMigration = 1000;
 						TestTargetID = 3DF2924920A37FEE006671AC;
 					};
 				};
@@ -276,6 +291,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3D528FDA2155AC8800EF65CA /* Menu.sks in Resources */,
+				3D73D2E621C2226F00DB6FB7 /* PlayerWait.sks in Resources */,
 				3DF2925920A37FEE006671AC /* Main.storyboard in Resources */,
 				3D528FD62154A50300EF65CA /* GameScene.sks in Resources */,
 				3DF2925E20A37FF0006671AC /* LaunchScreen.storyboard in Resources */,
@@ -307,10 +323,12 @@
 				3DF2925420A37FEE006671AC /* GameScene.swift in Sources */,
 				3D5FB09420AE768700ACD716 /* AnimationSettings.swift in Sources */,
 				3DF2925620A37FEE006671AC /* GameViewController.swift in Sources */,
+				3D7EF45C21D18D9000A2D9E8 /* Transformation.swift in Sources */,
+				3D7EF45E21D18DAB00A2D9E8 /* TileTransformation.swift in Sources */,
 				3DF2928520A76242006671AC /* Board.swift in Sources */,
-				3D528FD22150A53600EF65CA /* BoardState.swift in Sources */,
+				3DAFBD3721B8E6E7009B116A /* InputQueue.swift in Sources */,
+				5605D6D321CC2DF400C1C5C2 /* DFTileSpriteNode.swift in Sources */,
 				3D528FDC2155B15D00EF65CA /* Menu.swift in Sources */,
-				3D528FD42150A56500EF65CA /* Notification+DF.swift in Sources */,
 				3DE657CD20B0AFD2003492DA /* Int+Extensions.swift in Sources */,
 				3DF2924E20A37FEE006671AC /* AppDelegate.swift in Sources */,
 				3DF2928320A66BEB006671AC /* Tile.swift in Sources */,
@@ -321,7 +339,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3DF2926920A37FF0006671AC /* DownFallTests.swift in Sources */,
+				5605D6D521CC2EA400C1C5C2 /* GameSceneTests.swift in Sources */,
+				3DF2926920A37FF0006671AC /* DownFallBoardTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -495,7 +514,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.williamKatz.DroppedDown;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -513,7 +532,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.williamKatz.DroppedDown;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -533,7 +552,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.williamKatz.DownFallTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DownFall.app/DownFall";
 			};
@@ -554,7 +573,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.williamKatz.DownFallTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DownFall.app/DownFall";
 			};
@@ -574,7 +593,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.williamKatz.DownFallUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = DownFall;
 			};
@@ -594,7 +613,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.williamKatz.DownFallUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = DownFall;
 			};

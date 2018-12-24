@@ -6,31 +6,6 @@
 //  Copyright © 2018 William Katz LLC. All rights reserved.
 //
 
-import NotificationCenter
-
-struct Transformation {
-    let endBoard: Board
-    let endTiles: [[TileType]]?
-    var tileTransformation: [[TileTransformation]]?
-    
-    init(board endBoard: Board, tiles endTiles: [[TileType]]? = nil, transformation tileTransformation: [[TileTransformation]]? = nil) {
-        self.endBoard = endBoard
-        self.endTiles = endTiles
-        self.tileTransformation = tileTransformation
-    }
-}
-
-struct TileTransformation {
-    let initial : TileCoord
-    let end : TileCoord
-    let endTileType: TileType?
-    
-    init(_ initial: TileCoord, _ end: TileCoord, _ endTileType: TileType? = nil) {
-        self.initial = initial
-        self.end = end
-        self.endTileType = endTileType
-    }
-}
 
 struct TileCoord: Hashable {
     let x, y: Int

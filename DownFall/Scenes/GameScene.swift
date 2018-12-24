@@ -89,7 +89,7 @@ extension GameScene {
         spriteNodes?.forEach { $0.forEach { (sprite) in
             if sprite.type == .player {
                 let group = SKAction.group([SKAction.wait(forDuration:5), sprite.animatedPlayerAction()])
-                let repeatAnimation = SKAction.repeat(group, count: Int.max)
+                let repeatAnimation = SKAction.repeat(group, count: 500)
                 sprite.run(repeatAnimation)
             }
             foreground.addChild(sprite)
@@ -140,12 +140,11 @@ extension GameScene {
         
         //add new tiles "newTiles"
         for trans in newTiles {
-            guard let newRockType = trans.endTileType else { assertionFailure("Transformation of new tile has no nil value for endTileType."); return }
             let (startRow, startCol) = trans.initial.tuple
             let (endRow, endCol) = trans.end.tuple
             
             // create a sprite based on the endTileType injected into this method
-            let sprite = DFTileSpriteNode(type: newRockType)
+            let sprite = spriteNodes[endRow][endCol]
             
             // place the tile at the "start" which is above the visible board
             // the animation will then move them to the correct place in the foreground
@@ -154,43 +153,21 @@ extension GameScene {
             sprite.position = CGPoint.init(x: y, y: x)
             
             //add it to the scene
-            foreground.addChild(sprite)
-            
-            //place the sprite in the appropriate place within the sprite storage
-            self.spriteNodes?[endRow][endCol] = sprite
-            
+            foreground.addChild(spriteNodes[endRow][endCol])
         }
         
         //animation "shiftDown" transformation
         var count = shiftDown.count
         animate(shiftDown) { [weak self] in
-            guard let strongSelf = self,
-                let bottomLeft = strongSelf.bottomLeft else { return }
+            guard let strongSelf = self else { return }
             count -= 1
             if count == 0 {
-                // the animations are done
-                // we can remove all the children and redraw
-                // set out sprites to reflect the new state
-                strongSelf.foreground.removeAllChildren()
-                
-                //TODO: figure out why i cant use addSpriteNodes here
-                strongSelf.spriteNodes = spriteNodes
-                var x : Int = 0
-                var y : Int = 0
-                for row in 0..<boardSize {
-                    y = row * strongSelf.tileSize + bottomLeft.0
-                    for col in 0..<boardSize {
-                        x = col * strongSelf.tileSize + bottomLeft.1
-                        strongSelf.spriteNodes?[row][col].position = CGPoint.init(x: x, y: y)
-                        strongSelf.foreground.addChild(spriteNodes[row][col])
-                    }
-                }
-                strongSelf.checkGameState()
-                strongSelf.animating = false
+                strongSelf.animationsFinished(for: spriteNodes)
             }
         }
     }
     
+    /// Animate each tileTransformation to display rotation
     private func rotate(for transformation: Transformation) {
         var animationCount = 0
         guard let trans = transformation.tileTransformation?.first,
@@ -199,13 +176,18 @@ extension GameScene {
             guard let strongSelf = self else { return }
             animationCount += 1
             if animationCount == trans.count {
-                strongSelf.foreground.removeAllChildren()
-                strongSelf.spriteNodes = spriteNodes
-                strongSelf.addSpriteTilesToScene()
-                strongSelf.checkGameState()
-                strongSelf.animating = false
+                strongSelf.animationsFinished(for: spriteNodes)
             }
         }
+    }
+    
+    //MARK: - Helper Methods
+    private func animationsFinished(for endBoard: [[DFTileSpriteNode]]) {
+        foreground.removeAllChildren()
+        spriteNodes = endBoard
+        addSpriteTilesToScene()
+        checkGameState()
+        animating = false
     }
 }
 

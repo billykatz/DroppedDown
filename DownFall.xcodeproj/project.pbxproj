@@ -13,6 +13,8 @@
 		3D528FDF2155BD7300EF65CA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3D528FDE2155BD7200EF65CA /* Assets.xcassets */; };
 		3D5FB09420AE768700ACD716 /* AnimationSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D5FB09320AE768700ACD716 /* AnimationSettings.swift */; };
 		3D73D2E621C2226F00DB6FB7 /* PlayerWait.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3D73D2E521C2226F00DB6FB7 /* PlayerWait.sks */; };
+		3D7EF45C21D18D9000A2D9E8 /* Transformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D7EF45B21D18D9000A2D9E8 /* Transformation.swift */; };
+		3D7EF45E21D18DAB00A2D9E8 /* TileTransformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D7EF45D21D18DAB00A2D9E8 /* TileTransformation.swift */; };
 		3DAFBD3721B8E6E7009B116A /* InputQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DAFBD3621B8E6E7009B116A /* InputQueue.swift */; };
 		3DE657CD20B0AFD2003492DA /* Int+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE657CC20B0AFD2003492DA /* Int+Extensions.swift */; };
 		3DF2924E20A37FEE006671AC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2924D20A37FEE006671AC /* AppDelegate.swift */; };
@@ -52,6 +54,8 @@
 		3D528FDE2155BD7200EF65CA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3D5FB09320AE768700ACD716 /* AnimationSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationSettings.swift; sourceTree = "<group>"; };
 		3D73D2E521C2226F00DB6FB7 /* PlayerWait.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = PlayerWait.sks; sourceTree = "<group>"; };
+		3D7EF45B21D18D9000A2D9E8 /* Transformation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transformation.swift; sourceTree = "<group>"; };
+		3D7EF45D21D18DAB00A2D9E8 /* TileTransformation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileTransformation.swift; sourceTree = "<group>"; };
 		3DAFBD3621B8E6E7009B116A /* InputQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = InputQueue.swift; path = DownFall/Models/InputQueue.swift; sourceTree = SOURCE_ROOT; };
 		3DE657CC20B0AFD2003492DA /* Int+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int+Extensions.swift"; sourceTree = "<group>"; };
 		3DF2924A20A37FEE006671AC /* DownFall.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DownFall.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -172,6 +176,8 @@
 			children = (
 				3DF2928220A66BEB006671AC /* Tile.swift */,
 				3DF2928420A76242006671AC /* Board.swift */,
+				3D7EF45D21D18DAB00A2D9E8 /* TileTransformation.swift */,
+				3D7EF45B21D18D9000A2D9E8 /* Transformation.swift */,
 				5605D6D221CC2DF400C1C5C2 /* DFTileSpriteNode.swift */,
 			);
 			path = Models;
@@ -317,6 +323,8 @@
 				3DF2925420A37FEE006671AC /* GameScene.swift in Sources */,
 				3D5FB09420AE768700ACD716 /* AnimationSettings.swift in Sources */,
 				3DF2925620A37FEE006671AC /* GameViewController.swift in Sources */,
+				3D7EF45C21D18D9000A2D9E8 /* Transformation.swift in Sources */,
+				3D7EF45E21D18DAB00A2D9E8 /* TileTransformation.swift in Sources */,
 				3DF2928520A76242006671AC /* Board.swift in Sources */,
 				3DAFBD3721B8E6E7009B116A /* InputQueue.swift in Sources */,
 				5605D6D321CC2DF400C1C5C2 /* DFTileSpriteNode.swift in Sources */,

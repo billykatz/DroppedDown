@@ -86,7 +86,15 @@ extension GameScene {
     
     /// Adds all sprite nodes from the store of [[DFTileSpriteNodes]] to the foreground
     private func addSpriteTilesToScene() {
-        spriteNodes?.forEach { $0.forEach { foreground.addChild($0) } }
+        spriteNodes?.forEach { $0.forEach { (sprite) in
+            if sprite.type == .player {
+                let group = SKAction.group([SKAction.wait(forDuration:5), sprite.animatedPlayerAction()])
+                let repeatAnimation = SKAction.repeat(group, count: Int.max)
+                sprite.run(repeatAnimation)
+            }
+            foreground.addChild(sprite)
+            }
+        }
     }
     
     /// Create sprite nodes from a 2d list of TileTypes and calculates their positions

@@ -14,7 +14,7 @@ class GameViewController: UIViewController {
 
     private var gameSceneNode: GameScene?
     private var menuScene: Menu?
-    private var boardSize = 4
+    private var boardSize = 5
     
     override func viewDidLoad() {
         super.viewDidLoad()

@@ -171,7 +171,5 @@ class GameRefereeTests: XCTestCase {
         let actualSet = Set(ref.enforceRules())
         
         XCTAssertEqual(expectedSet, actualSet, "Multiple monsters can die when hp reachs 0")
-
-
     }
 }

@@ -167,7 +167,7 @@ class DownFallTests: XCTestCase {
 
     func testFindNeighbors () {
         let expectedNeighbors: [TileCoord] = [(0,2), (1,2), (2,2), (1,1), (1,0), (2,0), (2,1)].map { TileCoord($0.0, $0.1) }
-        guard let actualNeighbors = board.findNeighbors(1, 1) else { XCTFail("Unable to find neighbors"); return }
+        let actualNeighbors = board.findNeighbors(1, 1)
         XCTAssertEqual(Set(actualNeighbors), Set(expectedNeighbors), "Neighbors found do not match")
         
     }
@@ -181,12 +181,12 @@ class DownFallTests: XCTestCase {
                                playerPosition: TileCoord(0,0),
                                exitPosition: TileCoord(0,1))
         let actualFoundNeighbors = board.findNeighbors(1,1)
-        XCTAssertTrue(actualFoundNeighbors?.count ?? nil == 1, "No neighbors found, inital and after board should be equal")
+        XCTAssertTrue(actualFoundNeighbors.count == 1, "No neighbors found, inital and after board should be equal")
     }
     
     func testInvalidInputFindNeighbors() {
         let actualFoundNeighbors = board.findNeighbors(-1,-1)
-        XCTAssertNil(actualFoundNeighbors, "Invalid input, inital and after board should be equal")
+        XCTAssertTrue(actualFoundNeighbors.isEmpty, "Invalid input, inital and after board should be equal")
     }
     
     func testRotateLeft() {
@@ -403,7 +403,7 @@ class DownFallTests: XCTestCase {
             }
         }
         
-        let actualTransformation: [TileTransformation] = board.removeAndReplace(row: 0, col: 0).tileTransformation![2]
+        let actualTransformation: [TileTransformation] = board.removeAndReplace(TileCoord(0,0)).tileTransformation![2]
         
         XCTAssertEqual(expectedTransformation.count, actualTransformation.count, "Shift down transformations should be the same")
         
@@ -433,11 +433,26 @@ class DownFallTests: XCTestCase {
 
         
         
-        let actualTransformation = board.removeAndReplace(row: 0, col: 0).tileTransformation![2]
+        let actualTransformation = board.removeAndReplace(TileCoord(0,0)).tileTransformation![2]
         
         XCTAssertEqual(expectedTransformation.count, actualTransformation.count, "Shift down transformations should be the same")
         arrayEquality(actualTransformation, expectedTransformation)
         
+    }
+    
+    func testBoardRemoveAndReplaceSingleTile() {
+        let board = MockBoardHelper.createBoard(.greenRock, size: 3)
+        
+        let expectedTransformation = [TileTransformation.init(TileCoord(1, 1), TileCoord(0, 1)),
+                                      TileTransformation.init(TileCoord(2, 1), TileCoord(1, 1)),
+                                      TileTransformation.init(TileCoord(3, 1), TileCoord(2, 1))]
+        
+        
+        let actualTransformation = board.removeAndReplace(TileCoord(0, 1), singleTile: true).tileTransformation![2]
+        
+        XCTAssertEqual(expectedTransformation.count, actualTransformation.count, "Shift down transformations should be the same")
+        arrayEquality(actualTransformation, expectedTransformation)
+
     }
 }
 

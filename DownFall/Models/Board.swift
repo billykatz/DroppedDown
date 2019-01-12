@@ -31,15 +31,15 @@ struct Board: Equatable {
         case .rotateRight:
             return self.rotate(.right)
         case .touch(let tileCoord):
-            // here we should pass the board and input into the TileGod
-            //
-            return self.removeAndReplace(row: tileCoord.x, col: tileCoord.y)
+            return self.removeAndReplace(tileCoord)
         case .playerAttack:
             return self.playerAttack()
         case .monsterAttack(let tileCoord):
+            return Transformation(board: self)
             return self.monsterAttack(tileCoord)
         case .monsterDies(let tileCoord):
-            return self.removeAndReplaceSingleTile(tileCoord)
+            //only remove a single tile when a monster dies
+            return self.removeAndReplace(tileCoord, singleTile: true)
         case .gameWin:
             return gameWin()
         case .gameLose:
@@ -95,11 +95,11 @@ extension Board {
     /// Find all contiguous neighbors of the same color as the tile that was tapped
     /// Return a new board with the selectedTiles updated
     
-    func findNeighbors(_ x: Int, _ y: Int) -> [TileCoord]? {
+    func findNeighbors(_ x: Int, _ y: Int) -> [TileCoord] {
         guard x >= 0,
             x < boardSize,
             y >= 0,
-            y < boardSize else { return nil }
+            y < boardSize else { return [] }
         var queue = [TileCoord(x, y)]
         var tileCoordSet = Set(queue)
         var head = 0
@@ -135,11 +135,13 @@ extension Board {
      *  - returns a transformation with the tiles that have been removed, added, and shifted down
      */
     
-    func removeAndReplace(row x: Int, col y: Int) -> Transformation {
+    func removeAndReplace(_ tileCoord: TileCoord, singleTile: Bool = false) -> Transformation {
         // Check that the tile group at row, col has more than 3 tiles
-        guard let selectedTiles = self.findNeighbors(x, y),
-            selectedTiles.count > 2 else {
-            return Transformation(board: self, transformation: nil)
+        let (row, col) = tileCoord.tuple
+        var selectedTiles: [TileCoord] = [tileCoord]
+        if !singleTile {
+            selectedTiles = self.findNeighbors(row, col)
+            if selectedTiles.count < 3 { return Transformation(board: self, transformation: nil) }
         }
         
         // set the tiles to be removed as Empty placeholder
@@ -224,91 +226,6 @@ extension Board {
                               transformation: [selectedTilesTransformation, newTiles, shiftDown])
     }
     
-    func removeAndReplaceSingleTile(_ coord: TileCoord) -> Transformation {
-        // Check that the tile group at row, col has more than 3 tiles
-        // set the tiles to be removed as Empty placeholder
-        let selectedTiles = [coord]
-        var intermediateTiles = tiles
-        for coord in selectedTiles {
-            intermediateTiles[coord.x][coord.y] = TileType.empty
-        }
-        
-        // keep track of the new player position and exit position after shifting
-        // in case the positions don't shift, initiate to the current player and exit position
-        var newPlayerPosition: TileCoord? = playerPosition
-        var newExitPosition: TileCoord? = exitPosition
-        
-        var shiftDown : [TileTransformation] = []
-        var newTiles : [TileTransformation] = []
-        var shiftIndices = Array(repeating: 0, count: tiles.count)
-        for col in 0..<boardSize {
-            var shift = 0
-            for row in 0..<boardSize {
-                switch intermediateTiles[row][col] {
-                case .empty:
-                    shift += 1
-                default:
-                    if shift != 0 {
-                        let endRow = row-shift
-                        // keep track of player position and exit position so we don't have to later
-                        if intermediateTiles[row][col] == TileType.player() {
-                            newPlayerPosition = TileCoord(endRow, col)
-                        } else if intermediateTiles[row][col] == .exit {
-                            newExitPosition = TileCoord(endRow, col)
-                        }
-                        
-                        let trans = TileTransformation.init(TileCoord(row, col), TileCoord(endRow, col))
-                        shiftDown.append(trans)
-                        
-                        //update tile storage
-                        let intermediateTile = intermediateTiles[row][col]
-                        
-                        // move the empty tile up
-                        intermediateTiles[row][col] = intermediateTiles[row-shift][col]
-                        // move the non-empty tile down
-                        intermediateTiles[row-shift][col] = intermediateTile
-                    }
-                }
-            }
-            shiftIndices[col] = shift
-        }
-        
-        // get new tiles from the Creator
-        var newTileTypes = TileCreator.tiles(for: Board.init(tiles: intermediateTiles))
-        guard newTileTypes.count == shiftIndices.reduce(0, +) else { assertionFailure("newTileTypes count must match the number of empty tiles in the board"); return Transformation.init(board: self) }
-        
-        //add new tiles here as we know shiftIdx for the columns
-        for (col, shifts) in shiftIndices.enumerated() {
-            for shift in 0..<shifts {
-                let startRow = boardSize + shift
-                let startCol = col
-                let endRow = boardSize - shift - 1
-                let endCol = col
-                
-                //Add the first tile from TileCreator and remove it from the array
-                let randomType = TileType.randomRock()
-                intermediateTiles[endRow][endCol] = newTileTypes.removeFirst()
-                
-                //append to shift dictionary
-                var trans = TileTransformation(TileCoord(startRow, startCol),
-                                               TileCoord(endRow, endCol))
-                shiftDown.append(trans)
-                
-                //update new tiles
-                trans = TileTransformation(TileCoord(startRow, startCol),
-                                           TileCoord(endRow, endCol),
-                                           randomType)
-                newTiles.append(trans)
-            }
-        }
-        let selectedTilesTransformation = selectedTiles.map { TileTransformation($0, $0) }
-        return Transformation(board: Board.init(tiles: intermediateTiles,
-                                                playerPosition: newPlayerPosition,
-                                                exitPosition: newExitPosition),
-                              tiles: intermediateTiles,
-                              transformation: [selectedTilesTransformation, newTiles, shiftDown])
-    }
-
 }
 
 // MARK: - Factory

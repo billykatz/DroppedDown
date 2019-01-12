@@ -30,7 +30,7 @@ struct Referee {
                 let playerPosition = board.playerPosition else { return false }
             for (i, row) in board.tiles.enumerated() {
                 for (j, _) in row.enumerated() {
-                    if board.findNeighbors(i, j)?.count ?? 0 > 2 || board.valid(neighbor: exitPosition, for: playerPosition) || playerAttacks() {
+                    if board.findNeighbors(i, j).count > 2 || board.valid(neighbor: exitPosition, for: playerPosition) || playerAttacks() {
                         return true
                     }
                 }

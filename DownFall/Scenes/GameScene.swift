@@ -79,6 +79,7 @@ class GameScene: SKScene {
         guard !self.animating, let input = inputQueue.pop() else { return }
         animating = true
         guard let transformation = board?.handle(input: input) else { animating = false; return }
+        referee = Referee(transformation.endBoard)
         render(transformation, for: input)
     }
     
@@ -87,10 +88,9 @@ class GameScene: SKScene {
     private func render(_ transformation: Transformation?, for input: Input) {
         guard let trans = transformation else { return }
         switch input{
-        case .touch(_):
+        case .touch(_), .monsterDies(_):
             board = trans.endBoard
             computeNewBoard(for: trans)
-            
         case .rotateLeft, .rotateRight:
             board = trans.endBoard
             rotate(for: trans)
@@ -100,7 +100,6 @@ class GameScene: SKScene {
             return
         case .monsterAttack:
             return
-        case .monsterDies(let coord): ()
         case .gameWin:
             gameWin(trans)
         case .gameLose:
@@ -278,6 +277,7 @@ extension GameScene {
             //self.reset()
             print(self.board as Any)
             print(self.debugBoardSprites())
+            print(self.inputQueue)
             return
         } else if rotateRight.contains(touch.location(in: self)) {
             input = Input.rotateRight

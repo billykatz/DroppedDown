@@ -16,7 +16,7 @@ struct Referee {
     }
     
     func enforceRules() -> [Input] {
-        //player wins
+        
         func playerWins() -> Bool {
             guard let playerRow = board.playerPosition?.x,
                 let playerCol = board.playerPosition?.y,
@@ -42,7 +42,8 @@ struct Referee {
             guard let playerCol = board.playerPosition?.y,
                 let playerRow = board.playerPosition?.x,
                 board.playerPosition?.x ?? 0 - 1 >= 1 else { return false }
-            if case TileType.greenMonster(_) = board.tiles[playerRow-1][playerCol] {
+            if case TileType.greenMonster(let monsterData) = board.tiles[playerRow-1][playerCol],
+                monsterData.hp > 0 {
                 return true
             }
             return false
@@ -64,6 +65,20 @@ struct Referee {
             }
             return attacks
         }
+        
+        func monsterDies() -> [TileCoord] {
+            var deadMonsters: [TileCoord] = []
+            for (i, row) in board.tiles.enumerated() {
+                for (j, _) in row.enumerated() {
+                    if case TileType.greenMonster(let data) = board.tiles[i][j] {
+                        if data.hp == 0 {
+                            deadMonsters.append(TileCoord(i, j))
+                        }
+                    }
+                }
+            }
+            return deadMonsters
+        }
 
         // Game rules are enforced in the following priorities
         // Game Win
@@ -72,6 +87,8 @@ struct Referee {
         // Monster attack
         // For rules that are not game win or game lose, they are all determined in the same step
         // Rules (inputs) are resolved in order of the array of inputs
+        //should monster get to attack before it dies?
+        
         if playerWins() {
             return [.gameWin]
         } else if !boardHasMoreMoves() {
@@ -85,6 +102,8 @@ struct Referee {
         }
         
         monsterAttacks().forEach { inputs.append(Input.monsterAttack($0)) }
+        
+        monsterDies().forEach { inputs.append(Input.monsterDies($0)) }
         
         return inputs
     }

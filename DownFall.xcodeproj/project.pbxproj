@@ -18,6 +18,7 @@
 		3D90AAD021D8854300C7428A /* GameRefereeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D90AACF21D8854300C7428A /* GameRefereeTests.swift */; };
 		3D90AAD321D8869200C7428A /* Referee.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D90AAD121D8863100C7428A /* Referee.swift */; };
 		3DA0087D21E6D1960017D8DA /* TileCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DA0087C21E6D1960017D8DA /* TileCreator.swift */; };
+		3DA0087F21EADDDE0017D8DA /* Animator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DA0087E21EADDDE0017D8DA /* Animator.swift */; };
 		3DAFBD3721B8E6E7009B116A /* InputQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DAFBD3621B8E6E7009B116A /* InputQueue.swift */; };
 		3DC9CA1321D1DDD4004D05D5 /* Difficulty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC9CA1221D1DDD4004D05D5 /* Difficulty.swift */; };
 		3DD36ECB21E5B86100AC4873 /* TileStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DD36ECA21E5B86100AC4873 /* TileStrategy.swift */; };
@@ -57,6 +58,7 @@
 		3D90AACF21D8854300C7428A /* GameRefereeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameRefereeTests.swift; sourceTree = "<group>"; };
 		3D90AAD121D8863100C7428A /* Referee.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Referee.swift; sourceTree = "<group>"; };
 		3DA0087C21E6D1960017D8DA /* TileCreator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileCreator.swift; sourceTree = "<group>"; };
+		3DA0087E21EADDDE0017D8DA /* Animator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animator.swift; sourceTree = "<group>"; };
 		3DAFBD3621B8E6E7009B116A /* InputQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = InputQueue.swift; path = DownFall/Models/InputQueue.swift; sourceTree = SOURCE_ROOT; };
 		3DC9CA1221D1DDD4004D05D5 /* Difficulty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Difficulty.swift; sourceTree = "<group>"; };
 		3DD36ECA21E5B86100AC4873 /* TileStrategy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileStrategy.swift; sourceTree = "<group>"; };
@@ -133,9 +135,11 @@
 				3DF2924D20A37FEE006671AC /* AppDelegate.swift */,
 				3D528FDD2155B17200EF65CA /* Scenes */,
 				3D5FB09320AE768700ACD716 /* AnimationSettings.swift */,
+				3DA0087E21EADDDE0017D8DA /* Animator.swift */,
 				3DE657CC20B0AFD2003492DA /* Int+Extensions.swift */,
 				3D528FDE2155BD7200EF65CA /* Assets.xcassets */,
 				3D90AAD121D8863100C7428A /* Referee.swift */,
+				3DA0087C21E6D1960017D8DA /* TileCreator.swift */,
 				3DF2928120A66A4E006671AC /* Models */,
 				3DF2925520A37FEE006671AC /* GameViewController.swift */,
 				3DD36ECA21E5B86100AC4873 /* TileStrategy.swift */,
@@ -164,7 +168,6 @@
 				3DC9CA1221D1DDD4004D05D5 /* Difficulty.swift */,
 				3DF2928220A66BEB006671AC /* Tile.swift */,
 				3DF2928420A76242006671AC /* Board.swift */,
-				3DA0087C21E6D1960017D8DA /* TileCreator.swift */,
 				3D7EF45D21D18DAB00A2D9E8 /* TileTransformation.swift */,
 				3D7EF45B21D18D9000A2D9E8 /* Transformation.swift */,
 				5605D6D221CC2DF400C1C5C2 /* DFTileSpriteNode.swift */,
@@ -291,6 +294,7 @@
 				3DA0087D21E6D1960017D8DA /* TileCreator.swift in Sources */,
 				3DF2924E20A37FEE006671AC /* AppDelegate.swift in Sources */,
 				3DF2928320A66BEB006671AC /* Tile.swift in Sources */,
+				3DA0087F21EADDDE0017D8DA /* Animator.swift in Sources */,
 				3DD36ECB21E5B86100AC4873 /* TileStrategy.swift in Sources */,
 				3D90AAD321D8869200C7428A /* Referee.swift in Sources */,
 				3DC9CA1321D1DDD4004D05D5 /* Difficulty.swift in Sources */,

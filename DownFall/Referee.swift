@@ -15,7 +15,7 @@ struct Referee {
         self.board = board
     }
     
-    func enforceRules() -> [Input] {
+    func enforceRules(movesLeft: Int? = Int.max) -> [Input] {
         
         func playerWins() -> Bool {
             guard let playerRow = board.playerPosition?.x,
@@ -30,9 +30,19 @@ struct Referee {
                 let playerPosition = board.playerPosition else { return false }
             for (i, row) in board.tiles.enumerated() {
                 for (j, _) in row.enumerated() {
-                    if board.findNeighbors(i, j).count > 2 || board.valid(neighbor: exitPosition, for: playerPosition) || playerAttacks() {
+                    if board.findNeighbors(i, j).count > 2 || board.valid(neighbor: exitPosition, for: playerPosition) || playerAttacks() || playerHasPossibleAttack() {
                         return true
                     }
+                }
+            }
+            return false
+        }
+        
+        func playerHasPossibleAttack() -> Bool {
+            guard let playerPosition = board.playerPosition else { return false }
+            for neighbor in board.validCardinalNeighbors(of: playerPosition) {
+                if case TileType.greenMonster(_) = board.tiles[neighbor.x][neighbor.y] {
+                    return true
                 }
             }
             return false
@@ -91,7 +101,7 @@ struct Referee {
         
         if playerWins() {
             return [.gameWin]
-        } else if !boardHasMoreMoves() {
+        } else if !boardHasMoreMoves() || movesLeft ?? Int.max <= 0 {
             return [.gameLose]
         }
         

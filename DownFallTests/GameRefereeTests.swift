@@ -112,6 +112,31 @@ class GameRefereeTests: XCTestCase {
         let actualOutput4 = ref.enforceRules()
         XCTAssertFalse(actualOutput4.contains(Input.gameLose))
         
+        //the player can rotate to kill a monster
+        ref = initRef([[.greenRock, .blueRock, .blueRock, .exit],
+                       [.blueRock, .blackRock, .blackRock, .greenRock],
+                       [.greenRock, .player(), .greenMonster(), .blackRock],
+                       [.blueRock, .blueRock, .greenRock, .greenRock]])
+        let actualOutput5 = ref.enforceRules()
+        XCTAssertFalse(actualOutput5.contains(Input.gameLose))
+        
+        //the player can rotate to kill a monster
+        ref = initRef([[.greenRock, .blueRock, .blueRock, .exit],
+                       [.blueRock, .blackRock, .blackRock, .greenRock],
+                       [.greenRock, .player(), .blueRock, .blackRock],
+                       [.blueRock, .greenMonster(), .greenRock, .greenRock]])
+        let actualOutput6 = ref.enforceRules()
+        XCTAssertFalse(actualOutput6.contains(Input.gameLose))
+        
+        //the player can rotate to kill a monster
+        ref = initRef([[.greenRock, .blueRock, .blueRock, .exit],
+                       [.blueRock, .blackRock, .blackRock, .greenRock],
+                       [.greenMonster(), .player(), .blueRock, .blackRock],
+                       [.blueRock, .blueRock, .greenRock, .greenRock]])
+        let actualOutput7 = ref.enforceRules()
+        XCTAssertFalse(actualOutput7.contains(Input.gameLose))
+
+        
     }
     
     func testRefereePlayerAttacks() {

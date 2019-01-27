@@ -454,5 +454,65 @@ class DownFallTests: XCTestCase {
         arrayEquality(actualTransformation, expectedTransformation)
 
     }
+    
+    func testvalidCardinalNeighbors() {
+        let board = MockBoardHelper.createBoard(.greenRock, size: 3)
+        
+        // Test 1,1 has 4 neighbors
+        var expectedNeighborsSet : Set<TileCoord> = [TileCoord(0, 1), TileCoord(1, 0), TileCoord(2, 1), TileCoord(1, 2)]
+        var actualNeighborSet = Set(board.validCardinalNeighbors(of: TileCoord(1, 1)))
+        XCTAssertEqual(expectedNeighborsSet, actualNeighborSet)
+        
+        
+        // Test 0,0 has 2 neighbors
+        expectedNeighborsSet = [TileCoord(0, 1), TileCoord(1, 0)]
+        actualNeighborSet = Set(board.validCardinalNeighbors(of: TileCoord(0, 0)))
+        
+        XCTAssertEqual(expectedNeighborsSet, actualNeighborSet)
+        
+        
+        // Test 2,0 has 2 neighbors
+        expectedNeighborsSet = [TileCoord(1, 0), TileCoord(2, 1)]
+        actualNeighborSet = Set(board.validCardinalNeighbors(of: TileCoord(2, 0)))
+        
+        XCTAssertEqual(expectedNeighborsSet, actualNeighborSet)
+        
+        // Test 2,2 has 2 neighbors
+        expectedNeighborsSet = [TileCoord(1, 2), TileCoord(2, 1)]
+        actualNeighborSet = Set(board.validCardinalNeighbors(of: TileCoord(2, 2)))
+        
+        XCTAssertEqual(expectedNeighborsSet, actualNeighborSet)
+        
+        // Test 0,2 has 2 neighbors
+        expectedNeighborsSet = [TileCoord(0, 1), TileCoord(1, 2)]
+        actualNeighborSet = Set(board.validCardinalNeighbors(of: TileCoord(0, 2)))
+        
+        XCTAssertEqual(expectedNeighborsSet, actualNeighborSet)
+        
+        // Test 0,1 has 3 neighbors
+        expectedNeighborsSet = [TileCoord(0, 0), TileCoord(1, 1), TileCoord(0, 2)]
+        actualNeighborSet = Set(board.validCardinalNeighbors(of: TileCoord(0, 1)))
+        
+        XCTAssertEqual(expectedNeighborsSet, actualNeighborSet)
+        
+        // Test 1,0 has 3 neighbors
+        expectedNeighborsSet = [TileCoord(0, 0), TileCoord(1, 1), TileCoord(2, 0)]
+        actualNeighborSet = Set(board.validCardinalNeighbors(of: TileCoord(1,0)))
+        
+        XCTAssertEqual(expectedNeighborsSet, actualNeighborSet)
+        
+        // Test 2,1 has 3 neighbors
+        expectedNeighborsSet = [TileCoord(2, 0), TileCoord(1, 1), TileCoord(2, 2)]
+        actualNeighborSet = Set(board.validCardinalNeighbors(of: TileCoord(2, 1)))
+        
+        XCTAssertEqual(expectedNeighborsSet, actualNeighborSet)
+        
+        // Test 1,2 has 3 neighbors
+        expectedNeighborsSet = [TileCoord(2, 2), TileCoord(1, 1), TileCoord(0, 2)]
+        actualNeighborSet = Set(board.validCardinalNeighbors(of: TileCoord(1, 2)))
+        
+        XCTAssertEqual(expectedNeighborsSet, actualNeighborSet)
+        
+    }
 }
 

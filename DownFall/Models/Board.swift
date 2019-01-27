@@ -91,6 +91,20 @@ extension Board {
         return true
     }
     
+    func validCardinalNeighbors(of coord: TileCoord) -> [TileCoord] {
+        var neighbors : [TileCoord] = []
+        let (tileRow, tileCol) = coord.tuple
+        for i in tileRow-1...tileRow+1 {
+            for j in tileCol-1...tileCol+1 {
+                //check that it is within bounds
+                if valid(neighbor: TileCoord(i,j), for: TileCoord(tileRow, tileCol)) {
+                    neighbors.append(TileCoord(i, j))
+                }
+            }
+        }
+        return neighbors
+    }
+    
     
     /// Find all contiguous neighbors of the same color as the tile that was tapped
     /// Return a new board with the selectedTiles updated

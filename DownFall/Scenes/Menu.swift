@@ -21,6 +21,12 @@ class Menu: SKScene {
     
     override func didMove(to view: SKView) {
         titleLabel = self.childNode(withName: "titleLabel") as? SKLabelNode
+        titleLabel.constraints = [
+            SKConstraint.distance(SKRange(lowerLimit: 200, upperLimit: 300), to:  CGPoint(x: CGRect(origin: frame.origin, size: size).minX, y: 0)),
+            SKConstraint.distance(SKRange(lowerLimit: 200, upperLimit: 300), to:  CGPoint(x: CGRect(origin: frame.origin, size: size).maxX, y: 0))
+                ]
+        
+        titleLabel.numberOfLines = 0
         primaryLabel = self.childNode(withName: "primaryLabel") as? SKLabelNode
     }
     

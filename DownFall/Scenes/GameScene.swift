@@ -35,6 +35,9 @@ class GameScene: SKScene {
     private var rotateLeft: SKNode!
     private var rotateRight: SKNode!
     private var setting: SKNode!
+    
+    //labels
+    private var movesLeftLabel: SKLabelNode!
 
     //animating
     private var animating: Bool = false
@@ -44,6 +47,14 @@ class GameScene: SKScene {
     
     //diffculty
     private var difficulty: Difficulty?
+    private var movesLeft: Int? {
+        didSet {
+            movesLeftLabel.text = "Moves Left: \(movesLeft!)"
+            if movesLeft! < 5 {
+                movesLeftLabel.fontColor = .red
+            }
+        }
+    }
     
     //deleagte
     weak var gameSceneDelegate: GameSceneDelegate?
@@ -69,6 +80,8 @@ class GameScene: SKScene {
         setting = self.childNode(withName: "setting")!
         rotateRight = self.childNode(withName: "rotateRight")!
         rotateLeft = self.childNode(withName: "rotateLeft")!
+        movesLeftLabel = self.childNode(withName: "movesLeftLabel")! as? SKLabelNode
+        movesLeft = difficulty!.moves
         inputQueue = InputQueue(queue: [])
         addSpriteTilesToScene()
     }
@@ -88,10 +101,12 @@ class GameScene: SKScene {
     private func render(_ transformation: Transformation?, for input: Input) {
         guard let trans = transformation else { return }
         switch input{
-        case .touch(_), .monsterDies(_):
+        case .touch(_):
+            if trans.tileTransformation != nil { movesLeft! -= 1 }
             board = trans.endBoard
             computeNewBoard(for: trans)
         case .rotateLeft, .rotateRight:
+            movesLeft! -= 1
             board = trans.endBoard
             rotate(for: trans)
         case .playerAttack:
@@ -99,7 +114,19 @@ class GameScene: SKScene {
             render(board: trans.endBoard)
             return
         case .monsterAttack:
+            let duration = 0.1
+            movesLeft! -= 2
+            let sequence = SKAction.sequence([SKAction.rotate(byAngle: CGFloat(Double.pi/8), duration: duration),
+                                              SKAction.rotate(byAngle: CGFloat(Double.pi/(-4)), duration: duration),
+                                              SKAction.rotate(byAngle: CGFloat(Double.pi/4), duration: duration),
+                                              SKAction.rotate(byAngle: CGFloat(Double.pi/(-8)), duration: duration)])
+            movesLeftLabel.run(sequence)
+
+            self.animating = false
             return
+        case .monsterDies(_):
+            board = trans.endBoard
+            computeNewBoard(for: trans)
         case .gameWin:
             gameWin(trans)
         case .gameLose:
@@ -217,7 +244,7 @@ extension GameScene {
         spriteNodes = endBoard
         addSpriteTilesToScene()
         animating = false
-        referee?.enforceRules().forEach { inputQueue.append($0) }
+        referee?.enforceRules(movesLeft: movesLeft).forEach { inputQueue.append($0) }
     }
     
     private func render(board: Board) {

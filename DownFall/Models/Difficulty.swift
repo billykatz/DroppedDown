@@ -14,5 +14,16 @@ enum Difficulty: Double {
     func maxExpectedMonsters(for board: Board) -> Int {
         return max(Int(Double(board.tiles.count) * self.rawValue / 5.0), 1)
     }
+    
+    var moves: Int {
+        switch self {
+        case .easy:
+            return 20
+        case .normal:
+            return 15
+        case .hard:
+            return 10
+        }
+    }
 }
 

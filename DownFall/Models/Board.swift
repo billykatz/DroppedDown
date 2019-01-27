@@ -31,15 +31,27 @@ struct Board: Equatable {
         case .rotateRight:
             return self.rotate(.right)
         case .touch(let tileCoord):
-            return self.removeAndReplace(row: tileCoord.x, col: tileCoord.y)
+            return self.removeAndReplace(tileCoord)
+        case .playerAttack:
+            return self.playerAttack()
+        case .monsterAttack(let tileCoord):
+            return Transformation(board: self)
+            return self.monsterAttack(tileCoord)
+        case .monsterDies(let tileCoord):
+            //only remove a single tile when a monster dies
+            return self.removeAndReplace(tileCoord, singleTile: true)
+        case .gameWin:
+            return gameWin()
+        case .gameLose:
+            return Transformation(board: self)
         }
     }
     
     init(tiles: [[TileType]],
-         playerPosition playerPos: TileCoord?,
-         exitPosition exitPos: TileCoord?) {
+         playerPosition playerPos: TileCoord? = nil,
+         exitPosition exitPos: TileCoord? = nil) {
         self.tiles = tiles
-        playerPosition = playerPos ?? getTilePosition(.player)
+        playerPosition = playerPos ?? getTilePosition(TileType.player())
         exitPosition = exitPos ?? getTilePosition(.exit)
     }
     
@@ -74,19 +86,34 @@ extension Board {
             else { return false }
         let tileSum = tileRow + tileCol
         let neighborSum = neighborRow + neighborCol
-        guard (tileSum % 2 == 0  && neighborSum % 2 == 1) || (tileSum % 2 == 1 && neighborSum % 2 == 0) else { return false }
+        let difference = abs(neighborSum - tileSum)
+        guard difference <= 1 && ((tileSum % 2 == 0  && neighborSum % 2 == 1) || (tileSum % 2 == 1 && neighborSum % 2 == 0)) else { return false }
         return true
+    }
+    
+    func validCardinalNeighbors(of coord: TileCoord) -> [TileCoord] {
+        var neighbors : [TileCoord] = []
+        let (tileRow, tileCol) = coord.tuple
+        for i in tileRow-1...tileRow+1 {
+            for j in tileCol-1...tileCol+1 {
+                //check that it is within bounds
+                if valid(neighbor: TileCoord(i,j), for: TileCoord(tileRow, tileCol)) {
+                    neighbors.append(TileCoord(i, j))
+                }
+            }
+        }
+        return neighbors
     }
     
     
     /// Find all contiguous neighbors of the same color as the tile that was tapped
     /// Return a new board with the selectedTiles updated
     
-    func findNeighbors(_ x: Int, _ y: Int) -> [TileCoord]? {
+    func findNeighbors(_ x: Int, _ y: Int) -> [TileCoord] {
         guard x >= 0,
             x < boardSize,
             y >= 0,
-            y < boardSize else { return nil }
+            y < boardSize else { return [] }
         var queue = [TileCoord(x, y)]
         var tileCoordSet = Set(queue)
         var head = 0
@@ -122,11 +149,13 @@ extension Board {
      *  - returns a transformation with the tiles that have been removed, added, and shifted down
      */
     
-    func removeAndReplace(row x: Int, col y: Int) -> Transformation {
+    func removeAndReplace(_ tileCoord: TileCoord, singleTile: Bool = false) -> Transformation {
         // Check that the tile group at row, col has more than 3 tiles
-        guard let selectedTiles = self.findNeighbors(x, y),
-            selectedTiles.count > 2 else {
-            return Transformation(board: self, transformation: nil)
+        let (row, col) = tileCoord.tuple
+        var selectedTiles: [TileCoord] = [tileCoord]
+        if !singleTile {
+            selectedTiles = self.findNeighbors(row, col)
+            if selectedTiles.count < 3 { return Transformation(board: self, transformation: nil) }
         }
         
         // set the tiles to be removed as Empty placeholder
@@ -142,6 +171,7 @@ extension Board {
         
         var shiftDown : [TileTransformation] = []
         var newTiles : [TileTransformation] = []
+        var shiftIndices = Array(repeating: 0, count: tiles.count)
         for col in 0..<boardSize {
             var shift = 0
             for row in 0..<boardSize {
@@ -152,7 +182,7 @@ extension Board {
                     if shift != 0 {
                         let endRow = row-shift
                         // keep track of player position and exit position so we don't have to later
-                        if intermediateTiles[row][col] == .player {
+                        if intermediateTiles[row][col] == TileType.player() {
                             newPlayerPosition = TileCoord(endRow, col)
                         } else if intermediateTiles[row][col] == .exit {
                             newExitPosition = TileCoord(endRow, col)
@@ -171,17 +201,24 @@ extension Board {
                     }
                 }
             }
-            
-            //create new tiles here as we know the shiftIdx for the columns
-            for shiftIdx in 0..<shift {
-                let startRow = boardSize + shiftIdx
+            shiftIndices[col] = shift
+        }
+        
+        // get new tiles from the Creator
+        var newTileTypes = TileCreator.tiles(for: Board.init(tiles: intermediateTiles))
+        guard newTileTypes.count == shiftIndices.reduce(0, +) else { assertionFailure("newTileTypes count must match the number of empty tiles in the board"); return Transformation.init(board: self) }
+        
+        //add new tiles here as we know shiftIdx for the columns
+        for (col, shifts) in shiftIndices.enumerated() where shifts > 0 {
+            for startIdx in 0..<shifts {
+                let startRow = boardSize + startIdx
                 let startCol = col
-                let endRow = boardSize - shiftIdx - 1
+                let endRow = startRow - shifts
                 let endCol = col
                 
-                //add a random rock to the Tile storage
+                //Add the first tile from TileCreator and remove it from the array
                 let randomType = TileType.randomRock()
-                intermediateTiles[endRow][endCol] = randomType
+                intermediateTiles[endRow][endCol] = newTileTypes.removeFirst()
                 
                 //append to shift dictionary
                 var trans = TileTransformation(TileCoord(startRow, startCol),
@@ -194,7 +231,7 @@ extension Board {
                                            randomType)
                 newTiles.append(trans)
             }
-        } // end column for loop
+        }
         let selectedTilesTransformation = selectedTiles.map { TileTransformation($0, $0) }
         return Transformation(board: Board.init(tiles: intermediateTiles,
                                                 playerPosition: newPlayerPosition,
@@ -202,12 +239,36 @@ extension Board {
                               tiles: intermediateTiles,
                               transformation: [selectedTilesTransformation, newTiles, shiftDown])
     }
+    
 }
 
 // MARK: - Factory
 
 extension Board {
-    static func build(size: Int, playerPosition: TileCoord? = nil, exitPosition: TileCoord? = nil) -> Board {
+    static func build(size: Int,
+                      playerPosition: TileCoord? = nil,
+                      exitPosition: TileCoord? = nil,
+                      difficulty: Difficulty? = .normal) -> Board {
+        
+        
+        /// Considerations:
+        /// - not too many monsters, but at least 1?
+        /// - can a monster start next to a player?
+        /// - should this be in Board?
+        ///
+        /// Board should know what tiles it has.
+        /// Board should know how to rotate the tiles
+        /// Board should know how to remove and replace tiles
+        /// Game should know if the player has won or lost
+        /// Game should know if what difficulty the game is
+        /// Game should know how to place a Tile in the Scene
+        ///
+        /// Who knows tile specific data? Player's health/attack? The monster's health/attack? Exit is lock or unlocked?
+        /// Who knows how tiles interact with each other? eg. Player/Monster attack triggered.  Player can obtain key/artifact.
+        /// Who knows what tile to create? Monsters/Rocks/Artifcats/Power-ups etc...
+        ///
+        
+        
         var tiles: [[TileType]] = []
         for row in 0..<size {
             tiles.append([])
@@ -224,7 +285,7 @@ extension Board {
             playerRow = Int.random(size)
             playerCol = Int.random(size)
         }
-        tiles[playerRow][playerCol] = TileType.player
+        tiles[playerRow][playerCol] = TileType.player(CombatTileData.player())
         
         let exitRow: Int
         let exitCol: Int
@@ -236,6 +297,8 @@ extension Board {
             exitCol = Int.random(size, not: playerCol)
         }
         tiles[exitRow][exitCol] = TileType.exit
+        
+        
         
         return Board.init(tiles: tiles,
                           playerPosition: TileCoord(playerRow, playerCol),
@@ -266,7 +329,7 @@ extension Board {
                 for rowIdx in 0..<boardSize {
                     let endRow = colIdx
                     let endCol = numCols - rowIdx
-                    if tiles[rowIdx][colIdx] == .player {
+                    if tiles[rowIdx][colIdx] == TileType.player() {
                         newPlayerPosition = TileCoord(endRow, endCol)
                     } else if tiles[rowIdx][colIdx] == .exit {
                         newExitPosition = TileCoord(endRow, endCol)
@@ -284,7 +347,7 @@ extension Board {
                 for rowIdx in 0..<boardSize {
                     let endRow = numCols - colIdx
                     let endCol = rowIdx
-                    if tiles[rowIdx][colIdx] == .player {
+                    if tiles[rowIdx][colIdx] == TileType.player() {
                         newPlayerPosition = TileCoord(endRow, endCol)
                     } else if tiles[rowIdx][colIdx] == .exit {
                         newExitPosition = TileCoord(endRow, endCol)
@@ -319,3 +382,69 @@ extension Board : CustomDebugStringConvertible {
     
 }
 
+
+extension Board {
+    func gameWin() -> Transformation {
+        guard let playerPosition = self.playerPosition,
+            let exitPosition = self.exitPosition else { return Transformation(board: self)  }
+        return Transformation(board: self, transformation: [[TileTransformation(playerPosition, exitPosition)]])
+    }
+}
+
+// MARK - Tile counts
+
+extension Board {
+    func tiles(of type: TileType) -> [TileCoord] {
+        var tileCoords: [TileCoord] = []
+        for (i, _) in tiles.enumerated() {
+            for (j, _) in tiles[i].enumerated() {
+                tiles[i][j] == type ? tileCoords.append(TileCoord(i, j)) : ()
+            }
+        }
+        return tileCoords
+    }
+    
+}
+
+// MARK: - Combat
+extension Board {
+    func playerAttack() -> Transformation {
+        // Right now players only attack down, guard that we dont go out of bounds
+        guard  let playerCol = playerPosition?.y,
+                let playerRow = playerPosition?.x,
+                playerPosition?.x ?? 0 - 1 >= 1 else { return Transformation(board: self) }
+        var currBoard = self.tiles
+        let player = currBoard[playerRow][playerCol]
+        let targetRow = playerRow - 1
+        let target =  currBoard[targetRow][playerCol]
+        if case TileType.greenMonster(let monsterData) = target,
+            case TileType.player(let playerData) = player {
+            let data = CombatTileData(hp: monsterData.hp - playerData.attackDamage, attackDamage: monsterData.attackDamage)
+            currBoard[targetRow][playerCol] = TileType.greenMonster(data)
+        }
+
+        return Transformation(board: Board.init(tiles: currBoard,
+                                                playerPosition: self.playerPosition,
+                                                exitPosition: self.exitPosition),
+                              tiles: currBoard)
+    }
+    
+    
+    func monsterAttack(_ tileCoord: TileCoord) -> Transformation {
+        let (monsterRow, monsterCol) = tileCoord.tuple
+        guard monsterRow  >= 1 else { return Transformation(board: self) }
+        var currBoard = self.tiles
+        let player = currBoard[monsterRow-1][monsterCol]
+        if case TileType.greenMonster(let monsterData) = currBoard[monsterRow][monsterCol],
+            case TileType.player(let playerData) = player {
+            let data = CombatTileData(hp: playerData.hp - monsterData.attackDamage, attackDamage: playerData.attackDamage)
+            currBoard[monsterRow-1][monsterCol] = TileType.player(data)
+        }
+        
+        return Transformation(board: Board.init(tiles: currBoard,
+                                                playerPosition: self.playerPosition,
+                                                exitPosition: self.exitPosition),
+                              tiles: currBoard,
+                              transformation: nil)
+    }
+}

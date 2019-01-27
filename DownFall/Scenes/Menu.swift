@@ -16,26 +16,26 @@ protocol MenuDelegate: class {
 class Menu: SKScene {
     private var titleLabel: SKLabelNode!
     private var primaryLabel: SKLabelNode!
-    private var secondaryLabel: SKLabelNode!
     
     weak var menuDelegate: MenuDelegate?
     
     override func didMove(to view: SKView) {
         titleLabel = self.childNode(withName: "titleLabel") as? SKLabelNode
+        titleLabel.constraints = [
+            SKConstraint.distance(SKRange(lowerLimit: 200, upperLimit: 300), to:  CGPoint(x: CGRect(origin: frame.origin, size: size).minX, y: 0)),
+            SKConstraint.distance(SKRange(lowerLimit: 200, upperLimit: 300), to:  CGPoint(x: CGRect(origin: frame.origin, size: size).maxX, y: 0))
+                ]
+        
+        titleLabel.numberOfLines = 0
         primaryLabel = self.childNode(withName: "primaryLabel") as? SKLabelNode
-        secondaryLabel = self.childNode(withName: "secondaryLabel") as? SKLabelNode
     }
     
     public func configure(title: String,
                    primary: String?,
-                   secondary: String?,
                    delegate: MenuDelegate) {
         titleLabel.text = title
         if let primaryText = primary {
             primaryLabel.text = primaryText
-        }
-        if let secondaryText = secondary {
-            secondaryLabel.text = secondaryText
         }
     }
     
@@ -52,9 +52,6 @@ extension Menu {
         let location = touch.location(in: self)
         if primaryLabel.contains(location) {
             menuDelegate?.didTapPrimary()
-        }
-        if secondaryLabel.contains(location) {
-            menuDelegate?.didTapSecondary()
         }
     }
 }

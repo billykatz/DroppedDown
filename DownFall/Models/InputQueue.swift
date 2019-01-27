@@ -8,10 +8,15 @@
 
 import SpriteKit
 
-enum Input {
+enum Input : Equatable, Hashable {
     case touch(TileCoord)
     case rotateLeft
     case rotateRight
+    case playerAttack
+    case monsterAttack(TileCoord)
+    case monsterDies(TileCoord)
+    case gameWin
+    case gameLose
 }
 
 struct InputQueue {

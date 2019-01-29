@@ -14,7 +14,7 @@ protocol GameSceneDelegate: class {
 
 class GameScene: SKScene {
     
-    private var tileSize = 75
+    private var tileSize = 100
     private var boardSize: Int?
     private var board: Board? {
         didSet {
@@ -168,7 +168,7 @@ extension GameScene {
             sprites.append([])
             for col in 0..<boardSize {
                 x = col * tileSize + bottomLeftX
-                sprites[row].append(DFTileSpriteNode(type: tiles[row][col]))
+                sprites[row].append(DFTileSpriteNode(type: tiles[row][col], size: CGFloat(tileSize)))
                 sprites[row][col].position = CGPoint.init(x: x, y: y)
             }
         }

@@ -7,6 +7,7 @@
 //
 
 import SpriteKit
+import UIKit
 
 protocol GameSceneDelegate: class {
     func shouldShowMenu(win: Bool)
@@ -61,6 +62,12 @@ class GameScene: SKScene {
     
     //game referee
     private var referee: Referee?
+    
+    //renderer
+    private var renderer: Renderer?
+    
+    //playable margin
+    private var playableRect: CGRect?
 
     required init?(coder aDecoder: NSCoder) { super.init(coder: aDecoder) }
     
@@ -70,8 +77,8 @@ class GameScene: SKScene {
         self.difficulty = difficulty
         board = Board.build(size: bsize)
         boardSize = bsize
-        bottomLeft = (-1 * tileSize/2 * bsize, -1 * tileSize/2 * bsize )
-        spriteNodes = createAndPositionSprites(from: board!.tiles)
+        bottomLeft = (-1 * tileSize/2 * bsize, -1 * tileSize/2 * bsize)
+        
         referee = Referee(board!)
     }
     
@@ -83,7 +90,18 @@ class GameScene: SKScene {
         movesLeftLabel = self.childNode(withName: "movesLeftLabel")! as? SKLabelNode
         movesLeft = difficulty!.moves
         inputQueue = InputQueue(queue: [])
-        addSpriteTilesToScene()
+        
+        //Adjust the playbale rect depending on the size of the device
+        let maxAspectRatio : CGFloat = 19.5/9.0
+        let playableWidth = size.height / maxAspectRatio
+        let playableRect = CGRect(x: -playableWidth/2,
+                              y: -size.height/2,
+                              width: playableWidth,
+                              height: size.height)
+        self.renderer = Renderer(playableRect: playableRect,
+                                 foreground: foreground,
+                                 board: self.board!,
+                                 size: boardSize!)
     }
     
     /// Called every frame
@@ -134,7 +152,6 @@ class GameScene: SKScene {
         }
     }
 }
-
 
 //MARK: - Adding and Calculating Sprite Tiles
 
@@ -377,3 +394,4 @@ extension GameScene {
         addSpriteTilesToScene()
     }
 }
+

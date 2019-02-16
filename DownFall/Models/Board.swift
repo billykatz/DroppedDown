@@ -6,23 +6,25 @@
 //  Copyright © 2018 William Katz LLC. All rights reserved.
 //
 
-
-struct TileCoord: Hashable {
-    let x, y: Int
-    var tuple : (Int, Int) { return (x, y) }
-    
-    init(_ x: Int, _ y: Int) {
-        self.x = x
-        self.y = y
-    }
-}
-
 struct Board: Equatable {
     private(set) var tiles: [[TileType]]
     private(set) var playerPosition : TileCoord?
     private(set) var exitPosition : TileCoord?
-    private var boardSize: Int { return tiles.count }
+    var boardSize: Int { return tiles.count }
     
+    subscript(index: TileCoord) -> TileType? {
+        guard isWithinBounds(index) else { return nil }
+        return tiles[index.x][index.y]
+        
+    }
+    
+    func isWithinBounds(_ tileCoord: TileCoord) -> Bool {
+        let (tileRow, tileCol) = tileCoord.tuple
+        return tileRow >= 0 && //lower bound
+            tileCol >= 0 && // lower bound
+            tileRow < boardSize && // upper bound
+            tileCol < boardSize
+    }
     
     func handle(input: Input) -> Transformation {
         switch input {
@@ -55,7 +57,7 @@ struct Board: Equatable {
     }
     
     // MARK: - Helpers
-    private func getTilePosition(_ type: TileType) -> TileCoord? {
+    func getTilePosition(_ type: TileType) -> TileCoord? {
         for i in 0..<tiles.count {
             for j in 0..<tiles[i].count {
                 if tiles[i][j] == type {

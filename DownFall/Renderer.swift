@@ -15,11 +15,7 @@ struct Renderer {
     var sprites: [[DFTileSpriteNode]] = []
     let bottomLeft: (Int, Int)
     let boardSize: Int
-    let tileSize: Int = 75
-    
-//    func render(_ board: Board) -> SKNode {
-//        
-//    }
+    let tileSize: Int = 150
     
     init(playableRect: CGRect,
          foreground: SKNode,
@@ -37,6 +33,7 @@ struct Renderer {
         //DEBUG
         debugDrawPlayableArea()
     }
+    
     
     func add(sprites: [[DFTileSpriteNode]], to foreground: SKNode) {
         sprites.forEach {

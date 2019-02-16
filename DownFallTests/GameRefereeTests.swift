@@ -11,6 +11,21 @@ import XCTest
 
 class GameRefereeTests: XCTestCase {
     
+    let mockBoard = Board.build(size: 10)
+    var allBlack: Builder!
+    var allGreen: Builder!
+    var player: Builder!
+    var exit: Builder!
+    
+    override func setUp() {
+        super.setUp()
+        
+        allBlack = all(.blackRock, mockBoard)
+        allGreen = all(.greenRock, mockBoard)
+        player = xTiles(1, .player(), mockBoard)
+        exit = xTiles(1, .exit, mockBoard)
+    }
+    
     func initRef(_ tiles: [[TileType]]) -> Referee {
         let board = Board(tiles: tiles)
         return Referee(board)
@@ -24,37 +39,36 @@ class GameRefereeTests: XCTestCase {
     }
     
     func testRefereeGameWin() {
-        var ref = initRef([[.exit, .blackRock], [.player(), .blackRock]])
         
+        //same for all tests in this function
         let expectedOutput = [Input.gameWin]
-        let actualOutput = ref.enforceRules()
         
+        let gameWin = allBlack >>> win(mockBoard)
+        let gameBoard = gameWin(mockBoard)
+        let actualOutput = Referee(gameBoard).enforceRules()
         XCTAssertEqual(expectedOutput, actualOutput)
         
-        ref = initRef([[.greenRock, .blackRock, .blueRock],
-                       [.exit, .blackRock, .blueRock],
-                       [.player(), .blackRock, .blueRock]])
         
-        let actualOutput2 = ref.enforceRules()
-        
+        let gameWin2 = (allGreen >>> player) >>> win(mockBoard)
+        let gameBoard2 = gameWin2(mockBoard)
+        let actualOutput2 = Referee(gameBoard2).enforceRules()
         XCTAssertEqual(expectedOutput, actualOutput2)
-        
-        ref = initRef([[.greenRock, .blackRock, .blueRock],
-                 [.blueRock, .blackRock, .exit],
-                 [.greenRock, .blackRock, .player()]])
-        
-        let actualOutput3 = ref.enforceRules()
-        
+
+        let gameWin3 = (allGreen >>> exit) >>> win(mockBoard)
+        let gameBoard3 = gameWin3(mockBoard)
+        let actualOutput3 = Referee(gameBoard3).enforceRules()
         XCTAssertEqual(expectedOutput, actualOutput3)
     }
     
     
     func testRefereeGameLoses() {
         
+        let gameLose = lose(mockBoard)
+        let gameBoard = gameLose(mockBoard)
         var ref = initRef([[.exit, .blackRock], [.blackRock, .player()]])
         
         let expectedOutput = [Input.gameLose]
-        let actualOutput = ref.enforceRules()
+        let actualOutput = Referee(gameBoard).enforceRules()
         
         XCTAssertEqual(expectedOutput, actualOutput)
         
@@ -140,21 +154,15 @@ class GameRefereeTests: XCTestCase {
     }
     
     func testRefereePlayerAttacks() {
-        var ref = initRef([[.greenRock, .blueRock, .greenRock, .greenRock],
-                                   [.blueRock, .greenMonster(), .exit, .greenRock],
-                                   [.greenRock, .player(), .blueRock, .blackRock],
-                                   [.blueRock, .blackRock, .greenRock, .greenRock]])
+        let playerAttack = all(.blackRock, mockBoard) >>> playerAttacks(mockBoard)
         let expectedOutput = [Input.playerAttack]
-        let actualOutput = ref.enforceRules()
+        let actualOutput = Referee(playerAttack(mockBoard)).enforceRules()
         
         XCTAssertEqual(expectedOutput, actualOutput)
         
         
-        ref = initRef([[.greenRock, .blueRock, .greenRock, .greenRock],
-                 [.blueRock, .greenMonster(CombatTileData(hp:2, attackDamage: 3)), .exit, .greenRock],
-                 [.greenRock, .player(), .blueRock, .blackRock],
-                 [.blueRock, .blackRock, .greenRock, .greenRock]])
-        let actualOutput2 = ref.enforceRules()
+        let playerAttackBigMonster = all(.greenRock, mockBoard) >>> playerAttacks(mockBoard, .greenMonster(CombatTileData(hp:2, attackDamage: 3)))
+        let actualOutput2 = Referee(playerAttackBigMonster(mockBoard)).enforceRules()
         
         XCTAssertEqual(expectedOutput, actualOutput2)
         

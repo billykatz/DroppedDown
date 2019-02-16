@@ -26,11 +26,10 @@ struct Referee {
         }
         
         func boardHasMoreMoves() -> Bool {
-            guard let exitPosition = board.exitPosition,
-                let playerPosition = board.playerPosition else { return false }
+            guard let playerPosition = board.playerPosition else { return false }
             for (i, row) in board.tiles.enumerated() {
                 for (j, _) in row.enumerated() {
-                    if board.findNeighbors(i, j).count > 2 || board.valid(neighbor: exitPosition, for: playerPosition) || playerAttacks() || playerHasPossibleAttack() {
+                    if board.findNeighbors(i, j).count > 2 || board.valid(neighbor: board.exitPosition, for: playerPosition) || playerAttacks() || playerHasPossibleAttack() {
                         return true
                     }
                 }

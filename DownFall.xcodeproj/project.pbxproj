@@ -15,6 +15,11 @@
 		3D528FDC2155B15D00EF65CA /* Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D528FDB2155B15D00EF65CA /* Menu.swift */; };
 		3D528FDF2155BD7300EF65CA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3D528FDE2155BD7200EF65CA /* Assets.xcassets */; };
 		3D5FB09420AE768700ACD716 /* AnimationSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D5FB09320AE768700ACD716 /* AnimationSettings.swift */; };
+		3D6AACD8222A324D00C77B24 /* CGRectHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D6AACD7222A324D00C77B24 /* CGRectHelpers.swift */; };
+		3D6AACE1222C997800C77B24 /* Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D6AACE0222C997800C77B24 /* Header.swift */; };
+		3D6AACE4222CD38E00C77B24 /* Controls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D6AACE3222CD38E00C77B24 /* Controls.swift */; };
+		3D6AACE6222CDF9800C77B24 /* DispatchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D6AACE5222CDF9800C77B24 /* DispatchTests.swift */; };
+		3D6AACE9222CDFE800C77B24 /* Dispatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D6AACE8222CDFE800C77B24 /* Dispatch.swift */; };
 		3D73D2E621C2226F00DB6FB7 /* PlayerWait.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3D73D2E521C2226F00DB6FB7 /* PlayerWait.sks */; };
 		3D7EF45C21D18D9000A2D9E8 /* Transformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D7EF45B21D18D9000A2D9E8 /* Transformation.swift */; };
 		3D7EF45E21D18DAB00A2D9E8 /* TileTransformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D7EF45D21D18DAB00A2D9E8 /* TileTransformation.swift */; };
@@ -59,6 +64,11 @@
 		3D528FDB2155B15D00EF65CA /* Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Menu.swift; sourceTree = "<group>"; };
 		3D528FDE2155BD7200EF65CA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3D5FB09320AE768700ACD716 /* AnimationSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationSettings.swift; sourceTree = "<group>"; };
+		3D6AACD7222A324D00C77B24 /* CGRectHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CGRectHelpers.swift; path = DownFall/CGRectHelpers.swift; sourceTree = "<group>"; };
+		3D6AACE0222C997800C77B24 /* Header.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Header.swift; sourceTree = "<group>"; };
+		3D6AACE3222CD38E00C77B24 /* Controls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Controls.swift; sourceTree = "<group>"; };
+		3D6AACE5222CDF9800C77B24 /* DispatchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DispatchTests.swift; path = DownFallTests/DispatchTests.swift; sourceTree = SOURCE_ROOT; };
+		3D6AACE8222CDFE800C77B24 /* Dispatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dispatch.swift; sourceTree = "<group>"; };
 		3D73D2E521C2226F00DB6FB7 /* PlayerWait.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = PlayerWait.sks; sourceTree = "<group>"; };
 		3D7EF45B21D18D9000A2D9E8 /* Transformation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transformation.swift; sourceTree = "<group>"; };
 		3D7EF45D21D18DAB00A2D9E8 /* TileTransformation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileTransformation.swift; sourceTree = "<group>"; };
@@ -119,9 +129,34 @@
 			path = Scenes;
 			sourceTree = "<group>";
 		};
+		3D6AACDF222C996900C77B24 /* Header */ = {
+			isa = PBXGroup;
+			children = (
+				3D6AACE0222C997800C77B24 /* Header.swift */,
+			);
+			path = Header;
+			sourceTree = "<group>";
+		};
+		3D6AACE2222CD22100C77B24 /* Controls */ = {
+			isa = PBXGroup;
+			children = (
+				3D6AACE3222CD38E00C77B24 /* Controls.swift */,
+			);
+			path = Controls;
+			sourceTree = "<group>";
+		};
+		3D6AACE7222CDFDA00C77B24 /* Dispatch */ = {
+			isa = PBXGroup;
+			children = (
+				3D6AACE8222CDFE800C77B24 /* Dispatch.swift */,
+			);
+			path = Dispatch;
+			sourceTree = "<group>";
+		};
 		3DF2924120A37FEE006671AC = {
 			isa = PBXGroup;
 			children = (
+				3D6AACD7222A324D00C77B24 /* CGRectHelpers.swift */,
 				3DF2924C20A37FEE006671AC /* DownFall */,
 				3DF2926720A37FF0006671AC /* DownFallTests */,
 				3DF2924B20A37FEE006671AC /* Products */,
@@ -149,7 +184,10 @@
 				3D90AAD121D8863100C7428A /* Referee.swift */,
 				3D9C505F21FE206000A2210D /* Renderer.swift */,
 				3DA0087C21E6D1960017D8DA /* TileCreator.swift */,
+				3D6AACE2222CD22100C77B24 /* Controls */,
+				3D6AACDF222C996900C77B24 /* Header */,
 				3DF2928120A66A4E006671AC /* Models */,
+				3D6AACE7222CDFDA00C77B24 /* Dispatch */,
 				3DF2925520A37FEE006671AC /* GameViewController.swift */,
 				3DD36ECA21E5B86100AC4873 /* TileStrategy.swift */,
 				3DF2925720A37FEE006671AC /* Main.storyboard */,
@@ -163,6 +201,7 @@
 			isa = PBXGroup;
 			children = (
 				3DF2926820A37FF0006671AC /* DownFallBoardTests.swift */,
+				3D6AACE5222CDF9800C77B24 /* DispatchTests.swift */,
 				3D30A4212216888300AFA1E1 /* RendererTests.swift */,
 				3D90AACF21D8854300C7428A /* GameRefereeTests.swift */,
 				5605D6D421CC2EA400C1C5C2 /* GameSceneTests.swift */,
@@ -297,17 +336,21 @@
 				3D5FB09420AE768700ACD716 /* AnimationSettings.swift in Sources */,
 				3DF2925620A37FEE006671AC /* GameViewController.swift in Sources */,
 				3D7EF45C21D18D9000A2D9E8 /* Transformation.swift in Sources */,
+				3D6AACE4222CD38E00C77B24 /* Controls.swift in Sources */,
 				3D7EF45E21D18DAB00A2D9E8 /* TileTransformation.swift in Sources */,
 				3DF2928520A76242006671AC /* Board.swift in Sources */,
 				3DAFBD3721B8E6E7009B116A /* InputQueue.swift in Sources */,
 				5605D6D321CC2DF400C1C5C2 /* DFTileSpriteNode.swift in Sources */,
+				3D6AACE9222CDFE800C77B24 /* Dispatch.swift in Sources */,
 				3D528FDC2155B15D00EF65CA /* Menu.swift in Sources */,
+				3D6AACD8222A324D00C77B24 /* CGRectHelpers.swift in Sources */,
 				3DE657CD20B0AFD2003492DA /* Int+Extensions.swift in Sources */,
 				3DA0087D21E6D1960017D8DA /* TileCreator.swift in Sources */,
 				3D30A42B2217F63500AFA1E1 /* TileCoord.swift in Sources */,
 				3DF2924E20A37FEE006671AC /* AppDelegate.swift in Sources */,
 				3DF2928320A66BEB006671AC /* Tile.swift in Sources */,
 				3DA0087F21EADDDE0017D8DA /* Animator.swift in Sources */,
+				3D6AACE1222C997800C77B24 /* Header.swift in Sources */,
 				3DD36ECB21E5B86100AC4873 /* TileStrategy.swift in Sources */,
 				3D90AAD321D8869200C7428A /* Referee.swift in Sources */,
 				3D9C506021FE206000A2210D /* Renderer.swift in Sources */,
@@ -325,6 +368,7 @@
 				3DD36ECD21E5BD9100AC4873 /* TileStrategyTests.swift in Sources */,
 				3D30A4222216888300AFA1E1 /* RendererTests.swift in Sources */,
 				3D90AAD021D8854300C7428A /* GameRefereeTests.swift in Sources */,
+				3D6AACE6222CDF9800C77B24 /* DispatchTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

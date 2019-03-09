@@ -32,13 +32,7 @@ class GameScene: SKScene {
     //foreground
     private var foreground: SKNode!
     
-    //buttons
-    private var rotateLeft: SKNode!
-    private var rotateRight: SKNode!
     private var setting: SKNode!
-    
-    //labels
-    private var movesLeftLabel: SKLabelNode!
 
     //animating
     private var animating: Bool = false
@@ -48,14 +42,6 @@ class GameScene: SKScene {
     
     //diffculty
     private var difficulty: Difficulty?
-    private var movesLeft: Int? {
-        didSet {
-            movesLeftLabel.text = "Moves Left: \(movesLeft!)"
-            if movesLeft! < 5 {
-                movesLeftLabel.fontColor = .red
-            }
-        }
-    }
     
     //deleagte
     weak var gameSceneDelegate: GameSceneDelegate?
@@ -65,6 +51,9 @@ class GameScene: SKScene {
     
     //renderer
     private var renderer: Renderer?
+    
+    //board helpder
+    private var boardHelper: BoardHelper?
     
     //playable margin
     private var playableRect: CGRect?
@@ -80,15 +69,12 @@ class GameScene: SKScene {
         bottomLeft = (-1 * tileSize/2 * bsize, -1 * tileSize/2 * bsize)
         
         referee = Referee(board!)
+        boardHelper = BoardHelper(board!)
     }
     
     override func didMove(to view: SKView) {
         foreground = self.childNode(withName: "foreground")!
         setting = self.childNode(withName: "setting")!
-        rotateRight = self.childNode(withName: "rotateRight")!
-        rotateLeft = self.childNode(withName: "rotateLeft")!
-        movesLeftLabel = self.childNode(withName: "movesLeftLabel")! as? SKLabelNode
-        movesLeft = difficulty!.moves
         inputQueue = InputQueue(queue: [])
         
         //Adjust the playbale rect depending on the size of the device
@@ -100,18 +86,20 @@ class GameScene: SKScene {
                               height: size.height)
         self.renderer = Renderer(playableRect: playableRect,
                                  foreground: foreground,
-                                 board: self.board!,
-                                 size: boardSize!)
+                                 board: self.board!)
+        
+        Dispatch.sharedInstance.register(self, for: .animationsFinished(nil))
     }
     
     /// Called every frame
     /// We try to digest the top of the queue every frame
     override func update(_ currentTime: TimeInterval) {
-        guard !self.animating, let input = inputQueue.pop() else { return }
-        animating = true
-        guard let transformation = board?.handle(input: input) else { animating = false; return }
-        referee = Referee(transformation.endBoard)
-        render(transformation, for: input)
+//        guard !self.animating, let input = inputQueue.pop() else { return }
+//        animating = true
+//        guard let transformation = board?.handle(input: input) else { animating = false; return }
+//        referee = Referee(transformation.endBoard)
+//        render(transformation, for: input)
+        Dispatch.sharedInstance.send()
     }
     
     
@@ -120,11 +108,9 @@ class GameScene: SKScene {
         guard let trans = transformation else { return }
         switch input{
         case .touch(_):
-            if trans.tileTransformation != nil { movesLeft! -= 1 }
             board = trans.endBoard
             computeNewBoard(for: trans)
         case .rotateLeft, .rotateRight:
-            movesLeft! -= 1
             board = trans.endBoard
             rotate(for: trans)
         case .playerAttack:
@@ -132,14 +118,6 @@ class GameScene: SKScene {
             render(board: trans.endBoard)
             return
         case .monsterAttack:
-            let duration = 0.1
-            movesLeft! -= 2
-            let sequence = SKAction.sequence([SKAction.rotate(byAngle: CGFloat(Double.pi/8), duration: duration),
-                                              SKAction.rotate(byAngle: CGFloat(Double.pi/(-4)), duration: duration),
-                                              SKAction.rotate(byAngle: CGFloat(Double.pi/4), duration: duration),
-                                              SKAction.rotate(byAngle: CGFloat(Double.pi/(-8)), duration: duration)])
-            movesLeftLabel.run(sequence)
-
             self.animating = false
             return
         case .monsterDies(_):
@@ -261,7 +239,6 @@ extension GameScene {
         spriteNodes = endBoard
         addSpriteTilesToScene()
         animating = false
-        referee?.enforceRules(movesLeft: movesLeft).forEach { inputQueue.append($0) }
     }
     
     private func render(board: Board) {
@@ -319,24 +296,21 @@ extension GameScene {
         var input: Input? = nil
         if setting.contains(touch.location(in: self)) {
             //self.reset()
-            print(self.board as Any)
-            print(self.debugBoardSprites())
-            print(self.inputQueue)
+//            print(self.board as Any)
+//            print(self.debugBoardSprites())
+//            print(self.inputQueue)
+            self.gameSceneDelegate?.shouldShowMenu(win: true)
             return
-        } else if rotateRight.contains(touch.location(in: self)) {
-            input = Input.rotateRight
-        } else if rotateLeft.contains(touch.location(in:self)) {
-            input = Input.rotateLeft
         } else {
-            for index in 0..<spriteNodes!.reduce([],+).count {
-                let row = index / boardSize!
-                let col = (index - row * boardSize!) % boardSize!
-                let tile = spriteNodes![row][col]
-                if tile.contains(touch.location(in: self.foreground)) {
-                    input = Input.touch(TileCoord(row, col))
-                    break
-                }
-            }
+//            for index in 0..<spriteNodes!.reduce([],+).count {
+//                let row = index / boardSize!
+//                let col = (index - row * boardSize!) % boardSize!
+//                let tile = spriteNodes![row][col]
+//                if tile.contains(touch.location(in: self.foreground)) {
+//                    input = Input.touch(TileCoord(row, col))
+//                    break
+//                }
+//            }
         }
         handledTouch = true
         guard let inputReal = input else { return }
@@ -381,6 +355,24 @@ extension GameScene {
         }
         outs += "\nbottom of SpriteNodes"
         return outs
+    }
+}
+
+//MARK: - DispatchReceiver
+
+extension GameScene: DispatchReceiver {
+    func isEqual(to other: AnyObject) -> Bool {
+        return true
+    }
+    
+    func receive(_ e: Event) {
+        switch e {
+        case .animationsFinished(let trans):
+            self.board = trans?.endBoard
+            self.boardHelper?.board = trans?.endBoard
+            Dispatch.sharedInstance.post(.refereeStart(self.board))
+        default: ()
+        }
     }
 }
 

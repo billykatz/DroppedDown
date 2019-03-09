@@ -31,14 +31,7 @@ class GameScene: SKScene {
     
     //foreground
     private var foreground: SKNode!
-    
-    //buttons
-    private var rotateLeft: SKNode!
-    private var rotateRight: SKNode!
     private var setting: SKNode!
-    
-    //labels
-    private var movesLeftLabel: SKLabelNode!
 
     //animating
     private var animating: Bool = false
@@ -48,14 +41,6 @@ class GameScene: SKScene {
     
     //diffculty
     private var difficulty: Difficulty?
-    private var movesLeft: Int? {
-        didSet {
-            movesLeftLabel.text = "Moves Left: \(movesLeft!)"
-            if movesLeft! < 5 {
-                movesLeftLabel.fontColor = .red
-            }
-        }
-    }
     
     //deleagte
     weak var gameSceneDelegate: GameSceneDelegate?
@@ -85,10 +70,6 @@ class GameScene: SKScene {
     override func didMove(to view: SKView) {
         foreground = self.childNode(withName: "foreground")!
         setting = self.childNode(withName: "setting")!
-        rotateRight = self.childNode(withName: "rotateRight")!
-        rotateLeft = self.childNode(withName: "rotateLeft")!
-        movesLeftLabel = self.childNode(withName: "movesLeftLabel")! as? SKLabelNode
-        movesLeft = difficulty!.moves
         inputQueue = InputQueue(queue: [])
         
         //Adjust the playbale rect depending on the size of the device
@@ -100,8 +81,7 @@ class GameScene: SKScene {
                               height: size.height)
         self.renderer = Renderer(playableRect: playableRect,
                                  foreground: foreground,
-                                 board: self.board!,
-                                 size: boardSize!)
+                                 board: self.board!)
     }
     
     /// Called every frame
@@ -120,11 +100,9 @@ class GameScene: SKScene {
         guard let trans = transformation else { return }
         switch input{
         case .touch(_):
-            if trans.tileTransformation != nil { movesLeft! -= 1 }
             board = trans.endBoard
             computeNewBoard(for: trans)
         case .rotateLeft, .rotateRight:
-            movesLeft! -= 1
             board = trans.endBoard
             rotate(for: trans)
         case .playerAttack:
@@ -132,14 +110,6 @@ class GameScene: SKScene {
             render(board: trans.endBoard)
             return
         case .monsterAttack:
-            let duration = 0.1
-            movesLeft! -= 2
-            let sequence = SKAction.sequence([SKAction.rotate(byAngle: CGFloat(Double.pi/8), duration: duration),
-                                              SKAction.rotate(byAngle: CGFloat(Double.pi/(-4)), duration: duration),
-                                              SKAction.rotate(byAngle: CGFloat(Double.pi/4), duration: duration),
-                                              SKAction.rotate(byAngle: CGFloat(Double.pi/(-8)), duration: duration)])
-            movesLeftLabel.run(sequence)
-
             self.animating = false
             return
         case .monsterDies(_):
@@ -261,7 +231,7 @@ extension GameScene {
         spriteNodes = endBoard
         addSpriteTilesToScene()
         animating = false
-        referee?.enforceRules(movesLeft: movesLeft).forEach { inputQueue.append($0) }
+        referee?.enforceRules().forEach { inputQueue.append($0) }
     }
     
     private func render(board: Board) {
@@ -323,21 +293,8 @@ extension GameScene {
             print(self.debugBoardSprites())
             print(self.inputQueue)
             return
-        } else if rotateRight.contains(touch.location(in: self)) {
-            input = Input.rotateRight
-        } else if rotateLeft.contains(touch.location(in:self)) {
-            input = Input.rotateLeft
-        } else {
-            for index in 0..<spriteNodes!.reduce([],+).count {
-                let row = index / boardSize!
-                let col = (index - row * boardSize!) % boardSize!
-                let tile = spriteNodes![row][col]
-                if tile.contains(touch.location(in: self.foreground)) {
-                    input = Input.touch(TileCoord(row, col))
-                    break
-                }
-            }
         }
+
         handledTouch = true
         guard let inputReal = input else { return }
         inputQueue.append(inputReal)

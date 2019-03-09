@@ -9,33 +9,62 @@
 import Foundation
 import SpriteKit
 
-struct Renderer {
+class Renderer {
     let playableRect: CGRect
-    let foreground: SKNode
+    var foreground: SKNode = SKNode()
     var sprites: [[DFTileSpriteNode]] = []
-    let bottomLeft: (Int, Int)
-    let boardSize: Int
-    let tileSize: Int = 150
+    let bottomLeft: CGPoint
+    let boardSize: CGFloat!
+    let tileSize: CGFloat = 125
+    var animating = false
     
     init(playableRect: CGRect,
          foreground: SKNode,
-         board: Board,
-         size: Int) {
+         board: Board) {
         self.playableRect = playableRect
-        self.foreground = foreground
-        self.boardSize = size
-        self.bottomLeft = (Int(-1 * tileSize/2 * boardSize), Int(-1 * tileSize/2 * boardSize))
+        self.boardSize = CGFloat(board.boardSize)
+        
+        //center the board in the playable rect
+        let marginWidth = playableRect.width - CGFloat(tileSize * boardSize)
+        let marginHeight = playableRect.height - CGFloat(tileSize * boardSize)
+        let bottomLeftX = playableRect.minX + marginWidth/2 + tileSize/2
+        let bottomLeftY = playableRect.minY + marginHeight/2 + tileSize/2
+        self.bottomLeft = CGPoint(x: bottomLeftX, y: bottomLeftY)
+        
+        //create sprite representations based on the given board.tiles
         self.sprites = createSprites(from: board)
         
-        //rendering
-        add(sprites: sprites, to: foreground)
+        //place the created sprites onto the foreground
+//        var centeredForeground = foreground
+        foreground.position = playableRect.center
+        self.foreground = add(sprites: sprites, to: foreground)
+        
+        // add settings button to board
+        let header = Header.build(color: .black, size: CGSize(width: playableRect.width, height: 200.0))
+        header.position = CGPoint(x: playableRect.midX, y: playableRect.maxY - 100.0)
+        self.foreground.addChild(header)
+        
+        
+        // add left and right rotate button to board
+        let controls = Controls.build(color: .black, size: CGSize(width: playableRect.width, height: 400.0))
+        controls.position = CGPoint(x: playableRect.midX, y: playableRect.minY + 100.0)
+        self.foreground.addChild(controls)
+        
+        // add moves left label
+        
+        
         
         //DEBUG
-        debugDrawPlayableArea()
+        #if DEBUG
+        if let _ = NSClassFromString("XCTest") {
+        } else {
+            debugDrawPlayableArea()
+        }
+        #endif
     }
     
-    
-    func add(sprites: [[DFTileSpriteNode]], to foreground: SKNode) {
+    func add(sprites: [[DFTileSpriteNode]], to foreground: SKNode) -> SKNode {
+        foreground.removeAllChildren()
         sprites.forEach {
             $0.forEach { (sprite) in
                 if sprite.type == TileType.player() {
@@ -45,31 +74,30 @@ struct Renderer {
                     sprite.run(repeatAnimation)
                 }
                 
-                //add it to the scene
                 foreground.addChild(sprite)
             }
         }
+        return foreground
 
     }
     
     func createSprites(from board: Board) -> [[DFTileSpriteNode]] {
         let tiles = board.tiles
-        let bottomLeftX = bottomLeft.1
-        let bottomLeftY = bottomLeft.0
-        var x : Int = 0
-        var y : Int = 0
+        let bottomLeftX = bottomLeft.x
+        let bottomLeftY = bottomLeft.y
+        var x : CGFloat = 0
+        var y : CGFloat = 0
         var sprites: [[DFTileSpriteNode]] = []
-        for row in 0..<boardSize {
-            y = row * tileSize + bottomLeftY
+        for row in 0..<Int(boardSize) {
+            y = CGFloat(row) * tileSize + bottomLeftY
             sprites.append([])
-            for col in 0..<boardSize {
-                x = col * tileSize + bottomLeftX
+            for col in 0..<Int(boardSize) {
+                x = CGFloat(col) * tileSize + bottomLeftX
                 sprites[row].append(DFTileSpriteNode(type: tiles[row][col], size: CGFloat(tileSize)))
                 sprites[row][col].position = CGPoint.init(x: x, y: y)
             }
         }
         return sprites
-
     }
 }
 

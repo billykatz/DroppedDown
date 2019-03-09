@@ -17,18 +17,27 @@ enum Input : Equatable, Hashable {
     case monsterDies(TileCoord)
     case gameWin
     case gameLose
+    case animationFinished 
 }
 
 struct InputQueue {
-    var queue: [Input]
+    static var queue: [Input] = []
+    static private var animating = false
     
-    @discardableResult mutating func append(_ input: Input) -> Bool {
+    @discardableResult static func append(_ input: Input) -> Bool {
+        if input == .animationFinished {
+            animating = false
+            return true
+        }
         queue.append(input)
         return true
     }
     
-    mutating func pop() -> Input? {
+    static func pop() -> Input? {
         //there should be some way for this to know when it can or cannot pop
+        guard !queue.isEmpty else { return nil }
+        guard !animating else { return nil }
+        animating = true
         let input = queue.first
         queue = Array(queue.dropFirst())
         return input

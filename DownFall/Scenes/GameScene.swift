@@ -37,7 +37,7 @@ class GameScene: SKScene {
     private var animating: Bool = false
     
     //input queue
-    private var inputQueue: InputQueue!
+//    private var inputQueue: InputQueue!
     
     //diffculty
     private var difficulty: Difficulty?
@@ -70,7 +70,6 @@ class GameScene: SKScene {
     override func didMove(to view: SKView) {
         foreground = self.childNode(withName: "foreground")!
         setting = self.childNode(withName: "setting")!
-        inputQueue = InputQueue(queue: [])
         
         //Adjust the playbale rect depending on the size of the device
         let maxAspectRatio : CGFloat = 19.5/9.0
@@ -87,8 +86,7 @@ class GameScene: SKScene {
     /// Called every frame
     /// We try to digest the top of the queue every frame
     override func update(_ currentTime: TimeInterval) {
-        guard !self.animating, let input = inputQueue.pop() else { return }
-        animating = true
+        guard let input = InputQueue.pop() else { return }
         guard let transformation = board?.handle(input: input) else { animating = false; return }
         referee = Referee(transformation.endBoard)
         render(transformation, for: input)
@@ -104,7 +102,7 @@ class GameScene: SKScene {
             computeNewBoard(for: trans)
         case .rotateLeft, .rotateRight:
             board = trans.endBoard
-            rotate(for: trans)
+            renderer?.rotate(for: trans)
         case .playerAttack:
             // we should just render the new board here
             render(board: trans.endBoard)
@@ -119,6 +117,8 @@ class GameScene: SKScene {
             gameWin(trans)
         case .gameLose:
             gameLost()
+        case .animationFinished:
+            animationsFinished()
         }
     }
 }
@@ -206,12 +206,12 @@ extension GameScene {
             guard let strongSelf = self else { return }
             count -= 1
             if count == 0 {
-                strongSelf.animationsFinished(for: spriteNodes)
+//                strongSelf.animationsFinished(for: spriteNodes)
             }
         }
     }
     
-    /// Animate each tileTransformation to display rotation
+//    /// Animate each tileTransformation to display rotation
     private func rotate(for transformation: Transformation) {
         var animationCount = 0
         guard let trans = transformation.tileTransformation?.first,
@@ -220,23 +220,22 @@ extension GameScene {
             guard let strongSelf = self else { return }
             animationCount += 1
             if animationCount == trans.count {
-                strongSelf.animationsFinished(for: spriteNodes)
+                strongSelf.animationsFinished()
             }
         }
     }
     
     //MARK: - Helper Methods
-    private func animationsFinished(for endBoard: [[DFTileSpriteNode]]) {
-        foreground.removeAllChildren()
-        spriteNodes = endBoard
-        addSpriteTilesToScene()
+    private func animationsFinished() {
         animating = false
-        referee?.enforceRules().forEach { inputQueue.append($0) }
+        
+        //TODO: Update Referee
+//        referee?.enforceRules().forEach { InputQueue.append($0) }
     }
     
     private func render(board: Board) {
         guard let newBoard = createAndPositionSprites(from: board.tiles) else { return }
-        animationsFinished(for: newBoard)
+        animationsFinished()
     }
 }
 
@@ -260,7 +259,7 @@ extension GameScene {
                     break
                 }
             }
-            
+
         }
         for (child, action) in childActionDict {
             child.run(action) {
@@ -275,30 +274,30 @@ extension GameScene {
 extension GameScene {
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard let touch = touches.first else { return }
-        registerTouch(touch)
+        self.renderer?.touchesEnded(touches, with: event)
+//        guard let touch = touches.first else { return }
+//        registerTouch(touch)
     }
-    
-    private func registerTouch(_ touch: UITouch) {
-        var handledTouch = false
-        defer {
-            if !handledTouch {
-                animating = false
-            }
-        }
-        var input: Input? = nil
-        if setting.contains(touch.location(in: self)) {
-            //self.reset()
-            print(self.board as Any)
-            print(self.debugBoardSprites())
-            print(self.inputQueue)
-            return
-        }
-
-        handledTouch = true
-        guard let inputReal = input else { return }
-        inputQueue.append(inputReal)
-    }
+//
+//    private func registerTouch(_ touch: UITouch) {
+//        var handledTouch = false
+//        defer {
+//            if !handledTouch {
+//                animating = false
+//            }
+//        }
+//        var input: Input? = nil
+//        if setting.contains(touch.location(in: self)) {
+//            //self.reset()
+//            print(self.board as Any)
+//            print(self.debugBoardSprites())
+//            return
+//        }
+//
+//        handledTouch = true
+//        guard let inputReal = input else { return }
+//        InputQueue.append(inputReal)
+//    }
 }
 
 //MARK: - Game win and Game loss
@@ -329,15 +328,16 @@ extension GameScene {
 
 extension GameScene {
     func debugBoardSprites() -> String {
-        var outs = "\nTop of SpriteNodes"
-        for (i, _) in spriteNodes!.enumerated().reversed() {
-            outs += "\n"
-            for (j, _) in spriteNodes![i].enumerated() {
-                outs += "\t\(spriteNodes![i][j].type)"
-            }
-        }
-        outs += "\nbottom of SpriteNodes"
-        return outs
+//        var outs = "\nTop of SpriteNodes"
+//        for (i, _) in spriteNodes!.enumerated().reversed() {
+//            outs += "\n"
+//            for (j, _) in spriteNodes![i].enumerated() {
+//                outs += "\t\(spriteNodes![i][j].type)"
+//            }
+//        }
+//        outs += "\nbottom of SpriteNodes"
+//        return outs
+        return ""
     }
 }
 

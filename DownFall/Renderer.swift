@@ -9,7 +9,7 @@
 import Foundation
 import SpriteKit
 
-class Renderer {
+class Renderer : SKSpriteNode {
     let playableRect: CGRect
     var foreground: SKNode = SKNode()
     var sprites: [[DFTileSpriteNode]] = []
@@ -31,6 +31,12 @@ class Renderer {
         let bottomLeftY = playableRect.minY + marginHeight/2 + tileSize/2
         self.bottomLeft = CGPoint(x: bottomLeftX, y: bottomLeftY)
         
+        
+        
+        super.init(texture: nil, color: .clear, size: CGSize.zero)
+        self.isUserInteractionEnabled = true
+        self.zPosition = 5
+        
         //create sprite representations based on the given board.tiles
         self.sprites = createSprites(from: board)
         
@@ -51,9 +57,6 @@ class Renderer {
         self.foreground.addChild(controls)
         
         // add moves left label
-        
-        
-        
         //DEBUG
         #if DEBUG
         if let _ = NSClassFromString("XCTest") {
@@ -61,6 +64,10 @@ class Renderer {
             debugDrawPlayableArea()
         }
         #endif
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     func add(sprites: [[DFTileSpriteNode]], to foreground: SKNode) -> SKNode {
@@ -99,8 +106,68 @@ class Renderer {
         }
         return sprites
     }
+    
+    
+    /// Animate each tileTransformation to display rotation
+    func rotate(for transformation: Transformation) {
+        guard let trans = transformation.tileTransformation?.first else { return }
+        var animationCount = 0
+        let spriteNodes = createSprites(from: transformation.endBoard)
+        animate(trans) { [weak self] in
+            guard let strongSelf = self else { return }
+            animationCount += 1
+            if animationCount == trans.count {
+                strongSelf.animationsFinished(for: spriteNodes)
+            }
+        }
+    }
+    
+    private func animationsFinished(for endBoard: [[DFTileSpriteNode]]) {
+        InputQueue.append(.animationFinished)
+    }
+    
+    func animate(_ transformation: [TileTransformation], _ completion: (() -> Void)? = nil) {
+        var childActionDict : [SKNode : SKAction] = [:]
+        for transIdx in 0..<transformation.count {
+            let trans = transformation[transIdx]
+            let outOfBounds: CGFloat = CGFloat(trans.initial.x) >= boardSize ? tileSize * boardSize : 0
+            let point = CGPoint.init(x: tileSize * CGFloat(trans.initial.tuple.1) + bottomLeft.x,
+                                     y: outOfBounds + tileSize * CGFloat(trans.initial.x) + bottomLeft.y)
+            for child in foreground.children {
+                if child.contains(point) {
+                    let endPoint = CGPoint.init(x: tileSize * CGFloat(trans.end.y) + bottomLeft.x,
+                                                y: tileSize * CGFloat(trans.end.x) + bottomLeft.y)
+                    let animation = SKAction.move(to: endPoint, duration: AnimationSettings.fallSpeed)
+                    childActionDict[child] = animation
+                    break
+                }
+            }
+            
+        }
+        for (child, action) in childActionDict {
+            child.run(action) {
+                completion?()
+            }
+        }
+    }
+
 }
 
+
+extension Renderer {
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = touches.first else { return }
+        let positionInScene = touch.location(in: self.foreground)
+        let nodes = self.foreground.nodes(at: positionInScene)
+        
+        for node in nodes {
+            if node.name == "rotateRight" {
+                //want to append to Input queue
+                InputQueue.append(.rotateRight)
+            }
+        }
+    }
+}
 
 //MARK: Debug
 

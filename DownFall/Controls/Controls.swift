@@ -40,20 +40,6 @@ class Controls: SKSpriteNode {
         super.init(texture: texture, color: color, size: size)
     }
     
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard let touch = touches.first else { return }
-        let positionInScene = touch.location(in: self)
-        let nodes = self.nodes(at: positionInScene)
-        
-        for node in nodes {
-            if node.name == Constants.rotateRight {
-                Dispatch.sharedInstance.post(.rotate)
-            }
-        }
-        
-
-    }
-    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

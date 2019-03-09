@@ -45,6 +45,8 @@ struct Board: Equatable {
             return gameWin()
         case .gameLose:
             return Transformation(board: self)
+        case .animationFinished:
+            return Transformation(board: self)
         }
     }
     

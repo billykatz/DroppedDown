@@ -43,9 +43,7 @@ struct Board: Equatable {
             return self.removeAndReplace(tileCoord, singleTile: true)
         case .gameWin:
             return gameWin()
-        case .gameLose:
-            return Transformation(board: self)
-        case .animationFinished:
+        case .gameLose, .enforceRules:
             return Transformation(board: self)
         }
     }

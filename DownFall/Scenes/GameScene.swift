@@ -25,17 +25,8 @@ class GameScene: SKScene {
         }
     }
     
-    //coordinates
-    private var bottomLeft: (Int, Int)?
-    
     //foreground
     private var foreground: SKNode!
-
-    //animating
-    private var animating: Bool = false
-    
-    //input queue
-//    private var inputQueue: InputQueue!
     
     //diffculty
     private var difficulty: Difficulty?
@@ -60,7 +51,6 @@ class GameScene: SKScene {
         self.difficulty = difficulty
         board = Board.build(size: bsize)
         boardSize = bsize
-        bottomLeft = (-1 * tileSize/2 * bsize, -1 * tileSize/2 * bsize)
         
         referee = Referee(board!)
     }
@@ -83,9 +73,15 @@ class GameScene: SKScene {
     /// Called every frame
     /// We try to digest the top of the queue every frame
     override func update(_ currentTime: TimeInterval) {
-        guard let input = InputQueue.pop() else { return }
-        guard let transformation = board?.handle(input: input) else { animating = false; return }
+        guard !(renderer?.isAnimating ?? true),
+            let input = InputQueue.pop() else { return }
+        guard let transformation = board?.handle(input: input) else {
+            renderer?.isAnimating = false
+            return
+        }
+        renderer?.isAnimating = true
         referee = Referee(transformation.endBoard)
+        InputQueue.append(.enforceRules)
         render(transformation, for: input)
     }
     
@@ -103,19 +99,25 @@ class GameScene: SKScene {
         case .playerAttack:
             // we should just render the new board here
 //            render(board: trans.endBoard)
+//            renderer?.computeNewBoard(for: trans)
             return
         case .monsterAttack:
-            self.animating = false
             return
         case .monsterDies(_):
             board = trans.endBoard
 //            computeNewBoard(for: trans)
         case .gameWin:
-            gameWin(trans)
+//            gameWin(trans)
+            renderer?.animate(trans.tileTransformation?.first) { [weak self] in
+                self?.renderer?.gameWin()
+            }
         case .gameLose:
             gameLost()
-        case .animationFinished:
-            ()
+        case .enforceRules:
+            referee?.enforceRules().forEach {
+                InputQueue.append($0)
+            }
+            renderer?.isAnimating = false
         }
     }
 }

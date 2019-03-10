@@ -16,7 +16,6 @@ class Renderer : SKSpriteNode {
     let bottomLeft: CGPoint
     let boardSize: CGFloat!
     let tileSize: CGFloat = 125
-    var animating = false
     
     init(playableRect: CGRect,
          foreground: SKNode,
@@ -32,10 +31,8 @@ class Renderer : SKSpriteNode {
         self.bottomLeft = CGPoint(x: bottomLeftX, y: bottomLeftY)
         
         
-        
         super.init(texture: nil, color: .clear, size: CGSize.zero)
-        self.isUserInteractionEnabled = true
-        self.zPosition = 5
+    
         
         //create sprite representations based on the given board.tiles
         self.sprites = createSprites(from: board)
@@ -71,7 +68,11 @@ class Renderer : SKSpriteNode {
     }
     
     func add(sprites: [[DFTileSpriteNode]], to foreground: SKNode) -> SKNode {
-        foreground.removeAllChildren()
+        for child in foreground.children {
+            if child is DFTileSpriteNode {
+                child.removeFromParent()
+            }
+        }
         sprites.forEach {
             $0.forEach { (sprite) in
                 if sprite.type == TileType.player() {
@@ -112,12 +113,12 @@ class Renderer : SKSpriteNode {
     func rotate(for transformation: Transformation) {
         guard let trans = transformation.tileTransformation?.first else { return }
         var animationCount = 0
-        let spriteNodes = createSprites(from: transformation.endBoard)
+        self.sprites = createSprites(from: transformation.endBoard)
         animate(trans) { [weak self] in
             guard let strongSelf = self else { return }
             animationCount += 1
             if animationCount == trans.count {
-                strongSelf.animationsFinished(for: spriteNodes)
+                strongSelf.animationsFinished(for: strongSelf.sprites)
             }
         }
     }
@@ -134,7 +135,7 @@ class Renderer : SKSpriteNode {
             let point = CGPoint.init(x: tileSize * CGFloat(trans.initial.tuple.1) + bottomLeft.x,
                                      y: outOfBounds + tileSize * CGFloat(trans.initial.x) + bottomLeft.y)
             for child in foreground.children {
-                if child.contains(point) {
+                if child.contains(point), child is DFTileSpriteNode {
                     let endPoint = CGPoint.init(x: tileSize * CGFloat(trans.end.y) + bottomLeft.x,
                                                 y: tileSize * CGFloat(trans.end.x) + bottomLeft.y)
                     let animation = SKAction.move(to: endPoint, duration: AnimationSettings.fallSpeed)
@@ -153,6 +154,72 @@ class Renderer : SKSpriteNode {
 
 }
 
+extension Renderer {
+    
+    func computeNewBoard(for transformation: Transformation) {
+        guard let transformations = transformation.tileTransformation else {
+            InputQueue.append(.animationFinished)
+            return
+        }
+        let spriteNodes = createSprites(from: transformation.endBoard)
+        //TODO: don't hardcode this
+        let removed = transformations[0]
+        let newTiles = transformations[1]
+        let shiftDown = transformations[2]
+        
+        //remove "removed" tiles from sprite storage
+        for tileTrans in removed {
+            sprites[tileTrans.end.x][tileTrans.end.y].removeFromParent()
+        }
+        
+        
+        //add new tiles "newTiles"
+        for trans in newTiles {
+            let (startRow, startCol) = trans.initial.tuple
+            let (endRow, endCol) = trans.end.tuple
+            
+            // get sprite from the target sprites row and col
+            let sprite = spriteNodes[endRow][endCol]
+            
+            // place the tile at the "start" which is above the visible board
+            // the animation will then move them to the correct place in the foreground
+            let x = tileSize * boardSize + ( CGFloat(startRow) * tileSize ) + bottomLeft.x
+            let y = tileSize * CGFloat(startCol) + bottomLeft.y
+            sprite.position = CGPoint.init(x: y, y: x)
+            
+            //add it to the scene
+            self.foreground.addChild(spriteNodes[endRow][endCol])
+        }
+        
+        //animation "shiftDown" transformation
+        var count = shiftDown.count
+        animate(shiftDown) { [weak self] in
+            guard let strongSelf = self else { return }
+            count -= 1
+            if count == 0 {
+                strongSelf.animationsFinished(for: spriteNodes)
+                strongSelf.sprites = spriteNodes
+                
+                //TODO: Figure out why we need the following line of code.  this will solve the bug that the player sprite reanimates on every remove and refill
+                strongSelf.foreground = strongSelf.add(sprites: strongSelf.sprites, to: strongSelf.foreground)
+            }
+        }
+    }
+    
+    func compare(_ a: [[DFTileSpriteNode]], _ b: [[DFTileSpriteNode]]) {
+        var output = ""
+        for (ridx, _) in a.enumerated() {
+            for (cidx, _) in a[ridx].enumerated() {
+                if a[ridx][cidx].type !=  b[ridx][cidx].type {
+                    output += "\n-----\nRow \(ridx), Col \(cidx) are different.\nBefore is \(a[ridx][cidx].type) \nAfter is \(b[ridx][cidx].type)"
+                }
+            }
+        }
+        if output == "" { output = "\n-----\nThere are no differences" }
+        print(output)
+    }
+}
+
 
 extension Renderer {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -165,6 +232,22 @@ extension Renderer {
                 //want to append to Input queue
                 InputQueue.append(.rotateRight)
             }
+            
+            if node.name == "rotateLeft" {
+                //want to append to Input queue
+                InputQueue.append(.rotateLeft)
+            }
+            
+            if node is DFTileSpriteNode {
+                for index in 0..<sprites.reduce([],+).count {
+                    let boardSize = Int(self.boardSize)
+                    let row = index / boardSize
+                    let col = (index - row * boardSize) % boardSize
+                    if sprites[row][col].contains(positionInScene) {
+                        InputQueue.append(.touch(TileCoord(row, col)))
+                    }
+                }
+            }
         }
     }
 }
@@ -172,6 +255,7 @@ extension Renderer {
 //MARK: Debug
 
 extension Renderer {
+    
     func debugDrawPlayableArea() {
         let shape = SKShapeNode()
         let path = CGMutablePath()
@@ -181,5 +265,17 @@ extension Renderer {
         shape.lineWidth = 4.0
         shape.zPosition = 10
         foreground.addChild(shape)
+    }
+    
+    func debugBoardSprites() -> String {
+        var outs = "\nTop of Sprites"
+        for (i, _) in sprites.enumerated().reversed() {
+            outs += "\n"
+            for (j, _) in sprites[i].enumerated() {
+                outs += "\t\(sprites[i][j].type)"
+            }
+        }
+        outs += "\nbottom of Sprites"
+        return outs
     }
 }

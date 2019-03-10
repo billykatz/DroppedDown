@@ -9,13 +9,20 @@
 import Foundation
 import SpriteKit
 
+
+protocol RendererDelegate {
+    func gameWin()
+}
+
 class Renderer : SKSpriteNode {
-    let playableRect: CGRect
-    var foreground: SKNode = SKNode()
-    var sprites: [[DFTileSpriteNode]] = []
-    let bottomLeft: CGPoint
-    let boardSize: CGFloat!
-    let tileSize: CGFloat = 125
+    private let playableRect: CGRect
+    private var foreground: SKNode = SKNode()
+    private var sprites: [[DFTileSpriteNode]] = []
+    private let bottomLeft: CGPoint
+    private let boardSize: CGFloat!
+    private let tileSize: CGFloat = 125
+    
+    public var isAnimating = false
     
     init(playableRect: CGRect,
          foreground: SKNode,
@@ -67,7 +74,7 @@ class Renderer : SKSpriteNode {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func add(sprites: [[DFTileSpriteNode]], to foreground: SKNode) -> SKNode {
+    private func add(sprites: [[DFTileSpriteNode]], to foreground: SKNode) -> SKNode {
         for child in foreground.children {
             if child is DFTileSpriteNode {
                 child.removeFromParent()
@@ -89,7 +96,7 @@ class Renderer : SKSpriteNode {
 
     }
     
-    func createSprites(from board: Board) -> [[DFTileSpriteNode]] {
+    private func createSprites(from board: Board) -> [[DFTileSpriteNode]] {
         let tiles = board.tiles
         let bottomLeftX = bottomLeft.x
         let bottomLeftY = bottomLeft.y
@@ -119,15 +126,17 @@ class Renderer : SKSpriteNode {
             animationCount += 1
             if animationCount == trans.count {
                 strongSelf.animationsFinished(for: strongSelf.sprites)
+                strongSelf.foreground = strongSelf.add(sprites: strongSelf.sprites, to: strongSelf.foreground)
             }
         }
     }
     
     private func animationsFinished(for endBoard: [[DFTileSpriteNode]]) {
-        InputQueue.append(.animationFinished)
+        isAnimating = false
     }
     
-    func animate(_ transformation: [TileTransformation], _ completion: (() -> Void)? = nil) {
+    func animate(_ transformation: [TileTransformation]?, _ completion: (() -> Void)? = nil) {
+        guard let transformation = transformation else { return }
         var childActionDict : [SKNode : SKAction] = [:]
         for transIdx in 0..<transformation.count {
             let trans = transformation[transIdx]
@@ -158,7 +167,7 @@ extension Renderer {
     
     func computeNewBoard(for transformation: Transformation) {
         guard let transformations = transformation.tileTransformation else {
-            InputQueue.append(.animationFinished)
+            isAnimating = false
             return
         }
         let spriteNodes = createSprites(from: transformation.endBoard)
@@ -249,6 +258,14 @@ extension Renderer {
                 }
             }
         }
+    }
+}
+
+extension Renderer {
+    func gameWin() {
+        let menu = MenuSpriteNode(playableRect: playableRect)
+        menu.zPosition = 10
+        foreground.addChild(menu)
     }
 }
 

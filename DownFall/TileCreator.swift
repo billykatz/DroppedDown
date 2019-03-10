@@ -12,7 +12,7 @@ struct TileCreator: TileStrategy {
     static func tiles(for board: Board, difficulty: Difficulty = .normal) -> [TileType] {
         var newTiles: [TileType] = []
         var newMonsterCount = 0
-        let maxMonsters = difficulty.maxExpectedMonsters(for: board)
+        let maxMonsters = 0//difficulty.maxExpectedMonsters(for: board)
         let currentMonsterCount = board.tiles(of: .greenMonster()).count
         while (newTiles.count < board.tiles(of: .empty).count) {
             var canAdd = true

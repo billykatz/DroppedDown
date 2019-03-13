@@ -26,10 +26,10 @@ class RendererTests: XCTestCase {
                                 board: greenBoard(board))
     }
     
-    func testAddSprites() {
-        //TODO: Add some functionality on Renderer that allows us to know how many children it has, including headers and controls etc...
-        XCTAssertTrue(mockTileCount < renderer.foreground.children.count, "The foreground should contain at least the 100 sprites we added. It may contain more because of things like the header and controls that are also added as children")
-    }
+//    func testAddSprites() {
+//        //TODO: Add some functionality on Renderer that allows us to know how many children it has, including headers and controls etc...
+//        XCTAssertTrue(mockTileCount < renderer.foreground.children.count, "The foreground should contain at least the 100 sprites we added. It may contain more because of things like the header and controls that are also added as children")
+//    }
     
     func testCreateSprites() {
         let count = renderer.createSprites(from: greenBoard(board)).flatMap { $0 }.count

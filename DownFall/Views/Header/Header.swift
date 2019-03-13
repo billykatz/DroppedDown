@@ -14,12 +14,25 @@ class Header: SKSpriteNode {
                       size: CGSize) -> Header {
         let header = Header(texture: SKTexture(imageNamed: "header"), color: color, size: size)
         let setting = SKSpriteNode(imageNamed: "setting")
-        let settingX = header.frame.maxX - setting.frame.width/2
+        setting.name = "setting"
+        let settingX = header.frame.maxX - setting.frame.width
         setting.position = CGPoint(x: settingX, y: size.height/2 - setting.frame.height)
-        setting.zPosition = 3.0
+        setting.zPosition = 3
         
         header.addChild(setting)
+        header.isUserInteractionEnabled = true
         return header
+    }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = touches.first else { return }
+        let position = touch.location(in: self)
+        for node in self.nodes(at: position) {
+            if node.name == "setting" {
+                InputQueue.append(.pause)
+            }
+        }
+
     }
     
     override init(texture: SKTexture?, color: UIColor, size: CGSize) {

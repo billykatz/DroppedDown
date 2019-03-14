@@ -15,8 +15,8 @@ struct Referee {
         self.board = board
     }
     
-    func enforceRules(movesLeft: Int? = Int.max) -> [Input] {
-        
+    static func enforceRules(_ board: Board?, movesLeft: Int? = Int.max) -> [Input] {
+        guard let board = board else { return [] }
         func playerWins() -> Bool {
             guard let playerRow = board.playerPosition?.x,
                 let playerCol = board.playerPosition?.y,
@@ -88,7 +88,7 @@ struct Referee {
             }
             return deadMonsters
         }
-
+        
         // Game rules are enforced in the following priorities
         // Game Win
         // Game Lose
@@ -99,21 +99,125 @@ struct Referee {
         //should monster get to attack before it dies?
         
         if playerWins() {
-            return [.gameWin]
+            return [Input(.gameWin, false)]
         } else if !boardHasMoreMoves() || movesLeft ?? Int.max <= 0 {
-            return [.gameLose]
+            return [Input(.gameLose, false)]
         }
         
         var inputs: [Input] = []
         
         if playerAttacks() {
-           inputs.append(Input.playerAttack)
+            inputs.append(Input(.playerAttack, false))
         }
         
-        monsterAttacks().forEach { inputs.append(Input.monsterAttack($0)) }
+        monsterAttacks().forEach { inputs.append(Input(.monsterAttack($0), false)) }
         
-        monsterDies().forEach { inputs.append(Input.monsterDies($0)) }
+        monsterDies().forEach { inputs.append(Input(.monsterDies($0), false)) }
         
         return inputs
     }
+
+    
+    
+//    func enforceRules(movesLeft: Int? = Int.max) -> [Input] {
+//
+//        func playerWins() -> Bool {
+//            guard let playerRow = board.playerPosition?.x,
+//                let playerCol = board.playerPosition?.y,
+//                let exitRow = board.exitPosition?.x,
+//                let exitCol = board.exitPosition?.y else { return false }
+//            return playerRow == exitRow + 1 && playerCol == exitCol
+//        }
+//
+//        func boardHasMoreMoves() -> Bool {
+//            guard let playerPosition = board.playerPosition else { return false }
+//            for (i, row) in board.tiles.enumerated() {
+//                for (j, _) in row.enumerated() {
+//                    if board.findNeighbors(i, j).count > 2 || board.valid(neighbor: board.exitPosition, for: playerPosition) || playerAttacks() || playerHasPossibleAttack() {
+//                        return true
+//                    }
+//                }
+//            }
+//            return false
+//        }
+//
+//        func playerHasPossibleAttack() -> Bool {
+//            guard let playerPosition = board.playerPosition else { return false }
+//            for neighbor in board.validCardinalNeighbors(of: playerPosition) {
+//                if case TileType.greenMonster(_) = board.tiles[neighbor.x][neighbor.y] {
+//                    return true
+//                }
+//            }
+//            return false
+//        }
+//
+//        func playerAttacks() -> Bool {
+//            guard let playerCol = board.playerPosition?.y,
+//                let playerRow = board.playerPosition?.x,
+//                board.playerPosition?.x ?? 0 - 1 >= 1 else { return false }
+//            if case TileType.greenMonster(let monsterData) = board.tiles[playerRow-1][playerCol],
+//                monsterData.hp > 0 {
+//                return true
+//            }
+//            return false
+//        }
+//
+//
+//        func monsterAttacks() -> [TileCoord] {
+//            var attacks : [TileCoord] = []
+//
+//            for (i, row) in board.tiles.enumerated() {
+//                for (j, _) in row.enumerated() {
+//                    if i >= 1 {
+//                        if case TileType.greenMonster(_) = board.tiles[i][j],
+//                            case TileType.player(_) = board.tiles[i-1][j] {
+//                            attacks.append(TileCoord(i, j))
+//                        }
+//                    }
+//                }
+//            }
+//            return attacks
+//        }
+//
+//        func monsterDies() -> [TileCoord] {
+//            var deadMonsters: [TileCoord] = []
+//            for (i, row) in board.tiles.enumerated() {
+//                for (j, _) in row.enumerated() {
+//                    if case TileType.greenMonster(let data) = board.tiles[i][j] {
+//                        if data.hp == 0 {
+//                            deadMonsters.append(TileCoord(i, j))
+//                        }
+//                    }
+//                }
+//            }
+//            return deadMonsters
+//        }
+//
+//        // Game rules are enforced in the following priorities
+//        // Game Win
+//        // Game Lose
+//        // Player attack
+//        // Monster attack
+//        // For rules that are not game win or game lose, they are all determined in the same step
+//        // Rules (inputs) are resolved in order of the array of inputs
+//        //should monster get to attack before it dies?
+//
+//        if playerWins() {
+//            return [.gameWin]
+//        } else if !boardHasMoreMoves() || movesLeft ?? Int.max <= 0 {
+//            return [.gameLose]
+//        }
+//
+//        var inputs: [Input] = []
+//
+//        if playerAttacks() {
+//           inputs.append(.playerAttack)
+//        }
+//
+//        monsterAttacks().forEach { inputs.append(.monsterAttack($0)) }
+//
+//        monsterDies().forEach { inputs.append(.monsterDies($0)) }
+//
+//        return inputs
+//    }
 }

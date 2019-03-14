@@ -9,23 +9,28 @@
 import Foundation
 import SpriteKit
 
-
 protocol RendererDelegate {
     func gameWin()
 }
 
 class Renderer : SKSpriteNode {
     private let playableRect: CGRect
-    private var foreground: SKNode = SKNode()
+    private(set) var foreground: SKNode = SKNode()
     private var sprites: [[DFTileSpriteNode]] = []
     private let bottomLeft: CGPoint
     private let boardSize: CGFloat!
     private let tileSize: CGFloat = 125
     
-    public var isAnimating = false
+    var spriteForeground = SKNode()
+    var menuForeground = SKNode()
     
+    var menuSpriteNode: MenuSpriteNode {
+        return MenuSpriteNode.init(.pause, playableRect: playableRect)
+    }
+    
+    var header: Header = Header()
     init(playableRect: CGRect,
-         foreground: SKNode,
+         foreground givenForeground: SKNode,
          board: Board) {
         self.playableRect = playableRect
         self.boardSize = CGFloat(board.boardSize)
@@ -39,26 +44,31 @@ class Renderer : SKSpriteNode {
         
         
         super.init(texture: nil, color: .clear, size: CGSize.zero)
-    
         
+        isUserInteractionEnabled = true
+    
+        foreground = givenForeground
+
         //create sprite representations based on the given board.tiles
         self.sprites = createSprites(from: board)
-        
         //place the created sprites onto the foreground
-//        var centeredForeground = foreground
+        let _ = add(sprites: sprites)
         foreground.position = playableRect.center
-        self.foreground = add(sprites: sprites, to: foreground)
+        menuForeground.position = playableRect.center
+        menuForeground.addChild(menuSpriteNode)
         
         // add settings button to board
-        let header = Header.build(color: .black, size: CGSize(width: playableRect.width, height: 200.0))
+        header = Header.build(color: .black, size: CGSize(width: playableRect.width, height: 200.0))
         header.position = CGPoint(x: playableRect.midX, y: playableRect.maxY - 100.0)
-        self.foreground.addChild(header)
-        
+        header.zPosition = 5
         
         // add left and right rotate button to board
         let controls = Controls.build(color: .black, size: CGSize(width: playableRect.width, height: 400.0))
         controls.position = CGPoint(x: playableRect.midX, y: playableRect.minY + 100.0)
-        self.foreground.addChild(controls)
+        controls.isUserInteractionEnabled = true
+        controls.zPosition = 5
+        
+        [spriteForeground, header, controls].forEach { foreground.addChild($0) }
         
         // add moves left label
         //DEBUG
@@ -70,18 +80,55 @@ class Renderer : SKSpriteNode {
         #endif
     }
     
+    func render(_ transformation: Transformation?, for input: Input) {
+        switch input.type {
+        case .rotateLeft, .rotateRight:
+            rotate(for: transformation)
+        case .touch(_), .monsterDies(_):
+            computeNewBoard(for: transformation)
+        case .playerAttack:
+            () //TODO
+        case .monsterAttack(_):
+            () //TODO
+        case .gameWin:
+            gameWin()
+        case .gameLose:
+            gameWin()
+        case .play, .pause:
+            render(InputQueue.gameState)
+        case .animationsFinished:
+            ()
+        }
+    }
+    
+    private func render(_ gameState: GameState) {
+        switch gameState {
+        case .playing:
+            //maybe just think about re enabling user interaction if we disabled it
+            menuForeground.removeFromParent()
+        case .paused:
+            // show the menu
+            foreground.addChild(menuForeground)
+//            menuForeground.addChild(menuSpriteNode)
+        case .animating:
+            // nothing to do that isnt already being done
+            ()
+        }
+        
+    }
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func add(sprites: [[DFTileSpriteNode]], to foreground: SKNode) -> SKNode {
-        for child in foreground.children {
-            if child is DFTileSpriteNode {
-                child.removeFromParent()
-            }
-        }
+    private func add(sprites: [[DFTileSpriteNode]]) {
+        spriteForeground.removeAllChildren()
         sprites.forEach {
-            $0.forEach { (sprite) in
+            $0.forEach { sprite in
+                //this sprite may already be somewhere on the parent
+                //make sure to remove it
+                
+                //add the sprite back
                 if sprite.type == TileType.player() {
                     let group = SKAction.group([SKAction.wait(forDuration:5), sprite.animatedPlayerAction()])
                     let repeatAnimation = SKAction.repeat(group, count: 500)
@@ -89,14 +136,12 @@ class Renderer : SKSpriteNode {
                     sprite.run(repeatAnimation)
                 }
                 
-                foreground.addChild(sprite)
+                spriteForeground.addChild(sprite)
             }
         }
-        return foreground
-
     }
     
-    private func createSprites(from board: Board) -> [[DFTileSpriteNode]] {
+    func createSprites(from board: Board) -> [[DFTileSpriteNode]] {
         let tiles = board.tiles
         let bottomLeftX = bottomLeft.x
         let bottomLeftY = bottomLeft.y
@@ -117,8 +162,10 @@ class Renderer : SKSpriteNode {
     
     
     /// Animate each tileTransformation to display rotation
-    func rotate(for transformation: Transformation) {
-        guard let trans = transformation.tileTransformation?.first else { return }
+    func rotate(for transformation: Transformation?) {
+        guard let transformation = transformation,
+            let trans = transformation.tileTransformation?.first else {
+                return }
         var animationCount = 0
         self.sprites = createSprites(from: transformation.endBoard)
         animate(trans) { [weak self] in
@@ -126,13 +173,13 @@ class Renderer : SKSpriteNode {
             animationCount += 1
             if animationCount == trans.count {
                 strongSelf.animationsFinished(for: strongSelf.sprites)
-                strongSelf.foreground = strongSelf.add(sprites: strongSelf.sprites, to: strongSelf.foreground)
             }
         }
     }
     
     private func animationsFinished(for endBoard: [[DFTileSpriteNode]]) {
-        isAnimating = false
+        let _ = add(sprites: endBoard)
+        InputQueue.append(Input(.animationsFinished, false))
     }
     
     func animate(_ transformation: [TileTransformation]?, _ completion: (() -> Void)? = nil) {
@@ -143,7 +190,7 @@ class Renderer : SKSpriteNode {
             let outOfBounds: CGFloat = CGFloat(trans.initial.x) >= boardSize ? tileSize * boardSize : 0
             let point = CGPoint.init(x: tileSize * CGFloat(trans.initial.tuple.1) + bottomLeft.x,
                                      y: outOfBounds + tileSize * CGFloat(trans.initial.x) + bottomLeft.y)
-            for child in foreground.children {
+            for child in spriteForeground.children {
                 if child.contains(point), child is DFTileSpriteNode {
                     let endPoint = CGPoint.init(x: tileSize * CGFloat(trans.end.y) + bottomLeft.x,
                                                 y: tileSize * CGFloat(trans.end.x) + bottomLeft.y)
@@ -165,9 +212,9 @@ class Renderer : SKSpriteNode {
 
 extension Renderer {
     
-    func computeNewBoard(for transformation: Transformation) {
-        guard let transformations = transformation.tileTransformation else {
-            isAnimating = false
+    func computeNewBoard(for transformation: Transformation?) {
+        guard let transformation = transformation,
+            let transformations = transformation.tileTransformation else {
             return
         }
         let spriteNodes = createSprites(from: transformation.endBoard)
@@ -197,7 +244,7 @@ extension Renderer {
             sprite.position = CGPoint.init(x: y, y: x)
             
             //add it to the scene
-            self.foreground.addChild(spriteNodes[endRow][endCol])
+            spriteForeground.addChild(spriteNodes[endRow][endCol])
         }
         
         //animation "shiftDown" transformation
@@ -206,11 +253,10 @@ extension Renderer {
             guard let strongSelf = self else { return }
             count -= 1
             if count == 0 {
-                strongSelf.animationsFinished(for: spriteNodes)
                 strongSelf.sprites = spriteNodes
                 
                 //TODO: Figure out why we need the following line of code.  this will solve the bug that the player sprite reanimates on every remove and refill
-                strongSelf.foreground = strongSelf.add(sprites: strongSelf.sprites, to: strongSelf.foreground)
+                strongSelf.animationsFinished(for: spriteNodes)
             }
         }
     }
@@ -234,28 +280,22 @@ extension Renderer {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
         let positionInScene = touch.location(in: self.foreground)
-        let nodes = self.foreground.nodes(at: positionInScene)
-        
+        let nodes = foreground.nodes(at: positionInScene)
+
         for node in nodes {
-            if node.name == "rotateRight" {
-                //want to append to Input queue
-                InputQueue.append(.rotateRight)
-            }
-            
-            if node.name == "rotateLeft" {
-                //want to append to Input queue
-                InputQueue.append(.rotateLeft)
-            }
-            
             if node is DFTileSpriteNode {
                 for index in 0..<sprites.reduce([],+).count {
                     let boardSize = Int(self.boardSize)
                     let row = index / boardSize
                     let col = (index - row * boardSize) % boardSize
                     if sprites[row][col].contains(positionInScene) {
-                        InputQueue.append(.touch(TileCoord(row, col)))
+                        InputQueue.append(Input(.touch(TileCoord(row, col)), true))
                     }
                 }
+            }
+            
+            if node.name == "setting" {
+                header.touchesEnded(touches, with: event)
             }
         }
     }
@@ -263,9 +303,9 @@ extension Renderer {
 
 extension Renderer {
     func gameWin() {
-        let menu = MenuSpriteNode(playableRect: playableRect)
-        menu.zPosition = 10
-        foreground.addChild(menu)
+//        let menu = MenuSpriteNode(playableRect: playableRect)
+//        menu.zPosition = 10
+//        foreground.addChild(menu)
     }
 }
 

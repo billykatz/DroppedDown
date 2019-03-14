@@ -73,51 +73,27 @@ class GameScene: SKScene {
     /// Called every frame
     /// We try to digest the top of the queue every frame
     override func update(_ currentTime: TimeInterval) {
-        guard !(renderer?.isAnimating ?? true),
-            let input = InputQueue.pop() else { return }
-        guard let transformation = board?.handle(input: input) else {
-            renderer?.isAnimating = false
-            return
-        }
-        renderer?.isAnimating = true
-        referee = Referee(transformation.endBoard)
-        InputQueue.append(.enforceRules)
-        render(transformation, for: input)
+        guard let input = InputQueue.pop() else { return }
+        route(board?.handle(input: input), for: input)
     }
     
     
     /// Switches on input type and calls the appropriate function to determine the new board
-    private func render(_ transformation: Transformation?, for input: Input) {
-        guard let trans = transformation else { return }
-        switch input{
-        case .touch(_):
-            board = trans.endBoard
-            renderer?.computeNewBoard(for: trans)
-        case .rotateLeft, .rotateRight:
-            board = trans.endBoard
-            renderer?.rotate(for: trans)
-        case .playerAttack:
-            // we should just render the new board here
-//            render(board: trans.endBoard)
-//            renderer?.computeNewBoard(for: trans)
-            return
-        case .monsterAttack:
-            return
-        case .monsterDies(_):
-            board = trans.endBoard
-//            computeNewBoard(for: trans)
-        case .gameWin:
-//            gameWin(trans)
-            renderer?.animate(trans.tileTransformation?.first) { [weak self] in
-                self?.renderer?.gameWin()
-            }
-        case .gameLose:
-            gameLost()
-        case .enforceRules:
-            referee?.enforceRules().forEach {
+    private func route(_ transformation: Transformation?, for input: Input) {
+        switch input.type {
+        case .touch, .rotateRight, .rotateLeft, .monsterDies, .playerAttack, .monsterAttack, .gameWin, .gameLose:
+            board = transformation?.endBoard
+        case .play, .pause, .animationsFinished:
+            //we only need to pass along the input
+            ()
+        }
+        //route the transformation and input to the Renderer
+        renderer?.render(transformation, for: input)
+        
+        if input.userGenerated {
+            Referee.enforceRules(transformation?.endBoard).forEach {
                 InputQueue.append($0)
             }
-            renderer?.isAnimating = false
         }
     }
 }
@@ -127,42 +103,6 @@ class GameScene: SKScene {
 extension GameScene {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         self.renderer?.touchesEnded(touches, with: event)
-    }
-}
-
-//MARK: - Game win and Game loss
-
-extension GameScene {
-    private func gameWin(_ transformation: Transformation) {
-        guard let trans = transformation.tileTransformation?.first else { return }
-//        animate(trans) { [weak self] in
-//            guard let strongSelf = self else { return }
-//            let wait = SKAction.wait(forDuration:0.5)
-//            let action = SKAction.run { [weak self] in
-//                guard let strongSelf = self else { return }
-//                strongSelf.gameSceneDelegate?.shouldShowMenu(win: true)
-//            }
-//            strongSelf.run(SKAction.sequence([wait,action]))
-//        }
-    }
-    
-    private func gameLost() {
-        let wait = SKAction.wait(forDuration:0.5)
-        let action = SKAction.run { [weak self] in
-            guard let strongSelf = self else { return }
-            strongSelf.gameSceneDelegate?.shouldShowMenu(win: false)
-        }
-        self.run(SKAction.sequence([wait,action]))
-    }
-}
-//MARK: - Communication from VC
-extension GameScene {
-    /// Debug only, use to reset the board easily
-    private func reset() {
-//        board = Board.build(size: boardSize!)
-//        spriteNodes = createAndPositionSprites(from: board!.tiles)
-//        foreground.removeAllChildren()
-//        addSpriteTilesToScene()
     }
 }
 

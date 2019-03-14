@@ -29,7 +29,7 @@ class Header: SKSpriteNode {
         let position = touch.location(in: self)
         for node in self.nodes(at: position) {
             if node.name == "setting" {
-                InputQueue.append(.pause)
+                InputQueue.append(Input(.pause, true))
             }
         }
 

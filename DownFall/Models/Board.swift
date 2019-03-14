@@ -26,8 +26,8 @@ struct Board: Equatable {
             tileCol < boardSize
     }
     
-    func handle(input: Input) -> Transformation {
-        switch input {
+    func handle(input: Input) -> Transformation? {
+        switch input.type {
         case .rotateLeft:
             return self.rotate(.left)
         case .rotateRight:
@@ -43,8 +43,10 @@ struct Board: Equatable {
             return self.removeAndReplace(tileCoord, singleTile: true)
         case .gameWin:
             return gameWin()
-        case .gameLose, .enforceRules:
+        case .gameLose, .play, .pause:
             return Transformation(board: self)
+        case .animationsFinished:
+            return nil
         }
     }
     

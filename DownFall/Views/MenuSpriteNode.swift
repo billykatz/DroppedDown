@@ -61,7 +61,7 @@ class MenuSpriteNode: SKSpriteNode {
 
         for node in nodes {
             if node.name == Constants.resume {
-                InputQueue.append(.play)        
+                InputQueue.append(Input(.play, true))        
             }
         }
 

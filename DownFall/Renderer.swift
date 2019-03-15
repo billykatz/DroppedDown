@@ -9,10 +9,6 @@
 import Foundation
 import SpriteKit
 
-protocol RendererDelegate {
-    func gameWin()
-}
-
 class Renderer : SKSpriteNode {
     private let playableRect: CGRect
     private(set) var foreground: SKNode = SKNode()
@@ -26,6 +22,10 @@ class Renderer : SKSpriteNode {
     
     var menuSpriteNode: MenuSpriteNode {
         return MenuSpriteNode.init(.pause, playableRect: playableRect)
+    }
+    
+    var gameWinSpriteNode: MenuSpriteNode {
+        return MenuSpriteNode(.gameWin, playableRect: playableRect)
     }
     
     var header: Header = Header()
@@ -91,13 +91,17 @@ class Renderer : SKSpriteNode {
         case .monsterAttack(_):
             () //TODO
         case .gameWin:
-            gameWin()
+            animate(transformation?.tileTransformation?.first) { [weak self] in
+                self?.render(InputQueue.gameState)
+            }
         case .gameLose:
             gameWin()
         case .play, .pause:
             render(InputQueue.gameState)
         case .animationsFinished:
             ()
+        case .playAgain:
+            menuForeground.removeFromParent()
         }
     }
     
@@ -105,14 +109,18 @@ class Renderer : SKSpriteNode {
         switch gameState {
         case .playing:
             //maybe just think about re enabling user interaction if we disabled it
+            menuForeground.addChild(menuSpriteNode)
             menuForeground.removeFromParent()
         case .paused:
             // show the menu
+            menuSpriteNode.removeFromParent()
             foreground.addChild(menuForeground)
 //            menuForeground.addChild(menuSpriteNode)
         case .animating:
             // nothing to do that isnt already being done
             ()
+        case .gameWin:
+            gameWin()
         }
         
     }
@@ -215,6 +223,7 @@ extension Renderer {
     func computeNewBoard(for transformation: Transformation?) {
         guard let transformation = transformation,
             let transformations = transformation.tileTransformation else {
+                InputQueue.append(Input(.animationsFinished, false))
             return
         }
         let spriteNodes = createSprites(from: transformation.endBoard)
@@ -303,9 +312,12 @@ extension Renderer {
 
 extension Renderer {
     func gameWin() {
-//        let menu = MenuSpriteNode(playableRect: playableRect)
-//        menu.zPosition = 10
-//        foreground.addChild(menu)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            guard let strongSelf = self else { return }
+            strongSelf.menuForeground.removeAllChildren()
+            strongSelf.menuForeground.addChild(strongSelf.gameWinSpriteNode)
+            strongSelf.foreground.addChild(strongSelf.menuForeground)
+        }
     }
 }
 

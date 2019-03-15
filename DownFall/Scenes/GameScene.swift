@@ -11,6 +11,7 @@ import UIKit
 
 protocol GameSceneDelegate: class {
     func shouldShowMenu(win: Bool)
+    func reset()
 }
 
 class GameScene: SKScene {
@@ -86,6 +87,8 @@ class GameScene: SKScene {
         case .play, .pause, .animationsFinished:
             //we only need to pass along the input
             ()
+        case .playAgain:
+            gameSceneDelegate?.reset()
         }
         //route the transformation and input to the Renderer
         renderer?.render(transformation, for: input)

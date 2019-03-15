@@ -47,6 +47,8 @@ struct Board: Equatable {
             return Transformation(board: self)
         case .animationsFinished:
             return nil
+        case .playAgain:
+            return nil
         }
     }
     

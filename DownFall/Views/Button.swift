@@ -11,8 +11,8 @@ import SpriteKit
 
 class Button: SKSpriteNode {
     static func build(_ text: String, size: CGSize) -> Button {
-        let button = Button.init(texture: SKTexture(imageNamed: "button"), color: .white, size: size)
-        let label = SKLabelNode(text: "Resume")
+        let button = Button.init(texture: nil, color: .white, size: size)
+        let label = SKLabelNode(text: text)
         label.fontSize = 80
         label.zPosition = 5
         label.fontColor = .black

@@ -8,7 +8,13 @@
 
 import SpriteKit
 
-enum InputType : Equatable, Hashable {
+enum InputType : Equatable, Hashable, CaseIterable{
+    static var allCases: [InputType] = [.touch(TileCoord(0,0)), .rotateLeft, .rotateRight, .playerAttack,
+                                        .monsterAttack(TileCoord(0,0)), .monsterDies(TileCoord(0,0)), .gameWin, .gameLose,
+                                        .play, .pause, .animationsFinished, .playAgain]
+    
+    typealias AllCases = [InputType]
+    
     case touch(TileCoord)
     case rotateLeft
     case rotateRight
@@ -23,7 +29,7 @@ enum InputType : Equatable, Hashable {
     case playAgain
 }
 
-struct Input {
+struct Input: Hashable {
     let type: InputType
     let userGenerated: Bool
     
@@ -31,29 +37,19 @@ struct Input {
         self.type = type
         self.userGenerated = userGenerated
     }
-    
-    
-}
-
-enum GameState {
-    case playing
-    case paused
-    case animating
-    case gameWin
 }
 
 struct InputQueue {
     static var queue: [Input] = []
     static var bufferQueue: [Input] = []
-    static var gameState: GameState = .playing
-    
+    static var gameState = AnyGameState(PlayState())
     /// Attempts to append the input given the current game state
     /// However the game state is a FSM and cannot accept input at different points
     /// An example, if we are animating a rotation and the user hits rotate right, we
     /// ignore that input because we cannot animate two things at a time
-    static func append(_ input: Input, given: GameState = gameState) {
+    static func append(_ input: Input, given: AnyGameState = gameState) {
         debugPrint(input)
-        switch gameState {
+        switch gameState.state {
         case .animating:
             //temporal, these statements must go in this order
             if input.type == .animationsFinished {
@@ -80,15 +76,20 @@ struct InputQueue {
             } else {
                 fatalError("Not everything is possibleeeeeee!!!")
             }
+        case .gameLose:
+            fatalError("haven't implemented")
         }
 
     }
     
     static func pop() -> Input? {
-        guard let input = InputQueue.peek(),
-            shouldPop(input, for: InputQueue.gameState) else { return nil }
+        guard let input = InputQueue.peek(), let transition = InputQueue.gameState.transitionState(given: input) else {
+            queue = Array(queue.dropFirst())
+            return nil
+        }
         queue = Array(queue.dropFirst())
-        InputQueue.gameState = gameState(given: input)
+        gameState = transition
+        
         debugPrint("\(input) was popped")
         if input.type == .animationsFinished {
             queue.append(contentsOf: bufferQueue)
@@ -102,42 +103,45 @@ struct InputQueue {
         return queue.first
     }
     
-    static func shouldPop(_ input: Input, for gameState: GameState) -> Bool {
-        switch gameState {
-        case .playing:
-            return true
-        case .animating:
-            if input.type == .animationsFinished {
-                return true
-            } else if !input.userGenerated {
-                return true
-            }
-            return false
-        case .paused:
-            return input.type == .play
-        case .gameWin:
-            return input.type == .playAgain
-        }
-    }
+    
+//    static func shouldPop(_ input: Input, for gameState: GameState) -> Bool {
+//        switch gameState.state {
+//        case .playing:
+//            return true
+//        case .animating:
+//            if input.type == .animationsFinished {
+//                return true
+//            } else if !input.userGenerated {
+//                return true
+//            }
+//            return false
+//        case .paused:
+//            return input.type == .play
+//        case .gameWin:
+//            return input.type == .playAgain
+//        case .gameLose:
+//            return input.type == .playAgain
+//
+//        }
+//    }
 
     
-    static func gameState(given input: Input) -> GameState {
-        switch input.type {
-        case .gameLose, .monsterAttack, .monsterDies, .playerAttack, .touch, .rotateLeft, .rotateRight:
-            return .animating
-        case .pause:
-            return .paused
-        case .animationsFinished:
-            //enforce rules unless they have already been enforced
-            return .playing
-        case .play:
-           return .playing
-        case .gameWin:
-            return .gameWin
-        case .playAgain:
-            return .playing
-        }
-    }
+//    static func gameState(given input: Input) -> GameState {
+//        switch input.type {
+//        case .gameLose, .monsterAttack, .monsterDies, .playerAttack, .touch, .rotateLeft, .rotateRight:
+//            return .animating
+//        case .pause:
+//            return .paused
+//        case .animationsFinished:
+//            return .playing
+//        case .play:
+//           return .playing
+//        case .gameWin:
+//            return .gameWin
+//        case .playAgain:
+//            return .playing
+//        }
+//    }
 }
 
 

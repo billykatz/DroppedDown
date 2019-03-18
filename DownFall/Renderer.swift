@@ -105,8 +105,8 @@ class Renderer : SKSpriteNode {
         }
     }
     
-    private func render(_ gameState: GameState) {
-        switch gameState {
+    private func render(_ gameState: AnyGameState) {
+        switch gameState.state {
         case .playing:
             //maybe just think about re enabling user interaction if we disabled it
             menuForeground.addChild(menuSpriteNode)
@@ -120,6 +120,9 @@ class Renderer : SKSpriteNode {
             // nothing to do that isnt already being done
             ()
         case .gameWin:
+            gameWin()
+        case .gameLose:
+            //TODO: update
             gameWin()
         }
         

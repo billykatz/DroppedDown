@@ -10,6 +10,8 @@ import UIKit
 import SpriteKit
 import GameplayKit
 
+
+
 class GameViewController: UIViewController {
 
     private var gameSceneNode: GameScene?
@@ -27,15 +29,10 @@ class GameViewController: UIViewController {
 
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         if UIDevice.current.userInterfaceIdiom == .phone {
-            return [.portrait, .portraitUpsideDown]
+            return [.portrait]
         } else {
             return .all
         }
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Release any cached data, images, etc that aren't in use.
     }
 
     override var prefersStatusBarHidden: Bool {
@@ -44,7 +41,7 @@ class GameViewController: UIViewController {
 }
 
 extension GameViewController {
-    func startLevel() {
+    private func startLevel() {
         if let scene = GKScene(fileNamed: "GameScene")?.rootNode as? GameScene {
             gameSceneNode = scene
             gameSceneNode!.scaleMode = .aspectFill
@@ -82,19 +79,20 @@ extension GameViewController: GameSceneDelegate {
     func shouldShowMenu(win: Bool) {
         menuScene = nil
         gameSceneNode = nil
-        guard let view = self.view as? SKView else { return }
-        if win {
-            boardSize += 1
-            let menu = SKScene(fileNamed: "Menu") as! Menu
-            menu.menuDelegate = self
-            menuScene = menu
-            view.presentScene(menuScene)
-            menuScene?.configure(title: "You Won :)", primary: "Play Again?", secondary: nil, delegate: self)
-        } else {
-            boardSize -= 1
-            view.presentScene(menuScene)
-            gameSceneNode = nil
-            menuScene?.configure(title: "You Lost :(", primary: "Play Again?", secondary: nil, delegate: self)
+        guard let view = self.view as? SKView,
+            let menu = SKScene(fileNamed: "Menu") as? Menu else { return }
+        menu.menuDelegate = self
+        menuScene = menu
+        view.presentScene(menuScene)
+        menuScene?.configure(title: win ? "You Won :)" : "You ran out of moves or time :(", primary: "Play Again?", delegate: self)
+    }
+    
+    func reset() {
+        
+        let fadeOut = SKAction.fadeOut(withDuration: 1.5)
+        let remove = SKAction.removeFromParent()
+        gameSceneNode?.run(SKAction.group([fadeOut, remove])) { [weak self] in
+            self?.startLevel()
         }
     }
 }

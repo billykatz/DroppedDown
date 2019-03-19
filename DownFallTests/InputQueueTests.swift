@@ -12,13 +12,6 @@ import XCTest
 /// These tests are to verify the rules we enforced for
 /// deciding when and where certain Input are queued
 
-private protocol Resets {
-    static var queue: [Input] { get set }
-    static var bufferQueue: [Input] { get set }
-    static var gameState: AnyGameState { get set }
-    static func reset(to startingGameState: AnyGameState)
-}
-
 extension InputQueue: Resets {
     static func reset(to startingGameState: AnyGameState) {
         queue = []

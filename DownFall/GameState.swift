@@ -144,6 +144,8 @@ struct AnimatingState: GameState {
         switch input.type {
         case .animationsFinished:
             return true
+        case .playAgain:
+            return true
         default:
             return false
         }
@@ -166,6 +168,8 @@ struct AnimatingState: GameState {
         switch input.type {
         case .animationsFinished:
             return true
+        case .playAgain:
+            return true
         default:
             return false
         }
@@ -173,7 +177,9 @@ struct AnimatingState: GameState {
 
     func transitionState(given input: Input) -> AnyGameState? {
         switch input.type {
-        case .animationsFinished:
+        case .animationsFinished, .playAgain:
+            return AnyGameState(PlayState())
+        case .playAgain:
             return AnyGameState(PlayState())
         default:
             return nil
@@ -190,7 +196,9 @@ struct PlayState: GameState {
              .playerAttack, .monsterAttack,
              .touch, .monsterDies, .rotateLeft, .rotateRight:
             return true
-        case .animationsFinished, .play, .playAgain:
+        case .playAgain:
+            return true
+        case .animationsFinished, .play:
             return false
 
         }
@@ -214,7 +222,9 @@ struct PlayState: GameState {
         case .playerAttack, .monsterAttack,
              .touch, .monsterDies, .rotateLeft, .rotateRight:
             return AnyGameState(AnimatingState())
-        case .animationsFinished, .play, .playAgain:
+        case .playAgain:
+            return AnyGameState(WinState())
+        case .animationsFinished, .play:
             return nil
         }
 

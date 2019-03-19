@@ -36,8 +36,8 @@ struct Board: Equatable {
             return self.removeAndReplace(tileCoord)
         case .playerAttack:
             return self.playerAttack()
-        case .monsterAttack(_):
-            return Transformation(board: self)
+        case .monsterAttack(let coord):
+            return self.monsterAttack(coord)
         case .monsterDies(let tileCoord):
             //only remove a single tile when a monster dies
             return self.removeAndReplace(tileCoord, singleTile: true)

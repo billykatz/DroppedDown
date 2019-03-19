@@ -21,9 +21,9 @@ class Header: SKSpriteNode {
         
         header.addChild(setting)
         header.isUserInteractionEnabled = true
+        
         return header
     }
-    
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
         let position = touch.location(in: self)
@@ -32,7 +32,6 @@ class Header: SKSpriteNode {
                 InputQueue.append(Input(.pause, true))
             }
         }
-
     }
     
     override init(texture: SKTexture?, color: UIColor, size: CGSize) {

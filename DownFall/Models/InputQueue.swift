@@ -92,4 +92,29 @@ struct InputQueue {
     }
 }
 
+extension InputQueue {
+    static var debugDescription: String {
+        var output = ""
+        output += "Current gameState: \(gameState.state)"
+        output += "\nCurrent queue \(queue)"
+        output += "\nCurrent buffer \(bufferQueue)"
+        return output
+    }
+}
+
+protocol Resets {
+    static var queue: [Input] { get set }
+    static var bufferQueue: [Input] { get set }
+    static var gameState: AnyGameState { get set }
+    static func reset(to startingGameState: AnyGameState)
+}
+
+extension InputQueue: Resets {
+    static func reset(to startingGameState: AnyGameState = AnyGameState(PlayState())) {
+        queue = []
+        bufferQueue = []
+        gameState = startingGameState
+    }
+}
+
 

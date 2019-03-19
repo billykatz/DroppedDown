@@ -87,9 +87,9 @@ class Renderer : SKSpriteNode {
         case .touch(_), .monsterDies(_):
             computeNewBoard(for: transformation)
         case .playerAttack:
-            () //TODO
-        case .monsterAttack(_):
-            () //TODO
+            playerAttack(transformation)
+        case .monsterAttack(let tileCoord):
+            monsterAttack(from: tileCoord, transformation)
         case .gameWin:
             animate(transformation?.tileTransformation?.first) { [weak self] in
                 self?.render(InputQueue.gameState)
@@ -104,6 +104,35 @@ class Renderer : SKSpriteNode {
             menuForeground.removeFromParent()
         }
     }
+    
+    func playerAttack(_ transfomation: Transformation?) {
+        guard let trans = transfomation else { animationsFinished(for: sprites); return }
+        sprites = createSprites(from: trans.endBoard)
+        animationsFinished(for: sprites)
+        
+    }
+    
+    func monsterAttack(from tileCoord: TileCoord, _ transformation: Transformation?) {
+        guard let trans = transformation else { animationsFinished(for: sprites); return }
+        //TODO: Animate that the player loses health
+        
+        
+        let duration = 0.25
+        let rotateLeft = SKAction.rotate(byAngle: -0.5, duration: duration)
+        let rotateRight = SKAction.rotate(byAngle: 0.25, duration: duration)
+        let group = SKAction.sequence([rotateRight,
+                                    rotateLeft,
+                                    SKAction.rotate(byAngle: 0.5, duration: duration),
+                                    rotateLeft,
+                                    rotateRight])
+        
+        sprites[tileCoord.rowBelow.x][tileCoord.y].run(group) { [weak self] in
+            guard let strongSelf = self else { return }
+            strongSelf.sprites = strongSelf.createSprites(from: trans.endBoard)
+            strongSelf.animationsFinished(for: strongSelf.sprites)
+        }
+    }
+    
     
     private func render(_ gameState: AnyGameState) {
         switch gameState.state {
@@ -308,7 +337,7 @@ extension Renderer {
 
 extension Renderer {
     func gameWin() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { [weak self] in
             guard let strongSelf = self else { return }
             strongSelf.menuForeground.removeAllChildren()
             strongSelf.menuForeground.addChild(strongSelf.gameWinSpriteNode)

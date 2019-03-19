@@ -69,7 +69,43 @@ class GameScene: SKScene {
         self.renderer = Renderer(playableRect: playableRect,
                                  foreground: foreground,
                                  board: self.board!)
+        
+        let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(tripleTap))
+        tapRecognizer.numberOfTapsRequired = 3
+
+        view.addGestureRecognizer(tapRecognizer)
+        
+//        view.addGestureRecognizer(taptapRecognizer)
+        
+        InputQueue.reset()
+        
     }
+    
+    
+    @objc func tripleTap(_ sender: UITapGestureRecognizer) {
+        
+        if sender.numberOfTapsRequired == 3 {
+            let touchLocation = sender.location(in: view)
+            let newTouch = convertPoint(fromView: touchLocation)
+            
+            if self.nodes(at: newTouch).contains(where: { node in
+                (node as? SKSpriteNode)?.name == "setting"
+            }) {
+                InputQueue.append(Input(.playAgain, true))
+            }
+        } else  if sender.numberOfTapsRequired == 2 {
+            let touchLocation = sender.location(in: view)
+            let newTouch = convertPoint(fromView: touchLocation)
+            
+            if self.nodes(at: newTouch).contains(where: { node in
+                (node as? SKSpriteNode)?.name == "setting"
+            }) {
+                print(InputQueue.debugDescription)
+            }
+
+        }
+    }
+
     
     /// Called every frame
     /// We try to digest the top of the queue every frame

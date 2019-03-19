@@ -115,9 +115,7 @@ class Renderer : SKSpriteNode {
             // show the menu
             menuSpriteNode.removeFromParent()
             foreground.addChild(menuForeground)
-//            menuForeground.addChild(menuSpriteNode)
         case .animating:
-            // nothing to do that isnt already being done
             ()
         case .gameWin:
             gameWin()
@@ -136,9 +134,6 @@ class Renderer : SKSpriteNode {
         spriteForeground.removeAllChildren()
         sprites.forEach {
             $0.forEach { sprite in
-                //this sprite may already be somewhere on the parent
-                //make sure to remove it
-                
                 //add the sprite back
                 if sprite.type == TileType.player() {
                     let group = SKAction.group([SKAction.wait(forDuration:5), sprite.animatedPlayerAction()])
@@ -154,23 +149,20 @@ class Renderer : SKSpriteNode {
     
     func createSprites(from board: Board) -> [[DFTileSpriteNode]] {
         let tiles = board.tiles
-        let bottomLeftX = bottomLeft.x
-        let bottomLeftY = bottomLeft.y
         var x : CGFloat = 0
         var y : CGFloat = 0
         var sprites: [[DFTileSpriteNode]] = []
         for row in 0..<Int(boardSize) {
-            y = CGFloat(row) * tileSize + bottomLeftY
+            y = CGFloat(row) * tileSize + bottomLeft.y
             sprites.append([])
             for col in 0..<Int(boardSize) {
-                x = CGFloat(col) * tileSize + bottomLeftX
+                x = CGFloat(col) * tileSize + bottomLeft.x
                 sprites[row].append(DFTileSpriteNode(type: tiles[row][col], size: CGFloat(tileSize)))
                 sprites[row][col].position = CGPoint.init(x: x, y: y)
             }
         }
         return sprites
     }
-    
     
     /// Animate each tileTransformation to display rotation
     func rotate(for transformation: Transformation?) {
@@ -198,6 +190,7 @@ class Renderer : SKSpriteNode {
         var childActionDict : [SKNode : SKAction] = [:]
         for transIdx in 0..<transformation.count {
             let trans = transformation[transIdx]
+            //calculate a point that is out of bounds of the foreground
             let outOfBounds: CGFloat = CGFloat(trans.initial.x) >= boardSize ? tileSize * boardSize : 0
             let point = CGPoint.init(x: tileSize * CGFloat(trans.initial.tuple.1) + bottomLeft.x,
                                      y: outOfBounds + tileSize * CGFloat(trans.initial.x) + bottomLeft.y)

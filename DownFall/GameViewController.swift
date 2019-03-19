@@ -84,7 +84,7 @@ extension GameViewController: GameSceneDelegate {
         menu.menuDelegate = self
         menuScene = menu
         view.presentScene(menuScene)
-        menuScene?.configure(title: win ? "You Won :)" : "You ran out of moves or time :(", primary: "Play Again?", delegate: self)
+        menuScene?.configure(title: win ? "You Won :)" : "No Moves Left", primary: "Play Again?", delegate: self)
     }
     
     func reset() {

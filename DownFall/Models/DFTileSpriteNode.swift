@@ -11,9 +11,9 @@ import Foundation
 
 class DFTileSpriteNode: SKSpriteNode {
     var type : TileType
-    init(type: TileType) {
+    init(type: TileType, size: CGFloat) {
         self.type = type
-        super.init(texture: SKTexture(imageNamed: type.textureString()), color: .clear, size: CGSize.init(width: 75.0, height: 75.0))
+        super.init(texture: SKTexture(imageNamed: type.textureString()), color: .clear, size: CGSize.init(width: size, height: size))
     }
     
     required init?(coder aDecoder: NSCoder) { fatalError("DFTileSpriteNode init?(coder:) is not implemented") }

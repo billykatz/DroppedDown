@@ -15,8 +15,8 @@ struct Referee {
         self.board = board
     }
     
-    func enforceRules(movesLeft: Int? = Int.max) -> [Input] {
-        
+    static func enforceRules(_ board: Board?, movesLeft: Int? = Int.max) -> [Input] {
+        guard let board = board else { return [] }
         func playerWins() -> Bool {
             guard let playerRow = board.playerPosition?.x,
                 let playerCol = board.playerPosition?.y,
@@ -26,11 +26,10 @@ struct Referee {
         }
         
         func boardHasMoreMoves() -> Bool {
-            guard let exitPosition = board.exitPosition,
-                let playerPosition = board.playerPosition else { return false }
+            guard let playerPosition = board.playerPosition else { return false }
             for (i, row) in board.tiles.enumerated() {
                 for (j, _) in row.enumerated() {
-                    if board.findNeighbors(i, j).count > 2 || board.valid(neighbor: exitPosition, for: playerPosition) || playerAttacks() || playerHasPossibleAttack() {
+                    if board.findNeighbors(i, j).count > 2 || board.valid(neighbor: board.exitPosition, for: playerPosition) || playerAttacks() || playerHasPossibleAttack() {
                         return true
                     }
                 }
@@ -89,7 +88,7 @@ struct Referee {
             }
             return deadMonsters
         }
-
+        
         // Game rules are enforced in the following priorities
         // Game Win
         // Game Lose
@@ -100,20 +99,20 @@ struct Referee {
         //should monster get to attack before it dies?
         
         if playerWins() {
-            return [.gameWin]
+            return [Input(.gameWin, false)]
         } else if !boardHasMoreMoves() || movesLeft ?? Int.max <= 0 {
-            return [.gameLose]
+            return [Input(.gameLose, false)]
         }
         
         var inputs: [Input] = []
         
         if playerAttacks() {
-           inputs.append(Input.playerAttack)
+            inputs.append(Input(.playerAttack, false))
         }
         
-        monsterAttacks().forEach { inputs.append(Input.monsterAttack($0)) }
+        monsterAttacks().forEach { inputs.append(Input(.monsterAttack($0), false)) }
         
-        monsterDies().forEach { inputs.append(Input.monsterDies($0)) }
+        monsterDies().forEach { inputs.append(Input(.monsterDies($0), false)) }
         
         return inputs
     }

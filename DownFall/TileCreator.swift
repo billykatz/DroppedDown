@@ -9,14 +9,20 @@
 import GameplayKit
 
 struct TileCreator: TileStrategy {
+    
+    static func randomTile(_ given: Int) -> TileType {
+        let index = abs(given) % TileType.allCases.count
+        return TileType.allCases[index]
+    }
+    
+    static var maxMonsters = 2
     static func tiles(for board: Board, difficulty: Difficulty = .normal) -> [TileType] {
         var newTiles: [TileType] = []
         var newMonsterCount = 0
-        let maxMonsters = difficulty.maxExpectedMonsters(for: board)
         let currentMonsterCount = board.tiles(of: .greenMonster()).count
         while (newTiles.count < board.tiles(of: .empty).count) {
             var canAdd = true
-            let nextTile = TileType.randomTile(randomSource.nextInt())
+            let nextTile = randomTile(randomSource.nextInt())
             if (TileType.exit == nextTile) {
                 canAdd = false
                 if board.tiles(of: .exit).count < 1 && !newTiles.contains(.exit) {

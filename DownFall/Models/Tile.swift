@@ -23,11 +23,6 @@ enum TileType: Equatable, CaseIterable {
     
     static var allCases: [TileType] = [.blueRock, .blackRock ,.greenRock, .player(), .exit, .empty, .greenMonster()]
     typealias AllCases = [TileType]
-    
-    static func randomTile(_ given: Int) -> TileType {
-        let index = abs(given) % allCases.count
-        return allCases[index]
-    }
 
     static func == (lhs: TileType, rhs: TileType) -> Bool {
         switch (lhs, rhs) {

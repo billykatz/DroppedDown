@@ -10,12 +10,13 @@ import SpriteKit
 
 struct Animator {
     
-    static func shake(label: SKLabelNode) {
+    static func shake(label: SKNode) {
         let duration = 0.5
+        let rotateLeft = SKAction.rotate(byAngle: -1, duration: duration)
         let group = SKAction.group([SKAction.rotate(byAngle: 0.5, duration: duration),
-                     SKAction.rotate(byAngle: -1, duration: duration),
+                     rotateLeft,
                      SKAction.rotate(byAngle: 1, duration: duration),
-                     SKAction.rotate(byAngle: -1, duration: duration),
+                     rotateLeft,
                      SKAction.rotate(byAngle: 0.5, duration: duration)])
         label.run(group)
     }

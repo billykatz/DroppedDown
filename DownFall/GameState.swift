@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum State {
+enum State: CaseIterable {
     case playing
     case paused
     case animating
@@ -16,16 +16,20 @@ enum State {
     case gameLose
 }
 
-protocol GameState: class {
+protocol GameState {
     var state: State { get }
     func canTransition(given input: Input) -> Bool
     func transitionState(given input: Input) -> AnyGameState?
+    func shouldAppend(_ input: Input) -> Bool
+    func shouldBuffer(_ input: Input) -> Bool
 }
 
-final class AnyGameState {
+final class AnyGameState: GameState {
     private var _state: State
     private let _canTransition : (Input) -> Bool
     private let _transitionState: (Input) -> AnyGameState?
+    private let _shouldAppend: (Input) -> Bool
+    private let _shouldBuffer: (Input) -> Bool
     var state: State {
         get {
             return _state
@@ -39,6 +43,8 @@ final class AnyGameState {
         _state = state.state
         _canTransition = state.canTransition
         _transitionState = state.transitionState
+        _shouldAppend = state.shouldAppend
+        _shouldBuffer = state.shouldBuffer
     }
     
     func canTransition(given input: Input) -> Bool {
@@ -48,11 +54,32 @@ final class AnyGameState {
     func transitionState(given input: Input) -> AnyGameState? {
         return _transitionState(input)
     }
+    
+    func shouldAppend(_ input: Input) -> Bool {
+        return _shouldAppend(input)
+    }
+    
+    func shouldBuffer(_ input: Input) -> Bool {
+        return _shouldBuffer(input)
+    }
 }
 
 
 
-class LoseState: GameState {
+struct LoseState: GameState {
+    func shouldAppend(_ input: Input) -> Bool {
+        switch input.type {
+        case .playAgain:
+            return true
+        default:
+            return false
+        }
+    }
+    
+    func shouldBuffer(_ input: Input) -> Bool {
+        return false
+    }
+    
     
     var state: State = .gameLose
     
@@ -77,7 +104,20 @@ class LoseState: GameState {
     }
 }
 
-class WinState: GameState {
+struct WinState: GameState {
+    func shouldAppend(_ input: Input) -> Bool {
+        switch input.type {
+        case .playAgain:
+            return true
+        default:
+            return false
+        }
+    }
+    
+    func shouldBuffer(_ input: Input) -> Bool {
+        return false
+    }
+    
     var state: State = .gameWin
     
     func canTransition(given input: Input) -> Bool {
@@ -99,7 +139,26 @@ class WinState: GameState {
     }
 }
 
-class AnimatingState: GameState {
+struct AnimatingState: GameState {
+    func shouldAppend(_ input: Input) -> Bool {
+        switch input.type {
+        case .animationsFinished:
+            return true
+        default:
+            return false
+        }
+    }
+    
+    func shouldBuffer(_ input: Input) -> Bool {
+        switch input.type {
+        case .gameWin, .gameLose,
+             .monsterAttack, .monsterDies, .playerAttack:
+            return !input.userGenerated
+        default:
+            return false
+        }
+    }
+    
     typealias StateType = State
     var state: State = .animating
 
@@ -123,8 +182,24 @@ class AnimatingState: GameState {
 
 
 }
-//
-class PlayState: GameState {
+
+struct PlayState: GameState {
+    func shouldAppend(_ input: Input) -> Bool {
+        switch input.type {
+        case .gameWin,. gameLose,. pause,
+             .playerAttack, .monsterAttack,
+             .touch, .monsterDies, .rotateLeft, .rotateRight:
+            return true
+        case .animationsFinished, .play, .playAgain:
+            return false
+
+        }
+    }
+    
+    func shouldBuffer(_ input: Input) -> Bool {
+        return false
+    }
+    
     typealias StateType = PlayState
     var state: State = .playing
 
@@ -160,7 +235,15 @@ class PlayState: GameState {
 
 
 
-class PauseState: GameState {
+struct PauseState: GameState {
+    func shouldAppend(_ input: Input) -> Bool {
+        return input.type == .play
+    }
+    
+    func shouldBuffer(_ input: Input) -> Bool {
+        return false
+    }
+    
     typealias StateType = State
     var state: State = .paused
 

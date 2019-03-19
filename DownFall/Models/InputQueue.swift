@@ -27,6 +27,16 @@ enum InputType : Equatable, Hashable, CaseIterable{
     case pause
     case animationsFinished
     case playAgain
+    
+    var canBeNonUserGenerated: Bool {
+        switch self {
+            case .playerAttack, .monsterAttack, .monsterDies,
+                 .animationsFinished, .gameWin, .gameLose:
+            return true
+        default:
+            return false
+        }
+    }
 }
 
 struct Input: Hashable {
@@ -49,42 +59,20 @@ struct InputQueue {
     /// ignore that input because we cannot animate two things at a time
     static func append(_ input: Input, given: AnyGameState = gameState) {
         debugPrint(input)
-        switch gameState.state {
-        case .animating:
-            //temporal, these statements must go in this order
-            if input.type == .animationsFinished {
-                queue.append(input)
-                debugPrint("\(input) was appended")
-            } else if !input.userGenerated {
-                bufferQueue.append(input)
-                debugPrint("\(input) was appended to bufferQueue")
-            }
-            debugPrint("\(input) was NOT appended b/c the game state is .animating")
-        case .paused:
-            guard input.type == .play else {
-                debugPrint("\(input) was NOT appended b/c the game state is .paused")
-                return
-            }
+        if gameState.shouldAppend(input) {
             queue.append(input)
             debugPrint("\(input) was appended")
-        case .playing:
-            queue.append(input)
-            debugPrint("\(input) was appended")
-        case .gameWin:
-            if input.type == .playAgain {
-                queue.append(input)
-            } else {
-                fatalError("Not everything is possibleeeeeee!!!")
-            }
-        case .gameLose:
-            fatalError("haven't implemented")
+        } else if gameState.shouldBuffer(input) && input.type.canBeNonUserGenerated {
+            bufferQueue.append(input)
+            debugPrint("\(input) was appended to bufferQueue")
+        } else {
+            debugPrint("\(input) was NOT appended b/c the game state is \(gameState.state)")
         }
-
     }
     
     static func pop() -> Input? {
-        guard let input = InputQueue.peek(), let transition = InputQueue.gameState.transitionState(given: input) else {
-            queue = Array(queue.dropFirst())
+        guard let input = InputQueue.peek(),
+            let transition = InputQueue.gameState.transitionState(given: input) else {
             return nil
         }
         queue = Array(queue.dropFirst())
@@ -102,46 +90,6 @@ struct InputQueue {
         guard !queue.isEmpty else { return nil }
         return queue.first
     }
-    
-    
-//    static func shouldPop(_ input: Input, for gameState: GameState) -> Bool {
-//        switch gameState.state {
-//        case .playing:
-//            return true
-//        case .animating:
-//            if input.type == .animationsFinished {
-//                return true
-//            } else if !input.userGenerated {
-//                return true
-//            }
-//            return false
-//        case .paused:
-//            return input.type == .play
-//        case .gameWin:
-//            return input.type == .playAgain
-//        case .gameLose:
-//            return input.type == .playAgain
-//
-//        }
-//    }
-
-    
-//    static func gameState(given input: Input) -> GameState {
-//        switch input.type {
-//        case .gameLose, .monsterAttack, .monsterDies, .playerAttack, .touch, .rotateLeft, .rotateRight:
-//            return .animating
-//        case .pause:
-//            return .paused
-//        case .animationsFinished:
-//            return .playing
-//        case .play:
-//           return .playing
-//        case .gameWin:
-//            return .gameWin
-//        case .playAgain:
-//            return .playing
-//        }
-//    }
 }
 
 

@@ -9,99 +9,127 @@
 import XCTest
 @testable import DownFall
 
+/// These tests are to verify the rules we enforced for
+/// deciding when and where certain Input are queued
+
 private protocol Resets {
     static var queue: [Input] { get set }
     static var bufferQueue: [Input] { get set }
-    static var gameState: GameState { get set }
-    static func resetGameState()
+    static var gameState: AnyGameState { get set }
+    static func reset(to startingGameState: AnyGameState)
 }
 
 extension InputQueue: Resets {
-    static func resetGameState() {
+    static func reset(to startingGameState: AnyGameState) {
         queue = []
         bufferQueue = []
-        gameState = .playing
+        gameState = startingGameState
+        
+        
+        XCTAssertEqual(InputQueue.gameState, gameState, "After reset, we start at \(gameState.state)")
+        XCTAssertTrue(InputQueue.queue.isEmpty, "After reset, we have nothing in the input queue")
+        XCTAssertTrue(InputQueue.bufferQueue.isEmpty, "After reset, we have nothing in the buffer queue")
     }
 }
 
-/// The purpose of these tests is to verfiy our state machine
-/// There are 5 nodes or states represented in the GameState enum type
-/// There are 12 edges or inputs represented in the InputType enum
-/// Depending on the state there are rules describing:
-///    - what edges exist between nodes
-///    - if and where we append incoming input
-///    - if and when we can pop outgoing input
-/// The following is a graphical representation of our FSM
-/*
- 
-                            DroppedDown's Finite State Machine
- 
-       Input: playAgain
-+-------^---------------------+
-|       |                     |
-|  +----+----+  Inputs:       |
-|  |         |  gameLose      |                   Inputs: animationsFinished
-|  |Game Lose+<-------------+ |  +----------------------------------------------------------------------+
-|  |         |              | |  |                                                                      |
-|  +---------+              | |  |                                                                      |
-|                           | |  |                                                                      |
-|                           | v  v                                                                      |
-|  +---------+  Inputs:  +--+-+--+-----+                                                         +------+-----+
-|  |         |  gameWin  |             |      Inputs: touch, monsterAttach, monsterDies,         |            |
-+--+ Game Win+<----------+  Playing    +-------------------------------------------------------->+ Animating  |
-   |         |           |             |      rotateRight, rotateLeft, playerAttack              |            |
-   +---------+           +-+--------+--+                                                         +------------+
-                           |        ^
-                           |        |
-                           |        |
-                   Inputs: |        |Inputs:
-                   pause   |        |play
-                           |        |
-                           |        |
-                           v        |
-                         +-+--------+--+
-                         |             |
-                         |   Pause     |
-                         |             |
-                         +-------------+
- */
-
-
-
-
-
-
-
 class InputQueueTests: XCTestCase {
     let pause = Input(.pause, true)
-
+    let playingState = AnyGameState(PlayState())
+    let pauseState = AnyGameState(PauseState())
+    let animatingState = AnyGameState(AnimatingState())
+    let winState = AnyGameState(WinState())
+    let loseState = AnyGameState(LoseState())
+    var gameStates: [AnyGameState] = []
+    
     override func setUp() {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-        InputQueue.resetGameState()
+        gameStates = [pauseState,
+                      playingState,
+                      winState,
+                      loseState,
+                      animatingState]
     }
 
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+    func testInputQueueAppendsPause() {
+        for gameState in gameStates {
+            for inputType in InputType.allCases {
+                
+                InputQueue.reset(to: gameState)
+                var input = Input(inputType, false)
+                InputQueue.append(input)
+                var expectedQueueCount = (gameState.shouldAppend(input) ? 1 : 0)
+                var expectedBufferCount = (gameState.shouldBuffer(input) ? 1 : 0)
+                XCTAssertEqual(InputQueue.queue.count, expectedQueueCount, "After appending \(input.type) in the \(gameState.state), our queue should have \(expectedQueueCount) input")
+                XCTAssertEqual(InputQueue.bufferQueue.count, expectedBufferCount, "After appending \(input.type) in the \(gameState.state), our buffer should have \(expectedBufferCount) input")
+                
+                
+                InputQueue.reset(to: gameState)
+                XCTAssertEqual(InputQueue.gameState, gameState, "After reset, we start at \(gameState.state)")
+                XCTAssertTrue(InputQueue.queue.isEmpty, "After reset, we have nothing in the input queue")
+                XCTAssertTrue(InputQueue.bufferQueue.isEmpty, "After reset, we have nothing in the buffer queue")
+                input = Input(inputType, true)
+                InputQueue.append(input)
+                expectedQueueCount = (gameState.shouldAppend(input) ? 1 : 0)
+                expectedBufferCount = (gameState.shouldBuffer(input) ? 1 : 0)
+                XCTAssertEqual(InputQueue.queue.count, expectedQueueCount, "After appending \(input.type) in the \(gameState.state), our queue should have \(expectedQueueCount) input")
+                XCTAssertEqual(InputQueue.bufferQueue.count, expectedBufferCount, "After appending \(input.type) in the \(gameState.state), our buffer should have \(expectedBufferCount) input")
+            }
+        }
     }
     
-    func testInputQueuePause() {
-        InputQueue.append(pause)
-        let _ = InputQueue.pop()
-        
-        for inputType in InputType.allCases {
-            XCTAssertTrue(InputQueue.gameState == .paused)
-            
-            InputQueue.gameState = InputQueue.gameState(given: Input(inputType, false))
-            switch inputType{
-            case .play:
-               XCTAssertTrue(InputQueue.gameState == .playing)
-            default:
-                XCTAssertTrue(InputQueue.gameState == .paused, "\(inputType) traversed from .paused To \(InputQueue.gameState)")
+    func testInputQueuePop() {
+        for gameState in gameStates {
+            for inputType in InputType.allCases {
+                InputQueue.reset(to: gameState)
+                
+                var input = Input(inputType, false)
+                InputQueue.append(input)
+                
+                if gameState.shouldAppend(input) {
+                    XCTAssertEqual(InputQueue.queue.count, 1)
+                    if gameState.canTransition(given: input) {
+                        let _ = InputQueue.pop()
+                        XCTAssertEqual(InputQueue.queue.count, 0)
+                    } else {
+                        XCTAssertEqual(InputQueue.queue.count, 1)
+                    }
+                }
+                
+                
+                InputQueue.reset(to: gameState)
+                
+                input = Input(inputType, true)
+                InputQueue.append(input)
+                
+                if gameState.shouldAppend(input) {
+                    XCTAssertEqual(InputQueue.queue.count, 1)
+                    if gameState.canTransition(given: input) {
+                        let _ = InputQueue.pop()
+                        XCTAssertEqual(InputQueue.queue.count, 0)
+                    } else {
+                        XCTAssertEqual(InputQueue.queue.count, 1)
+                    }
+                    
+                }
             }
-            
-            //Reset before the next test
-            InputQueue.gameState = .paused
         }
+    }
+    
+    func testInputBufferQueue() {
+        InputQueue.reset(to: animatingState)
+        
+        InputQueue.append(Input(.playerAttack, false))
+        InputQueue.append(Input(.monsterAttack(TileCoord(0,0)), false))
+        
+        XCTAssertTrue(InputQueue.queue.isEmpty, "While in \(animatingState.state), we do not append inputs where input.canBeNonUserGenerated is false")
+        XCTAssertEqual(InputQueue.bufferQueue.count, 2, "While in \(animatingState.state), we can buffer inputs where input.canBeNonUserGenerated is true")
+        
+        InputQueue.append(Input(.animationsFinished, false))
+        XCTAssertEqual(InputQueue.queue.count, 1, "While in \(animatingState.state), we can append animationsFinished input")
+        
+        let _ = InputQueue.pop()
+        XCTAssertEqual(InputQueue.queue.count, 2, "While in \(animatingState.state), we can pop animationsFinished input and the buffered inputs get added to the queue")
+        XCTAssertEqual(InputQueue.bufferQueue.count, 0, "While in \(animatingState.state), after popping an animationsFinished input, we move buffered input to the queue")
+        
         
     }
 

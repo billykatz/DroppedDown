@@ -65,7 +65,6 @@ class GameRefereeTests: XCTestCase {
         
         let gameLose = lose(mockBoard)
         let gameBoard = gameLose(mockBoard)
-        var ref = initRef([[.exit, .blackRock], [.blackRock, .player()]])
         
         let expectedOutput = [Input(.gameLose, false)]
         let actualOutput = Referee.enforceRules(gameBoard)

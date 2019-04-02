@@ -50,7 +50,7 @@ class Renderer : SKSpriteNode {
         foreground = givenForeground
 
         //create sprite representations based on the given board.tiles
-        self.sprites = createSprites(from: board)
+        self.sprites = createSprites(from: board.tiles)
         //place the created sprites onto the foreground
         let _ = add(sprites: sprites)
         foreground.position = playableRect.center
@@ -70,7 +70,15 @@ class Renderer : SKSpriteNode {
         
         [spriteForeground, header, controls].forEach { foreground.addChild($0) }
         
-        // add moves left label
+        Dispatch.shared.register { [weak self] input in
+            switch input.type{
+            case .transformation(let trans):
+                self?.render(trans, for: input)
+            default:
+                self?.render(nil, for: input)
+            }
+        }
+        
         //DEBUG
         #if DEBUG
         if let _ = NSClassFromString("XCTest") {
@@ -82,58 +90,39 @@ class Renderer : SKSpriteNode {
     
     func render(_ transformation: Transformation?, for input: Input) {
         switch input.type {
-        case .rotateLeft, .rotateRight:
-            rotate(for: transformation)
-        case .touch(_), .monsterDies(_):
-            computeNewBoard(for: transformation)
-        case .playerAttack:
-            playerAttack(transformation)
-        case .monsterAttack(let tileCoord):
-            monsterAttack(from: tileCoord, transformation)
-        case .gameWin:
-            animate(transformation?.tileTransformation?.first) { [weak self] in
-                self?.render(InputQueue.gameState)
-            }
-        case .gameLose:
-            gameWin()
-        case .play, .pause:
+        case .play, .pause, .gameLose:
             render(InputQueue.gameState)
-        case .animationsFinished:
-            ()
         case .playAgain:
             menuForeground.removeFromParent()
+        case .transformation(let trans):
+            if let inputType = trans.inputType {
+                switch inputType {
+                case .rotateLeft, .rotateRight:
+                    rotate(for: transformation)
+                case .touch, .monsterDies:
+                    computeNewBoard(for: transformation)
+                case .attack(let attacker, let defender):
+                    animationsFinished(for: sprites, endTiles: trans.endTiles)
+                case .gameWin:
+                    animate(transformation?.tileTransformation?.first) { [weak self] in
+                        self?.render(InputQueue.gameState)
+                    }
+
+                default:
+                    // Transformation assoc value should ony exist for certain inputs
+                    fatalError()
+
+                }
+            } else {
+                animationsFinished(for: sprites)
+            }
+            
+        default:
+            ()
         }
     }
     
-    func playerAttack(_ transfomation: Transformation?) {
-        guard let trans = transfomation else { animationsFinished(for: sprites); return }
-        sprites = createSprites(from: trans.endBoard)
-        animationsFinished(for: sprites)
-        
-    }
-    
-    func monsterAttack(from tileCoord: TileCoord, _ transformation: Transformation?) {
-        guard let trans = transformation else { animationsFinished(for: sprites); return }
-        //TODO: Animate that the player loses health
-        
-        
-        let duration = 0.25
-        let rotateLeft = SKAction.rotate(byAngle: -0.5, duration: duration)
-        let rotateRight = SKAction.rotate(byAngle: 0.25, duration: duration)
-        let group = SKAction.sequence([rotateRight,
-                                    rotateLeft,
-                                    SKAction.rotate(byAngle: 0.5, duration: duration),
-                                    rotateLeft,
-                                    rotateRight])
-        
-        sprites[tileCoord.rowBelow.x][tileCoord.y].run(group) { [weak self] in
-            guard let strongSelf = self else { return }
-            strongSelf.sprites = strongSelf.createSprites(from: trans.endBoard)
-            strongSelf.animationsFinished(for: strongSelf.sprites)
-        }
-    }
-    
-    
+  
     private func render(_ gameState: AnyGameState) {
         switch gameState.state {
         case .playing:
@@ -146,11 +135,10 @@ class Renderer : SKSpriteNode {
             foreground.addChild(menuForeground)
         case .animating:
             ()
-        case .gameWin:
+        case .gameWin, .gameLose:
             gameWin()
-        case .gameLose:
-            //TODO: update
-            gameWin()
+        case .computing, .reffing:
+            fatalError()
         }
         
     }
@@ -176,8 +164,8 @@ class Renderer : SKSpriteNode {
         }
     }
     
-    func createSprites(from board: Board) -> [[DFTileSpriteNode]] {
-        let tiles = board.tiles
+    func createSprites(from tiles: [[TileType]]?) -> [[DFTileSpriteNode]] {
+        guard let tiles = tiles else { fatalError() }
         var x : CGFloat = 0
         var y : CGFloat = 0
         var sprites: [[DFTileSpriteNode]] = []
@@ -194,24 +182,24 @@ class Renderer : SKSpriteNode {
     }
     
     /// Animate each tileTransformation to display rotation
-    func rotate(for transformation: Transformation?) {
+    func rotate(for transformation: Transformation?, _ userGenerated: Bool = false) {
         guard let transformation = transformation,
-            let trans = transformation.tileTransformation?.first else {
-                return }
+            let trans = transformation.tileTransformation?.first,
+            let endTiles = transformation.endTiles else { return }
         var animationCount = 0
-        self.sprites = createSprites(from: transformation.endBoard)
+        self.sprites = createSprites(from: endTiles)
         animate(trans) { [weak self] in
             guard let strongSelf = self else { return }
             animationCount += 1
             if animationCount == trans.count {
-                strongSelf.animationsFinished(for: strongSelf.sprites)
+                strongSelf.animationsFinished(for: strongSelf.sprites, endTiles: endTiles, userGenerated: userGenerated)
             }
         }
     }
     
-    private func animationsFinished(for endBoard: [[DFTileSpriteNode]]) {
+    private func animationsFinished(for endBoard: [[DFTileSpriteNode]], endTiles: [[TileType]]? = nil, userGenerated: Bool = false) {
         let _ = add(sprites: endBoard)
-        InputQueue.append(Input(.animationsFinished, false))
+        InputQueue.append(Input(.animationsFinished, endTiles))
     }
     
     func animate(_ transformation: [TileTransformation]?, _ completion: (() -> Void)? = nil) {
@@ -245,13 +233,14 @@ class Renderer : SKSpriteNode {
 
 extension Renderer {
     
-    func computeNewBoard(for transformation: Transformation?) {
+    func computeNewBoard(for transformation: Transformation?, _ userGenerated: Bool = false) {
         guard let transformation = transformation,
-            let transformations = transformation.tileTransformation else {
-                InputQueue.append(Input(.animationsFinished, false))
+            let transformations = transformation.tileTransformation,
+            let endTiles = transformation.endTiles else {
+                InputQueue.append(Input(.animationsFinished))
             return
         }
-        let spriteNodes = createSprites(from: transformation.endBoard)
+        let spriteNodes = createSprites(from: endTiles)
         //TODO: don't hardcode this
         let removed = transformations[0]
         let newTiles = transformations[1]
@@ -290,7 +279,7 @@ extension Renderer {
                 strongSelf.sprites = spriteNodes
                 
                 //TODO: Figure out why we need the following line of code.  this will solve the bug that the player sprite reanimates on every remove and refill
-                strongSelf.animationsFinished(for: spriteNodes)
+                strongSelf.animationsFinished(for: spriteNodes, endTiles: endTiles, userGenerated: userGenerated)
             }
         }
     }
@@ -323,7 +312,7 @@ extension Renderer {
                     let row = index / boardSize
                     let col = (index - row * boardSize) % boardSize
                     if sprites[row][col].contains(positionInScene) {
-                        InputQueue.append(Input(.touch(TileCoord(row, col)), true))
+                        InputQueue.append(Input(.touch(TileCoord(row, col))))
                     }
                 }
             }

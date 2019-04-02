@@ -6,14 +6,12 @@
 //  Copyright © 2018 William Katz LLC. All rights reserved.
 //
 
-struct TileTransformation {
+struct TileTransformation: Equatable, Hashable {
     let initial : TileCoord
     let end : TileCoord
-    let endTileType: TileType?
     
-    init(_ initial: TileCoord, _ end: TileCoord, _ endTileType: TileType? = nil) {
+    init(_ initial: TileCoord, _ end: TileCoord) {
         self.initial = initial
         self.end = end
-        self.endTileType = endTileType
     }
 }

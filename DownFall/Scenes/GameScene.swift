@@ -18,13 +18,7 @@ class GameScene: SKScene {
     
     private var tileSize = 100
     private var boardSize: Int?
-    private var board: Board? {
-        didSet {
-            if board != nil {
-                referee = Referee(board!)
-            }
-        }
-    }
+    private var board: Board?
     
     //foreground
     private var foreground: SKNode!
@@ -52,8 +46,6 @@ class GameScene: SKScene {
         self.difficulty = difficulty
         board = Board.build(size: bsize)
         boardSize = bsize
-        
-        referee = Referee(board!)
     }
     
     override func didMove(to view: SKView) {
@@ -75,10 +67,13 @@ class GameScene: SKScene {
 
         view.addGestureRecognizer(tapRecognizer)
         
-//        view.addGestureRecognizer(taptapRecognizer)
-        
         InputQueue.reset()
         
+        Dispatch.shared.register { [weak self] input in
+            if input.type == .playAgain {
+                self?.gameSceneDelegate?.reset()
+            }
+        }
     }
     
     
@@ -91,7 +86,7 @@ class GameScene: SKScene {
             if self.nodes(at: newTouch).contains(where: { node in
                 (node as? SKSpriteNode)?.name == "setting"
             }) {
-                InputQueue.append(Input(.playAgain, true))
+                gameSceneDelegate?.reset()
             }
         } else  if sender.numberOfTapsRequired == 2 {
             let touchLocation = sender.location(in: view)
@@ -111,29 +106,7 @@ class GameScene: SKScene {
     /// We try to digest the top of the queue every frame
     override func update(_ currentTime: TimeInterval) {
         guard let input = InputQueue.pop() else { return }
-        route(board?.handle(input: input), for: input)
-    }
-    
-    
-    /// Switches on input type and calls the appropriate function to determine the new board
-    private func route(_ transformation: Transformation?, for input: Input) {
-        switch input.type {
-        case .touch, .rotateRight, .rotateLeft, .monsterDies, .playerAttack, .monsterAttack, .gameWin, .gameLose:
-            board = transformation?.endBoard
-        case .play, .pause, .animationsFinished:
-            //we only need to pass along the input
-            ()
-        case .playAgain:
-            gameSceneDelegate?.reset()
-        }
-        //route the transformation and input to the Renderer
-        renderer?.render(transformation, for: input)
-        
-        if input.userGenerated {
-            Referee.enforceRules(transformation?.endBoard).forEach {
-                InputQueue.append($0)
-            }
-        }
+        Dispatch.shared.send(input)
     }
 }
 
@@ -144,4 +117,3 @@ extension GameScene {
         self.renderer?.touchesEnded(touches, with: event)
     }
 }
-

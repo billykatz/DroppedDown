@@ -119,7 +119,7 @@ func win(_ board: Board) -> Builder {
                 newTiles[ep.x][ep.y] = .player() // put player on top of exit
             }
         } else {
-            let playerPosition = TileCoord.random(board.boardSize-1) // guaranteed not to be on at the top
+            let playerPosition = TileCoord.random(board.boardSize-1).rowAbove // guaranteed not to be on the bottom
             let exitPosition = playerPosition.rowBelow
             newTiles[playerPosition.x][playerPosition.y] = .player()
             newTiles[exitPosition.x][exitPosition.y] = .exit

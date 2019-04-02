@@ -32,7 +32,7 @@ class RendererTests: XCTestCase {
 //    }
     
     func testCreateSprites() {
-        let count = renderer.createSprites(from: greenBoard(board)).flatMap { $0 }.count
+        let count = renderer.createSprites(from: greenBoard(board).tiles).flatMap { $0 }.count
         XCTAssertEqual(mockTileCount, count)
     }
 

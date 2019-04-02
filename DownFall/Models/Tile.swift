@@ -6,28 +6,10 @@
 //  Copyright © 2018 William Katz LLC. All rights reserved.
 //
 
-struct CombatTileData: Equatable {
-    let hp: Int
-    let attackDamage: Int
-    
-    static func monster() -> CombatTileData {
-        return CombatTileData(hp: 1, attackDamage: 1)
-    }
-    
-    static func player() -> CombatTileData {
-        return CombatTileData(hp: 1, attackDamage: 1)
-    }
-}
-
-enum TileType: Equatable, CaseIterable {
+enum TileType: Equatable, Hashable, CaseIterable {
     
     static var allCases: [TileType] = [.blueRock, .blackRock ,.greenRock, .player(), .exit, .empty, .greenMonster()]
     typealias AllCases = [TileType]
-    
-    static func randomTile(_ given: Int) -> TileType {
-        let index = abs(given) % allCases.count
-        return allCases[index]
-    }
 
     static func == (lhs: TileType, rhs: TileType) -> Bool {
         switch (lhs, rhs) {
@@ -70,12 +52,36 @@ enum TileType: Equatable, CaseIterable {
     
     /// Create default player funcion
     static func player() -> TileType {
-        return .player(CombatTileData(hp: 1, attackDamage: 1))
+        return .player(CombatTileData.player())
     }
     
     //Create default monster
     static func greenMonster() -> TileType {
         return .greenMonster(CombatTileData.monster())
+    }
+
+    //MARK: - Instance Properties and Methods
+    
+    func updateCombat(_ given: CombatTileData) -> TileType {
+        switch self {
+        case .player:
+            return .player(given)
+        case .greenMonster:
+            return .greenMonster(given)
+        default:
+            fatalError("Only Combat tiles can call this method")
+        }
+    }
+    
+    var combatData:  CombatTileData? {
+        switch self {
+        case .player(let data):
+            return data
+        case .greenMonster(let data):
+            return data
+        default:
+            return nil
+        }
     }
     
     /// Return a string representing the texture's file name

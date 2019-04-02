@@ -16,7 +16,7 @@ class GameViewController: UIViewController {
 
     private var gameSceneNode: GameScene?
     private var menuScene: Menu?
-    private var boardSize = 5
+    private var boardSize = 7
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,6 +42,7 @@ class GameViewController: UIViewController {
 
 extension GameViewController {
     private func startLevel() {
+        gameSceneNode = nil
         if let scene = GKScene(fileNamed: "GameScene")?.rootNode as? GameScene {
             gameSceneNode = scene
             gameSceneNode!.scaleMode = .aspectFill
@@ -84,11 +85,10 @@ extension GameViewController: GameSceneDelegate {
         menu.menuDelegate = self
         menuScene = menu
         view.presentScene(menuScene)
-        menuScene?.configure(title: win ? "You Won :)" : "You ran out of moves or time :(", primary: "Play Again?", delegate: self)
+        menuScene?.configure(title: win ? "You Won :)" : "No Moves Left", primary: "Play Again?", delegate: self)
     }
     
     func reset() {
-        
         let fadeOut = SKAction.fadeOut(withDuration: 1.5)
         let remove = SKAction.removeFromParent()
         gameSceneNode?.run(SKAction.group([fadeOut, remove])) { [weak self] in

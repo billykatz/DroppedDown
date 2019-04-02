@@ -10,14 +10,17 @@ import SpriteKit
 
 struct Animator {
     
-    static func shake(label: SKLabelNode) {
-        let duration = 0.5
+    static func shake(_ label: SKSpriteNode, completion: (() -> ())? ) {
+        let duration = 0.25
+        let rotateLeft = SKAction.rotate(byAngle: -1, duration: duration)
         let group = SKAction.group([SKAction.rotate(byAngle: 0.5, duration: duration),
-                     SKAction.rotate(byAngle: -1, duration: duration),
+                     rotateLeft,
                      SKAction.rotate(byAngle: 1, duration: duration),
-                     SKAction.rotate(byAngle: -1, duration: duration),
+                     rotateLeft,
                      SKAction.rotate(byAngle: 0.5, duration: duration)])
-        label.run(group)
+        label.run(group, completion: {
+            completion?()
+        })
     }
     
     static func colorize(label: SKLabelNode) {

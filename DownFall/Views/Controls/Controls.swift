@@ -47,10 +47,10 @@ class Controls: SKSpriteNode {
         
         for node in nodes {
             if node.name == Constants.rotateLeft {
-                InputQueue.append(Input(.rotateLeft, true))
+                InputQueue.append(Input(.rotateLeft))
             }
             if node.name == Constants.rotateRight {
-                InputQueue.append(Input(.rotateRight, true))
+                InputQueue.append(Input(.rotateRight))
             }
         }
         

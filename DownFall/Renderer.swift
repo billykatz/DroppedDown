@@ -28,7 +28,10 @@ class Renderer : SKSpriteNode {
         return MenuSpriteNode(.gameWin, playableRect: playableRect)
     }
     
-    var header: Header = Header()
+    var header  = Header()
+    var hud = HUD()
+    var helperTextView = HelperTextView()
+    
     init(playableRect: CGRect,
          foreground givenForeground: SKNode,
          board: Board) {
@@ -68,7 +71,15 @@ class Renderer : SKSpriteNode {
         controls.isUserInteractionEnabled = true
         controls.zPosition = 5
         
-        [spriteForeground, header, controls].forEach { foreground.addChild($0) }
+        //create the hud
+        hud = HUD.build(color: .lightGray, size: CGSize(width: playableRect.width * 0.9, height: 150))
+        hud.position = CGPoint(x: playableRect.midX, y: playableRect.minY + controls.size.height + 16)
+        
+        //create the helper text view
+        helperTextView = HelperTextView.build(color: .lightGray, size: CGSize(width: playableRect.width * 0.9, height: 200))
+        helperTextView.position = CGPoint(x: playableRect.midX, y: playableRect.maxY - header.size.height - 116)
+        
+        [spriteForeground, header, controls, hud, helperTextView].forEach { foreground.addChild($0) }
         
         Dispatch.shared.register { [weak self] input in
             switch input.type{
@@ -102,7 +113,7 @@ class Renderer : SKSpriteNode {
                 case .touch, .monsterDies:
                     computeNewBoard(for: transformation)
                 case .attack(let attacker, let defender):
-                    animationsFinished(for: sprites, endTiles: trans.endTiles)
+                    animateAttack(attacker, defender, trans.endTiles)
                 case .gameWin:
                     animate(transformation?.tileTransformation?.first) { [weak self] in
                         self?.render(InputQueue.gameState)
@@ -145,6 +156,13 @@ class Renderer : SKSpriteNode {
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func animateAttack(_ attackerPosition: TileCoord,
+                               _ defenderPosition: TileCoord,
+                               _ endTiles: [[TileType]]?) {
+        guard let tiles = endTiles else { animationsFinished(for: sprites); return }
+        animationsFinished(for: sprites, endTiles: endTiles)
     }
     
     private func add(sprites: [[DFTileSpriteNode]]) {
@@ -312,7 +330,10 @@ extension Renderer {
                     let row = index / boardSize
                     let col = (index - row * boardSize) % boardSize
                     if sprites[row][col].contains(positionInScene) {
-                        InputQueue.append(Input(.touch(TileCoord(row, col))))
+                        InputQueue.append(
+                            Input(.touch(TileCoord(row, col),
+                                         sprites[row][col].type))
+                        )
                     }
                 }
             }

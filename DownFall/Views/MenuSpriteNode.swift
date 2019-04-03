@@ -32,7 +32,7 @@ class MenuSpriteNode: SKSpriteNode {
     
     init(_ menuType: MenuType, playableRect: CGRect) {
         let menuSizeWidth = playableRect.size.width * 0.7
-        let menuSizeHeight = playableRect.size.height * 0.5
+        let menuSizeHeight = playableRect.size.height * 0.25
         
         
         super.init(texture: SKTexture(imageNamed: "menu"), color: .black, size: CGSize(width: menuSizeWidth, height: menuSizeHeight))

@@ -17,17 +17,6 @@ class Referee {
     static func enforceRules(_ tiles: [[TileType]]?) -> Input {
         guard let tiles = tiles else { return Input(.reffingFinished) }
         
-        func getTilePosition(_ type: TileType) -> TileCoord? {
-            for i in 0..<tiles.count {
-                for j in 0..<tiles[i].count {
-                    if tiles[i][j] == type {
-                        return TileCoord(i,j)
-                    }
-                }
-            }
-            return nil
-        }
-        
         func valid(neighbor: TileCoord?, for currCoord: TileCoord?) -> Bool {
             guard let (neighborRow, neighborCol) = neighbor?.tuple,
                 let (tileRow, tileCol) = currCoord?.tuple else { return false }
@@ -92,8 +81,8 @@ class Referee {
 
 
         
-        let playerPosition = getTilePosition(.player())
-        let exitPosition = getTilePosition(.exit)
+        let playerPosition = getTilePosition(.player(), tiles: tiles)
+        let exitPosition = getTilePosition(.exit, tiles: tiles)
         
         func playerWins() -> Input? {
             guard let pp = playerPosition,

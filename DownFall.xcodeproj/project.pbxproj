@@ -22,6 +22,10 @@
 		3D73D2E621C2226F00DB6FB7 /* PlayerWait.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3D73D2E521C2226F00DB6FB7 /* PlayerWait.sks */; };
 		3D7D8B2D2252857E0016FE4C /* CombatHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D7D8B2C2252857E0016FE4C /* CombatHelper.swift */; };
 		3D7D8B2F22531BF00016FE4C /* TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D7D8B2E22531BF00016FE4C /* TestHelpers.swift */; };
+		3D7D8B332253E5BC0016FE4C /* HUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D7D8B322253E5BC0016FE4C /* HUD.swift */; };
+		3D7D8B352253F9850016FE4C /* HelperTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D7D8B342253F9850016FE4C /* HelperTextView.swift */; };
+		3D7D8B37225422440016FE4C /* TilesHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D7D8B36225422440016FE4C /* TilesHelper.swift */; };
+		3D7D8B3A225436B60016FE4C /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D7D8B39225436B60016FE4C /* StoreKit.framework */; };
 		3D7EF45C21D18D9000A2D9E8 /* Transformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D7EF45B21D18D9000A2D9E8 /* Transformation.swift */; };
 		3D7EF45E21D18DAB00A2D9E8 /* TileTransformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D7EF45D21D18DAB00A2D9E8 /* TileTransformation.swift */; };
 		3D90AAD021D8854300C7428A /* RefereeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D90AACF21D8854300C7428A /* RefereeTests.swift */; };
@@ -76,6 +80,10 @@
 		3D73D2E521C2226F00DB6FB7 /* PlayerWait.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = PlayerWait.sks; sourceTree = "<group>"; };
 		3D7D8B2C2252857E0016FE4C /* CombatHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombatHelper.swift; sourceTree = "<group>"; };
 		3D7D8B2E22531BF00016FE4C /* TestHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestHelpers.swift; sourceTree = "<group>"; };
+		3D7D8B322253E5BC0016FE4C /* HUD.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HUD.swift; sourceTree = "<group>"; };
+		3D7D8B342253F9850016FE4C /* HelperTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperTextView.swift; sourceTree = "<group>"; };
+		3D7D8B36225422440016FE4C /* TilesHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TilesHelper.swift; sourceTree = "<group>"; };
+		3D7D8B39225436B60016FE4C /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		3D7EF45B21D18D9000A2D9E8 /* Transformation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transformation.swift; sourceTree = "<group>"; };
 		3D7EF45D21D18DAB00A2D9E8 /* TileTransformation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileTransformation.swift; sourceTree = "<group>"; };
 		3D90AACF21D8854300C7428A /* RefereeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefereeTests.swift; sourceTree = "<group>"; };
@@ -113,6 +121,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3D7D8B3A225436B60016FE4C /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -163,10 +172,20 @@
 			path = Combat;
 			sourceTree = "<group>";
 		};
+		3D7D8B38225436B60016FE4C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				3D7D8B39225436B60016FE4C /* StoreKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		3DE87C8C2235D03300D750CF /* Views */ = {
 			isa = PBXGroup;
 			children = (
 				3DE87C8F22374C2C00D750CF /* Button.swift */,
+				3D7D8B322253E5BC0016FE4C /* HUD.swift */,
+				3D7D8B342253F9850016FE4C /* HelperTextView.swift */,
 				3D6AACDF222C996900C77B24 /* Header */,
 				3D6AACE2222CD22100C77B24 /* Controls */,
 				3DE87C8D2235D05300D750CF /* MenuSpriteNode.swift */,
@@ -177,10 +196,12 @@
 		3DF2924120A37FEE006671AC = {
 			isa = PBXGroup;
 			children = (
+				3D7D8B36225422440016FE4C /* TilesHelper.swift */,
 				3D6AACD7222A324D00C77B24 /* CGRectHelpers.swift */,
 				3DF2924C20A37FEE006671AC /* DownFall */,
 				3DF2926720A37FF0006671AC /* DownFallTests */,
 				3DF2924B20A37FEE006671AC /* Products */,
+				3D7D8B38225436B60016FE4C /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -300,6 +321,11 @@
 					3DF2924920A37FEE006671AC = {
 						CreatedOnToolsVersion = 9.3;
 						LastSwiftMigration = 1000;
+						SystemCapabilities = {
+							com.apple.InAppPurchase = {
+								enabled = 1;
+							};
+						};
 					};
 					3DF2926320A37FF0006671AC = {
 						CreatedOnToolsVersion = 9.3;
@@ -362,6 +388,7 @@
 				3D6AACE4222CD38E00C77B24 /* Controls.swift in Sources */,
 				3D7EF45E21D18DAB00A2D9E8 /* TileTransformation.swift in Sources */,
 				3DF2928520A76242006671AC /* Board.swift in Sources */,
+				3D7D8B37225422440016FE4C /* TilesHelper.swift in Sources */,
 				3DAFBD3721B8E6E7009B116A /* InputQueue.swift in Sources */,
 				5605D6D321CC2DF400C1C5C2 /* DFTileSpriteNode.swift in Sources */,
 				3D528FDC2155B15D00EF65CA /* Menu.swift in Sources */,
@@ -380,8 +407,10 @@
 				3D90AAD321D8869200C7428A /* Referee.swift in Sources */,
 				3D9C506021FE206000A2210D /* Renderer.swift in Sources */,
 				3DC9CA1321D1DDD4004D05D5 /* Difficulty.swift in Sources */,
+				3D7D8B332253E5BC0016FE4C /* HUD.swift in Sources */,
 				3D18A39D224D68D300343C29 /* Dispatch.swift in Sources */,
 				3D7D8B2D2252857E0016FE4C /* CombatHelper.swift in Sources */,
+				3D7D8B352253F9850016FE4C /* HelperTextView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

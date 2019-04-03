@@ -43,6 +43,9 @@ class GameScene: SKScene {
     /// Creates an instance of board and does preparationg necessary for didMove(to:) to be called
     public func commonInit(boardSize bsize: Int, difficulty: Difficulty = .normal){
         //TODO: the  order of the following lines of code matter.  (bottom left has to happen before create and position. Consider refactoring
+        InputQueue.reset()
+        TileCreator.reset()
+        
         self.difficulty = difficulty
         board = Board.build(size: bsize)
         boardSize = bsize
@@ -67,7 +70,7 @@ class GameScene: SKScene {
 
         view.addGestureRecognizer(tapRecognizer)
         
-        InputQueue.reset()
+        
         
         Dispatch.shared.register { [weak self] input in
             if input.type == .playAgain {

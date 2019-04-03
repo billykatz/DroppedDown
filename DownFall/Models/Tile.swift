@@ -8,7 +8,7 @@
 
 enum TileType: Equatable, Hashable, CaseIterable {
     
-    static var allCases: [TileType] = [.blueRock, .blackRock ,.greenRock, .player(), .exit, .empty, .greenMonster()]
+    static var allCases: [TileType] = [.blueRock, .blackRock ,.greenRock, .player(), .exit, .empty, .greenMonster(), .gem1]
     typealias AllCases = [TileType]
 
     static func == (lhs: TileType, rhs: TileType) -> Bool {
@@ -39,6 +39,7 @@ enum TileType: Equatable, Hashable, CaseIterable {
     case empty
     case exit
     case greenMonster(CombatTileData)
+    case gem1
     
     /// Create a random rock Tile instance
     static func randomRock() -> TileType {
@@ -101,6 +102,8 @@ enum TileType: Equatable, Hashable, CaseIterable {
             return TextueName.exit.rawValue
         case .greenMonster:
             return TextueName.greenMonster.rawValue
+        case .gem1:
+            return TextueName.gem1.rawValue
         }
     }
     
@@ -113,5 +116,6 @@ enum TileType: Equatable, Hashable, CaseIterable {
         case empty
         case exit
         case greenMonster
+        case gem1
     }
 }

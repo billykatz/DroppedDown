@@ -9,14 +9,14 @@
 import SpriteKit
 
 indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringConvertible{
-    static var allCases: [InputType] = [.touch(TileCoord(0,0)), .rotateLeft, .rotateRight,
+    static var allCases: [InputType] = [.touch(TileCoord(0,0), .blueRock), .rotateLeft, .rotateRight,
                                         .attack(TileCoord(0,0), TileCoord(0,0)), .monsterDies(TileCoord(0,0)),
                                         .gameWin, .gameLose, .play, .pause,
                                         .animationsFinished, .playAgain, .reffingFinished]
     
     typealias AllCases = [InputType]
     
-    case touch(TileCoord)
+    case touch(_ position: TileCoord, _ tileType: TileType)
     case rotateLeft
     case rotateRight
     case monsterDies(TileCoord)
@@ -29,6 +29,8 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
     case playAgain
     case transformation(Transformation)
     case reffingFinished
+    case boardBuilt
+    case collectGem(TileCoord)
     
     var canBeNonUserGenerated: Bool {
         switch self {
@@ -68,6 +70,10 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
             return "Reffing Finished"
         case .attack(let from, let to):
             return "Attacked from \(from) to \(to)"
+        case .boardBuilt:
+            return "Board has been built"
+        case .collectGem:
+            return "Player collects gem"
         }
     }
 }

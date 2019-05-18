@@ -63,7 +63,8 @@ class GameScene: SKScene {
                               height: size.height)
         self.renderer = Renderer(playableRect: playableRect,
                                  foreground: foreground,
-                                 board: self.board!)
+                                 board: self.board!,
+                                 precedence: Precedence.foreground)
         
         let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(tripleTap))
         tapRecognizer.numberOfTapsRequired = 3
@@ -98,7 +99,7 @@ class GameScene: SKScene {
             if self.nodes(at: newTouch).contains(where: { node in
                 (node as? SKSpriteNode)?.name == "setting"
             }) {
-                print(InputQueue.debugDescription)
+                debugPrint(InputQueue.debugDescription)
             }
 
         }

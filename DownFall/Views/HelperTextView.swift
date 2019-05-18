@@ -43,7 +43,7 @@ class HelperTextView: SKSpriteNode {
                     let defender = tiles[defenderPosition]
                     
                     if case let TileType.greenMonster(monsterData) = attacker,
-                        case let TileType.player(playerData) = defender{
+                        case let TileType.player(_) = defender{
                         // monster attacked player
                         
                         descriptionText = "You've been attacked by a monster for \(monsterData.weapon.damage) damage.\n If you fall to 0 hp you lose"

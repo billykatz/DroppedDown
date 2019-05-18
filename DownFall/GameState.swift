@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum State: CaseIterable {
+enum State: CaseIterable, Equatable {
     case playing
     case paused
     case animating
@@ -18,7 +18,7 @@ enum State: CaseIterable {
     case reffing
 }
 
-protocol GameState {
+protocol GameState: Equatable {
     var state: State { get }
     func transitionState(given input: Input) -> AnyGameState?
     func shouldAppend(_ input: Input) -> Bool
@@ -58,6 +58,13 @@ final class AnyGameState: GameState {
         return _enter(input)
     }
 }
+
+extension AnyGameState: Equatable {
+    static func == (lhs: AnyGameState, rhs: AnyGameState) -> Bool {
+        return lhs.state == rhs.state
+    }
+}
+    
 
 struct LoseState: GameState {
     

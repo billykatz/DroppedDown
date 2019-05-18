@@ -16,16 +16,17 @@ class Renderer : SKSpriteNode {
     private let bottomLeft: CGPoint
     private let boardSize: CGFloat!
     private let tileSize: CGFloat = 125
+    private let precedence: Precedence
     
-    var spriteForeground = SKNode()
-    var menuForeground = SKNode()
+    private var spriteForeground = SKNode()
+    private var menuForeground = SKNode()
     
     var menuSpriteNode: MenuSpriteNode {
-        return MenuSpriteNode.init(.pause, playableRect: playableRect)
+        return MenuSpriteNode(.pause, playableRect: playableRect, precedence: .menu)
     }
     
     var gameWinSpriteNode: MenuSpriteNode {
-        return MenuSpriteNode(.gameWin, playableRect: playableRect)
+        return MenuSpriteNode(.gameWin, playableRect: playableRect, precedence: .menu)
     }
     
     var header  = Header()
@@ -34,7 +35,9 @@ class Renderer : SKSpriteNode {
     
     init(playableRect: CGRect,
          foreground givenForeground: SKNode,
-         board: Board) {
+         board: Board,
+         precedence: Precedence) {
+        self.precedence = precedence
         self.playableRect = playableRect
         self.boardSize = CGFloat(board.boardSize)
         
@@ -61,15 +64,19 @@ class Renderer : SKSpriteNode {
         menuForeground.addChild(menuSpriteNode)
         
         // add settings button to board
-        header = Header.build(color: .black, size: CGSize(width: playableRect.width, height: 200.0))
+        header = Header.build(color: .black,
+                              size: CGSize(width: playableRect.width, height: 200.0),
+                              precedence: precedence)
         header.position = CGPoint(x: playableRect.midX, y: playableRect.maxY - 100.0)
-        header.zPosition = 5
+        header.zPosition = precedence.rawValue
         
         // add left and right rotate button to board
-        let controls = Controls.build(color: .black, size: CGSize(width: playableRect.width, height: 400.0))
+        let controls = Controls.build(color: .black,
+                                      size: CGSize(width: playableRect.width, height: 400.0),
+                                      precedence: precedence)
         controls.position = CGPoint(x: playableRect.midX, y: playableRect.minY + 100.0)
         controls.isUserInteractionEnabled = true
-        controls.zPosition = 5
+        controls.zPosition = precedence.rawValue
         
         //create the hud
         hud = HUD.build(color: .lightGray, size: CGSize(width: playableRect.width * 0.9, height: 150))
@@ -81,6 +88,7 @@ class Renderer : SKSpriteNode {
         
         [spriteForeground, header, controls, hud, helperTextView].forEach { foreground.addChild($0) }
         
+        // Register for Dispatch
         Dispatch.shared.register { [weak self] input in
             switch input.type{
             case .transformation(let trans):
@@ -90,7 +98,6 @@ class Renderer : SKSpriteNode {
             }
         }
         
-        //DEBUG
         #if DEBUG
         if let _ = NSClassFromString("XCTest") {
         } else {
@@ -101,8 +108,14 @@ class Renderer : SKSpriteNode {
     
     func render(_ transformation: Transformation?, for input: Input) {
         switch input.type {
-        case .play, .pause, .gameLose:
-            render(InputQueue.gameState)
+        case .play:
+            // remove the menu
+            menuForeground.removeFromParent()
+        case .pause:
+            // show the menu
+            foreground.addChild(menuForeground)
+        case .gameLose:
+            gameWin()
         case .playAgain:
             menuForeground.removeFromParent()
         case .transformation(let trans):
@@ -116,9 +129,8 @@ class Renderer : SKSpriteNode {
                     animateAttack(attacker, defender, trans.endTiles)
                 case .gameWin:
                     animate(transformation?.tileTransformation?.first) { [weak self] in
-                        self?.render(InputQueue.gameState)
+                        self?.gameWin()
                     }
-
                 default:
                     // Transformation assoc value should ony exist for certain inputs
                     fatalError()
@@ -127,31 +139,12 @@ class Renderer : SKSpriteNode {
             } else {
                 animationsFinished(for: sprites)
             }
-            
-        default:
+        case .touch(_, _), .rotateLeft, .rotateRight,
+             .monsterDies, .attack, .gameWin,
+             .animationsFinished, .reffingFinished,
+             .boardBuilt, .collectGem:
             ()
         }
-    }
-    
-  
-    private func render(_ gameState: AnyGameState) {
-        switch gameState.state {
-        case .playing:
-            //maybe just think about re enabling user interaction if we disabled it
-            menuForeground.addChild(menuSpriteNode)
-            menuForeground.removeFromParent()
-        case .paused:
-            // show the menu
-            menuSpriteNode.removeFromParent()
-            foreground.addChild(menuForeground)
-        case .animating:
-            ()
-        case .gameWin, .gameLose:
-            gameWin()
-        case .computing, .reffing:
-            fatalError()
-        }
-        
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -173,7 +166,7 @@ class Renderer : SKSpriteNode {
                 if sprite.type == TileType.player() {
                     let group = SKAction.group([SKAction.wait(forDuration:5), sprite.animatedPlayerAction()])
                     let repeatAnimation = SKAction.repeat(group, count: 500)
-                    sprite.zPosition = 5
+                    sprite.zPosition = precedence.rawValue
                     sprite.run(repeatAnimation)
                 }
                 
@@ -367,7 +360,7 @@ extension Renderer {
         shape.path = path
         shape.strokeColor = SKColor.red
         shape.lineWidth = 4.0
-        shape.zPosition = 10
+        shape.zPosition = precedence.rawValue
         foreground.addChild(shape)
     }
     

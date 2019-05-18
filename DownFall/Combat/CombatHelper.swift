@@ -89,29 +89,44 @@ struct CombatTileData: Equatable, Hashable {
     let attacksThisTurn: Int
     let attacksPerTurn = 1
     let weapon: Weapon
+    let hasGem: Bool
     
     static func monster() -> CombatTileData {
         return CombatTileData(hp: 1,
                               attacksThisTurn: 0,
-                              weapon: .mouth)
+                              weapon: .mouth,
+                              hasGem: false)
     }
 
     static func player() -> CombatTileData {
-        return CombatTileData(hp: 1,
+        return CombatTileData(hp: 3,
                               attacksThisTurn: 0,
-                              weapon: .pickAxe)
+                              weapon: .pickAxe,
+                              hasGem: false)
+    }
+    
+    // collects gem
+    func collectsGem() -> CombatTileData {
+        return CombatTileData(hp: self.hp,
+                              attacksThisTurn: 0,
+                              weapon: self.weapon,
+                              hasGem: true)
     }
     
     /// resets attacks
     func resetAttacksThisTurn() -> CombatTileData {
-        return CombatTileData(hp: self.hp, attacksThisTurn: 0, weapon: self.weapon)
+        return CombatTileData(hp: self.hp,
+                              attacksThisTurn: 0,
+                              weapon: self.weapon,
+                              hasGem: self.hasGem)
     }
     
     ///updates the attacker
     func attacks(_ defender: CombatTileData) -> CombatTileData {
         let attacker = CombatTileData(hp: self.hp,
                                       attacksThisTurn: self.attacksThisTurn + 1,
-                                      weapon: self.weapon)
+                                      weapon: self.weapon,
+                                      hasGem: self.hasGem)
         return attacker
     }
     
@@ -119,7 +134,8 @@ struct CombatTileData: Equatable, Hashable {
     func attacked(by attacker: CombatTileData) -> CombatTileData {
         let defender = CombatTileData(hp: self.hp - attacker.weapon.damage,
                                       attacksThisTurn: self.attacksThisTurn,
-                                      weapon: self.weapon)
+                                      weapon: self.weapon,
+                                      hasGem: self.hasGem)
         return defender
     }
     

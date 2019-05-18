@@ -17,17 +17,6 @@ class Referee {
     static func enforceRules(_ tiles: [[TileType]]?) -> Input {
         guard let tiles = tiles else { return Input(.reffingFinished) }
         
-        func getTilePosition(_ type: TileType) -> TileCoord? {
-            for i in 0..<tiles.count {
-                for j in 0..<tiles[i].count {
-                    if tiles[i][j] == type {
-                        return TileCoord(i,j)
-                    }
-                }
-            }
-            return nil
-        }
-        
         func valid(neighbor: TileCoord?, for currCoord: TileCoord?) -> Bool {
             guard let (neighborRow, neighborCol) = neighbor?.tuple,
                 let (tileRow, tileCol) = currCoord?.tuple else { return false }
@@ -92,15 +81,16 @@ class Referee {
 
 
         
-        let playerPosition = getTilePosition(.player())
-        let exitPosition = getTilePosition(.exit)
+        let playerPosition = getTilePosition(.player(), tiles: tiles)
+        let exitPosition = getTilePosition(.exit, tiles: tiles)
         
-        func playerWins() -> Bool {
-            guard let playerRow = playerPosition?.x,
-                let playerCol = playerPosition?.y,
-                let exitRow = exitPosition?.x,
-                let exitCol = exitPosition?.y else { return false }
-            return playerRow == exitRow + 1 && playerCol == exitCol
+        func playerWins() -> Input? {
+            guard let pp = playerPosition,
+                isWithinBounds(pp.rowBelow),
+                case TileType.exit = tiles[pp.rowBelow],
+                case let TileType.player(data) = tiles[pp],
+                data.hasGem else { return nil }
+            return Input(.gameWin)
         }
         
         func boardHasMoreMoves() -> Bool {
@@ -254,16 +244,35 @@ class Referee {
             return nil
         }
         
+        func playerIsDead() -> Bool {
+            guard let playerPosition = playerPosition,
+                case TileType.player(let playerCombat) = tiles[playerPosition] else { return false }
+            return playerCombat.hp <= 0
+        }
+        
+        func playerCollectsGem() -> Input? {
+            guard let playerPosition = playerPosition,
+                case TileType.player(let playerCombat) = tiles[playerPosition],
+                !playerCombat.hasGem,
+                isWithinBounds(playerPosition.rowBelow),
+                case TileType.gem1 = tiles[playerPosition.rowBelow]
+                else { return nil }
+            return Input(.collectGem(playerPosition.rowBelow), tiles)
+            
+
+        }
+        
         // Game rules are enforced in the following priorities
         // Game Win
         // Game Lose
         // Player attack
         // Monster attack
         // Monster Die
+        // Player collects gems
         
-        if playerWins() {
-            return Input(.gameWin)
-        } else if !boardHasMoreMoves() {
+        if let input = playerWins() {
+            return input
+        } else if !boardHasMoreMoves() || playerIsDead() {
             return Input(.gameLose)
         }
         
@@ -278,6 +287,10 @@ class Referee {
         
         if let deadMonster = monsterDies() {
             return deadMonster
+        }
+        
+        if let collectGem = playerCollectsGem() {
+            return collectGem
         }
 
         return Input(.reffingFinished)

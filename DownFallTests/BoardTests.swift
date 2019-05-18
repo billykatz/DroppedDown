@@ -253,11 +253,11 @@ class BoardTests: XCTestCase {
         XCTAssertEqual(expectedTiles, actualBoard, "Board removes HP from tiles beneath the player equal to the palyer attack damage.")
 
         givenTiles = [[.blueRock, .exit, .blueRock],
-                      [.greenMonster(CombatTileData(hp: 5, attacksThisTurn: 0, weapon: .mouth)), .blueRock, .blueRock],
+                      [.greenMonster(CombatTileData(hp: 5, attacksThisTurn: 0, weapon: .mouth, hasGem: false)), .blueRock, .blueRock],
                       [player2, .blueRock, .blueRock]]
 
         expectedTiles = [[.blueRock, .exit, .blueRock],
-                         [.greenMonster(CombatTileData(hp: 2, attacksThisTurn: 0, weapon: .mouth)), .blueRock, .blueRock],
+                         [.greenMonster(CombatTileData(hp: 2, attacksThisTurn: 0, weapon: .mouth, hasGem: false)), .blueRock, .blueRock],
                          [player2, .blueRock, .blueRock]]
 
         actualBoard = Board(tiles: givenTiles).attack(TileCoord(2, 0), TileCoord(1, 0)).endTiles
@@ -265,11 +265,11 @@ class BoardTests: XCTestCase {
 
 
         givenTiles = [[.blueRock, .exit, .blueRock],
-                      [.greenMonster(CombatTileData(hp: 1, attacksThisTurn: 0, weapon: .mouth)), .blueRock, .blueRock],
+                      [.greenMonster(CombatTileData(hp: 1, attacksThisTurn: 0, weapon: .mouth, hasGem: false)), .blueRock, .blueRock],
                       [player2, .blueRock, .blueRock]]
 
         expectedTiles = [[.blueRock, .exit, .blueRock],
-                         [.greenMonster(CombatTileData(hp: -2, attacksThisTurn: 0, weapon: .mouth)), .blueRock, .blueRock],
+                         [.greenMonster(CombatTileData(hp: -2, attacksThisTurn: 0, weapon: .mouth, hasGem: false)), .blueRock, .blueRock],
                          [player2, .blueRock, .blueRock]]
 
         actualBoard = Board(tiles: givenTiles).attack(TileCoord(2, 0), TileCoord(1, 0)).endTiles
@@ -277,11 +277,11 @@ class BoardTests: XCTestCase {
 
 
         givenTiles = [[.blueRock, .exit, .blueRock],
-                      [.greenMonster(CombatTileData(hp: 2, attacksThisTurn: 0, weapon: .mouth)), .blueRock, .blueRock],
+                      [.greenMonster(CombatTileData(hp: 2, attacksThisTurn: 0, weapon: .mouth, hasGem: false)), .blueRock, .blueRock],
                       [.strongPlayer, .blueRock, .blueRock]]
 
         expectedTiles = [[.blueRock, .exit, .blueRock],
-                         [.greenMonster(CombatTileData(hp: -1, attacksThisTurn: 0, weapon: .mouth)), .blueRock, .blueRock],
+                         [.greenMonster(CombatTileData(hp: -1, attacksThisTurn: 0, weapon: .mouth, hasGem: false)), .blueRock, .blueRock],
                          [.strongPlayer, .blueRock, .blueRock]]
 
         actualBoard = Board(tiles: givenTiles).attack(TileCoord(2, 0), TileCoord(1, 0)).endTiles

@@ -20,7 +20,7 @@ class MenuSpriteNode: SKSpriteNode {
         case pause
         case gameWin
         
-        func buttonText() -> String {
+        var buttonText: String {
             switch self {
             case .pause:
                 return Constants.resume
@@ -28,75 +28,62 @@ class MenuSpriteNode: SKSpriteNode {
                 return Constants.playAgain
             }
         }
+        
+        var buttonIdentifer: ButtonIdentifier {
+            switch self {
+            case .pause:
+                return ButtonIdentifier.resume
+            case .gameWin:
+                return ButtonIdentifier.playAgain
+            }
+            
+        }
     }
     
-    init(_ menuType: MenuType, playableRect: CGRect) {
+    init(_ menuType: MenuType, playableRect: CGRect, precedence: Precedence) {
         let menuSizeWidth = playableRect.size.width * 0.7
-        let menuSizeHeight = playableRect.size.height * 0.5
+        let menuSizeHeight = playableRect.size.height * 0.25
         
         
-        super.init(texture: SKTexture(imageNamed: "menu"), color: .black, size: CGSize(width: menuSizeWidth, height: menuSizeHeight))
-        isUserInteractionEnabled = true
+        super.init(texture: SKTexture(imageNamed: "menu"),
+                   color: .black,
+                   size: CGSize(width: menuSizeWidth, height: menuSizeHeight))
         
-        setupButtons(menuType, playableRect)
-        self.zPosition = 20
+        setupButtons(menuType, playableRect, precedence: precedence)
+        zPosition = precedence.rawValue
         
     }
     
-    func setupButtons(_ menuType: MenuType, _ playableRect: CGRect) {
+    func setupButtons(_ menuType: MenuType, _ playableRect: CGRect, precedence: Precedence) {
         let menuSizeWidth = playableRect.size.width * 0.7
-        
-        let button = Button.build(menuType.buttonText(), size: CGSize(width: menuSizeWidth * 0.8, height: 200))
+        let buttonWidth = CGSize(width: menuSizeWidth * 0.8, height: 200)
+        let button = Button(size: buttonWidth,
+                            delegate: self,
+                            identifier: menuType.buttonIdentifer,
+                            precedence: precedence)
         button.position = playableRect.center
-        button.zPosition = 1
-        button.name = menuType.buttonText()
-        self.addChild(button)
+        addChild(button)
         
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+}
+
+//MARK:- ButtonDelegate
+
+extension MenuSpriteNode: ButtonDelegate {
+    func buttonPressBegan(_ button: Button) { }
     
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard let touch = touches.first,
-            let nodes = self.nodes(at: touch.location(in: self)) as? [SKSpriteNode] else {
-                return
-        }
+    func buttonPressed(_ button: Button) {
+        guard let identifier = ButtonIdentifier(rawValue: button.name ?? "") else { return }
         
-
-        for node in nodes {
-            if node.name == Constants.resume {
-                InputQueue.append(Input(.play))
-                node.color = .white
-            }
-            
-            if node.name == Constants.playAgain {
-                InputQueue.append(Input(.playAgain))
-                node.color = .white
-            }
+        switch identifier {
+        case .resume:
+            InputQueue.append(Input(.play))
+        case .playAgain:
+            InputQueue.append(Input(.playAgain))
         }
-
     }
-    
-    
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard let touch = touches.first,
-            let nodes = self.nodes(at: touch.location(in: self)) as? [SKSpriteNode] else {
-                return
-        }
-        
-        
-        for node in nodes {
-            if node.name == Constants.resume {
-                node.color = .gray
-            }
-            
-            if node.name == Constants.playAgain {
-                node.color = .gray
-            }
-        }
-        
-    }
-
 }

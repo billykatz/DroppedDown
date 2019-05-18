@@ -68,7 +68,11 @@ func xTiles(_ numTiles: Int, _ tile: TileType, _ board: Board) -> Builder {
     }
 }
 
-
+extension TileType {
+    static var playerWithGem: TileType {
+        return TileType.player(CombatTileData(hp: 1, attacksThisTurn: 0, weapon: .mouth, hasGem: true))
+    }
+}
 
 /*
  +----------+-----------------------------+------------------------------------------------+
@@ -88,7 +92,7 @@ func win(_ board: Board) -> Builder {
         if let pp = playerPosition, let ep = exitPosition {
             if !board.isUpperBound(row: ep.x) {
                 let intermediate = newTiles[ep.rowAbove.x][ep.y]
-                newTiles[ep.rowAbove.x][ep.y] = .player()
+                newTiles[ep.rowAbove.x][ep.y] = .playerWithGem
                 newTiles[pp.x][pp.y] = intermediate
             } else if !board.isLowerBound(row: pp.x)  {
                 let intermediate = newTiles[pp.rowBelow.x][pp.y]
@@ -99,7 +103,7 @@ func win(_ board: Board) -> Builder {
                 //swapsies time
                 let intermediate = newTiles[ep.rowBelow.x][ep.y] // tile beneath exit
                 newTiles[ep.rowBelow.x][ep.y] = .exit // swaps intermediate with exit
-                newTiles[ep.x][ep.y] = .player() // put player on top of exit
+                newTiles[ep.x][ep.y] = .playerWithGem // put player on top of exit
                 newTiles[pp.x][pp.y] = intermediate // swap intermediate with player
             }
         } else if let pp = playerPosition {
@@ -107,21 +111,21 @@ func win(_ board: Board) -> Builder {
                 newTiles[pp.rowBelow.x][pp.y] = .exit
             } else {
                 //player is on bottom row, move it up and
-                newTiles[pp.rowAbove.x][pp.y] = .player() // swaps intermediate with exit
+                newTiles[pp.rowAbove.x][pp.y] = .playerWithGem // swaps intermediate with exit
                 newTiles[pp.x][pp.y] = .exit // swap intermediate with player
             }
         } else if let ep = exitPosition {
             if !board.isUpperBound(row: ep.x) {
-                newTiles[ep.rowAbove.x][ep.y] = .player()
+                newTiles[ep.rowAbove.x][ep.y] = .playerWithGem
             } else {
                 //exit is on top row
                 newTiles[ep.rowBelow.x][ep.y] = .exit // swaps intermediate with exit
-                newTiles[ep.x][ep.y] = .player() // put player on top of exit
+                newTiles[ep.x][ep.y] = .playerWithGem // put player on top of exit
             }
         } else {
             let playerPosition = TileCoord.random(board.boardSize-1).rowAbove // guaranteed not to be on the bottom
             let exitPosition = playerPosition.rowBelow
-            newTiles[playerPosition.x][playerPosition.y] = .player()
+            newTiles[playerPosition.x][playerPosition.y] = .playerWithGem
             newTiles[exitPosition.x][exitPosition.y] = .exit
         }
         

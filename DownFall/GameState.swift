@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum State: CaseIterable {
+enum State: CaseIterable, Equatable {
     case playing
     case paused
     case animating
@@ -18,9 +18,8 @@ enum State: CaseIterable {
     case reffing
 }
 
-protocol GameState {
+protocol GameState: Equatable {
     var state: State { get }
-    func canTransition(given input: Input) -> Bool
     func transitionState(given input: Input) -> AnyGameState?
     func shouldAppend(_ input: Input) -> Bool
     func enter(_ input: Input)
@@ -28,7 +27,6 @@ protocol GameState {
 
 final class AnyGameState: GameState {
     private var _state: State
-    private let _canTransition : (Input) -> Bool
     private let _transitionState: (Input) -> AnyGameState?
     private let _shouldAppend: (Input) -> Bool
     private let _enter: (Input) -> ()
@@ -43,14 +41,9 @@ final class AnyGameState: GameState {
 
     init<T>(_ state: T) where T: GameState {
         _state = state.state
-        _canTransition = state.canTransition
         _transitionState = state.transitionState
         _shouldAppend = state.shouldAppend
         _enter = state.enter
-    }
-    
-    func canTransition(given input: Input) -> Bool {
-        return _canTransition(input)
     }
     
     func transitionState(given input: Input) -> AnyGameState? {
@@ -66,6 +59,13 @@ final class AnyGameState: GameState {
     }
 }
 
+extension AnyGameState: Equatable {
+    static func == (lhs: AnyGameState, rhs: AnyGameState) -> Bool {
+        return lhs.state == rhs.state
+    }
+}
+    
+
 struct LoseState: GameState {
     
     var state: State = .gameLose
@@ -74,15 +74,6 @@ struct LoseState: GameState {
     
     func shouldAppend(_ input: Input) -> Bool {
         switch input.type {
-        case .playAgain:
-            return true
-        default:
-            return false
-        }
-    }
-
-    func canTransition(given input: Input) -> Bool {
-        switch  input.type {
         case .playAgain:
             return true
         default:
@@ -108,22 +99,6 @@ struct WinState: GameState {
     
     func shouldAppend(_ input: Input) -> Bool {
         switch input.type {
-        case .playAgain:
-            return true
-        case .transformation(let trans):
-            switch trans.inputType! {
-            case .gameWin:
-                return true
-            default:
-                return false
-            }
-        default:
-            return false
-        }
-    }
-    
-    func canTransition(given input: Input) -> Bool {
-        switch  input.type {
         case .playAgain:
             return true
         case .transformation(let trans):
@@ -170,15 +145,6 @@ struct AnimatingState: GameState {
         }
     }
 
-    func canTransition(given input: Input) -> Bool {
-        switch input.type {
-        case .animationsFinished:
-            return true
-        default:
-            return false
-        }
-    }
-
     func transitionState(given input: Input) -> AnyGameState? {
         switch input.type {
         case .animationsFinished:
@@ -199,22 +165,11 @@ struct ReffingState: GameState {
         Referee.enterRules(input.endTiles)
     }
     
-    func canTransition(given input: Input) -> Bool {
-        switch input.type {
-        case .reffingFinished:
-            return true
-        case .attack, .monsterDies, .gameLose, .gameWin:
-            return true
-        default:
-            return false
-        }
-    }
-    
     func transitionState(given input: Input) -> AnyGameState? {
         switch input.type {
         case .reffingFinished:
             return AnyGameState(PlayState())
-        case .attack, .monsterDies:
+        case .attack, .monsterDies, .collectGem:
             return AnyGameState(ComputingState())
         case .gameWin:
             return AnyGameState(WinState())
@@ -227,7 +182,8 @@ struct ReffingState: GameState {
     
     func shouldAppend(_ input: Input) -> Bool {
         switch input.type {
-        case .reffingFinished, .attack, .monsterDies, .gameWin, .gameLose:
+        case .reffingFinished, .attack, .monsterDies,
+             .gameWin, .gameLose, .collectGem:
             return true
         default:
             return false
@@ -240,15 +196,6 @@ struct ComputingState: GameState {
     var state: State = .computing
     
     func enter(_ input: Input) {}
-    
-    func canTransition(given input: Input) -> Bool {
-        switch input.type {
-        case .transformation:
-            return true
-        default:
-            return false
-        }
-    }
     
     func transitionState(given input: Input) -> AnyGameState? {
         switch input.type {
@@ -279,9 +226,11 @@ struct PlayState: GameState {
         switch input.type {
         case .gameWin,. gameLose,. pause,
              .attack, .transformation,
-             .touch, .monsterDies, .rotateLeft, .rotateRight:
+             .touch, .monsterDies, .rotateLeft, .rotateRight,
+             .boardBuilt:
             return true
-        case .animationsFinished, .play, .reffingFinished, .playAgain:
+        case .animationsFinished, .play, .reffingFinished, .playAgain,
+             .collectGem:
             return false
         }
     }
@@ -297,23 +246,13 @@ struct PlayState: GameState {
         case .attack, .touch, .monsterDies,
              .rotateLeft, .rotateRight:
             return AnyGameState(ComputingState())
-        case .animationsFinished, .play, .transformation, .reffingFinished, .playAgain:
+        case .boardBuilt:
+            return AnyGameState(PlayState())
+        case .animationsFinished, .play, .transformation, .reffingFinished, .playAgain, .collectGem:
             return nil
         }
 
     }
-
-    func canTransition(given input: Input) -> Bool {
-        switch input.type {
-        case .gameLose, .gameWin, .attack,
-             .touch, .monsterDies, .rotateLeft, .rotateRight, .pause:
-            return true
-        case .animationsFinished, .play, .playAgain, .transformation, .reffingFinished:
-            return false
-        }
-    }
-
-
 }
 
 struct PauseState: GameState {
@@ -323,15 +262,6 @@ struct PauseState: GameState {
     
     func shouldAppend(_ input: Input) -> Bool {
         return input.type == .play
-    }
-
-    func canTransition(given input: Input) -> Bool {
-        switch input.type {
-        case .play:
-            return true
-        default:
-            return false
-        }
     }
 
     func transitionState(given input: Input) -> AnyGameState? {

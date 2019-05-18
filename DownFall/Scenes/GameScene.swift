@@ -43,6 +43,9 @@ class GameScene: SKScene {
     /// Creates an instance of board and does preparationg necessary for didMove(to:) to be called
     public func commonInit(boardSize bsize: Int, difficulty: Difficulty = .normal){
         //TODO: the  order of the following lines of code matter.  (bottom left has to happen before create and position. Consider refactoring
+        InputQueue.reset()
+        TileCreator.reset()
+        
         self.difficulty = difficulty
         board = Board.build(size: bsize)
         boardSize = bsize
@@ -60,14 +63,15 @@ class GameScene: SKScene {
                               height: size.height)
         self.renderer = Renderer(playableRect: playableRect,
                                  foreground: foreground,
-                                 board: self.board!)
+                                 board: self.board!,
+                                 precedence: Precedence.foreground)
         
         let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(tripleTap))
         tapRecognizer.numberOfTapsRequired = 3
 
         view.addGestureRecognizer(tapRecognizer)
         
-        InputQueue.reset()
+        
         
         Dispatch.shared.register { [weak self] input in
             if input.type == .playAgain {
@@ -95,7 +99,7 @@ class GameScene: SKScene {
             if self.nodes(at: newTouch).contains(where: { node in
                 (node as? SKSpriteNode)?.name == "setting"
             }) {
-                print(InputQueue.debugDescription)
+                debugPrint(InputQueue.debugDescription)
             }
 
         }

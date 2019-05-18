@@ -16,18 +16,19 @@ class Controls: SKSpriteNode {
     }
     
     static func build(color: UIColor,
-                      size: CGSize) -> Controls {
+                      size: CGSize,
+                      precedence: Precedence) -> Controls {
         let controls = Controls(texture: SKTexture(imageNamed: "header"), color: color, size: size)
         let rotateRight = SKSpriteNode(imageNamed: "rotateRight")
         rotateRight.scale(to: CGSize(width: 200.0, height: 200.0))
-        rotateRight.zPosition = 20
+        rotateRight.zPosition = precedence.rawValue
         let rotateRightX = controls.frame.maxX - rotateRight.frame.width/2
         rotateRight.position = CGPoint(x: rotateRightX, y: size.height/2 - rotateRight.frame.height/2)
         rotateRight.name = Constants.rotateRight
         
         let rotateLeft = SKSpriteNode(imageNamed: "rotateLeft")
         rotateLeft.scale(to: CGSize(width: 200.0, height: 200.0))
-        rotateLeft.zPosition = 20
+        rotateLeft.zPosition = precedence.rawValue
         let rotateLeftX = controls.frame.minX + rotateLeft.frame.width/2
         rotateLeft.position = CGPoint(x: rotateLeftX, y: size.height/2 - rotateLeft.frame.height/2)
         rotateLeft.name = Constants.rotateLeft

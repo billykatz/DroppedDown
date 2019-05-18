@@ -37,7 +37,7 @@ class Board: Equatable {
             transformation = self.rotate(.left)
         case .rotateRight:
             transformation = self.rotate(.right)
-        case .touch(let tileCoord):
+        case .touch(let tileCoord, _):
             transformation = self.removeAndReplace(tileCoord)
         case .attack(let attacker, let defender):
             transformation = self.attack(attacker, defender)
@@ -46,6 +46,8 @@ class Board: Equatable {
             transformation = self.removeAndReplace(tileCoord, singleTile: true)
         case .gameWin:
             transformation = gameWin()
+        case .collectGem(let tileCoord):
+            transformation = self.removeAndReplace(tileCoord, singleTile: true, collectedGem: true)
         @unknown default:
             // We dont care about these inputs, intentionally do nothing
             transformation = nil
@@ -83,6 +85,17 @@ extension Board {
         guard let playerPosition = playerPosition else { return }
         if case .player(let data) = tiles[playerPosition] {
             tiles[playerPosition.x][playerPosition.y] = .player(data.resetAttacksThisTurn())
+        }
+    }
+    
+    func resetMonsterAttacks() {
+        for (i, row) in tiles.enumerated() {
+            for (j, _) in row.enumerated() {
+                if case .greenMonster(let data) = tiles[i][j] {
+                    tiles[i][j] = .greenMonster(data.resetAttacksThisTurn())
+                }
+            }
+
         }
     }
 }
@@ -138,6 +151,8 @@ extension Board {
             x < boardSize,
             y >= 0,
             y < boardSize else { return [] }
+        
+        if case TileType.greenMonster(_) = tiles[x][y] { return [] }
         var queue = [TileCoord(x, y)]
         var tileCoordSet = Set(queue)
         var head = 0
@@ -173,7 +188,7 @@ extension Board {
      *  - returns a transformation with the tiles that have been removed, added, and shifted down
      */
     
-    func removeAndReplace(_ tileCoord: TileCoord, singleTile: Bool = false) -> Transformation {
+    func removeAndReplace(_ tileCoord: TileCoord, singleTile: Bool = false, collectedGem: Bool = false) -> Transformation {
         // Check that the tile group at row, col has more than 3 tiles
         let (row, col) = tileCoord.tuple
         var selectedTiles: [TileCoord] = [tileCoord]
@@ -253,8 +268,7 @@ extension Board {
                 
                 //update new tiles
                 trans = TileTransformation(TileCoord(startRow, startCol),
-                                           TileCoord(endRow, endCol),
-                                           randomType)
+                                           TileCoord(endRow, endCol))
                 newTiles.append(trans)
             }
         }
@@ -263,11 +277,16 @@ extension Board {
         self.tiles = intermediateTiles
         self.playerPosition = newPlayerPosition
         self.exitPosition = newExitPosition
+        if collectedGem,
+            let pp = playerPosition,
+            case let TileType.player(data) = tiles[pp] {
+            tiles[pp.x][pp.y] = TileType.player(data.collectsGem())
+        }
         self.resetPlayerAttacks()
-        
+        self.resetMonsterAttacks()
         return Transformation(tiles: tiles,
                               transformation: [selectedTilesTransformation, newTiles, shiftDown],
-                              inputType: .touch(tileCoord))
+                              inputType: .touch(tileCoord, tiles[tileCoord]))
     }
     
 }
@@ -278,61 +297,10 @@ extension Board {
     static func build(size: Int,
                       playerPosition: TileCoord? = nil,
                       exitPosition: TileCoord? = nil,
-                      difficulty: Difficulty? = .normal) -> Board {
-        
-        
-        /// Considerations:
-        /// - not too many monsters, but at least 1?
-        /// - can a monster start next to a player?
-        /// - should this be in Board?
-        ///
-        /// Board should know what tiles it has.
-        /// Board should know how to rotate the tiles
-        /// Board should know how to remove and replace tiles
-        /// Game should know if the player has won or lost
-        /// Game should know if what difficulty the game is
-        /// Game should know how to place a Tile in the Scene
-        ///
-        /// Who knows tile specific data? Player's health/attack? The monster's health/attack? Exit is lock or unlocked?
-        /// Who knows how tiles interact with each other? eg. Player/Monster attack triggered.  Player can obtain key/artifact.
-        /// Who knows what tile to create? Monsters/Rocks/Artifcats/Power-ups etc...
-        ///
-        
-        
-        var tiles: [[TileType]] = []
-        for row in 0..<size {
-            tiles.append([])
-            for _ in 0..<size {
-                tiles[row].append(TileType.randomRock())
-            }
-        }
-        let playerRow: Int
-        let playerCol: Int
-        if let playerPos = playerPosition {
-            playerRow = playerPos.x
-            playerCol = playerPos.y
-        } else {
-            playerRow = Int.random(size)
-            playerCol = Int.random(size)
-        }
-        tiles[playerRow][playerCol] = TileType.player(CombatTileData.player())
-        
-        let exitRow: Int
-        let exitCol: Int
-        if let exitPos = exitPosition {
-            exitRow = exitPos.x
-            exitCol = exitPos.y
-        } else {
-            exitRow = Int.random(size, not: playerRow)
-            exitCol = Int.random(size, not: playerCol)
-        }
-        tiles[exitRow][exitCol] = TileType.exit
-        
-        
-        
-        return Board.init(tiles: tiles,
-                          playerPosition: TileCoord(playerRow, playerCol),
-                          exitPosition: TileCoord(exitRow, exitCol))
+                      difficulty: Difficulty = .normal) -> Board {
+        let tiles = TileCreator.board(size, difficulty: difficulty)
+        InputQueue.append(Input(.boardBuilt, tiles))
+        return Board.init(tiles: tiles)
     }
 }
 
@@ -396,7 +364,9 @@ extension Board {
         self.tiles = intermediateTiles
         self.playerPosition = newPlayerPosition
         self.exitPosition = newExitPosition
-        return Transformation(tiles: intermediateTiles,
+        self.resetPlayerAttacks()
+        self.resetMonsterAttacks()
+        return Transformation(tiles: tiles,
                               transformation: [transformation],
                               inputType: inputType)
     }

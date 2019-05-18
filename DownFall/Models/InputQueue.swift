@@ -9,14 +9,14 @@
 import SpriteKit
 
 indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringConvertible{
-    static var allCases: [InputType] = [.touch(TileCoord(0,0)), .rotateLeft, .rotateRight,
+    static var allCases: [InputType] = [.touch(TileCoord(0,0), .blueRock), .rotateLeft, .rotateRight,
                                         .attack(TileCoord(0,0), TileCoord(0,0)), .monsterDies(TileCoord(0,0)),
                                         .gameWin, .gameLose, .play, .pause,
                                         .animationsFinished, .playAgain, .reffingFinished]
     
     typealias AllCases = [InputType]
     
-    case touch(TileCoord)
+    case touch(_ position: TileCoord, _ tileType: TileType)
     case rotateLeft
     case rotateRight
     case monsterDies(TileCoord)
@@ -29,6 +29,8 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
     case playAgain
     case transformation(Transformation)
     case reffingFinished
+    case boardBuilt
+    case collectGem(TileCoord)
     
     var canBeNonUserGenerated: Bool {
         switch self {
@@ -68,6 +70,10 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
             return "Reffing Finished"
         case .attack(let from, let to):
             return "Attacked from \(from) to \(to)"
+        case .boardBuilt:
+            return "Board has been built"
+        case .collectGem:
+            return "Player collects gem"
         }
     }
 }
@@ -76,7 +82,8 @@ struct Input: Hashable, CustomDebugStringConvertible {
     let type: InputType
     let endTiles: [[TileType]]?
 
-    init(_ type: InputType, _ endTiles: [[TileType]]? = []) {
+    init(_ type: InputType,
+         _ endTiles: [[TileType]]? = []) {
         self.type = type
         self.endTiles = endTiles
     }
@@ -89,38 +96,40 @@ struct Input: Hashable, CustomDebugStringConvertible {
 struct InputQueue {
     static var queue: [Input] = []
     static var gameState = AnyGameState(PlayState())
+    
     /// Attempts to append the input given the current game state
-    /// However the game state is a FSM and cannot accept input at different points
-    /// An example, if we are animating a rotation and the user hits rotate right, we
-    /// ignore that input because we cannot animate two things at a time
     static func append(_ input: Input, given: AnyGameState = gameState) {
-        debugPrint("ATTEMP TO APPEND: \(input) and gameState: \(given.state)")
         
-        let debugString : String
         if gameState.shouldAppend(input) {
             queue.append(input)
-            debugString = #"SUCCESS Appending: \#(input)"#
-        } else {
-            debugString = #"FAIL to append: \#(input). \#n\#tCurrent Game State: \#(gameState.state)"#
         }
-        debugPrint(debugString)
+//        debugPrint("ATTEMP TO APPEND: \(input) and gameState: \(given.state)")
+        
+//        let debugString : String
+//        if gameState.shouldAppend(input) {
+//            queue.append(input)
+//            debugString = #"SUCCESS Appending: \#(input)"#
+//        } else {
+//            debugString = #"FAIL to append: \#(input). \#n\#tCurrent Game State: \#(gameState.state)"#
+//        }
+//        debugPrint(debugString)
     }
     
     static func pop() -> Input? {
         guard let input = InputQueue.peek(),
             let transition = InputQueue.gameState.transitionState(given: input) else {
                 if !queue.isEmpty {
-                    let input = InputQueue.peek()
-                    if let input = input {
-                        debugPrint(#"ILLEGAL: \#(input) Current Game State: \#(gameState.state)"#)
-                    } else {
-                        debugPrint(#"NOT SURE HOW WE ARE HERE"#)
-                    }
+//                    let input = InputQueue.peek()
+//                    if let input = input {
+////                        debugPrint(#"ILLEGAL: \#(input) Current Game State: \#(gameState.state)"#)
+//                    } else {
+////                        debugPrint(#"NOT SURE HOW WE ARE HERE"#)
+//                    }
                     queue.removeFirst()
                 }
             return nil
         }
-        print(#"POPPING: \#(input) \#n\#tBefore: \#(gameState.state) \#n\#tAfter: \#(transition.state)"#)
+//        debugPrint(#"POPPING: \#(input) \#n\#tBefore: \#(gameState.state) \#n\#tAfter: \#(transition.state)"#)
         
         queue = Array(queue.dropFirst())
         let oldGameState = gameState

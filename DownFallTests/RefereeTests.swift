@@ -22,7 +22,7 @@ class RefereeTests: XCTestCase {
         
         allBlack = all(.blackRock, mockBoard)
         allGreen = all(.greenRock, mockBoard)
-        player = xTiles(1, .player(), mockBoard)
+        player = xTiles(1, .playerWithGem, mockBoard)
         exit = xTiles(1, .exit, mockBoard)
     }
     
@@ -150,7 +150,7 @@ class RefereeTests: XCTestCase {
         XCTAssertEqual(expectedOutput, actualOutput)
         
         tiles = [[.blackRock, .blueRock, .blueRock],
-                 [.exit, .blueRock, .greenMonster(CombatTileData(hp:1, attacksThisTurn: 0, weapon: .mouth))],
+                 [.exit, .blueRock, .greenMonster(CombatTileData(hp:1, attacksThisTurn: 0, weapon: .mouth, hasGem: false))],
                  [.greenRock, .greenRock, .player()]]
         expectedOutput = Input(.attack(TileCoord(2, 2), TileCoord(1, 2)))
         let actualOutput2 = Referee.enforceRules(tiles)
@@ -205,7 +205,7 @@ class RefereeTests: XCTestCase {
     }
     
     func testRefereeMonsterDies() {
-        let dyingMonster = TileType.greenMonster(CombatTileData(hp: 0, attacksThisTurn: 0, weapon: .mouth))
+        let dyingMonster = TileType.greenMonster(CombatTileData(hp: 0, attacksThisTurn: 0, weapon: .mouth, hasGem: false))
         
         var tiles = [[TileType.greenRock, .blueRock, .greenRock, .greenRock],
                      [.blueRock, dyingMonster, .exit, .greenRock],

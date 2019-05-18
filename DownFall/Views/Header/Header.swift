@@ -11,13 +11,14 @@ import SpriteKit
 class Header: SKSpriteNode {
     
     static func build(color: UIColor,
-                      size: CGSize) -> Header {
+                      size: CGSize,
+                      precedence: Precedence) -> Header {
         let header = Header(texture: SKTexture(imageNamed: "header"), color: color, size: size)
         let setting = SKSpriteNode(imageNamed: "setting")
         setting.name = "setting"
         let settingX = header.frame.maxX - setting.frame.width
         setting.position = CGPoint(x: settingX, y: size.height/2 - setting.frame.height)
-        setting.zPosition = 3
+        setting.zPosition = precedence.rawValue
         
         header.addChild(setting)
         header.isUserInteractionEnabled = true

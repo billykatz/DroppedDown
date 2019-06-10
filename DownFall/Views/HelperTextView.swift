@@ -42,13 +42,13 @@ class HelperTextView: SKSpriteNode {
                     let attacker = tiles[attackerPosition]
                     let defender = tiles[defenderPosition]
                     
-                    if case let TileType.greenMonster(monsterData) = attacker,
-                        case let TileType.player(_) = defender{
+                    if case let TileType.monster(monsterData) = attacker,
+                        case let TileType.player = defender{
                         // monster attacked player
                         
-                        descriptionText = "You've been attacked by a monster for \(monsterData.weapon.damage) damage.\n If you fall to 0 hp you lose"
-                    } else if case TileType.greenMonster(_) = defender,
-                        case TileType.player(_) = attacker {
+                        descriptionText = "You've been attacked by a monster for \(monsterData.attack.damage) damage.\n If you fall to 0 hp you lose"
+                    } else if case TileType.monster = defender,
+                        case TileType.player = attacker {
                         // we attacked the monster
                         descriptionText = "You slayed a monster, you're a worthy champion indeed!"
                     }
@@ -75,7 +75,7 @@ class HelperTextView: SKSpriteNode {
                 showGem = true
             case .player:
                 descriptionText = "That's you! Stay alive and find the exit"
-            case .greenMonster(let data):
+            case .monster(let data):
                 descriptionText = "That's a monster! It has \(data.hp) hp and attacks sideways  "
             case .empty:
                 descriptionText = "How in the hell did you tap on an empty tile?"

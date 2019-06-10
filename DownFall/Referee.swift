@@ -81,7 +81,7 @@ class Referee {
 
 
         
-        let playerPosition = getTilePosition(.player(), tiles: tiles)
+        let playerPosition = getTilePosition(.player(.zero), tiles: tiles)
         let exitPosition = getTilePosition(.exit, tiles: tiles)
         
         func playerWins() -> Input? {
@@ -89,7 +89,7 @@ class Referee {
                 isWithinBounds(pp.rowBelow),
                 case TileType.exit = tiles[pp.rowBelow],
                 case let TileType.player(data) = tiles[pp],
-                data.hasGem else { return nil }
+                data.carry.hasGem else { return nil }
             return Input(.gameWin)
         }
         
@@ -127,11 +127,12 @@ class Referee {
             return TileCoord(targetRow, targetCol)
         }
         
-        func calculateAttacks(combatTile: CombatTileData, from position: TileCoord) -> [TileCoord] {
-            let (attackDirections, attackRange) = combatTile.attackVector
+        func calculateAttacks(for entity: EntityModel, from position: TileCoord) -> [TileCoord] {
+            let attackDirections = entity.attack.directions
+            let attackRange = entity.attack.range
             var affectedTiles: [TileCoord] = []
             for direction in attackDirections {
-                for i in attackRange {
+                for i in attackRange.lower...attackRange.upper {
                     //TODO: consider how to add logic that stops at the first thing it hits
                     let target = calculateTarget(in: direction, distance: i, from: position)
                     if isWithinBounds(target) {
@@ -142,11 +143,11 @@ class Referee {
             return affectedTiles
         }
         
-        func calculatePossibleAttacks(combatTile: CombatTileData, from position: TileCoord) -> [TileCoord] {
-            let (_, attackRange) = combatTile.attackVector
+        func calculatePossibleAttacks(for entity: EntityModel, from position: TileCoord) -> [TileCoord] {
+            let attackRange = entity.attack.range
             var affectedTiles: [TileCoord] = []
             for direction in Directions.all {
-                for i in attackRange {
+                for i in attackRange.lower...attackRange.upper {
                     //TODO: consider how to add logic that stops at the first thing it hits
                     let target = calculateTarget(in: direction, distance: i, from: position)
                     if isWithinBounds(target) {
@@ -169,10 +170,10 @@ class Referee {
         
         func attackedTiles(from position: TileCoord) -> [TileCoord] {
             let attacker = tiles[position]
-            if case TileType.player(let data) = attacker  {
-                return calculateAttacks(combatTile: data, from: position)
-            } else if case TileType.greenMonster(let data) = attacker {
-                return calculateAttacks(combatTile: data, from: position)
+            if case TileType.player(let player) = attacker  {
+                return calculateAttacks(for: player, from: position)
+            } else if case TileType.monster(let monster) = attacker {
+                return calculateAttacks(for: monster, from: position)
             }
             return []
         }
@@ -180,21 +181,21 @@ class Referee {
         
         func attackableTiles(from position: TileCoord) -> [TileCoord] {
             let attacker = tiles[position]
-            if case TileType.player(let data) = attacker  {
-                return calculatePossibleAttacks(combatTile: data, from: position)
-            } else if case TileType.greenMonster(let data) = attacker {
-                return calculatePossibleAttacks(combatTile: data, from: position)
+            if case TileType.player(let player) = attacker  {
+                return calculatePossibleAttacks(for: player, from: position)
+            } else if case TileType.monster(let monster) = attacker {
+                return calculatePossibleAttacks(for: monster, from: position)
             }
             return []
         }
         
         func playerHasPossibleAttack() -> Bool {
             guard let playerPosition = playerPosition,
-                case TileType.player(let playerCombat) = tiles[playerPosition],
-                playerCombat.canAttack else { return false }
+                case TileType.player(let playerData) = tiles[playerPosition],
+                playerData.attack.canAttack else { return false }
             
             for attackedTile in attackableTiles(from: playerPosition) {
-                if case TileType.greenMonster(_) = tiles[attackedTile] {
+                if case TileType.monster = tiles[attackedTile] {
                     return true
                 }
             }
@@ -203,10 +204,10 @@ class Referee {
         
         func playerAttacks() -> Input? {
             guard let playerPosition = playerPosition,
-                case TileType.player(let playerCombat) = tiles[playerPosition],
-                playerCombat.canAttack else { return nil }
+                case TileType.player(let playerData) = tiles[playerPosition],
+                playerData.attack.canAttack else { return nil }
             for attackedTile in attackedTiles(from: playerPosition) {
-                if case TileType.greenMonster(let data) = tiles[attackedTile], data.hp > 0 {
+                if case TileType.monster(let data) = tiles[attackedTile], data.hp > 0 {
                     return Input(.attack(playerPosition, attackedTile))
                 }
             }
@@ -218,10 +219,10 @@ class Referee {
             for (i, row) in tiles.enumerated() {
                 for (j, _) in row.enumerated() {
                     let potentialMonsterPosition = TileCoord(i, j)
-                    if case TileType.greenMonster(let monsterCombat) = tiles[potentialMonsterPosition],
-                        monsterCombat.canAttack {
+                    if case TileType.monster(let monsterData) = tiles[potentialMonsterPosition],
+                        monsterData.attack.canAttack {
                         for attackedTile in attackedTiles(from: potentialMonsterPosition) {
-                            if case TileType.player(_) = tiles[attackedTile] {
+                            if case TileType.player = tiles[attackedTile] {
                                 return Input(.attack(potentialMonsterPosition, attackedTile))
                             }
                         }
@@ -234,8 +235,8 @@ class Referee {
         func monsterDies() -> Input? {
             for (i, row) in tiles.enumerated() {
                 for (j, _) in row.enumerated() {
-                    if case TileType.greenMonster(let data) = tiles[TileCoord(i,j)] {
-                        if data.hp == 0 {
+                    if case TileType.monster(let data) = tiles[TileCoord(i,j)] {
+                        if data.hp <= 0 {
                             return Input(.monsterDies(TileCoord(i,j)))
                         }
                     }
@@ -253,7 +254,7 @@ class Referee {
         func playerCollectsGem() -> Input? {
             guard let playerPosition = playerPosition,
                 case TileType.player(let playerCombat) = tiles[playerPosition],
-                !playerCombat.hasGem,
+                !playerCombat.carry.hasGem,
                 isWithinBounds(playerPosition.rowBelow),
                 case TileType.gem1 = tiles[playerPosition.rowBelow]
                 else { return nil }

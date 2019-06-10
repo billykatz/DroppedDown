@@ -1,87 +1,12 @@
 //
-//  CombatHelper.swift
+//  CombatTileData.swift
 //  DownFall
 //
-//  Created by William Katz on 4/1/19.
+//  Created by William Katz on 5/18/19.
 //  Copyright © 2019 William Katz LLC. All rights reserved.
 //
 
 import Foundation
-
-protocol Option: RawRepresentable, Hashable, CaseIterable {}
-
-enum Direction: String, Option {
-    case north, south, east, west
-}
-
-typealias Directions = Set<Direction>
-typealias Vector = (Directions, ClosedRange<Int>)
-
-extension Set where Element: Option {
-    var rawValue: Int {
-        var rawValue = 0
-        for (index, element) in Element.allCases.enumerated() {
-            if self.contains(element) {
-                rawValue |= (1 << index)
-            }
-        }
-        
-        return rawValue
-    }
-}
-
-extension Set where Element == Direction {
-    static var sideways: Set<Direction> {
-        return [.east, .west]
-    }
-    
-    static var upDown: Set<Direction> {
-        return [.north, .south]
-    }
-    
-    static var all: Set<Direction> {
-        return Set(Element.allCases)
-    }
-}
-
-struct Weapon: Equatable, Hashable {
-    enum Durability: Equatable, Hashable {
-        case unlimited
-        case limited(Int)
-    }
-    
-    enum AttackType: Equatable, Hashable {
-        case melee, ranged
-    }
-    
-    let range: Int
-    let damage: Int
-    let direction: Directions
-    let attackType: AttackType
-    let durability: Durability
-    let chargeTime: Int
-    let currentCharge: Int
-    
-    static let pickAxe: Weapon = Weapon(range: 1,
-                                        damage: 1,
-                                        direction: [.south],
-                                        attackType: .melee,
-                                        durability: .unlimited,
-                                        chargeTime: 0,
-                                        currentCharge: 0)
-    
-    static let mouth: Weapon = Weapon(range: 1,
-                                      damage: 1,
-                                      direction: .sideways,
-                                      attackType: .melee,
-                                      durability: .unlimited,
-                                      chargeTime: 0,
-                                      currentCharge: 0)
-}
-
-struct Attack {
-    let damage: Int
-}
 
 struct CombatTileData: Equatable, Hashable {
     
@@ -97,7 +22,7 @@ struct CombatTileData: Equatable, Hashable {
                               weapon: .mouth,
                               hasGem: false)
     }
-
+    
     static func player() -> CombatTileData {
         return CombatTileData(hp: 3,
                               attacksThisTurn: 0,
@@ -146,22 +71,13 @@ struct CombatTileData: Equatable, Hashable {
         return 1...self.weapon.range
     }
     
-
+    
     var attackVector: Vector {
         return (self.weapon.direction, attackRange)
     }
     
     var canAttack: Bool {
         return attacksThisTurn < attacksPerTurn
-    }
-}
-
-
-struct CombatSimulator {
-    static func simulate(attacker: CombatTileData, defender: CombatTileData) -> (CombatTileData, CombatTileData) {
-        let newAttacker = attacker.attacks(defender)
-        let newDefender = defender.attacked(by: attacker)
-        return (newAttacker, newDefender)
     }
 }
 

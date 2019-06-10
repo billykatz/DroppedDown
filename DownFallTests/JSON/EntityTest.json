@@ -1,0 +1,14 @@
+{
+    "name": "Gloop",
+    "hp": 1,
+    "attack": {
+        "frequency": 0,
+        "directions": ["east", "west"],
+        "damage": 1,
+        "range": {
+            "lower": 0,
+            "upper": 1
+        },
+        "animationPaths": ["Animations/gloop.png"]
+    }
+}

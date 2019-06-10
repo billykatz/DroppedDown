@@ -155,7 +155,7 @@ class Renderer : SKSpriteNode {
                                _ defenderPosition: TileCoord,
                                _ endTiles: [[TileType]]?) {
         guard let tiles = endTiles else { animationsFinished(for: sprites); return }
-        animationsFinished(for: sprites, endTiles: endTiles)
+        animationsFinished(for: sprites, endTiles: tiles)
     }
     
     private func add(sprites: [[DFTileSpriteNode]]) {
@@ -163,7 +163,7 @@ class Renderer : SKSpriteNode {
         sprites.forEach {
             $0.forEach { sprite in
                 //add the sprite back
-                if sprite.type == TileType.player() {
+                if sprite.type == TileType.player(.zero) {
                     let group = SKAction.group([SKAction.wait(forDuration:5), sprite.animatedPlayerAction()])
                     let repeatAnimation = SKAction.repeat(group, count: 500)
                     sprite.zPosition = precedence.rawValue

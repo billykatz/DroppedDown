@@ -8,32 +8,36 @@
 
 import GameplayKit
 
-protocol TileCreatorResets {
-    static func reset()
-}
-
-struct TileCreator: TileStrategy {
+class TileCreator: TileStrategy {
     
-    static func randomTile(_ given: Int) -> TileType {
+    
+    func randomTile(_ given: Int) -> TileType {
         let index = abs(given) % TileType.allCases.count
         return TileType.allCases[index]
     }
     
-    static let maxMonsters = 2
-    static let maxGems = 1
-    static var spawnedGem = false
+    let maxMonsters = 2
+    let maxGems = 1
+    var spawnedGem = false
+    var randomSource = GKLinearCongruentialRandomSource()
+    var entities: [EntityModel]
     
-    static func tiles(for board: Board, difficulty: Difficulty = .normal) -> [TileType] {
+    
+    init(_ entities: [EntityModel]) {
+        self.entities = entities
+    }
+    
+    func tiles(for board: Board, difficulty: Difficulty = .normal) -> [TileType] {
         var newTiles: [TileType] = []
         var newMonsterCount = 0
-        let maxMonsters = 6
-        let currentMonsterCount = board.tiles(of: .greenMonster()).count
+        let maxMonsters = 4
+        let currentMonsterCount = board.tiles(of: .monster(.zero)).count
         while (newTiles.count < board.tiles(of: .empty).count) {
             let nextTile = randomTile(randomSource.nextInt())
             
             switch nextTile {
             case .player:
-                if board.tiles(of: .player()).count < 1 && !newTiles.contains(.player()) {
+                if board.tiles(of: .player(.zero)).count < 1 && !newTiles.contains(.player(.zero)) {
                     newTiles.append(nextTile)
                 }
             case .blueRock, .blackRock, .greenRock:
@@ -48,11 +52,6 @@ struct TileCreator: TileStrategy {
                 {
                     newTiles.append(nextTile)
                 }
-            case .greenMonster:
-                if currentMonsterCount + newMonsterCount < maxMonsters  {
-                    newMonsterCount += 1
-                    newTiles.append(nextTile)
-                }
             case .gem1:
                 if randomSource.nextInt().isMultiple(of: 2),
                     !newTiles.contains(.exit),
@@ -60,79 +59,59 @@ struct TileCreator: TileStrategy {
                     newTiles.append(nextTile)
                     spawnedGem = true
                 }
+            case .monster:
+                if currentMonsterCount + newMonsterCount < maxMonsters  {
+                    newMonsterCount += 1
+                    newTiles.append(.monster(entities[0]))
+                }
             }
         }
         return newTiles
     }
     
-    
-    
-    static func board(_ boardSize: Int, difficulty: Difficulty) -> [[TileType]] {
+    /**
+    Create a 2d Array of tile types
+    - Parameters:
+     - boardSize: The width and height of a board
+     - entities: An array of entities loaded from data
+     - difficulty: The level of difficuly
+ 
+    */
+    func board(_ boardSize: Int, difficulty: Difficulty) -> [[TileType]] {
         
-        func getNumber(of type: TileType, in tiles: [[TileType]]) -> Int {
-            var numberOf = 0
-            for i in 0..<tiles.count {
-                for j in 0..<tiles[i].count {
-                    if tiles[i][j] == type {
-                        numberOf += 1
-                    }
-                }
-            }
-            return numberOf
-        }
-
-        
-        var tiles: [[TileType]] = []
-        for row in 0..<boardSize {
-            tiles.append([])
-            for _ in 0..<boardSize {
-                tiles[row].append(TileType.empty)
-            }
-        }
-        
-        
+        //TODO: determine when we should add monsters to a new board
         
         var newTiles: [TileType] = []
-        var newMonsterCount = 0
-        let currentMonsterCount = 0
         while (newTiles.count < boardSize * boardSize) {
             let nextTile = randomTile(randomSource.nextInt())
             
             switch nextTile {
             case .blueRock, .blackRock, .greenRock:
                 newTiles.append(nextTile)
-            case .empty, .exit, .gem1, .player:
+            case .empty:
                 ()
-            case .greenMonster:
-                if currentMonsterCount + newMonsterCount < maxMonsters  {
-                    newMonsterCount += 1
-                    newTiles.append(nextTile)
-                }
+//                fatalError("Should not get a empty tile here")
+            case .exit, .gem1, .player, .monster:
+                ()
             }
         }
         
+        var tiles: [[TileType]] = []
         var currIdx = 0
-        for row in 0..<tiles.count {
-            for col in 0..<tiles.count {
-                tiles[row][col] = newTiles[currIdx]
+        for row in 0..<boardSize {
+            tiles.append([])
+            for _ in 0..<boardSize {
+                tiles[row].append(newTiles[currIdx])
                 currIdx += 1
             }
         }
         let lowerbound = Int(Double(tiles.count) * 0.33)
         
         let playerPosition = TileCoord((Int.random(lowerbound) + lowerbound), (Int.random(lowerbound) + lowerbound))
-        tiles[playerPosition.x][playerPosition.y] = TileType.player()
+        tiles[playerPosition.x][playerPosition.y] = TileType.player(entities[1])
         
         return tiles
 
     }
-    
-    static var randomSource = GKLinearCongruentialRandomSource()
 
-}
-
-extension TileCreator: TileCreatorResets {
-    static func reset() {
-        spawnedGem = false
-    }
 }

@@ -34,7 +34,7 @@ class HUD: SKSpriteNode {
         let attacker = tiles[attackerPosition]
         let defender = tiles[defenderPosition]
         
-        if case TileType.greenMonster(_) = attacker,
+        if case TileType.monster = attacker,
             case let TileType.player(playerData) = defender{
             // monster attacked player
             show(playerData)
@@ -54,8 +54,9 @@ class HUD: SKSpriteNode {
         case .collectGem:
             showGem()
         case .boardBuilt:
+            //TODO: check this logic out thoroughly
             guard let tiles = input.endTiles,
-                let playerPosition = getTilePosition(.player(), tiles: tiles),
+                let playerPosition = getTilePosition(.player(.zero), tiles: tiles),
                 case let TileType.player(data) = tiles[playerPosition] else { return }
             show(data)
         default:
@@ -63,7 +64,7 @@ class HUD: SKSpriteNode {
         }
     }
 
-    func show(_ data: CombatTileData) {
+    func show(_ data: EntityModel) {
         for child in self.children {
             if child is SKLabelNode {
                 child.removeFromParent()
@@ -76,7 +77,7 @@ class HUD: SKSpriteNode {
         """
         let weaponDamageString =
         """
-        Pickaxe Damage: \(data.weapon.damage)
+        Pickaxe Damage: \(data.attack.damage)
         """
         let weaponDirectionString = "Pickaxe Attacks: Down"
         

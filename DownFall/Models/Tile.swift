@@ -8,7 +8,7 @@
 
 enum TileType: Equatable, Hashable, CaseIterable {
     
-    static var allCases: [TileType] = [.blueRock, .blackRock ,.greenRock, .player(), .exit, .empty, .greenMonster(), .gem1]
+    static var allCases: [TileType] = [.blueRock, .blackRock ,.greenRock, .player(.zero), .exit, .empty, .gem1, .monster(.zero)]
     typealias AllCases = [TileType]
 
     static func == (lhs: TileType, rhs: TileType) -> Bool {
@@ -19,14 +19,14 @@ enum TileType: Equatable, Hashable, CaseIterable {
             return true
         case (.greenRock, .greenRock):
             return true
-        case (.player(_), .player(_)):
+        case (.player, .player):
             return true
         case (.empty, .empty):
             return true
         case (.exit, .exit):
             return true
-        case (.greenMonster(let lhsData), .greenMonster(let rhsData)):
-            return lhsData == rhsData
+        case (.monster, .monster):
+            return true
         default:
             return false
         }
@@ -35,55 +35,11 @@ enum TileType: Equatable, Hashable, CaseIterable {
     case blueRock
     case blackRock
     case greenRock
-    case player(CombatTileData)
+    case player(EntityModel)
+    case monster(EntityModel)
     case empty
     case exit
-    case greenMonster(CombatTileData)
     case gem1
-    
-    /// Create a random rock Tile instance
-    static func randomRock() -> TileType {
-        return [TileType.blueRock, TileType.blackRock, TileType.greenRock].shuffled().first!
-    }
-    
-    /// Create a random monster Tile instance
-    static func randomMonster() -> TileType {
-        return TileType.greenMonster(CombatTileData.monster())
-    }
-    
-    /// Create default player funcion
-    static func player() -> TileType {
-        return .player(CombatTileData.player())
-    }
-    
-    //Create default monster
-    static func greenMonster() -> TileType {
-        return .greenMonster(CombatTileData.monster())
-    }
-
-    //MARK: - Instance Properties and Methods
-    
-    func updateCombat(_ given: CombatTileData) -> TileType {
-        switch self {
-        case .player:
-            return .player(given)
-        case .greenMonster:
-            return .greenMonster(given)
-        default:
-            fatalError("Only Combat tiles can call this method")
-        }
-    }
-    
-    var combatData:  CombatTileData? {
-        switch self {
-        case .player(let data):
-            return data
-        case .greenMonster(let data):
-            return data
-        default:
-            return nil
-        }
-    }
     
     /// Return a string representing the texture's file name
     func textureString() -> String {
@@ -100,10 +56,10 @@ enum TileType: Equatable, Hashable, CaseIterable {
             return TextueName.empty.rawValue
         case .exit:
             return TextueName.exit.rawValue
-        case .greenMonster:
-            return TextueName.greenMonster.rawValue
         case .gem1:
             return TextueName.gem1.rawValue
+        case .monster(let data):
+            return data.name
         }
     }
     

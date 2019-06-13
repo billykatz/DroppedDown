@@ -59,7 +59,6 @@ enum TileType: Equatable, Hashable, CaseIterable {
     static var gold: TileType {
         return TileType.item(.gold)
     }
-
     
     /// Return a string representing the texture's file name
     func textureString() -> String {

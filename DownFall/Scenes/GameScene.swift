@@ -15,7 +15,6 @@ protocol GameSceneDelegate: class {
 
 class GameScene: SKScene {
     
-    private var tileSize = 100
     private var boardSize: Int?
     private var board: Board?
     
@@ -45,16 +44,17 @@ class GameScene: SKScene {
     /// Creates an instance of board and does preparationg necessary for didMove(to:) to be called
     public func commonInit(boardSize bsize: Int,
                            entities: [EntityModel],
-                           difficulty: Difficulty = .normal){
+                           difficulty diff: Difficulty = .normal){
         //TODO: the  order of the following lines of code matter.  (bottom left has to happen before create and position. Consider refactoring
         InputQueue.reset()
         tileCreator = TileCreator(entities)
-        self.difficulty = difficulty
+        difficulty = diff
         board = Board.build(size: bsize, tileCreator: tileCreator!)
         boardSize = bsize
     }
     
     override func didMove(to view: SKView) {
+        guard let board = board else { fatalError("failed to init board in commonInit()")}
         foreground = self.childNode(withName: "foreground")!
         
         //Adjust the playbale rect depending on the size of the device
@@ -66,7 +66,7 @@ class GameScene: SKScene {
                               height: size.height)
         self.renderer = Renderer(playableRect: playableRect,
                                  foreground: foreground,
-                                 board: self.board!,
+                                 board: board,
                                  precedence: Precedence.foreground)
         
         let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(tripleTap))
@@ -179,7 +179,6 @@ extension GameScene {
 // MARK: - Update
     
 extension GameScene {
-    /// Called every frame
     /// We try to digest the top of the queue every frame
     override func update(_ currentTime: TimeInterval) {
         guard let input = InputQueue.pop() else { return }

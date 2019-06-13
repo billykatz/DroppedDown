@@ -29,10 +29,16 @@ class TileCreator: TileStrategy {
             } else {
                 return TileType.empty
             }
+        case .monster:
+            if randomSource.nextInt().isMultiple(of: 2), !spawnedGem {
+                spawnedGem = true
+                return TileType.monster(entities[1])
+            } else {
+                return TileType.monster(entities[0])
+            }
         default:
             return TileType.allCases[index]
         }
-        return TileType.empty
     }
     
     let maxMonsters = 2
@@ -61,7 +67,7 @@ class TileCreator: TileStrategy {
                 }
             case .blueRock, .blackRock, .greenRock:
                 newTiles.append(nextTile)
-            case .empty:
+            case .empty, .item:
                 ()
             case .exit:
                 if typeCount(for: tiles, of: .exit).count < 1,
@@ -70,16 +76,16 @@ class TileCreator: TileStrategy {
                 {
                     newTiles.append(nextTile)
                 }
-            case .item(let item):
-                if  item.type == .gem,
-                    !spawnedGem {
-                    newTiles.append(nextTile)
-                    spawnedGem = true
-                }
+//            case .item(let item):
+//                if  item.type == .gem,
+//                    !spawnedGem {
+//                    newTiles.append(nextTile)
+//                    spawnedGem = true
+//                }
             case .monster:
                 if currentMonsterCount + newMonsterCount < maxMonsters  {
                     newMonsterCount += 1
-                    newTiles.append(.monster(entities[0]))
+                    newTiles.append(nextTile)
                 }
             }
         }
@@ -124,7 +130,7 @@ class TileCreator: TileStrategy {
         let lowerbound = Int(Double(tiles.count) * 0.33)
         
         let playerPosition = TileCoord((Int.random(lowerbound) + lowerbound), (Int.random(lowerbound) + lowerbound))
-        tiles[playerPosition.x][playerPosition.y] = TileType.player(entities[1])
+        tiles[playerPosition.x][playerPosition.y] = TileType.player(entities[2])
         
         return tiles
 

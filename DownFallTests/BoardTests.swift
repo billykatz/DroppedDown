@@ -28,15 +28,17 @@ struct MockBoardHelper {
     }
     
     static func createBoard(_ type: TileType = .greenRock, size: Int = 5) -> Board {
-        return Board.init(tiles: Array(repeating: row(of: type, by: size), count: size))
+        let tc = TileCreator([.zero])
+        return Board(tiles: Array(repeating: row(of: type, by: size),  count: size), tileCreator: tc)
     }
     
     static func createBoardWithRowOfSameColor(_ type: TileType = .greenRock, size: Int = 5, rowIdx: Int = 0) -> Board {
-        var tiles = createBoard(.exit, size: size).tiles
+        let board = createBoard(.exit, size: size)
+        var tiles = board.tiles
         for col in 0..<size {
             tiles[rowIdx][col] = type
         }
-        return Board.init(tiles: tiles)
+        return Board(tiles: tiles, tileCreator:  board.tileCreator!)
     }
 }
 
@@ -48,10 +50,11 @@ class BoardTests: XCTestCase {
     override func setUp() {
         super.setUp()
         // Put setup code here. This method is called before the invocation of each test method in the class.
-        self.tiles = [[TileType.player(), .exit, .blueRock],
+        self.tiles = [[TileType.player(.zero), .exit, .blueRock],
                   [.blueRock, .blueRock, .blueRock],
                   [.blueRock, .blueRock, .blueRock]]
         self.board = Board.init(tiles: tiles,
+                                tileCreator: TileCreator([.zero]),
                                 playerPosition: TileCoord(0,0),
                                 exitPosition: TileCoord(0,1))
     }
@@ -173,7 +176,7 @@ class BoardTests: XCTestCase {
     }
     
     func testFindNoNeighbots() {
-        let tiles: [[TileType]] = [[TileType.player(), .exit, .blueRock],
+        let tiles: [[TileType]] = [[TileType.player(.zero), .exit, .blueRock],
                                    [.blackRock, .greenRock, .blackRock],
                                    [.blueRock, .blackRock, .blueRock]]
         
@@ -191,11 +194,11 @@ class BoardTests: XCTestCase {
     
     func testRotateLeft() {
         
-        let tiles: [[TileType]] = [[TileType.player(), .exit, .blueRock],
+        let tiles: [[TileType]] = [[TileType.player(.zero), .exit, .blueRock],
                                    [.greenRock, .blueRock, .blackRock],
                                    [.blueRock, .greenRock, .blueRock]]
         
-        let rotatedTiles: [[TileType]] = [[.blueRock, .greenRock, TileType.player()],
+        let rotatedTiles: [[TileType]] = [[.blueRock, .greenRock, TileType.player(.zero)],
                                           [.greenRock, .blueRock, .exit],
                                           [.blueRock, .blackRock, .blueRock]]
         
@@ -210,13 +213,13 @@ class BoardTests: XCTestCase {
     }
     
     func testRotateRight() {
-        let tiles: [[TileType]] = [[TileType.player(), .exit, .blueRock],
+        let tiles: [[TileType]] = [[TileType.player(.zero), .exit, .blueRock],
                                    [.greenRock, .blueRock, .blackRock],
                                    [.blueRock, .greenRock, .blueRock]]
         
         let rotatedTiles: [[TileType]] = [[.blueRock, .blackRock, .blueRock],
                                           [.exit, .blueRock, .greenRock],
-                                          [TileType.player(), .greenRock, .blueRock]]
+                                          [TileType.player(.zero), .greenRock, .blueRock]]
         
         let initalBoard = Board.init(tiles: tiles,
                                      playerPosition: TileCoord(0,0),
@@ -239,8 +242,8 @@ class BoardTests: XCTestCase {
     //TODO: tap monster does not result in transformation
     
     func testBoardComputesValidPlayerAttackVariableDamage() {
-        let player1 = TileType.player()
-        let player2 = TileType.strongPlayer
+        let player1 = TileType.player(.zero)
+        let player2 = TileType.player(EntityModel(hp: 5, name: "strong", attack: AttackModel(frequency: 0, range: .one, damage: 3, directions: [.south], animationPaths: [], hasAttacked: false), type: .player, carry: .zero))
 
 
         var givenTiles: [[TileType]] = [[.blueRock, .exit, .blueRock],
@@ -253,11 +256,11 @@ class BoardTests: XCTestCase {
         XCTAssertEqual(expectedTiles, actualBoard, "Board removes HP from tiles beneath the player equal to the palyer attack damage.")
 
         givenTiles = [[.blueRock, .exit, .blueRock],
-                      [.greenMonster(CombatTileData(hp: 5, attacksThisTurn: 0, weapon: .mouth, hasGem: false)), .blueRock, .blueRock],
+                      [.healthyMonster, .blueRock, .blueRock],
                       [player2, .blueRock, .blueRock]]
 
         expectedTiles = [[.blueRock, .exit, .blueRock],
-                         [.greenMonster(CombatTileData(hp: 2, attacksThisTurn: 0, weapon: .mouth, hasGem: false)), .blueRock, .blueRock],
+                         [.normalMonster, .blueRock, .blueRock],
                          [player2, .blueRock, .blueRock]]
 
         actualBoard = Board(tiles: givenTiles).attack(TileCoord(2, 0), TileCoord(1, 0)).endTiles
@@ -265,11 +268,11 @@ class BoardTests: XCTestCase {
 
 
         givenTiles = [[.blueRock, .exit, .blueRock],
-                      [.greenMonster(CombatTileData(hp: 1, attacksThisTurn: 0, weapon: .mouth, hasGem: false)), .blueRock, .blueRock],
+                      [.normalMonster, .blueRock, .blueRock],
                       [player2, .blueRock, .blueRock]]
 
         expectedTiles = [[.blueRock, .exit, .blueRock],
-                         [.greenMonster(CombatTileData(hp: -2, attacksThisTurn: 0, weapon: .mouth, hasGem: false)), .blueRock, .blueRock],
+                         [.deadMonster, .blueRock, .blueRock],
                          [player2, .blueRock, .blueRock]]
 
         actualBoard = Board(tiles: givenTiles).attack(TileCoord(2, 0), TileCoord(1, 0)).endTiles
@@ -277,11 +280,11 @@ class BoardTests: XCTestCase {
 
 
         givenTiles = [[.blueRock, .exit, .blueRock],
-                      [.greenMonster(CombatTileData(hp: 2, attacksThisTurn: 0, weapon: .mouth, hasGem: false)), .blueRock, .blueRock],
+                      [.strongMonster, .blueRock, .blueRock],
                       [.strongPlayer, .blueRock, .blueRock]]
 
         expectedTiles = [[.blueRock, .exit, .blueRock],
-                         [.greenMonster(CombatTileData(hp: -1, attacksThisTurn: 0, weapon: .mouth, hasGem: false)), .blueRock, .blueRock],
+                         [.deadMonster, .blueRock, .blueRock],
                          [.strongPlayer, .blueRock, .blueRock]]
 
         actualBoard = Board(tiles: givenTiles).attack(TileCoord(2, 0), TileCoord(1, 0)).endTiles
@@ -289,12 +292,12 @@ class BoardTests: XCTestCase {
     }
     
     func testBoardValidMonsters() {
-        let monster = TileType.greenMonster()
-        let givenTiles = [[TileType.player(), monster, .blueRock],
+        let monster = TileType.monster(.zero)
+        let givenTiles = [[TileType.player(.zero), monster, .blueRock],
                           [.blueRock, .exit, .blueRock],
                           [.blueRock, .blueRock, .blueRock]]
         
-        let expectedTiles = [[TileType.deadPlayer, .monsterThatHasAttacked, .blueRock],
+        let expectedTiles: [[TileType]] = [[.deadPlayer, .monsterThatHasAttacked, .blueRock],
                              [.blueRock, .exit, .blueRock],
                              [.blueRock, .blueRock, .blueRock]]
         let actualBoard = Board(tiles: givenTiles).attack(TileCoord(0, 1), TileCoord(0, 0)).endTiles
@@ -303,7 +306,7 @@ class BoardTests: XCTestCase {
     }
     
     func testBoardDeterminesHowManyTilesAreEmpty() {
-        var tiles: [[TileType]] = [[TileType.player(), .exit, .blueRock],
+        var tiles: [[TileType]] = [[TileType.player(.zero), .exit, .blueRock],
                                    [.blackRock, .empty, .blackRock],
                                    [.blueRock, .empty, .blueRock]]
         
@@ -325,7 +328,7 @@ class BoardTests: XCTestCase {
     }
     
     func testBoardKnowsHowManyExitsThereAre() {
-        var tiles: [[TileType]] = [[TileType.player(), .exit, .blueRock],
+        var tiles: [[TileType]] = [[TileType.player(.zero), .exit, .blueRock],
                                    [.blackRock, .empty, .blackRock],
                                    [.blueRock, .empty, .blueRock]]
         

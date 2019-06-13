@@ -10,22 +10,7 @@ import UIKit
 import SpriteKit
 import GameplayKit
 
-
-
 class GameViewController: UIViewController {
-    
-    //TODO: move to a different file
-    func data(from fileName: String) throws -> Data? {
-        if let path = Bundle(for: type(of: self)).path(forResource: fileName, ofType: "json") {
-            do {
-                return try Data(contentsOf: URL(fileURLWithPath: path), options: .mappedIfSafe)
-            }
-            catch {
-                fatalError()
-            }
-        }
-        return nil
-    }
 
     private var gameSceneNode: GameScene?
     private var boardSize = 7
@@ -33,7 +18,7 @@ class GameViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        let entityData = try! data(from: "entities")!
+        let entityData = try! Data.data(from: "entities")!
         entities = try! JSONDecoder().decode(EntitiesModel.self, from: entityData).entities
         startLevel()
     }

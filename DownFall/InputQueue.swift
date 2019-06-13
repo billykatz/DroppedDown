@@ -12,7 +12,8 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
     static var allCases: [InputType] = [.touch(TileCoord(0,0), .blueRock), .rotateLeft, .rotateRight,
                                         .attack(TileCoord(0,0), TileCoord(0,0)), .monsterDies(TileCoord(0,0)),
                                         .gameWin, .gameLose, .play, .pause,
-                                        .animationsFinished, .playAgain, .reffingFinished]
+                                        .animationsFinished, .playAgain, .reffingFinished,
+                                        .collectItem(TileCoord(0,0), .zero)]
     
     typealias AllCases = [InputType]
     
@@ -30,7 +31,7 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
     case transformation(Transformation)
     case reffingFinished
     case boardBuilt
-    case collectGem(TileCoord)
+    case collectItem(TileCoord, Item)
     
     var canBeNonUserGenerated: Bool {
         switch self {
@@ -72,8 +73,8 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
             return "Attacked from \(from) to \(to)"
         case .boardBuilt:
             return "Board has been built"
-        case .collectGem:
-            return "Player collects gem"
+        case .collectItem:
+            return "Player collects an item"
         }
     }
 }

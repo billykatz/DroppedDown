@@ -10,10 +10,29 @@ import GameplayKit
 
 class TileCreator: TileStrategy {
     
+    func typeCount(for tiles: [[TileType]], of type: TileType) -> [TileCoord] {
+        var tileCoords: [TileCoord] = []
+        for (i, _) in tiles.enumerated() {
+            for (j, _) in tiles[i].enumerated() {
+                tiles[i][j] == type ? tileCoords.append(TileCoord(i, j)) : ()
+            }
+        }
+        return tileCoords
+    }
     
     func randomTile(_ given: Int) -> TileType {
         let index = abs(given) % TileType.allCases.count
-        return TileType.allCases[index]
+        switch TileType.allCases[index] {
+        case .item:
+            if randomSource.nextInt().isMultiple(of: 2) {
+                return TileType.gem
+            } else {
+                return TileType.empty
+            }
+        default:
+            return TileType.allCases[index]
+        }
+        return TileType.empty
     }
     
     let maxMonsters = 2
@@ -27,17 +46,17 @@ class TileCreator: TileStrategy {
         self.entities = entities
     }
     
-    func tiles(for board: Board, difficulty: Difficulty = .normal) -> [TileType] {
+    func tiles(for tiles: [[TileType]], difficulty: Difficulty = .normal) -> [TileType] {
         var newTiles: [TileType] = []
         var newMonsterCount = 0
         let maxMonsters = 4
-        let currentMonsterCount = board.tiles(of: .monster(.zero)).count
-        while (newTiles.count < board.tiles(of: .empty).count) {
+        let currentMonsterCount =  typeCount(for: tiles, of: .monster(.zero)).count
+        while (newTiles.count < typeCount(for: tiles, of: .empty).count) {
             let nextTile = randomTile(randomSource.nextInt())
             
             switch nextTile {
             case .player:
-                if board.tiles(of: .player(.zero)).count < 1 && !newTiles.contains(.player(.zero)) {
+                if typeCount(for: tiles, of: .player(.zero)).count < 1 && !newTiles.contains(.player(.zero)) {
                     newTiles.append(nextTile)
                 }
             case .blueRock, .blackRock, .greenRock:
@@ -45,16 +64,14 @@ class TileCreator: TileStrategy {
             case .empty:
                 ()
             case .exit:
-                if board.tiles(of: .exit).count < 1,
+                if typeCount(for: tiles, of: .exit).count < 1,
                     !newTiles.contains(.exit),
-                    !newTiles.contains(.gem1),
                     randomSource.nextInt().isMultiple(of: 3)
                 {
                     newTiles.append(nextTile)
                 }
-            case .gem1:
-                if randomSource.nextInt().isMultiple(of: 2),
-                    !newTiles.contains(.exit),
+            case .item(let item):
+                if  item.type == .gem,
                     !spawnedGem {
                     newTiles.append(nextTile)
                     spawnedGem = true
@@ -90,8 +107,7 @@ class TileCreator: TileStrategy {
                 newTiles.append(nextTile)
             case .empty:
                 ()
-//                fatalError("Should not get a empty tile here")
-            case .exit, .gem1, .player, .monster:
+            case .exit, .player, .monster, .item:
                 ()
             }
         }

@@ -10,7 +10,7 @@ import SpriteKit
 import Foundation
 
 class DFTileSpriteNode: SKSpriteNode {
-    var type : TileType
+    var type: TileType
     init(type: TileType, size: CGFloat) {
         self.type = type
         super.init(texture: SKTexture(imageNamed: type.textureString()), color: .clear, size: CGSize.init(width: size, height: size))

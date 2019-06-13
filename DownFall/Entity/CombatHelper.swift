@@ -44,46 +44,6 @@ extension Set where Element == Direction {
     }
 }
 
-struct Weapon: Equatable, Hashable {
-    enum Durability: Equatable, Hashable {
-        case unlimited
-        case limited(Int)
-    }
-    
-    enum AttackType: Equatable, Hashable {
-        case melee, ranged
-    }
-    
-    let range: Int
-    let damage: Int
-    let direction: Directions
-    let attackType: AttackType
-    let durability: Durability
-    let chargeTime: Int
-    let currentCharge: Int
-    
-    static let pickAxe: Weapon = Weapon(range: 1,
-                                        damage: 1,
-                                        direction: [.south],
-                                        attackType: .melee,
-                                        durability: .unlimited,
-                                        chargeTime: 0,
-                                        currentCharge: 0)
-    
-    static let mouth: Weapon = Weapon(range: 1,
-                                      damage: 1,
-                                      direction: .sideways,
-                                      attackType: .melee,
-                                      durability: .unlimited,
-                                      chargeTime: 0,
-                                      currentCharge: 0)
-}
-
-struct Attack {
-    let damage: Int
-}
-
-
 struct CombatSimulator {
     static func simulate(attacker: EntityModel, defender: EntityModel) -> (EntityModel, EntityModel) {
         // get the attack damage

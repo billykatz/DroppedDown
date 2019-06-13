@@ -70,7 +70,9 @@ func xTiles(_ numTiles: Int, _ tile: TileType, _ board: Board) -> Builder {
 
 extension TileType {
     static var playerWithGem: TileType {
-        return TileType.player(CombatTileData(hp: 1, attacksThisTurn: 0, weapon: .mouth, hasGem: true))
+        let gemCarry = CarryModel(item: [Item(type: .gem, range: .one)])
+        let hasGem = EntityModel(hp: 1, name: "test", attack: .zero, type: .player, carry: gemCarry)
+        return TileType.player(hasGem)
     }
 }
 
@@ -85,7 +87,7 @@ extension TileType {
 func win(_ board: Board) -> Builder {
     return { board in
         guard board.boardSize > 1 else { return board } //cant win if there is only 1 row
-        let playerPosition = board.getTilePosition(.player())
+        let playerPosition = board.getTilePosition(.player(.zero))
         let exitPosition = board.getTilePosition(.exit)
         var newTiles = board.tiles
         
@@ -146,11 +148,11 @@ func lose(_ board: Board) -> Builder {
 }
 
 func playerAttacks(_ board: Board,
-                   _ monsterTile: TileType = .greenMonster(),
-                   _ player: TileType = .player()) -> Builder {
+                   _ monsterTile: TileType = .monster(.zero),
+                   _ player: TileType = .player(.zero)) -> Builder {
     return { board in
         guard board.boardSize > 1 else { return board }
-        let playerPosition = board.getTilePosition(.player())
+        let playerPosition = board.getTilePosition(.player(.zero))
         var newTiles = board.tiles
         
         if let pp = playerPosition{

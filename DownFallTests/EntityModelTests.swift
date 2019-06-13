@@ -23,12 +23,14 @@ class EntityModelTests: XCTestCase {
             XCTAssertEqual(entity.hp, 1)
             XCTAssertEqual(entity.name, "Gloop")
             
-            let expectedRangeModel = RangeModel(lower: 0, upper: 1)
+            let expectedRangeModel = RangeModel(lower: 1, upper: 1)
             let expectedAnimationPaths = URL(string: "Animations/gloop.png")!
             let expectedAttackModel = AttackModel(frequency: 0,
                                                   range: expectedRangeModel,
+                                                  damage: 1,
                                                   directions: [.east, .west],
-                                                  animationPaths: [expectedAnimationPaths])
+                                                  animationPaths: [],
+                                                  hasAttacked: false)
             XCTAssertEqual(entity.attack.frequency, expectedAttackModel.frequency)
             XCTAssertEqual(entity.attack.range, expectedAttackModel.range)
             XCTAssertEqual(entity.attack.directions, expectedAttackModel.directions)

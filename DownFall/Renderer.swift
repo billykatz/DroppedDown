@@ -123,7 +123,7 @@ class Renderer : SKSpriteNode {
                 switch inputType {
                 case .rotateLeft, .rotateRight:
                     rotate(for: transformation)
-                case .touch, .monsterDies:
+                case .touch:
                     computeNewBoard(for: transformation)
                 case .attack(let attacker, let defender):
                     animateAttack(attacker, defender, trans.endTiles)
@@ -131,6 +131,11 @@ class Renderer : SKSpriteNode {
                     animate(transformation?.tileTransformation?.first) { [weak self] in
                         self?.gameWin()
                     }
+                case .monsterDies:
+                    let sprites = createSprites(from: trans.endTiles)
+                    animationsFinished(for: sprites, endTiles: trans.endTiles)
+                case .collectItem:
+                    computeNewBoard(for: transformation)
                 default:
                     // Transformation assoc value should ony exist for certain inputs
                     fatalError()
@@ -142,7 +147,7 @@ class Renderer : SKSpriteNode {
         case .touch(_, _), .rotateLeft, .rotateRight,
              .monsterDies, .attack, .gameWin,
              .animationsFinished, .reffingFinished,
-             .boardBuilt, .collectGem:
+             .boardBuilt,. collectItem:
             ()
         }
     }
@@ -289,7 +294,7 @@ extension Renderer {
             if count == 0 {
                 strongSelf.sprites = spriteNodes
                 
-                //TODO: Figure out why we need the following line of code.  this will solve the bug that the player sprite reanimates on every remove and refill
+                //TODO: Figure out why we need the following line of code.  this will solve the bug that the player sprite reanimates on input
                 strongSelf.animationsFinished(for: spriteNodes, endTiles: endTiles, userGenerated: userGenerated)
             }
         }

@@ -169,7 +169,7 @@ struct ReffingState: GameState {
         switch input.type {
         case .reffingFinished:
             return AnyGameState(PlayState())
-        case .attack, .monsterDies, .collectGem:
+        case .attack, .monsterDies, .collectItem:
             return AnyGameState(ComputingState())
         case .gameWin:
             return AnyGameState(WinState())
@@ -183,7 +183,7 @@ struct ReffingState: GameState {
     func shouldAppend(_ input: Input) -> Bool {
         switch input.type {
         case .reffingFinished, .attack, .monsterDies,
-             .gameWin, .gameLose, .collectGem:
+             .gameWin, .gameLose, .collectItem:
             return true
         default:
             return false
@@ -229,8 +229,8 @@ struct PlayState: GameState {
              .touch, .monsterDies, .rotateLeft, .rotateRight,
              .boardBuilt:
             return true
-        case .animationsFinished, .play, .reffingFinished, .playAgain,
-             .collectGem:
+        case .animationsFinished, .play,
+             .reffingFinished, .playAgain, .collectItem:
             return false
         }
     }
@@ -248,7 +248,7 @@ struct PlayState: GameState {
             return AnyGameState(ComputingState())
         case .boardBuilt:
             return AnyGameState(PlayState())
-        case .animationsFinished, .play, .transformation, .reffingFinished, .playAgain, .collectGem:
+        case .animationsFinished, .play, .transformation, .reffingFinished, .playAgain, .collectItem:
             return nil
         }
 

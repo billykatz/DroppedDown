@@ -251,17 +251,15 @@ class Referee {
             return playerCombat.hp <= 0
         }
         
-        func playerCollectsGem() -> Input? {
+        func playerCollectsItem() -> Input? {
             guard let playerPosition = playerPosition,
-                case TileType.player(let playerCombat) = tiles[playerPosition],
-                !playerCombat.carry.hasGem,
+                case TileType.player = tiles[playerPosition],
                 isWithinBounds(playerPosition.rowBelow),
-                case TileType.gem1 = tiles[playerPosition.rowBelow]
+                case TileType.item(let item) = tiles[playerPosition.rowBelow]
                 else { return nil }
-            return Input(.collectGem(playerPosition.rowBelow), tiles)
-            
-
+            return Input(.collectItem(playerPosition.rowBelow, item), tiles)
         }
+
         
         // Game rules are enforced in the following priorities
         // Game Win
@@ -290,8 +288,8 @@ class Referee {
             return deadMonster
         }
         
-        if let collectGem = playerCollectsGem() {
-            return collectGem
+        if let collectItem = playerCollectsItem() {
+            return collectItem
         }
 
         return Input(.reffingFinished)

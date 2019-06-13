@@ -8,7 +8,7 @@
 
 enum TileType: Equatable, Hashable, CaseIterable {
     
-    static var allCases: [TileType] = [.blueRock, .blackRock ,.greenRock, .player(.zero), .exit, .empty, .gem1, .monster(.zero)]
+    static var allCases: [TileType] = [.blueRock, .blackRock ,.greenRock, .player(.zero), .exit, .empty, .monster(.zero), .item(.zero)]
     typealias AllCases = [TileType]
 
     static func == (lhs: TileType, rhs: TileType) -> Bool {
@@ -27,6 +27,8 @@ enum TileType: Equatable, Hashable, CaseIterable {
             return true
         case (.monster, .monster):
             return true
+        case (.item(let lhsItem), .item(let rhsItem)):
+            return lhsItem == rhsItem
         default:
             return false
         }
@@ -39,7 +41,25 @@ enum TileType: Equatable, Hashable, CaseIterable {
     case monster(EntityModel)
     case empty
     case exit
-    case gem1
+    case item(Item)
+    
+    func isARock() -> Bool {
+        switch self {
+        case .blackRock, .blueRock, .greenRock:
+            return true
+        default:
+            return false
+        }
+    }
+    
+    static var gem: TileType {
+        return TileType.item(.gem)
+    }
+    
+    static var gold: TileType {
+        return TileType.item(.gold)
+    }
+
     
     /// Return a string representing the texture's file name
     func textureString() -> String {
@@ -56,10 +76,10 @@ enum TileType: Equatable, Hashable, CaseIterable {
             return TextueName.empty.rawValue
         case .exit:
             return TextueName.exit.rawValue
-        case .gem1:
-            return TextueName.gem1.rawValue
         case .monster(let data):
             return data.name
+        case .item(let item):
+            return item.textureName
         }
     }
     

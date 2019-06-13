@@ -51,8 +51,10 @@ class HUD: SKSpriteNode {
             default:
                 ()
             }
-        case .collectGem:
-            showGem()
+        case .collectItem(_, let item):
+            if item.type == .gem {
+                showGem()
+            }
         case .boardBuilt:
             //TODO: check this logic out thoroughly
             guard let tiles = input.endTiles,

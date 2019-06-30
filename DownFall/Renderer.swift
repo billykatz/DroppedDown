@@ -21,6 +21,10 @@ class Renderer : SKSpriteNode {
     private var spriteForeground = SKNode()
     private var menuForeground = SKNode()
     
+    //Animations
+    private var attackAnimation: [SKTexture]
+    private var fallAnimation: [SKTexture]
+    
     var menuSpriteNode: MenuSpriteNode {
         return MenuSpriteNode(.pause, playableRect: playableRect, precedence: .menu)
     }
@@ -37,6 +41,7 @@ class Renderer : SKSpriteNode {
          foreground givenForeground: SKNode,
          board: Board,
          precedence: Precedence) {
+        
         self.precedence = precedence
         self.playableRect = playableRect
         self.boardSize = CGFloat(board.boardSize)
@@ -48,12 +53,23 @@ class Renderer : SKSpriteNode {
         let bottomLeftY = playableRect.minY + marginHeight/2 + tileSize/2
         self.bottomLeft = CGPoint(x: bottomLeftX, y: bottomLeftY)
         
+        //load attack animation
+        attackAnimation = SpriteSheet(texture: SKTexture(imageNamed: "playerAttack"),
+                                      rows: 1,
+                                      columns: 10).animationsFrames()
+        
+        fallAnimation = SpriteSheet(texture: SKTexture(imageNamed: "playerFall"),
+                                      rows: 1,
+                                      columns: 9).animationsFrames()
+        
         
         super.init(texture: nil, color: .clear, size: CGSize.zero)
         
         isUserInteractionEnabled = true
     
         foreground = givenForeground
+        
+        
 
         //create sprite representations based on the given board.tiles
         self.sprites = createSprites(from: board.tiles)
@@ -160,21 +176,21 @@ class Renderer : SKSpriteNode {
                                _ defenderPosition: TileCoord,
                                _ endTiles: [[TileType]]?) {
         guard let tiles = endTiles else { animationsFinished(for: sprites); return }
-        animationsFinished(for: sprites, endTiles: tiles)
+        if tiles[attackerPosition] == TileType.player(.zero) {
+            let group = SKAction.animate(with: attackAnimation, timePerFrame: 0.1)
+            sprites[attackerPosition].run(group) { [weak self] in
+                guard let strongSelf = self else { return }
+                strongSelf.animationsFinished(for: strongSelf.sprites, endTiles: tiles)
+            }
+        } else {
+            animationsFinished(for: sprites, endTiles: tiles)
+        }
     }
     
     private func add(sprites: [[DFTileSpriteNode]]) {
         spriteForeground.removeAllChildren()
-        sprites.forEach {
-            $0.forEach { sprite in
-                //add the sprite back
-                if sprite.type == TileType.player(.zero) {
-                    let group = SKAction.group([SKAction.wait(forDuration:5), sprite.animatedPlayerAction()])
-                    let repeatAnimation = SKAction.repeat(group, count: 500)
-                    sprite.zPosition = precedence.rawValue
-                    sprite.run(repeatAnimation)
-                }
-                
+        sprites.forEach { spriteRow in
+            spriteRow.forEach { sprite in
                 spriteForeground.addChild(sprite)
             }
         }
@@ -190,8 +206,13 @@ class Renderer : SKSpriteNode {
             sprites.append([])
             for col in 0..<Int(boardSize) {
                 x = CGFloat(col) * tileSize + bottomLeft.x
-                sprites[row].append(DFTileSpriteNode(type: tiles[row][col], size: CGFloat(tileSize)))
-                sprites[row][col].position = CGPoint.init(x: x, y: y)
+                if tiles[row][col] == TileType.player(.zero) {
+                    //TODO: Don't hardcode height and width
+                    sprites[row].append(DFTileSpriteNode(type: tiles[row][col], height: 200, width: 100))
+                } else {
+                    sprites[row].append(DFTileSpriteNode(type: tiles[row][col], size: CGFloat(tileSize)))
+                }
+                sprites[row][col].position = CGPoint(x: x, y: y)
             }
         }
         return sprites
@@ -218,7 +239,7 @@ class Renderer : SKSpriteNode {
         InputQueue.append(Input(.animationsFinished, endTiles))
     }
     
-    func animate(_ transformation: [TileTransformation]?, _ completion: (() -> Void)? = nil) {
+    func animate(_ transformation: [TileTransformation]?,_ animateFall: Bool = false, _ completion: (() -> Void)? = nil) {
         guard let transformation = transformation else { return }
         var childActionDict : [SKNode : SKAction] = [:]
         for transIdx in 0..<transformation.count {
@@ -228,11 +249,18 @@ class Renderer : SKSpriteNode {
             let point = CGPoint.init(x: tileSize * CGFloat(trans.initial.tuple.1) + bottomLeft.x,
                                      y: outOfBounds + tileSize * CGFloat(trans.initial.x) + bottomLeft.y)
             for child in spriteForeground.children {
-                if child.contains(point), child is DFTileSpriteNode {
+                if child.contains(point), let childType = (child as? DFTileSpriteNode)?.type {
                     let endPoint = CGPoint.init(x: tileSize * CGFloat(trans.end.y) + bottomLeft.x,
                                                 y: tileSize * CGFloat(trans.end.x) + bottomLeft.y)
                     let animation = SKAction.move(to: endPoint, duration: AnimationSettings.fallSpeed)
-                    childActionDict[child] = animation
+                    if animateFall, childType == TileType.player(.zero) {
+                        let fall = SKAction.animate(with: fallAnimation, timePerFrame: 0.05)
+                        let group = SKAction.group([fall, animation])
+                        childActionDict[child] = group
+                    } else {
+                        childActionDict[child] = animation
+                    }
+                    
                     break
                 }
             }
@@ -288,7 +316,7 @@ extension Renderer {
         
         //animation "shiftDown" transformation
         var count = shiftDown.count
-        animate(shiftDown) { [weak self] in
+        animate(shiftDown, true) { [weak self] in
             guard let strongSelf = self else { return }
             count -= 1
             if count == 0 {

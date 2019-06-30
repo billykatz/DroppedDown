@@ -16,6 +16,13 @@ class DFTileSpriteNode: SKSpriteNode {
         super.init(texture: SKTexture(imageNamed: type.textureString()), color: .clear, size: CGSize.init(width: size, height: size))
     }
     
+    init(type: TileType, height: CGFloat, width: CGFloat) {
+        self.type = type
+        super.init(texture: SKTexture(imageNamed: type.textureString()),
+                   color: .clear,
+                   size: CGSize.init(width: width, height: height))
+    }
+    
     required init?(coder aDecoder: NSCoder) { fatalError("DFTileSpriteNode init?(coder:) is not implemented") }
     
     func animatedPlayerAction() -> SKAction {

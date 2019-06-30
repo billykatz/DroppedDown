@@ -15,6 +15,24 @@ extension Int: Sequence {
     }
 }
 
+func entities() -> [EntityModel] {
+    guard let data = try! Data.data(from: "EntityTest") else {
+        return []
+    }
+    do {
+        return try JSONDecoder().decode(EntitiesModel.self, from: data).entities
+    }
+    catch {
+        fatalError("\(error)")
+    }
+}
+
+extension Board {
+    convenience init(tiles: [[TileType]]) {
+        self.init(tiles: tiles, tileCreator: TileCreator(entities()))
+    }
+}
+
 typealias Builder = (Board) -> Board
 infix operator >>>
 func >>>(builder1: @escaping Builder, builder2: @escaping Builder) -> Builder { return { board in builder2(builder1(board)) }
@@ -76,6 +94,7 @@ extension TileType {
     }
 }
 
+
 /*
  +----------+-----------------------------+------------------------------------------------+
  |          |         Player Yes          |                   Player No                    |
@@ -87,8 +106,8 @@ extension TileType {
 func win(_ board: Board) -> Builder {
     return { board in
         guard board.boardSize > 1 else { return board } //cant win if there is only 1 row
-        let playerPosition = board.getTilePosition(.player(.zero))
-        let exitPosition = board.getTilePosition(.exit)
+        let playerPosition = typeCount(for: board.tiles, of: .player(.zero)).first
+        let exitPosition = typeCount(for: board.tiles, of: .exit).first
         var newTiles = board.tiles
         
         if let pp = playerPosition, let ep = exitPosition {
@@ -152,7 +171,7 @@ func playerAttacks(_ board: Board,
                    _ player: TileType = .player(.zero)) -> Builder {
     return { board in
         guard board.boardSize > 1 else { return board }
-        let playerPosition = board.getTilePosition(.player(.zero))
+        let playerPosition = typeCount(for: board.tiles, of: .player(.zero)).first
         var newTiles = board.tiles
         
         if let pp = playerPosition{

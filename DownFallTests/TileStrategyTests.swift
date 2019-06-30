@@ -31,7 +31,7 @@ class TileStrategyTests: XCTestCase {
         for i in testBoardSize+1 { // 0,1,2,3
             let compose =  allBlack >>> xRows(i, .empty, board)
             let composedBoard = compose(board)
-            let newTiles = TileCreator([.zero]).tiles(for: composedBoard)
+            let newTiles = TileCreator(entities()).tiles(for: composedBoard.tiles)
             XCTAssertEqual(newTiles.count, i*testBoardSize, "TileGod adds \(i) tiles if there are \(i) empty")
         }
         
@@ -41,30 +41,29 @@ class TileStrategyTests: XCTestCase {
         let exit = xTiles(1, .exit, board)
         let emptyButOne = empty >>> exit
         
-        var newTiles = TileCreator([.zero]).tiles(for: emptyButOne(board))
+        var newTiles = TileCreator(entities()).tiles(for: emptyButOne(board).tiles)
         XCTAssertFalse(newTiles.contains(.exit), "Tile God should not suggest adding another exit")
         
-        newTiles = TileCreator([.zero]).tiles(for: empty(board))
+        newTiles = TileCreator(entities()).tiles(for: empty(board).tiles)
         XCTAssertEqual(newTiles.filter { $0 == .exit }.count, 1, "Tile God suggest adding only 1 exit")
     }
     
     func testTileStrategyAddsCorrectNumberExtraPlayer() {
-        var newTiles = TileCreator([.zero]).tiles(for: emptyButOnePlayer(board))
+        var newTiles = TileCreator(entities()).tiles(for: emptyButOnePlayer(board).tiles)
         XCTAssertFalse(newTiles.contains(.player(.zero)), "Tile God should not suggest adding another player")
         
-        newTiles = TileCreator([.zero]).tiles(for: empty(board))
+        newTiles = TileCreator(entities()).tiles(for: empty(board).tiles)
         XCTAssertEqual(newTiles.filter{ $0 == .player(.zero) }.count, 1, "Tile God should suggest adding 1 player")
     }
     
     func testTileStrategyAddsCorrectNumberOfMonstersForDifferentDifficulties() {
         for _ in 0..<3 { //repeat these test so can be more confident that not too many monsters are being added
             [Difficulty.easy, Difficulty.normal, Difficulty.hard].forEach { difficulty in
-                let newTiles = TileCreator([.zero]).tiles(for: emptyButOnePlayer(board), difficulty: difficulty)
+                let newTiles = TileCreator(entities()).tiles(for: emptyButOnePlayer(board).tiles, difficulty: difficulty)
                 let monsterCount = newTiles.filter { $0 == .monster(.zero) }.count
                 let maxExpectedMonsters = difficulty.maxExpectedMonsters(for: emptyButOnePlayer(board))
                 //TODO: fix test when we add back monsters
-//                XCTAssertTrue(monsterCount <= TileCreator([]).maxMonsters, "Tile God should add some monsters")
-//                XCTAssertTrue(monsterCount <= maxExpectedMonsters, "Tile God added \(monsterCount), that's \(monsterCount - maxExpectedMonsters) too many")
+                XCTAssertTrue(monsterCount <= 4, "Tile God added \(monsterCount), that's \(monsterCount - maxExpectedMonsters) too many")
             }
         }
     }

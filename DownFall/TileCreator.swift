@@ -10,16 +10,6 @@ import GameplayKit
 
 class TileCreator: TileStrategy {
     
-    func typeCount(for tiles: [[TileType]], of type: TileType) -> [TileCoord] {
-        var tileCoords: [TileCoord] = []
-        for (i, _) in tiles.enumerated() {
-            for (j, _) in tiles[i].enumerated() {
-                tiles[i][j] == type ? tileCoords.append(TileCoord(i, j)) : ()
-            }
-        }
-        return tileCoords
-    }
-    
     func randomTile(_ given: Int) -> TileType {
         let index = abs(given) % TileType.allCases.count
         switch TileType.allCases[index] {
@@ -41,8 +31,11 @@ class TileCreator: TileStrategy {
         }
     }
     
-    let maxMonsters = 2
-    let maxGems = 1
+    func randomRock(_ given: Int) -> TileType {
+        let index = abs(given) % TileType.rockCases.count
+        return TileType.rockCases[index]
+    }
+
     var spawnedGem = false
     var randomSource = GKLinearCongruentialRandomSource()
     var entities: [EntityModel]
@@ -76,12 +69,6 @@ class TileCreator: TileStrategy {
                 {
                     newTiles.append(nextTile)
                 }
-//            case .item(let item):
-//                if  item.type == .gem,
-//                    !spawnedGem {
-//                    newTiles.append(nextTile)
-//                    spawnedGem = true
-//                }
             case .monster:
                 if currentMonsterCount + newMonsterCount < maxMonsters  {
                     newMonsterCount += 1
@@ -106,15 +93,13 @@ class TileCreator: TileStrategy {
         
         var newTiles: [TileType] = []
         while (newTiles.count < boardSize * boardSize) {
-            let nextTile = randomTile(randomSource.nextInt())
+            let nextTile = randomRock(randomSource.nextInt())
             
             switch nextTile {
             case .blueRock, .blackRock, .greenRock:
                 newTiles.append(nextTile)
-            case .empty:
-                ()
-            case .exit, .player, .monster, .item:
-                ()
+            case .exit, .player, .monster, .item, .empty:
+                assertionFailure("randomRock should only create rocks")
             }
         }
         

@@ -36,8 +36,14 @@ class GameScene: SKScene {
     //TileCreator
     private var tileCreator: TileCreator?
     
+    //Generator
+    private var generator: HapticGenerator?
+    
     //playable margin
     private var playableRect: CGRect?
+    
+    //touch state
+    private var touchWasSwipe = false
 
     required init?(coder aDecoder: NSCoder) { super.init(coder: aDecoder) }
     
@@ -51,6 +57,7 @@ class GameScene: SKScene {
         difficulty = diff
         board = Board.build(size: bsize, tileCreator: tileCreator!)
         boardSize = bsize
+        generator = HapticGenerator()
     }
     
     override func didMove(to view: SKView) {
@@ -60,11 +67,11 @@ class GameScene: SKScene {
         //Adjust the playbale rect depending on the size of the device
         let maxAspectRatio : CGFloat = 19.5/9.0
         let playableWidth = size.height / maxAspectRatio
-        let playableRect = CGRect(x: -playableWidth/2,
+        playableRect = CGRect(x: -playableWidth/2,
                               y: -size.height/2,
                               width: playableWidth,
                               height: size.height)
-        self.renderer = Renderer(playableRect: playableRect,
+        self.renderer = Renderer(playableRect: playableRect!,
                                  foreground: foreground,
                                  board: board,
                                  precedence: Precedence.foreground)
@@ -72,9 +79,14 @@ class GameScene: SKScene {
         let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(tripleTap))
         tapRecognizer.numberOfTapsRequired = 3
         view.addGestureRecognizer(tapRecognizer)
+
+        let swipeUpGestureReconizer = UISwipeGestureRecognizer(target: self, action: #selector(swipedUp))
+        swipeUpGestureReconizer.direction = .up
+        view.addGestureRecognizer(swipeUpGestureReconizer)
         
-        view.addSubview(createLeftSwipeView(playableWidth))
-        view.addSubview(createRightSwipeView(playableWidth))
+        let swipeDownGestureReconizer = UISwipeGestureRecognizer(target: self, action: #selector(swipedDown))
+        swipeDownGestureReconizer.direction = .down
+        view.addGestureRecognizer(swipeDownGestureReconizer)
         
         Dispatch.shared.register { [weak self] input in
             if input.type == .playAgain {
@@ -83,73 +95,86 @@ class GameScene: SKScene {
         }
     }
     
+    @objc func swipedUp(_ gestureRecognizer: UISwipeGestureRecognizer) {
+        let location = gestureRecognizer.location(in: self.view)
+        if isInRightHalf(location) {
+            touchWasSwipe = true
+            rotateLeft()
+        }
+    }
+    
+    @objc func swipedDown(_ gestureRecognizer: UISwipeGestureRecognizer) {
+        let location = gestureRecognizer.location(in: self.view)
+        if isInRightHalf(location) {
+            touchWasSwipe = true
+            rotateRight()
+        }
+    }
 }
 
-// MARK: - Swipe Controls
+//MARK: - Rotate
+extension GameScene {
+    func rotateRight() {
+        let input = Input(.rotateRight)
+        InputQueue.append(input)
+    }
+    func rotateLeft() {
+        let input = Input(.rotateLeft)
+        InputQueue.append(input)
+    }
+}
+
+//MARK: - Coordinate Math
 
 extension GameScene {
-    
-    private func createRightSwipeView(_ playableWidth: CGFloat) -> SKView {
-        let rightSubView = SKView(frame: CGRect(x: self.view!.frame.width/2,
-                                                y: -size.height/2,
-                                                width: playableWidth/2,
-                                                height: size.height))
-        rightSubView.allowsTransparency = true
-        rightSubView.backgroundColor = .clear
-        rightSubView.alpha = 0.05
-        
-        let rightHalfSwipeUpRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(rightHalfSwipeUp))
-        rightHalfSwipeUpRecognizer.direction = .up
-        
-        let rightHalfSwipeDownRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(rightHalfSwipeDown))
-        rightHalfSwipeDownRecognizer.direction = .down
-        
-        rightSubView.addGestureRecognizer(rightHalfSwipeUpRecognizer)
-        rightSubView.addGestureRecognizer(rightHalfSwipeDownRecognizer)
-        return rightSubView
+//    func isInTopHalf(_ location: CGPoint) -> Bool {
+//        return topHalf().contains(location)
+//    }
+//    func isInBottomHalf(_ location: CGPoint) -> Bool {
+//        return bottomHalf().contains(location)
+//    }
+    func isInRightHalf(_ location: CGPoint) -> Bool {
+        return rightHalf().contains(location)
     }
+//
+//    func topHalf() -> CGRect {
+//        guard let playableRect = playableRect,
+//            let viewRect = self.view?.frame else { fatalError("No playable rect calculated") }
+//        return CGRect(x: viewRect.width/2 - playableRect.width/2,
+//                      y: viewRect.height/2 - playableRect.height/2,
+//                      width: playableRect.width,
+//                      height: playableRect.height/2)
+//
+//
+//    }
     
+//    func bottomHalf() -> CGRect {
+//        guard let playableRect = playableRect,
+//            let viewRect = self.view?.frame else { fatalError("No playable rect calculated") }
+//        return CGRect(x: viewRect.width/2 - playableRect.width/2,
+//                      y: viewRect.height/2,
+//                      width: playableRect.width,
+//                      height: playableRect.height/2)
+//
+//
+//    }
     
-    private func createLeftSwipeView(_ playableWidth: CGFloat) -> SKView {
-        let leftSubView = SKView(frame: CGRect(x: (self.view!.frame.width/2) - (playableWidth/2),
-                                                y: -size.height/2,
-                                                width: playableWidth/2,
-                                                height: size.height))
-        leftSubView.alpha = 0.05
-        leftSubView.backgroundColor = .clear
-        leftSubView.allowsTransparency = true
-        let leftHalfSwipeUpRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(leftHalfSwipeUp))
-        leftHalfSwipeUpRecognizer.direction = .up
-        
-        let leftHalfSwipeDownRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(leftHalfSwipeDown))
-        leftHalfSwipeDownRecognizer.direction = .down
-        
-        leftSubView.addGestureRecognizer(leftHalfSwipeUpRecognizer)
-        leftSubView.addGestureRecognizer(leftHalfSwipeDownRecognizer)
-        leftSubView.backgroundColor = .clear
-        return leftSubView
+    func rightHalf() -> CGRect {
+        guard let playableRect = playableRect,
+            let viewRect = self.view?.frame else { fatalError("No playable rect calculated") }
+        return CGRect(x: viewRect.width/2,
+                      y: viewRect.height/2 - playableRect.height/2,
+                      width: playableRect.width/2,
+                      height: playableRect.height)
+
     }
+
     
-    @objc func rightHalfSwipeUp(_ sender: UITapGestureRecognizer) {
-        let input = Input(.rotateLeft)
-        InputQueue.append(input)
-    }
-    
-    @objc func rightHalfSwipeDown(_ sender: UITapGestureRecognizer) {
-        let input = Input(.rotateRight)
-        InputQueue.append(input)
-    }
-    
-    @objc func leftHalfSwipeDown(_ sender: UITapGestureRecognizer) {
-        let input = Input(.rotateLeft)
-        InputQueue.append(input)
-    }
-    
-    @objc func leftHalfSwipeUp(_ sender: UITapGestureRecognizer) {
-        let input = Input(.rotateRight)
-        InputQueue.append(input)
-    }
-    
+}
+
+// MARK: - Debug
+
+extension GameScene {
     
     @objc func tripleTap(_ sender: UITapGestureRecognizer) {
         
@@ -189,7 +214,13 @@ extension GameScene {
 // MARK: - Touch Relay
 
 extension GameScene {
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        touchWasSwipe = false
+    }
+    
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        self.renderer?.touchesEnded(touches, with: event)
+        if !touchWasSwipe {
+            self.renderer?.touchesEnded(touches, with: event)
+        }
     }
 }

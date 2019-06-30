@@ -11,6 +11,9 @@
 		3D30A4222216888300AFA1E1 /* RendererTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D30A4212216888300AFA1E1 /* RendererTests.swift */; };
 		3D30A4292216899E00AFA1E1 /* BoardMocker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D30A4232216892A00AFA1E1 /* BoardMocker.swift */; };
 		3D30A42B2217F63500AFA1E1 /* TileCoord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D30A42A2217F63500AFA1E1 /* TileCoord.swift */; };
+		3D4F569222B2D087003695D8 /* SpriteSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4F569122B2D087003695D8 /* SpriteSheet.swift */; };
+		3D4F569422B33B44003695D8 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4F569322B33B44003695D8 /* Helpers.swift */; };
+		3D4F569622B88A90003695D8 /* HapticGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4F569522B88A90003695D8 /* HapticGenerator.swift */; };
 		3D528FD62154A50300EF65CA /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3D528FD52154A50300EF65CA /* GameScene.sks */; };
 		3D528FDF2155BD7300EF65CA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3D528FDE2155BD7200EF65CA /* Assets.xcassets */; };
 		3D58468822A6322900EDD845 /* RangeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D58468722A6322900EDD845 /* RangeModel.swift */; };
@@ -84,6 +87,9 @@
 		3D30A4212216888300AFA1E1 /* RendererTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RendererTests.swift; sourceTree = "<group>"; };
 		3D30A4232216892A00AFA1E1 /* BoardMocker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardMocker.swift; sourceTree = "<group>"; };
 		3D30A42A2217F63500AFA1E1 /* TileCoord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileCoord.swift; sourceTree = "<group>"; };
+		3D4F569122B2D087003695D8 /* SpriteSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteSheet.swift; sourceTree = "<group>"; };
+		3D4F569322B33B44003695D8 /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
+		3D4F569522B88A90003695D8 /* HapticGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticGenerator.swift; sourceTree = "<group>"; };
 		3D528FD52154A50300EF65CA /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
 		3D528FDE2155BD7200EF65CA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3D58468722A6322900EDD845 /* RangeModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RangeModel.swift; sourceTree = "<group>"; };
@@ -320,7 +326,10 @@
 				3DF2925720A37FEE006671AC /* Main.storyboard */,
 				3DF2925C20A37FF0006671AC /* LaunchScreen.storyboard */,
 				3DF2925F20A37FF0006671AC /* Info.plist */,
+				3D4F569522B88A90003695D8 /* HapticGenerator.swift */,
 				3D18A39C224D68D300343C29 /* Dispatch.swift */,
+				3D4F569122B2D087003695D8 /* SpriteSheet.swift */,
+				3D4F569322B33B44003695D8 /* Helpers.swift */,
 			);
 			path = DownFall;
 			sourceTree = "<group>";
@@ -477,11 +486,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				3DA4E888228E7448006E90D1 /* BMGlyphLabel.swift in Sources */,
+				3D4F569422B33B44003695D8 /* Helpers.swift in Sources */,
 				3DF2925420A37FEE006671AC /* GameScene.swift in Sources */,
 				3D5FB09420AE768700ACD716 /* AnimationSettings.swift in Sources */,
 				3DF2925620A37FEE006671AC /* GameViewController.swift in Sources */,
 				3D7EF45C21D18D9000A2D9E8 /* Transformation.swift in Sources */,
 				3D6AACE4222CD38E00C77B24 /* Controls.swift in Sources */,
+				3D4F569622B88A90003695D8 /* HapticGenerator.swift in Sources */,
 				3D7EF45E21D18DAB00A2D9E8 /* TileTransformation.swift in Sources */,
 				3DB270A722AE065300D9BF8B /* Data+Extensions.swift in Sources */,
 				3DF2928520A76242006671AC /* Board.swift in Sources */,
@@ -510,6 +521,7 @@
 				3D9C506021FE206000A2210D /* Renderer.swift in Sources */,
 				3DA4E88F228FC860006E90D1 /* SKNode+Extension.swift in Sources */,
 				3DC9CA1321D1DDD4004D05D5 /* Difficulty.swift in Sources */,
+				3D4F569222B2D087003695D8 /* SpriteSheet.swift in Sources */,
 				3D7D8B332253E5BC0016FE4C /* HUD.swift in Sources */,
 				3D18A39D224D68D300343C29 /* Dispatch.swift in Sources */,
 				3D7D8B2D2252857E0016FE4C /* CombatHelper.swift in Sources */,

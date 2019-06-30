@@ -244,11 +244,11 @@ struct PlayState: GameState {
         case .pause:
             return AnyGameState(PauseState())
         case .attack, .touch, .monsterDies,
-             .rotateLeft, .rotateRight:
+             .rotateLeft, .rotateRight, .collectItem:
             return AnyGameState(ComputingState())
         case .boardBuilt:
             return AnyGameState(PlayState())
-        case .animationsFinished, .play, .transformation, .reffingFinished, .playAgain, .collectItem:
+        case .animationsFinished, .play, .transformation, .reffingFinished, .playAgain:
             return nil
         }
 

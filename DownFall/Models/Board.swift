@@ -48,7 +48,7 @@ class Board: Equatable {
             transformation = monsterDied(at: tileCoord)
         case .gameWin:
             transformation = gameWin()
-        case .collectItem(let tileCoord, let item):
+        case .collectItem(let tileCoord, _):
             transformation = collectItem(at: tileCoord)
         @unknown default:
             // We dont care about these inputs, intentionally do nothing
@@ -69,7 +69,7 @@ class Board: Equatable {
 
     
     // MARK: - Helpers
-    func getTilePosition(_ type: TileType) -> TileCoord? {
+    private func getTilePosition(_ type: TileType) -> TileCoord? {
         for i in 0..<tiles.count {
             for j in 0..<tiles[i].count {
                 if tiles[i][j] == type {
@@ -351,8 +351,6 @@ extension Board {
 
 extension Board {
     static func build(size: Int,
-                      playerPosition: TileCoord? = nil,
-                      exitPosition: TileCoord? = nil,
                       tileCreator: TileCreator,
                       difficulty: Difficulty = .normal) -> Board {
         
@@ -446,8 +444,6 @@ extension Board {
 
 // MARK - Tile counts
 
-
-
 extension Board {
     func tiles(of type: TileType) -> [TileCoord] {
         var tileCoords: [TileCoord] = []
@@ -458,10 +454,9 @@ extension Board {
         }
         return tileCoords
     }
-    
 }
 
-extension Array where Element : Collection, Element.Index == Int {
+extension Array where Element: Collection, Element.Index == Int {
     subscript(tileCoord: TileCoord) -> Element.Iterator.Element {
         return self[tileCoord.x][tileCoord.y]
     }

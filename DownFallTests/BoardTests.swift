@@ -28,7 +28,7 @@ struct MockBoardHelper {
     }
     
     static func createBoard(_ type: TileType = .greenRock, size: Int = 5) -> Board {
-        let tc = TileCreator([.zero])
+        let tc = TileCreator(entities())
         return Board(tiles: Array(repeating: row(of: type, by: size),  count: size), tileCreator: tc)
     }
     
@@ -38,7 +38,7 @@ struct MockBoardHelper {
         for col in 0..<size {
             tiles[rowIdx][col] = type
         }
-        return Board(tiles: tiles, tileCreator:  board.tileCreator!)
+        return Board(tiles: tiles, tileCreator:  board.tileCreator)
     }
 }
 
@@ -53,10 +53,8 @@ class BoardTests: XCTestCase {
         self.tiles = [[TileType.player(.zero), .exit, .blueRock],
                   [.blueRock, .blueRock, .blueRock],
                   [.blueRock, .blueRock, .blueRock]]
-        self.board = Board.init(tiles: tiles,
-                                tileCreator: TileCreator([.zero]),
-                                playerPosition: TileCoord(0,0),
-                                exitPosition: TileCoord(0,1))
+        self.board = Board(tiles: tiles,
+                           tileCreator: TileCreator(entities()))
     }
     
     func testValidNeighbors() {
@@ -170,7 +168,7 @@ class BoardTests: XCTestCase {
 
     func testFindNeighbors () {
         let expectedNeighbors: [TileCoord] = [(0,2), (1,2), (2,2), (1,1), (1,0), (2,0), (2,1)].map { TileCoord($0.0, $0.1) }
-        let actualNeighbors = board.findNeighbors(1, 1)
+        let actualNeighbors = board.findNeighbors(TileCoord(1, 1))
         XCTAssertEqual(Set(actualNeighbors), Set(expectedNeighbors), "Neighbors found do not match")
         
     }
@@ -180,15 +178,13 @@ class BoardTests: XCTestCase {
                                    [.blackRock, .greenRock, .blackRock],
                                    [.blueRock, .blackRock, .blueRock]]
         
-        let board = Board.init(tiles: tiles,
-                               playerPosition: TileCoord(0,0),
-                               exitPosition: TileCoord(0,1))
-        let actualFoundNeighbors = board.findNeighbors(1,1)
+        let board = Board(tiles: tiles)
+        let actualFoundNeighbors = board.findNeighbors(TileCoord(1,1))
         XCTAssertTrue(actualFoundNeighbors.count == 1, "No neighbors found, inital and after board should be equal")
     }
     
     func testInvalidInputFindNeighbors() {
-        let actualFoundNeighbors = board.findNeighbors(-1,-1)
+        let actualFoundNeighbors = board.findNeighbors(TileCoord(-1,-1))
         XCTAssertTrue(actualFoundNeighbors.isEmpty, "Invalid input, inital and after board should be equal")
     }
     
@@ -202,9 +198,7 @@ class BoardTests: XCTestCase {
                                           [.greenRock, .blueRock, .exit],
                                           [.blueRock, .blackRock, .blueRock]]
         
-        let initalBoard = Board.init(tiles: tiles,
-                                     playerPosition: TileCoord(0,0),
-                                     exitPosition: TileCoord(0,1))
+        let initalBoard = Board(tiles: tiles)
         
         let acutalRotatedBoard = initalBoard.rotate(.left).endTiles
         XCTAssertEqual(acutalRotatedBoard, rotatedTiles, "Inital board should match expected result board after 90 degree rotate left")
@@ -221,9 +215,7 @@ class BoardTests: XCTestCase {
                                           [.exit, .blueRock, .greenRock],
                                           [TileType.player(.zero), .greenRock, .blueRock]]
         
-        let initalBoard = Board.init(tiles: tiles,
-                                     playerPosition: TileCoord(0,0),
-                                     exitPosition: TileCoord(0,1))
+        let initalBoard = Board(tiles: tiles)
         
         let acutalRotatedBoard = initalBoard.rotate(.right).endTiles
         XCTAssert(acutalRotatedBoard == rotatedTiles, "Inital board should match expected result board after 90 degree rotate right")
@@ -292,14 +284,13 @@ class BoardTests: XCTestCase {
     }
     
     func testBoardValidMonsters() {
-        let monster = TileType.monster(.zero)
-        let givenTiles = [[TileType.player(.zero), monster, .blueRock],
+        let givenTiles = [[TileType.normalPlayer, .normalMonster, .blueRock],
                           [.blueRock, .exit, .blueRock],
                           [.blueRock, .blueRock, .blueRock]]
         
         let expectedTiles: [[TileType]] = [[.deadPlayer, .monsterThatHasAttacked, .blueRock],
-                             [.blueRock, .exit, .blueRock],
-                             [.blueRock, .blueRock, .blueRock]]
+                                           [.blueRock, .exit, .blueRock],
+                                           [.blueRock, .blueRock, .blueRock]]
         let actualBoard = Board(tiles: givenTiles).attack(TileCoord(0, 1), TileCoord(0, 0)).endTiles
         XCTAssertEqual(expectedTiles, actualBoard, "Board applies Monster's attack damage to Player's hp.")
         

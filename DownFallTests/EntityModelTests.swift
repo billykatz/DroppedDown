@@ -14,22 +14,22 @@ import XCTest
 class EntityModelTests: XCTestCase {
     
     func testEntityModelParsingFromData() {
-        guard let data = try! data(from: "EntityTest") else {
+        guard let data = try! Data.data(from: "EntityTest") else {
             XCTFail("Failed to json file");
             return
         }
         do {
-            let entity = try JSONDecoder().decode(EntityModel.self, from: data)
+            let entity = try JSONDecoder().decode(EntitiesModel.self, from: data).entities.first!
             XCTAssertEqual(entity.hp, 1)
             XCTAssertEqual(entity.name, "Gloop")
             
             let expectedRangeModel = RangeModel(lower: 1, upper: 1)
-            let expectedAnimationPaths = URL(string: "Animations/gloop.png")!
+            let expectedAnimationPaths = "Animations/gloop.png"
             let expectedAttackModel = AttackModel(frequency: 0,
                                                   range: expectedRangeModel,
                                                   damage: 1,
                                                   directions: [.east, .west],
-                                                  animationPaths: [],
+                                                  animationPaths: [expectedAnimationPaths],
                                                   hasAttacked: false)
             XCTAssertEqual(entity.attack.frequency, expectedAttackModel.frequency)
             XCTAssertEqual(entity.attack.range, expectedAttackModel.range)
@@ -52,18 +52,6 @@ class EntityModelTests: XCTestCase {
             } catch {
                 // handle error
                 print(error)
-            }
-        }
-        return nil
-    }
-    
-    func data(from fileName: String) throws -> Data? {
-        if let path = Bundle(for: type(of: self)).path(forResource: fileName, ofType: "json") {
-            do {
-                return try Data(contentsOf: URL(fileURLWithPath: path), options: .mappedIfSafe)
-            }
-            catch {
-                fatalError()
             }
         }
         return nil

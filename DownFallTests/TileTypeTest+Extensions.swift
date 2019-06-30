@@ -16,7 +16,7 @@ extension TileType {
     
     
     static var deadPlayer: TileType {
-        return TileType.monster(EntityModel(hp: 0, name: "player2", attack: AttackModel(frequency: 0, range: .one, damage: 1, directions: [.east, .west], animationPaths: [], hasAttacked: false), type: .player, carry: .zero))
+        return TileType.player(EntityModel(hp: 0, name: "player2", attack: AttackModel(frequency: 0, range: .one, damage: 1, directions: [.east, .west], animationPaths: [], hasAttacked: false), type: .player, carry: .zero))
     }
 
     
@@ -33,12 +33,23 @@ extension TileType {
         return TileType.monster(EntityModel(hp: 1, name: "Gloop", attack: AttackModel(frequency: 0, range: .one, damage: 1, directions: [.east, .west], animationPaths: [], hasAttacked: false), type: .monster, carry: .zero))
     }
     
+    
+    static var pickAxeMonster: TileType {
+        return TileType.monster(EntityModel(hp: 1, name: "Gloop", attack: AttackModel(frequency: 0, range: .one, damage: 1, directions: [.south], animationPaths: [], hasAttacked: false), type: .monster, carry: .zero))
+    }
+
+    
     static var  healthyMonster: TileType {
         return TileType.monster(EntityModel(hp: 5, name: "Gloop", attack: AttackModel(frequency: 0, range: .one, damage: 1, directions: [.east, .west], animationPaths: [], hasAttacked: false), type: .monster, carry: .zero))
     }
     
     
+    static var normalPlayer: TileType {
+        return TileType.player(EntityModel(hp: 1, name: "player2", attack: AttackModel(frequency: 0, range: .one, damage: 1, directions: [.south], animationPaths: [], hasAttacked: false), type: .player, carry: .zero))
+    }
+
+    
     static var strongPlayer: TileType {
-        return TileType.monster(EntityModel(hp: 2, name: "playe2", attack: AttackModel(frequency: 0, range: .one, damage: 2, directions: [.south], animationPaths: [], hasAttacked: false), type: .player, carry: .zero))
+        return TileType.player(EntityModel(hp: 2, name: "player2", attack: AttackModel(frequency: 0, range: .one, damage: 2, directions: [.south], animationPaths: [], hasAttacked: false), type: .player, carry: .zero))
     }
 }

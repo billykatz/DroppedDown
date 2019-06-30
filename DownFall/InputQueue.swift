@@ -104,7 +104,7 @@ struct InputQueue {
         if gameState.shouldAppend(input) {
             queue.append(input)
         }
-        debugPrint("ATTEMP TO APPEND: \(input) and gameState: \(given.state)")
+//        debugPrint("ATTEMP TO APPEND: \(input) and gameState: \(given.state)")
         
 //        let debugString : String
 //        if gameState.shouldAppend(input) {
@@ -130,7 +130,7 @@ struct InputQueue {
                 }
             return nil
         }
-        debugPrint(#"POPPING: \#(input) \#n\#tBefore: \#(gameState.state) \#n\#tAfter: \#(transition.state)"#)
+//        debugPrint(#"POPPING: \#(input) \#n\#tBefore: \#(gameState.state) \#n\#tAfter: \#(transition.state)"#)
         
         queue = Array(queue.dropFirst())
         let oldGameState = gameState

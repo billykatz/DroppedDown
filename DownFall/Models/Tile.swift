@@ -8,6 +8,7 @@
 
 enum TileType: Equatable, Hashable, CaseIterable {
     
+    static var rockCases: [TileType] = [.blueRock, .blackRock, .greenRock]
     static var allCases: [TileType] = [.blueRock, .blackRock ,.greenRock, .player(.zero), .exit, .empty, .monster(.zero), .item(.zero)]
     typealias AllCases = [TileType]
 

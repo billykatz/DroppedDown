@@ -9,7 +9,7 @@
 import GameplayKit
 
 protocol TileStrategy {
-    static var randomSource: GKLinearCongruentialRandomSource { get }
-    static func tiles(for board: Board, difficulty: Difficulty) -> [TileType]
+    var randomSource: GKLinearCongruentialRandomSource { get }
+    func tiles(for tiles: [[TileType]], difficulty: Difficulty) -> [TileType]
 }
     

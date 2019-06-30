@@ -8,131 +8,117 @@
 
 import GameplayKit
 
-protocol TileCreatorResets {
-    static func reset()
-}
-
-struct TileCreator: TileStrategy {
+class TileCreator: TileStrategy {
     
-    static func randomTile(_ given: Int) -> TileType {
+    func randomTile(_ given: Int) -> TileType {
         let index = abs(given) % TileType.allCases.count
-        return TileType.allCases[index]
+        switch TileType.allCases[index] {
+        case .item:
+            if randomSource.nextInt().isMultiple(of: 2) {
+                return TileType.gem
+            } else {
+                return TileType.empty
+            }
+        case .monster:
+            if randomSource.nextInt().isMultiple(of: 2), !spawnedGem {
+                spawnedGem = true
+                return TileType.monster(entities[1])
+            } else {
+                return TileType.monster(entities[0])
+            }
+        default:
+            return TileType.allCases[index]
+        }
     }
     
-    static let maxMonsters = 2
-    static let maxGems = 1
-    static var spawnedGem = false
+    func randomRock(_ given: Int) -> TileType {
+        let index = abs(given) % TileType.rockCases.count
+        return TileType.rockCases[index]
+    }
+
+    var spawnedGem = false
+    var randomSource = GKLinearCongruentialRandomSource()
+    var entities: [EntityModel]
     
-    static func tiles(for board: Board, difficulty: Difficulty = .normal) -> [TileType] {
+    
+    init(_ entities: [EntityModel]) {
+        self.entities = entities
+    }
+    
+    func tiles(for tiles: [[TileType]], difficulty: Difficulty = .normal) -> [TileType] {
         var newTiles: [TileType] = []
         var newMonsterCount = 0
-        let maxMonsters = 6
-        let currentMonsterCount = board.tiles(of: .greenMonster()).count
-        while (newTiles.count < board.tiles(of: .empty).count) {
+        let maxMonsters = 4
+        let currentMonsterCount =  typeCount(for: tiles, of: .monster(.zero)).count
+        while (newTiles.count < typeCount(for: tiles, of: .empty).count) {
             let nextTile = randomTile(randomSource.nextInt())
             
             switch nextTile {
             case .player:
-                if board.tiles(of: .player()).count < 1 && !newTiles.contains(.player()) {
+                if typeCount(for: tiles, of: .player(.zero)).count < 1 && !newTiles.contains(.player(.zero)) {
                     newTiles.append(nextTile)
                 }
             case .blueRock, .blackRock, .greenRock:
                 newTiles.append(nextTile)
-            case .empty:
+            case .empty, .item:
                 ()
             case .exit:
-                if board.tiles(of: .exit).count < 1,
+                if typeCount(for: tiles, of: .exit).count < 1,
                     !newTiles.contains(.exit),
-                    !newTiles.contains(.gem1),
                     randomSource.nextInt().isMultiple(of: 3)
                 {
                     newTiles.append(nextTile)
                 }
-            case .greenMonster:
+            case .monster:
                 if currentMonsterCount + newMonsterCount < maxMonsters  {
                     newMonsterCount += 1
                     newTiles.append(nextTile)
-                }
-            case .gem1:
-                if randomSource.nextInt().isMultiple(of: 2),
-                    !newTiles.contains(.exit),
-                    !spawnedGem {
-                    newTiles.append(nextTile)
-                    spawnedGem = true
                 }
             }
         }
         return newTiles
     }
     
-    
-    
-    static func board(_ boardSize: Int, difficulty: Difficulty) -> [[TileType]] {
+    /**
+    Create a 2d Array of tile types
+    - Parameters:
+     - boardSize: The width and height of a board
+     - entities: An array of entities loaded from data
+     - difficulty: The level of difficuly
+ 
+    */
+    func board(_ boardSize: Int, difficulty: Difficulty) -> [[TileType]] {
         
-        func getNumber(of type: TileType, in tiles: [[TileType]]) -> Int {
-            var numberOf = 0
-            for i in 0..<tiles.count {
-                for j in 0..<tiles[i].count {
-                    if tiles[i][j] == type {
-                        numberOf += 1
-                    }
-                }
-            }
-            return numberOf
-        }
-
-        
-        var tiles: [[TileType]] = []
-        for row in 0..<boardSize {
-            tiles.append([])
-            for _ in 0..<boardSize {
-                tiles[row].append(TileType.empty)
-            }
-        }
-        
-        
+        //TODO: determine when we should add monsters to a new board
         
         var newTiles: [TileType] = []
-        var newMonsterCount = 0
-        let currentMonsterCount = 0
         while (newTiles.count < boardSize * boardSize) {
-            let nextTile = randomTile(randomSource.nextInt())
+            let nextTile = randomRock(randomSource.nextInt())
             
             switch nextTile {
             case .blueRock, .blackRock, .greenRock:
                 newTiles.append(nextTile)
-            case .empty, .exit, .gem1, .player:
-                ()
-            case .greenMonster:
-                if currentMonsterCount + newMonsterCount < maxMonsters  {
-                    newMonsterCount += 1
-                    newTiles.append(nextTile)
-                }
+            case .exit, .player, .monster, .item, .empty:
+                assertionFailure("randomRock should only create rocks")
             }
         }
         
+        var tiles: [[TileType]] = []
         var currIdx = 0
-        for row in 0..<tiles.count {
-            for col in 0..<tiles.count {
-                tiles[row][col] = newTiles[currIdx]
+        for row in 0..<boardSize {
+            tiles.append([])
+            for _ in 0..<boardSize {
+                tiles[row].append(newTiles[currIdx])
                 currIdx += 1
             }
         }
         let lowerbound = Int(Double(tiles.count) * 0.33)
         
         let playerPosition = TileCoord((Int.random(lowerbound) + lowerbound), (Int.random(lowerbound) + lowerbound))
-        tiles[playerPosition.x][playerPosition.y] = TileType.player()
+        tiles[playerPosition.x][playerPosition.y] = TileType.player(entities[2])
         
         return tiles
 
     }
-    
-    static var randomSource = GKLinearCongruentialRandomSource()
 
-}
-
-extension TileCreator: TileCreatorResets {
-    static func reset() {
-        spawnedGem = false
-    }
 }

@@ -23,7 +23,8 @@ class RendererTests: XCTestCase {
         greenBoard = all(.greenRock, board)
         renderer = Renderer(playableRect: CGRect.zero,
                                 foreground: SKNode(),
-                                board: greenBoard(board))
+                                board: greenBoard(board),
+                                precedence: .foreground)
     }
     
 //    func testAddSprites() {

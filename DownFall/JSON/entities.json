@@ -1,0 +1,70 @@
+{
+    "entities": [
+        { "name": "Gloop",
+            "type": "monster",
+            "hp": 1,
+            "attack": {
+                "frequency": 0,
+                "directions": ["east", "west"],
+                "damage": 1,
+                "range": {
+                    "lower": 1,
+                    "upper": 1
+                },
+                "animationPaths": ["Animations/gloop.png"],
+                "hasAttacked": false
+            },
+            "carry": {
+                "item": [{
+                    "type": "gold",
+                    "range": {
+                        "lower": 5,
+                        "upper": 10
+                    }
+                }]
+            }
+        },
+        { "name": "GloopWithGem",
+            "type": "monster",
+            "hp": 1,
+            "attack": {
+                "frequency": 0,
+                "directions": ["east", "west"],
+                "damage": 1,
+                "range": {
+                    "lower": 1,
+                    "upper": 1
+                },
+                "animationPaths": ["Animations/gloop.png"],
+                "hasAttacked": false
+            },
+            "carry": {
+                "item": [{
+                    "type": "gem1",
+                    "range": {
+                        "lower": 1,
+                        "upper": 1
+                    }
+                }]
+            }
+        },
+        { "name": "player2",
+            "type": "player",
+            "hp": 3,
+            "attack": {
+                "frequency": 0,
+                "directions": ["south"],
+                "damage": 1,
+                "range": {
+                    "lower": 1,
+                    "upper": 1
+                },
+                "animationPaths": ["Animations/player.png"],
+                "hasAttacked": false
+            },
+            "carry": {
+                "item": []
+            }
+        }
+    ]
+}

@@ -42,13 +42,13 @@ class HelperTextView: SKSpriteNode {
                     let attacker = tiles[attackerPosition]
                     let defender = tiles[defenderPosition]
                     
-                    if case let TileType.greenMonster(monsterData) = attacker,
-                        case let TileType.player(_) = defender{
+                    if case let TileType.monster(monsterData) = attacker,
+                        case TileType.player = defender{
                         // monster attacked player
                         
-                        descriptionText = "You've been attacked by a monster for \(monsterData.weapon.damage) damage.\n If you fall to 0 hp you lose"
-                    } else if case TileType.greenMonster(_) = defender,
-                        case TileType.player(_) = attacker {
+                        descriptionText = "You've been attacked by a monster for \(monsterData.attack.damage) damage.\n If you fall to 0 hp you lose"
+                    } else if case TileType.monster = defender,
+                        case TileType.player = attacker {
                         // we attacked the monster
                         descriptionText = "You slayed a monster, you're a worthy champion indeed!"
                     }
@@ -75,15 +75,13 @@ class HelperTextView: SKSpriteNode {
                 showGem = true
             case .player:
                 descriptionText = "That's you! Stay alive and find the exit"
-            case .greenMonster(let data):
+            case .monster(let data):
                 descriptionText = "That's a monster! It has \(data.hp) hp and attacks sideways  "
             case .empty:
                 descriptionText = "How in the hell did you tap on an empty tile?"
-            case .gem1:
-                descriptionText = "That's the gem I need to collect"
+            case .item(let item):
+                descriptionText = "That's \(item.textureName), cool!"
             }
-        case .collectGem:
-            descriptionText = "Nice! You got the gem, now head to the mine shaft"
         case .boardBuilt:
             descriptionText = "Hello there Adventurer\nYou'll need to navigate these mines \nand find the magical gem before \ncontinuing down the mine shaft"
             showExit = true

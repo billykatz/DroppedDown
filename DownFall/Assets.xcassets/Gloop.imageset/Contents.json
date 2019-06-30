@@ -2,7 +2,11 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "IMG_0086.png",
+      "filename" : "gloop.png",
+      "scale" : "1x"
+    },
+    {
+      "idiom" : "universal",
       "scale" : "1x"
     },
     {

@@ -10,9 +10,7 @@ import SpriteKit
 
 extension SKNode {
     func wasTouched(_ touches: Set<UITouch>, with event: UIEvent?) -> Bool {
-        guard let touch = touches.first else { return false }
+        guard let _ = touches.first else { return false }
         return true
-//        let nodes = self.nodes(at: touch.location(in: self))
-//        return nodes.contains { $0.name == self.name }
     }
 }

@@ -10,16 +10,17 @@ import UIKit
 import SpriteKit
 import GameplayKit
 
-
-
 class GameViewController: UIViewController {
 
     private var gameSceneNode: GameScene?
-    private var menuScene: Menu?
     private var boardSize = 7
+    private var entities: [EntityModel]?
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        //TODO: handle failure more gracefully. ie redownload or retry
+        let entityData = try! Data.data(from: "entities")!
+        entities = try! JSONDecoder().decode(EntitiesModel.self, from: entityData).entities
         startLevel()
     }
 
@@ -43,11 +44,12 @@ class GameViewController: UIViewController {
 extension GameViewController {
     private func startLevel() {
         gameSceneNode = nil
-        if let scene = GKScene(fileNamed: "GameScene")?.rootNode as? GameScene {
+        if let scene = GKScene(fileNamed: "GameScene")?.rootNode as? GameScene,
+            let entities = entities {
             gameSceneNode = scene
             gameSceneNode!.scaleMode = .aspectFill
             gameSceneNode!.gameSceneDelegate = self
-            gameSceneNode!.commonInit(boardSize: boardSize)
+            gameSceneNode!.commonInit(boardSize: boardSize, entities: entities)
             
             if let view = self.view as! SKView? {
                 view.presentScene(gameSceneNode)
@@ -64,30 +66,7 @@ extension GameViewController {
 }
 
 
-// MARK: - MenuDelegate
-extension GameViewController: MenuDelegate {
-    func didTapPrimary() {
-        startLevel()
-    }
-    
-    func didTapSecondary() {
-        //TODO: implement secondary button
-        print("did tap secondary")
-    }
-}
-
 extension GameViewController: GameSceneDelegate {
-    func shouldShowMenu(win: Bool) {
-        menuScene = nil
-        gameSceneNode = nil
-        guard let view = self.view as? SKView,
-            let menu = SKScene(fileNamed: "Menu") as? Menu else { return }
-        menu.menuDelegate = self
-        menuScene = menu
-        view.presentScene(menuScene)
-        menuScene?.configure(title: win ? "You Won :)" : "No Moves Left", primary: "Play Again?", delegate: self)
-    }
-    
     func reset() {
         let fadeOut = SKAction.fadeOut(withDuration: 1.5)
         let remove = SKAction.removeFromParent()

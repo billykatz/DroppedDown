@@ -15,6 +15,24 @@ extension Int: Sequence {
     }
 }
 
+func entities() -> [EntityModel] {
+    guard let data = try! Data.data(from: "EntityTest") else {
+        return []
+    }
+    do {
+        return try JSONDecoder().decode(EntitiesModel.self, from: data).entities
+    }
+    catch {
+        fatalError("\(error)")
+    }
+}
+
+extension Board {
+    convenience init(tiles: [[TileType]]) {
+        self.init(tiles: tiles, tileCreator: TileCreator(entities()))
+    }
+}
+
 typealias Builder = (Board) -> Board
 infix operator >>>
 func >>>(builder1: @escaping Builder, builder2: @escaping Builder) -> Builder { return { board in builder2(builder1(board)) }
@@ -70,9 +88,12 @@ func xTiles(_ numTiles: Int, _ tile: TileType, _ board: Board) -> Builder {
 
 extension TileType {
     static var playerWithGem: TileType {
-        return TileType.player(CombatTileData(hp: 1, attacksThisTurn: 0, weapon: .mouth, hasGem: true))
+        let gemCarry = CarryModel(item: [Item(type: .gem, range: .one)])
+        let hasGem = EntityModel(hp: 1, name: "test", attack: .zero, type: .player, carry: gemCarry)
+        return TileType.player(hasGem)
     }
 }
+
 
 /*
  +----------+-----------------------------+------------------------------------------------+
@@ -85,8 +106,8 @@ extension TileType {
 func win(_ board: Board) -> Builder {
     return { board in
         guard board.boardSize > 1 else { return board } //cant win if there is only 1 row
-        let playerPosition = board.getTilePosition(.player())
-        let exitPosition = board.getTilePosition(.exit)
+        let playerPosition = typeCount(for: board.tiles, of: .player(.zero)).first
+        let exitPosition = typeCount(for: board.tiles, of: .exit).first
         var newTiles = board.tiles
         
         if let pp = playerPosition, let ep = exitPosition {
@@ -146,11 +167,11 @@ func lose(_ board: Board) -> Builder {
 }
 
 func playerAttacks(_ board: Board,
-                   _ monsterTile: TileType = .greenMonster(),
-                   _ player: TileType = .player()) -> Builder {
+                   _ monsterTile: TileType = .monster(.zero),
+                   _ player: TileType = .player(.zero)) -> Builder {
     return { board in
         guard board.boardSize > 1 else { return board }
-        let playerPosition = board.getTilePosition(.player())
+        let playerPosition = typeCount(for: board.tiles, of: .player(.zero)).first
         var newTiles = board.tiles
         
         if let pp = playerPosition{

@@ -51,7 +51,7 @@ class EntityModelTests: XCTestCase {
                 return jsonResult
             } catch {
                 // handle error
-                print(error)
+                XCTFail("\(error)")
             }
         }
         return nil

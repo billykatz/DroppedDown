@@ -127,37 +127,10 @@ extension GameScene {
 //MARK: - Coordinate Math
 
 extension GameScene {
-//    func isInTopHalf(_ location: CGPoint) -> Bool {
-//        return topHalf().contains(location)
-//    }
-//    func isInBottomHalf(_ location: CGPoint) -> Bool {
-//        return bottomHalf().contains(location)
-//    }
+    
     func isInRightHalf(_ location: CGPoint) -> Bool {
         return rightHalf().contains(location)
     }
-//
-//    func topHalf() -> CGRect {
-//        guard let playableRect = playableRect,
-//            let viewRect = self.view?.frame else { fatalError("No playable rect calculated") }
-//        return CGRect(x: viewRect.width/2 - playableRect.width/2,
-//                      y: viewRect.height/2 - playableRect.height/2,
-//                      width: playableRect.width,
-//                      height: playableRect.height/2)
-//
-//
-//    }
-    
-//    func bottomHalf() -> CGRect {
-//        guard let playableRect = playableRect,
-//            let viewRect = self.view?.frame else { fatalError("No playable rect calculated") }
-//        return CGRect(x: viewRect.width/2 - playableRect.width/2,
-//                      y: viewRect.height/2,
-//                      width: playableRect.width,
-//                      height: playableRect.height/2)
-//
-//
-//    }
     
     func rightHalf() -> CGRect {
         guard let playableRect = playableRect,
@@ -168,8 +141,6 @@ extension GameScene {
                       height: playableRect.height)
 
     }
-
-    
 }
 
 // MARK: - Debug

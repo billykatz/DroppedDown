@@ -18,6 +18,7 @@ class GameViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        //TODO: handle failure more gracefully. ie redownload or retry
         let entityData = try! Data.data(from: "entities")!
         entities = try! JSONDecoder().decode(EntitiesModel.self, from: entityData).entities
         startLevel()

@@ -232,12 +232,12 @@ extension Board {
                               inputType: .touch(tileCoord, tiles[tileCoord]))
     }
     
-    func resetAttacks() {
+    private func resetAttacks() {
         resetPlayerAttacks()
         resetMonsterAttacks()
     }
     
-    func collectItem(at coord: TileCoord) -> Transformation {
+    private func collectItem(at coord: TileCoord) -> Transformation {
         let selectedTile = tiles[coord]
         
         //remove and replace the single item tile
@@ -271,7 +271,7 @@ extension Board {
     }
     
     
-    func monsterDied(at coord: TileCoord) -> Transformation {
+    private func monsterDied(at coord: TileCoord) -> Transformation {
         if case let .monster(monsterData) = tiles[coord],
             let item = monsterData.carry.item.first {
             let itemTile = TileType.item(item)

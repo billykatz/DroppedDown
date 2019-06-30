@@ -30,8 +30,8 @@ class HelperTextView: SKSpriteNode {
         var showExit = false
         var descriptionText = ""
         switch input.type {
-        case .gameLose:
-            descriptionText = "You either ran out of moves\n or you ran out of hp"
+        case .gameLose(let text):
+            descriptionText = text
         case .gameWin:
             descriptionText = "You won, you are a masterful miner!"
         case .transformation(let trans):

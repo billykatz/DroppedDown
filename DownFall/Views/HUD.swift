@@ -68,59 +68,17 @@ class HUD: SKSpriteNode {
 
     func show(_ data: EntityModel) {
         for child in self.children {
-            if child is SKLabelNode {
+            if child.name == "heart" {
                 child.removeFromParent()
             }
         }
         
-        let playerHealthString =
-        """
-        Health: \(data.hp)
-        """
-        let weaponDamageString =
-        """
-        Pickaxe Damage: \(data.attack.damage)
-        """
-        let weaponDirectionString = "Pickaxe Attacks: Down"
-        
-        let titleLabel = SKLabelNode(text: "Player 1")
-        titleLabel.fontSize = 40
-        titleLabel.zPosition = 11
-        titleLabel.fontColor = .black
-        titleLabel.fontName = "Helvetica-Bold"
-        titleLabel.position = CGPoint(x: 0, y: 38)
-        
-        
-        let label = SKLabelNode(text: playerHealthString)
-        label.fontSize = 30
-        label.zPosition = 11
-        label.fontColor = .black
-        label.fontName = "Helvetica-Bold"
-        label.numberOfLines = 2
-        label.position = CGPoint(x: 0, y: 0)
-        
-        let label1 = SKLabelNode(text: weaponDamageString)
-        label1.fontSize = 30
-        label1.zPosition = 11
-        label1.fontColor = .black
-        label1.fontName = "Helvetica-Bold"
-        label1.numberOfLines = 2
-        label1.position = CGPoint(x: 0, y: -30)
-
-        
-        let label2 = SKLabelNode(text: weaponDirectionString)
-        label2.fontSize = 30
-        label2.zPosition = 11
-        label2.fontColor = .black
-        label2.fontName = "Helvetica-Bold"
-        label2.numberOfLines = 2
-        label2.position = CGPoint(x: 0, y: -60)
-
-        
-        self.addChild(titleLabel)
-        self.addChild(label)
-        self.addChild(label1)
-        self.addChild(label2)
+        for health in 0..<data.hp {
+            let heartNode = SKSpriteNode(texture: SKTexture(imageNamed: "heart"), size: CGSize(width: 50, height: 50))
+            heartNode.position = CGPoint(x: -150 + (health * 50), y:0)
+            heartNode.name = "heart"
+            self.addChild(heartNode)
+        }
     }
     
     func showGem() {

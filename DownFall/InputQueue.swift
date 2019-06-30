@@ -11,7 +11,7 @@ import SpriteKit
 indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringConvertible{
     static var allCases: [InputType] = [.touch(TileCoord(0,0), .blueRock), .rotateLeft, .rotateRight,
                                         .attack(TileCoord(0,0), TileCoord(0,0)), .monsterDies(TileCoord(0,0)),
-                                        .gameWin, .gameLose, .play, .pause,
+                                        .gameWin, .gameLose(""), .play, .pause,
                                         .animationsFinished, .playAgain, .reffingFinished,
                                         .collectItem(TileCoord(0,0), .zero)]
     
@@ -23,7 +23,7 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
     case monsterDies(TileCoord)
     case attack(_ from: TileCoord, _ to: TileCoord)
     case gameWin
-    case gameLose
+    case gameLose(String)
     case play
     case pause
     case animationsFinished

@@ -24,6 +24,7 @@ class Renderer : SKSpriteNode {
     //Animations
     private var attackAnimation: [SKTexture]
     private var fallAnimation: [SKTexture]
+    private var playerDamagedAnimation: [SKTexture]
     
     var menuSpriteNode: MenuSpriteNode {
         return MenuSpriteNode(.pause, playableRect: playableRect, precedence: .menu)
@@ -62,6 +63,10 @@ class Renderer : SKSpriteNode {
                                       rows: 1,
                                       columns: 9).animationsFrames()
         
+        playerDamagedAnimation = SpriteSheet(texture: SKTexture(imageNamed: "playerDamaged"),
+                                             rows: 1,
+                                             columns: 9).animationsFrames()
+        
         
         super.init(texture: nil, color: .clear, size: CGSize.zero)
         
@@ -99,7 +104,7 @@ class Renderer : SKSpriteNode {
         hud.position = CGPoint(x: playableRect.midX, y: playableRect.minY + controls.size.height + 16)
         
         //create the helper text view
-        helperTextView = HelperTextView.build(color: .lightGray, size: CGSize(width: playableRect.width * 0.9, height: 200))
+        helperTextView = HelperTextView.build(color: UIColor(rgb: 0x9c461f), size: CGSize(width: playableRect.width * 0.9, height: 200))
         helperTextView.position = CGPoint(x: playableRect.midX, y: playableRect.maxY - header.size.height - 116)
         
         [spriteForeground, header, controls, hud, helperTextView].forEach { foreground.addChild($0) }
@@ -163,7 +168,7 @@ class Renderer : SKSpriteNode {
         case .touch(_, _), .rotateLeft, .rotateRight,
              .monsterDies, .attack, .gameWin,
              .animationsFinished, .reffingFinished,
-             .boardBuilt,. collectItem:
+             .boardBuilt,. collectItem, .selectLevel:
             ()
         }
     }
@@ -177,13 +182,21 @@ class Renderer : SKSpriteNode {
                                _ endTiles: [[TileType]]?) {
         guard let tiles = endTiles else { animationsFinished(for: sprites); return }
         if tiles[attackerPosition] == TileType.player(.zero) {
-            let group = SKAction.animate(with: attackAnimation, timePerFrame: 0.1)
+            let group = SKAction.animate(with: attackAnimation, timePerFrame: 0.07)
             sprites[attackerPosition].run(group) { [weak self] in
                 guard let strongSelf = self else { return }
                 strongSelf.animationsFinished(for: strongSelf.sprites, endTiles: tiles)
             }
-        } else {
-            animationsFinished(for: sprites, endTiles: tiles)
+        } else if tiles[attackerPosition] == TileType.monster(.zero) {
+            let colorize = SKAction.colorize(with: .red, colorBlendFactor: 0.9, duration: 0.2)
+            let playerDamaged = SKAction.animate(with: playerDamagedAnimation, timePerFrame: 0.07)
+            sprites[attackerPosition].run(colorize) { [weak self] in
+                guard let strongSelf = self else { return }
+                strongSelf.sprites[defenderPosition].run(playerDamaged) { [weak self] in
+                    guard let strongSelf = self else { return }
+                    strongSelf.animationsFinished(for: strongSelf.sprites, endTiles: tiles)
+                }
+            }
         }
     }
     

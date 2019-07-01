@@ -10,17 +10,21 @@ import GameplayKit
 
 class TileCreator: TileStrategy {
     
+    var spawnedGem = false
+    var randomSource = GKLinearCongruentialRandomSource()
+    var entities: [EntityModel]
+    var difficulty: Difficulty
+    
+    init(_ entities: [EntityModel], difficulty: Difficulty) {
+        self.entities = entities
+        self.difficulty = difficulty
+    }
+    
     func randomTile(_ given: Int) -> TileType {
         let index = abs(given) % TileType.allCases.count
         switch TileType.allCases[index] {
-        case .item:
-            if randomSource.nextInt().isMultiple(of: 2) {
-                return TileType.gem
-            } else {
-                return TileType.empty
-            }
         case .monster:
-            if randomSource.nextInt().isMultiple(of: 2), !spawnedGem {
+            if !spawnedGem {
                 spawnedGem = true
                 return TileType.monster(entities[1])
             } else {
@@ -35,37 +39,54 @@ class TileCreator: TileStrategy {
         let index = abs(given) % TileType.rockCases.count
         return TileType.rockCases[index]
     }
-
-    var spawnedGem = false
-    var randomSource = GKLinearCongruentialRandomSource()
-    var entities: [EntityModel]
     
-    
-    init(_ entities: [EntityModel]) {
-        self.entities = entities
+    func getTilePosition(_ type: TileType, tiles: [[TileType]]) -> TileCoord? {
+        for i in 0..<tiles.count {
+            for j in 0..<tiles[i].count {
+                if tiles[i][j] == type {
+                    return TileCoord(i,j)
+                }
+            }
+        }
+        return nil
     }
     
-    func tiles(for tiles: [[TileType]], difficulty: Difficulty = .normal) -> [TileType] {
+    var maxMonsters: Int {
+        switch difficulty {
+        case .easy:
+            return 2
+        case .normal:
+            return 4
+        case .hard:
+            return 8
+        }
+    }
+
+    
+    func tiles(for tiles: [[TileType]]) -> [TileType] {
         var newTiles: [TileType] = []
         var newMonsterCount = 0
-        let maxMonsters = 4
+        var spawnExit = false
+        if let playerPosition = getTilePosition(.player(.zero), tiles: tiles),
+            case let TileType.player(data) = tiles[playerPosition] {
+            if data.carry.hasGem {
+                spawnExit = true
+            }
+        }
+        
         let currentMonsterCount =  typeCount(for: tiles, of: .monster(.zero)).count
         while (newTiles.count < typeCount(for: tiles, of: .empty).count) {
             let nextTile = randomTile(randomSource.nextInt())
             
             switch nextTile {
-            case .player:
-                if typeCount(for: tiles, of: .player(.zero)).count < 1 && !newTiles.contains(.player(.zero)) {
-                    newTiles.append(nextTile)
-                }
             case .blueRock, .blackRock, .greenRock:
                 newTiles.append(nextTile)
-            case .empty, .item:
+            case .empty, .item, .player:
                 ()
             case .exit:
                 if typeCount(for: tiles, of: .exit).count < 1,
                     !newTiles.contains(.exit),
-                    randomSource.nextInt().isMultiple(of: 3)
+                    spawnExit
                 {
                     newTiles.append(nextTile)
                 }
@@ -115,10 +136,21 @@ class TileCreator: TileStrategy {
         let lowerbound = Int(Double(tiles.count) * 0.33)
         
         let playerPosition = TileCoord((Int.random(lowerbound) + lowerbound), (Int.random(lowerbound) + lowerbound))
-        tiles[playerPosition.x][playerPosition.y] = TileType.player(entities[2])
+        tiles[playerPosition.x][playerPosition.y] = TileType.player(playerEntityData)
         
         return tiles
 
+    }
+    
+    var playerEntityData: EntityModel {
+        switch difficulty {
+        case .easy:
+            return entities[2]
+        case .normal:
+            return entities[3]
+        case .hard:
+            return entities[4]
+        }
     }
 
 }

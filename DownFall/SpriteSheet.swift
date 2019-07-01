@@ -64,6 +64,5 @@ class SpriteSheet {
         }
         return textures
     }
-    
 }
 

@@ -29,7 +29,7 @@ func entities() -> [EntityModel] {
 
 extension Board {
     convenience init(tiles: [[TileType]]) {
-        self.init(tiles: tiles, tileCreator: TileCreator(entities()))
+        self.init(tiles: tiles, tileCreator: TileCreator(entities(), difficulty: .normal))
     }
 }
 

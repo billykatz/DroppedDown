@@ -11,6 +11,7 @@ import UIKit
 
 protocol GameSceneDelegate: class {
     func reset()
+    func selectLevel()
 }
 
 class GameScene: SKScene {
@@ -20,9 +21,6 @@ class GameScene: SKScene {
     
     //foreground
     private var foreground: SKNode!
-    
-    //diffculty
-    private var difficulty: Difficulty?
     
     //delegate
     weak var gameSceneDelegate: GameSceneDelegate?
@@ -50,11 +48,10 @@ class GameScene: SKScene {
     /// Creates an instance of board and does preparationg necessary for didMove(to:) to be called
     public func commonInit(boardSize bsize: Int,
                            entities: [EntityModel],
-                           difficulty diff: Difficulty = .normal){
+                           difficulty: Difficulty = .normal){
         //TODO: the  order of the following lines of code matter.  (bottom left has to happen before create and position. Consider refactoring
         InputQueue.reset()
-        tileCreator = TileCreator(entities)
-        difficulty = diff
+        tileCreator = TileCreator(entities, difficulty: difficulty)
         board = Board.build(size: bsize, tileCreator: tileCreator!)
         boardSize = bsize
         generator = HapticGenerator()
@@ -91,6 +88,9 @@ class GameScene: SKScene {
         Dispatch.shared.register { [weak self] input in
             if input.type == .playAgain {
                 self?.gameSceneDelegate?.reset()
+            }
+            else if input.type == .selectLevel {
+                self?.gameSceneDelegate?.selectLevel()
             }
         }
     }

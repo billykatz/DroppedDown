@@ -271,8 +271,10 @@ class Referee {
         
         if let input = playerWins() {
             return input
-        } else if !boardHasMoreMoves() || playerIsDead() {
-            return Input(.gameLose)
+        } else if !boardHasMoreMoves() {
+            return Input(.gameLose("The board has no more moves"))
+        } else if playerIsDead() {
+            return Input(.gameLose("You ran out of health"))
         }
         
         

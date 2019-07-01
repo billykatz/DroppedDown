@@ -42,7 +42,7 @@ class MenuSpriteNode: SKSpriteNode {
     
     init(_ menuType: MenuType, playableRect: CGRect, precedence: Precedence) {
         let menuSizeWidth = playableRect.size.width * 0.7
-        let menuSizeHeight = playableRect.size.height * 0.25
+        let menuSizeHeight = playableRect.size.height * 0.33
         
         
         super.init(texture: SKTexture(imageNamed: "menu"),
@@ -56,13 +56,22 @@ class MenuSpriteNode: SKSpriteNode {
     
     func setupButtons(_ menuType: MenuType, _ playableRect: CGRect, precedence: Precedence) {
         let menuSizeWidth = playableRect.size.width * 0.7
-        let buttonWidth = CGSize(width: menuSizeWidth * 0.8, height: 200)
-        let button = Button(size: buttonWidth,
+        let menuSizeHeight = playableRect.size.height * 0.33
+        let buttonSize = CGSize(width: menuSizeWidth * 0.8, height: menuSizeHeight/4)
+        let button = Button(size: buttonSize,
                             delegate: self,
                             identifier: menuType.buttonIdentifer,
                             precedence: precedence)
-        button.position = playableRect.center
+        button.position = CGPoint(x: 0, y: -buttonSize.height/2 - 15)
         addChild(button)
+        
+        let button2 = Button(size: buttonSize,
+                             delegate: self,
+                             identifier: .selectLevel,
+                             precedence: precedence)
+        button2.position = CGPoint(x: 0, y: buttonSize.height/2 + 15)
+        addChild(button2)
+
         
     }
     
@@ -84,6 +93,8 @@ extension MenuSpriteNode: ButtonDelegate {
             InputQueue.append(Input(.play))
         case .playAgain:
             InputQueue.append(Input(.playAgain))
+        case .selectLevel:
+            InputQueue.append(Input(.selectLevel))
         }
     }
 }

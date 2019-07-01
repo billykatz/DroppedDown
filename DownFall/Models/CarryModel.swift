@@ -14,4 +14,8 @@ struct CarryModel: Decodable, Equatable {
     var hasGem: Bool {
         return item.contains { $0.type == .gem }
     }
+    
+    var totalGold: Int {
+        return item.filter({ $0.type == .gold }).count
+    }
 }

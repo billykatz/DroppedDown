@@ -10,6 +10,6 @@ import GameplayKit
 
 protocol TileStrategy {
     var randomSource: GKLinearCongruentialRandomSource { get }
-    func tiles(for tiles: [[TileType]], difficulty: Difficulty) -> [TileType]
+    func tiles(for tiles: [[TileType]]) -> [TileType]
 }
     

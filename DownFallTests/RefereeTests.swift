@@ -53,7 +53,7 @@ class RefereeTests: XCTestCase {
         let gameLose = lose(mockBoard)
         let gameBoard = gameLose(mockBoard)
         
-        let expectedOutput = Input(.gameLose)
+        let expectedOutput = Input(.gameLose("The board has no more moves"))
         let actualOutput = Referee.enforceRules(gameBoard.tiles)
         
         XCTAssertEqual(expectedOutput, actualOutput)
@@ -79,7 +79,7 @@ class RefereeTests: XCTestCase {
     
     func testRefereeNonGameLose() {
         
-        let gameLose = Input(.gameLose)
+        let gameLose = Input(.gameLose(""))
         // If the player can attack we dont lose (yet)
         var tiles = [[TileType.greenRock, .blueRock, .blueRock, .greenRock],
                      [.blueRock, .normalMonster, .exit, .greenRock],

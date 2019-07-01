@@ -32,6 +32,7 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
     case reffingFinished
     case boardBuilt
     case collectItem(TileCoord, Item)
+    case selectLevel
     
     var canBeNonUserGenerated: Bool {
         switch self {
@@ -75,6 +76,8 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
             return "Board has been built"
         case .collectItem:
             return "Player collects an item"
+        case .selectLevel:
+            return "Select Level"
         }
     }
 }

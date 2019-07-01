@@ -74,7 +74,7 @@ struct LoseState: GameState {
     
     func shouldAppend(_ input: Input) -> Bool {
         switch input.type {
-        case .playAgain:
+        case .playAgain, .selectLevel:
             return true
         default:
             return false
@@ -83,7 +83,7 @@ struct LoseState: GameState {
     
     func transitionState(given input: Input) -> AnyGameState? {
         switch input.type {
-        case .playAgain:
+        case .playAgain, .selectLevel:
             return AnyGameState(PlayState())
         @unknown default:
             return nil
@@ -99,7 +99,7 @@ struct WinState: GameState {
     
     func shouldAppend(_ input: Input) -> Bool {
         switch input.type {
-        case .playAgain:
+        case .playAgain, .selectLevel:
             return true
         case .transformation(let trans):
             switch trans.inputType! {
@@ -115,7 +115,7 @@ struct WinState: GameState {
     
     func transitionState(given input: Input) -> AnyGameState? {
         switch input.type {
-        case .playAgain:
+        case .playAgain, .selectLevel:
             return AnyGameState(PlayState())
         case .transformation(let trans):
             switch trans.inputType! {
@@ -230,7 +230,7 @@ struct PlayState: GameState {
              .boardBuilt:
             return true
         case .animationsFinished, .play,
-             .reffingFinished, .playAgain, .collectItem:
+             .reffingFinished, .playAgain, .collectItem, .selectLevel:
             return false
         }
     }
@@ -248,7 +248,7 @@ struct PlayState: GameState {
             return AnyGameState(ComputingState())
         case .boardBuilt:
             return AnyGameState(PlayState())
-        case .animationsFinished, .play, .transformation, .reffingFinished, .playAgain:
+        case .animationsFinished, .play, .transformation, .reffingFinished, .playAgain,. selectLevel:
             return nil
         }
 
@@ -261,12 +261,12 @@ struct PauseState: GameState {
     func enter(_ input: Input) {}
     
     func shouldAppend(_ input: Input) -> Bool {
-        return input.type == .play
+        return input.type == .play || input.type == .selectLevel
     }
 
     func transitionState(given input: Input) -> AnyGameState? {
         switch input.type {
-        case .play:
+        case .play, .selectLevel:
             return AnyGameState(PlayState())
         default:
             return nil

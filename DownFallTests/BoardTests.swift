@@ -28,7 +28,7 @@ struct MockBoardHelper {
     }
     
     static func createBoard(_ type: TileType = .greenRock, size: Int = 5) -> Board {
-        let tc = TileCreator(entities())
+        let tc = TileCreator(entities(), difficulty: .normal)
         return Board(tiles: Array(repeating: row(of: type, by: size),  count: size), tileCreator: tc)
     }
     
@@ -54,7 +54,7 @@ class BoardTests: XCTestCase {
                   [.blueRock, .blueRock, .blueRock],
                   [.blueRock, .blueRock, .blueRock]]
         self.board = Board(tiles: tiles,
-                           tileCreator: TileCreator(entities()))
+                           tileCreator: TileCreator(entities(), difficulty: .normal))
     }
     
     func testValidNeighbors() {

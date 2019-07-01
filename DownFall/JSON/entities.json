@@ -65,6 +65,42 @@
             "carry": {
                 "item": []
             }
+        },
+        { "name": "player2",
+            "type": "player",
+            "hp": 2,
+            "attack": {
+                "frequency": 0,
+                "directions": ["south"],
+                "damage": 1,
+                "range": {
+                    "lower": 1,
+                    "upper": 1
+                },
+                "animationPaths": ["Animations/player.png"],
+                "hasAttacked": false
+            },
+            "carry": {
+                "item": []
+            }
+        },
+        { "name": "player2",
+            "type": "player",
+            "hp": 1,
+            "attack": {
+                "frequency": 0,
+                "directions": ["south"],
+                "damage": 1,
+                "range": {
+                    "lower": 1,
+                    "upper": 1
+                },
+                "animationPaths": ["Animations/player.png"],
+                "hasAttacked": false
+            },
+            "carry": {
+                "item": []
+            }
         }
     ]
 }

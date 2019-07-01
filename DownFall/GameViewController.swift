@@ -15,13 +15,14 @@ class GameViewController: UIViewController {
     private var gameSceneNode: GameScene?
     private var boardSize = 7
     private var entities: [EntityModel]?
+    private var selectedDifficulty: Difficulty = .normal
     
     override func viewDidLoad() {
         super.viewDidLoad()
         //TODO: handle failure more gracefully. ie redownload or retry
         let entityData = try! Data.data(from: "entities")!
         entities = try! JSONDecoder().decode(EntitiesModel.self, from: entityData).entities
-        startLevel()
+        levelSelect()
     }
 
     override var shouldAutorotate: Bool {
@@ -42,6 +43,19 @@ class GameViewController: UIViewController {
 }
 
 extension GameViewController {
+    private func levelSelect() {
+        if let levelSelectScene = GKScene(fileNamed: "LevelSelect")?.rootNode as? LevelSelect {
+            levelSelectScene.scaleMode = .aspectFill
+            levelSelectScene.levelSelectDelegate = self
+            
+            if let view = self.view as! SKView? {
+                view.presentScene(levelSelectScene)
+                view.ignoresSiblingOrder = true
+            }
+            
+        }
+    }
+    
     private func startLevel() {
         gameSceneNode = nil
         if let scene = GKScene(fileNamed: "GameScene")?.rootNode as? GameScene,
@@ -49,7 +63,9 @@ extension GameViewController {
             gameSceneNode = scene
             gameSceneNode!.scaleMode = .aspectFill
             gameSceneNode!.gameSceneDelegate = self
-            gameSceneNode!.commonInit(boardSize: boardSize, entities: entities)
+            gameSceneNode!.commonInit(boardSize: boardSize,
+                                      entities: entities,
+                                      difficulty: selectedDifficulty)
             
             if let view = self.view as! SKView? {
                 view.presentScene(gameSceneNode)
@@ -65,10 +81,28 @@ extension GameViewController {
     }
 }
 
+extension GameViewController: LevelSelectDelegate {
+    func didSelect(_ difficulty: Difficulty) {
+        if let view = self.view as! SKView? {
+            view.presentScene(nil)
+            selectedDifficulty = difficulty
+            startLevel()
+        }
+    }
+}
+
 
 extension GameViewController: GameSceneDelegate {
+    func selectLevel() {
+        if let view = self.view as! SKView? {
+            view.presentScene(nil)
+            levelSelect()
+        }
+
+    }
+    
     func reset() {
-        let fadeOut = SKAction.fadeOut(withDuration: 1.5)
+        let fadeOut = SKAction.fadeOut(withDuration: 0.75)
         let remove = SKAction.removeFromParent()
         gameSceneNode?.run(SKAction.group([fadeOut, remove])) { [weak self] in
             self?.startLevel()

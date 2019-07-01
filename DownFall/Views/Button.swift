@@ -12,6 +12,7 @@ import SpriteKit
 enum ButtonIdentifier: String {
     case resume
     case playAgain
+    case selectLevel
     
     var title: String {
         switch self {
@@ -19,6 +20,8 @@ enum ButtonIdentifier: String {
             return "Resume"
         case .playAgain:
             return "Play Again?"
+        case .selectLevel:
+            return "Level Select"
         }
     }
 }

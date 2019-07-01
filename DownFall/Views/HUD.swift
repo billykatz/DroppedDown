@@ -10,7 +10,7 @@ import SpriteKit
 
 class HUD: SKSpriteNode {
     static func build(color: UIColor, size: CGSize) -> HUD {
-        let header = HUD(texture: nil, color: color, size: size)
+        let header = HUD(texture: nil, color: .clear, size: size)
         Dispatch.shared.register {
             header.handle($0)
         }
@@ -54,6 +54,8 @@ class HUD: SKSpriteNode {
         case .collectItem(_, let item):
             if item.type == .gem {
                 showGem()
+            } else {
+                incrementGoldCounter()
             }
         case .boardBuilt:
             //TODO: check this logic out thoroughly
@@ -74,10 +76,27 @@ class HUD: SKSpriteNode {
         }
         
         for health in 0..<data.hp {
-            let heartNode = SKSpriteNode(texture: SKTexture(imageNamed: "heart"), size: CGSize(width: 50, height: 50))
-            heartNode.position = CGPoint(x: -150 + (health * 50), y:0)
+            let heartNode = SKSpriteNode(texture: SKTexture(imageNamed: "heart"), size: CGSize(width: 100, height: 100))
+            heartNode.position = CGPoint(x: -150 + (health * 100), y:0)
             heartNode.name = "heart"
             self.addChild(heartNode)
+        }
+        
+        let coinNode = SKSpriteNode(texture: SKTexture(imageNamed: "gold"), size: CGSize(width: 100, height: 100))
+        coinNode.position = CGPoint(x: 250, y: 0)
+        self.addChild(coinNode)
+        
+        if let _ = self.childNode(withName: "goldLabel") {
+            
+        }
+        else {
+            let goldLabel = SKLabelNode(fontNamed: "Helvetica")
+            goldLabel.fontSize = 75
+            goldLabel.position = CGPoint(x: 355, y: -22)
+            goldLabel.text = "0"
+            goldLabel.fontColor = .lightText
+            goldLabel.name = "goldLabel"
+            self.addChild(goldLabel)
         }
     }
     
@@ -85,6 +104,16 @@ class HUD: SKSpriteNode {
         let spriteNode = SKSpriteNode(texture: SKTexture(imageNamed: "gem1"), size: CGSize(width: 100, height: 100))
         spriteNode.position = CGPoint(x: -300, y: 0)
         self.addChild(spriteNode)
+    }
+    
+    func incrementGoldCounter() {
+        if let goldLabel = self.childNode(withName: "goldLabel") as? SKLabelNode,
+            let text = goldLabel.text,
+            let gold = Int(text) {
+            goldLabel.text = ""
+            goldLabel.text = "\(gold + 1)"
+            
+        }
     }
 }
 

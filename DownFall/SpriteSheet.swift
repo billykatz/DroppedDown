@@ -56,11 +56,13 @@ class SpriteSheet {
         return SKTexture(rect: textureRect, in: texture)
     }
     
-    func animationsFrames() -> [SKTexture] {
+    func animationFrames() -> [SKTexture] {
         var textures: [SKTexture] = []
-        for col in 0..<columns {
-            guard let texture = textureForColumn(column: col, row: 0) else { continue }
-            textures.append(texture)
+        for row in 0..<rows {
+            for col in 0..<columns {
+                guard let texture = textureForColumn(column: col, row: row) else { continue }
+                textures.append(texture)
+            }
         }
         return textures
     }

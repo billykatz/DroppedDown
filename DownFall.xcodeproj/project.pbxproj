@@ -22,6 +22,7 @@
 		3D58468A22A6325300EDD845 /* CarryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D58468922A6325300EDD845 /* CarryModel.swift */; };
 		3D58468C22A632F100EDD845 /* AttackModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D58468B22A632F100EDD845 /* AttackModel.swift */; };
 		3D5FB09420AE768700ACD716 /* AnimationSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D5FB09320AE768700ACD716 /* AnimationSettings.swift */; };
+		3D635E8F22E20CDA0090C99C /* AnimationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D635E8E22E20CDA0090C99C /* AnimationModel.swift */; };
 		3D674C9122C9BFDB0003AEB4 /* UIColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D674C9022C9BFDB0003AEB4 /* UIColor+Extensions.swift */; };
 		3D674C9322C9D54C0003AEB4 /* LevelSelect.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3D674C9222C9D54C0003AEB4 /* LevelSelect.sks */; };
 		3D674C9522C9D6640003AEB4 /* LevelSelect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D674C9422C9D6640003AEB4 /* LevelSelect.swift */; };
@@ -101,6 +102,7 @@
 		3D58468922A6325300EDD845 /* CarryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarryModel.swift; sourceTree = "<group>"; };
 		3D58468B22A632F100EDD845 /* AttackModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttackModel.swift; sourceTree = "<group>"; };
 		3D5FB09320AE768700ACD716 /* AnimationSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationSettings.swift; sourceTree = "<group>"; };
+		3D635E8E22E20CDA0090C99C /* AnimationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationModel.swift; sourceTree = "<group>"; };
 		3D674C9022C9BFDB0003AEB4 /* UIColor+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extensions.swift"; sourceTree = "<group>"; };
 		3D674C9222C9D54C0003AEB4 /* LevelSelect.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = LevelSelect.sks; sourceTree = "<group>"; };
 		3D674C9422C9D6640003AEB4 /* LevelSelect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelSelect.swift; sourceTree = "<group>"; };
@@ -351,6 +353,7 @@
 				3D58468B22A632F100EDD845 /* AttackModel.swift */,
 				3D58468922A6325300EDD845 /* CarryModel.swift */,
 				3DA4E8962290A88C006E90D1 /* EntityModel.swift */,
+				3D635E8E22E20CDA0090C99C /* AnimationModel.swift */,
 				3D30A42A2217F63500AFA1E1 /* TileCoord.swift */,
 				3DF2928220A66BEB006671AC /* Tile.swift */,
 				3DF2928420A76242006671AC /* Board.swift */,
@@ -497,6 +500,7 @@
 				3DA0087D21E6D1960017D8DA /* TileCreator.swift in Sources */,
 				3D30A42B2217F63500AFA1E1 /* TileCoord.swift in Sources */,
 				3D58468C22A632F100EDD845 /* AttackModel.swift in Sources */,
+				3D635E8F22E20CDA0090C99C /* AnimationModel.swift in Sources */,
 				3DE87C94223D691100D750CF /* GameState.swift in Sources */,
 				3D674C9122C9BFDB0003AEB4 /* UIColor+Extensions.swift in Sources */,
 				3DA4E883228E5D2F006E90D1 /* SKSpriteNode+Extensions.swift in Sources */,

@@ -11,8 +11,29 @@
                     "lower": 1,
                     "upper": 1
                 },
-                "animationPaths": ["Animations/gloop.png"],
                 "hasAttacked": false
+            },
+            "animations": {
+                "attack": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "hurt": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "dying": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "idle": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "fall":{
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                }
             },
             "carry": {
                 "item": [{
@@ -35,8 +56,29 @@
                     "lower": 1,
                     "upper": 1
                 },
-                "animationPaths": ["Animations/gloop.png"],
                 "hasAttacked": false
+            },
+            "animations": {
+                "attack": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "hurt": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "dying": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "idle": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "fall":{
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                }
             },
             "carry": {
                 "item": [{
@@ -59,8 +101,29 @@
                     "lower": 1,
                     "upper": 1
                 },
-                "animationPaths": ["Animations/player.png"],
                 "hasAttacked": false
+            },
+            "animations": {
+                "attack": {
+                    "animationFilename": "playerAttack",
+                    "numberOfFrames": 10
+                },
+                "hurt": {
+                    "animationFilename": "playerDamaged",
+                    "numberOfFrames": 9
+                },
+                "dying": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "idle": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "fall":{
+                    "animationFilename": "playerFall",
+                    "numberOfFrames": 9
+                }
             },
             "carry": {
                 "item": []
@@ -77,8 +140,29 @@
                     "lower": 1,
                     "upper": 1
                 },
-                "animationPaths": ["Animations/player.png"],
                 "hasAttacked": false
+            },
+            "animations": {
+                "attack": {
+                    "animationFilename": "playerAttack",
+                    "numberOfFrames": 10
+                },
+                "hurt": {
+                    "animationFilename": "playerDamaged",
+                    "numberOfFrames": 9
+                },
+                "dying": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "idle": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "fall":{
+                    "animationFilename": "playerFall",
+                    "numberOfFrames": 9
+                }
             },
             "carry": {
                 "item": []
@@ -95,11 +179,78 @@
                     "lower": 1,
                     "upper": 1
                 },
-                "animationPaths": ["Animations/player.png"],
                 "hasAttacked": false
+            },
+            "animations": {
+                "attack": {
+                    "animationFilename": "playerAttack",
+                    "numberOfFrames": 10
+                },
+                "hurt": {
+                    "animationFilename": "playerDamaged",
+                    "numberOfFrames": 9
+                },
+                "dying": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "idle": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "fall":{
+                    "animationFilename": "playerFall",
+                    "numberOfFrames": 9
+                }
             },
             "carry": {
                 "item": []
+            }
+        },
+        { "name": "dragon",
+            "type": "dragon",
+            "hp": 1,
+            "attack": {
+                "frequency": 0,
+                "directions": ["north"],
+                "damage": 1,
+                "range": {
+                    "lower": 1,
+                    "upper": 10
+                },
+                "hasAttacked": false
+            },
+            "animations": {
+                "attack": {
+                    "animationFilename": "dragonAttack",
+                    "numberOfFrames": 21
+                },
+                "hurt": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "dying": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "idle": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "fall":{
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                }
+            },
+            "carry": {
+                "item": [{
+                    "type": "gold",
+                    "range": {
+                        "lower": 5,
+                        "upper": 10
+                    }
+                }]
+                
             }
         }
     ]

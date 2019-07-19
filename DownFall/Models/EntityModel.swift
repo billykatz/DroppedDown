@@ -15,17 +15,19 @@ protocol ResetsAttacks {
 struct EntityModel: Equatable, Decodable {
         
     enum EntityType: String, Decodable {
+        case dragon
         case monster
         case player
     }
     
-    static let zero: EntityModel = EntityModel(hp: 0, name: "null", attack: .zero, type: .monster, carry: .zero)
+    static let zero: EntityModel = EntityModel(hp: 0, name: "null", attack: .zero, type: .monster, carry: .zero, animations: .zero)
     
     let hp: Int
     let name: String
     let attack: AttackModel
     let type: EntityType
     let carry: CarryModel
+    let animations: AllAnimationsModel
     
     
 }
@@ -36,14 +38,14 @@ extension EntityModel: ResetsAttacks {
                                          range: self.attack.range,
                                          damage: self.attack.damage,
                                          directions: self.attack.directions,
-                                         animationPaths: self.attack.animationPaths,
                                          hasAttacked: false)
         
         return EntityModel(hp: self.hp,
                            name: self.name,
                            attack: newAttackModel,
                            type: self.type,
-                           carry: self.carry)
+                           carry: self.carry,
+                           animations: self.animations)
     }
 }
 

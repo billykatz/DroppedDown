@@ -220,7 +220,8 @@ class Referee {
                 for (j, _) in row.enumerated() {
                     let potentialMonsterPosition = TileCoord(i, j)
                     if case TileType.monster(let monsterData) = tiles[potentialMonsterPosition],
-                        monsterData.attack.canAttack {
+                        monsterData.attack.canAttack,
+                        monsterData.hp > 0{
                         for attackedTile in attackedTiles(from: potentialMonsterPosition) {
                             if case TileType.player = tiles[attackedTile] {
                                 return Input(.attack(potentialMonsterPosition, attackedTile))

@@ -257,7 +257,8 @@ extension Board {
                                          name: data.name,
                                          attack: data.attack,
                                          type: data.type,
-                                         carry: newCarryModel)
+                                         carry: newCarryModel,
+                                         animations: data.animations)
             
             updatedTiles[pp.x][pp.y] = TileType.player(playerData)
         }

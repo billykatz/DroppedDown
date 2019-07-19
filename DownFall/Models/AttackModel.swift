@@ -13,10 +13,9 @@ struct AttackModel: Equatable, Decodable {
     let range: RangeModel
     let damage: Int
     let directions: [Direction]
-    let animationPaths: [String]
     var hasAttacked: Bool = false
     
-    static let zero = AttackModel(frequency: 0, range: RangeModel(lower: 0, upper: 0), damage: 0, directions: [], animationPaths: [], hasAttacked: false)
+    static let zero = AttackModel(frequency: 0, range: RangeModel(lower: 0, upper: 0), damage: 0, directions: [], hasAttacked: false)
     
     var canAttack: Bool { return !hasAttacked }
 }

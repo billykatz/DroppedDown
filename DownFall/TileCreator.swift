@@ -28,7 +28,7 @@ class TileCreator: TileStrategy {
                 spawnedGem = true
                 return TileType.monster(entities[1])
             } else {
-                return TileType.monster(entities[0])
+                return TileType.monster(entities[5])
             }
         default:
             return TileType.allCases[index]
@@ -81,7 +81,7 @@ class TileCreator: TileStrategy {
             switch nextTile {
             case .blueRock, .blackRock, .greenRock:
                 newTiles.append(nextTile)
-            case .empty, .item, .player:
+            case .empty, .item, .player, .fireball:
                 ()
             case .exit:
                 if typeCount(for: tiles, of: .exit).count < 1,
@@ -119,7 +119,7 @@ class TileCreator: TileStrategy {
             switch nextTile {
             case .blueRock, .blackRock, .greenRock:
                 newTiles.append(nextTile)
-            case .exit, .player, .monster, .item, .empty:
+            case .exit, .player, .monster, .item, .empty, .fireball:
                 assertionFailure("randomRock should only create rocks")
             }
         }

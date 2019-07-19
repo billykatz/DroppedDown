@@ -25,6 +25,10 @@ class Renderer : SKSpriteNode {
     private var attackAnimation: [SKTexture]
     private var fallAnimation: [SKTexture]
     private var playerDamagedAnimation: [SKTexture]
+    private var dragonAttackAnimation: [SKTexture]
+    
+    //fireball
+    private var fireball: SKTexture
     
     var menuSpriteNode: MenuSpriteNode {
         return MenuSpriteNode(.pause, playableRect: playableRect, precedence: .menu)
@@ -57,15 +61,21 @@ class Renderer : SKSpriteNode {
         //load attack animation
         attackAnimation = SpriteSheet(texture: SKTexture(imageNamed: "playerAttack"),
                                       rows: 1,
-                                      columns: 10).animationsFrames()
+                                      columns: 10).animationFrames()
         
         fallAnimation = SpriteSheet(texture: SKTexture(imageNamed: "playerFall"),
                                       rows: 1,
-                                      columns: 9).animationsFrames()
+                                      columns: 9).animationFrames()
         
         playerDamagedAnimation = SpriteSheet(texture: SKTexture(imageNamed: "playerDamaged"),
                                              rows: 1,
-                                             columns: 9).animationsFrames()
+                                             columns: 9).animationFrames()
+        
+        dragonAttackAnimation = SpriteSheet(texture: SKTexture(imageNamed: "dragonAttack"),
+                                            rows: 1,
+                                            columns: 21).animationFrames()
+        
+        fireball = SKTexture(imageNamed: "fireball")
         
         
         super.init(texture: nil, color: .clear, size: CGSize.zero)
@@ -181,23 +191,72 @@ class Renderer : SKSpriteNode {
                                _ defenderPosition: TileCoord,
                                _ endTiles: [[TileType]]?) {
         guard let tiles = endTiles else { animationsFinished(for: sprites); return }
-        if tiles[attackerPosition] == TileType.player(.zero) {
-            let group = SKAction.animate(with: attackAnimation, timePerFrame: 0.07)
-            sprites[attackerPosition].run(group) { [weak self] in
+        if case let TileType.monster(monsterData) = tiles[attackerPosition],
+            case let TileType.player(playerData) = tiles[defenderPosition],
+            let attackAnimation = monsterData.animations.attackAnimation,
+            let hurtAnimation = playerData.animations.hurtAnimation {
+            let monsterAnimation = SKAction.animate(with: attackAnimation, timePerFrame: 0.07)
+            let playerAnimation = SKAction.animate(with: hurtAnimation, timePerFrame: 0.07)
+            let monsterRun = SKAction.run { [weak self] in
+                self?.sprites[attackerPosition].run(monsterAnimation)
+            }
+            let playerRun = SKAction.run { [weak self] in
+                self?.sprites[defenderPosition].run(playerAnimation)
+            }
+            
+            let group = SKAction.group([monsterRun, playerRun])
+            
+            foreground.run(group) { [weak self] in
                 guard let strongSelf = self else { return }
                 strongSelf.animationsFinished(for: strongSelf.sprites, endTiles: tiles)
             }
-        } else if tiles[attackerPosition] == TileType.monster(.zero) {
-            let colorize = SKAction.colorize(with: .red, colorBlendFactor: 0.9, duration: 0.2)
-            let playerDamaged = SKAction.animate(with: playerDamagedAnimation, timePerFrame: 0.07)
-            sprites[attackerPosition].run(colorize) { [weak self] in
+        } else if case let TileType.player(playerData) = tiles[attackerPosition],
+            let attackAnimation = playerData.animations.attackAnimation {
+            let playerAnimation = SKAction.animate(with: attackAnimation, timePerFrame: 0.07)
+            sprites[attackerPosition].run(playerAnimation) { [weak self] in
                 guard let strongSelf = self else { return }
-                strongSelf.sprites[defenderPosition].run(playerDamaged) { [weak self] in
-                    guard let strongSelf = self else { return }
-                    strongSelf.animationsFinished(for: strongSelf.sprites, endTiles: tiles)
-                }
+                strongSelf.animationsFinished(for: strongSelf.sprites, endTiles: tiles)
             }
         }
+        
+//        animationsFinished(for: sprites, endTiles: tiles)
+//        if tiles[attackerPosition] == TileType.player(.zero) {
+//            let group = SKAction.animate(with: attackAnimation, timePerFrame: 0.07)
+//            sprites[attackerPosition].run(group) { [weak self] in
+//                guard let strongSelf = self else { return }
+//                strongSelf.animationsFinished(for: strongSelf.sprites, endTiles: tiles)
+//            }
+//        } else if case let TileType.monster(monsterData) = tiles[attackerPosition] {
+//            switch monsterData.type {
+//            case .monster:
+//                let colorize = SKAction.colorize(with: .red, colorBlendFactor: 0.9, duration: 0.2)
+//                let playerDamaged = SKAction.animate(with: playerDamagedAnimation, timePerFrame: 0.07)
+//                sprites[attackerPosition].run(colorize) { [weak self] in
+//                    guard let strongSelf = self else { return }
+//                    strongSelf.sprites[defenderPosition].run(playerDamaged) { [weak self] in
+//                        guard let strongSelf = self else { return }
+//                        strongSelf.animationsFinished(for: strongSelf.sprites, endTiles: tiles)
+//                    }
+//                }
+//            case .dragon:
+//                let group = SKAction.animate(with: dragonAttackAnimation, timePerFrame: 0.07)
+//                showFireballs(starting: attackerPosition)
+//                sprites[attackerPosition].run(group) { [weak self] in
+//                    guard let strongSelf = self else { return }
+//                    strongSelf.animationsFinished(for: strongSelf.sprites, endTiles: tiles)
+//                }
+//            case .player:
+//                ()
+//            }
+//        }
+    }
+    
+    private func allCoordinatesAbove(coord: TileCoord) -> [TileCoord] {
+        var coordinates: [TileCoord] = []
+        for row in coord.x+1..<Int(boardSize) {
+            coordinates.append(TileCoord(row, coord.y))
+        }
+        return coordinates
     }
     
     private func add(sprites: [[DFTileSpriteNode]]) {
@@ -207,6 +266,49 @@ class Renderer : SKSpriteNode {
                 spriteForeground.addChild(sprite)
             }
         }
+    }
+    
+    private func add(sprites: [DFTileSpriteNode], with delay: Double) {
+        let wait = SKAction.wait(forDuration: delay)
+        var adds: [SKAction] = []
+        sprites.forEach { sprite in
+            let add = SKAction.run { [weak self] in
+                self?.spriteForeground.addChild(sprite)
+            }
+            adds.append(add)
+        }
+        
+        var sequence: [SKAction] = []
+        for add in adds {
+            sequence.append(contentsOf: [wait, add])
+        }
+        
+        run(SKAction.sequence(sequence))
+    }
+    
+    func showFireballs(starting fromCoord: TileCoord) {
+        let allCoords = allCoordinatesAbove(coord: fromCoord)
+        let fireballs = createFireballSprites(at: allCoords)
+        add(sprites: fireballs, with: 10)
+    }
+    
+    func createFireballSprites(at coords: [TileCoord]) -> [DFTileSpriteNode] {
+        var sprites: [DFTileSpriteNode] = []
+        var x : CGFloat = 0
+        var y : CGFloat = 0
+        for coordinate in coords {
+            x = CGFloat(coordinate.y) * tileSize + bottomLeft.x
+            y = CGFloat(coordinate.x) * tileSize + bottomLeft.y
+            let sprite = DFTileSpriteNode(type: .fireball,
+                                          height: tileSize,
+                                          width: tileSize)
+            sprite.name = "fireball"
+            sprite.position = CGPoint(x: x, y: y)
+            sprite.zPosition = Precedence.foreground.rawValue
+            sprites.append(sprite)
+            spriteForeground.addChild(sprite)
+        }
+        return sprites
     }
     
     func createSprites(from tiles: [[TileType]]?) -> [[DFTileSpriteNode]] {

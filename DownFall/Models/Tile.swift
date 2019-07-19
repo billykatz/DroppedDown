@@ -9,7 +9,7 @@
 enum TileType: Equatable, Hashable, CaseIterable {
     
     static var rockCases: [TileType] = [.blueRock, .blackRock, .greenRock]
-    static var allCases: [TileType] = [.blueRock, .blackRock ,.greenRock, .player(.zero), .exit, .empty, .monster(.zero), .item(.zero)]
+    static var allCases: [TileType] = [.blueRock, .blackRock ,.greenRock, .player(.zero), .exit, .empty, .monster(.zero), .item(.zero), .fireball]
     typealias AllCases = [TileType]
 
     static func == (lhs: TileType, rhs: TileType) -> Bool {
@@ -43,6 +43,7 @@ enum TileType: Equatable, Hashable, CaseIterable {
     case empty
     case exit
     case item(Item)
+    case fireball
     
     func isARock() -> Bool {
         switch self {
@@ -80,6 +81,8 @@ enum TileType: Equatable, Hashable, CaseIterable {
             return data.name
         case .item(let item):
             return item.textureName
+        case .fireball:
+            return TextueName.fireball.rawValue
         }
     }
     
@@ -93,5 +96,6 @@ enum TileType: Equatable, Hashable, CaseIterable {
         case exit
         case greenMonster
         case gem1
+        case fireball
     }
 }

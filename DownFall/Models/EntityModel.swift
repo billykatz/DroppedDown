@@ -15,6 +15,7 @@ protocol ResetsAttacks {
 struct EntityModel: Equatable, Decodable {
         
     enum EntityType: String, Decodable {
+        case rat
         case dragon
         case monster
         case player

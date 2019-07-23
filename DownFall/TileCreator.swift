@@ -28,7 +28,7 @@ class TileCreator: TileStrategy {
                 spawnedGem = true
                 return TileType.monster(entities[1])
             } else {
-                return TileType.monster(entities[5])
+                return TileType.monster(entities[6])
             }
         default:
             return TileType.allCases[index]

@@ -252,6 +252,51 @@
                 }]
                 
             }
+        },
+        { "name": "rat",
+            "type": "rat",
+            "hp": 1,
+            "attack": {
+                "frequency": 0,
+                "directions": ["east", "west"],
+                "damage": 1,
+                "range": {
+                    "lower": 1,
+                    "upper": 1
+                },
+                "hasAttacked": false
+            },
+            "animations": {
+                "attack": {
+                    "animationFilename": "ratAttack",
+                    "numberOfFrames": 7
+                },
+                "hurt": {
+                    "animationFilename": "ratHurt",
+                    "numberOfFrames": 5
+                },
+                "dying": {
+                    "animationFilename": "ratDying",
+                    "numberOfFrames": 5
+                },
+                "idle": {
+                    "animationFilename": "ratIdle",
+                    "numberOfFrames": 5
+                },
+                "fall":{
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                }
+            },
+            "carry": {
+                "item": [{
+                    "type": "gold",
+                    "range": {
+                        "lower": 5,
+                        "upper": 10
+                    }
+                }]
+            }
         }
     ]
 }

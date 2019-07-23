@@ -192,19 +192,29 @@ class Renderer : SKSpriteNode {
                                _ endTiles: [[TileType]]?) {
         guard let tiles = endTiles else { animationsFinished(for: sprites); return }
         if case let TileType.monster(monsterData) = tiles[attackerPosition],
-            case let TileType.player(playerData) = tiles[defenderPosition],
-            let attackAnimation = monsterData.animations.attackAnimation,
-            let hurtAnimation = playerData.animations.hurtAnimation {
-            let monsterAnimation = SKAction.animate(with: attackAnimation, timePerFrame: 0.07)
-            let playerAnimation = SKAction.animate(with: hurtAnimation, timePerFrame: 0.07)
-            let monsterRun = SKAction.run { [weak self] in
-                self?.sprites[attackerPosition].run(monsterAnimation)
+            case let TileType.player(playerData) = tiles[defenderPosition] {
+            
+            //
+            var monsterRun: SKAction? = nil
+            let playerRun: SKAction
+            
+            //attack animation
+            if let attackAnimationFrames = monsterData.animations.attackAnimation {
+                let monsterAnimation = SKAction.animate(with: attackAnimationFrames, timePerFrame: 0.07)
+                monsterRun = SKAction.run { [weak self] in
+                    self?.sprites[attackerPosition].run(monsterAnimation)
+                }
             }
-            let playerRun = SKAction.run { [weak self] in
+            
+            //hurt animations
+            let playerAnimation = SKAction.animate(with: playerData.animations.hurtAnimation ?? [], timePerFrame: 0.07)
+            playerRun = SKAction.run { [weak self] in
                 self?.sprites[defenderPosition].run(playerAnimation)
             }
             
-            let group = SKAction.group([monsterRun, playerRun])
+            let groupedActions: [SKAction] = monsterRun != nil ? [monsterRun!, playerRun] : [playerRun]
+            
+            let group = SKAction.group(groupedActions)
             
             foreground.run(group) { [weak self] in
                 guard let strongSelf = self else { return }
@@ -218,37 +228,6 @@ class Renderer : SKSpriteNode {
                 strongSelf.animationsFinished(for: strongSelf.sprites, endTiles: tiles)
             }
         }
-        
-//        animationsFinished(for: sprites, endTiles: tiles)
-//        if tiles[attackerPosition] == TileType.player(.zero) {
-//            let group = SKAction.animate(with: attackAnimation, timePerFrame: 0.07)
-//            sprites[attackerPosition].run(group) { [weak self] in
-//                guard let strongSelf = self else { return }
-//                strongSelf.animationsFinished(for: strongSelf.sprites, endTiles: tiles)
-//            }
-//        } else if case let TileType.monster(monsterData) = tiles[attackerPosition] {
-//            switch monsterData.type {
-//            case .monster:
-//                let colorize = SKAction.colorize(with: .red, colorBlendFactor: 0.9, duration: 0.2)
-//                let playerDamaged = SKAction.animate(with: playerDamagedAnimation, timePerFrame: 0.07)
-//                sprites[attackerPosition].run(colorize) { [weak self] in
-//                    guard let strongSelf = self else { return }
-//                    strongSelf.sprites[defenderPosition].run(playerDamaged) { [weak self] in
-//                        guard let strongSelf = self else { return }
-//                        strongSelf.animationsFinished(for: strongSelf.sprites, endTiles: tiles)
-//                    }
-//                }
-//            case .dragon:
-//                let group = SKAction.animate(with: dragonAttackAnimation, timePerFrame: 0.07)
-//                showFireballs(starting: attackerPosition)
-//                sprites[attackerPosition].run(group) { [weak self] in
-//                    guard let strongSelf = self else { return }
-//                    strongSelf.animationsFinished(for: strongSelf.sprites, endTiles: tiles)
-//                }
-//            case .player:
-//                ()
-//            }
-//        }
     }
     
     private func allCoordinatesAbove(coord: TileCoord) -> [TileCoord] {

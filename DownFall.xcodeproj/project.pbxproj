@@ -7,12 +7,21 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3D06390122EEB4FB00C4D5E9 /* PauseState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D06390022EEB4FB00C4D5E9 /* PauseState.swift */; };
+		3D06390322EEB50C00C4D5E9 /* PlayState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D06390222EEB50C00C4D5E9 /* PlayState.swift */; };
+		3D06390522EEB52300C4D5E9 /* LoseState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D06390422EEB52300C4D5E9 /* LoseState.swift */; };
+		3D06390722EEB53C00C4D5E9 /* ComputingState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D06390622EEB53C00C4D5E9 /* ComputingState.swift */; };
+		3D06390922EEB54E00C4D5E9 /* ReffingState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D06390822EEB54E00C4D5E9 /* ReffingState.swift */; };
+		3D06390B22EEB56100C4D5E9 /* AnimatingState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D06390A22EEB56100C4D5E9 /* AnimatingState.swift */; };
+		3D06390D22EEB57300C4D5E9 /* WinState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D06390C22EEB57300C4D5E9 /* WinState.swift */; };
+		3D06390F22F1DB8300C4D5E9 /* StoreScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D06390E22F1DB8300C4D5E9 /* StoreScene.swift */; };
 		3D18A39D224D68D300343C29 /* Dispatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D18A39C224D68D300343C29 /* Dispatch.swift */; };
 		3D2C757322C85362009ABD36 /* Direction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D2C757222C85362009ABD36 /* Direction.swift */; };
 		3D2C757522C854F8009ABD36 /* ItemModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D2C757422C854F8009ABD36 /* ItemModel.swift */; };
 		3D30A4222216888300AFA1E1 /* RendererTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D30A4212216888300AFA1E1 /* RendererTests.swift */; };
 		3D30A4292216899E00AFA1E1 /* BoardMocker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D30A4232216892A00AFA1E1 /* BoardMocker.swift */; };
 		3D30A42B2217F63500AFA1E1 /* TileCoord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D30A42A2217F63500AFA1E1 /* TileCoord.swift */; };
+		3D46333A22E7A4A1009159FF /* ObjectiveTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D46333922E7A4A1009159FF /* ObjectiveTracker.swift */; };
 		3D4F569222B2D087003695D8 /* SpriteSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4F569122B2D087003695D8 /* SpriteSheet.swift */; };
 		3D4F569422B33B44003695D8 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4F569322B33B44003695D8 /* Helpers.swift */; };
 		3D4F569622B88A90003695D8 /* HapticGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4F569522B88A90003695D8 /* HapticGenerator.swift */; };
@@ -87,12 +96,21 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		3D06390022EEB4FB00C4D5E9 /* PauseState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PauseState.swift; sourceTree = "<group>"; };
+		3D06390222EEB50C00C4D5E9 /* PlayState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayState.swift; sourceTree = "<group>"; };
+		3D06390422EEB52300C4D5E9 /* LoseState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoseState.swift; sourceTree = "<group>"; };
+		3D06390622EEB53C00C4D5E9 /* ComputingState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComputingState.swift; sourceTree = "<group>"; };
+		3D06390822EEB54E00C4D5E9 /* ReffingState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReffingState.swift; sourceTree = "<group>"; };
+		3D06390A22EEB56100C4D5E9 /* AnimatingState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatingState.swift; sourceTree = "<group>"; };
+		3D06390C22EEB57300C4D5E9 /* WinState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WinState.swift; sourceTree = "<group>"; };
+		3D06390E22F1DB8300C4D5E9 /* StoreScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreScene.swift; sourceTree = "<group>"; };
 		3D18A39C224D68D300343C29 /* Dispatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dispatch.swift; sourceTree = "<group>"; };
 		3D2C757222C85362009ABD36 /* Direction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Direction.swift; sourceTree = "<group>"; };
 		3D2C757422C854F8009ABD36 /* ItemModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemModel.swift; sourceTree = "<group>"; };
 		3D30A4212216888300AFA1E1 /* RendererTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RendererTests.swift; sourceTree = "<group>"; };
 		3D30A4232216892A00AFA1E1 /* BoardMocker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardMocker.swift; sourceTree = "<group>"; };
 		3D30A42A2217F63500AFA1E1 /* TileCoord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileCoord.swift; sourceTree = "<group>"; };
+		3D46333922E7A4A1009159FF /* ObjectiveTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectiveTracker.swift; sourceTree = "<group>"; };
 		3D4F569122B2D087003695D8 /* SpriteSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteSheet.swift; sourceTree = "<group>"; };
 		3D4F569322B33B44003695D8 /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
 		3D4F569522B88A90003695D8 /* HapticGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticGenerator.swift; sourceTree = "<group>"; };
@@ -178,6 +196,29 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3D0638FF22EEB4E600C4D5E9 /* GameState */ = {
+			isa = PBXGroup;
+			children = (
+				3DE87C93223D691100D750CF /* GameState.swift */,
+				3D06390C22EEB57300C4D5E9 /* WinState.swift */,
+				3D06390022EEB4FB00C4D5E9 /* PauseState.swift */,
+				3D06390222EEB50C00C4D5E9 /* PlayState.swift */,
+				3D06390622EEB53C00C4D5E9 /* ComputingState.swift */,
+				3D06390822EEB54E00C4D5E9 /* ReffingState.swift */,
+				3D06390A22EEB56100C4D5E9 /* AnimatingState.swift */,
+				3D06390422EEB52300C4D5E9 /* LoseState.swift */,
+			);
+			path = GameState;
+			sourceTree = "<group>";
+		};
+		3D46333822E7A488009159FF /* Objective */ = {
+			isa = PBXGroup;
+			children = (
+				3D46333922E7A4A1009159FF /* ObjectiveTracker.swift */,
+			);
+			name = Objective;
+			sourceTree = "<group>";
+		};
 		3D528FDD2155B17200EF65CA /* Scenes */ = {
 			isa = PBXGroup;
 			children = (
@@ -186,6 +227,7 @@
 				3D73D2E521C2226F00DB6FB7 /* PlayerWait.sks */,
 				3D674C9222C9D54C0003AEB4 /* LevelSelect.sks */,
 				3D674C9422C9D6640003AEB4 /* LevelSelect.swift */,
+				3D06390E22F1DB8300C4D5E9 /* StoreScene.swift */,
 			);
 			path = Scenes;
 			sourceTree = "<group>";
@@ -305,9 +347,10 @@
 				3DA4E881228E5D1B006E90D1 /* Extensions */,
 				3D528FDE2155BD7200EF65CA /* Assets.xcassets */,
 				3D90AAD121D8863100C7428A /* Referee.swift */,
+				3D46333822E7A488009159FF /* Objective */,
 				3D9C505F21FE206000A2210D /* Renderer.swift */,
 				3DA0087C21E6D1960017D8DA /* TileCreator.swift */,
-				3DE87C93223D691100D750CF /* GameState.swift */,
+				3D0638FF22EEB4E600C4D5E9 /* GameState */,
 				3DE87C8C2235D03300D750CF /* Views */,
 				3DA4E89E2290B77E006E90D1 /* Entity */,
 				3DF2928120A66A4E006671AC /* Models */,
@@ -484,6 +527,7 @@
 			files = (
 				3D4F569422B33B44003695D8 /* Helpers.swift in Sources */,
 				3DF2925420A37FEE006671AC /* GameScene.swift in Sources */,
+				3D06390B22EEB56100C4D5E9 /* AnimatingState.swift in Sources */,
 				3D5FB09420AE768700ACD716 /* AnimationSettings.swift in Sources */,
 				3DF2925620A37FEE006671AC /* GameViewController.swift in Sources */,
 				3D7EF45C21D18D9000A2D9E8 /* Transformation.swift in Sources */,
@@ -498,26 +542,33 @@
 				3D6AACD8222A324D00C77B24 /* CGRectHelpers.swift in Sources */,
 				3DE657CD20B0AFD2003492DA /* Int+Extensions.swift in Sources */,
 				3DA0087D21E6D1960017D8DA /* TileCreator.swift in Sources */,
+				3D06390522EEB52300C4D5E9 /* LoseState.swift in Sources */,
 				3D30A42B2217F63500AFA1E1 /* TileCoord.swift in Sources */,
 				3D58468C22A632F100EDD845 /* AttackModel.swift in Sources */,
+				3D06390922EEB54E00C4D5E9 /* ReffingState.swift in Sources */,
 				3D635E8F22E20CDA0090C99C /* AnimationModel.swift in Sources */,
 				3DE87C94223D691100D750CF /* GameState.swift in Sources */,
 				3D674C9122C9BFDB0003AEB4 /* UIColor+Extensions.swift in Sources */,
+				3D46333A22E7A4A1009159FF /* ObjectiveTracker.swift in Sources */,
 				3DA4E883228E5D2F006E90D1 /* SKSpriteNode+Extensions.swift in Sources */,
 				3D58468822A6322900EDD845 /* RangeModel.swift in Sources */,
 				3DE87C9022374C2C00D750CF /* Button.swift in Sources */,
 				3DF2924E20A37FEE006671AC /* AppDelegate.swift in Sources */,
+				3D06390122EEB4FB00C4D5E9 /* PauseState.swift in Sources */,
 				3D58468A22A6325300EDD845 /* CarryModel.swift in Sources */,
 				3DF2928320A66BEB006671AC /* Tile.swift in Sources */,
 				3DA0087F21EADDDE0017D8DA /* Animator.swift in Sources */,
 				3DA4E88B228FC156006E90D1 /* Util.swift in Sources */,
 				3DE87C8E2235D05300D750CF /* MenuSpriteNode.swift in Sources */,
 				3D6AACE1222C997800C77B24 /* Header.swift in Sources */,
+				3D06390322EEB50C00C4D5E9 /* PlayState.swift in Sources */,
 				3DD36ECB21E5B86100AC4873 /* TileStrategy.swift in Sources */,
+				3D06390F22F1DB8300C4D5E9 /* StoreScene.swift in Sources */,
 				3D90AAD321D8869200C7428A /* Referee.swift in Sources */,
 				3D9C506021FE206000A2210D /* Renderer.swift in Sources */,
 				3DA4E88F228FC860006E90D1 /* SKNode+Extension.swift in Sources */,
 				3DC9CA1321D1DDD4004D05D5 /* Difficulty.swift in Sources */,
+				3D06390D22EEB57300C4D5E9 /* WinState.swift in Sources */,
 				3D4F569222B2D087003695D8 /* SpriteSheet.swift in Sources */,
 				3D2C757322C85362009ABD36 /* Direction.swift in Sources */,
 				3D7D8B332253E5BC0016FE4C /* HUD.swift in Sources */,
@@ -525,6 +576,7 @@
 				3D18A39D224D68D300343C29 /* Dispatch.swift in Sources */,
 				3D7D8B2D2252857E0016FE4C /* CombatHelper.swift in Sources */,
 				3DA4E8972290A88C006E90D1 /* EntityModel.swift in Sources */,
+				3D06390722EEB53C00C4D5E9 /* ComputingState.swift in Sources */,
 				3D674C9522C9D6640003AEB4 /* LevelSelect.swift in Sources */,
 				3DA4E88D228FC7FC006E90D1 /* Label.swift in Sources */,
 				3D7D8B352253F9850016FE4C /* HelperTextView.swift in Sources */,

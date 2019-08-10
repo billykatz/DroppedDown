@@ -11,21 +11,18 @@ import SpriteKit
 
 class Renderer : SKSpriteNode {
     private let playableRect: CGRect
-    private(set) var foreground: SKNode = SKNode()
+    let foreground: SKNode
     private var sprites: [[DFTileSpriteNode]] = []
     private let bottomLeft: CGPoint
     private let boardSize: CGFloat!
-    private let tileSize: CGFloat = 125
+    private let tileSize: CGFloat = 100
     private let precedence: Precedence
     
     private var spriteForeground = SKNode()
     private var menuForeground = SKNode()
     
     //Animations
-    private var attackAnimation: [SKTexture]
     private var fallAnimation: [SKTexture]
-    private var playerDamagedAnimation: [SKTexture]
-    private var dragonAttackAnimation: [SKTexture]
     
     //fireball
     private var fireball: SKTexture
@@ -59,32 +56,18 @@ class Renderer : SKSpriteNode {
         self.bottomLeft = CGPoint(x: bottomLeftX, y: bottomLeftY)
         
         //load attack animation
-        attackAnimation = SpriteSheet(texture: SKTexture(imageNamed: "playerAttack"),
-                                      rows: 1,
-                                      columns: 10).animationFrames()
-        
         fallAnimation = SpriteSheet(texture: SKTexture(imageNamed: "playerFall"),
                                       rows: 1,
                                       columns: 9).animationFrames()
         
-        playerDamagedAnimation = SpriteSheet(texture: SKTexture(imageNamed: "playerDamaged"),
-                                             rows: 1,
-                                             columns: 9).animationFrames()
-        
-        dragonAttackAnimation = SpriteSheet(texture: SKTexture(imageNamed: "dragonAttack"),
-                                            rows: 1,
-                                            columns: 21).animationFrames()
-        
         fireball = SKTexture(imageNamed: "fireball")
         
+        foreground = givenForeground
         
         super.init(texture: nil, color: .clear, size: CGSize.zero)
         
         isUserInteractionEnabled = true
     
-        foreground = givenForeground
-        
-        
 
         //create sprite representations based on the given board.tiles
         self.sprites = createSprites(from: board.tiles)
@@ -117,6 +100,7 @@ class Renderer : SKSpriteNode {
         helperTextView = HelperTextView.build(color: UIColor(rgb: 0x9c461f), size: CGSize(width: playableRect.width * 0.9, height: 200))
         helperTextView.position = CGPoint(x: playableRect.midX, y: playableRect.maxY - header.size.height - 116)
         
+
         [spriteForeground, header, controls, hud, helperTextView].forEach { foreground.addChild($0) }
         
         // Register for Dispatch
@@ -302,7 +286,7 @@ class Renderer : SKSpriteNode {
                 x = CGFloat(col) * tileSize + bottomLeft.x
                 if tiles[row][col] == TileType.player(.zero) {
                     //TODO: Don't hardcode height and width
-                    sprites[row].append(DFTileSpriteNode(type: tiles[row][col], height: 200, width: 100))
+                    sprites[row].append(DFTileSpriteNode(type: tiles[row][col], height: 160, width: 80))
                 } else {
                     sprites[row].append(DFTileSpriteNode(type: tiles[row][col], size: CGFloat(tileSize)))
                 }

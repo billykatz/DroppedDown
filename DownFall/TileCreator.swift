@@ -12,12 +12,16 @@ class TileCreator: TileStrategy {
     
     var spawnedGem = false
     var randomSource = GKLinearCongruentialRandomSource()
-    var entities: [EntityModel]
-    var difficulty: Difficulty
+    let entities: [EntityModel]
+    let difficulty: Difficulty
+    let objectiveTracker: ObjectiveTracker
     
-    init(_ entities: [EntityModel], difficulty: Difficulty) {
+    init(_ entities: [EntityModel],
+         difficulty: Difficulty,
+         objectiveTracker: ObjectiveTracker) {
         self.entities = entities
         self.difficulty = difficulty
+        self.objectiveTracker = objectiveTracker
     }
     
     func randomTile(_ given: Int) -> TileType {
@@ -66,14 +70,6 @@ class TileCreator: TileStrategy {
     func tiles(for tiles: [[TileType]]) -> [TileType] {
         var newTiles: [TileType] = []
         var newMonsterCount = 0
-        var spawnExit = false
-        if let playerPosition = getTilePosition(.player(.zero), tiles: tiles),
-            case let TileType.player(data) = tiles[playerPosition] {
-            if data.carry.hasGem {
-                spawnExit = true
-            }
-        }
-        
         let currentMonsterCount =  typeCount(for: tiles, of: .monster(.zero)).count
         while (newTiles.count < typeCount(for: tiles, of: .empty).count) {
             let nextTile = randomTile(randomSource.nextInt())
@@ -86,7 +82,7 @@ class TileCreator: TileStrategy {
             case .exit:
                 if typeCount(for: tiles, of: .exit).count < 1,
                     !newTiles.contains(.exit),
-                    spawnExit
+                    objectiveTracker.shouldSpawnExit
                 {
                     newTiles.append(nextTile)
                 }
@@ -108,7 +104,8 @@ class TileCreator: TileStrategy {
      - difficulty: The level of difficuly
  
     */
-    func board(_ boardSize: Int, difficulty: Difficulty) -> [[TileType]] {
+    func board(_ boardSize: Int,
+               difficulty: Difficulty) -> [[TileType]] {
         
         //TODO: determine when we should add monsters to a new board
         
@@ -152,5 +149,4 @@ class TileCreator: TileStrategy {
             return entities[4]
         }
     }
-
 }

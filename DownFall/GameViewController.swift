@@ -13,7 +13,7 @@ import GameplayKit
 class GameViewController: UIViewController {
 
     private var gameSceneNode: GameScene?
-    private var boardSize = 7
+    private var boardSize = 9
     private var entities: [EntityModel]?
     private var selectedDifficulty: Difficulty = .normal
     

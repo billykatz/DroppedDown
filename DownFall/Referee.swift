@@ -87,9 +87,7 @@ class Referee {
         func playerWins() -> Input? {
             guard let pp = playerPosition,
                 isWithinBounds(pp.rowBelow),
-                case TileType.exit = tiles[pp.rowBelow],
-                case let TileType.player(data) = tiles[pp],
-                data.carry.hasGem else { return nil }
+                case TileType.exit = tiles[pp.rowBelow] else { return nil }
             return Input(.gameWin)
         }
         

@@ -9,10 +9,18 @@
 import SpriteKit
 
 indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringConvertible{
-    static var allCases: [InputType] = [.touch(TileCoord(0,0), .blueRock), .rotateLeft, .rotateRight,
-                                        .attack(TileCoord(0,0), TileCoord(0,0)), .monsterDies(TileCoord(0,0)),
-                                        .gameWin, .gameLose(""), .play, .pause,
-                                        .animationsFinished, .playAgain, .reffingFinished,
+    static var allCases: [InputType] = [.touch(TileCoord(0,0), .blueRock),
+                                        .rotateLeft,
+                                        .rotateRight,
+                                        .attack(TileCoord(0,0), TileCoord(0,0)),
+                                        .monsterDies(TileCoord(0,0)),
+                                        .gameWin,
+                                        .gameLose(""),
+                                        .play,
+                                        .pause,
+                                        .animationsFinished,
+                                        .playAgain,
+                                        .reffingFinished,
                                         .collectItem(TileCoord(0,0), .zero)]
     
     typealias AllCases = [InputType]
@@ -34,27 +42,17 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
     case collectItem(TileCoord, Item)
     case selectLevel
     
-    var canBeNonUserGenerated: Bool {
-        switch self {
-            case .attack, .monsterDies,
-                 .animationsFinished, .gameWin, .gameLose, .transformation:
-            return true
-        default:
-            return false
-        }
-    }
-    
     var debugDescription: String {
         switch self {
         case .transformation:
             return "Transformation"
-        case .touch(_):
+        case .touch:
             return "Touch"
         case .rotateLeft:
             return "Rotate Left"
         case .rotateRight:
             return "Rotate Right"
-        case .monsterDies(_):
+        case .monsterDies:
             return "Monster Dies"
         case .gameWin:
             return "Game Win"

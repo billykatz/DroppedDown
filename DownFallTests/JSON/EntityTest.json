@@ -2,6 +2,7 @@
     "entities": [
         { "name": "Gloop",
             "type": "monster",
+            "originalHp": 1,
             "hp": 1,
             "attack": {
                 "frequency": 0,
@@ -11,8 +12,29 @@
                     "lower": 1,
                     "upper": 1
                 },
-                "animationPaths": ["Animations/gloop.png"],
-                "hasAttacked": false
+                "attacksPerTurn": 1
+            },
+            "animations": {
+                "attack": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "hurt": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "dying": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "idle": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "fall":{
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                }
             },
             "carry": {
                 "item": [{
@@ -22,10 +44,12 @@
                         "upper": 10
                     }
                 }]
-            }
+            },
+            "abilities": []
         },
         { "name": "GloopWithGem",
             "type": "monster",
+            "originalHp": 1,
             "hp": 1,
             "attack": {
                 "frequency": 0,
@@ -35,8 +59,29 @@
                     "lower": 1,
                     "upper": 1
                 },
-                "animationPaths": ["Animations/gloop.png"],
-                "hasAttacked": false
+                "attacksPerTurn": 1
+            },
+            "animations": {
+                "attack": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "hurt": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "dying": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "idle": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "fall":{
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                }
             },
             "carry": {
                 "item": [{
@@ -46,10 +91,12 @@
                         "upper": 1
                     }
                 }]
-            }
+            },
+            "abilities": []
         },
         { "name": "player2",
             "type": "player",
+            "originalHp": 3,
             "hp": 3,
             "attack": {
                 "frequency": 0,
@@ -59,12 +106,211 @@
                     "lower": 1,
                     "upper": 1
                 },
-                "animationPaths": ["Animations/player.png"],
-                "hasAttacked": false
+                "attacksPerTurn": 1
+            },
+            "animations": {
+                "attack": {
+                    "animationFilename": "playerAttack",
+                    "numberOfFrames": 10
+                },
+                "hurt": {
+                    "animationFilename": "playerDamaged",
+                    "numberOfFrames": 9
+                },
+                "dying": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "idle": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "fall":{
+                    "animationFilename": "playerFall",
+                    "numberOfFrames": 9
+                }
             },
             "carry": {
                 "item": []
-            }
+            },
+            "abilities": []
+        },
+        { "name": "player2",
+            "type": "player",
+            "originalHp": 2,
+            "hp": 2,
+            "attack": {
+                "frequency": 0,
+                "directions": ["south"],
+                "damage": 1,
+                "range": {
+                    "lower": 1,
+                    "upper": 1
+                },
+                "attacksPerTurn": 1
+            },
+            "animations": {
+                "attack": {
+                    "animationFilename": "playerAttack",
+                    "numberOfFrames": 10
+                },
+                "hurt": {
+                    "animationFilename": "playerDamaged",
+                    "numberOfFrames": 9
+                },
+                "dying": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "idle": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "fall":{
+                    "animationFilename": "playerFall",
+                    "numberOfFrames": 9
+                }
+            },
+            "carry": {
+                "item": []
+            },
+            "abilities": []
+        },
+        { "name": "player2",
+            "type": "player",
+            "originalHp": 1,
+            "hp": 1,
+            "attack": {
+                "frequency": 0,
+                "directions": ["south"],
+                "damage": 1,
+                "range": {
+                    "lower": 1,
+                    "upper": 1
+                },
+                "attacksPerTurn": 1
+            },
+            "animations": {
+                "attack": {
+                    "animationFilename": "playerAttack",
+                    "numberOfFrames": 10
+                },
+                "hurt": {
+                    "animationFilename": "playerDamaged",
+                    "numberOfFrames": 9
+                },
+                "dying": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "idle": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "fall":{
+                    "animationFilename": "playerFall",
+                    "numberOfFrames": 9
+                }
+            },
+            "carry": {
+                "item": []
+            },
+            "abilities": []
+        },
+        { "name": "dragon",
+            "type": "dragon",
+            "originalHp": 1,
+            "hp": 1,
+            "attack": {
+                "frequency": 0,
+                "directions": ["north"],
+                "damage": 1,
+                "range": {
+                    "lower": 1,
+                    "upper": 10
+                },
+                "attacksPerTurn": 1
+            },
+            "animations": {
+                "attack": {
+                    "animationFilename": "dragonAttack",
+                    "numberOfFrames": 21
+                },
+                "hurt": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "dying": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "idle": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "fall":{
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                }
+            },
+            "carry": {
+                "item": [{
+                    "type": "gold",
+                    "range": {
+                        "lower": 5,
+                        "upper": 10
+                    }
+                }]
+                
+            },
+            "abilities": []
+        },
+        { "name": "rat",
+            "type": "rat",
+            "originalHp": 2,
+            "hp": 2,
+            "attack": {
+                "frequency": 0,
+                "directions": ["east", "west"],
+                "damage": 1,
+                "range": {
+                    "lower": 1,
+                    "upper": 1
+                },
+                "attacksPerTurn": 1
+            },
+            "animations": {
+                "attack": {
+                    "animationFilename": "ratAttack",
+                    "numberOfFrames": 7
+                },
+                "hurt": {
+                    "animationFilename": "ratHurt",
+                    "numberOfFrames": 5
+                },
+                "dying": {
+                    "animationFilename": "ratDying",
+                    "numberOfFrames": 5
+                },
+                "idle": {
+                    "animationFilename": "ratIdle",
+                    "numberOfFrames": 5
+                },
+                "fall":{
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                }
+            },
+            "carry": {
+                "item": [{
+                    "type": "gold",
+                    "range": {
+                        "lower": 5,
+                        "upper": 10
+                    }
+                }]
+            },
+            "abilities": []
         }
     ]
 }

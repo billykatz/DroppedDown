@@ -13,6 +13,8 @@ enum ButtonIdentifier: String {
     case resume
     case playAgain
     case selectLevel
+    case leaveStore
+    case storeItem
     
     var title: String {
         switch self {
@@ -22,6 +24,10 @@ enum ButtonIdentifier: String {
             return "Play Again?"
         case .selectLevel:
             return "Level Select"
+        case .leaveStore:
+            return "Leave Store"
+        case .storeItem:
+            return ""
         }
     }
 }
@@ -35,8 +41,21 @@ class Button: SKSpriteNode {
     
     init(size: CGSize,
          delegate: ButtonDelegate,
-         identifier: ButtonIdentifier,
+         textureName: String,
          precedence: Precedence) {
+        
+        self.delegate = delegate
+        super.init(texture: SKTexture(imageNamed: textureName), color: .white, size: size)
+        name = textureName
+        isUserInteractionEnabled = true
+        zPosition = precedence.rawValue
+    }
+    
+    init(size: CGSize,
+         delegate: ButtonDelegate,
+         identifier: ButtonIdentifier,
+         precedence: Precedence,
+         fontSize: CGFloat = 80) {
         
         //Set properties
         self.delegate = delegate
@@ -52,7 +71,8 @@ class Button: SKSpriteNode {
         let label = Label(text: identifier.title,
                           delegate: self,
                           precedence: precedence,
-                          identifier: identifier)
+                          identifier: identifier,
+                          fontSize: fontSize)
         label.position = self.frame.center
         
         // Add Label

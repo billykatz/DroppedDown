@@ -12,6 +12,7 @@ import UIKit
 protocol GameSceneDelegate: class {
     func reset()
     func selectLevel()
+    func visitStore(_ playerData: EntityModel)
 }
 
 class GameScene: SKScene {
@@ -49,7 +50,8 @@ class GameScene: SKScene {
     /// Creates an instance of board and does preparationg necessary for didMove(to:) to be called
     public func commonInit(boardSize bsize: Int,
                            entities: [EntityModel],
-                           difficulty: Difficulty = .normal){
+                           difficulty: Difficulty = .normal,
+                           updatedEntity: EntityModel? = nil){
         //TODO: the  order of the following lines of code matter.  (bottom left has to happen before create and position. Consider refactoring
         InputQueue.reset()
         foreground = SKNode()
@@ -75,7 +77,8 @@ class GameScene: SKScene {
         //tile creatore
         tileCreator = TileCreator(entities,
                                   difficulty: difficulty,
-                                  objectiveTracker: objectiveTracker)
+                                  objectiveTracker: objectiveTracker,
+                                  updatedEntity: updatedEntity)
         
         //board
         board = Board.build(size: bsize, tileCreator: tileCreator!)
@@ -112,12 +115,33 @@ class GameScene: SKScene {
         
         Dispatch.shared.register { [weak self] input in
             if input.type == .playAgain {
-                self?.gameSceneDelegate?.reset()
+                self?.foreground.removeAllChildren()
+                let player = board.tiles[board.tiles(of: .player(.zero)).first!]
+                if case let TileType.player(data) = player {
+                    let revivedData = data.revive()
+                    self?.removeFromParent()
+                    self?.gameSceneDelegate?.visitStore(revivedData)
+                    view.removeGestureRecognizer(swipeUpGestureReconizer)
+                    view.removeGestureRecognizer(swipeDownGestureReconizer)
+                }
             }
             else if input.type == .selectLevel {
                 self?.gameSceneDelegate?.selectLevel()
             }
         }
+    }
+    
+    deinit {
+        board = nil
+        renderer = nil
+        tileCreator = nil
+        foreground = nil
+        gameSceneDelegate = nil
+        referee = nil
+        generator = nil
+        playableRect = nil
+        Dispatch.shared.reset()
+        print("deiniting")
     }
     
     @objc func swipedUp(_ gestureRecognizer: UISwipeGestureRecognizer) {
@@ -135,6 +159,8 @@ class GameScene: SKScene {
             rotateRight()
         }
     }
+    
+    
 }
 
 //MARK: - Rotate
@@ -156,7 +182,7 @@ extension GameScene {
     func isInRightHalf(_ location: CGPoint) -> Bool {
         return rightHalf().contains(location)
     }
-    
+    //TODO: remove gesture recgonizers when the scene is not visible
     func rightHalf() -> CGRect {
         guard let playableRect = playableRect,
             let viewRect = self.view?.frame else { fatalError("No playable rect calculated") }

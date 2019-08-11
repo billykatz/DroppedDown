@@ -29,7 +29,10 @@ func entities() -> [EntityModel] {
 
 extension Board {
     convenience init(tiles: [[TileType]]) {
-        self.init(tiles: tiles, tileCreator: TileCreator(entities(), difficulty: .normal))
+        self.init(tiles: tiles,
+                  tileCreator: TileCreator(entities(),
+                                           difficulty: .normal,
+                                           objectiveTracker: MockObjectiveTracker()))
     }
 }
 
@@ -89,8 +92,7 @@ func xTiles(_ numTiles: Int, _ tile: TileType, _ board: Board) -> Builder {
 extension TileType {
     static var playerWithGem: TileType {
         let gemCarry = CarryModel(item: [Item(type: .gem, range: .one)])
-        let hasGem = EntityModel(hp: 1, name: "test", attack: .zero, type: .player, carry: gemCarry)
-        return TileType.player(hasGem)
+        return TileType.createPlayer(carry: gemCarry)
     }
 }
 

@@ -20,4 +20,8 @@ class Dispatch {
             $0(input)
         }
     }
+    
+    func reset() {
+        receivers = []
+    }
 }

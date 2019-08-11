@@ -10,6 +10,14 @@ import XCTest
 import GameplayKit
 @testable import DownFall
 
+class MockObjectiveTracker: ProvidesObjectiveData {
+    var shouldSpawnExit: Bool {
+        return _shouldSpawnExit
+    }
+    
+    var _shouldSpawnExit = false
+}
+
 class TileStrategyTests: XCTestCase {
     
     var testBoardSize: Int!
@@ -31,7 +39,10 @@ class TileStrategyTests: XCTestCase {
         for i in testBoardSize+1 { // 0,1,2,3
             let compose =  allBlack >>> xRows(i, .empty, board)
             let composedBoard = compose(board)
-            let newTiles = TileCreator(entities(), difficulty: .normal).tiles(for: composedBoard.tiles)
+            let newTiles = TileCreator(entities(),
+                                       difficulty: .normal,
+                                       objectiveTracker: MockObjectiveTracker())
+                .tiles(for: composedBoard.tiles)
             XCTAssertEqual(newTiles.count, i*testBoardSize, "TileGod adds \(i) tiles if there are \(i) empty")
         }
         
@@ -41,29 +52,33 @@ class TileStrategyTests: XCTestCase {
         let exit = xTiles(1, .exit, board)
         let emptyButOne = empty >>> exit
         
-        var newTiles = TileCreator(entities(), difficulty: .normal).tiles(for: emptyButOne(board).tiles)
+        var newTiles = TileCreator(entities(),
+                                   difficulty: .normal,
+                                   objectiveTracker: MockObjectiveTracker())
+            .tiles(for: emptyButOne(board).tiles)
         XCTAssertFalse(newTiles.contains(.exit), "Tile God should not suggest adding another exit")
         
-        newTiles = TileCreator(entities(), difficulty: .normal).tiles(for: empty(board).tiles)
+        let objectiveTracker = MockObjectiveTracker()
+        objectiveTracker._shouldSpawnExit = true
+        newTiles = TileCreator(entities(),
+                               difficulty: .normal,
+                               objectiveTracker: objectiveTracker)
+            .tiles(for: empty(board).tiles)
         XCTAssertEqual(newTiles.filter { $0 == .exit }.count, 1, "Tile God suggest adding only 1 exit")
     }
     
-    func testTileStrategyAddsCorrectNumberExtraPlayer() {
-        var newTiles = TileCreator(entities(), difficulty: .normal).tiles(for: emptyButOnePlayer(board).tiles)
-        XCTAssertFalse(newTiles.contains(.player(.zero)), "Tile God should not suggest adding another player")
-        
-        newTiles = TileCreator(entities(), difficulty: .normal).tiles(for: empty(board).tiles)
-        XCTAssertEqual(newTiles.filter{ $0 == .player(.zero) }.count, 1, "Tile God should suggest adding 1 player")
-    }
     
     func testTileStrategyAddsCorrectNumberOfMonstersForDifferentDifficulties() {
         for _ in 0..<3 { //repeat these test so can be more confident that not too many monsters are being added
-            [Difficulty.easy, Difficulty.normal, Difficulty.hard].forEach { difficulty in
-                let newTiles = TileCreator(entities(), difficulty: .normal).tiles(for: emptyButOnePlayer(board).tiles)
+            [Difficulty.easy, .normal, .hard].forEach { difficulty in
+                let newTiles = TileCreator(entities(),
+                                           difficulty: difficulty,
+                                           objectiveTracker: MockObjectiveTracker())
+                    .tiles(for: emptyButOnePlayer(board).tiles)
                 let monsterCount = newTiles.filter { $0 == .monster(.zero) }.count
-                let maxExpectedMonsters = difficulty.maxExpectedMonsters(for: emptyButOnePlayer(board))
+                let maxExpectedMonsters = difficulty.maxExpectedMonsters(for: 10)
                 //TODO: fix test when we add back monsters
-                XCTAssertTrue(monsterCount <= 4, "Tile God added \(monsterCount), that's \(monsterCount - maxExpectedMonsters) too many")
+                XCTAssertTrue(monsterCount <= maxExpectedMonsters, "Difficulty \(difficulty) - Tile God added \(monsterCount), we expected at most \(maxExpectedMonsters)")
             }
         }
     }

@@ -28,7 +28,9 @@ struct MockBoardHelper {
     }
     
     static func createBoard(_ type: TileType = .greenRock, size: Int = 5) -> Board {
-        let tc = TileCreator(entities(), difficulty: .normal)
+        let tc = TileCreator(entities(),
+                             difficulty: .normal,
+                             objectiveTracker: MockObjectiveTracker())
         return Board(tiles: Array(repeating: row(of: type, by: size),  count: size), tileCreator: tc)
     }
     
@@ -54,7 +56,9 @@ class BoardTests: XCTestCase {
                   [.blueRock, .blueRock, .blueRock],
                   [.blueRock, .blueRock, .blueRock]]
         self.board = Board(tiles: tiles,
-                           tileCreator: TileCreator(entities(), difficulty: .normal))
+                           tileCreator: TileCreator(entities(),
+                                                    difficulty: .normal,
+                                                    objectiveTracker: MockObjectiveTracker()))
     }
     
     func testValidNeighbors() {
@@ -235,8 +239,14 @@ class BoardTests: XCTestCase {
     
     func testBoardComputesValidPlayerAttackVariableDamage() {
         let player1 = TileType.player(.zero)
-        let player2 = TileType.player(EntityModel(hp: 5, name: "strong", attack: AttackModel(frequency: 0, range: .one, damage: 3, directions: [.south], animationPaths: [], hasAttacked: false), type: .player, carry: .zero))
-
+        let player2 = TileType.createPlayer(originalHp: 5,
+                                            hp: 5,
+                                            attack: AttackModel(frequency: 0,
+                                                                range: .one,
+                                                                damage: 3,
+                                                                directions: [.south],
+                                                                attacksThisTurn: 0,
+                                                                attacksPerTurn: 1))
 
         var givenTiles: [[TileType]] = [[.blueRock, .exit, .blueRock],
                                         [.strongMonster, .blueRock, .blueRock],

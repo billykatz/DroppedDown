@@ -253,12 +253,14 @@ extension Board {
             var items = data.carry.item
             items.append(item)
             let newCarryModel = CarryModel(item: items)
-            let playerData = EntityModel(hp: data.hp,
+            let playerData = EntityModel(originalHp: data.originalHp,
+                                         hp: data.hp,
                                          name: data.name,
                                          attack: data.attack,
                                          type: data.type,
                                          carry: newCarryModel,
-                                         animations: data.animations)
+                                         animations: data.animations,
+                                         abilities: data.abilities)
             
             updatedTiles[pp.x][pp.y] = TileType.player(playerData)
         }

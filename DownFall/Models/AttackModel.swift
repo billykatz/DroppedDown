@@ -13,9 +13,43 @@ struct AttackModel: Equatable, Decodable {
     let range: RangeModel
     let damage: Int
     let directions: [Direction]
-    var hasAttacked: Bool = false
+    var attacksThisTurn: Int = 0
+    let attacksPerTurn: Int
     
-    static let zero = AttackModel(frequency: 0, range: RangeModel(lower: 0, upper: 0), damage: 0, directions: [], hasAttacked: false)
+    private enum CodingKeys: String, CodingKey {
+        typealias RawValue = String
+        
+        case frequency
+        case range
+        case damage
+        case directions
+        case attacksPerTurn
+    }
+
     
-    var canAttack: Bool { return !hasAttacked }
+    static let zero = AttackModel(frequency: 0,
+                                  range: RangeModel(lower: 0, upper: 0),
+                                  damage: 0,
+                                  directions: [],
+                                  attacksThisTurn: 0,
+                                  attacksPerTurn: 0)
+    
+    func didAttack() -> AttackModel {
+        return AttackModel(frequency: frequency,
+                           range: range,
+                           damage: damage,
+                           directions: directions,
+                           attacksThisTurn: attacksThisTurn + 1,
+                           attacksPerTurn: attacksPerTurn)
+    }
+    
+    func resetAttack() -> AttackModel {
+        return AttackModel(frequency: frequency,
+                           range: range,
+                           damage: damage,
+                           directions: directions,
+                           attacksThisTurn: 0,
+                           attacksPerTurn: attacksPerTurn)
+    }
+    
 }

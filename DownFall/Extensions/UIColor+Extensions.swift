@@ -24,4 +24,10 @@ extension UIColor {
             blue: rgb & 0xFF
         )
     }
+    
+    static let clayRed: UIColor = UIColor(rgb: 0x9c461f)
+    static let storeItemBackground: UIColor = UIColor(rgb: 0x8fa9af)
+    static let storeDarkGray = UIColor(rgb: 0x404040)
+    static let storeBlack = UIColor(rgb: 0x171717)
+    static let highlightGold = UIColor(rgb: 0xfcd833)
 }

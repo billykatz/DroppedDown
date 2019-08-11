@@ -95,6 +95,8 @@ extension MenuSpriteNode: ButtonDelegate {
             InputQueue.append(Input(.playAgain))
         case .selectLevel:
             InputQueue.append(Input(.selectLevel))
+        case .leaveStore, .storeItem:
+            fatalError("These buttons dont appear in game")
         }
     }
 }

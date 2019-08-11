@@ -14,26 +14,24 @@ class TileCreator: TileStrategy {
     var randomSource = GKLinearCongruentialRandomSource()
     let entities: [EntityModel]
     let difficulty: Difficulty
-    let objectiveTracker: ObjectiveTracker
+    let objectiveTracker: ProvidesObjectiveData
+    var updatedEntity: EntityModel?
     
     init(_ entities: [EntityModel],
          difficulty: Difficulty,
-         objectiveTracker: ObjectiveTracker) {
+         objectiveTracker: ProvidesObjectiveData,
+         updatedEntity: EntityModel? = nil) {
         self.entities = entities
         self.difficulty = difficulty
         self.objectiveTracker = objectiveTracker
+        self.updatedEntity = updatedEntity
     }
     
     func randomTile(_ given: Int) -> TileType {
         let index = abs(given) % TileType.allCases.count
         switch TileType.allCases[index] {
         case .monster:
-            if !spawnedGem {
-                spawnedGem = true
-                return TileType.monster(entities[1])
-            } else {
-                return TileType.monster(entities[6])
-            }
+            return TileType.monster(entities[6])
         default:
             return TileType.allCases[index]
         }
@@ -56,14 +54,7 @@ class TileCreator: TileStrategy {
     }
     
     var maxMonsters: Int {
-        switch difficulty {
-        case .easy:
-            return 2
-        case .normal:
-            return 4
-        case .hard:
-            return 8
-        }
+        return difficulty.maxExpectedMonsters(for: 10)
     }
 
     
@@ -135,11 +126,25 @@ class TileCreator: TileStrategy {
         let playerPosition = TileCoord((Int.random(lowerbound) + lowerbound), (Int.random(lowerbound) + lowerbound))
         tiles[playerPosition.x][playerPosition.y] = TileType.player(playerEntityData)
         
+        let lowerMonsterbound = Int(Double(tiles.count))
+        
+        for _ in 0..<maxMonsters/2 {
+            let randomRow = Int.random(lowerMonsterbound)
+            let randomCol = Int.random(lowerMonsterbound)
+            guard !TileCoord(randomRow, randomCol).isOrthogonallyAdjacent(to: playerPosition) else { continue }
+            tiles[randomRow][randomCol] = TileType.monster(entities[6])
+        }
+        
         return tiles
 
     }
     
     var playerEntityData: EntityModel {
+        
+        //TODO remove this hack
+        guard updatedEntity == nil else {
+            return updatedEntity!
+        }
         switch difficulty {
         case .easy:
             return entities[2]

@@ -34,6 +34,41 @@ struct TileCoord: Hashable {
         return TileCoord(self.x, self.y+1)
     }
     
+    func isOrthogonallyAdjacent(to other: TileCoord) -> Bool {
+        
+        /// x  x  x
+        /// x  us them
+        /// x  x  x
+        if other.y == colRight.y && other.x == x {
+            return true
+        }
+        
+        /// x    x   x
+        /// them us  x
+        /// x    x   x
+        if other.y == colLeft.y && other.x == x {
+            return true
+        }
+        
+        /// x   them  x
+        /// x    us   x
+        /// x    x    x
+        if other.x == rowAbove.x && other.y == y {
+            return true
+        }
+        
+        
+        /// x    x     x
+        /// x    us    x
+        /// x   them   x
+        if other.x == rowBelow.x && other.y == y {
+            return true
+        }
+        
+        return false
+
+    }
+    
     static func random(_ size: Int) -> TileCoord {
         return TileCoord(Int.random(size), Int.random(size))
     }

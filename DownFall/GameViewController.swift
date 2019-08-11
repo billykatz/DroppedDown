@@ -13,7 +13,7 @@ import GameplayKit
 class GameViewController: UIViewController {
 
     private var gameSceneNode: GameScene?
-    private var boardSize = 9
+    private var boardSize = 8
     private var entities: [EntityModel]?
     private var selectedDifficulty: Difficulty = .normal
     
@@ -22,7 +22,8 @@ class GameViewController: UIViewController {
         //TODO: handle failure more gracefully. ie redownload or retry
         let entityData = try! Data.data(from: "entities")!
         entities = try! JSONDecoder().decode(EntitiesModel.self, from: entityData).entities
-        levelSelect()
+//        levelSelect()
+        visitStore(entities![2])
     }
 
     override var shouldAutorotate: Bool {
@@ -56,7 +57,7 @@ extension GameViewController {
         }
     }
     
-    private func startLevel() {
+    private func startLevel(_ updatedPlayerData: EntityModel? = nil) {
         gameSceneNode = nil
         if let scene = GKScene(fileNamed: "GameScene")?.rootNode as? GameScene,
             let entities = entities {
@@ -65,17 +66,18 @@ extension GameViewController {
             gameSceneNode!.gameSceneDelegate = self
             gameSceneNode!.commonInit(boardSize: boardSize,
                                       entities: entities,
-                                      difficulty: selectedDifficulty)
-            
+                                      difficulty: selectedDifficulty,
+                                      updatedEntity: updatedPlayerData)
+
             if let view = self.view as! SKView? {
                 view.presentScene(gameSceneNode)
                 view.ignoresSiblingOrder = true
-                
+
                 //Debug settings
                 //TODO: remove for release
                 view.showsFPS = true
                 view.showsNodeCount = true
-                
+
             }
         }
     }
@@ -91,6 +93,16 @@ extension GameViewController: LevelSelectDelegate {
     }
 }
 
+extension GameViewController: StoreSceneDelegate {
+    func leave(_ storeScene: StoreScene, updatedPlayerData: EntityModel) {
+        if let view = self.view as! SKView? {
+            view.presentScene(nil)
+            startLevel(updatedPlayerData)
+        }
+
+    }
+}
+
 
 extension GameViewController: GameSceneDelegate {
     func selectLevel() {
@@ -101,6 +113,20 @@ extension GameViewController: GameSceneDelegate {
 
     }
     
+    func visitStore(_ playerData: EntityModel) {
+        if let view = self.view as! SKView? {
+            view.presentScene(nil)
+            gameSceneNode?.removeFromParent()
+            
+            
+            let storeScene = StoreScene(size: self.view!.frame.size,
+                                        playerData: playerData)
+            storeScene.storeSceneDelegate = self
+            view.presentScene(storeScene)
+        }
+        
+    }
+    
     func reset() {
         let fadeOut = SKAction.fadeOut(withDuration: 0.75)
         let remove = SKAction.removeFromParent()
@@ -108,4 +134,6 @@ extension GameViewController: GameSceneDelegate {
             self?.startLevel()
         }
     }
+    
+   
 }

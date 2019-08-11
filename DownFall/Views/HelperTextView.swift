@@ -74,7 +74,7 @@ class HelperTextView: SKSpriteNode {
                 descriptionText = ""
             }
         case .boardBuilt, .pause:
-            showTutorial()
+            ()
         case .rotateLeft, .rotateRight:
             descriptionText = "Try swiping up or down on the\n right side of the screen!!"
         default:
@@ -102,12 +102,4 @@ class HelperTextView: SKSpriteNode {
             self.addChild(spriteNode)
         }
     }
-    
-    func showTutorial() {
-        let tutorial = SKSpriteNode(texture: SKTexture(imageNamed: "tutorial"), size: CGSize(width: 600, height: 200))
-        tutorial.position = CGPoint(x: 0, y: 0)
-        self.addChild(tutorial)
-    }
-
-
 }

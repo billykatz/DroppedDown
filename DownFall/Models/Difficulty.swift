@@ -7,12 +7,12 @@
 //
 
 enum Difficulty: Double {
-    case easy = 0.5
-    case normal = 1.0
-    case hard = 1.5
+    case easy = 1
+    case normal = 1.5
+    case hard = 2.0
     
-    func maxExpectedMonsters(for board: Board) -> Int {
-        return max(Int(Double(board.tiles.count) * self.rawValue / 5.0), 1)
+    func maxExpectedMonsters(for boardSize: Int) -> Int {
+        return max(Int(Double(boardSize) * self.rawValue / 2.0), 1)
     }
 }
 

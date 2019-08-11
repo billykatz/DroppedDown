@@ -190,7 +190,7 @@ class Referee {
         func playerHasPossibleAttack() -> Bool {
             guard let playerPosition = playerPosition,
                 case TileType.player(let playerData) = tiles[playerPosition],
-                playerData.attack.canAttack else { return false }
+                playerData.canAttack else { return false }
             
             for attackedTile in attackableTiles(from: playerPosition) {
                 if case TileType.monster = tiles[attackedTile] {
@@ -203,7 +203,7 @@ class Referee {
         func playerAttacks() -> Input? {
             guard let playerPosition = playerPosition,
                 case TileType.player(let playerData) = tiles[playerPosition],
-                playerData.attack.canAttack else { return nil }
+                playerData.canAttack else { return nil }
             for attackedTile in attackedTiles(from: playerPosition) {
                 if case TileType.monster(let data) = tiles[attackedTile], data.hp > 0 {
                     return Input(.attack(playerPosition, attackedTile))
@@ -218,7 +218,7 @@ class Referee {
                 for (j, _) in row.enumerated() {
                     let potentialMonsterPosition = TileCoord(i, j)
                     if case TileType.monster(let monsterData) = tiles[potentialMonsterPosition],
-                        monsterData.attack.canAttack,
+                        monsterData.canAttack,
                         monsterData.hp > 0{
                         for attackedTile in attackedTiles(from: potentialMonsterPosition) {
                             if case TileType.player = tiles[attackedTile] {

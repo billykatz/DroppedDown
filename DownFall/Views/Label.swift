@@ -19,18 +19,37 @@ class Label: SKLabelNode {
     init(text: String,
          delegate: LabelDelegate,
          precedence: Precedence,
-         identifier: ButtonIdentifier) {
+         identifier: ButtonIdentifier,
+         fontSize: CGFloat = 80,
+         fontColor: UIColor = .blue) {
         
         super.init()
         self.delegate = delegate
         self.text = text
         fontName = "Times"
         name = identifier.rawValue
-        fontSize = 80
-        fontColor = .blue
+        self.fontSize = fontSize
+        self.fontColor = fontColor
         zPosition = precedence.rawValue
         isUserInteractionEnabled = true
     }
+    
+    init(text: String,
+         precedence: Precedence,
+         font: UIFont,
+         fontColor: UIColor = .blue,
+         maxWidth: CGFloat) {
+        
+        super.init()
+        self.text = text
+        self.fontName = font.fontName
+        self.fontSize = font.pointSize
+        zPosition = precedence.rawValue
+        preferredMaxLayoutWidth = maxWidth
+        numberOfLines = 0
+        lineBreakMode = .byWordWrapping
+    }
+
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")

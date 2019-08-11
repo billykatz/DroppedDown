@@ -30,7 +30,7 @@ class ObjectiveTracker {
     let initialDistance: Int
     var relativeDirection: Direction
     let playableRect: CGRect
-    let foreground: SKNode
+    weak var foreground: SKNode?
     var hasSpawnedExit = false
     
     init(goal: Goal,
@@ -122,7 +122,7 @@ class ObjectiveTracker {
     
     
     func delete() {
-        for child in foreground.children {
+        for child in foreground?.children ?? [] {
             if child.name == objectiveBackgroundId {
                 child.removeFromParent()
             }
@@ -132,7 +132,7 @@ class ObjectiveTracker {
     func update() {
         delete()
         if !hasSpawnedExit {
-            foreground.addChild(createForeground)
+            foreground?.addChild(createForeground)
         }
     }
     

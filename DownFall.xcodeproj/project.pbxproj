@@ -35,6 +35,7 @@
 		3D674C9122C9BFDB0003AEB4 /* UIColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D674C9022C9BFDB0003AEB4 /* UIColor+Extensions.swift */; };
 		3D674C9322C9D54C0003AEB4 /* LevelSelect.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3D674C9222C9D54C0003AEB4 /* LevelSelect.sks */; };
 		3D674C9522C9D6640003AEB4 /* LevelSelect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D674C9422C9D6640003AEB4 /* LevelSelect.swift */; };
+		3D68BF9622FF3D9000FC9B10 /* AbilityModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D68BF9522FF3D9000FC9B10 /* AbilityModel.swift */; };
 		3D6AACD8222A324D00C77B24 /* CGRectHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D6AACD7222A324D00C77B24 /* CGRectHelpers.swift */; };
 		3D6AACE1222C997800C77B24 /* Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D6AACE0222C997800C77B24 /* Header.swift */; };
 		3D6AACE4222CD38E00C77B24 /* Controls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D6AACE3222CD38E00C77B24 /* Controls.swift */; };
@@ -50,7 +51,8 @@
 		3D90AAD321D8869200C7428A /* Referee.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D90AAD121D8863100C7428A /* Referee.swift */; };
 		3D9C506021FE206000A2210D /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D9C505F21FE206000A2210D /* Renderer.swift */; };
 		3DA0087D21E6D1960017D8DA /* TileCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DA0087C21E6D1960017D8DA /* TileCreator.swift */; };
-		3DA0087F21EADDDE0017D8DA /* Animator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DA0087E21EADDDE0017D8DA /* Animator.swift */; };
+		3DA0A37822FFA6250041EF34 /* StoreItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DA0A37722FFA6250041EF34 /* StoreItem.swift */; };
+		3DA0A37A22FFAECE0041EF34 /* UIFont+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DA0A37922FFAECE0041EF34 /* UIFont+Extensions.swift */; };
 		3DA4E883228E5D2F006E90D1 /* SKSpriteNode+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DA4E882228E5D2F006E90D1 /* SKSpriteNode+Extensions.swift */; };
 		3DA4E88B228FC156006E90D1 /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DA4E88A228FC156006E90D1 /* Util.swift */; };
 		3DA4E88D228FC7FC006E90D1 /* Label.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DA4E88C228FC7FC006E90D1 /* Label.swift */; };
@@ -124,6 +126,7 @@
 		3D674C9022C9BFDB0003AEB4 /* UIColor+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extensions.swift"; sourceTree = "<group>"; };
 		3D674C9222C9D54C0003AEB4 /* LevelSelect.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = LevelSelect.sks; sourceTree = "<group>"; };
 		3D674C9422C9D6640003AEB4 /* LevelSelect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelSelect.swift; sourceTree = "<group>"; };
+		3D68BF9522FF3D9000FC9B10 /* AbilityModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AbilityModel.swift; sourceTree = "<group>"; };
 		3D6AACD7222A324D00C77B24 /* CGRectHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CGRectHelpers.swift; path = DownFall/CGRectHelpers.swift; sourceTree = "<group>"; };
 		3D6AACE0222C997800C77B24 /* Header.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Header.swift; sourceTree = "<group>"; };
 		3D6AACE3222CD38E00C77B24 /* Controls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Controls.swift; sourceTree = "<group>"; };
@@ -139,7 +142,8 @@
 		3D90AAD121D8863100C7428A /* Referee.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Referee.swift; sourceTree = "<group>"; };
 		3D9C505F21FE206000A2210D /* Renderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Renderer.swift; sourceTree = "<group>"; };
 		3DA0087C21E6D1960017D8DA /* TileCreator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileCreator.swift; sourceTree = "<group>"; };
-		3DA0087E21EADDDE0017D8DA /* Animator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animator.swift; sourceTree = "<group>"; };
+		3DA0A37722FFA6250041EF34 /* StoreItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreItem.swift; sourceTree = "<group>"; };
+		3DA0A37922FFAECE0041EF34 /* UIFont+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIFont+Extensions.swift"; sourceTree = "<group>"; };
 		3DA4E882228E5D2F006E90D1 /* SKSpriteNode+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SKSpriteNode+Extensions.swift"; sourceTree = "<group>"; };
 		3DA4E88A228FC156006E90D1 /* Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
 		3DA4E88C228FC7FC006E90D1 /* Label.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Label.swift; sourceTree = "<group>"; };
@@ -264,6 +268,7 @@
 				3DA4E882228E5D2F006E90D1 /* SKSpriteNode+Extensions.swift */,
 				3DA4E88E228FC860006E90D1 /* SKNode+Extension.swift */,
 				3D674C9022C9BFDB0003AEB4 /* UIColor+Extensions.swift */,
+				3DA0A37922FFAECE0041EF34 /* UIFont+Extensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -305,6 +310,7 @@
 			isa = PBXGroup;
 			children = (
 				3DE87C8F22374C2C00D750CF /* Button.swift */,
+				3DA0A37722FFA6250041EF34 /* StoreItem.swift */,
 				3DA4E88C228FC7FC006E90D1 /* Label.swift */,
 				3D7D8B322253E5BC0016FE4C /* HUD.swift */,
 				3D7D8B342253F9850016FE4C /* HelperTextView.swift */,
@@ -341,9 +347,9 @@
 			children = (
 				3DF2924D20A37FEE006671AC /* AppDelegate.swift */,
 				3DAFBD3621B8E6E7009B116A /* InputQueue.swift */,
+				3DF2925520A37FEE006671AC /* GameViewController.swift */,
 				3D528FDD2155B17200EF65CA /* Scenes */,
 				3D5FB09320AE768700ACD716 /* AnimationSettings.swift */,
-				3DA0087E21EADDDE0017D8DA /* Animator.swift */,
 				3DA4E881228E5D1B006E90D1 /* Extensions */,
 				3D528FDE2155BD7200EF65CA /* Assets.xcassets */,
 				3D90AAD121D8863100C7428A /* Referee.swift */,
@@ -354,7 +360,6 @@
 				3DE87C8C2235D03300D750CF /* Views */,
 				3DA4E89E2290B77E006E90D1 /* Entity */,
 				3DF2928120A66A4E006671AC /* Models */,
-				3DF2925520A37FEE006671AC /* GameViewController.swift */,
 				3DD36ECA21E5B86100AC4873 /* TileStrategy.swift */,
 				3DB270A622AE065300D9BF8B /* Data+Extensions.swift */,
 				3DA4E8932290A78E006E90D1 /* Animations */,
@@ -405,6 +410,7 @@
 				5605D6D221CC2DF400C1C5C2 /* DFTileSpriteNode.swift */,
 				3D2C757222C85362009ABD36 /* Direction.swift */,
 				3D2C757422C854F8009ABD36 /* ItemModel.swift */,
+				3D68BF9522FF3D9000FC9B10 /* AbilityModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -529,6 +535,7 @@
 				3DF2925420A37FEE006671AC /* GameScene.swift in Sources */,
 				3D06390B22EEB56100C4D5E9 /* AnimatingState.swift in Sources */,
 				3D5FB09420AE768700ACD716 /* AnimationSettings.swift in Sources */,
+				3D68BF9622FF3D9000FC9B10 /* AbilityModel.swift in Sources */,
 				3DF2925620A37FEE006671AC /* GameViewController.swift in Sources */,
 				3D7EF45C21D18D9000A2D9E8 /* Transformation.swift in Sources */,
 				3D6AACE4222CD38E00C77B24 /* Controls.swift in Sources */,
@@ -552,17 +559,18 @@
 				3D46333A22E7A4A1009159FF /* ObjectiveTracker.swift in Sources */,
 				3DA4E883228E5D2F006E90D1 /* SKSpriteNode+Extensions.swift in Sources */,
 				3D58468822A6322900EDD845 /* RangeModel.swift in Sources */,
+				3DA0A37A22FFAECE0041EF34 /* UIFont+Extensions.swift in Sources */,
 				3DE87C9022374C2C00D750CF /* Button.swift in Sources */,
 				3DF2924E20A37FEE006671AC /* AppDelegate.swift in Sources */,
 				3D06390122EEB4FB00C4D5E9 /* PauseState.swift in Sources */,
 				3D58468A22A6325300EDD845 /* CarryModel.swift in Sources */,
 				3DF2928320A66BEB006671AC /* Tile.swift in Sources */,
-				3DA0087F21EADDDE0017D8DA /* Animator.swift in Sources */,
 				3DA4E88B228FC156006E90D1 /* Util.swift in Sources */,
 				3DE87C8E2235D05300D750CF /* MenuSpriteNode.swift in Sources */,
 				3D6AACE1222C997800C77B24 /* Header.swift in Sources */,
 				3D06390322EEB50C00C4D5E9 /* PlayState.swift in Sources */,
 				3DD36ECB21E5B86100AC4873 /* TileStrategy.swift in Sources */,
+				3DA0A37822FFA6250041EF34 /* StoreItem.swift in Sources */,
 				3D06390F22F1DB8300C4D5E9 /* StoreScene.swift in Sources */,
 				3D90AAD321D8869200C7428A /* Referee.swift in Sources */,
 				3D9C506021FE206000A2210D /* Renderer.swift in Sources */,

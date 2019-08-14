@@ -298,8 +298,8 @@
         },
         { "name": "rat",
             "type": "rat",
-            "originalHp": 2,
-            "hp": 2,
+            "originalHp": 3,
+            "hp": 3,
             "attack": {
                 "frequency": 0,
                 "directions": ["east", "west"],

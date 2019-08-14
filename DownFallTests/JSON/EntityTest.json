@@ -37,7 +37,7 @@
                 }
             },
             "carry": {
-                "item": [{
+                "items": [{
                     "type": "gold",
                     "range": {
                         "lower": 5,
@@ -84,7 +84,7 @@
                 }
             },
             "carry": {
-                "item": [{
+                "items": [{
                     "type": "gem1",
                     "range": {
                         "lower": 1,
@@ -131,7 +131,38 @@
                 }
             },
             "carry": {
-                "item": []
+                "items": [
+                    { "type": "gold",
+                        "range": {
+                            "lower" : 1,
+                            "upper" : 1
+                        }
+                    },
+                    { "type": "gold",
+                        "range": {
+                            "lower" : 1,
+                            "upper" : 1
+                        }
+                    },
+                    { "type": "gold",
+                        "range": {
+                            "lower" : 1,
+                            "upper" : 1
+                        }
+                    },
+                    { "type": "gold",
+                        "range": {
+                            "lower" : 1,
+                            "upper" : 1
+                        }
+                    },
+                    { "type": "gold",
+                        "range": {
+                            "lower" : 1,
+                            "upper" : 1
+                        }
+                    }
+                ]
             },
             "abilities": []
         },
@@ -172,7 +203,7 @@
                 }
             },
             "carry": {
-                "item": []
+                "items": []
             },
             "abilities": []
         },
@@ -213,7 +244,7 @@
                 }
             },
             "carry": {
-                "item": []
+                "items": []
             },
             "abilities": []
         },
@@ -254,7 +285,7 @@
                 }
             },
             "carry": {
-                "item": [{
+                "items": [{
                     "type": "gold",
                     "range": {
                         "lower": 5,
@@ -302,7 +333,7 @@
                 }
             },
             "carry": {
-                "item": [{
+                "items": [{
                     "type": "gold",
                     "range": {
                         "lower": 5,

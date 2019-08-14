@@ -6,6 +6,8 @@
 //  Copyright © 2019 William Katz LLC. All rights reserved.
 //
 
+import SpriteKit
+
 struct ShieldEast: Ability {
     var affectsCombat: Bool {
         return true
@@ -16,7 +18,7 @@ struct ShieldEast: Ability {
     }
     
     var textureName: String {
-        return "shieldEast"
+        return "shieldBlank"
     }
     
     var cost: Int {
@@ -40,5 +42,11 @@ struct ShieldEast: Ability {
         return nil
     }
     
-    
+    var sprite: SKSpriteNode? {
+        let blankShield = SKTexture(imageNamed: textureName)
+        let arrowEast = SKTexture(imageNamed: "arrowEast")
+        let compositeSprite = SKSpriteNode(texture: blankShield, size: CGSize(width: 50, height: 50))
+        compositeSprite.addChild(SKSpriteNode(texture: arrowEast, size: CGSize(width: 20, height: 20)))
+        return compositeSprite
+    }
 }

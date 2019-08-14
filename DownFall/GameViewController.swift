@@ -120,7 +120,8 @@ extension GameViewController: GameSceneDelegate {
             
             
             let storeScene = StoreScene(size: self.view!.frame.size,
-                                        playerData: playerData)
+                                        playerData: playerData,
+                                        inventory: StoreInventory())
             storeScene.storeSceneDelegate = self
             view.presentScene(storeScene)
         }

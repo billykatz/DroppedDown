@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SpriteKit
 
 struct AnyAbility {
     let _ability: Ability
@@ -65,7 +66,14 @@ protocol Ability {
     var description: String { get }
     var flavorText: String { get }
     var grantsExtraAttacks: Int? { get }
+    var sprite: SKSpriteNode? { get }
     func blocksDamage(from: Direction) -> Int?
+}
+
+extension Ability {
+    var sprite: SKSpriteNode? {
+        return SKSpriteNode(texture: SKTexture(imageNamed: textureName), size: CGSize(width: 50.0, height: 50.0))
+    }
 }
 
 enum AbilityType {

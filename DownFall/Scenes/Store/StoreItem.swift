@@ -12,12 +12,13 @@ let highlightString = "highlight"
 
 protocol StoreItemDelegate: class {
     func storeItemTapped(_ storeItem: StoreItem, ability: Ability)
-    func wasPurchased(_ storeItem: StoreItem)
+    func wasTransactedOn(_ storeItem: StoreItem)
 }
 
 class StoreItem: SKSpriteNode {
     weak var storeItemDelegate: StoreItemDelegate?
     let ability: Ability
+    var boxShapeNode: SKShapeNode?
     var isSelected = false {
         didSet {
             toggleSelection()
@@ -25,7 +26,7 @@ class StoreItem: SKSpriteNode {
     }
     var isPurchased = false {
         didSet {
-            storeItemDelegate?.wasPurchased(self)
+            storeItemDelegate?.wasTransactedOn(self)
             togglePurchaseIndicator()
         }
     }
@@ -40,17 +41,33 @@ class StoreItem: SKSpriteNode {
         self.ability = ability
         super.init(texture: nil, color: color, size: size)
         
-        let costLabel = Label(text: "\(ability.cost) coins",
+        let costLabel = Label(text: "\(ability.cost)",
             delegate: self,
             precedence: .menu,
             identifier: .storeItem,
-            fontSize: fontSize)
-        let abilityForeground = SKSpriteNode(texture: SKTexture(imageNamed: ability.textureName), size: CGSize(width: 35, height: 35))
+            fontSize: fontSize,
+            fontColor: .black)
+        if let abilityForeground = ability.sprite {
+            abilityForeground.position = .zero
+            abilityForeground.name = ability.textureName
+            addChild(abilityForeground)
+        }
+        
+        
+        boxShapeNode = SKShapeNode(rect: frame.applying(CGAffineTransform(scaleX: 1.4 , y: 1.7)))
+        boxShapeNode?.strokeColor = .white
+        boxShapeNode?.position = CGPoint(x: 0, y: -15)
+        boxShapeNode?.lineWidth = 1.5
+        addChild(boxShapeNode!)
+        
+        
+        let coin = SKTexture(imageNamed: "gold")
+        let coinSprite = SKSpriteNode(texture: coin)
+        coinSprite.position = CGPoint(x: 20, y: 8)
+        costLabel.addChild(coinSprite)
         
         costLabel.position = CGPoint(x: 0, y: -50)
-        abilityForeground.position = .zero
-        abilityForeground.name = ability.textureName
-        addChild(abilityForeground)
+        
         addChild(costLabel)
         position = .zero
         zPosition = precedence.rawValue
@@ -78,12 +95,13 @@ class StoreItem: SKSpriteNode {
     private func toggleSelection() {
         let selectionHighlight: SKShapeNode = {
             let strokeColor: UIColor = isPurchased ? .highlightGreen : .highlightGold
-            let highlight = SKShapeNode(path: CGPath(rect: self.frame, transform: nil), centered: true)
+            let highlight = SKShapeNode(path: CGPath(rect: boxShapeNode!.frame, transform: nil), centered: true)
             highlight.strokeColor = strokeColor
             highlight.fillColor = .clear
             highlight.name = highlightString
-            highlight.lineWidth = 8.0
+            highlight.lineWidth = 2.5
             highlight.zPosition = 2
+            highlight.position = boxShapeNode!.position
             return highlight
         }()
         

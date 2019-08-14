@@ -158,7 +158,7 @@ class EntityModelTests: XCTestCase {
         let rat = EntityModel.createMonster()
         let player = EntityModel.createPlayer()
         
-        let playerTookDamage = player.wasAttacked(for: rat.attack.damage)
+        let playerTookDamage = player.wasAttacked(for: rat.attack.damage, from: .east)
         
         XCTAssertEqual(playerTookDamage.hp, player.hp - rat.attack.damage, "A player takes damage equal to the rat's attack")
     }

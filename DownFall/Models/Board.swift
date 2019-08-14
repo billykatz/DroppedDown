@@ -250,9 +250,9 @@ extension Board {
         if let pp = playerPosition,
             case let .player(data) = updatedTiles[pp] {
             
-            var items = data.carry.item
+            var items = data.carry.items
             items.append(item)
-            let newCarryModel = CarryModel(item: items)
+            let newCarryModel = CarryModel(items: items)
             let playerData = EntityModel(originalHp: data.originalHp,
                                          hp: data.hp,
                                          name: data.name,
@@ -276,7 +276,7 @@ extension Board {
     
     private func monsterDied(at coord: TileCoord) -> Transformation {
         if case let .monster(monsterData) = tiles[coord],
-            let item = monsterData.carry.item.first {
+            let item = monsterData.carry.items.first {
             let itemTile = TileType.item(item)
             tiles[coord.x][coord.y] = itemTile
             return Transformation(tiles: tiles, transformation: nil, inputType: .monsterDies(coord))
@@ -475,6 +475,10 @@ extension Board {
         var attacker: EntityModel
         var defender: EntityModel
         
+        guard let relativeAttackDirection = defenderPosition.direction(relative: attackerPosition) else {
+            fatalError("Attack did not come from a cardinal direction")
+        }
+        
         //TODO: DRY, extract and shorten this code
         if case let .player(playerModel) = tiles[attackerPosition],
             case let .monster(monsterModel) = tiles[defenderPosition] {
@@ -483,7 +487,8 @@ extension Board {
             defender = monsterModel
             
             let (newAttackerData, newDefenderData) = CombatSimulator.simulate(attacker: attacker,
-                                                                              defender: defender)
+                                                                              defender: defender,
+                                                                              attacked: relativeAttackDirection)
             
             tiles[attackerPosition.x][attackerPosition.y] = TileType.player(newAttackerData)
             tiles[defenderPosition.x][defenderPosition.y] = TileType.monster(newDefenderData)
@@ -495,7 +500,8 @@ extension Board {
             defender = playerModel
             
             let (newAttackerData, newDefenderData) = CombatSimulator.simulate(attacker: attacker,
-                                                                              defender: defender)
+                                                                              defender: defender,
+                                                                              attacked: relativeAttackDirection)
             
             tiles[attackerPosition.x][attackerPosition.y] = TileType.monster(newAttackerData)
             tiles[defenderPosition.x][defenderPosition.y] = TileType.player(newDefenderData)

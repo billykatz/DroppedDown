@@ -169,6 +169,16 @@ class EntityModelTests: XCTestCase {
         XCTAssertEqual(player.hp, 0, "Player has no more hp")
         XCTAssertEqual(player.originalHp, player.revive().hp, "A player has it's original HP after being revived")
     }
+    
+    func testEntityRemovesAbility() {
+        let doubleAttack = AnyAbility(DoubleAttack())
+        let player = EntityModel.createPlayer(abilities:[doubleAttack])
+        
+        XCTAssertTrue(player.abilities.contains(doubleAttack), "Player has ability double attack")
+        
+        let updatedPlayer = player.remove(DoubleAttack())
+        XCTAssertFalse(updatedPlayer.abilities.contains(doubleAttack), "Player no longer has ability double attack")
+    }
 
 
     

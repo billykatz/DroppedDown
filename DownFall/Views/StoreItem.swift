@@ -12,13 +12,23 @@ let highlightString = "highlight"
 
 protocol StoreItemDelegate: class {
     func storeItemTapped(_ storeItem: StoreItem, ability: Ability)
+    func wasPurchased(_ storeItem: StoreItem)
 }
 
 class StoreItem: SKSpriteNode {
     weak var storeItemDelegate: StoreItemDelegate?
     let ability: Ability
-    var isSelected = false
-    var isPurchased = false
+    var isSelected = false {
+        didSet {
+            toggleSelection()
+        }
+    }
+    var isPurchased = false {
+        didSet {
+            storeItemDelegate?.wasPurchased(self)
+            togglePurchaseIndicator()
+        }
+    }
     
     init(ability: Ability,
          size: CGSize,
@@ -50,48 +60,88 @@ class StoreItem: SKSpriteNode {
     }
     
     func select() {
-        guard !isPurchased else { return }
-        let highlight = SKShapeNode(path: CGPath(rect: self.frame, transform: nil), centered: true)
-        highlight.strokeColor = .highlightGold
-        highlight.fillColor = .clear
-        highlight.name = highlightString
-        highlight.lineWidth = 8.0
-        addChild(highlight)
-        
         isSelected = true
     }
     
     func deselect() {
-        for child in children {
-            if child.name == highlightString {
-                child.removeFromParent()
-                isSelected = false
-            }
-        }
+        isSelected = false
     }
     
     func purchase() {
         isPurchased = true
-        deselect()
-        
-        let grayOut = SKSpriteNode(color: .gray, size: self.size)
-        grayOut.alpha = 0.9
-        addChild(grayOut)
     }
+    
+    func sell() {
+        isPurchased = false
+    }
+    
+    private func toggleSelection() {
+        let selectionHighlight: SKShapeNode = {
+            let strokeColor: UIColor = isPurchased ? .highlightGreen : .highlightGold
+            let highlight = SKShapeNode(path: CGPath(rect: self.frame, transform: nil), centered: true)
+            highlight.strokeColor = strokeColor
+            highlight.fillColor = .clear
+            highlight.name = highlightString
+            highlight.lineWidth = 8.0
+            highlight.zPosition = 2
+            return highlight
+        }()
+        
+        func select() {
+            addChild(selectionHighlight)
+        }
+        
+        func deselect() {
+            for child in children {
+                if child.name == highlightString {
+                    child.removeFromParent()
+                }
+            }
+        }
+        
+        isSelected ? select() : deselect()
+    }
+    
+    private func togglePurchaseIndicator() {
+        let grayOut: SKSpriteNode = {
+            let grayOut = SKSpriteNode(color: .gray, size: self.size)
+            grayOut.alpha = 0.9
+            grayOut.zPosition = 1
+            grayOut.name = "grayOut"
+            return grayOut
+        }()
+        
+        switch isPurchased {
+        case true:
+            addChild(grayOut)
+        case false:
+            for child in children {
+                if child.name == "grayOut" {
+                    child.removeFromParent()
+                }
+            }
+        }
+    }
+    
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    static func ==(_ lhs: StoreItem, rhs: StoreItem) -> Bool {
+        return lhs.ability.type == rhs.ability.type && lhs.isPurchased == rhs.isPurchased
+    }
+
 }
 
 extension StoreItem: LabelDelegate {
     func labelPressed(_ label: Label) {
+        self.storeItemDelegate?.storeItemTapped(self, ability: ability)
     }
     
     func labelPressBegan(_ label: Label) {
+        self.storeItemDelegate?.storeItemTapped(self, ability: ability)
     }
-    
-    
 }
 
 //MARK:- Touch Events

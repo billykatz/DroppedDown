@@ -30,4 +30,5 @@ extension UIColor {
     static let storeDarkGray = UIColor(rgb: 0x404040)
     static let storeBlack = UIColor(rgb: 0x171717)
     static let highlightGold = UIColor(rgb: 0xfcd833)
+    static let highlightGreen = UIColor(rgb: 0x2a4f36)
 }

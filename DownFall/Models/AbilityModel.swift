@@ -8,7 +8,6 @@
 
 import Foundation
 
-
 struct AnyAbility {
     let _ability: Ability
     init(_ ability: Ability) {
@@ -17,6 +16,9 @@ struct AnyAbility {
 }
 
 extension AnyAbility: Ability {
+    func blocksDamage(from: Direction) -> Int? {
+        return _ability.blocksDamage(from: from)
+    }
     
     var description: String {
         return _ability.description
@@ -46,6 +48,7 @@ extension AnyAbility: Ability {
     var grantsExtraAttacks: Int? {
         return _ability.grantsExtraAttacks
     }
+    
 }
 
 extension AnyAbility: Equatable {
@@ -62,34 +65,11 @@ protocol Ability {
     var description: String { get }
     var flavorText: String { get }
     var grantsExtraAttacks: Int? { get }
+    func blocksDamage(from: Direction) -> Int?
 }
 
 enum AbilityType {
     case doubleAttack
+    case sheildEast
 }
 
-struct DoubleAttack: Ability {
-    var affectsCombat: Bool {
-        return true
-    }
-    
-    var textureName: String {
-        return "doubleAttack"
-    }
-    
-    var cost: Int { return 2 }
-    
-    var type: AbilityType { return .doubleAttack }
-    
-    var description: String {
-        return "Swing at your foes twice in one turn with this two headed pickaxe."
-    }
-    
-    var flavorText: String {
-        return "Gives whole new meaning to the ol' saying 'kill two birds with one pickaxe.'"
-    }
-    
-    var grantsExtraAttacks: Int? {
-        return 1
-    }
-}

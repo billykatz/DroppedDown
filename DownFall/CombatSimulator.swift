@@ -10,12 +10,13 @@ import Foundation
 
 
 struct CombatSimulator {
-    static func simulate(attacker: EntityModel, defender: EntityModel) -> (EntityModel, EntityModel) {
-        //
+    static func simulate(attacker: EntityModel,
+                         defender: EntityModel,
+                         attacked from: Direction) -> (EntityModel, EntityModel) {
         let newAttacker = attacker.didAttack()
         
         //create new defender model reflecting new state
-        let newDefender = defender.wasAttacked(for: attacker.attack.damage)
+        let newDefender = defender.wasAttacked(for: attacker.attack.damage, from: from)
         
         return (newAttacker, newDefender)
     }

@@ -7,15 +7,38 @@
 //
 
 struct CarryModel: Decodable, Equatable {
-    let item: [Item]
+    let items: [Item]
     
-    static let zero = CarryModel(item: [])
+    static let zero = CarryModel(items: [])
     
     var hasGem: Bool {
-        return item.contains { $0.type == .gem }
+        return items.contains { $0.type == .gem }
     }
     
     var totalGold: Int {
-        return item.filter({ $0.type == .gold }).count
+        return items.filter({ $0.type == .gold }).count
     }
+    
+    func pay(_ price: Int) -> CarryModel {
+        var newItems: [Item] = []
+        var pricePaid = 0
+        for item in items {
+            if item.type == .gold && pricePaid < price {
+                pricePaid += 1
+            } else {
+                newItems.append(item)
+            }
+        }
+        
+        return CarryModel(items: newItems)
+    }
+    
+    func earn(_ money: Int) -> CarryModel {
+        var newItems = items
+        for _ in 0..<money {
+            newItems.append(Item(type: .gold, range: .one))
+        }
+        return CarryModel(items: newItems)
+    }
+
 }

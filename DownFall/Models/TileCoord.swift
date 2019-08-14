@@ -57,7 +57,6 @@ struct TileCoord: Hashable {
             return true
         }
         
-        
         /// x    x     x
         /// x    us    x
         /// x   them   x
@@ -66,7 +65,29 @@ struct TileCoord: Hashable {
         }
         
         return false
-
+    }
+    
+    /// x              other(same col, row above)     x
+    /// other(colLeft, same row)    us    other(colRight, same row)
+    /// x              other(same col, row below)   x
+    func direction(relative to: TileCoord) -> Direction? {
+        if to.y == colLeft.y && to.x == x {
+            return .west
+        }
+        
+        if to.y == colRight.y && to.x == x {
+            return .east
+        }
+        
+        if to.x == rowAbove.x && to.y == y {
+            return .north
+        }
+        
+        if to.x == rowBelow.x && to.y == y {
+            return .south
+        }
+        
+        return nil
     }
     
     static func random(_ size: Int) -> TileCoord {

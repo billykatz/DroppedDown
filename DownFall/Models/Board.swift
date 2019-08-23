@@ -69,7 +69,7 @@ class Board: Equatable {
 
     
     // MARK: - Helpers
-    private func getTilePosition(_ type: TileType) -> TileCoord? {
+    public func getTilePosition(_ type: TileType) -> TileCoord? {
         for i in 0..<tiles.count {
             for j in 0..<tiles[i].count {
                 if tiles[i][j] == type {

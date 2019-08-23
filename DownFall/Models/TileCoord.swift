@@ -10,6 +10,8 @@ import Foundation
 
 
 struct TileCoord: Hashable {
+    
+    static var zero = TileCoord(0, 0)
     let x, y: Int
     var tuple : (Int, Int) { return (x, y) }
     
@@ -32,6 +34,10 @@ struct TileCoord: Hashable {
     
     var colRight : TileCoord {
         return TileCoord(self.x, self.y+1)
+    }
+    
+    var adjacentOrthogonalCoords: [TileCoord] {
+        return [colLeft, rowAbove, colRight, rowBelow]
     }
     
     func isOrthogonallyAdjacent(to other: TileCoord) -> Bool {

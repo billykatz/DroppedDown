@@ -176,3 +176,12 @@ extension InputQueue: Resets {
 }
 
 
+
+extension InputType {
+    static func legalMoves() -> [InputType] {
+        let moves =  [InputType.rotateRight,
+                      .rotateLeft,
+                      .touch(TileCoord(0, 0), .blackRock)]
+        return moves
+    }
+}

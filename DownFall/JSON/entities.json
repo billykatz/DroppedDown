@@ -168,8 +168,8 @@
         },
         { "name": "player2",
             "type": "player",
-            "originalHp": 2,
-            "hp": 2,
+            "originalHp": 5,
+            "hp": 5,
             "attack": {
                 "frequency": 0,
                 "directions": ["south"],
@@ -298,8 +298,8 @@
         },
         { "name": "rat",
             "type": "rat",
-            "originalHp": 3,
-            "hp": 3,
+            "originalHp": 1,
+            "hp": 1,
             "attack": {
                 "frequency": 0,
                 "directions": ["east", "west"],

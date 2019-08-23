@@ -22,8 +22,8 @@ class GameViewController: UIViewController {
         //TODO: handle failure more gracefully. ie redownload or retry
         let entityData = try! Data.data(from: "entities")!
         entities = try! JSONDecoder().decode(EntitiesModel.self, from: entityData).entities
-//        levelSelect()
-        visitStore(entities![2])
+        levelSelect()
+//        visitStore(entities![2])
     }
 
     override var shouldAutorotate: Bool {

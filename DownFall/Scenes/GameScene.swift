@@ -41,6 +41,9 @@ class GameScene: SKScene {
     //playable margin
     private var playableRect: CGRect?
     
+    //player
+    private var playerAI: Player?
+    
     
     //touch state
     private var touchWasSwipe = false
@@ -68,7 +71,7 @@ class GameScene: SKScene {
         
         //objective tracker
         let objectiveTracker = ObjectiveTracker(goal: .exit,
-                                                objectiveAbsoluteDirection: .north,
+                                                objectiveAbsoluteDirection: .south,
                                                 objectiveDistance: 50,
                                                 playableRect: playableRect!,
                                                 foreground: foreground)
@@ -84,6 +87,10 @@ class GameScene: SKScene {
         board = Board.build(size: bsize, tileCreator: tileCreator!)
         boardSize = bsize
         generator = HapticGenerator()
+        
+        
+        //player
+        playerAI = Player(objective: objectiveTracker, board: board!)
     }
     
     override func didMove(to view: SKView) {
@@ -228,6 +235,7 @@ extension GameScene {
 extension GameScene {
     /// We try to digest the top of the queue every frame
     override func update(_ currentTime: TimeInterval) {
+        playerAI?.move()
         guard let input = InputQueue.pop() else { return }
         Dispatch.shared.send(input)
     }

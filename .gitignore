@@ -28,6 +28,11 @@
 #
 #########################
 
+##### Custom
+* Files I would Like to ignore
+Sprites/
+
+
 #####
 # OS X temporary files that should never be committed
 #

@@ -25,7 +25,20 @@ struct LoseState: GameState {
         switch input.type {
         case .playAgain, .selectLevel:
             return AnyGameState(PlayState())
-        @unknown default:
+        case .touch(_, _),
+             .rotateLeft,
+             .rotateRight,
+             .monsterDies(_),
+             .attack(_, _),
+             .gameWin,
+             .gameLose(_),
+             .play,
+             .pause,
+             .animationsFinished,
+             .transformation(_),
+             .reffingFinished,
+             .boardBuilt,
+             .collectItem(_, _):
             return nil
         }
     }

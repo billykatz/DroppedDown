@@ -50,8 +50,15 @@ class Board: Equatable {
             transformation = gameWin()
         case .collectItem(let tileCoord, _):
             transformation = collectItem(at: tileCoord)
-        @unknown default:
-            // We dont care about these inputs, intentionally do nothing
+        case .gameLose(_),
+             .play,
+             .pause,
+             .animationsFinished,
+             .playAgain,
+             .transformation(_),
+             .reffingFinished,
+             .boardBuilt,
+             .selectLevel:
             transformation = nil
         }
         
@@ -66,7 +73,7 @@ class Board: Equatable {
         
         Dispatch.shared.register { [weak self] in self?.handle(input: $0) }
     }
-
+    
     
     // MARK: - Helpers
     private func getTilePosition(_ type: TileType) -> TileCoord? {
@@ -123,7 +130,7 @@ extension Board {
         let neighborSum = neighborRow + neighborCol
         let difference = abs(neighborSum - tileSum)
         guard difference <= 1 //tiles are within one of eachother
-                && ((tileSum % 2 == 0  && neighborSum % 2 == 1) || (tileSum % 2 == 1 && neighborSum % 2 == 0)) // they are not diagonally touching
+            && ((tileSum % 2 == 0  && neighborSum % 2 == 1) || (tileSum % 2 == 1 && neighborSum % 2 == 0)) // they are not diagonally touching
             else { return false }
         return true
     }
@@ -172,7 +179,7 @@ extension Board {
                         !tileCoordSet.contains(TileCoord(i,j)),
                         tiles[i][j] == currTile,
                         tiles[i][j].isARock()
-                    else { continue }
+                        else { continue }
                     //valid neighbor within bounds
                     queue.append(TileCoord(i,j))
                     tileCoordSet.insert(TileCoord(i,j))
@@ -181,7 +188,7 @@ extension Board {
         }
         return queue
     }
-
+    
     /*
      * Remove and refill tiles from the current board
      *
@@ -217,7 +224,7 @@ extension Board {
         
         //create selectedTilesTransformation array
         let selectedTilesTransformation = selectedTiles.map { TileTransformation($0, $0) }
-
+        
         //update our store of tiles
         tiles = intermediateTiles
         
@@ -242,7 +249,7 @@ extension Board {
         
         //remove and replace the single item tile
         let transformation = removeAndReplace(coord, singleTile: true)
-
+        
         //save the item
         guard case let TileType.item(item) = selectedTile,
             var updatedTiles = transformation.endTiles else { return Transformation.zero }
@@ -267,7 +274,7 @@ extension Board {
         
         tiles = updatedTiles
         resetAttacks()
-
+        
         return Transformation(tiles: tiles,
                               transformation: transformation.tileTransformation,
                               inputType: .collectItem(coord, item))
@@ -389,7 +396,7 @@ extension Board {
                 for rowIdx in 0..<boardSize {
                     let endRow = colIdx
                     let endCol = numCols - rowIdx
-
+                    
                     column.insert(tiles[rowIdx][colIdx], at: 0)
                     let trans = TileTransformation(TileCoord(rowIdx, colIdx),
                                                    TileCoord(endRow, endCol))
@@ -507,7 +514,7 @@ extension Board {
             tiles[defenderPosition.x][defenderPosition.y] = TileType.player(newDefenderData)
         }
         
-
+        
         return Transformation(tiles: tiles, inputType: .attack(attackerPosition, defenderPosition))
     }
 }

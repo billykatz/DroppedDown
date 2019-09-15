@@ -31,10 +31,25 @@ class TileCreator: TileStrategy {
         let index = abs(given) % TileType.allCases.count
         switch TileType.allCases[index] {
         case .monster:
-            return TileType.monster(entities[6])
+            return randomMonster(given)
         default:
             return TileType.allCases[index]
         }
+    }
+    
+    func randomMonster(_ given: Int) -> TileType {
+        let index = abs(given) % EntityModel.EntityType.allCases.count
+        switch EntityModel.EntityType.allCases[index] {
+        case .rat:
+            return TileType.monster(entities[6])
+        case .bat:
+            return TileType.monster(entities[7])
+        default:
+            //TODO: Get rid of unused monsters
+            return randomRock(given)
+            
+        }
+        
     }
     
     func randomRock(_ given: Int) -> TileType {

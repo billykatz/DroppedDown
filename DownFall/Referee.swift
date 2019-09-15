@@ -120,6 +120,18 @@ class Referee {
             case .west:
                 targetCol = initialCol - i
                 targetRow = initialRow
+            case .northEast:
+                targetRow = initialRow + i
+                targetCol = initialCol + i
+            case .southEast:
+                targetRow = initialRow - i
+                targetCol = initialCol + i
+            case .northWest:
+                targetRow = initialRow + i
+                targetCol = initialCol - i
+            case .southWest:
+                targetRow = initialRow - i
+                targetCol = initialCol - i
             }
 
             return TileCoord(targetRow, targetCol)

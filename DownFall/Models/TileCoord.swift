@@ -67,24 +67,61 @@ struct TileCoord: Hashable {
         return false
     }
     
+    enum Axis {
+        case vertical
+        case horizontal
+    }
+    
+    func distance(to: TileCoord, along axis: Axis) -> Int {
+        switch axis {
+        case .vertical:
+            return abs(x - to.x)
+        case .horizontal:
+            return abs(y - to.y)
+        }
+    }
+    
     /// x              other(same col, row above)     x
     /// other(colLeft, same row)    us    other(colRight, same row)
     /// x              other(same col, row below)   x
     func direction(relative to: TileCoord) -> Direction? {
-        if to.y == colLeft.y && to.x == x {
+        if to.y <= colLeft.y && to.x == x {
             return .west
         }
         
-        if to.y == colRight.y && to.x == x {
+        if to.y >= colRight.y && to.x == x {
             return .east
         }
         
-        if to.x == rowAbove.x && to.y == y {
+        if to.x >= rowAbove.x && to.y == y {
             return .north
         }
         
-        if to.x == rowBelow.x && to.y == y {
+        if to.x <= rowBelow.x && to.y == y {
             return .south
+        }
+        
+        // We might be a diagonally on the same line
+        // Therefore our row and col could both be different than the other row and col
+        // If the other coords are different, we have to make sure the difference is the same
+        guard  distance(to: to, along: .vertical) == distance(to: to, along: .horizontal) else {
+            return nil
+        }
+        
+        if to.y <= colLeft.y && to.x >= rowAbove.x {
+            return  .northWest
+        }
+        
+        if to.y >= colRight.y && to.x >= rowAbove.x {
+            return .northEast
+        }
+        
+        if to.x <= rowBelow.x && to.y <= colLeft.y {
+            return .southWest
+        }
+        
+        if to.x <= rowBelow.x && to.y >= colRight.y {
+            return .southEast
         }
         
         return nil

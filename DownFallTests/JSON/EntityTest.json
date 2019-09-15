@@ -298,8 +298,8 @@
         },
         { "name": "rat",
             "type": "rat",
-            "originalHp": 2,
-            "hp": 2,
+            "originalHp": 1,
+            "hp": 1,
             "attack": {
                 "frequency": 0,
                 "directions": ["east", "west"],
@@ -325,6 +325,53 @@
                 },
                 "idle": {
                     "animationFilename": "ratIdle",
+                    "numberOfFrames": 5
+                },
+                "fall":{
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                }
+            },
+            "carry": {
+                "items": [{
+                    "type": "gold",
+                    "range": {
+                        "lower": 5,
+                        "upper": 10
+                    }
+                }]
+            },
+            "abilities": []
+        },
+        { "name": "bat",
+            "type": "bat",
+            "originalHp": 1,
+            "hp": 1,
+            "attack": {
+                "frequency": 2,
+                "directions": ["northEast", "northWest", "southEast", "southWest"],
+                "damage": 1,
+                "range": {
+                    "lower": 1,
+                    "upper": 10
+                },
+                "attacksPerTurn": 1
+            },
+            "animations": {
+                "attack": {
+                    "animationFilename": "batAttack",
+                    "numberOfFrames": 17
+                },
+                "hurt": {
+                    "animationFilename": "batHurt",
+                    "numberOfFrames": 6
+                },
+                "dying": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "idle": {
+                    "animationFilename": "batIdle",
                     "numberOfFrames": 5
                 },
                 "fall":{

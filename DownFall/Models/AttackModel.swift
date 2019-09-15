@@ -20,7 +20,7 @@ struct AttackModel: Equatable, Decodable {
     let damage: Int
     let directions: [Direction]
     var attacksThisTurn: Int = 0
-    var turns: Int = 0
+    var turns: Int = 1
     let attacksPerTurn: Int
     
     private enum CodingKeys: String, CodingKey {

@@ -33,7 +33,7 @@ class Board: Equatable {
     }
     
     func handle(input: Input) {
-        let transformation: Transformation?
+        var transformation: Transformation?
         switch input.type {
         case .rotateLeft:
             transformation = rotate(.left)
@@ -52,18 +52,25 @@ class Board: Equatable {
             transformation = collectItem(at: tileCoord)
         case .reffingFinished:
             transformation = resetAttacks()
+        case .attackArea(let tiles):
+            //TODO
+            ()
         case .transformation(let trans):
-            guard let inputType = trans.inputType,
-                inputType == .reffingFinished else { transformation = nil }
-            InputQueue.append(Input(.newTurn))
+            if let inputType = trans.inputType,
+                inputType == .reffingFinished,
+                let tiles = trans.endTiles {
+                self.tiles = tiles
+                InputQueue.append(Input(.newTurn))
+                transformation = nil
+            }
         case .gameLose(_),
              .play,
              .pause,
              .animationsFinished,
              .playAgain,
-             .transformation(_),
              .boardBuilt,
-             .selectLevel:
+             .selectLevel,
+             .newTurn:
             transformation = nil
         }
         
@@ -226,11 +233,12 @@ extension Board {
             for (i, row) in tiles.enumerated() {
                 for (j, _) in row.enumerated() {
                     if case .monster(let data) = tiles[i][j] {
-                        newTiles[i][j] = .monster(data.resetAttacks())
+                        newTiles[i][j] = .monster(data.resetAttacks().incrementsAttackTurns())
+                        
                     }
                     
                     if case .player(let data) = tiles[i][j] {
-                        newTiles[i][j] = .monster(data.resetAttacks())
+                        newTiles[i][j] = .player(data.resetAttacks())
                     }
                 }
             }

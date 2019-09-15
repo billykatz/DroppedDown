@@ -137,6 +137,12 @@ extension EntityModel: ResetsAttacks {
     }
 }
 
+extension EntityModel {
+    func incrementsAttackTurns() -> EntityModel {
+        return update(attack: attack.incrementTurns())
+    }
+}
+
 extension EntityModel: Hashable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(hp)

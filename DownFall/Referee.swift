@@ -232,10 +232,18 @@ class Referee {
                     if case TileType.monster(let monsterData) = tiles[potentialMonsterPosition],
                         monsterData.canAttack,
                         monsterData.hp > 0{
-                        for attackedTile in attackedTiles(from: potentialMonsterPosition) {
-                            if case TileType.player = tiles[attackedTile] {
-                                return Input(.attack(potentialMonsterPosition, attackedTile))
+                        let attackFrequency = monsterData.attack.frequency
+                        let totalTurns = monsterData.attack.turns
+                        let shouldAttack = totalTurns % attackFrequency == 0
+                        
+                        if monsterData.attack.type == .targets {
+                            for attackedTile in attackedTiles(from: potentialMonsterPosition) {
+                                if case TileType.player = tiles[attackedTile] {
+                                    return Input(.attack(potentialMonsterPosition, attackedTile))
+                                }
                             }
+                        } else if monsterData.attack.type == .areaOfEffect && shouldAttack  {
+                            return Input(.attackArea(tileCoords: attackedTiles(from: potentialMonsterPosition)))
                         }
                     }
                 }

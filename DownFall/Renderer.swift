@@ -142,6 +142,8 @@ class Renderer : SKSpriteNode {
                     computeNewBoard(for: transformation)
                 case .attack(let attacker, let defender):
                     animateAttack(attacker, defender, trans.endTiles)
+                case .attackArea:
+                    () //TODO: todo
                 case .gameWin:
                     animate(transformation?.tileTransformation?.first) { [weak self] in
                         self?.gameWin()
@@ -151,6 +153,8 @@ class Renderer : SKSpriteNode {
                     animationsFinished(for: sprites, endTiles: trans.endTiles)
                 case .collectItem:
                     computeNewBoard(for: transformation)
+                case .reffingFinished:
+                    () // Purposely left blank.  
                 default:
                     // Transformation assoc value should ony exist for certain inputs
                     fatalError()
@@ -162,7 +166,8 @@ class Renderer : SKSpriteNode {
         case .touch(_, _), .rotateLeft, .rotateRight,
              .monsterDies, .attack, .gameWin,
              .animationsFinished, .reffingFinished,
-             .boardBuilt,. collectItem, .selectLevel:
+             .boardBuilt,. collectItem, .selectLevel,
+             .newTurn, .attackArea:
             ()
         }
     }

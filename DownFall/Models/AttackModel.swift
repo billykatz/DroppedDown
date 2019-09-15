@@ -8,17 +8,24 @@
 
 import Foundation
 
+enum AttackType: String, Decodable {
+    case targets
+    case areaOfEffect
+}
+
 struct AttackModel: Equatable, Decodable {
+    let type: AttackType
     let frequency: Int
     let range: RangeModel
     let damage: Int
     let directions: [Direction]
     var attacksThisTurn: Int = 0
+    var turns: Int = 0
     let attacksPerTurn: Int
     
     private enum CodingKeys: String, CodingKey {
         typealias RawValue = String
-        
+        case type
         case frequency
         case range
         case damage
@@ -27,29 +34,47 @@ struct AttackModel: Equatable, Decodable {
     }
 
     
-    static let zero = AttackModel(frequency: 0,
+    static let zero = AttackModel(type: .targets,
+                                  frequency: 0,
                                   range: RangeModel(lower: 0, upper: 0),
                                   damage: 0,
                                   directions: [],
                                   attacksThisTurn: 0,
+                                  turns: 0,
                                   attacksPerTurn: 0)
     
     func didAttack() -> AttackModel {
-        return AttackModel(frequency: frequency,
+        return AttackModel(type: type,
+                           frequency: frequency,
                            range: range,
                            damage: damage,
                            directions: directions,
                            attacksThisTurn: attacksThisTurn + 1,
+                           turns: turns,
                            attacksPerTurn: attacksPerTurn)
     }
     
     func resetAttack() -> AttackModel {
-        return AttackModel(frequency: frequency,
+        return AttackModel(type: type,
+                           frequency: frequency,
                            range: range,
                            damage: damage,
                            directions: directions,
                            attacksThisTurn: 0,
+                           turns: turns,
                            attacksPerTurn: attacksPerTurn)
+    }
+    
+    func incrementTurns() -> AttackModel {
+        return AttackModel(type: type,
+                           frequency: frequency,
+                           range: range,
+                           damage: damage,
+                           directions: directions,
+                           attacksThisTurn: attacksThisTurn,
+                           turns:  turns + 1,
+                           attacksPerTurn: attacksPerTurn)
+
     }
     
 }

@@ -5,7 +5,8 @@
             "originalHp": 1,
             "hp": 1,
             "attack": {
-                "frequency": 0,
+                "type": "targets",
+                "frequency" : 1,
                 "directions": ["east", "west"],
                 "damage": 1,
                 "range": {
@@ -52,7 +53,8 @@
             "originalHp": 1,
             "hp": 1,
             "attack": {
-                "frequency": 0,
+                "type": "targets",
+                "frequency" : 1,
                 "directions": ["east", "west"],
                 "damage": 1,
                 "range": {
@@ -99,7 +101,8 @@
             "originalHp": 3,
             "hp": 3,
             "attack": {
-                "frequency": 0,
+                "type": "targets",
+                "frequency" : 1,
                 "directions": ["south"],
                 "damage": 1,
                 "range": {
@@ -171,7 +174,8 @@
             "originalHp": 2,
             "hp": 2,
             "attack": {
-                "frequency": 0,
+                "type": "targets",
+                "frequency" : 1,
                 "directions": ["south"],
                 "damage": 1,
                 "range": {
@@ -212,7 +216,8 @@
             "originalHp": 1,
             "hp": 1,
             "attack": {
-                "frequency": 0,
+                "type": "targets",
+                "frequency" : 1,
                 "directions": ["south"],
                 "damage": 1,
                 "range": {
@@ -253,7 +258,8 @@
             "originalHp": 1,
             "hp": 1,
             "attack": {
-                "frequency": 0,
+                "type": "targets",
+                "frequency" : 1,
                 "directions": ["north"],
                 "damage": 1,
                 "range": {
@@ -301,7 +307,8 @@
             "originalHp": 1,
             "hp": 1,
             "attack": {
-                "frequency": 0,
+                "type": "targets",
+                "frequency" : 1,
                 "directions": ["east", "west"],
                 "damage": 1,
                 "range": {
@@ -348,7 +355,8 @@
             "originalHp": 1,
             "hp": 1,
             "attack": {
-                "frequency": 2,
+                "type": "targets",
+                "frequency" : 3,
                 "directions": ["northEast", "northWest", "southEast", "southWest"],
                 "damage": 1,
                 "range": {

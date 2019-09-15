@@ -30,6 +30,7 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
     case rotateRight
     case monsterDies(TileCoord)
     case attack(_ from: TileCoord, _ to: TileCoord)
+    case attackArea(tileCoords: [TileCoord])
     case gameWin
     case gameLose(String)
     case play
@@ -41,6 +42,7 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
     case boardBuilt
     case collectItem(TileCoord, Item)
     case selectLevel
+    case newTurn
     
     var debugDescription: String {
         switch self {
@@ -76,6 +78,10 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
             return "Player collects an item"
         case .selectLevel:
             return "Select Level"
+        case .newTurn:
+            return "New Turn"
+        case .attackArea:
+            return "Area attack"
         }
     }
 }

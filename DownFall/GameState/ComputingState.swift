@@ -14,8 +14,14 @@ struct ComputingState: GameState {
     
     func transitionState(given input: Input) -> AnyGameState? {
         switch input.type {
-        case .transformation:
-            return AnyGameState(AnimatingState())
+        case .transformation(let trans):
+            if trans.inputType == .reffingFinished {
+                return AnyGameState(ComputingState())
+            } else {
+                return AnyGameState(AnimatingState())
+            }
+        case .newTurn:
+            return AnyGameState(PlayState())
         default:
             return nil
         }
@@ -23,7 +29,7 @@ struct ComputingState: GameState {
     
     func shouldAppend(_ input: Input) -> Bool {
         switch input.type {
-        case .transformation:
+        case .transformation, .newTurn:
             return true
         default:
             return false

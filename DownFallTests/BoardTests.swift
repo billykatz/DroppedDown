@@ -241,11 +241,13 @@ class BoardTests: XCTestCase {
         let player1 = TileType.player(.zero)
         let player2 = TileType.createPlayer(originalHp: 5,
                                             hp: 5,
-                                            attack: AttackModel(frequency: 0,
+                                            attack: AttackModel(type: .targets,
+                                                                frequency: 1,
                                                                 range: .one,
                                                                 damage: 3,
                                                                 directions: [.south],
                                                                 attacksThisTurn: 0,
+                                                                turns: 1,
                                                                 attacksPerTurn: 1))
 
         var givenTiles: [[TileType]] = [[.blueRock, .exit, .blueRock],

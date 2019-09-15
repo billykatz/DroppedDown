@@ -355,7 +355,7 @@
             "originalHp": 1,
             "hp": 1,
             "attack": {
-                "type": "targets",
+                "type": "areaOfEffect",
                 "frequency" : 3,
                 "directions": ["northEast", "northWest", "southEast", "southWest"],
                 "damage": 1,

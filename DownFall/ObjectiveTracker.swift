@@ -114,6 +114,11 @@ class ObjectiveTracker {
             relativeDirection = .west
         case (.west, .right):
             relativeDirection = .north
+        case (.northEast, _),
+             (.southEast, _),
+             (.northWest, _),
+             (.southWest, _):
+            ()
         }
         
         //update view
@@ -175,6 +180,11 @@ class ObjectiveTracker {
             return .pi / 2 * 2
         case .east:
             return .pi / 2 * 3
+        case .northEast,
+             .southEast,
+             .northWest,
+             .southWest:
+            fatalError("We should not be rotating like this!")
         }
     }
     
@@ -188,6 +198,11 @@ class ObjectiveTracker {
             return .pi / 2 * 2
         case .east:
             return .pi / 2 * 1
+        case .northEast,
+             .southEast,
+             .northWest,
+             .southWest:
+            fatalError("We should not be rotating like this!")
         }
     }
 

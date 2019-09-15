@@ -120,6 +120,18 @@ class Referee {
             case .west:
                 targetCol = initialCol - i
                 targetRow = initialRow
+            case .northEast:
+                targetRow = initialRow + i
+                targetCol = initialCol + i
+            case .southEast:
+                targetRow = initialRow - i
+                targetCol = initialCol + i
+            case .northWest:
+                targetRow = initialRow + i
+                targetCol = initialCol - i
+            case .southWest:
+                targetRow = initialRow - i
+                targetCol = initialCol - i
             }
 
             return TileCoord(targetRow, targetCol)
@@ -131,7 +143,7 @@ class Referee {
             var affectedTiles: [TileCoord] = []
             for direction in attackDirections {
                 for i in attackRange.lower...attackRange.upper {
-                    //TODO: consider how to add logic that stops at the first thing it hits
+                    // TODO: Let's add a property to attacks that says if the attack goes thru targets or not
                     let target = calculateTarget(in: direction, distance: i, from: position)
                     if isWithinBounds(target) {
                         affectedTiles.append(target)
@@ -146,7 +158,7 @@ class Referee {
             var affectedTiles: [TileCoord] = []
             for direction in Directions.all {
                 for i in attackRange.lower...attackRange.upper {
-                    //TODO: consider how to add logic that stops at the first thing it hits
+                    // TODO: Let's add a property to attacks that says if the attack goes thru targets or not
                     let target = calculateTarget(in: direction, distance: i, from: position)
                     if isWithinBounds(target) {
                         affectedTiles.append(target)
@@ -220,10 +232,18 @@ class Referee {
                     if case TileType.monster(let monsterData) = tiles[potentialMonsterPosition],
                         monsterData.canAttack,
                         monsterData.hp > 0{
-                        for attackedTile in attackedTiles(from: potentialMonsterPosition) {
-                            if case TileType.player = tiles[attackedTile] {
-                                return Input(.attack(potentialMonsterPosition, attackedTile))
+                        let attackFrequency = monsterData.attack.frequency
+                        let totalTurns = monsterData.attack.turns
+                        let shouldAttack = totalTurns % attackFrequency == 0
+                        
+                        if monsterData.attack.type == .targets {
+                            for attackedTile in attackedTiles(from: potentialMonsterPosition) {
+                                if case TileType.player = tiles[attackedTile] {
+                                    return Input(.attack(potentialMonsterPosition, attackedTile))
+                                }
                             }
+                        } else if monsterData.attack.type == .areaOfEffect && shouldAttack  {
+                            return Input(.attackArea(tileCoords: attackedTiles(from: potentialMonsterPosition)))
                         }
                     }
                 }

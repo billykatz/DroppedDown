@@ -10,18 +10,32 @@ import Foundation
 @testable import DownFall
 
 extension AttackModel {
-    static var pickaxe = AttackModel(frequency: 0,
+    static var pickaxe = AttackModel(type: .targets,
+                                     frequency: 1,
                                      range: .one,
                                      damage: 1,
-                                     directions: [.south],
+                                     directions: [Direction.south],
                                      attacksThisTurn: 0,
+                                     turns: 1,
                                      attacksPerTurn: 1)
-    static var swipe = AttackModel(frequency: 0,
-                                     range: .one,
-                                     damage: 1,
-                                     directions: [.east, .west],
-                                     attacksThisTurn: 0,
-                                     attacksPerTurn: 1)
+    
+    static var swipe = AttackModel(type: .targets,
+                                   frequency: 1,
+                                   range: .one,
+                                   damage: 1,
+                                   directions: [.east, .west],
+                                   attacksThisTurn: 0,
+                                   turns: 1,
+                                   attacksPerTurn: 1)
+    
+    static var scream = AttackModel(type: .areaOfEffect,
+                                    frequency: 3,
+                                    range: .init(lower: 1, upper: 10),
+                                    damage: 1,
+                                    directions: [.northEast, .northWest, .southEast, .southWest],
+                                    attacksThisTurn: 0,
+                                    turns: 1,
+                                    attacksPerTurn: 1)
 }
 
 extension TileType {
@@ -44,22 +58,26 @@ extension TileType {
     
     
     static var monsterThatHasAttacked: TileType {
-        return createMonster(attack: AttackModel(frequency: 0,
+        return createMonster(attack: AttackModel(type: .targets,
+                                                 frequency: 1,
                                                  range: .one,
                                                  damage: 1,
                                                  directions: [.east, .west],
                                                  attacksThisTurn: 1,
+                                                 turns: 1,
                                                  attacksPerTurn: 1))
     }
     
     static func createMonster(originalHp: Int = 1,
                               hp: Int = 1,
                               name: String = "Gloop",
-                              attack: AttackModel = AttackModel(frequency: 0,
+                              attack: AttackModel = AttackModel(type: .targets,
+                                                                frequency: 1,
                                                                 range: .one,
                                                                 damage: 1,
                                                                 directions: [.east, .west],
                                                                 attacksThisTurn: 0,
+                                                                turns: 1,
                                                                 attacksPerTurn: 1),
                               type: EntityModel.EntityType = .monster,
                               carry: CarryModel = .zero,
@@ -107,6 +125,10 @@ extension TileType {
         return createMonster(attack: AttackModel.pickaxe)
     }
     
+    static var batMonster: TileType {
+        return createMonster(attack: AttackModel.scream)
+    }
+    
     
     static var  healthyMonster: TileType {
         return createMonster(originalHp: 5, hp: 5)
@@ -121,11 +143,13 @@ extension TileType {
     static var strongPlayer: TileType {
         return createPlayer(originalHp: 2,
                             hp: 2,
-                            attack: AttackModel(frequency: 0,
+                            attack: AttackModel(type: .targets,
+                                                frequency: 1,
                                                 range: .one,
                                                 damage: 2,
                                                 directions: [.south],
                                                 attacksThisTurn: 0,
+                                                turns: 1,
                                                 attacksPerTurn: 1))
     }
 }

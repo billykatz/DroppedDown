@@ -20,7 +20,8 @@ struct PlayState: GameState {
              .boardBuilt:
             return true
         case .animationsFinished, .play,
-             .reffingFinished, .playAgain, .collectItem, .selectLevel:
+             .reffingFinished, .playAgain, .collectItem,
+             .selectLevel, .newTurn, .attackArea:
             return false
         }
     }
@@ -38,7 +39,7 @@ struct PlayState: GameState {
             return AnyGameState(ComputingState())
         case .boardBuilt:
             return AnyGameState(PlayState())
-        case .animationsFinished, .play, .transformation, .reffingFinished, .playAgain,. selectLevel:
+        case .animationsFinished, .play, .transformation, .reffingFinished, .playAgain,. selectLevel, .newTurn, .attackArea:
             return nil
         }
         

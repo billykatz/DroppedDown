@@ -203,6 +203,41 @@ class RefereeTests: XCTestCase {
         XCTAssertNotEqual(expectedOutput, actualOutput, "Mouthy monsters attacked things on it's sides")
     }
     
+    func testRefereeMonterAttacksAreaOfEffect() {
+        let monster = TileType.batMonster
+        var tiles = [[TileType.normalPlayer, .blueRock, .blueRock],
+                     [.greenRock, monster, .blueRock],
+                     [.blueRock, .blueRock, .greenRock]]
+        guard case let TileType.monster(entity) = monster else { XCTFail(); return }
+        let frequency = entity.attack.frequency
+        var turns = 0
+        var shouldAttack = false
+        
+        for _ in 0..<frequency {
+            turns = entity.attack.turns
+            shouldAttack = turns % frequency == 0
+            
+            if shouldAttack {
+                let expectedOutput = Input(.attackArea(tileCoords: [TileCoord(0, 0),
+                                                                    TileCoord(0, 2),
+                                                                    TileCoord(2, 0),
+                                                                    TileCoord(2, 2)]))
+                let actualOutput = Referee.enforceRules(tiles)
+                XCTAssertEqual(expectedOutput, actualOutput, "Pick axe monsters attack down")
+            } else {
+                XCTAssertEqual(Referee.enforceRules(tiles), Input(.reffingFinished), "We do not enforce any rules")
+                XCTAssertNotEqual(turns % frequency, 0, "Area of effect attack on a cadence")
+            }
+            
+            //Update the turn counter for the entity
+            tiles[1][1] = TileType.monster(entity.incrementsAttackTurns())
+
+        }
+        
+        
+
+    }
+    
     func testRefereeMonsterDies() {
         
         var tiles = [[TileType.greenRock, .blueRock, .greenRock, .greenRock],

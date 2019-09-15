@@ -14,7 +14,8 @@ protocol ResetsAttacks {
 
 struct EntityModel: Equatable, Decodable {
         
-    enum EntityType: String, Decodable {
+    enum EntityType: String, Decodable, CaseIterable {
+        case bat
         case rat
         case dragon
         case monster
@@ -133,6 +134,12 @@ struct EntityModel: Equatable, Decodable {
 extension EntityModel: ResetsAttacks {
     func resetAttacks() -> EntityModel {
         return update(attack: attack.resetAttack())
+    }
+}
+
+extension EntityModel {
+    func incrementsAttackTurns() -> EntityModel {
+        return update(attack: attack.incrementTurns())
     }
 }
 

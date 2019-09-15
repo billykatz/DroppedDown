@@ -30,6 +30,7 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
     case rotateRight
     case monsterDies(TileCoord)
     case attack(_ from: TileCoord, _ to: TileCoord)
+    case attackArea(tileCoords: [TileCoord])
     case gameWin
     case gameLose(String)
     case play
@@ -41,6 +42,7 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
     case boardBuilt
     case collectItem(TileCoord, Item)
     case selectLevel
+    case newTurn
     
     var debugDescription: String {
         switch self {
@@ -76,6 +78,10 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
             return "Player collects an item"
         case .selectLevel:
             return "Select Level"
+        case .newTurn:
+            return "New Turn"
+        case .attackArea:
+            return "Area attack"
         }
     }
 }
@@ -105,33 +111,16 @@ struct InputQueue {
         if gameState.shouldAppend(input) {
             queue.append(input)
         }
-//        debugPrint("ATTEMP TO APPEND: \(input) and gameState: \(given.state)")
-        
-//        let debugString : String
-//        if gameState.shouldAppend(input) {
-//            queue.append(input)
-//            debugString = #"SUCCESS Appending: \#(input)"#
-//        } else {
-//            debugString = #"FAIL to append: \#(input). \#n\#tCurrent Game State: \#(gameState.state)"#
-//        }
-//        debugPrint(debugString)
     }
     
     static func pop() -> Input? {
         guard let input = InputQueue.peek(),
             let transition = InputQueue.gameState.transitionState(given: input) else {
                 if !queue.isEmpty {
-//                    let input = InputQueue.peek()
-//                    if let input = input {
-////                        debugPrint(#"ILLEGAL: \#(input) Current Game State: \#(gameState.state)"#)
-//                    } else {
-////                        debugPrint(#"NOT SURE HOW WE ARE HERE"#)
-//                    }
                     queue.removeFirst()
                 }
             return nil
         }
-//        debugPrint(#"POPPING: \#(input) \#n\#tBefore: \#(gameState.state) \#n\#tAfter: \#(transition.state)"#)
         
         queue = Array(queue.dropFirst())
         let oldGameState = gameState

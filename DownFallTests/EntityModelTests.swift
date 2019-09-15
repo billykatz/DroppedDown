@@ -63,11 +63,13 @@ class EntityModelTests: XCTestCase {
             XCTAssertEqual(entity.name, "Gloop")
             
             let expectedRangeModel = RangeModel.one
-            let expectedAttackModel = AttackModel(frequency: 0,
+            let expectedAttackModel = AttackModel(type: .targets,
+                                                  frequency: 1,
                                                   range: expectedRangeModel,
                                                   damage: 1,
                                                   directions: [.east, .west],
                                                   attacksThisTurn: 0,
+                                                  turns: 1,
                                                   attacksPerTurn: 1)
             XCTAssertEqual(entity.attack.frequency, expectedAttackModel.frequency)
             XCTAssertEqual(entity.attack.range, expectedAttackModel.range)

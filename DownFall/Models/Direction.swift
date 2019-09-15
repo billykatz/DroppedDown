@@ -9,7 +9,7 @@
 protocol Option: RawRepresentable, Hashable, CaseIterable {}
 
 enum Direction: String, Option, Codable {
-    case north, south, east, west
+    case north, south, east, west, northEast, southEast, northWest, southWest
 }
 
 typealias Directions = Set<Direction>

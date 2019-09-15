@@ -143,7 +143,7 @@ class Referee {
             var affectedTiles: [TileCoord] = []
             for direction in attackDirections {
                 for i in attackRange.lower...attackRange.upper {
-                    //TODO: consider how to add logic that stops at the first thing it hits
+                    // TODO: Let's add a property to attacks that says if the attack goes thru targets or not
                     let target = calculateTarget(in: direction, distance: i, from: position)
                     if isWithinBounds(target) {
                         affectedTiles.append(target)
@@ -158,7 +158,7 @@ class Referee {
             var affectedTiles: [TileCoord] = []
             for direction in Directions.all {
                 for i in attackRange.lower...attackRange.upper {
-                    //TODO: consider how to add logic that stops at the first thing it hits
+                    // TODO: Let's add a property to attacks that says if the attack goes thru targets or not
                     let target = calculateTarget(in: direction, distance: i, from: position)
                     if isWithinBounds(target) {
                         affectedTiles.append(target)

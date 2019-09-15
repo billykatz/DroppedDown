@@ -105,33 +105,16 @@ struct InputQueue {
         if gameState.shouldAppend(input) {
             queue.append(input)
         }
-//        debugPrint("ATTEMP TO APPEND: \(input) and gameState: \(given.state)")
-        
-//        let debugString : String
-//        if gameState.shouldAppend(input) {
-//            queue.append(input)
-//            debugString = #"SUCCESS Appending: \#(input)"#
-//        } else {
-//            debugString = #"FAIL to append: \#(input). \#n\#tCurrent Game State: \#(gameState.state)"#
-//        }
-//        debugPrint(debugString)
     }
     
     static func pop() -> Input? {
         guard let input = InputQueue.peek(),
             let transition = InputQueue.gameState.transitionState(given: input) else {
                 if !queue.isEmpty {
-//                    let input = InputQueue.peek()
-//                    if let input = input {
-////                        debugPrint(#"ILLEGAL: \#(input) Current Game State: \#(gameState.state)"#)
-//                    } else {
-////                        debugPrint(#"NOT SURE HOW WE ARE HERE"#)
-//                    }
                     queue.removeFirst()
                 }
             return nil
         }
-//        debugPrint(#"POPPING: \#(input) \#n\#tBefore: \#(gameState.state) \#n\#tAfter: \#(transition.state)"#)
         
         queue = Array(queue.dropFirst())
         let oldGameState = gameState

@@ -50,13 +50,18 @@ class Board: Equatable {
             transformation = gameWin()
         case .collectItem(let tileCoord, _):
             transformation = collectItem(at: tileCoord)
+        case .reffingFinished:
+            transformation = resetAttacks()
+        case .transformation(let trans):
+            guard let inputType = trans.inputType,
+                inputType == .reffingFinished else { transformation = nil }
+            InputQueue.append(Input(.newTurn))
         case .gameLose(_),
              .play,
              .pause,
              .animationsFinished,
              .playAgain,
              .transformation(_),
-             .reffingFinished,
              .boardBuilt,
              .selectLevel:
             transformation = nil
@@ -87,27 +92,6 @@ class Board: Equatable {
         return nil
     }
 }
-
-extension Board {
-    func resetPlayerAttacks() {
-        guard let playerPosition = playerPosition else { return }
-        if case .player(let data) = tiles[playerPosition] {
-            tiles[playerPosition.x][playerPosition.y] = .player(data.resetAttacks())
-        }
-    }
-    
-    func resetMonsterAttacks() {
-        for (i, row) in tiles.enumerated() {
-            for (j, _) in row.enumerated() {
-                if case .monster(let data) = tiles[i][j] {
-                    tiles[i][j] = .monster(data.resetAttacks())
-                }
-            }
-        }
-    }
-}
-
-
 
 
 // MARK: - Find Neighbors Remove and Replace
@@ -228,9 +212,6 @@ extension Board {
         //update our store of tiles
         tiles = intermediateTiles
         
-        //TODO: move this reset to somewhere that actually makes sense.  This wont support monsters with more than one health
-        resetAttacks()
-        
         // return our new board
         return Transformation(tiles: tiles,
                               transformation: [selectedTilesTransformation,
@@ -239,9 +220,31 @@ extension Board {
                               inputType: .touch(tileCoord, tiles[tileCoord]))
     }
     
-    private func resetAttacks() {
-        resetPlayerAttacks()
-        resetMonsterAttacks()
+    private func resetAttacks() -> Transformation? {
+        func resetAttacks(in tiles: [[TileType]]) -> [[TileType]] {
+            var newTiles = tiles
+            for (i, row) in tiles.enumerated() {
+                for (j, _) in row.enumerated() {
+                    if case .monster(let data) = tiles[i][j] {
+                        newTiles[i][j] = .monster(data.resetAttacks())
+                    }
+                    
+                    if case .player(let data) = tiles[i][j] {
+                        newTiles[i][j] = .monster(data.resetAttacks())
+                    }
+                }
+            }
+            return newTiles
+
+        }
+        
+        let newTiles = resetAttacks(in: tiles)
+        
+        return Transformation(tiles: newTiles,
+                                   transformation: nil,
+                                   inputType: .reffingFinished)
+        
+        
     }
     
     private func collectItem(at coord: TileCoord) -> Transformation {
@@ -273,7 +276,6 @@ extension Board {
         }
         
         tiles = updatedTiles
-        resetAttacks()
         
         return Transformation(tiles: tiles,
                               transformation: transformation.tileTransformation,
@@ -421,8 +423,6 @@ extension Board {
             inputType = .rotateRight
         }
         self.tiles = intermediateTiles
-        self.resetPlayerAttacks()
-        self.resetMonsterAttacks()
         return Transformation(tiles: tiles,
                               transformation: [transformation],
                               inputType: inputType)

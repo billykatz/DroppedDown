@@ -12,7 +12,10 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
     static var allCases: [InputType] = [.touch(TileCoord(0,0), .blueRock),
                                         .rotateLeft,
                                         .rotateRight,
-                                        .attack(TileCoord(0,0), TileCoord(0,0)),
+                                        .attack(attackType: .targets,
+                                                attacker: TileCoord(0,0),
+                                                defender: TileCoord(0,0),
+                                                affectedTiles: []),
                                         .monsterDies(TileCoord(0,0)),
                                         .gameWin,
                                         .gameLose(""),
@@ -29,8 +32,7 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
     case rotateLeft
     case rotateRight
     case monsterDies(TileCoord)
-    case attack(_ from: TileCoord, _ to: TileCoord)
-    case attackArea(tileCoords: [TileCoord])
+    case attack(attackType: AttackType, attacker: TileCoord, defender: TileCoord?, affectedTiles: [TileCoord])
     case gameWin
     case gameLose(String)
     case play
@@ -70,8 +72,8 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
             return "Play Again"
         case .reffingFinished:
             return "Reffing Finished"
-        case .attack(let from, let to):
-            return "Attacked from \(from) to \(to)"
+        case .attack(_, let attacker, let defender, _):
+            return "Attacked from \(attacker) to \(String(describing: defender))"
         case .boardBuilt:
             return "Board has been built"
         case .collectItem:
@@ -80,8 +82,6 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
             return "Select Level"
         case .newTurn:
             return "New Turn"
-        case .attackArea:
-            return "Area attack"
         }
     }
 }
@@ -111,16 +111,33 @@ struct InputQueue {
         if gameState.shouldAppend(input) {
             queue.append(input)
         }
+        // debugPrint("ATTEMP TO APPEND: \(input) and gameState: \(given.state)")
+        
+        let debugString : String
+        if gameState.shouldAppend(input) {
+            queue.append(input)
+            debugString = #"SUCCESS Appending: \#(input)"#
+        } else {
+            debugString = #"FAIL to append: \#(input). \#n\#tCurrent Game State: \#(gameState.state)"#
+        }
+        // debugPrint(debugString)
     }
     
     static func pop() -> Input? {
         guard let input = InputQueue.peek(),
             let transition = InputQueue.gameState.transitionState(given: input) else {
                 if !queue.isEmpty {
+                    let input = InputQueue.peek()
+                    if let input = input {
+                        // debugPrint(#"ILLEGAL: \#(input) Current Game State: \#(gameState.state)"#)
+                    } else {
+                        // debugPrint(#"NOT SURE HOW WE ARE HERE"#)
+                    }
                     queue.removeFirst()
                 }
             return nil
         }
+        // debugPrint(#"POPPING: \#(input) \#n\#tBefore: \#(gameState.state) \#n\#tAfter: \#(transition.state)"#)
         
         queue = Array(queue.dropFirst())
         let oldGameState = gameState

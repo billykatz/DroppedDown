@@ -11,7 +11,7 @@ import SpriteKit
 
 class Renderer : SKSpriteNode {
     private let playableRect: CGRect
-    let foreground: SKNode
+    private let foreground: SKNode
     private var sprites: [[DFTileSpriteNode]] = []
     private let bottomLeft: CGPoint
     private let boardSize: CGFloat!
@@ -21,23 +21,20 @@ class Renderer : SKSpriteNode {
     private var spriteForeground = SKNode()
     private var menuForeground = SKNode()
     
-    //Animations
-    private var fallAnimation: [SKTexture]
+    //Animator
+    private let animator = Animator()
     
-    //fireball
-    private var fireball: SKTexture
-    
-    var menuSpriteNode: MenuSpriteNode {
+    private var menuSpriteNode: MenuSpriteNode {
         return MenuSpriteNode(.pause, playableRect: playableRect, precedence: .menu)
     }
     
-    var gameWinSpriteNode: MenuSpriteNode {
+    private var gameWinSpriteNode: MenuSpriteNode {
         return MenuSpriteNode(.gameWin, playableRect: playableRect, precedence: .menu)
     }
     
-    var header  = Header()
-    var hud = HUD()
-    var helperTextView = HelperTextView()
+    private var header  = Header()
+    private var hud = HUD()
+    private var helperTextView = HelperTextView()
     
     init(playableRect: CGRect,
          foreground givenForeground: SKNode,
@@ -55,19 +52,11 @@ class Renderer : SKSpriteNode {
         let bottomLeftY = playableRect.minY + marginHeight/2 + tileSize/2
         self.bottomLeft = CGPoint(x: bottomLeftX, y: bottomLeftY)
         
-        //load attack animation
-        fallAnimation = SpriteSheet(texture: SKTexture(imageNamed: "playerFall"),
-                                      rows: 1,
-                                      columns: 9).animationFrames()
-        
-        fireball = SKTexture(imageNamed: "fireball")
-        
         foreground = givenForeground
         
         super.init(texture: nil, color: .clear, size: CGSize.zero)
         
         isUserInteractionEnabled = true
-    
 
         //create sprite representations based on the given board.tiles
         self.sprites = createSprites(from: board.tiles)
@@ -107,21 +96,44 @@ class Renderer : SKSpriteNode {
         Dispatch.shared.register { [weak self] input in
             switch input.type{
             case .transformation(let trans):
-                self?.render(trans, for: input)
+                self?.renderTransformation(trans)
             default:
-                self?.render(nil, for: input)
+                self?.renderInput(input)
             }
         }
-        
-        #if DEBUG
-        if let _ = NSClassFromString("XCTest") {
-        } else {
-            debugDrawPlayableArea()
-        }
-        #endif
     }
     
-    func render(_ transformation: Transformation?, for input: Input) {
+    private func renderTransformation(_ trans: Transformation) {
+        if let inputType = trans.inputType {
+            switch inputType {
+            case .rotateLeft, .rotateRight:
+                rotate(for: trans)
+            case .touch:
+                computeNewBoard(for: trans)
+            case .attack:
+                animateAttack(attackInput: inputType, endTiles: trans.endTiles)
+            case .gameWin:
+                animate(trans.tileTransformation?.first) { [weak self] in
+                    self?.gameWin()
+                }
+            case .monsterDies:
+                let sprites = createSprites(from: trans.endTiles)
+                animationsFinished(for: sprites, endTiles: trans.endTiles)
+            case .collectItem:
+                computeNewBoard(for: trans)
+            case .reffingFinished:
+                () // Purposely left blank.
+            default:
+                // Transformation assoc value should ony exist for certain inputs
+                fatalError()
+            }
+        } else {
+            animationsFinished(for: sprites)
+        }
+
+    }
+    
+    private func renderInput(_ input: Input) {
         switch input.type {
         case .play:
             // remove the menu
@@ -133,41 +145,11 @@ class Renderer : SKSpriteNode {
             gameWin()
         case .playAgain:
             menuForeground.removeFromParent()
-        case .transformation(let trans):
-            if let inputType = trans.inputType {
-                switch inputType {
-                case .rotateLeft, .rotateRight:
-                    rotate(for: transformation)
-                case .touch:
-                    computeNewBoard(for: transformation)
-                case .attack(let attacker, let defender):
-                    animateAttack(attacker, defender, trans.endTiles)
-                case .attackArea:
-                    () //TODO: todo
-                case .gameWin:
-                    animate(transformation?.tileTransformation?.first) { [weak self] in
-                        self?.gameWin()
-                    }
-                case .monsterDies:
-                    let sprites = createSprites(from: trans.endTiles)
-                    animationsFinished(for: sprites, endTiles: trans.endTiles)
-                case .collectItem:
-                    computeNewBoard(for: transformation)
-                case .reffingFinished:
-                    () // Purposely left blank.  
-                default:
-                    // Transformation assoc value should ony exist for certain inputs
-                    fatalError()
-
-                }
-            } else {
-                animationsFinished(for: sprites)
-            }
         case .touch(_, _), .rotateLeft, .rotateRight,
              .monsterDies, .attack, .gameWin,
              .animationsFinished, .reffingFinished,
              .boardBuilt,. collectItem, .selectLevel,
-             .newTurn, .attackArea:
+             .newTurn, .transformation:
             ()
         }
     }
@@ -176,55 +158,21 @@ class Renderer : SKSpriteNode {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func animateAttack(_ attackerPosition: TileCoord,
-                               _ defenderPosition: TileCoord,
-                               _ endTiles: [[TileType]]?) {
-        guard let tiles = endTiles else { animationsFinished(for: sprites); return }
-        if case let TileType.monster(monsterData) = tiles[attackerPosition],
-            case let TileType.player(playerData) = tiles[defenderPosition] {
-            
-            //
-            var monsterRun: SKAction? = nil
-            let playerRun: SKAction
-            
-            //attack animation
-            if let attackAnimationFrames = monsterData.animations.attackAnimation {
-                let monsterAnimation = SKAction.animate(with: attackAnimationFrames, timePerFrame: 0.07)
-                monsterRun = SKAction.run { [weak self] in
-                    self?.sprites[attackerPosition].run(monsterAnimation)
-                }
-            }
-            
-            //hurt animations
-            let playerAnimation = SKAction.animate(with: playerData.animations.hurtAnimation ?? [], timePerFrame: 0.07)
-            playerRun = SKAction.run { [weak self] in
-                self?.sprites[defenderPosition].run(playerAnimation)
-            }
-            
-            let groupedActions: [SKAction] = monsterRun != nil ? [monsterRun!, playerRun] : [playerRun]
-            
-            let group = SKAction.group(groupedActions)
-            
-            foreground.run(group) { [weak self] in
-                guard let strongSelf = self else { return }
-                strongSelf.animationsFinished(for: strongSelf.sprites, endTiles: tiles)
-            }
-        } else if case let TileType.player(playerData) = tiles[attackerPosition],
-            let attackAnimation = playerData.animations.attackAnimation {
-            let playerAnimation = SKAction.animate(with: attackAnimation, timePerFrame: 0.07)
-            sprites[attackerPosition].run(playerAnimation) { [weak self] in
-                guard let strongSelf = self else { return }
-                strongSelf.animationsFinished(for: strongSelf.sprites, endTiles: tiles)
-            }
+    private func animateAttack(attackInput: InputType, endTiles: [[TileType]]?) {
+        guard let tiles = endTiles else {
+            animationsFinished(for: sprites)
+            return
         }
-    }
-    
-    private func allCoordinatesAbove(coord: TileCoord) -> [TileCoord] {
-        var coordinates: [TileCoord] = []
-        for row in coord.x+1..<Int(boardSize) {
-            coordinates.append(TileCoord(row, coord.y))
+        
+        animator.animate(attackInputType: attackInput,
+                         foreground: foreground,
+                         tiles: tiles,
+                         sprites: sprites,
+                         positions: positionsInForeground) { [weak self] in
+                            guard let strongSelf = self else { return }
+                            strongSelf.animationsFinished(for: strongSelf.sprites, endTiles: tiles)
         }
-        return coordinates
+        
     }
     
     private func add(sprites: [[DFTileSpriteNode]]) {
@@ -236,50 +184,20 @@ class Renderer : SKSpriteNode {
         }
     }
     
-    private func add(sprites: [DFTileSpriteNode], with delay: Double) {
-        let wait = SKAction.wait(forDuration: delay)
-        var adds: [SKAction] = []
-        sprites.forEach { sprite in
-            let add = SKAction.run { [weak self] in
-                self?.spriteForeground.addChild(sprite)
-            }
-            adds.append(add)
-        }
-        
-        var sequence: [SKAction] = []
-        for add in adds {
-            sequence.append(contentsOf: [wait, add])
-        }
-        
-        run(SKAction.sequence(sequence))
-    }
-    
-    func showFireballs(starting fromCoord: TileCoord) {
-        let allCoords = allCoordinatesAbove(coord: fromCoord)
-        let fireballs = createFireballSprites(at: allCoords)
-        add(sprites: fireballs, with: 10)
-    }
-    
-    func createFireballSprites(at coords: [TileCoord]) -> [DFTileSpriteNode] {
-        var sprites: [DFTileSpriteNode] = []
+    private func positionsInForeground(at coords: [TileCoord]) -> [CGPoint] {
         var x : CGFloat = 0
         var y : CGFloat = 0
+        var points: [CGPoint] = []
         for coordinate in coords {
             x = CGFloat(coordinate.y) * tileSize + bottomLeft.x
             y = CGFloat(coordinate.x) * tileSize + bottomLeft.y
-            let sprite = DFTileSpriteNode(type: .fireball,
-                                          height: tileSize,
-                                          width: tileSize)
-            sprite.name = "fireball"
-            sprite.position = CGPoint(x: x, y: y)
-            sprite.zPosition = Precedence.foreground.rawValue
-            sprites.append(sprite)
-            spriteForeground.addChild(sprite)
+            points.append(CGPoint(x: x, y: y))
         }
-        return sprites
+        
+        return points
     }
     
-    func createSprites(from tiles: [[TileType]]?) -> [[DFTileSpriteNode]] {
+    private func createSprites(from tiles: [[TileType]]?) -> [[DFTileSpriteNode]] {
         guard let tiles = tiles else { fatalError() }
         var x : CGFloat = 0
         var y : CGFloat = 0
@@ -302,65 +220,40 @@ class Renderer : SKSpriteNode {
     }
     
     /// Animate each tileTransformation to display rotation
-    func rotate(for transformation: Transformation?, _ userGenerated: Bool = false) {
+    private func rotate(for transformation: Transformation?) {
         guard let transformation = transformation,
             let trans = transformation.tileTransformation?.first,
             let endTiles = transformation.endTiles else { return }
         var animationCount = 0
-        self.sprites = createSprites(from: endTiles)
         animate(trans) { [weak self] in
             guard let strongSelf = self else { return }
             animationCount += 1
             if animationCount == trans.count {
-                strongSelf.animationsFinished(for: strongSelf.sprites, endTiles: endTiles, userGenerated: userGenerated)
+                strongSelf.animationsFinished(for: strongSelf.sprites, endTiles: endTiles)
             }
         }
     }
     
-    private func animationsFinished(for endBoard: [[DFTileSpriteNode]], endTiles: [[TileType]]? = nil, userGenerated: Bool = false) {
-        let _ = add(sprites: endBoard)
+    private func animationsFinished(for endBoard: [[DFTileSpriteNode]], endTiles: [[TileType]]? = nil) {
+        sprites = createSprites(from: endTiles)
+        let _ = add(sprites: sprites)
         InputQueue.append(Input(.animationsFinished, endTiles))
     }
     
-    func animate(_ transformation: [TileTransformation]?,_ animateFall: Bool = false, _ completion: (() -> Void)? = nil) {
-        guard let transformation = transformation else { return }
-        var childActionDict : [SKNode : SKAction] = [:]
-        for transIdx in 0..<transformation.count {
-            let trans = transformation[transIdx]
-            //calculate a point that is out of bounds of the foreground
-            let outOfBounds: CGFloat = CGFloat(trans.initial.x) >= boardSize ? tileSize * boardSize : 0
-            let point = CGPoint.init(x: tileSize * CGFloat(trans.initial.tuple.1) + bottomLeft.x,
-                                     y: outOfBounds + tileSize * CGFloat(trans.initial.x) + bottomLeft.y)
-            for child in spriteForeground.children {
-                if child.contains(point), let childType = (child as? DFTileSpriteNode)?.type {
-                    let endPoint = CGPoint.init(x: tileSize * CGFloat(trans.end.y) + bottomLeft.x,
-                                                y: tileSize * CGFloat(trans.end.x) + bottomLeft.y)
-                    let animation = SKAction.move(to: endPoint, duration: AnimationSettings.fallSpeed)
-                    if animateFall, childType == TileType.player(.zero) {
-                        let fall = SKAction.animate(with: fallAnimation, timePerFrame: 0.05)
-                        let group = SKAction.group([fall, animation])
-                        childActionDict[child] = group
-                    } else {
-                        childActionDict[child] = animation
-                    }
-                    
-                    break
-                }
-            }
-            
-        }
-        for (child, action) in childActionDict {
-            child.run(action) {
-                completion?()
-            }
-        }
+    private func animate(_ transformation: [TileTransformation]?, _ completion: (() -> Void)?) {
+        animator.animate(transformation,
+                         boardSize: boardSize,
+                         bottomLeft: bottomLeft,
+                         spriteForeground: spriteForeground,
+                         tileSize: tileSize,
+                         completion)
     }
 
 }
 
 extension Renderer {
     
-    func computeNewBoard(for transformation: Transformation?, _ userGenerated: Bool = false) {
+    private func computeNewBoard(for transformation: Transformation?) {
         guard let transformation = transformation,
             let transformations = transformation.tileTransformation,
             let endTiles = transformation.endTiles else {
@@ -399,30 +292,15 @@ extension Renderer {
         
         //animation "shiftDown" transformation
         var count = shiftDown.count
-        animate(shiftDown, true) { [weak self] in
+        animate(shiftDown) { [weak self] in
             guard let strongSelf = self else { return }
             count -= 1
             if count == 0 {
-                strongSelf.sprites = spriteNodes
-                
-                //TODO: Figure out why we need the following line of code.  this will solve the bug that the player sprite reanimates on input
-                strongSelf.animationsFinished(for: spriteNodes, endTiles: endTiles, userGenerated: userGenerated)
+                strongSelf.animationsFinished(for: strongSelf.sprites, endTiles: endTiles)
             }
         }
     }
     
-    func compare(_ a: [[DFTileSpriteNode]], _ b: [[DFTileSpriteNode]]) {
-        var output = ""
-        for (ridx, _) in a.enumerated() {
-            for (cidx, _) in a[ridx].enumerated() {
-                if a[ridx][cidx].type !=  b[ridx][cidx].type {
-                    output += "\n-----\nRow \(ridx), Col \(cidx) are different.\nBefore is \(a[ridx][cidx].type) \nAfter is \(b[ridx][cidx].type)"
-                }
-            }
-        }
-        if output == "" { output = "\n-----\nThere are no differences" }
-        print(output)
-    }
 }
 
 
@@ -455,7 +333,7 @@ extension Renderer {
 }
 
 extension Renderer {
-    func gameWin() {
+    private func gameWin() {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { [weak self] in
             guard let strongSelf = self else { return }
             strongSelf.menuForeground.removeAllChildren()
@@ -469,7 +347,7 @@ extension Renderer {
 
 extension Renderer {
     
-    func debugDrawPlayableArea() {
+    private func debugDrawPlayableArea() {
         let shape = SKShapeNode()
         let path = CGMutablePath()
         path.addRect(playableRect)
@@ -480,7 +358,7 @@ extension Renderer {
         foreground.addChild(shape)
     }
     
-    func debugBoardSprites() -> String {
+    private func debugBoardSprites() -> String {
         var outs = "\nTop of Sprites"
         for (i, _) in sprites.enumerated().reversed() {
             outs += "\n"
@@ -491,4 +369,18 @@ extension Renderer {
         outs += "\nbottom of Sprites"
         return outs
     }
+    
+    private func compare(_ a: [[DFTileSpriteNode]], _ b: [[DFTileSpriteNode]]) {
+        var output = ""
+        for (ridx, _) in a.enumerated() {
+            for (cidx, _) in a[ridx].enumerated() {
+                if a[ridx][cidx].type !=  b[ridx][cidx].type {
+                    output += "\n-----\nRow \(ridx), Col \(cidx) are different.\nBefore is \(a[ridx][cidx].type) \nAfter is \(b[ridx][cidx].type)"
+                }
+            }
+        }
+        if output == "" { output = "\n-----\nThere are no differences" }
+        print(output)
+    }
+
 }

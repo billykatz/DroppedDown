@@ -14,6 +14,7 @@ protocol BuildAnimations {
     var dyingAnimation: [SKTexture]? { get }
     var idleAnimation: [SKTexture]? { get }
     var fallAnimation: [SKTexture]? { get }
+    var projectileAnimation: [SKTexture]? { get }
 }
 
 struct AllAnimationsModel: Equatable, Decodable {
@@ -22,12 +23,14 @@ struct AllAnimationsModel: Equatable, Decodable {
     let dying: AnimationModel
     let idle: AnimationModel
     let fall: AnimationModel
+    let projectile: AnimationModel
     
     static var zero = AllAnimationsModel(attack: .zero,
                                          hurt: .zero,
                                          dying: .zero,
                                          idle: .zero,
-                                         fall: .zero)
+                                         fall: .zero,
+                                         projectile: .zero)
     
 }
 
@@ -77,6 +80,13 @@ extension AllAnimationsModel: BuildAnimations {
         return SpriteSheet(texture: texture,
                            rows: 1,
                            columns: fall.numberOfFrames).animationFrames()
+    }
+    
+    var projectileAnimation: [SKTexture]? {
+        guard let texture = projectile.texture else { return nil }
+        return SpriteSheet(texture: texture,
+                           rows: 1,
+                           columns: projectile.numberOfFrames).animationFrames()
     }
 }
 

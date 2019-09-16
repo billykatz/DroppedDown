@@ -35,6 +35,10 @@
                 "fall":{
                     "animationFilename": "",
                     "numberOfFrames": 0
+                },
+                "projectile": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
                 }
             },
             "carry": {
@@ -81,6 +85,10 @@
                     "numberOfFrames": 0
                 },
                 "fall":{
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "projectile": {
                     "animationFilename": "",
                     "numberOfFrames": 0
                 }
@@ -131,6 +139,10 @@
                 "fall":{
                     "animationFilename": "playerFall",
                     "numberOfFrames": 9
+                },
+                "projectile": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
                 }
             },
             "carry": {
@@ -204,6 +216,10 @@
                 "fall":{
                     "animationFilename": "playerFall",
                     "numberOfFrames": 9
+                },
+                "projectile": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
                 }
             },
             "carry": {
@@ -246,6 +262,10 @@
                 "fall":{
                     "animationFilename": "playerFall",
                     "numberOfFrames": 9
+                },
+                "projectile": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
                 }
             },
             "carry": {
@@ -286,6 +306,10 @@
                     "numberOfFrames": 0
                 },
                 "fall":{
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "projectile": {
                     "animationFilename": "",
                     "numberOfFrames": 0
                 }
@@ -337,6 +361,10 @@
                 "fall":{
                     "animationFilename": "",
                     "numberOfFrames": 0
+                },
+                "projectile": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
                 }
             },
             "carry": {
@@ -385,6 +413,10 @@
                 "fall":{
                     "animationFilename": "",
                     "numberOfFrames": 0
+                },
+                "projectile": {
+                    "animationFilename": "batProjectile",
+                    "numberOfFrames": 4
                 }
             },
             "carry": {

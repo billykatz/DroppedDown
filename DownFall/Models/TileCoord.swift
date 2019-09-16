@@ -12,6 +12,7 @@ import Foundation
 struct TileCoord: Hashable {
     let x, y: Int
     var tuple : (Int, Int) { return (x, y) }
+    static var zero: TileCoord = TileCoord(0,0)
     
     init(_ x: Int, _ y: Int) {
         self.x = x
@@ -125,6 +126,14 @@ struct TileCoord: Hashable {
         }
         
         return nil
+    }
+    
+    func coordsAbove(boardSize: Int) -> [TileCoord] {
+        var coordinates: [TileCoord] = []
+        for row in x+1..<Int(boardSize) {
+            coordinates.append(TileCoord(row, y))
+        }
+        return coordinates
     }
     
     static func random(_ size: Int) -> TileCoord {

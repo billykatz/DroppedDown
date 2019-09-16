@@ -41,8 +41,8 @@ class Board: Equatable {
             transformation = rotate(.right)
         case .touch(let tileCoord, _):
             transformation = removeAndReplace(tileCoord)
-        case .attack(let attacker, let defender):
-            transformation = attack(attacker, defender)
+        case .attack:
+            transformation = attack(input)
         case .monsterDies(let tileCoord):
             //only remove a single tile when a monster dies
             transformation = monsterDied(at: tileCoord)
@@ -52,9 +52,6 @@ class Board: Equatable {
             transformation = collectItem(at: tileCoord)
         case .reffingFinished:
             transformation = resetAttacks()
-        case .attackArea(let tiles):
-            //TODO
-            ()
         case .transformation(let trans):
             if let inputType = trans.inputType,
                 inputType == .reffingFinished,
@@ -484,19 +481,22 @@ extension Array where Element: Collection, Element.Index == Int {
 // MARK: - Combat
 extension Board {
     
-    func attack(_ attackerPosition: TileCoord, _ defenderPosition: TileCoord) -> Transformation {
-        // Right now players only attack down, guard that we dont go out of bounds
-        //retrieve the player and target types
+    func attack(_ input: Input) -> Transformation {
+        guard case InputType.attack(_,
+                                    let attackerPosition,
+                                    let defenderPostion,
+                                    _) = input.type else {
+                                        return Transformation.zero
+        }
         var attacker: EntityModel
         var defender: EntityModel
         
-        guard let relativeAttackDirection = defenderPosition.direction(relative: attackerPosition) else {
-            fatalError("Attack did not come from a cardinal direction")
-        }
         
         //TODO: DRY, extract and shorten this code
-        if case let .player(playerModel) = tiles[attackerPosition],
-            case let .monster(monsterModel) = tiles[defenderPosition] {
+        if let defenderPosition = defenderPostion,
+            case let .player(playerModel) = tiles[attackerPosition],
+            case let .monster(monsterModel) = tiles[defenderPosition],
+            let relativeAttackDirection = defenderPosition.direction(relative: attackerPosition) {
             
             attacker = playerModel
             defender = monsterModel
@@ -508,8 +508,10 @@ extension Board {
             tiles[attackerPosition.x][attackerPosition.y] = TileType.player(newAttackerData)
             tiles[defenderPosition.x][defenderPosition.y] = TileType.monster(newDefenderData)
             
-        } else if case let .player(playerModel) = tiles[defenderPosition],
-            case let .monster(monsterModel) = tiles[attackerPosition] {
+        } else if let defenderPosition = defenderPostion,
+            case let .player(playerModel) = tiles[defenderPosition],
+            case let .monster(monsterModel) = tiles[attackerPosition],
+            let relativeAttackDirection = defenderPosition.direction(relative: attackerPosition) {
             
             attacker = monsterModel
             defender = playerModel
@@ -520,9 +522,18 @@ extension Board {
             
             tiles[attackerPosition.x][attackerPosition.y] = TileType.monster(newAttackerData)
             tiles[defenderPosition.x][defenderPosition.y] = TileType.player(newDefenderData)
+        } else if case let .player(playerModel) = tiles[attackerPosition],
+            defenderPostion == nil {
+            //just note that the player attacked
+            tiles[attackerPosition.x][attackerPosition.y] = TileType.player(playerModel.didAttack())
+            
+        } else if case let .monster(monsterModel) = tiles[attackerPosition],
+            defenderPostion == nil {
+            //just note that the monster attacked
+            tiles[attackerPosition.x][attackerPosition.y] = TileType.monster(monsterModel.didAttack())
         }
         
         
-        return Transformation(tiles: tiles, inputType: .attack(attackerPosition, defenderPosition))
+        return Transformation(tiles: tiles, inputType: input.type)
     }
 }

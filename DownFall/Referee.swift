@@ -218,7 +218,10 @@ class Referee {
                 playerData.canAttack else { return nil }
             for attackedTile in attackedTiles(from: playerPosition) {
                 if case TileType.monster(let data) = tiles[attackedTile], data.hp > 0 {
-                    return Input(.attack(playerPosition, attackedTile))
+                    return Input(.attack(attackType: playerData.attack.type,
+                                         attacker: playerPosition,
+                                         defender: attackedTile,
+                                         affectedTiles: [attackedTile]))
                 }
             }
             return nil
@@ -229,23 +232,37 @@ class Referee {
             for (i, row) in tiles.enumerated() {
                 for (j, _) in row.enumerated() {
                     let potentialMonsterPosition = TileCoord(i, j)
-                    if case TileType.monster(let monsterData) = tiles[potentialMonsterPosition],
+                    
+                    guard case TileType.monster(let monsterData) = tiles[potentialMonsterPosition],
                         monsterData.canAttack,
-                        monsterData.hp > 0{
-                        let attackFrequency = monsterData.attack.frequency
-                        let totalTurns = monsterData.attack.turns
-                        let shouldAttack = totalTurns % attackFrequency == 0
-                        
-                        if monsterData.attack.type == .targets {
-                            for attackedTile in attackedTiles(from: potentialMonsterPosition) {
-                                if case TileType.player = tiles[attackedTile] {
-                                    return Input(.attack(potentialMonsterPosition, attackedTile))
-                                }
-                            }
-                        } else if monsterData.attack.type == .areaOfEffect && shouldAttack  {
-                            return Input(.attackArea(tileCoords: attackedTiles(from: potentialMonsterPosition)))
+                        monsterData.hp > 0 else { continue }
+                    
+                    let attackFrequency = monsterData.attack.frequency
+                    let totalTurns = monsterData.attack.turns
+                    let shouldAttack = totalTurns % attackFrequency == 0
+                    
+                    guard shouldAttack else { continue }
+                    
+                    let attackedTileArray = attackedTiles(from: potentialMonsterPosition)
+                    for attackedTile in attackedTileArray {
+                        if case TileType.player = tiles[attackedTile] {
+                            return Input(.attack(attackType: monsterData.attack.type,
+                                                 attacker: potentialMonsterPosition,
+                                                 defender: attackedTile,
+                                                 affectedTiles: attackedTileArray))
                         }
                     }
+                    
+                    // At this point, there was no player in the affect tiles
+                    // We should still create an attack input, with the defender was nil
+                    // So that the board and renderer can do their things
+                    if monsterData.attack.type == .areaOfEffect {
+                        return Input(.attack(attackType: monsterData.attack.type,
+                                             attacker: potentialMonsterPosition,
+                                             defender: nil,
+                                             affectedTiles: attackedTileArray))
+                    }
+
                 }
             }
             return nil

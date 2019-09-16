@@ -27,16 +27,17 @@ class HUD: SKSpriteNode {
     
     //Mark: - Instance Methods
     
-    private func showAttack(_ attackerPosition: TileCoord,
-                               _ defenderPosition: TileCoord,
-                               _ endTiles: [[TileType]]?) {
-        guard let tiles = endTiles else { return }
-        let attacker = tiles[attackerPosition]
-        let defender = tiles[defenderPosition]
+    private func showAttack(attackInput: Input, endTiles: [[TileType]]?) {
+        guard case InputType.attack(_,
+                                    _,
+                                    let defenderPosition,
+                                    _) = attackInput.type,
+            let tiles = endTiles else {
+                                        return
+        }
         
-        if case TileType.monster = attacker,
-            case let TileType.player(playerData) = defender{
-            // monster attacked player
+        if let defenderPosition = defenderPosition,
+            case let TileType.player(playerData) = tiles[defenderPosition] {
             show(playerData)
         }
     }
@@ -46,8 +47,8 @@ class HUD: SKSpriteNode {
         case .transformation(let trans):
             guard let inputType = trans.inputType else { return }
             switch inputType {
-            case .attack(let attacker, let defender):
-                showAttack(attacker, defender, trans.endTiles)
+            case .attack:
+                showAttack(attackInput: input, endTiles: trans.endTiles)
             default:
                 ()
             }

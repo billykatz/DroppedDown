@@ -39,8 +39,7 @@ struct LoseState: GameState {
              .reffingFinished,
              .boardBuilt,
              .collectItem,
-             .newTurn,
-             .attackArea:
+             .newTurn:
             return nil
         }
     }

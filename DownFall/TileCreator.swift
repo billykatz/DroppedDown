@@ -147,7 +147,7 @@ class TileCreator: TileStrategy {
             let randomRow = Int.random(lowerMonsterbound)
             let randomCol = Int.random(lowerMonsterbound)
             guard !TileCoord(randomRow, randomCol).isOrthogonallyAdjacent(to: playerPosition) else { continue }
-            tiles[randomRow][randomCol] = TileType.monster(entities[7])
+            tiles[randomRow][randomCol] = TileType.monster(entities[5])
         }
         
         return tiles

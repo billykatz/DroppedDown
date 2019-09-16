@@ -216,12 +216,13 @@ class Referee {
             guard let playerPosition = playerPosition,
                 case TileType.player(let playerData) = tiles[playerPosition],
                 playerData.canAttack else { return nil }
-            for attackedTile in attackedTiles(from: playerPosition) {
+            let attackedTileArray = attackedTiles(from: playerPosition)
+            for attackedTile in attackedTileArray {
                 if case TileType.monster(let data) = tiles[attackedTile], data.hp > 0 {
                     return Input(.attack(attackType: playerData.attack.type,
                                          attacker: playerPosition,
                                          defender: attackedTile,
-                                         affectedTiles: [attackedTile]))
+                                         affectedTiles: attackedTileArray))
                 }
             }
             return nil

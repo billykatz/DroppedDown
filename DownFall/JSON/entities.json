@@ -310,8 +310,8 @@
                     "numberOfFrames": 0
                 },
                 "projectile": {
-                    "animationFilename": "",
-                    "numberOfFrames": 0
+                    "animationFilename": "fireball",
+                    "numberOfFrames": 1
                 }
             },
             "carry": {

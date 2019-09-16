@@ -128,7 +128,7 @@ class Renderer : SKSpriteNode {
                 fatalError()
             }
         } else {
-            animationsFinished(for: sprites)
+            animationsFinished(for: sprites, endTiles: trans.endTiles)
         }
 
     }

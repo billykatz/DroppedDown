@@ -191,7 +191,7 @@ extension Board {
         var selectedTiles: [TileCoord] = [tileCoord]
         if !singleTile {
             selectedTiles = findNeighbors(tileCoord)
-            if selectedTiles.count < 3 { return Transformation.zero }
+            if selectedTiles.count < 3 { return Transformation(tiles: tiles, transformation: nil, inputType: nil) }
         }
         
         // set the tiles to be removed as Empty placeholder

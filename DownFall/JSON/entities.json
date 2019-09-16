@@ -106,8 +106,8 @@
         },
         { "name": "player2",
             "type": "player",
-            "originalHp": 3,
-            "hp": 3,
+            "originalHp": 10,
+            "hp": 10,
             "attack": {
                 "type": "targets",
                 "frequency" : 1,
@@ -311,7 +311,7 @@
                 },
                 "projectile": {
                     "animationFilename": "fireball",
-                    "numberOfFrames": 1
+                    "numberOfFrames": 8
                 }
             },
             "carry": {

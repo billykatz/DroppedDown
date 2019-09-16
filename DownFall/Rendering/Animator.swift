@@ -132,6 +132,7 @@ struct Animator {
             for position in positions {
                 let sprite = SKSpriteNode(color: .clear, size: CGSize(width: 100, height: 100))
                 sprite.position = position
+                sprite.zPosition = Precedence.menu.rawValue
                 groupedActions.append(SKAction.run {
                     foreground.addChild(sprite)
                     sprite.run(projectileAnimation) {

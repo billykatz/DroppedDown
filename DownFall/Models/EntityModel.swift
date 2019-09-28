@@ -129,6 +129,10 @@ struct EntityModel: Equatable, Decodable {
     func canAfford(_ cost: Int) -> Bool {
         return carry.totalGold >= cost
     }
+    
+    func willAttackNextTurn() -> Bool {
+        return attack.willAttackNextTurn()
+    }
 
 }
 

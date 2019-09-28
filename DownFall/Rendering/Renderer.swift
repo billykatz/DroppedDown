@@ -61,7 +61,7 @@ class Renderer : SKSpriteNode {
         //create sprite representations based on the given board.tiles
         self.sprites = createSprites(from: board.tiles)
         //place the created sprites onto the foreground
-        let _ = add(sprites: sprites)
+        let _ = add(sprites: sprites, tiles: board.tiles)
         foreground.position = playableRect.center
         menuForeground.position = playableRect.center
         menuForeground.addChild(menuSpriteNode)
@@ -160,7 +160,7 @@ class Renderer : SKSpriteNode {
     
     private func animateAttack(attackInput: InputType, endTiles: [[TileType]]?) {
         guard let tiles = endTiles else {
-            animationsFinished(for: sprites)
+            animationsFinished(for: sprites, endTiles: endTiles)
             return
         }
         
@@ -175,10 +175,19 @@ class Renderer : SKSpriteNode {
         
     }
     
-    private func add(sprites: [[DFTileSpriteNode]]) {
+    private func add(sprites: [[DFTileSpriteNode]], tiles: [[TileType]]?) {
         spriteForeground.removeAllChildren()
-        sprites.forEach { spriteRow in
-            spriteRow.forEach { sprite in
+//        sprites.forEach { spriteRow in
+//            spriteRow.forEach { sprite in
+//                spriteForeground.addChild(sprite)
+//            }
+//        }
+//        
+        for (row, innerSprites) in sprites.enumerated() {
+            for (col, sprite) in innerSprites.enumerated() {
+                if tiles?[row][col].willAttackNextTurn() ?? false {
+                    sprite.indicateAboutToAttack()
+                }
                 spriteForeground.addChild(sprite)
             }
         }
@@ -234,9 +243,9 @@ class Renderer : SKSpriteNode {
         }
     }
     
-    private func animationsFinished(for endBoard: [[DFTileSpriteNode]], endTiles: [[TileType]]? = nil) {
+    private func animationsFinished(for endBoard: [[DFTileSpriteNode]], endTiles: [[TileType]]?) {
         sprites = createSprites(from: endTiles)
-        let _ = add(sprites: sprites)
+        let _ = add(sprites: sprites, tiles: endTiles)
         InputQueue.append(Input(.animationsFinished, endTiles))
     }
     

@@ -25,16 +25,17 @@ class DFTileSpriteNode: SKSpriteNode {
     
     required init?(coder aDecoder: NSCoder) { fatalError("DFTileSpriteNode init?(coder:) is not implemented") }
     
-    func animatedPlayerAction() -> SKAction {
-        var textureNames: [SKTexture] = []
-        for frame in 1...9 {
-            textureNames.append(SKTexture(imageNamed: "Burly-person-v2-frame-\(frame)"))
+    func indicateAboutToAttack() {
+        let blinkingSprite = SKSpriteNode(color: .yellow, size: self.size)
+        blinkingSprite.zPosition = Precedence.background.rawValue
+        let blink = SKAction.run {
+            blinkingSprite.alpha = abs(blinkingSprite.alpha - 1)
         }
-        for frame in 0..<9 {
-            textureNames.append(SKTexture(imageNamed: "Burly-person-v2-frame-\(9-frame)"))
-        }
-        let animation = SKAction.animate(with: textureNames, timePerFrame: 0.1)
-        return animation
+        let wait = SKAction.wait(forDuration: 0.2)
+        let group = SKAction.sequence([blink, wait])
+        let action = SKAction.repeatForever(group)
+        blinkingSprite.run(action)
+        self.addChild(blinkingSprite)
     }
 }
 

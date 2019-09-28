@@ -36,7 +36,7 @@ class TileCreator: TileStrategy {
     }
     
     func randomMonster(_ given: Int) -> TileType {
-        let index = abs(given) % EntityModel.monsterCases.count
+        let index = Int.random(EntityModel.monsterCases.count)
         switch EntityModel.monsterCases[index] {
         case .dragon:
             return TileType.monster(entities[3])
@@ -76,6 +76,8 @@ class TileCreator: TileStrategy {
         var newTiles: [TileType] = []
         var newMonsterCount = 0
         let currentMonsterCount =  typeCount(for: tiles, of: .monster(.zero)).count
+        // The paramter tiles array has .empty tiles in it
+        // Create new tiles until we have enough to cover the empty tiles
         while (newTiles.count < typeCount(for: tiles, of: .empty).count) {
             let nextTile = randomTile(randomSource.nextInt())
             

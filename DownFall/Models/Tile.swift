@@ -54,6 +54,13 @@ enum TileType: Equatable, Hashable, CaseIterable {
         }
     }
     
+    func willAttackNextTurn() -> Bool {
+        if case let .monster(data) = self {
+            return data.willAttackNextTurn()
+        }
+        return false
+    }
+    
     static var gem: TileType {
         return TileType.item(.gem)
     }

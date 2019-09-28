@@ -77,4 +77,9 @@ struct AttackModel: Equatable, Decodable {
 
     }
     
+    func willAttackNextTurn() -> Bool {
+        let shouldAttack = (self.turns + 1) % self.frequency == 0
+        return shouldAttack && type == .areaOfEffect
+    }
+    
 }

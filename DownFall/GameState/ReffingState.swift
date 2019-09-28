@@ -16,8 +16,12 @@ struct ReffingState: GameState {
     
     func transitionState(given input: Input) -> AnyGameState? {
         switch input.type {
-        case .reffingFinished:
+        case .reffingFinished(true):
+            // check the global Turn Counter,
+            // that knows whether or not a "turn" happened
             return AnyGameState(ComputingState())
+        case .reffingFinished(newTurn: false):
+            return AnyGameState(PlayState())
         case .attack, .monsterDies, .collectItem:
             return AnyGameState(ComputingState())
         case .gameWin:

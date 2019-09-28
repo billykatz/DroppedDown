@@ -14,16 +14,14 @@ class TileCreator: TileStrategy {
     var randomSource = GKLinearCongruentialRandomSource()
     let entities: [EntityModel]
     let difficulty: Difficulty
-    let objectiveTracker: ProvidesObjectiveData
     var updatedEntity: EntityModel?
+    var boardSize: Int = 0
     
     init(_ entities: [EntityModel],
          difficulty: Difficulty,
-         objectiveTracker: ProvidesObjectiveData,
          updatedEntity: EntityModel? = nil) {
         self.entities = entities
         self.difficulty = difficulty
-        self.objectiveTracker = objectiveTracker
         self.updatedEntity = updatedEntity
     }
     
@@ -38,16 +36,16 @@ class TileCreator: TileStrategy {
     }
     
     func randomMonster(_ given: Int) -> TileType {
-        let index = abs(given) % EntityModel.EntityType.allCases.count
-        switch EntityModel.EntityType.allCases[index] {
+        let index = abs(given) % EntityModel.monsterCases.count
+        switch EntityModel.monsterCases[index] {
+        case .dragon:
+            return TileType.monster(entities[3])
         case .rat:
-            return TileType.monster(entities[6])
+            return TileType.monster(entities[4])
         case .bat:
-            return TileType.monster(entities[7])
-        default:
-            //TODO: Get rid of unused monsters
-            return randomRock(given)
-            
+            return TileType.monster(entities[5])
+        case .player:
+            fatalError("monstersCases should not included player")
         }
         
     }
@@ -69,6 +67,7 @@ class TileCreator: TileStrategy {
     }
     
     var maxMonsters: Int {
+        //TODO: dont hardcode
         return difficulty.maxExpectedMonsters(for: 10)
     }
 
@@ -87,8 +86,7 @@ class TileCreator: TileStrategy {
                 ()
             case .exit:
                 if typeCount(for: tiles, of: .exit).count < 1,
-                    !newTiles.contains(.exit),
-                    objectiveTracker.shouldSpawnExit
+                    !newTiles.contains(.exit)
                 {
                     newTiles.append(nextTile)
                 }
@@ -112,9 +110,7 @@ class TileCreator: TileStrategy {
     */
     func board(_ boardSize: Int,
                difficulty: Difficulty) -> [[TileType]] {
-        
-        //TODO: determine when we should add monsters to a new board
-        
+        self.boardSize = boardSize
         var newTiles: [TileType] = []
         while (newTiles.count < boardSize * boardSize) {
             let nextTile = randomRock(randomSource.nextInt())
@@ -136,19 +132,26 @@ class TileCreator: TileStrategy {
                 currIdx += 1
             }
         }
-        let lowerbound = Int(Double(tiles.count) * 0.33)
         
-        let playerPosition = TileCoord((Int.random(lowerbound) + lowerbound), (Int.random(lowerbound) + lowerbound))
+        let playerQuadrant = Quadrant.allCases[Int.random(Quadrant.allCases.count)]
+        let playerPosition = playerQuadrant.randomCoord(for: boardSize)
         tiles[playerPosition.x][playerPosition.y] = TileType.player(playerEntityData)
         
-        let lowerMonsterbound = Int(Double(tiles.count))
+        let upperMonsterbound = Int(Double(tiles.count))
         
-        for _ in 0..<maxMonsters/2 {
-            let randomRow = Int.random(lowerMonsterbound)
-            let randomCol = Int.random(lowerMonsterbound)
-            guard !TileCoord(randomRow, randomCol).isOrthogonallyAdjacent(to: playerPosition) else { continue }
-            tiles[randomRow][randomCol] = TileType.monster(entities[5])
+        for _ in 0..<maxMonsters {
+            let randomRow = Int.random(upperMonsterbound)
+            let randomCol = Int.random(upperMonsterbound)
+            guard playerPosition != TileCoord(randomRow,randomCol),
+                !TileCoord(randomRow, randomCol).isOrthogonallyAdjacent(to: playerPosition) else { continue }
+            tiles[randomRow][randomCol] = randomMonster(randomSource.nextInt())
         }
+        
+        //place the exit on the opposite side of the grid
+        let exitQuadrant = playerQuadrant.opposite
+        let exitPosition = exitQuadrant.randomCoord(for: boardSize)
+        
+        tiles[exitPosition.x][exitPosition.y] = TileType.exit
         
         return tiles
 
@@ -162,11 +165,50 @@ class TileCreator: TileStrategy {
         }
         switch difficulty {
         case .easy:
-            return entities[2]
+            return entities[0]
         case .normal:
-            return entities[3]
+            return entities[1]
         case .hard:
-            return entities[4]
+            return entities[2]
+        }
+    }
+}
+
+enum Quadrant: CaseIterable {
+    case northEast
+    case northWest
+    case southEast
+    case southWest
+    
+    var opposite: Quadrant {
+        switch self {
+        case .northEast:
+            return .southWest
+        case .northWest:
+            return .southEast
+        case .southEast:
+            return .northWest
+        case .southWest:
+            return .northEast
+        }
+    }
+    
+    func randomCoord(for boardSize: Int) -> TileCoord {
+        switch self {
+        case .northEast:
+            return TileCoord(Int.random(in: 2*boardSize/3..<boardSize),
+                             Int.random(in: 2*boardSize/3..<boardSize))
+        case .northWest:
+            return TileCoord(Int.random(in: 2*boardSize/3..<boardSize),
+                             Int.random(in: 0...boardSize/3))
+
+        case .southEast:
+            return TileCoord(Int.random(in: 0...boardSize/3),
+                             Int.random(in: 2*boardSize/3..<boardSize))
+        case .southWest:
+            return TileCoord(Int.random(in: 0...boardSize/3),
+                             Int.random(in: 0...boardSize/3))
+
         }
     }
 }

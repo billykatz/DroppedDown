@@ -23,7 +23,7 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
                                         .pause,
                                         .animationsFinished,
                                         .playAgain,
-                                        .reffingFinished,
+                                        .reffingFinished(newTurn: false),
                                         .collectItem(TileCoord(0,0), .zero)]
     
     typealias AllCases = [InputType]
@@ -40,7 +40,7 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
     case animationsFinished
     case playAgain
     case transformation(Transformation)
-    case reffingFinished
+    case reffingFinished(newTurn: Bool)
     case boardBuilt
     case collectItem(TileCoord, Item)
     case selectLevel

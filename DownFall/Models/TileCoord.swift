@@ -9,6 +9,13 @@
 import Foundation
 
 
+
+enum Axis {
+    case vertical
+    case horizontal
+}
+
+
 struct TileCoord: Hashable {
     let x, y: Int
     var tuple : (Int, Int) { return (x, y) }
@@ -66,11 +73,6 @@ struct TileCoord: Hashable {
         }
         
         return false
-    }
-    
-    enum Axis {
-        case vertical
-        case horizontal
     }
     
     func distance(to: TileCoord, along axis: Axis) -> Int {

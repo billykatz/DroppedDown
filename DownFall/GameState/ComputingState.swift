@@ -15,7 +15,7 @@ struct ComputingState: GameState {
     func transitionState(given input: Input) -> AnyGameState? {
         switch input.type {
         case .transformation(let trans):
-            if trans.inputType == .reffingFinished {
+            if case .reffingFinished(_)? = trans.inputType {
                 return AnyGameState(ComputingState())
             } else {
                 return AnyGameState(AnimatingState())

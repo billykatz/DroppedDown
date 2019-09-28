@@ -41,7 +41,6 @@ class GameScene: SKScene {
     //playable margin
     private var playableRect: CGRect?
     
-    
     //touch state
     private var touchWasSwipe = false
     
@@ -65,25 +64,18 @@ class GameScene: SKScene {
                               y: -size.height/2,
                               width: playableWidth,
                               height: size.height)
-        
-        //objective tracker
-        let objectiveTracker = ObjectiveTracker(goal: .exit,
-                                                objectiveAbsoluteDirection: .north,
-                                                objectiveDistance: 50,
-                                                playableRect: playableRect!,
-                                                foreground: foreground)
-        
+          
         
         //tile creatore
         tileCreator = TileCreator(entities,
                                   difficulty: difficulty,
-                                  objectiveTracker: objectiveTracker,
                                   updatedEntity: updatedEntity)
         
         //board
         board = Board.build(size: bsize, tileCreator: tileCreator!)
         boardSize = bsize
         generator = HapticGenerator()
+        
     }
     
     override func didMove(to view: SKView) {
@@ -129,9 +121,12 @@ class GameScene: SKScene {
                 self?.gameSceneDelegate?.selectLevel()
             }
         }
+        
+        //Turn watcher
+        TurnWatcher.shared.register()
     }
     
-    deinit {
+    func prepareForReuse() {
         board = nil
         renderer = nil
         tileCreator = nil
@@ -140,6 +135,7 @@ class GameScene: SKScene {
         referee = nil
         generator = nil
         playableRect = nil
+        InputQueue.reset()
         Dispatch.shared.reset()
         print("deiniting")
     }

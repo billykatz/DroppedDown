@@ -22,8 +22,7 @@ class GameViewController: UIViewController {
         //TODO: handle failure more gracefully. ie redownload or retry
         let entityData = try! Data.data(from: "entities")!
         entities = try! JSONDecoder().decode(EntitiesModel.self, from: entityData).entities
-//        levelSelect()
-        visitStore(entities![2])
+        visitStore(entities![0])
     }
 
     override var shouldAutorotate: Bool {
@@ -58,7 +57,7 @@ extension GameViewController {
     }
     
     private func startLevel(_ updatedPlayerData: EntityModel? = nil) {
-        gameSceneNode = nil
+        gameSceneNode?.prepareForReuse()
         if let scene = GKScene(fileNamed: "GameScene")?.rootNode as? GameScene,
             let entities = entities {
             gameSceneNode = scene

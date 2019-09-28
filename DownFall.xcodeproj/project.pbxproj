@@ -16,10 +16,10 @@
 		3D06390D22EEB57300C4D5E9 /* WinState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D06390C22EEB57300C4D5E9 /* WinState.swift */; };
 		3D06390F22F1DB8300C4D5E9 /* StoreScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D06390E22F1DB8300C4D5E9 /* StoreScene.swift */; };
 		3D106098232E9A0200ECE7E6 /* Animator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D106097232E9A0200ECE7E6 /* Animator.swift */; };
+		3D10609B233DD05500ECE7E6 /* TurnWatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D10609A233DD05500ECE7E6 /* TurnWatcher.swift */; };
 		3D18A39D224D68D300343C29 /* Dispatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D18A39C224D68D300343C29 /* Dispatch.swift */; };
 		3D2C757322C85362009ABD36 /* Direction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D2C757222C85362009ABD36 /* Direction.swift */; };
 		3D2C757522C854F8009ABD36 /* ItemModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D2C757422C854F8009ABD36 /* ItemModel.swift */; };
-		3D30A4222216888300AFA1E1 /* RendererTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D30A4212216888300AFA1E1 /* RendererTests.swift */; };
 		3D30A4292216899E00AFA1E1 /* BoardMocker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D30A4232216892A00AFA1E1 /* BoardMocker.swift */; };
 		3D30A42B2217F63500AFA1E1 /* TileCoord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D30A42A2217F63500AFA1E1 /* TileCoord.swift */; };
 		3D46333A22E7A4A1009159FF /* ObjectiveTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D46333922E7A4A1009159FF /* ObjectiveTracker.swift */; };
@@ -114,10 +114,10 @@
 		3D06390C22EEB57300C4D5E9 /* WinState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WinState.swift; sourceTree = "<group>"; };
 		3D06390E22F1DB8300C4D5E9 /* StoreScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreScene.swift; sourceTree = "<group>"; };
 		3D106097232E9A0200ECE7E6 /* Animator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animator.swift; sourceTree = "<group>"; };
+		3D10609A233DD05500ECE7E6 /* TurnWatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurnWatcher.swift; sourceTree = "<group>"; };
 		3D18A39C224D68D300343C29 /* Dispatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dispatch.swift; sourceTree = "<group>"; };
 		3D2C757222C85362009ABD36 /* Direction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Direction.swift; sourceTree = "<group>"; };
 		3D2C757422C854F8009ABD36 /* ItemModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemModel.swift; sourceTree = "<group>"; };
-		3D30A4212216888300AFA1E1 /* RendererTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RendererTests.swift; sourceTree = "<group>"; };
 		3D30A4232216892A00AFA1E1 /* BoardMocker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardMocker.swift; sourceTree = "<group>"; };
 		3D30A42A2217F63500AFA1E1 /* TileCoord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileCoord.swift; sourceTree = "<group>"; };
 		3D46333922E7A4A1009159FF /* ObjectiveTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectiveTracker.swift; sourceTree = "<group>"; };
@@ -391,6 +391,7 @@
 				3D46333822E7A488009159FF /* Objective */,
 				3D106099232E9A0B00ECE7E6 /* Rendering */,
 				3DA0087C21E6D1960017D8DA /* TileCreator.swift */,
+				3D10609A233DD05500ECE7E6 /* TurnWatcher.swift */,
 				3D0638FF22EEB4E600C4D5E9 /* GameState */,
 				3DE87C8C2235D03300D750CF /* Views */,
 				3D7D8B2C2252857E0016FE4C /* CombatSimulator.swift */,
@@ -417,7 +418,6 @@
 				3DB270A822B00E0D00D9BF8B /* TileTypeTest+Extensions.swift */,
 				3DF2926820A37FF0006671AC /* BoardTests.swift */,
 				3DCB38AA232DCE88001D148F /* TileCoordTests.swift */,
-				3D30A4212216888300AFA1E1 /* RendererTests.swift */,
 				3D90AACF21D8854300C7428A /* RefereeTests.swift */,
 				3DE87C95224068FA00D750CF /* GameStateTests.swift */,
 				3DD36ECC21E5BD9100AC4873 /* TileStrategyTests.swift */,
@@ -603,6 +603,7 @@
 				3DA0A37F2300CE3B0041EF34 /* ShieldEast.swift in Sources */,
 				3D106098232E9A0200ECE7E6 /* Animator.swift in Sources */,
 				3DF2924E20A37FEE006671AC /* AppDelegate.swift in Sources */,
+				3D10609B233DD05500ECE7E6 /* TurnWatcher.swift in Sources */,
 				3D06390122EEB4FB00C4D5E9 /* PauseState.swift in Sources */,
 				3D58468A22A6325300EDD845 /* CarryModel.swift in Sources */,
 				3DF2928320A66BEB006671AC /* Tile.swift in Sources */,
@@ -642,7 +643,6 @@
 				3D30A4292216899E00AFA1E1 /* BoardMocker.swift in Sources */,
 				3DF2926920A37FF0006671AC /* BoardTests.swift in Sources */,
 				3DD36ECD21E5BD9100AC4873 /* TileStrategyTests.swift in Sources */,
-				3D30A4222216888300AFA1E1 /* RendererTests.swift in Sources */,
 				3DA4E8992290AC82006E90D1 /* EntityModelTests.swift in Sources */,
 				3DB270A922B00E0D00D9BF8B /* TileTypeTest+Extensions.swift in Sources */,
 				3D90AAD021D8854300C7428A /* RefereeTests.swift in Sources */,

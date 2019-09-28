@@ -15,7 +15,7 @@ class Referee {
     }
     
     static func enforceRules(_ tiles: [[TileType]]?) -> Input {
-        guard let tiles = tiles else { return Input(.reffingFinished) }
+        guard let tiles = tiles else { return Input(.reffingFinished(newTurn: false)) }
         
         func valid(neighbor: TileCoord?, for currCoord: TileCoord?) -> Bool {
             guard let (neighborRow, neighborCol) = neighbor?.tuple,
@@ -331,7 +331,8 @@ class Referee {
             return collectItem
         }
 
-        return Input(.reffingFinished)
+        let newTurn = TurnWatcher.shared.getNewTurnAndReset()
+        return Input(.reffingFinished(newTurn: newTurn))
     }
 
 }

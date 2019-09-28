@@ -142,25 +142,46 @@ class ObjectiveTracker {
     }
     
     private var createForeground: SKNode {
-        let maxArrowSize: Double = 175.0
-        let maxExitSize: Double = 75.0
-        let distanceRatio = Double(1 - (Double(distance) / Double(initialDistance)))
-        let minDistanceRatio = max(0.2, distanceRatio)
-        
-        let arrowSize = maxArrowSize * minDistanceRatio
-        let exitSpriteSize = maxExitSize * minDistanceRatio
+        let arrowSize: Double = 105
+        let exitSpriteSize: Double = 125
         
         let objectiveForeground = SKNode()
-        let objectiveArrow = SKSpriteNode(texture: SKTexture(imageNamed: "arrow"), size: CGSize(width: arrowSize, height: arrowSize))
+        let objectiveBackground = SKSpriteNode(color: .lightGray,
+                                               size: CGSize(width: playableRect.width * 0.9,
+                                                            height: 150))
+        
+        
+        let objectiveArrow = SKSpriteNode(texture: SKTexture(imageNamed: "arrow"),
+                                          size: CGSize(width: arrowSize, height: arrowSize))
         objectiveArrow.zRotation = zRotation
-        
-        let exitSprite = SKSpriteNode(texture: SKTexture(imageNamed: "exit"), size: CGSize(width: exitSpriteSize, height: exitSpriteSize))
+        objectiveArrow.position = CGPoint(x: objectiveBackground.frame.width/2 - (2*objectiveArrow.frame.width) - 50,
+                                          y: (objectiveBackground.frame.height/2 - objectiveArrow.frame.height/2) / 2)
+
+        let exitSprite = SKSpriteNode(texture: SKTexture(imageNamed: "exit"),
+                                      size: CGSize(width: exitSpriteSize,
+                                                   height: exitSpriteSize))
         exitSprite.zPosition = Precedence.foreground.rawValue
-        exitSprite.zRotation = uprightZRotation
-        objectiveArrow.addChild(exitSprite)
+        exitSprite.position = CGPoint(x: objectiveBackground.frame.width/2 - exitSprite.frame.width - 15,
+                                      y: (objectiveBackground.frame.height/2 - exitSprite.frame.height/2) / 2)
         
-        let objectiveBackground = SKSpriteNode(color: .lightGray, size: CGSize(width: playableRect.width * 0.9, height: 150))
+        let distanceLabel = SKLabelNode(fontNamed: "Helvetica-bold")
+        distanceLabel.fontSize = 36
+        switch abs(distance) {
+        case 0..<10 :
+            distanceLabel.text = "Almost there!"
+        case 10..<30:
+            distanceLabel.text = "It's getting closer, I can feel it!"
+        case 30...Int.max:
+            distanceLabel.text = "The exit is far away."
+        default:
+            () // Silly compiler, this is impossible
+        }
+        distanceLabel.position = CGPoint(x: -objectiveBackground.frame.width/2 + distanceLabel.frame.width + 15,
+                                         y: (objectiveBackground.frame.height/2 - objectiveArrow.frame.height/2) / 2)
+        
+        objectiveBackground.addChild(distanceLabel)
         objectiveBackground.addChild(objectiveArrow)
+        objectiveBackground.addChild(exitSprite)
         objectiveForeground.addChild(objectiveBackground)
         
         objectiveBackground.position = CGPoint(x: playableRect.midX, y: playableRect.maxY - 385 - 116)

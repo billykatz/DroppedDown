@@ -31,8 +31,7 @@ extension Board {
     convenience init(tiles: [[TileType]]) {
         self.init(tiles: tiles,
                   tileCreator: TileCreator(entities(),
-                                           difficulty: .normal,
-                                           objectiveTracker: MockObjectiveTracker()))
+                                           difficulty: .normal))
     }
 }
 

@@ -28,4 +28,13 @@ public extension Int {
         }
         return retVal
     }
+    
+    
+    /**
+     Returns a random integer between 0 and n-1 that is not the given number
+     */
+    static func random(lower: Int, upper: Int) -> Int {
+        return Int(arc4random_uniform(UInt32(lower)))
+    }
+
 }

@@ -33,7 +33,5 @@ extension CGPoint {
         }
         
         return points
-        
     }
-
 }

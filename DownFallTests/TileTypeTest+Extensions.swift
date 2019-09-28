@@ -39,12 +39,12 @@ extension AttackModel {
 }
 
 extension TileType {
-    static var deadMonster: TileType {
+    static var deadRat: TileType {
         return TileType.monster(EntityModel(originalHp:0,
                                             hp: 0,
                                             name: "Gloop",
                                             attack: .zero,
-                                            type: .monster,
+                                            type: .rat,
                                             carry: .zero,
                                             animations: .zero,
                                             abilities: [])
@@ -70,7 +70,7 @@ extension TileType {
     
     static func createMonster(originalHp: Int = 1,
                               hp: Int = 1,
-                              name: String = "Gloop",
+                              name: String = "Rat",
                               attack: AttackModel = AttackModel(type: .targets,
                                                                 frequency: 1,
                                                                 range: .one,
@@ -79,7 +79,7 @@ extension TileType {
                                                                 attacksThisTurn: 0,
                                                                 turns: 1,
                                                                 attacksPerTurn: 1),
-                              type: EntityModel.EntityType = .monster,
+                              type: EntityModel.EntityType = .rat,
                               carry: CarryModel = .zero,
                               animations: AllAnimationsModel = .zero,
                               abilities: [AnyAbility] = []) -> TileType {

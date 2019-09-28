@@ -50,14 +50,15 @@ class Board: Equatable {
             transformation = gameWin()
         case .collectItem(let tileCoord, _):
             transformation = collectItem(at: tileCoord)
-        case .reffingFinished:
-            transformation = resetAttacks()
+        case .reffingFinished(let newTurn):
+            transformation = resetAttacks(newTurn: newTurn)
         case .transformation(let trans):
             if let inputType = trans.inputType,
-                inputType == .reffingFinished,
+                case .reffingFinished(_) = inputType,
                 let tiles = trans.endTiles {
                 self.tiles = tiles
-                InputQueue.append(Input(.newTurn))
+                let input = Input(.newTurn, tiles)
+                InputQueue.append(input)
                 transformation = nil
             }
         case .gameLose(_),
@@ -224,7 +225,7 @@ extension Board {
                               inputType: .touch(tileCoord, tiles[tileCoord]))
     }
     
-    private func resetAttacks() -> Transformation? {
+    private func resetAttacks(newTurn: Bool) -> Transformation? {
         func resetAttacks(in tiles: [[TileType]]) -> [[TileType]] {
             var newTiles = tiles
             for (i, row) in tiles.enumerated() {
@@ -247,7 +248,7 @@ extension Board {
         
         return Transformation(tiles: newTiles,
                                    transformation: nil,
-                                   inputType: .reffingFinished)
+                                   inputType: .reffingFinished(newTurn: newTurn))
         
         
     }
@@ -271,7 +272,11 @@ extension Board {
             let playerData = EntityModel(originalHp: data.originalHp,
                                          hp: data.hp,
                                          name: data.name,
-                                         attack: data.attack,
+                                         // FIXME: Hack
+                                         // we have to reset attack here because the player has moved but the turn may not be over
+                                         // Eg: it is possible that there could be two or more monsters
+                                         // under the player and the player should be able to attack
+                                         attack: data.attack.resetAttack(),
                                          type: data.type,
                                          carry: newCarryModel,
                                          animations: data.animations,

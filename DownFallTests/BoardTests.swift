@@ -29,8 +29,7 @@ struct MockBoardHelper {
     
     static func createBoard(_ type: TileType = .greenRock, size: Int = 5) -> Board {
         let tc = TileCreator(entities(),
-                             difficulty: .normal,
-                             objectiveTracker: MockObjectiveTracker())
+                             difficulty: .normal)
         return Board(tiles: Array(repeating: row(of: type, by: size),  count: size), tileCreator: tc)
     }
     
@@ -57,8 +56,7 @@ class BoardTests: XCTestCase {
                   [.blueRock, .blueRock, .blueRock]]
         self.board = Board(tiles: tiles,
                            tileCreator: TileCreator(entities(),
-                                                    difficulty: .normal,
-                                                    objectiveTracker: MockObjectiveTracker()))
+                                                    difficulty: .normal))
     }
     
     func testValidNeighbors() {
@@ -227,12 +225,14 @@ class BoardTests: XCTestCase {
     
     func testTapPlayerDoesNotResultTransformation() {
         let playerTapppedTransformation = board.removeAndReplace(TileCoord(0,0))
-        XCTAssertEqual(Transformation.zero, playerTapppedTransformation, "Tapping player should not result in a board transformation")
+        let expectedTrans = Transformation(tiles: board.tiles, transformation: nil, inputType: nil)
+        XCTAssertEqual(expectedTrans, playerTapppedTransformation, "Tapping player should not result in a board transformation")
     }
     
     func testTapExitDoesNotResultTransformation() {
         let exitTappedTransformation = board.removeAndReplace(TileCoord(0,1))
-        XCTAssertEqual(Transformation.zero, exitTappedTransformation, "Tapping exit should not result in a board transformation")
+        let expectedTrans = Transformation(tiles: board.tiles, transformation: nil, inputType: nil)
+        XCTAssertEqual(expectedTrans, exitTappedTransformation, "Tapping exit should not result in a board transformation")
     }
     
     //TODO: tap monster does not result in transformation
@@ -256,7 +256,10 @@ class BoardTests: XCTestCase {
         var expectedTiles: [[TileType]] = [[.blueRock, .exit, .blueRock],
                                            [.normalMonster, .blueRock, .blueRock],
                                            [player1, .blueRock, .blueRock]]
-        var actualBoard = Board(tiles: givenTiles).attack(TileCoord(2, 0), TileCoord(1, 0)).endTiles
+        var actualBoard = Board(tiles: givenTiles).attack(Input(.attack(attackType: .targets,
+                                                                        attacker: TileCoord(2, 0),
+                                                                        defender: TileCoord(1, 0),
+                                                                        affectedTiles: [TileCoord(1, 0)]))).endTiles
         XCTAssertEqual(expectedTiles, actualBoard, "Board removes HP from tiles beneath the player equal to the palyer attack damage.")
 
         givenTiles = [[.blueRock, .exit, .blueRock],
@@ -267,7 +270,10 @@ class BoardTests: XCTestCase {
                          [.normalMonster, .blueRock, .blueRock],
                          [player2, .blueRock, .blueRock]]
 
-        actualBoard = Board(tiles: givenTiles).attack(TileCoord(2, 0), TileCoord(1, 0)).endTiles
+        actualBoard = Board(tiles: givenTiles).attack(Input(.attack(attackType: .targets,
+                                                                    attacker: TileCoord(2, 0),
+                                                                    defender: TileCoord(1, 0),
+                                                                    affectedTiles: [TileCoord(1, 0)]))).endTiles
         XCTAssertEqual(expectedTiles, actualBoard, "Board removes HP from tiles beneath the palyer equal to the palyer attack damage.")
 
 
@@ -276,10 +282,13 @@ class BoardTests: XCTestCase {
                       [player2, .blueRock, .blueRock]]
 
         expectedTiles = [[.blueRock, .exit, .blueRock],
-                         [.deadMonster, .blueRock, .blueRock],
+                         [.deadRat, .blueRock, .blueRock],
                          [player2, .blueRock, .blueRock]]
 
-        actualBoard = Board(tiles: givenTiles).attack(TileCoord(2, 0), TileCoord(1, 0)).endTiles
+        actualBoard = Board(tiles: givenTiles).attack(Input(.attack(attackType: .targets,
+                                                                    attacker: TileCoord(2, 0),
+                                                                    defender: TileCoord(1, 0),
+                                                                    affectedTiles: [TileCoord(1, 0)]))).endTiles
         XCTAssertEqual(expectedTiles, actualBoard, "Board subtracts HP from tile's hp located beneath the player equal to the player attack damage.")
 
 
@@ -288,10 +297,13 @@ class BoardTests: XCTestCase {
                       [.strongPlayer, .blueRock, .blueRock]]
 
         expectedTiles = [[.blueRock, .exit, .blueRock],
-                         [.deadMonster, .blueRock, .blueRock],
+                         [.deadRat, .blueRock, .blueRock],
                          [.strongPlayer, .blueRock, .blueRock]]
 
-        actualBoard = Board(tiles: givenTiles).attack(TileCoord(2, 0), TileCoord(1, 0)).endTiles
+        actualBoard = Board(tiles: givenTiles).attack(Input(.attack(attackType: .targets,
+                                                                    attacker: TileCoord(2, 0),
+                                                                    defender: TileCoord(1, 0),
+                                                                    affectedTiles: [TileCoord(1, 0)]))).endTiles
         XCTAssertEqual(expectedTiles, actualBoard, "Board subtracts HP from tile's hp located beneath the player equal to the player attack damage.")
     }
     
@@ -303,7 +315,10 @@ class BoardTests: XCTestCase {
         let expectedTiles: [[TileType]] = [[.deadPlayer, .monsterThatHasAttacked, .blueRock],
                                            [.blueRock, .exit, .blueRock],
                                            [.blueRock, .blueRock, .blueRock]]
-        let actualBoard = Board(tiles: givenTiles).attack(TileCoord(0, 1), TileCoord(0, 0)).endTiles
+        let actualBoard = Board(tiles: givenTiles).attack(Input(.attack(attackType: .targets,
+                                                                        attacker: TileCoord(0, 1),
+                                                                        defender: TileCoord(0, 0),
+                                                                        affectedTiles: [TileCoord(0, 0)]))).endTiles
         XCTAssertEqual(expectedTiles, actualBoard, "Board applies Monster's attack damage to Player's hp.")
         
     }

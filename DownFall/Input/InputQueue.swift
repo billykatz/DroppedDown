@@ -9,7 +9,8 @@
 import SpriteKit
 
 indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringConvertible{
-    static var allCases: [InputType] = [.touch(TileCoord(0,0), .blueRock),
+    static var allCases: [InputType] = [.touchBegan(TileCoord(0,0), .blueRock),
+                                        .touch(TileCoord(0,0), .blueRock),
                                         .rotateLeft,
                                         .rotateRight,
                                         .attack(attackType: .targets,
@@ -28,6 +29,7 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
     
     typealias AllCases = [InputType]
     
+    case touchBegan(_ position: TileCoord, _ tileType: TileType)
     case touch(_ position: TileCoord, _ tileType: TileType)
     case rotateLeft
     case rotateRight
@@ -82,6 +84,8 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
             return "Select Level"
         case .newTurn:
             return "New Turn"
+        case .touchBegan:
+            return "Touch began"
         }
     }
 }
@@ -89,11 +93,14 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
 struct Input: Hashable, CustomDebugStringConvertible {
     let type: InputType
     let endTiles: [[TileType]]?
+    let transformation: Transformation?
 
     init(_ type: InputType,
-         _ endTiles: [[TileType]]? = []) {
+         _ endTiles: [[TileType]]? = [],
+         _ transformation: Transformation? = .zero) {
         self.type = type
         self.endTiles = endTiles
+        self.transformation = transformation
     }
     
     var debugDescription: String {

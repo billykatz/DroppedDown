@@ -26,6 +26,7 @@ struct LoseState: GameState {
         case .playAgain, .selectLevel:
             return AnyGameState(PlayState())
         case .touch,
+             .touchBegan,
              .rotateLeft,
              .rotateRight,
              .monsterDies,

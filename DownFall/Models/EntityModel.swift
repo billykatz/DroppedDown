@@ -158,3 +158,17 @@ extension EntityModel: Hashable {
 struct EntitiesModel: Equatable, Decodable {
     let entities: [EntityModel]
 }
+
+
+extension EntityModel: CustomDebugStringConvertible {
+    var debugDescription: String {
+        return "That is a \(self.type), it has \(self.hp)\n \(self.attack)"
+    }
+}
+
+extension AttackModel: CustomDebugStringConvertible {
+    var debugDescription: String {
+        return "Attacks \(self.directions) for \(self.damage)"
+    }
+}
+

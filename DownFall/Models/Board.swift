@@ -39,17 +39,24 @@ class Board: Equatable {
             transformation = rotate(.left)
         case .rotateRight:
             transformation = rotate(.right)
+        case .touchBegan(let tileCoord, _):
+            let selectedTiles = findNeighbors(tileCoord)
+            if selectedTiles.count < 3 {
+                transformation = Transformation(tiles: tiles,
+                                      transformation: nil,
+                                      inputType: input.type)
+            }
         case .touch(let tileCoord, _):
-            transformation = removeAndReplace(tileCoord)
+            transformation = removeAndReplace(tileCoord, input: input)
         case .attack:
             transformation = attack(input)
         case .monsterDies(let tileCoord):
             //only remove a single tile when a monster dies
-            transformation = monsterDied(at: tileCoord)
+            transformation = monsterDied(at: tileCoord, input: input)
         case .gameWin:
             transformation = gameWin()
         case .collectItem(let tileCoord, _):
-            transformation = collectItem(at: tileCoord)
+            transformation = collectItem(at: tileCoord, input: input)
         case .reffingFinished(let newTurn):
             transformation = resetAttacks(newTurn: newTurn)
         case .transformation(let trans):
@@ -187,12 +194,17 @@ extension Board {
      *  - returns a transformation with the tiles that have been removed, added, and shifted down
      */
     
-    func removeAndReplace(_ tileCoord: TileCoord, singleTile: Bool = false) -> Transformation {
+    func removeAndReplace(_ tileCoord: TileCoord,
+                          singleTile: Bool = false,
+                          input: Input) -> Transformation {
         // Check that the tile group at row, col has more than 3 tiles
         var selectedTiles: [TileCoord] = [tileCoord]
         if !singleTile {
             selectedTiles = findNeighbors(tileCoord)
-            if selectedTiles.count < 3 { return Transformation(tiles: tiles, transformation: nil, inputType: nil) }
+            if selectedTiles.count < 3 {
+                return Transformation(tiles: tiles,
+                                      transformation: nil,
+                                      inputType: input.type) }
         }
         
         // set the tiles to be removed as Empty placeholder
@@ -241,23 +253,23 @@ extension Board {
                 }
             }
             return newTiles
-
+            
         }
         
         let newTiles = resetAttacks(in: tiles)
         
         return Transformation(tiles: newTiles,
-                                   transformation: nil,
-                                   inputType: .reffingFinished(newTurn: newTurn))
+                              transformation: nil,
+                              inputType: .reffingFinished(newTurn: newTurn))
         
         
     }
     
-    private func collectItem(at coord: TileCoord) -> Transformation {
+    private func collectItem(at coord: TileCoord, input: Input) -> Transformation {
         let selectedTile = tiles[coord]
         
         //remove and replace the single item tile
-        let transformation = removeAndReplace(coord, singleTile: true)
+        let transformation = removeAndReplace(coord, singleTile: true, input: input)
         
         //save the item
         guard case let TileType.item(item) = selectedTile,
@@ -273,14 +285,14 @@ extension Board {
                                          hp: data.hp,
                                          name: data.name,
                                          // FIXME: Hack
-                                         // we have to reset attack here because the player has moved but the turn may not be over
-                                         // Eg: it is possible that there could be two or more monsters
-                                         // under the player and the player should be able to attack
-                                         attack: data.attack.resetAttack(),
-                                         type: data.type,
-                                         carry: newCarryModel,
-                                         animations: data.animations,
-                                         abilities: data.abilities)
+                // we have to reset attack here because the player has moved but the turn may not be over
+                // Eg: it is possible that there could be two or more monsters
+                // under the player and the player should be able to attack
+                attack: data.attack.resetAttack(),
+                type: data.type,
+                carry: newCarryModel,
+                animations: data.animations,
+                abilities: data.abilities)
             
             updatedTiles[pp.x][pp.y] = TileType.player(playerData)
         }
@@ -293,7 +305,7 @@ extension Board {
     }
     
     
-    private func monsterDied(at coord: TileCoord) -> Transformation {
+    private func monsterDied(at coord: TileCoord, input: Input) -> Transformation {
         if case let .monster(monsterData) = tiles[coord],
             let item = monsterData.carry.items.first {
             let itemTile = TileType.item(item)
@@ -301,7 +313,7 @@ extension Board {
             return Transformation(tiles: tiles, transformation: nil, inputType: .monsterDies(coord))
         } else {
             //no item! remove and replace
-            return removeAndReplace(coord, singleTile: true)
+            return removeAndReplace(coord, singleTile: true, input: input)
         }
         
     }
@@ -410,6 +422,8 @@ extension Board {
                     let endCol = numCols - rowIdx
                     
                     column.insert(tiles[rowIdx][colIdx], at: 0)
+                    
+                    //Create a TileTransformation object, the Renderer will use this to animate the changes
                     let trans = TileTransformation(TileCoord(rowIdx, colIdx),
                                                    TileCoord(endRow, endCol))
                     transformation.append(trans)

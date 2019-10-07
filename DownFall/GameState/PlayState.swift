@@ -17,7 +17,7 @@ struct PlayState: GameState {
         case .gameWin,. gameLose,. pause,
              .attack, .transformation,
              .touch, .monsterDies, .rotateLeft, .rotateRight,
-             .boardBuilt:
+             .boardBuilt, .touchBegan:
             return true
         case .animationsFinished, .play,
              .reffingFinished, .playAgain, .collectItem,
@@ -35,7 +35,8 @@ struct PlayState: GameState {
         case .pause:
             return AnyGameState(PauseState())
         case .attack, .touch, .monsterDies,
-             .rotateLeft, .rotateRight, .collectItem:
+             .rotateLeft, .rotateRight, .collectItem,
+             .touchBegan:
             return AnyGameState(ComputingState())
         case .boardBuilt:
             return AnyGameState(PlayState())

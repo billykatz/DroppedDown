@@ -53,6 +53,7 @@ class Renderer : SKSpriteNode {
         self.bottomLeft = CGPoint(x: bottomLeftX, y: bottomLeftY)
         
         foreground = givenForeground
+        foreground.isUserInteractionEnabled = false
         
         super.init(texture: nil, color: .clear, size: CGSize.zero)
         
@@ -110,6 +111,16 @@ class Renderer : SKSpriteNode {
                 rotate(for: trans)
             case .touch:
                 computeNewBoard(for: trans)
+            case .touchBegan:
+                if trans.tileTransformation == nil {
+                    animator.indicateAttackPattern(touchInputType: inputType,
+                                                   foreground: foreground,
+                                                   tiles: trans.endTiles,
+                                                   sprites: sprites) {
+                                                    InputQueue.append(Input(.animationsFinished, trans.endTiles))
+//                                                    strongSelf.animationsFinished(for: strongSelf.sprites, endTiles: trans.endTiles)
+                    }
+                } 
             case .attack:
                 animateAttack(attackInput: inputType, endTiles: trans.endTiles)
             case .gameWin:
@@ -145,11 +156,11 @@ class Renderer : SKSpriteNode {
             gameWin()
         case .playAgain:
             menuForeground.removeFromParent()
-        case .touch(_, _), .rotateLeft, .rotateRight,
+        case .touch, .rotateLeft, .rotateRight,
              .monsterDies, .attack, .gameWin,
              .animationsFinished, .reffingFinished,
              .boardBuilt,. collectItem, .selectLevel,
-             .newTurn, .transformation:
+             .newTurn, .transformation, .touchBegan:
             ()
         }
     }
@@ -177,12 +188,6 @@ class Renderer : SKSpriteNode {
     
     private func add(sprites: [[DFTileSpriteNode]], tiles: [[TileType]]?) {
         spriteForeground.removeAllChildren()
-//        sprites.forEach { spriteRow in
-//            spriteRow.forEach { sprite in
-//                spriteForeground.addChild(sprite)
-//            }
-//        }
-//        
         for (row, innerSprites) in sprites.enumerated() {
             for (col, sprite) in innerSprites.enumerated() {
                 if tiles?[row][col].willAttackNextTurn() ?? false {
@@ -314,6 +319,31 @@ extension Renderer {
 
 
 extension Renderer {
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = touches.first else { return }
+        let positionInScene = touch.location(in: self.foreground)
+        let nodes = foreground.nodes(at: positionInScene)
+        
+        for node in nodes {
+            if node is DFTileSpriteNode {
+                for index in 0..<sprites.reduce([],+).count {
+                    let boardSize = Int(self.boardSize)
+                    let row = index / boardSize
+                    let col = (index - row * boardSize) % boardSize
+                    if sprites[row][col].contains(positionInScene) {
+                        InputQueue.append(
+                            Input(.touchBegan(TileCoord(row, col),
+                                              sprites[row][col].type))
+                        )
+                    }
+                }
+            }
+        }
+    }
+    
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+    }
+    
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
         let positionInScene = touch.location(in: self.foreground)

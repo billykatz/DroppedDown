@@ -67,7 +67,7 @@ class HelperTextView: SKSpriteNode {
             case .player:
                 descriptionText = "That's you! Stay alive and find the exit"
             case .monster(let data):
-                descriptionText = "That's a monster!\n It has \(data.hp) hp and attacks sideways"
+                descriptionText = "\(data)"
             case .empty:
                 descriptionText = "How in the hell did you tap on an empty tile?"
             case .item(let item):

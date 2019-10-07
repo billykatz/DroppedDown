@@ -99,11 +99,20 @@ class GameScene: SKScene {
         
         let swipeUpGestureReconizer = UISwipeGestureRecognizer(target: self, action: #selector(swipedUp))
         swipeUpGestureReconizer.direction = .up
+        
         view.addGestureRecognizer(swipeUpGestureReconizer)
         
         let swipeDownGestureReconizer = UISwipeGestureRecognizer(target: self, action: #selector(swipedDown))
         swipeDownGestureReconizer.direction = .down
         view.addGestureRecognizer(swipeDownGestureReconizer)
+        
+        let swipeLeftGestureReconizer = UISwipeGestureRecognizer(target: self, action: #selector(swipedLeft))
+        swipeLeftGestureReconizer.direction = .left
+        view.addGestureRecognizer(swipeLeftGestureReconizer)
+        
+        let swipeRightGestureReconizer = UISwipeGestureRecognizer(target: self, action: #selector(swipedRight(_:)))
+        swipeRightGestureReconizer.direction = .right
+        view.addGestureRecognizer(swipeRightGestureReconizer)
         
         Dispatch.shared.register { [weak self] input in
             if input.type == .playAgain {
@@ -121,7 +130,7 @@ class GameScene: SKScene {
                 self?.gameSceneDelegate?.selectLevel()
             }
         }
-        
+
         //Turn watcher
         TurnWatcher.shared.register()
     }
@@ -142,17 +151,54 @@ class GameScene: SKScene {
     
     @objc func swipedUp(_ gestureRecognizer: UISwipeGestureRecognizer) {
         let location = gestureRecognizer.location(in: self.view)
-        if isInRightHalf(location) {
+        let onRight = location.x > (self.view?.frame.width ?? 0)/2
+        
+        if onRight {
+            touchWasSwipe = true
+            rotateLeft()
+        } else {
+            touchWasSwipe = true
+            rotateRight()
+        }
+
+    }
+    
+    @objc func swipedDown(_ gestureRecognizer: UISwipeGestureRecognizer) {
+        let location = gestureRecognizer.location(in: self.view)
+        let onRight = location.x > (self.view?.frame.width ?? 0)/2
+        if onRight {
+            touchWasSwipe = true
+            rotateRight()
+        } else {
             touchWasSwipe = true
             rotateLeft()
         }
     }
     
-    @objc func swipedDown(_ gestureRecognizer: UISwipeGestureRecognizer) {
+    @objc func swipedLeft(_ gestureRecognizer: UISwipeGestureRecognizer) {
         let location = gestureRecognizer.location(in: self.view)
-        if isInRightHalf(location) {
+        let inTop = location.y < (self.view?.frame.height ?? 0)/2
+
+        
+        if !inTop {
             touchWasSwipe = true
             rotateRight()
+        } else {
+            touchWasSwipe = true
+            rotateLeft()
+        }
+    }
+    
+    @objc func swipedRight(_ gestureRecognizer: UISwipeGestureRecognizer) {
+        let location = gestureRecognizer.location(in: self.view)
+        let inTop = location.y < (self.view?.frame.height ?? 0)/2
+        
+        if inTop {
+            touchWasSwipe = true
+            rotateRight()
+        } else {
+            touchWasSwipe = true
+            rotateLeft()
         }
     }
     
@@ -178,7 +224,11 @@ extension GameScene {
     func isInRightHalf(_ location: CGPoint) -> Bool {
         return rightHalf().contains(location)
     }
-    //TODO: remove gesture recgonizers when the scene is not visible
+    
+    func isInLeftHalf(_ location: CGPoint) -> Bool {
+        return leftHalf().contains(location)
+    }
+    
     func rightHalf() -> CGRect {
         guard let playableRect = playableRect,
             let viewRect = self.view?.frame else { fatalError("No playable rect calculated") }
@@ -188,6 +238,35 @@ extension GameScene {
                       height: playableRect.height)
         
     }
+    
+    func leftHalf() -> CGRect {
+        guard let playableRect = playableRect,
+            let viewRect = self.view?.frame else { fatalError("No playable rect calculated") }
+        return CGRect(x: viewRect.origin.x,
+                      y: viewRect.height/2 - playableRect.height/2,
+                      width: playableRect.width/2,
+                      height: playableRect.height)
+        
+    }
+    
+    var topHalf: CGRect {
+        guard let playableRect = playableRect,
+            let viewRect = self.view?.frame else { fatalError("No playable rect calculated") }
+        return CGRect(x: viewRect.origin.x - playableRect.width/2,
+                      y: viewRect.origin.y,
+                      width: playableRect.width,
+                      height: playableRect.height/2)
+    }
+    
+    var bottomHalf: CGRect {
+        guard let playableRect = playableRect,
+            let viewRect = self.view?.frame else { fatalError("Cannot calcu;ate bottom half") }
+        return CGRect(x: viewRect.origin.x - playableRect.width/2,
+                      y: viewRect.origin.y,
+                      width: playableRect.width,
+                      height: -playableRect.height/2)
+    }
+
 }
 
 // MARK: - Debug
@@ -234,6 +313,7 @@ extension GameScene {
 extension GameScene {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         touchWasSwipe = false
+//        self.renderer?.touchesBegan(touches, with: event)
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {

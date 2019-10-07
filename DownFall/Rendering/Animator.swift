@@ -24,8 +24,12 @@ struct Animator {
             let trans = transformation[transIdx]
             //calculate a point that is out of bounds of the foreground
             let outOfBounds: CGFloat = CGFloat(trans.initial.x) >= boardSize ? tileSize * boardSize : 0
+            
+            // Translate the TileTransformation initial to a tile on screen
             let point = CGPoint.init(x: tileSize * CGFloat(trans.initial.tuple.1) + bottomLeft.x,
                                      y: outOfBounds + tileSize * CGFloat(trans.initial.x) + bottomLeft.y)
+            
+            // Find that tile and add that animation
             for child in spriteForeground.children {
                 if child.contains(point) {
                     let endPoint = CGPoint.init(x: tileSize * CGFloat(trans.end.y) + bottomLeft.x,
@@ -45,6 +49,113 @@ struct Animator {
         }
     }
     
+    // Indicate how the entity at a given Coord attacks
+    func indicateAttackPattern(touchInputType: InputType,
+                               foreground: SKNode,
+                               tiles: [[TileType]]?,
+                               sprites: [[DFTileSpriteNode]],
+                               completion: (() -> Void)?) {
+        guard case let InputType.touchBegan(coord, tileType) = touchInputType,
+            case let TileType.monster(monsterData) = tileType,
+            let tiles = tiles
+            else {
+                completion?()
+                return
+        }
+        
+        
+        
+        func attackedTiles(in tiles: [[TileType]], from position: TileCoord) -> [TileCoord] {
+            guard isWithinBounds(position, boardSize: tiles.count) else { return [] }
+            let attacker = tiles[position]
+            if case TileType.player(let player) = attacker  {
+                return calculateAttacks(for: player, from: position)
+            } else if case TileType.monster(let monster) = attacker {
+                return calculateAttacks(for: monster, from: position)
+            }
+            return []
+        }
+        
+        func isWithinBounds(_ tileCoord: TileCoord, boardSize: Int) -> Bool {
+            let (tileRow, tileCol) = tileCoord.tuple
+            return tileRow >= 0 && //lower bound
+                tileCol >= 0 && // lower bound
+                tileRow < boardSize && // upper bound
+                tileCol < boardSize
+        }
+        
+        func calculateAttacks(for entity: EntityModel, from position: TileCoord) -> [TileCoord] {
+            let attackDirections = entity.attack.directions
+            let attackRange = entity.attack.range
+            var affectedTiles: [TileCoord] = []
+            for direction in attackDirections {
+                for i in attackRange.lower...attackRange.upper {
+                    // TODO: Let's add a property to attacks that says if the attack goes thru targets or not
+                    let target = calculateTarget(in: direction, distance: i, from: position)
+                    if isWithinBounds(target, boardSize: tiles.count) {
+                        affectedTiles.append(target)
+                    }
+                }
+            }
+            return affectedTiles
+        }
+
+        func calculateTarget(in direction: Direction, distance i: Int, from position: TileCoord) -> TileCoord {
+            let (initialRow, initialCol) = position.tuple
+            let targetRow: Int
+            let targetCol: Int
+            switch direction {
+            case .north:
+                targetRow = initialRow + i
+                targetCol = initialCol
+            case .south:
+                targetRow = initialRow - i
+                targetCol = initialCol
+            case .east:
+                targetCol = initialCol + i
+                targetRow = initialRow
+            case .west:
+                targetCol = initialCol - i
+                targetRow = initialRow
+            case .northEast:
+                targetRow = initialRow + i
+                targetCol = initialCol + i
+            case .southEast:
+                targetRow = initialRow - i
+                targetCol = initialCol + i
+            case .northWest:
+                targetRow = initialRow + i
+                targetCol = initialCol - i
+            case .southWest:
+                targetRow = initialRow - i
+                targetCol = initialCol - i
+            }
+            
+            return TileCoord(targetRow, targetCol)
+        }
+
+        
+        let affectedTile = attackedTiles(in: tiles, from: coord)
+        
+        for coord in affectedTile {
+            sprites[coord].indicateAboutToAttack()
+        }
+        
+        completion?()
+        
+        //TODO: All this is happneing, but when we run our completion all the sprites are removed and added back to the foreground
+        // This is unseful for keeping our UI and state in sync however it removes the sprites that indicate where an enemy attacks
+        // We need to figure out how to represent this in our state rather than impratively show this on certain inputs
+        
+        
+        
+    }
+    
+    
+    // Animate combat.  This includes:
+    // - The attacker animation
+    // - The defender animation
+    // - And any projectile animation
     func animate(attackInputType: InputType,
                  foreground: SKNode,
                  tiles: [[TileType]],
@@ -124,7 +235,7 @@ struct Animator {
                 }
             )
         }
-
+        
         // projectile
         if let frames = projectileAnimationFrames {
             let positions = positions(affectedTiles)
@@ -155,14 +266,12 @@ struct Animator {
                 }
             )
         }
-
+        
         
         foreground.run(SKAction.group(groupedActions))
         dispatchGroup.notify(queue: .main) {
             completion?()
         }
-
-        
         
     }
 }

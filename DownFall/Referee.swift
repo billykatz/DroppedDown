@@ -15,7 +15,7 @@ class Referee {
     }
     
     static func enforceRules(_ tiles: [[TileType]]?) -> Input {
-        guard let tiles = tiles else { return Input(.reffingFinished(newTurn: false)) }
+        guard let tiles = tiles, !tiles.isEmpty else { return Input(.reffingFinished(newTurn: false)) }
         
         func valid(neighbor: TileCoord?, for currCoord: TileCoord?) -> Bool {
             guard let (neighborRow, neighborCol) = neighbor?.tuple,

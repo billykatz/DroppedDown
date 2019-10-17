@@ -6,11 +6,11 @@
 //  Copyright © 2019 William Katz LLC. All rights reserved.
 //
 
-func typeCount(for tiles: [[TileType]], of type: TileType) -> [TileCoord] {
+func typeCount(for tiles: [[Tile]], of type: TileType) -> [TileCoord] {
     var tileCoords: [TileCoord] = []
     for (i, _) in tiles.enumerated() {
         for (j, _) in tiles[i].enumerated() {
-            tiles[i][j] == type ? tileCoords.append(TileCoord(i, j)) : ()
+            tiles[i][j].type == type ? tileCoords.append(TileCoord(i, j)) : ()
         }
     }
     return tileCoords

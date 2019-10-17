@@ -117,8 +117,8 @@ class GameScene: SKScene {
         Dispatch.shared.register { [weak self] input in
             if input.type == .playAgain {
                 self?.foreground.removeAllChildren()
-                let player = board.tiles[board.tiles(of: .player(.zero)).first!]
-                if case let TileType.player(data) = player {
+                let player = board.tilesStruct[board.tiles(of: .player(.zero)).first!]
+                if case let TileType.player(data) = player.type {
                     let revivedData = data.revive()
                     self?.removeFromParent()
                     self?.gameSceneDelegate?.visitStore(revivedData)
@@ -217,57 +217,6 @@ extension GameScene {
     }
 }
 
-//MARK: - Coordinate Math
-
-extension GameScene {
-    
-    func isInRightHalf(_ location: CGPoint) -> Bool {
-        return rightHalf().contains(location)
-    }
-    
-    func isInLeftHalf(_ location: CGPoint) -> Bool {
-        return leftHalf().contains(location)
-    }
-    
-    func rightHalf() -> CGRect {
-        guard let playableRect = playableRect,
-            let viewRect = self.view?.frame else { fatalError("No playable rect calculated") }
-        return CGRect(x: viewRect.width/2,
-                      y: viewRect.height/2 - playableRect.height/2,
-                      width: playableRect.width/2,
-                      height: playableRect.height)
-        
-    }
-    
-    func leftHalf() -> CGRect {
-        guard let playableRect = playableRect,
-            let viewRect = self.view?.frame else { fatalError("No playable rect calculated") }
-        return CGRect(x: viewRect.origin.x,
-                      y: viewRect.height/2 - playableRect.height/2,
-                      width: playableRect.width/2,
-                      height: playableRect.height)
-        
-    }
-    
-    var topHalf: CGRect {
-        guard let playableRect = playableRect,
-            let viewRect = self.view?.frame else { fatalError("No playable rect calculated") }
-        return CGRect(x: viewRect.origin.x - playableRect.width/2,
-                      y: viewRect.origin.y,
-                      width: playableRect.width,
-                      height: playableRect.height/2)
-    }
-    
-    var bottomHalf: CGRect {
-        guard let playableRect = playableRect,
-            let viewRect = self.view?.frame else { fatalError("Cannot calcu;ate bottom half") }
-        return CGRect(x: viewRect.origin.x - playableRect.width/2,
-                      y: viewRect.origin.y,
-                      width: playableRect.width,
-                      height: -playableRect.height/2)
-    }
-
-}
 
 // MARK: - Debug
 
@@ -313,7 +262,7 @@ extension GameScene {
 extension GameScene {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         touchWasSwipe = false
-//        self.renderer?.touchesBegan(touches, with: event)
+        self.renderer?.touchesBegan(touches, with: event)
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {

@@ -6,6 +6,35 @@
 //  Copyright © 2018 William Katz LLC. All rights reserved.
 //
 
+struct Tile: Hashable {
+    let type: TileType
+    var shouldHighlight: Bool
+    
+    init(type: TileType,
+         shouldHighlight: Bool = false) {
+        self.type = type
+        self.shouldHighlight = shouldHighlight
+    }
+    
+    static var exit: Tile {
+        return Tile(type: .exit)
+    }
+    
+    static var empty: Tile {
+        return Tile(type: .empty)
+    }
+    
+    static var player: Tile {
+        return Tile(type: .player(.zero))
+    }
+}
+
+extension Tile: Equatable {
+    static func ==(lhs: Tile, rhs: Tile) -> Bool {
+        return lhs.type == rhs.type && lhs.shouldHighlight == rhs.shouldHighlight
+    }
+}
+
 enum TileType: Equatable, Hashable, CaseIterable {
     
     static var rockCases: [TileType] = [.blueRock, .blackRock, .greenRock]
@@ -51,6 +80,14 @@ enum TileType: Equatable, Hashable, CaseIterable {
             return true
         default:
             return false
+        }
+    }
+    
+    var isInspectable: Bool {
+        switch self {
+        case .monster, .player, .item, .exit:
+            return true
+        default: return false
         }
     }
     

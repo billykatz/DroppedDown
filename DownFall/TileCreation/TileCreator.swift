@@ -9,7 +9,7 @@
 import GameplayKit
 
 class TileCreator: TileStrategy {
-    
+
     var spawnedGem = false
     var randomSource = GKLinearCongruentialRandomSource()
     let entities: [EntityModel]
@@ -55,40 +55,28 @@ class TileCreator: TileStrategy {
         return TileType.rockCases[index]
     }
     
-    func getTilePosition(_ type: TileType, tiles: [[TileType]]) -> TileCoord? {
-        for i in 0..<tiles.count {
-            for j in 0..<tiles[i].count {
-                if tiles[i][j] == type {
-                    return TileCoord(i,j)
-                }
-            }
-        }
-        return nil
-    }
-    
     var maxMonsters: Int {
         //TODO: dont hardcode
         return difficulty.maxExpectedMonsters(for: 10)
     }
 
-    
-    func tiles(for tiles: [[TileType]]) -> [TileType] {
-        var newTiles: [TileType] = []
+    func tiles(for tiles: [[Tile]]) -> [Tile] {
+        var newTiles: [Tile] = []
         var newMonsterCount = 0
         let currentMonsterCount =  typeCount(for: tiles, of: .monster(.zero)).count
         // The paramter tiles array has .empty tiles in it
         // Create new tiles until we have enough to cover the empty tiles
         while (newTiles.count < typeCount(for: tiles, of: .empty).count) {
-            let nextTile = randomTile(randomSource.nextInt())
+            let nextTile = Tile(type: randomTile(randomSource.nextInt()))
             
-            switch nextTile {
+            switch nextTile.type {
             case .blueRock, .blackRock, .greenRock:
                 newTiles.append(nextTile)
             case .empty, .item, .player, .fireball:
                 ()
             case .exit:
                 if typeCount(for: tiles, of: .exit).count < 1,
-                    !newTiles.contains(.exit)
+                    !newTiles.contains(Tile.exit)
                 {
                     newTiles.append(nextTile)
                 }
@@ -101,6 +89,7 @@ class TileCreator: TileStrategy {
         }
         return newTiles
     }
+
     
     /**
     Create a 2d Array of tile types
@@ -110,14 +99,15 @@ class TileCreator: TileStrategy {
      - difficulty: The level of difficuly
  
     */
+    
     func board(_ boardSize: Int,
-               difficulty: Difficulty) -> [[TileType]] {
+               difficulty: Difficulty) -> [[Tile]] {
         self.boardSize = boardSize
-        var newTiles: [TileType] = []
+        var newTiles: [Tile] = []
         while (newTiles.count < boardSize * boardSize) {
-            let nextTile = randomRock(randomSource.nextInt())
+            let nextTile = Tile(type: randomRock(randomSource.nextInt()))
             
-            switch nextTile {
+            switch nextTile.type {
             case .blueRock, .blackRock, .greenRock:
                 newTiles.append(nextTile)
             case .exit, .player, .monster, .item, .empty, .fireball:
@@ -125,7 +115,7 @@ class TileCreator: TileStrategy {
             }
         }
         
-        var tiles: [[TileType]] = []
+        var tiles: [[Tile]] = []
         var currIdx = 0
         for row in 0..<boardSize {
             tiles.append([])
@@ -137,7 +127,7 @@ class TileCreator: TileStrategy {
         
         let playerQuadrant = Quadrant.allCases[Int.random(Quadrant.allCases.count)]
         let playerPosition = playerQuadrant.randomCoord(for: boardSize)
-        tiles[playerPosition.x][playerPosition.y] = TileType.player(playerEntityData)
+        tiles[playerPosition.x][playerPosition.y] = Tile(type: .player(playerEntityData))
         
         let upperMonsterbound = Int(Double(tiles.count))
         
@@ -146,17 +136,17 @@ class TileCreator: TileStrategy {
             let randomCol = Int.random(upperMonsterbound)
             guard playerPosition != TileCoord(randomRow,randomCol),
                 !TileCoord(randomRow, randomCol).isOrthogonallyAdjacent(to: playerPosition) else { continue }
-            tiles[randomRow][randomCol] = randomMonster(randomSource.nextInt())
+            tiles[randomRow][randomCol] = Tile(type: randomMonster(randomSource.nextInt()))
         }
         
         //place the exit on the opposite side of the grid
         let exitQuadrant = playerQuadrant.opposite
         let exitPosition = exitQuadrant.randomCoord(for: boardSize)
         
-        tiles[exitPosition.x][exitPosition.y] = TileType.exit
+        tiles[exitPosition.x][exitPosition.y] = Tile.exit
         
         return tiles
-
+        
     }
     
     var playerEntityData: EntityModel {

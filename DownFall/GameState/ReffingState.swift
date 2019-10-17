@@ -11,7 +11,7 @@ struct ReffingState: GameState {
     var state: State = .reffing
     
     func enter(_ input: Input) {
-        Referee.enterRules(input.endTiles)
+        Referee.enterRules(input.endTilesStruct)
     }
     
     func transitionState(given input: Input) -> AnyGameState? {

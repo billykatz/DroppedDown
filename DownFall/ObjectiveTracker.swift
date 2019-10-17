@@ -48,40 +48,40 @@ class ObjectiveTracker {
         
         foreground.addChild(createForeground)
         
-        Dispatch.shared.register { [weak self] (input) in
-            switch input.type {
-            case .rotateLeft:
-                self?.rotated(.left)
-            case .rotateRight:
-                self?.rotated(.right)
-            case .transformation(let trans):
-                if let inputType = trans.inputType {
-                    switch inputType {
-                    case .touch(_, _):
-                        if let newTilesCount = trans.tileTransformation?[1].count {
-                            self?.explored(newTilesCount)
-                        }
-                        if !(self?.hasSpawnedExit ?? false) {
-                            if let endTiles = trans.endTiles {
-                                for i in 0..<endTiles.count {
-                                    for j in 0..<endTiles[i].count {
-                                        if endTiles[i][j] == .exit {
-                                            self?.hasSpawnedExit = true
-                                            self?.delete()
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    default:
-                        ()
-                    }
-                }
-
-            default:
-                ()
-            }
-        }
+//        Dispatch.shared.register { [weak self] (input) in
+//            switch input.type {
+//            case .rotateLeft:
+//                self?.rotated(.left)
+//            case .rotateRight:
+//                self?.rotated(.right)
+//            case .transformation(let trans):
+//                if let inputType = trans.inputType {
+//                    switch inputType {
+//                    case .touch(_, _):
+//                        if let newTilesCount = trans.tileTransformation?[1].count {
+//                            self?.explored(newTilesCount)
+//                        }
+//                        if !(self?.hasSpawnedExit ?? false) {
+//                            if let endTiles = trans.endTiles {
+//                                for i in 0..<endTiles.count {
+//                                    for j in 0..<endTiles[i].count {
+//                                        if endTiles[i][j] == .exit {
+//                                            self?.hasSpawnedExit = true
+//                                            self?.delete()
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    default:
+//                        ()
+//                    }
+//                }
+//
+//            default:
+//                ()
+//            }
+//        }
     }
     
     private func explored(_ numberOfRocks: Int) {

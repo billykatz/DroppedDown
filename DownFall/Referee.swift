@@ -10,11 +10,11 @@ import Foundation
 
 class Referee {
 
-    static func enterRules(_ tiles: [[TileType]]?) {
+    static func enterRules(_ tiles: [[Tile]]?) {
         InputQueue.append(Referee.enforceRules(tiles))
     }
     
-    static func enforceRules(_ tiles: [[TileType]]?) -> Input {
+    static func enforceRules(_ tiles: [[Tile]]?) -> Input {
         guard let tiles = tiles, !tiles.isEmpty else { return Input(.reffingFinished(newTurn: false)) }
         
         func valid(neighbor: TileCoord?, for currCoord: TileCoord?) -> Bool {
@@ -78,8 +78,8 @@ class Referee {
             }
             return neighbors
         }
-
-
+        
+        
         
         let playerPosition = getTilePosition(.player(.zero), tiles: tiles)
         let exitPosition = getTilePosition(.exit, tiles: tiles)
@@ -87,7 +87,7 @@ class Referee {
         func playerWins() -> Input? {
             guard let pp = playerPosition,
                 isWithinBounds(pp.rowBelow),
-                case TileType.exit = tiles[pp.rowBelow] else { return nil }
+                case Tile.exit = tiles[pp.rowBelow] else { return nil }
             return Input(.gameWin)
         }
         
@@ -133,7 +133,7 @@ class Referee {
                 targetRow = initialRow - i
                 targetCol = initialCol - i
             }
-
+            
             return TileCoord(targetRow, targetCol)
         }
         
@@ -176,13 +176,13 @@ class Referee {
                 tileRow < tiles.count && // upper bound
                 tileCol < tiles.count
         }
-
+        
         
         func attackedTiles(from position: TileCoord) -> [TileCoord] {
             let attacker = tiles[position]
-            if case TileType.player(let player) = attacker  {
+            if case TileType.player(let player) = attacker.type  {
                 return calculateAttacks(for: player, from: position)
-            } else if case TileType.monster(let monster) = attacker {
+            } else if case TileType.monster(let monster) = attacker.type {
                 return calculateAttacks(for: monster, from: position)
             }
             return []
@@ -191,9 +191,9 @@ class Referee {
         
         func attackableTiles(from position: TileCoord) -> [TileCoord] {
             let attacker = tiles[position]
-            if case TileType.player(let player) = attacker  {
+            if case TileType.player(let player) = attacker.type  {
                 return calculatePossibleAttacks(for: player, from: position)
-            } else if case TileType.monster(let monster) = attacker {
+            } else if case TileType.monster(let monster) = attacker.type {
                 return calculatePossibleAttacks(for: monster, from: position)
             }
             return []
@@ -201,11 +201,11 @@ class Referee {
         
         func playerHasPossibleAttack() -> Bool {
             guard let playerPosition = playerPosition,
-                case TileType.player(let playerData) = tiles[playerPosition],
+                case TileType.player(let playerData) = tiles[playerPosition].type,
                 playerData.canAttack else { return false }
             
             for attackedTile in attackableTiles(from: playerPosition) {
-                if case TileType.monster = tiles[attackedTile] {
+                if case TileType.monster = tiles[attackedTile].type {
                     return true
                 }
             }
@@ -214,11 +214,11 @@ class Referee {
         
         func playerAttacks() -> Input? {
             guard let playerPosition = playerPosition,
-                case TileType.player(let playerData) = tiles[playerPosition],
+                case TileType.player(let playerData) = tiles[playerPosition].type,
                 playerData.canAttack else { return nil }
             let attackedTileArray = attackedTiles(from: playerPosition)
             for attackedTile in attackedTileArray {
-                if case TileType.monster(let data) = tiles[attackedTile], data.hp > 0 {
+                if case TileType.monster(let data) = tiles[attackedTile].type, data.hp > 0 {
                     return Input(.attack(attackType: playerData.attack.type,
                                          attacker: playerPosition,
                                          defender: attackedTile,
@@ -234,7 +234,7 @@ class Referee {
                 for (j, _) in row.enumerated() {
                     let potentialMonsterPosition = TileCoord(i, j)
                     
-                    guard case TileType.monster(let monsterData) = tiles[potentialMonsterPosition],
+                    guard case TileType.monster(let monsterData) = tiles[potentialMonsterPosition].type,
                         monsterData.canAttack,
                         monsterData.hp > 0 else { continue }
                     
@@ -246,7 +246,7 @@ class Referee {
                     
                     let attackedTileArray = attackedTiles(from: potentialMonsterPosition)
                     for attackedTile in attackedTileArray {
-                        if case TileType.player = tiles[attackedTile] {
+                        if case TileType.player = tiles[attackedTile].type {
                             return Input(.attack(attackType: monsterData.attack.type,
                                                  attacker: potentialMonsterPosition,
                                                  defender: attackedTile,
@@ -263,7 +263,7 @@ class Referee {
                                              defender: nil,
                                              affectedTiles: attackedTileArray))
                     }
-
+                    
                 }
             }
             return nil
@@ -272,7 +272,7 @@ class Referee {
         func monsterDies() -> Input? {
             for (i, row) in tiles.enumerated() {
                 for (j, _) in row.enumerated() {
-                    if case TileType.monster(let data) = tiles[TileCoord(i,j)] {
+                    if case TileType.monster(let data) = tiles[TileCoord(i,j)].type {
                         if data.hp <= 0 {
                             return Input(.monsterDies(TileCoord(i,j)))
                         }
@@ -284,19 +284,21 @@ class Referee {
         
         func playerIsDead() -> Bool {
             guard let playerPosition = playerPosition,
-                case TileType.player(let playerCombat) = tiles[playerPosition] else { return false }
+                case TileType.player(let playerCombat) = tiles[playerPosition].type else { return false }
             return playerCombat.hp <= 0
         }
         
         func playerCollectsItem() -> Input? {
             guard let playerPosition = playerPosition,
-                case TileType.player = tiles[playerPosition],
+                case TileType.player = tiles[playerPosition].type,
                 isWithinBounds(playerPosition.rowBelow),
-                case TileType.item(let item) = tiles[playerPosition.rowBelow]
+                case TileType.item(let item) = tiles[playerPosition.rowBelow].type
                 else { return nil }
-            return Input(.collectItem(playerPosition.rowBelow, item), tiles)
+            let input = Input(.collectItem(playerPosition.rowBelow, item), tiles)
+            return input
+//            Input(.collectItem(playerPosition.rowBelow, item), tiles)
         }
-
+        
         
         // Game rules are enforced in the following priorities
         // Game Win
@@ -330,9 +332,10 @@ class Referee {
         if let collectItem = playerCollectsItem() {
             return collectItem
         }
-
+        
         let newTurn = TurnWatcher.shared.getNewTurnAndReset()
         return Input(.reffingFinished(newTurn: newTurn))
     }
+
 
 }

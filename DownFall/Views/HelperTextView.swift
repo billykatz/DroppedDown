@@ -37,18 +37,18 @@ class HelperTextView: SKSpriteNode {
             guard let inputType = trans.inputType else { return }
             switch inputType {
             case .attack(_, let attackerPosition, let defenderPosition, _):
-                if let tiles = trans.endTiles {
+                if let tiles = trans.endTilesStructs {
                     if let defenderPosition = defenderPosition {
                         let attacker = tiles[attackerPosition]
                         let defender = tiles[defenderPosition]
                         
-                        if case let TileType.monster(monsterData) = attacker,
-                            case TileType.player = defender{
+                        if case let TileType.monster(monsterData) = attacker.type,
+                            case TileType.player = defender.type {
                             // monster attacked player
                             
                             descriptionText = "You've been attacked by a\n monster for \(monsterData.attack.damage) damage."
-                        } else if case TileType.monster = defender,
-                            case TileType.player = attacker {
+                        } else if case TileType.monster = defender.type,
+                            case TileType.player = attacker.type {
                             // we attacked the monster
                             descriptionText = "You slayed a monster,\n you're a worthy champion indeed!"
                         }

@@ -60,9 +60,9 @@ class Renderer : SKSpriteNode {
         isUserInteractionEnabled = true
 
         //create sprite representations based on the given board.tiles
-        self.sprites = createSprites(from: board.tiles)
+        self.sprites = createSprites(from: board.tilesStruct)
         //place the created sprites onto the foreground
-        let _ = add(sprites: sprites, tiles: board.tiles)
+        let _ = add(sprites: sprites, tiles: board.tilesStruct)
         foreground.position = playableRect.center
         menuForeground.position = playableRect.center
         menuForeground.addChild(menuSpriteNode)
@@ -110,36 +110,34 @@ class Renderer : SKSpriteNode {
             case .rotateLeft, .rotateRight:
                 rotate(for: trans)
             case .touch:
-                computeNewBoard(for: trans)
-            case .touchBegan:
-                if trans.tileTransformation == nil {
-                    animator.indicateAttackPattern(touchInputType: inputType,
-                                                   foreground: foreground,
-                                                   tiles: trans.endTiles,
-                                                   sprites: sprites) {
-                                                    InputQueue.append(Input(.animationsFinished, trans.endTiles))
-//                                                    strongSelf.animationsFinished(for: strongSelf.sprites, endTiles: trans.endTiles)
-                    }
-                } 
+                //TODO: sometimes remove and replace has a monster for the touch(_, type).  not sure why
+                if let _ = trans.tileTransformation {
+                    computeNewBoard(for: trans)
+                } else {
+                    animationsFinished(for: sprites,
+                                       endTiles: trans.endTilesStructs)
+                }
             case .attack:
-                animateAttack(attackInput: inputType, endTiles: trans.endTiles)
+                animateAttack(attackInput: inputType, endTiles: trans.endTilesStructs)
             case .gameWin:
                 animate(trans.tileTransformation?.first) { [weak self] in
                     self?.gameWin()
                 }
             case .monsterDies:
-                let sprites = createSprites(from: trans.endTiles)
-                animationsFinished(for: sprites, endTiles: trans.endTiles)
+                let sprites = createSprites(from: trans.endTilesStructs)
+                animationsFinished(for: sprites, endTiles: trans.endTilesStructs)
             case .collectItem:
                 computeNewBoard(for: trans)
             case .reffingFinished:
                 () // Purposely left blank.
+            case .touchBegan:
+                ()
             default:
                 // Transformation assoc value should ony exist for certain inputs
                 fatalError()
             }
         } else {
-            animationsFinished(for: sprites, endTiles: trans.endTiles)
+            animationsFinished(for: sprites, endTiles: trans.endTilesStructs)
         }
 
     }
@@ -169,7 +167,7 @@ class Renderer : SKSpriteNode {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func animateAttack(attackInput: InputType, endTiles: [[TileType]]?) {
+    private func animateAttack(attackInput: InputType, endTiles: [[Tile]]?) {
         guard let tiles = endTiles else {
             animationsFinished(for: sprites, endTiles: endTiles)
             return
@@ -186,17 +184,18 @@ class Renderer : SKSpriteNode {
         
     }
     
-    private func add(sprites: [[DFTileSpriteNode]], tiles: [[TileType]]?) {
+    private func add(sprites: [[DFTileSpriteNode]], tiles: [[Tile]]?) {
         spriteForeground.removeAllChildren()
         for (row, innerSprites) in sprites.enumerated() {
             for (col, sprite) in innerSprites.enumerated() {
-                if tiles?[row][col].willAttackNextTurn() ?? false {
+                if tiles?[row][col].shouldHighlight ?? false {
                     sprite.indicateAboutToAttack()
                 }
                 spriteForeground.addChild(sprite)
             }
         }
     }
+
     
     private func positionsInForeground(at coords: [TileCoord]) -> [CGPoint] {
         var x : CGFloat = 0
@@ -211,7 +210,7 @@ class Renderer : SKSpriteNode {
         return points
     }
     
-    private func createSprites(from tiles: [[TileType]]?) -> [[DFTileSpriteNode]] {
+    private func createSprites(from tiles: [[Tile]]?) -> [[DFTileSpriteNode]] {
         guard let tiles = tiles else { fatalError() }
         var x : CGFloat = 0
         var y : CGFloat = 0
@@ -221,37 +220,50 @@ class Renderer : SKSpriteNode {
             sprites.append([])
             for col in 0..<Int(boardSize) {
                 x = CGFloat(col) * tileSize + bottomLeft.x
-                if tiles[row][col] == TileType.player(.zero) {
+                if tiles[row][col].type == TileType.player(.zero) {
                     //TODO: Don't hardcode height and width
-                    sprites[row].append(DFTileSpriteNode(type: tiles[row][col], height: 160, width: 80))
+                    let sprite = DFTileSpriteNode(type: tiles[row][col].type, height: 160, width: 80)
+                    if tiles[row][col].shouldHighlight {
+                        sprite.indicateAboutToAttack()
+                    }
+                    sprites[row].append(sprite)
                 } else {
-                    sprites[row].append(DFTileSpriteNode(type: tiles[row][col], size: CGFloat(tileSize)))
+                    let sprite = DFTileSpriteNode(type: tiles[row][col].type,
+                                                  size: CGFloat(tileSize))
+                    if tiles[row][col].shouldHighlight {
+                        sprite.indicateAboutToAttack()
+                    }
+                    sprites[row].append(sprite)
+                    
+                    
                 }
                 sprites[row][col].position = CGPoint(x: x, y: y)
             }
         }
         return sprites
     }
-    
+
     /// Animate each tileTransformation to display rotation
     private func rotate(for transformation: Transformation?) {
         guard let transformation = transformation,
             let trans = transformation.tileTransformation?.first,
-            let endTiles = transformation.endTiles else { return }
+            let endTileStructs = transformation.endTilesStructs else { return }
         var animationCount = 0
         animate(trans) { [weak self] in
             guard let strongSelf = self else { return }
             animationCount += 1
             if animationCount == trans.count {
-                strongSelf.animationsFinished(for: strongSelf.sprites, endTiles: endTiles)
+                strongSelf.animationsFinished(for: strongSelf.sprites, endTiles: endTileStructs)
             }
         }
     }
     
-    private func animationsFinished(for endBoard: [[DFTileSpriteNode]], endTiles: [[TileType]]?) {
+    private func animationsFinished(for endBoard: [[DFTileSpriteNode]],
+                                    endTiles: [[Tile]]?,
+                                    ref: Bool = true) {
         sprites = createSprites(from: endTiles)
         let _ = add(sprites: sprites, tiles: endTiles)
-        InputQueue.append(Input(.animationsFinished, endTiles))
+        InputQueue.append(Input(.animationsFinished(ref: ref), endTiles))
     }
     
     private func animate(_ transformation: [TileTransformation]?, _ completion: (() -> Void)?) {
@@ -268,12 +280,16 @@ class Renderer : SKSpriteNode {
 extension Renderer {
     
     private func computeNewBoard(for transformation: Transformation?) {
+        guard let endTiles = transformation?.endTilesStructs else {
+            fatalError("We should always be passing through end tiles")
+        }
+        
         guard let transformation = transformation,
-            let transformations = transformation.tileTransformation,
-            let endTiles = transformation.endTiles else {
-                InputQueue.append(Input(.animationsFinished))
+            let transformations = transformation.tileTransformation else {
+            animationsFinished(for: sprites, endTiles: endTiles)
             return
         }
+        
         let spriteNodes = createSprites(from: endTiles)
         //TODO: don't hardcode this
         let removed = transformations[0]
@@ -341,9 +357,6 @@ extension Renderer {
         }
     }
     
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-    }
-    
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
         let positionInScene = touch.location(in: self.foreground)
@@ -356,6 +369,13 @@ extension Renderer {
                     let row = index / boardSize
                     let col = (index - row * boardSize) % boardSize
                     if sprites[row][col].contains(positionInScene) {
+                        // create the new til coord
+                        let newTileCoord = TileCoord(row, col)
+                        
+                        // Check to see if where out touch ends is where it began
+                        guard let lastTouchInput = InputQueue.lastTouchInput(),
+                            case let InputType.touchBegan(lastTileCoord, _) = lastTouchInput.type,
+                            newTileCoord == lastTileCoord else { return }
                         InputQueue.append(
                             Input(.touch(TileCoord(row, col),
                                          sprites[row][col].type))

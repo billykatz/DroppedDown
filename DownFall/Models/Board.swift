@@ -41,8 +41,17 @@ class Board: Equatable {
             tileCol < boardSize
     }
     
+    func resetShouldHighlight() {
+        for i in 0..<tilesStruct.count {
+            for j in 0..<tilesStruct[i].count {
+                tilesStruct[i][j] = Tile(type: tilesStruct[i][j].type, shouldHighlight: false)
+            }
+        }
+    }
+    
     func handle(input: Input) {
         var transformation: Transformation?
+        resetShouldHighlight()
         switch input.type {
         case .rotateLeft:
             transformation = rotate(.left)

@@ -117,7 +117,7 @@ class GameScene: SKScene {
         Dispatch.shared.register { [weak self] input in
             if input.type == .playAgain {
                 self?.foreground.removeAllChildren()
-                let player = board.tilesStruct[board.tiles(of: .player(.zero)).first!]
+                let player = board.tiles[board.tiles(of: .player(.zero)).first!]
                 if case let TileType.player(data) = player.type {
                     let revivedData = data.revive()
                     self?.removeFromParent()

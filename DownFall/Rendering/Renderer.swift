@@ -60,9 +60,9 @@ class Renderer : SKSpriteNode {
         isUserInteractionEnabled = true
 
         //create sprite representations based on the given board.tiles
-        self.sprites = createSprites(from: board.tilesStruct)
+        self.sprites = createSprites(from: board.tiles)
         //place the created sprites onto the foreground
-        let _ = add(sprites: sprites, tiles: board.tilesStruct)
+        let _ = add(sprites: sprites, tiles: board.tiles)
         foreground.position = playableRect.center
         menuForeground.position = playableRect.center
         menuForeground.addChild(menuSpriteNode)
@@ -189,6 +189,8 @@ class Renderer : SKSpriteNode {
         for (row, innerSprites) in sprites.enumerated() {
             for (col, sprite) in innerSprites.enumerated() {
                 if tiles?[row][col].shouldHighlight ?? false {
+                    sprite.indicateAboutToAttack()
+                } else if tiles?[row][col].willAttackNextTurn() ?? false {
                     sprite.indicateAboutToAttack()
                 }
                 spriteForeground.addChild(sprite)

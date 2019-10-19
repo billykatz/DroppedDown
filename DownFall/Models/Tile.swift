@@ -27,6 +27,11 @@ struct Tile: Hashable {
     static var player: Tile {
         return Tile(type: .player(.zero))
     }
+    
+    func willAttackNextTurn() -> Bool {
+        return type.willAttackNextTurn()
+    }
+
 }
 
 extension Tile: Equatable {

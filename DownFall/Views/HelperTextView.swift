@@ -37,7 +37,7 @@ class HelperTextView: SKSpriteNode {
             guard let inputType = trans.inputType else { return }
             switch inputType {
             case .attack(_, let attackerPosition, let defenderPosition, _):
-                if let tiles = trans.endTilesStructs {
+                if let tiles = trans.endTiles {
                     if let defenderPosition = defenderPosition {
                         let attacker = tiles[attackerPosition]
                         let defender = tiles[defenderPosition]

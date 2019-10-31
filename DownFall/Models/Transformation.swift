@@ -9,14 +9,14 @@
 struct Transformation: Equatable, Hashable {
     var tileTransformation: [[TileTransformation]]?
     var inputType: InputType? = nil
-    var endTilesStructs: [[Tile]]?
+    var endTiles: [[Tile]]?
     
     init(transformation tileTransformation: [[TileTransformation]]? = nil,
          inputType: InputType? = nil,
-         endTilesStructs: [[Tile]]? = nil) {
+         endTiles: [[Tile]]? = nil) {
         self.tileTransformation = tileTransformation
         self.inputType = inputType
-        self.endTilesStructs = endTilesStructs
+        self.endTiles = endTiles
     }
     
     static var zero : Transformation {

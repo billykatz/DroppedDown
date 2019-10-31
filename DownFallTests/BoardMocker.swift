@@ -28,10 +28,11 @@ func entities() -> [EntityModel] {
 }
 
 extension Board {
-    convenience init(tiles: [[TileType]]) {
-        self.init(tiles: tiles,
-                  tileCreator: TileCreator(entities(),
-                                           difficulty: .normal))
+    convenience init(tiles: [[Tile]]) {
+        self.init(tileCreator: TileCreator(entities(),
+                                           difficulty: .normal),
+                  tiles: tiles
+                  )
     }
 }
 
@@ -42,20 +43,20 @@ func >>>(builder1: @escaping Builder, builder2: @escaping Builder) -> Builder { 
 
 func emptyBoard(size: Int) -> Builder {
     return { _ in
-        var tiles : [[TileType]] = []
+        var tiles : [[Tile]] = []
         for i in size {
             tiles.append([])
             for _ in size {
-                tiles[i].append(.empty)
+                tiles[i].append(Tile(type: .empty))
             }
         }
         return Board(tiles: tiles)
     }
 }
 
-func all(_ tile: TileType, _ board: Board) -> Builder {
+func all(_ tile: Tile, _ board: Board) -> Builder {
     return { newBoard in
-        var newTiles : [[TileType]] = board.tiles
+        var newTiles : [[Tile]] = board.tiles
         for row in board.boardSize {
             for col in board.boardSize {
                 newTiles[row][col] = tile
@@ -65,9 +66,9 @@ func all(_ tile: TileType, _ board: Board) -> Builder {
     }
 }
 
-func xRows(_ numRows: Int,_ tile: TileType,_ board: Board) -> Builder {
+func xRows(_ numRows: Int,_ tile: Tile, _ board: Board) -> Builder {
     return { board in
-        var newTiles : [[TileType]] = board.tiles
+        var newTiles : [[Tile]] = board.tiles
         for row in numRows {
             for col in board.boardSize {
                 newTiles[row][col] = tile
@@ -78,7 +79,7 @@ func xRows(_ numRows: Int,_ tile: TileType,_ board: Board) -> Builder {
     }
 }
 
-func xTiles(_ numTiles: Int, _ tile: TileType, _ board: Board) -> Builder {
+func xTiles(_ numTiles: Int, _ tile: Tile, _ board: Board) -> Builder {
     return { board in
         let row = Int.random(board.boardSize)
         let col = Int.random(board.boardSize)
@@ -114,7 +115,7 @@ func win(_ board: Board) -> Builder {
         if let pp = playerPosition, let ep = exitPosition {
             if !board.isUpperBound(row: ep.x) {
                 let intermediate = newTiles[ep.rowAbove.x][ep.y]
-                newTiles[ep.rowAbove.x][ep.y] = .playerWithGem
+                newTiles[ep.rowAbove.x][ep.y] = Tile(type: .playerWithGem)
                 newTiles[pp.x][pp.y] = intermediate
             } else if !board.isLowerBound(row: pp.x)  {
                 let intermediate = newTiles[pp.rowBelow.x][pp.y]
@@ -125,7 +126,7 @@ func win(_ board: Board) -> Builder {
                 //swapsies time
                 let intermediate = newTiles[ep.rowBelow.x][ep.y] // tile beneath exit
                 newTiles[ep.rowBelow.x][ep.y] = .exit // swaps intermediate with exit
-                newTiles[ep.x][ep.y] = .playerWithGem // put player on top of exit
+                newTiles[ep.x][ep.y] = Tile(type: .playerWithGem) // put player on top of exit
                 newTiles[pp.x][pp.y] = intermediate // swap intermediate with player
             }
         } else if let pp = playerPosition {
@@ -133,21 +134,21 @@ func win(_ board: Board) -> Builder {
                 newTiles[pp.rowBelow.x][pp.y] = .exit
             } else {
                 //player is on bottom row, move it up and
-                newTiles[pp.rowAbove.x][pp.y] = .playerWithGem // swaps intermediate with exit
+                newTiles[pp.rowAbove.x][pp.y] = Tile(type: .playerWithGem) // swaps intermediate with exit
                 newTiles[pp.x][pp.y] = .exit // swap intermediate with player
             }
         } else if let ep = exitPosition {
             if !board.isUpperBound(row: ep.x) {
-                newTiles[ep.rowAbove.x][ep.y] = .playerWithGem
+                newTiles[ep.rowAbove.x][ep.y] = Tile(type: .playerWithGem)
             } else {
                 //exit is on top row
                 newTiles[ep.rowBelow.x][ep.y] = .exit // swaps intermediate with exit
-                newTiles[ep.x][ep.y] = .playerWithGem // put player on top of exit
+                newTiles[ep.x][ep.y] = Tile(type: .playerWithGem) // put player on top of exit
             }
         } else {
             let playerPosition = TileCoord.random(board.boardSize-1).rowAbove // guaranteed not to be on the bottom
             let exitPosition = playerPosition.rowBelow
-            newTiles[playerPosition.x][playerPosition.y] = .playerWithGem
+            newTiles[playerPosition.x][playerPosition.y] = Tile(type: .playerWithGem)
             newTiles[exitPosition.x][exitPosition.y] = .exit
         }
         
@@ -160,7 +161,7 @@ func lose(_ board: Board) -> Builder {
         var newTiles = board.tiles
         for i in board.boardSize {
             for j in board.boardSize {
-                newTiles[i][j] = (i + j) % 2 == 0  ? .blackRock : .greenRock
+                newTiles[i][j] = (i + j) % 2 == 0  ? Tile(type: .blackRock) : Tile(type: .greenRock)
             }
         }
         return Board(tiles: newTiles)
@@ -168,8 +169,8 @@ func lose(_ board: Board) -> Builder {
 }
 
 func playerAttacks(_ board: Board,
-                   _ monsterTile: TileType = .monster(.zero),
-                   _ player: TileType = .player(.zero)) -> Builder {
+                   _ monsterTile: Tile = Tile(type: .monster(.zero)),
+                   _ player: Tile = Tile(type: .player(.zero))) -> Builder {
     return { board in
         guard board.boardSize > 1 else { return board }
         let playerPosition = typeCount(for: board.tiles, of: .player(.zero)).first
@@ -219,11 +220,11 @@ extension Array {
 
 extension Board {
     static func build(size: Int) -> Board {
-        var tiles : [[TileType]] = []
+        var tiles : [[Tile]] = []
         for i in size {
             tiles.append([])
             for _ in size {
-                tiles[i].append(.empty)
+                tiles[i].append(Tile(type: .empty))
             }
         }
         return Board(tiles: tiles)

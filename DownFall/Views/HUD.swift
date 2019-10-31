@@ -49,7 +49,7 @@ class HUD: SKSpriteNode {
             guard let inputType = trans.inputType else { return }
             switch inputType {
             case .attack:
-                showAttack(attackInput: input, endTiles: trans.endTilesStructs)
+                showAttack(attackInput: input, endTiles: trans.endTiles)
             default:
                 ()
             }

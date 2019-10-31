@@ -53,7 +53,6 @@ class Renderer : SKSpriteNode {
         self.bottomLeft = CGPoint(x: bottomLeftX, y: bottomLeftY)
         
         foreground = givenForeground
-        foreground.isUserInteractionEnabled = false
         
         super.init(texture: nil, color: .clear, size: CGSize.zero)
         
@@ -115,17 +114,17 @@ class Renderer : SKSpriteNode {
                     computeNewBoard(for: trans)
                 } else {
                     animationsFinished(for: sprites,
-                                       endTiles: trans.endTilesStructs)
+                                       endTiles: trans.endTiles)
                 }
             case .attack:
-                animateAttack(attackInput: inputType, endTiles: trans.endTilesStructs)
+                animateAttack(attackInput: inputType, endTiles: trans.endTiles)
             case .gameWin:
                 animate(trans.tileTransformation?.first) { [weak self] in
                     self?.gameWin()
                 }
             case .monsterDies:
-                let sprites = createSprites(from: trans.endTilesStructs)
-                animationsFinished(for: sprites, endTiles: trans.endTilesStructs)
+                let sprites = createSprites(from: trans.endTiles)
+                animationsFinished(for: sprites, endTiles: trans.endTiles)
             case .collectItem:
                 computeNewBoard(for: trans)
             case .reffingFinished:
@@ -137,7 +136,7 @@ class Renderer : SKSpriteNode {
                 fatalError()
             }
         } else {
-            animationsFinished(for: sprites, endTiles: trans.endTilesStructs)
+            animationsFinished(for: sprites, endTiles: trans.endTiles)
         }
 
     }
@@ -222,23 +221,16 @@ class Renderer : SKSpriteNode {
             sprites.append([])
             for col in 0..<Int(boardSize) {
                 x = CGFloat(col) * tileSize + bottomLeft.x
-                if tiles[row][col].type == TileType.player(.zero) {
-                    //TODO: Don't hardcode height and width
-                    let sprite = DFTileSpriteNode(type: tiles[row][col].type, height: 160, width: 80)
-                    if tiles[row][col].shouldHighlight {
-                        sprite.indicateAboutToAttack()
-                    }
-                    sprites[row].append(sprite)
-                } else {
-                    let sprite = DFTileSpriteNode(type: tiles[row][col].type,
-                                                  size: CGFloat(tileSize))
-                    if tiles[row][col].shouldHighlight {
-                        sprite.indicateAboutToAttack()
-                    }
-                    sprites[row].append(sprite)
-                    
-                    
+                let isPlayer = tiles[row][col].type == TileType.player(.zero)
+                let height: CGFloat = isPlayer ? 160 : tileSize
+                let width: CGFloat = isPlayer ? 80 : tileSize
+                let sprite = DFTileSpriteNode(type: tiles[row][col].type,
+                                              height: height,
+                                              width: width)
+                if tiles[row][col].shouldHighlight {
+                    sprite.indicateAboutToAttack()
                 }
+                sprites[row].append(sprite)
                 sprites[row][col].position = CGPoint(x: x, y: y)
             }
         }
@@ -249,7 +241,7 @@ class Renderer : SKSpriteNode {
     private func rotate(for transformation: Transformation?) {
         guard let transformation = transformation,
             let trans = transformation.tileTransformation?.first,
-            let endTileStructs = transformation.endTilesStructs else { return }
+            let endTileStructs = transformation.endTiles else { return }
         var animationCount = 0
         animate(trans) { [weak self] in
             guard let strongSelf = self else { return }
@@ -282,7 +274,7 @@ class Renderer : SKSpriteNode {
 extension Renderer {
     
     private func computeNewBoard(for transformation: Transformation?) {
-        guard let endTiles = transformation?.endTilesStructs else {
+        guard let endTiles = transformation?.endTiles else {
             fatalError("We should always be passing through end tiles")
         }
         

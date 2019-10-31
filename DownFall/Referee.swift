@@ -294,9 +294,7 @@ class Referee {
                 isWithinBounds(playerPosition.rowBelow),
                 case TileType.item(let item) = tiles[playerPosition.rowBelow].type
                 else { return nil }
-            let input = Input(.collectItem(playerPosition.rowBelow, item), tiles)
-            return input
-//            Input(.collectItem(playerPosition.rowBelow, item), tiles)
+            return Input(.collectItem(playerPosition.rowBelow, item), tiles)
         }
         
         

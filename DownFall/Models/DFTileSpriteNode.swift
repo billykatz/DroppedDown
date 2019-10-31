@@ -11,7 +11,6 @@ import Foundation
 
 class DFTileSpriteNode: SKSpriteNode {
     var type: TileType
-    var shouldBlink: Bool = false
     init(type: TileType, size: CGFloat) {
         self.type = type
         super.init(texture: SKTexture(imageNamed: type.textureString()), color: .clear, size: CGSize.init(width: size, height: size))

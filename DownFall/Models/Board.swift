@@ -26,9 +26,9 @@ class Board: Equatable {
     }
     
     init(tileCreator: TileCreator,
-         tilesStruct: [[Tile]]) {
+         tiles: [[Tile]]) {
         self.tileCreator = tileCreator
-        self.tiles = tilesStruct
+        self.tiles = tiles
         
         Dispatch.shared.register { [weak self] in self?.handle(input: $0) }
     }
@@ -60,7 +60,7 @@ class Board: Equatable {
         case .touchBegan:
             transformation = Transformation(transformation: nil,
                                             inputType: input.type,
-                                            endTilesStructs: tiles)
+                                            endTiles: tiles)
         case .touch(let tileCoord, let type):
             if case TileType.monster = type {
                 transformation = indicateAttackPattern(from: tileCoord, inputType: input.type)
@@ -81,7 +81,7 @@ class Board: Equatable {
         case .transformation(let trans):
             if let inputType = trans.inputType,
                 case .reffingFinished(_) = inputType,
-                let tilesSruct = trans.endTilesStructs {
+                let tilesSruct = trans.endTiles {
                 let input = Input(.newTurn, tilesSruct)
                 InputQueue.append(input)
                 transformation = nil
@@ -172,7 +172,7 @@ class Board: Equatable {
         
         return Transformation(transformation: .none,
                               inputType: inputType,
-                              endTilesStructs: tiles)
+                              endTiles: tiles)
     }
     
     
@@ -289,7 +289,7 @@ extension Board {
             if selectedTiles.count < 3 {
                 return Transformation(transformation: nil,
                                       inputType: input.type,
-                                      endTilesStructs: tiles)
+                                      endTiles: tiles)
             }
         }
         
@@ -320,7 +320,7 @@ extension Board {
                                                newTiles,
                                                shiftDown],
                               inputType: input.type,
-                              endTilesStructs: intermediateTiles
+                              endTiles: intermediateTiles
         )
     }
     
@@ -345,7 +345,7 @@ extension Board {
         
         return Transformation(transformation: nil,
                               inputType: .reffingFinished(newTurn: newTurn),
-                              endTilesStructs: tiles
+                              endTiles: tiles
         )
         
         
@@ -359,7 +359,7 @@ extension Board {
         
         //save the item
         guard case let TileType.item(item) = selectedTile.type,
-            var updatedTiles = transformation.endTilesStructs else { return Transformation.zero }
+            var updatedTiles = transformation.endTiles else { return Transformation.zero }
         
         if let pp = playerPosition,
             case let .player(data) = updatedTiles[pp].type {
@@ -383,12 +383,11 @@ extension Board {
             updatedTiles[pp.x][pp.y] = Tile(type: .player(playerData))
         }
         
-//        tiles = tileEnums(from: updatedTiles)
         tiles = updatedTiles
         
         return Transformation(transformation: transformation.tileTransformation,
                               inputType: .collectItem(coord, item),
-                              endTilesStructs: updatedTiles)
+                              endTiles: updatedTiles)
     }
     
     
@@ -399,7 +398,7 @@ extension Board {
             tiles[coord.x][coord.y] = Tile(type: itemTile)
             return Transformation(transformation: nil,
                                   inputType: .monsterDies(coord),
-                                  endTilesStructs: tiles)
+                                  endTiles: tiles)
         } else {
             //no item! remove and replace
             return removeAndReplace(coord, singleTile: true, input: input)
@@ -486,7 +485,7 @@ extension Board {
         InputQueue.append(Input(.boardBuilt, tilesStruct))
         
         //init new board
-        return Board(tileCreator: tileCreator, tilesStruct: tilesStruct)
+        return Board(tileCreator: tileCreator, tiles: tilesStruct)
     }
 }
 
@@ -541,7 +540,7 @@ extension Board {
         
         return Transformation(transformation: [transformation],
                               inputType: inputType,
-                              endTilesStructs: tiles)
+                              endTiles: tiles)
     }
 }
 
@@ -646,6 +645,6 @@ extension Board {
         
         
         return Transformation(inputType: input.type,
-                              endTilesStructs: tiles)
+                              endTiles: tiles)
     }
 }

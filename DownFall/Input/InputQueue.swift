@@ -138,10 +138,6 @@ struct InputQueue {
             if let _ = NSClassFromString("XCTest") {
             } else {
                 history.insert(input, at: history.startIndex)
-//                print("________________________")
-//                print(input.type.debugDescription)
-//                print(gameState.state)
-//                print("________________________")
                 gameState.enter(input)
             }
         }

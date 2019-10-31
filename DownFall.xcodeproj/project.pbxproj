@@ -22,7 +22,6 @@
 		3D2C757522C854F8009ABD36 /* ItemModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D2C757422C854F8009ABD36 /* ItemModel.swift */; };
 		3D30A4292216899E00AFA1E1 /* BoardMocker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D30A4232216892A00AFA1E1 /* BoardMocker.swift */; };
 		3D30A42B2217F63500AFA1E1 /* TileCoord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D30A42A2217F63500AFA1E1 /* TileCoord.swift */; };
-		3D46333A22E7A4A1009159FF /* ObjectiveTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D46333922E7A4A1009159FF /* ObjectiveTracker.swift */; };
 		3D4F569222B2D087003695D8 /* SpriteSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4F569122B2D087003695D8 /* SpriteSheet.swift */; };
 		3D4F569422B33B44003695D8 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4F569322B33B44003695D8 /* Helpers.swift */; };
 		3D4F569622B88A90003695D8 /* HapticGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4F569522B88A90003695D8 /* HapticGenerator.swift */; };
@@ -40,6 +39,7 @@
 		3D6AACD8222A324D00C77B24 /* CGRectHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D6AACD7222A324D00C77B24 /* CGRectHelpers.swift */; };
 		3D6AACE1222C997800C77B24 /* Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D6AACE0222C997800C77B24 /* Header.swift */; };
 		3D6AACE4222CD38E00C77B24 /* Controls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D6AACE3222CD38E00C77B24 /* Controls.swift */; };
+		3D6F09A7236B3EA50069CDF2 /* TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D6F09A6236B3EA50069CDF2 /* TestHelpers.swift */; };
 		3D73D2E621C2226F00DB6FB7 /* PlayerWait.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3D73D2E521C2226F00DB6FB7 /* PlayerWait.sks */; };
 		3D7D8B2D2252857E0016FE4C /* CombatSimulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D7D8B2C2252857E0016FE4C /* CombatSimulator.swift */; };
 		3D7D8B332253E5BC0016FE4C /* HUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D7D8B322253E5BC0016FE4C /* HUD.swift */; };
@@ -120,7 +120,6 @@
 		3D2C757422C854F8009ABD36 /* ItemModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemModel.swift; sourceTree = "<group>"; };
 		3D30A4232216892A00AFA1E1 /* BoardMocker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardMocker.swift; sourceTree = "<group>"; };
 		3D30A42A2217F63500AFA1E1 /* TileCoord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileCoord.swift; sourceTree = "<group>"; };
-		3D46333922E7A4A1009159FF /* ObjectiveTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectiveTracker.swift; sourceTree = "<group>"; };
 		3D4F569122B2D087003695D8 /* SpriteSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteSheet.swift; sourceTree = "<group>"; };
 		3D4F569322B33B44003695D8 /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
 		3D4F569522B88A90003695D8 /* HapticGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticGenerator.swift; sourceTree = "<group>"; };
@@ -138,6 +137,7 @@
 		3D6AACD7222A324D00C77B24 /* CGRectHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGRectHelpers.swift; sourceTree = "<group>"; };
 		3D6AACE0222C997800C77B24 /* Header.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Header.swift; sourceTree = "<group>"; };
 		3D6AACE3222CD38E00C77B24 /* Controls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Controls.swift; sourceTree = "<group>"; };
+		3D6F09A6236B3EA50069CDF2 /* TestHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestHelpers.swift; sourceTree = "<group>"; };
 		3D73D2E521C2226F00DB6FB7 /* PlayerWait.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = PlayerWait.sks; sourceTree = "<group>"; };
 		3D7D8B2C2252857E0016FE4C /* CombatSimulator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombatSimulator.swift; sourceTree = "<group>"; };
 		3D7D8B322253E5BC0016FE4C /* HUD.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HUD.swift; sourceTree = "<group>"; };
@@ -299,14 +299,6 @@
 			path = "Sprite Sheet";
 			sourceTree = "<group>";
 		};
-		3D46333822E7A488009159FF /* Objective */ = {
-			isa = PBXGroup;
-			children = (
-				3D46333922E7A4A1009159FF /* ObjectiveTracker.swift */,
-			);
-			name = Objective;
-			sourceTree = "<group>";
-		};
 		3D528FDD2155B17200EF65CA /* Scenes */ = {
 			isa = PBXGroup;
 			children = (
@@ -452,7 +444,6 @@
 				3D10609D2340400500ECE7E6 /* Settings */,
 				3D10609E2340404000ECE7E6 /* Input */,
 				3D528FDD2155B17200EF65CA /* Scenes */,
-				3D46333822E7A488009159FF /* Objective */,
 				3D106099232E9A0B00ECE7E6 /* Rendering */,
 				3D1060A02340408100ECE7E6 /* TileCreation */,
 				3D0638FF22EEB4E600C4D5E9 /* GameState */,
@@ -471,6 +462,7 @@
 			isa = PBXGroup;
 			children = (
 				3DE87C91223D555A00D750CF /* InputQueueTests.swift */,
+				3D6F09A6236B3EA50069CDF2 /* TestHelpers.swift */,
 				3DB270A822B00E0D00D9BF8B /* TileTypeTest+Extensions.swift */,
 				3DF2926820A37FF0006671AC /* BoardTests.swift */,
 				3DCB38AA232DCE88001D148F /* TileCoordTests.swift */,
@@ -651,7 +643,6 @@
 				3D635E8F22E20CDA0090C99C /* AnimationModel.swift in Sources */,
 				3DE87C94223D691100D750CF /* GameState.swift in Sources */,
 				3D674C9122C9BFDB0003AEB4 /* UIColor+Extensions.swift in Sources */,
-				3D46333A22E7A4A1009159FF /* ObjectiveTracker.swift in Sources */,
 				3DA4E883228E5D2F006E90D1 /* SKSpriteNode+Extensions.swift in Sources */,
 				3D58468822A6322900EDD845 /* RangeModel.swift in Sources */,
 				3DA0A37A22FFAECE0041EF34 /* UIFont+Extensions.swift in Sources */,
@@ -696,6 +687,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3DE87C92223D555A00D750CF /* InputQueueTests.swift in Sources */,
+				3D6F09A7236B3EA50069CDF2 /* TestHelpers.swift in Sources */,
 				3D30A4292216899E00AFA1E1 /* BoardMocker.swift in Sources */,
 				3DF2926920A37FF0006671AC /* BoardTests.swift in Sources */,
 				3DD36ECD21E5BD9100AC4873 /* TileStrategyTests.swift in Sources */,

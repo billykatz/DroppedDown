@@ -170,7 +170,7 @@ class Board: Equatable {
         }
         tiles = newTiles
         
-        return Transformation(transformation: nil,
+        return Transformation(transformation: .none,
                               inputType: inputType,
                               endTilesStructs: tiles)
     }

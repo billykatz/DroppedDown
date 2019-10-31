@@ -17,7 +17,10 @@ struct ComputingState: GameState {
         case .transformation(let trans):
             if case .reffingFinished(_)? = trans.inputType {
                 return AnyGameState(ComputingState())
-            } else {
+            } else if case .touchBegan? = trans.inputType {
+                return AnyGameState(PlayState())
+            }
+            else {
                 return AnyGameState(AnimatingState())
             }
         case .newTurn:

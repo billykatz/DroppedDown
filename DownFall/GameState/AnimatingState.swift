@@ -23,8 +23,10 @@ struct AnimatingState: GameState {
     
     func transitionState(given input: Input) -> AnyGameState? {
         switch input.type {
-        case .animationsFinished:
+        case .animationsFinished(true):
             return AnyGameState(ReffingState())
+        case .animationsFinished(ref: false):
+            return AnyGameState(PlayState())
         default:
             return nil
         }

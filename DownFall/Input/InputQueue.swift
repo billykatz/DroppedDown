@@ -9,7 +9,8 @@
 import SpriteKit
 
 indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringConvertible{
-    static var allCases: [InputType] = [.touch(TileCoord(0,0), .blueRock),
+    static var allCases: [InputType] = [.touchBegan(TileCoord(0,0), .blueRock),
+                                        .touch(TileCoord(0,0), .blueRock),
                                         .rotateLeft,
                                         .rotateRight,
                                         .attack(attackType: .targets,
@@ -21,13 +22,14 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
                                         .gameLose(""),
                                         .play,
                                         .pause,
-                                        .animationsFinished,
+                                        .animationsFinished(ref: true),
                                         .playAgain,
                                         .reffingFinished(newTurn: false),
                                         .collectItem(TileCoord(0,0), .zero)]
     
     typealias AllCases = [InputType]
     
+    case touchBegan(_ position: TileCoord, _ tileType: TileType)
     case touch(_ position: TileCoord, _ tileType: TileType)
     case rotateLeft
     case rotateRight
@@ -37,7 +39,7 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
     case gameLose(String)
     case play
     case pause
-    case animationsFinished
+    case animationsFinished(ref: Bool)
     case playAgain
     case transformation(Transformation)
     case reffingFinished(newTurn: Bool)
@@ -82,18 +84,23 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
             return "Select Level"
         case .newTurn:
             return "New Turn"
+        case .touchBegan:
+            return "Touch began"
         }
     }
 }
 
 struct Input: Hashable, CustomDebugStringConvertible {
     let type: InputType
-    let endTiles: [[TileType]]?
+    let endTilesStruct: [[Tile]]?
+    let transformation: Transformation?
 
     init(_ type: InputType,
-         _ endTiles: [[TileType]]? = []) {
+         _ endTilesStruct: [[Tile]]? = [],
+         _ transformation: Transformation? = .zero) {
         self.type = type
-        self.endTiles = endTiles
+        self.transformation = transformation
+        self.endTilesStruct = endTilesStruct
     }
     
     var debugDescription: String {
@@ -102,6 +109,7 @@ struct Input: Hashable, CustomDebugStringConvertible {
 }
 
 struct InputQueue {
+    static var history: [Input] = []
     static var queue: [Input] = []
     static var gameState = AnyGameState(PlayState())
     
@@ -129,6 +137,7 @@ struct InputQueue {
         if gameState.state != oldGameState.state {
             if let _ = NSClassFromString("XCTest") {
             } else {
+                history.insert(input, at: history.startIndex)
                 gameState.enter(input)
             }
         }
@@ -161,6 +170,21 @@ extension InputQueue: Resets {
     static func reset(to startingGameState: AnyGameState = AnyGameState(PlayState())) {
         queue = []
         gameState = startingGameState
+    }
+}
+
+extension InputQueue {
+    static func lastTouchInput() -> Input? {
+        for input in history {
+            if case InputType.touch = input.type {
+                // if we reach a .touch type, then we do not have a relatively new touchBegan input and should not be concerned with older touch begans
+                break
+            }
+            if case InputType.touchBegan = input.type {
+                return input
+            }
+        }
+        return nil
     }
 }
 

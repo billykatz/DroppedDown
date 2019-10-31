@@ -6,14 +6,15 @@
 //  Copyright © 2019 William Katz LLC. All rights reserved.
 //
 
-func getTilePosition(_ type: TileType, tiles: [[TileType]]) -> TileCoord? {
+func getTilePosition(_ type: TileType, tiles: [[Tile]]) -> TileCoord? {
     for i in 0..<tiles.count {
         for j in 0..<tiles[i].count {
-            if tiles[i][j] == type {
+            if tiles[i][j].type == type {
                 return TileCoord(i,j)
             }
         }
     }
     return nil
 }
+
 

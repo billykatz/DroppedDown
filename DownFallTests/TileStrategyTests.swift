@@ -10,14 +10,6 @@ import XCTest
 import GameplayKit
 @testable import DownFall
 
-class MockObjectiveTracker: ProvidesObjectiveData {
-    var shouldSpawnExit: Bool {
-        return _shouldSpawnExit
-    }
-    
-    var _shouldSpawnExit = false
-}
-
 class TileStrategyTests: XCTestCase {
     
     var testBoardSize: Int!
@@ -28,13 +20,13 @@ class TileStrategyTests: XCTestCase {
     
     override func setUp() {
         empty = all(.empty, board)
-        player = xTiles(1, .player(.zero), board)
+        player = xTiles(1, Tile(type: .player(.zero)), board)
         emptyButOnePlayer = empty >>> player
         testBoardSize = board.boardSize
     }
         
     func testTileStrategyCreatesTheCorrectAmountOfTiles() {
-        let allBlack = all(.blackRock, board)
+        let allBlack = all(Tile(type: .blackRock), board)
         
         for i in testBoardSize+1 { // 0,1,2,3
             let compose =  allBlack >>> xRows(i, .empty, board)
@@ -56,8 +48,6 @@ class TileStrategyTests: XCTestCase {
             .tiles(for: emptyButOne(board).tiles)
         XCTAssertFalse(newTiles.contains(.exit), "Tile God should not suggest adding another exit")
         
-        let objectiveTracker = MockObjectiveTracker()
-        objectiveTracker._shouldSpawnExit = true
         newTiles = TileCreator(entities(),
                                difficulty: .normal)
             .tiles(for: empty(board).tiles)
@@ -71,7 +61,7 @@ class TileStrategyTests: XCTestCase {
                 let newTiles = TileCreator(entities(),
                                            difficulty: difficulty)
                     .tiles(for: emptyButOnePlayer(board).tiles)
-                let monsterCount = newTiles.filter { $0 == .monster(.zero) }.count
+                let monsterCount = newTiles.filter { $0 == Tile(type: .monster(.zero)) }.count
                 let maxExpectedMonsters = difficulty.maxExpectedMonsters(for: 10)
                 //TODO: fix test when we add back monsters
                 XCTAssertTrue(monsterCount <= maxExpectedMonsters, "Difficulty \(difficulty) - Tile God added \(monsterCount), we expected at most \(maxExpectedMonsters)")

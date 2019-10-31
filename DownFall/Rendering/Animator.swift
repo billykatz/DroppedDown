@@ -24,8 +24,12 @@ struct Animator {
             let trans = transformation[transIdx]
             //calculate a point that is out of bounds of the foreground
             let outOfBounds: CGFloat = CGFloat(trans.initial.x) >= boardSize ? tileSize * boardSize : 0
+            
+            // Translate the TileTransformation initial to a tile on screen
             let point = CGPoint.init(x: tileSize * CGFloat(trans.initial.tuple.1) + bottomLeft.x,
                                      y: outOfBounds + tileSize * CGFloat(trans.initial.x) + bottomLeft.y)
+            
+            // Find that tile and add that animation
             for child in spriteForeground.children {
                 if child.contains(point) {
                     let endPoint = CGPoint.init(x: tileSize * CGFloat(trans.end.y) + bottomLeft.x,
@@ -47,7 +51,7 @@ struct Animator {
     
     func animate(attackInputType: InputType,
                  foreground: SKNode,
-                 tiles: [[TileType]],
+                 tiles: [[Tile]],
                  sprites: [[DFTileSpriteNode]],
                  positions: ([TileCoord]) -> [CGPoint],
                  completion: (() -> Void)?) {
@@ -80,24 +84,24 @@ struct Animator {
         var defenderAnimationFrames: [SKTexture]?
         
         // get the attack animation
-        if case let TileType.monster(monsterData) = tiles[attackerPosition] {
+        if case let TileType.monster(monsterData) = tiles[attackerPosition].type {
             attackAnimationFrames = monsterData.animations.attackAnimation
-        } else if case let TileType.player(playerData) = tiles[attackerPosition] {
+        } else if case let TileType.player(playerData) = tiles[attackerPosition].type {
             attackAnimationFrames = playerData.animations.attackAnimation
         }
         
         // get the projectile animation
-        if case let TileType.monster(monsterData) = tiles[attackerPosition] {
+        if case let TileType.monster(monsterData) = tiles[attackerPosition].type {
             projectileAnimationFrames = monsterData.animations.projectileAnimation
-        } else if case let TileType.player(playerData) = tiles[attackerPosition] {
+        } else if case let TileType.player(playerData) = tiles[attackerPosition].type {
             projectileAnimationFrames = playerData.animations.projectileAnimation
         }
         
         // get the defender animation
         if let defenderPosition = defenderPosition {
-            if case let TileType.monster(monsterData) = tiles[defenderPosition] {
+            if case let TileType.monster(monsterData) = tiles[defenderPosition].type {
                 defenderAnimationFrames = monsterData.animations.hurtAnimation
-            } else if case let TileType.player(playerData) = tiles[defenderPosition] {
+            } else if case let TileType.player(playerData) = tiles[defenderPosition].type {
                 defenderAnimationFrames = playerData.animations.hurtAnimation
             }
         }
@@ -124,7 +128,7 @@ struct Animator {
                 }
             )
         }
-
+        
         // projectile
         if let frames = projectileAnimationFrames {
             let positions = positions(affectedTiles)
@@ -155,14 +159,13 @@ struct Animator {
                 }
             )
         }
-
+        
         
         foreground.run(SKAction.group(groupedActions))
         dispatchGroup.notify(queue: .main) {
             completion?()
         }
-
-        
         
     }
+
 }

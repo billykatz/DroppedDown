@@ -7,21 +7,19 @@
 //
 
 struct Transformation: Equatable, Hashable {
-    let endTiles: [[TileType]]?
     var tileTransformation: [[TileTransformation]]?
     var inputType: InputType? = nil
+    var endTiles: [[Tile]]?
     
-    init(tiles endTiles: [[TileType]]? = nil,
-         transformation tileTransformation: [[TileTransformation]]? = nil,
-         inputType: InputType? = nil) {
-        self.endTiles = endTiles
+    init(transformation tileTransformation: [[TileTransformation]]? = nil,
+         inputType: InputType? = nil,
+         endTiles: [[Tile]]? = nil) {
         self.tileTransformation = tileTransformation
         self.inputType = inputType
+        self.endTiles = endTiles
     }
     
     static var zero : Transformation {
-        return Transformation.init(tiles: nil,
-                                   transformation: nil,
-                                   inputType: nil)
+        return Transformation()
     }
 }

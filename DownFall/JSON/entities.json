@@ -2,8 +2,8 @@
     "entities": [
         { "name": "player2",
             "type": "player",
-            "originalHp": 10,
-            "hp": 10,
+            "originalHp": 3,
+            "hp": 3,
             "attack": {
                 "type": "targets",
                 "frequency" : 1,

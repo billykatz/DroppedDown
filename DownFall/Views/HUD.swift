@@ -27,18 +27,19 @@ class HUD: SKSpriteNode {
     
     //Mark: - Instance Methods
     
-    private func showAttack(attackInput: Input, endTiles: [[TileType]]?) {
-        guard case InputType.attack(_,
-                                    _,
-                                    let defenderPosition,
-                                    _) = attackInput.type,
-            let tiles = endTiles else {
-                                        return
+    private func showAttack(attackInput: Input, endTiles: [[Tile]]?) {
+        if case InputType.attack(_,
+                                 _,
+                                 let defenderPosition,
+                                 _) = attackInput.type {
+            print("Defender position \(String(describing: defenderPosition))")
         }
+        guard let tiles = endTiles else { return }
         
-        if let defenderPosition = defenderPosition,
-            case let TileType.player(playerData) = tiles[defenderPosition] {
-            show(playerData)
+        for tile in tiles.flatMap({ $0 }) {
+            if case let TileType.player(playerData) = tile.type {
+                show(playerData)
+            }
         }
     }
     
@@ -60,9 +61,9 @@ class HUD: SKSpriteNode {
             }
         case .boardBuilt:
             //TODO: check this logic out thoroughly
-            guard let tiles = input.endTiles,
+            guard let tiles = input.endTilesStruct,
                 let playerPosition = getTilePosition(.player(.zero), tiles: tiles),
-                case let TileType.player(data) = tiles[playerPosition] else { return }
+                case let TileType.player(data) = tiles[playerPosition].type else { return }
             show(data)
         default:
             ()

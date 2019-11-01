@@ -114,7 +114,8 @@ class Renderer : SKSpriteNode {
                     computeNewBoard(for: trans)
                 } else {
                     animationsFinished(for: sprites,
-                                       endTiles: trans.endTiles)
+                                       endTiles: trans.endTiles,
+                                       ref: false)
                 }
             case .attack:
                 animateAttack(attackInput: inputType, endTiles: trans.endTiles)

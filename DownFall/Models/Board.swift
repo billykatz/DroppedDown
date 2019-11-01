@@ -329,7 +329,7 @@ extension Board {
             var newTiles = tiles
             for (i, row) in tiles.enumerated() {
                 for (j, _) in row.enumerated() {
-                    if case .monster(let data) = tiles[i][j].type {
+                    if case .monster(let data) = tiles[i][j].type, newTurn {
                         newTiles[i][j] = Tile(type: .monster(data.resetAttacks().incrementsAttackTurns()))
                     }
                     

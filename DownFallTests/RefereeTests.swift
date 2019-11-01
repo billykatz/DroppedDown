@@ -141,9 +141,9 @@ class RefereeTests: XCTestCase {
     }
 
     func testRefereePlayerAttacks() {
-        var tiles = [[TileType.blueRock, .normalMonster, .blueRock, .blueRock],
-                     [.blackRock, .normalPlayer, .exit, .blueRock],
-                     [.blackRock, .greenRock, .greenRock, .greenRock]]
+        var tiles = [[TileType.blueRock, .normalMonster, .blueRock],
+                     [.blackRock, .normalPlayer, .exit],
+                     [.blackRock, .greenRock, .greenRock]]
         var expectedOutput = Input(.attack(attackType: .targets ,
                                            attacker: TileCoord(1, 1),
                                            defender: TileCoord(0, 1),

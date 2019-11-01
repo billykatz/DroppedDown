@@ -139,6 +139,7 @@ struct InputQueue {
             } else {
                 history.insert(input, at: history.startIndex)
                 gameState.enter(input)
+                print("Entering \(gameState.state) with \(input)")
             }
         }
         

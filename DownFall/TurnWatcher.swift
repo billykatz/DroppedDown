@@ -22,6 +22,14 @@ class TurnWatcher {
                 switch transformation.inputType {
                 case .reffingFinished?:
                     ()
+                case .touchBegan:
+                    ()
+                case .touch(_, let type):
+                    if case TileType.monster = type {
+                        ()
+                    } else {
+                        fallthrough
+                    }
                 default:
                     if transformation.tileTransformation != nil {
                         self?.newTurn = true
@@ -38,5 +46,9 @@ class TurnWatcher {
         let newTurnValue = newTurn
         newTurn = false
         return newTurnValue
+    }
+    
+    func checkNewTurn() -> Bool {
+        return newTurn
     }
 }

@@ -228,7 +228,8 @@ class BoardTests: XCTestCase {
         let playerTapppedTransformation = board.removeAndReplace(TileCoord(0,0),
                                                                  input: Input(.touch(TileCoord(0,0),
                                                                                      TileType.player(.zero))))
-        let expectedTrans = Transformation(transformation: nil, inputType: nil, endTiles: board.tiles)
+        let expectedTrans = Transformation(transformation: nil, inputType: .touch(TileCoord(0,0),
+        TileType.player(.zero)), endTiles: board.tiles)
         XCTAssertEqual(expectedTrans, playerTapppedTransformation, "Tapping player should not result in a board transformation")
     }
     
@@ -237,7 +238,8 @@ class BoardTests: XCTestCase {
                                                               input: Input(.touch(TileCoord(0,1),
                                                                                   TileType.exit)))
         let expectedTrans = Transformation(transformation: nil,
-                                           inputType: nil,
+                                           inputType: .touch(TileCoord(0,1),
+                                           TileType.exit),
                                            endTiles: board.tiles)
         XCTAssertEqual(expectedTrans, exitTappedTransformation, "Tapping exit should not result in a board transformation")
     }

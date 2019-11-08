@@ -477,8 +477,6 @@ extension Board {
     static func build(size: Int,
                       tileCreator: TileStrategy,
                       difficulty: Difficulty) -> Board {
-//        //FIXME: We shouldnt have to cast this into a tile creator
-//        guard let tileCreator = tileCreator as? TileCreator else { fatalError("Need an instance of type TileCreator")}
         //create a boardful of tiles
         let tilesStruct: [[Tile]] = tileCreator.board(size, difficulty: difficulty)
         

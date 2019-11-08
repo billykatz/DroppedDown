@@ -10,13 +10,17 @@ import UIKit
 import SpriteKit
 import GameplayKit
 
+struct GameScope {
+    static var shared: GameScope = GameScope(difficulty: .normal)
+    var difficulty: Difficulty
+}
+
 class GameViewController: UIViewController {
 
     private var gameSceneNode: GameScene?
     private var tutorialSceneNode: TutorialScene?
     private var boardSize = 8
     private var entities: [EntityModel]?
-    private var selectedDifficulty: Difficulty = .normal
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -61,42 +65,42 @@ extension GameViewController {
         if true {
             startTutorial(updatedPlayerData)
         } else {
-        gameSceneNode?.prepareForReuse()
-        if let scene = GKScene(fileNamed: "GameScene")?.rootNode as? GameScene,
-            let entities = entities {
-            gameSceneNode = scene
-            gameSceneNode!.scaleMode = .aspectFill
-            gameSceneNode!.gameSceneDelegate = self
-            gameSceneNode!.commonInit(boardSize: boardSize,
-                                      entities: entities,
-                                      difficulty: selectedDifficulty,
-                                      updatedEntity: updatedPlayerData)
+            gameSceneNode?.prepareForReuse()
+            if let scene = GKScene(fileNamed: "GameScene")?.rootNode as? GameScene,
+                let entities = entities {
+                gameSceneNode = scene
+                gameSceneNode!.scaleMode = .aspectFill
+                gameSceneNode!.gameSceneDelegate = self
+                gameSceneNode!.commonInit(boardSize: boardSize,
+                                          entities: entities,
+                                          difficulty: GameScope.shared.difficulty,
+                                          updatedEntity: updatedPlayerData)
 
-            if let view = self.view as! SKView? {
-                view.presentScene(gameSceneNode)
-                view.ignoresSiblingOrder = true
+                if let view = self.view as! SKView? {
+                    view.presentScene(gameSceneNode)
+                    view.ignoresSiblingOrder = true
 
-                //Debug settings
-                //TODO: remove for release
-                view.showsFPS = true
-                view.showsNodeCount = true
+                    //Debug settings
+                    //TODO: remove for release
+                    view.showsFPS = true
+                    view.showsNodeCount = true
 
+                }
             }
-        }
         }
     }
     
     private func startTutorial(_ updatedPlayerData: EntityModel? = nil) {
         tutorialSceneNode?.prepareForReuse()
-        
+        GameScope.shared.difficulty = .tutorial1
         if let scene = GKScene(fileNamed: "TutorialScene")?.rootNode as? TutorialScene,
             let entities = entities {
             tutorialSceneNode = scene
             tutorialSceneNode!.scaleMode = .aspectFill
             tutorialSceneNode!.commonInit(boardSize: 4, //FIXME: dont hardcode 
                                       entities: entities,
-                                      difficulty: .tutorial1,
-                                      updatedEntity: updatedPlayerData)
+                                      difficulty: GameScope.shared.difficulty,
+                                      updatedEntity: nil)
 
             if let view = self.view as! SKView? {
                 view.presentScene(tutorialSceneNode)
@@ -117,7 +121,7 @@ extension GameViewController: LevelSelectDelegate {
     func didSelect(_ difficulty: Difficulty) {
         if let view = self.view as! SKView? {
             view.presentScene(nil)
-            selectedDifficulty = difficulty
+            GameScope.shared.difficulty = difficulty
             startLevel()
         }
     }

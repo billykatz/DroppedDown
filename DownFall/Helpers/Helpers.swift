@@ -15,3 +15,13 @@ func typeCount(for tiles: [[Tile]], of type: TileType) -> [TileCoord] {
     }
     return tileCoords
 }
+
+
+func isWithinBounds(_ tileCoord: TileCoord, within tiles: [[Tile]]?) -> Bool {
+    guard let tiles = tiles else { return false }
+    let (tileRow, tileCol) = tileCoord.tuple
+    return tileRow >= 0 && //lower bound
+        tileCol >= 0 && // lower bound
+        tileRow < tiles.count && // upper bound
+        tileCol < tiles.count
+}

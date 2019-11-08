@@ -47,7 +47,7 @@ struct TutorialTileCreator: TileStrategy {
                 [.blackRock, .gold, .blackRock, .blackRock],
                 blackRow,
                 blackRow,
-                [.blackRock, .blackRock, .player, .blackRock]
+                [.blackRock, .blackRock, Tile(type: .player(playerEntityData)), .blackRock]
             ]
         }
         return tiles
@@ -56,7 +56,7 @@ struct TutorialTileCreator: TileStrategy {
     
     func tiles(for tiles: [[Tile]]) -> [Tile] {
         let count = typeCount(for: tiles, of: .empty).count
-        let array = Array(repeating: randomSource.nextInt() % 2 == 0 ? Tile.gold : Tile.blackRock, count: count)
+        let array = Array(repeating: randomSource.nextInt() % 2 == 0 ? Tile.blackRock : Tile.blackRock, count: count)
         return array
     }
     
@@ -74,7 +74,7 @@ struct TutorialTileCreator: TileStrategy {
         case .hard:
             return entities[2]
         case .tutorial1:
-            return entities[0]
+            return entities[1]
         }
     }
 

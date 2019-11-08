@@ -15,7 +15,7 @@ class Renderer : SKSpriteNode {
     private var sprites: [[DFTileSpriteNode]] = []
     private let bottomLeft: CGPoint
     private let boardSize: CGFloat!
-    private let tileSize: CGFloat = 100
+    private let tileSize: CGFloat = 150
     private let precedence: Precedence
     
     private var spriteForeground = SKNode()
@@ -38,12 +38,12 @@ class Renderer : SKSpriteNode {
     
     init(playableRect: CGRect,
          foreground givenForeground: SKNode,
-         board: Board,
+         boardSize theBoardSize: Int,
          precedence: Precedence) {
         
         self.precedence = precedence
         self.playableRect = playableRect
-        self.boardSize = CGFloat(board.boardSize)
+        self.boardSize = CGFloat(theBoardSize)
         
         //center the board in the playable rect
         let marginWidth = playableRect.width - CGFloat(tileSize * boardSize)
@@ -54,14 +54,11 @@ class Renderer : SKSpriteNode {
         
         foreground = givenForeground
         
+        
         super.init(texture: nil, color: .clear, size: CGSize.zero)
         
         isUserInteractionEnabled = true
 
-        //create sprite representations based on the given board.tiles
-        self.sprites = createSprites(from: board.tiles)
-        //place the created sprites onto the foreground
-        let _ = add(sprites: sprites, tiles: board.tiles)
         foreground.position = playableRect.center
         menuForeground.position = playableRect.center
         menuForeground.addChild(menuSpriteNode)
@@ -74,29 +71,34 @@ class Renderer : SKSpriteNode {
         header.zPosition = precedence.rawValue
         
         // add left and right rotate button to board
-        let controls = Controls.build(color: .black,
-                                      size: CGSize(width: playableRect.width, height: 400.0),
-                                      precedence: precedence)
-        controls.position = CGPoint(x: playableRect.midX, y: playableRect.minY + 100.0)
-        controls.isUserInteractionEnabled = true
-        controls.zPosition = precedence.rawValue
+//        let controls = Controls.build(color: .black,
+//                                      size: CGSize(width: playableRect.width, height: 400.0),
+//                                      precedence: precedence)
+//        controls.position = CGPoint(x: playableRect.midX, y: playableRect.minY + 100.0)
+//        controls.isUserInteractionEnabled = true
+//        controls.zPosition = precedence.rawValue
         
         //create the hud
         hud = HUD.build(color: .lightGray, size: CGSize(width: playableRect.width * 0.9, height: 150))
-        hud.position = CGPoint(x: playableRect.midX, y: playableRect.minY + controls.size.height + 16)
+        hud.position = CGPoint(x: playableRect.midX, y: playableRect.minY + 400.0 + 16)
         
         //create the helper text view
         helperTextView = HelperTextView.build(color: UIColor(rgb: 0x9c461f), size: CGSize(width: playableRect.width * 0.9, height: 200))
         helperTextView.position = CGPoint(x: playableRect.midX, y: playableRect.maxY - header.size.height - 116)
         
 
-        [spriteForeground, header, controls, hud, helperTextView].forEach { foreground.addChild($0) }
+        [spriteForeground, header, hud, helperTextView].forEach { foreground.addChild($0) }
         
         // Register for Dispatch
         Dispatch.shared.register { [weak self] input in
             switch input.type{
             case .transformation(let trans):
                 self?.renderTransformation(trans)
+            case .boardBuilt:
+                guard let self = self,
+                    let tiles = input.endTilesStruct else { return }
+                self.sprites = self.createSprites(from: tiles)
+                self.add(sprites: self.sprites, tiles: tiles)
             default:
                 self?.renderInput(input)
             }
@@ -214,6 +216,7 @@ class Renderer : SKSpriteNode {
     
     private func createSprites(from tiles: [[Tile]]?) -> [[DFTileSpriteNode]] {
         guard let tiles = tiles else { fatalError() }
+        guard tiles.count == Int(boardSize) else { fatalError("For now, the board must be a square, and the boardSize must match the tiles.count") }
         var x : CGFloat = 0
         var y : CGFloat = 0
         var sprites: [[DFTileSpriteNode]] = []
@@ -257,7 +260,7 @@ class Renderer : SKSpriteNode {
                                     endTiles: [[Tile]]?,
                                     ref: Bool = true) {
         sprites = createSprites(from: endTiles)
-        let _ = add(sprites: sprites, tiles: endTiles)
+        add(sprites: sprites, tiles: endTiles)
         InputQueue.append(Input(.animationsFinished(ref: ref), endTiles))
     }
     

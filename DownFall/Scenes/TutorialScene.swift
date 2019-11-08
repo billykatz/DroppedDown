@@ -1,5 +1,5 @@
 //
-//  GameScene.swift
+//  TutorialScene.swift
 //  DownFall
 //
 //  Created by William Katz on 5/9/18.
@@ -9,13 +9,7 @@
 import SpriteKit
 import UIKit
 
-protocol GameSceneDelegate: class {
-    func reset()
-    func selectLevel()
-    func visitStore(_ playerData: EntityModel)
-}
-
-class GameScene: SKScene {
+class TutorialScene: SKScene {
     
     // only strong reference to the Board
     private var board: Board!
@@ -25,9 +19,6 @@ class GameScene: SKScene {
     
     //foreground
     private var foreground: SKNode!
-    
-    // delegate
-    weak var gameSceneDelegate: GameSceneDelegate?
     
     //renderer
     private var renderer: Renderer?
@@ -51,12 +42,12 @@ class GameScene: SKScene {
         addChild(foreground)
         
         //init our tile creator
-        let tileCreator = TileCreator(entities,
-                                  difficulty: difficulty,
-                                  updatedEntity: updatedEntity)
+        let tileCreator = TutorialTileCreator(entities,
+                                              difficulty: difficulty,
+                                              updatedEntity: updatedEntity)
         
         //board
-        board = Board.build(size: boardSize, tileCreator: tileCreator, difficulty: difficulty)
+        board = Board.build(size: boardSize, tileCreator: tileCreator, difficulty:  difficulty)
         self.boardSize = boardSize
         
         // create haptic generator
@@ -90,13 +81,10 @@ class GameScene: SKScene {
                 if case let TileType.player(data) = self.board.tiles[playerIndex].type {
                     let revivedData = data.revive()
                     self.removeFromParent()
-                    self.gameSceneDelegate?.visitStore(revivedData)
+                    // TODO: figure out how to restar
                 }
                 //TODO: investigate if this is a memory leak
                 swipingRecognizerView.removeFromSuperview()
-            }
-            else if input.type == .selectLevel {
-                self?.gameSceneDelegate?.selectLevel()
             }
         }
 
@@ -104,16 +92,15 @@ class GameScene: SKScene {
         TurnWatcher.shared.register()
         
         //Debug settings triple tap
-        let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(tripleTap))
-        tapRecognizer.numberOfTapsRequired = 3
-        view.addGestureRecognizer(tapRecognizer)
+       let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(tripleTap))
+       tapRecognizer.numberOfTapsRequired = 3
+       view.addGestureRecognizer(tapRecognizer)
     }
     
     public func prepareForReuse() {
         board = nil
         renderer = nil
         foreground = nil
-        gameSceneDelegate = nil
         generator = nil
         InputQueue.reset()
         Dispatch.shared.reset()
@@ -122,7 +109,7 @@ class GameScene: SKScene {
 }
 
 //MARK: Swiping logic
-extension GameScene {
+extension TutorialScene {
     
     @objc func swiped(_ gestureRecognizer: UISwipeGestureRecognizer) {
         let inTop = isInTop(gestureRecognizer: gestureRecognizer)
@@ -154,7 +141,7 @@ extension GameScene {
 }
 
 //MARK: - Rotate
-extension GameScene {
+extension TutorialScene {
     private func rotateRight() {
         InputQueue.append(Input(.rotateRight))
     }
@@ -163,27 +150,9 @@ extension GameScene {
     }
 }
 
-// MARK: - Debug
-
-extension GameScene {
-    
-    @objc private func tripleTap(_ sender: UITapGestureRecognizer) {
-        if sender.numberOfTapsRequired == 3 {
-            let touchLocation = sender.location(in: view)
-            let newTouch = convertPoint(fromView: touchLocation)
-            
-            if self.nodes(at: newTouch).contains(where: { node in
-                (node as? SKSpriteNode)?.name == "setting"
-            }) {
-                gameSceneDelegate?.reset()
-            }
-        }
-    }
-}
-
 // MARK: - Update
 
-extension GameScene {
+extension TutorialScene {
     /// We try to digest the top of the queue every frame
     override func update(_ currentTime: TimeInterval) {
         guard let input = InputQueue.pop() else { return }
@@ -193,7 +162,7 @@ extension GameScene {
 
 // MARK: - Touch Relay
 
-extension GameScene {
+extension TutorialScene {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         touchWasSwipe = false
         self.renderer?.touchesBegan(touches, with: event)
@@ -208,6 +177,25 @@ extension GameScene {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         if !touchWasSwipe {
             self.renderer?.touchesEnded(touches, with: event)
+        }
+    }
+}
+
+
+// MARK: - Debug
+
+extension TutorialScene {
+    
+    @objc private func tripleTap(_ sender: UITapGestureRecognizer) {
+        if sender.numberOfTapsRequired == 3 {
+            let touchLocation = sender.location(in: view)
+            let newTouch = convertPoint(fromView: touchLocation)
+            
+            if self.nodes(at: newTouch).contains(where: { node in
+                (node as? SKSpriteNode)?.name == "setting"
+            }) {
+//                gameSceneDelegate?.reset()
+            }
         }
     }
 }

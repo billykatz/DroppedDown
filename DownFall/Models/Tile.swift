@@ -28,6 +28,22 @@ struct Tile: Hashable {
         return Tile(type: .player(.zero))
     }
     
+    static var blackRock: Tile {
+        return Tile(type: .blackRock)
+    }
+    
+    static var blueRock: Tile {
+        return Tile(type: .blueRock)
+    }
+    
+    static var greenRock: Tile {
+        return Tile(type: .greenRock)
+    }
+    
+    static var gold: Tile {
+        return Tile(type: .gold)
+    }
+    
     func willAttackNextTurn() -> Bool {
         return type.willAttackNextTurn()
     }

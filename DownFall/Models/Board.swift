@@ -17,7 +17,7 @@ class Board: Equatable {
         return getTileStructPosition(.player(.zero))
     }
     var boardSize: Int { return tiles.count }
-    var tileCreator: TileCreator
+    var tileCreator: TileStrategy
     
     subscript(index: TileCoord) -> TileType? {
         guard isWithinBounds(index) else { return nil }
@@ -25,7 +25,7 @@ class Board: Equatable {
         
     }
     
-    init(tileCreator: TileCreator,
+    init(tileCreator: TileStrategy,
          tiles: [[Tile]]) {
         self.tileCreator = tileCreator
         self.tiles = tiles
@@ -475,9 +475,10 @@ extension Board {
 
 extension Board {
     static func build(size: Int,
-                      tileCreator: TileCreator,
-                      difficulty: Difficulty = .normal) -> Board {
-        
+                      tileCreator: TileStrategy,
+                      difficulty: Difficulty) -> Board {
+//        //FIXME: We shouldnt have to cast this into a tile creator
+//        guard let tileCreator = tileCreator as? TileCreator else { fatalError("Need an instance of type TileCreator")}
         //create a boardful of tiles
         let tilesStruct: [[Tile]] = tileCreator.board(size, difficulty: difficulty)
         

@@ -28,6 +28,6 @@ struct Item: Decodable, Equatable, Hashable {
     }
     
     static var gold: Item{
-        return Item(type: .gem, range: .zero)
+        return Item(type: .gold, range: .zero)
     }
 }

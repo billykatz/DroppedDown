@@ -13,6 +13,7 @@ import GameplayKit
 class GameViewController: UIViewController {
 
     private var gameSceneNode: GameScene?
+    private var tutorialSceneNode: TutorialScene?
     private var boardSize = 8
     private var entities: [EntityModel]?
     private var selectedDifficulty: Difficulty = .normal
@@ -57,6 +58,9 @@ extension GameViewController {
     }
     
     private func startLevel(_ updatedPlayerData: EntityModel? = nil) {
+        if true {
+            startTutorial(updatedPlayerData)
+        } else {
         gameSceneNode?.prepareForReuse()
         if let scene = GKScene(fileNamed: "GameScene")?.rootNode as? GameScene,
             let entities = entities {
@@ -79,6 +83,33 @@ extension GameViewController {
 
             }
         }
+        }
+    }
+    
+    private func startTutorial(_ updatedPlayerData: EntityModel? = nil) {
+        tutorialSceneNode?.prepareForReuse()
+        
+        if let scene = GKScene(fileNamed: "TutorialScene")?.rootNode as? TutorialScene,
+            let entities = entities {
+            tutorialSceneNode = scene
+            tutorialSceneNode!.scaleMode = .aspectFill
+            tutorialSceneNode!.commonInit(boardSize: 4, //FIXME: dont hardcode 
+                                      entities: entities,
+                                      difficulty: .tutorial1,
+                                      updatedEntity: updatedPlayerData)
+
+            if let view = self.view as! SKView? {
+                view.presentScene(tutorialSceneNode)
+                view.ignoresSiblingOrder = true
+
+                //Debug settings
+                //TODO: remove for release
+                view.showsFPS = true
+                view.showsNodeCount = true
+
+            }
+        }
+
     }
 }
 

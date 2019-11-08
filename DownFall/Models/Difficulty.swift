@@ -7,6 +7,7 @@
 //
 
 enum Difficulty: Double {
+    case tutorial1
     case easy = 1
     case normal = 1.5
     case hard = 2.0

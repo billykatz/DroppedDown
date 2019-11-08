@@ -8,6 +8,31 @@
 
 import Foundation
 
+func isWithinBounds(_ tileCoord: TileCoord, within tiles: [[Tile]]?) -> Bool {
+    guard let tiles = tiles else { return false }
+    let (tileRow, tileCol) = tileCoord.tuple
+    return tileRow >= 0 && //lower bound
+        tileCol >= 0 && // lower bound
+        tileRow < tiles.count && // upper bound
+        tileCol < tiles.count
+}
+
+
+protocol Rule {
+    func apply(_ tiles: [[Tile]]) -> Input?
+}
+
+struct Win: Rule {
+    func apply(_ tiles: [[Tile]]) -> Input? {
+        let playerPosition = getTilePosition(.player(.zero), tiles: tiles)
+        guard
+            let pp = playerPosition,
+            isWithinBounds(pp.rowBelow, within: tiles),
+            case Tile.exit = tiles[pp.rowBelow] else { return nil }
+        return Input(.gameWin)
+    }
+}
+
 class Referee {
 
     static func enterRules(_ tiles: [[Tile]]?) {
@@ -85,10 +110,12 @@ class Referee {
         let exitPosition = getTilePosition(.exit, tiles: tiles)
         
         func playerWins() -> Input? {
-            guard let pp = playerPosition,
-                isWithinBounds(pp.rowBelow),
-                case Tile.exit = tiles[pp.rowBelow] else { return nil }
-            return Input(.gameWin)
+            return Win().apply(tiles)
+//            
+//            guard let pp = playerPosition,
+//                isWithinBounds(pp.rowBelow),
+//                case Tile.exit = tiles[pp.rowBelow] else { return nil }
+//            return Input(.gameWin)
         }
         
         func boardHasMoreMoves() -> Bool {

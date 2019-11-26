@@ -16,8 +16,8 @@ struct PlayState: GameState {
         switch input.type {
         case .gameWin,. gameLose,. pause,
              .attack, .transformation,
-             .touch, .monsterDies, .rotateLeft, .rotateRight,
-             .boardBuilt, .touchBegan:
+             .touch, .monsterDies, .rotateCounterClockwise, .rotateClockwise,
+             .boardBuilt, .touchBegan, .tutorial:
             return true
         case .animationsFinished, .play,
              .reffingFinished, .playAgain, .collectItem,
@@ -35,10 +35,10 @@ struct PlayState: GameState {
         case .pause:
             return AnyGameState(PauseState())
         case .attack, .touch, .monsterDies,
-             .rotateLeft, .rotateRight, .collectItem,
+             .rotateCounterClockwise, .rotateClockwise, .collectItem,
              .touchBegan:
             return AnyGameState(ComputingState())
-        case .boardBuilt:
+        case .boardBuilt, .tutorial:
             return AnyGameState(PlayState())
         case .animationsFinished, .play, .transformation, .reffingFinished, .playAgain,. selectLevel, .newTurn:
             return nil
@@ -46,5 +46,3 @@ struct PlayState: GameState {
         
     }
 }
-
-

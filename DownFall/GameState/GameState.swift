@@ -57,6 +57,10 @@ final class AnyGameState: GameState {
     func enter(_ input: Input) {
         return _enter(input)
     }
+    
+    static var playState: AnyGameState {
+        return GameScope.shared.difficulty == Difficulty.tutorial1 ? AnyGameState(TutorialState()) : AnyGameState(PlayState())
+    }
 }
 
 extension AnyGameState: Equatable {

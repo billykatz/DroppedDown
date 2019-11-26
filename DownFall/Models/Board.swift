@@ -53,9 +53,9 @@ class Board: Equatable {
         var transformation: Transformation?
         resetShouldHighlight()
         switch input.type {
-        case .rotateLeft:
+        case .rotateCounterClockwise:
             transformation = rotate(.left)
-        case .rotateRight:
+        case .rotateClockwise:
             transformation = rotate(.right)
         case .touchBegan:
             transformation = Transformation(transformation: nil,
@@ -93,7 +93,8 @@ class Board: Equatable {
              .playAgain,
              .boardBuilt,
              .selectLevel,
-             .newTurn:
+             .newTurn,
+             .tutorial:
             transformation = nil
         }
         
@@ -519,7 +520,7 @@ extension Board {
                 }
                 intermediateTiles.append(column)
             }
-            inputType = .rotateLeft
+            inputType = .rotateCounterClockwise
         case .right:
             for colIdx in (0..<boardSize).reversed() {
                 var column : [Tile] = []
@@ -533,7 +534,7 @@ extension Board {
                 }
                 intermediateTiles.append(column)
             }
-            inputType = .rotateRight
+            inputType = .rotateClockwise
         }
         self.tiles = intermediateTiles
         

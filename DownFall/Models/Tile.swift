@@ -9,11 +9,14 @@
 struct Tile: Hashable {
     let type: TileType
     var shouldHighlight: Bool
+    var tutorialHighlight: Bool
     
     init(type: TileType,
-         shouldHighlight: Bool = false) {
+         shouldHighlight: Bool = false,
+         tutorialHighlight: Bool = false) {
         self.type = type
         self.shouldHighlight = shouldHighlight
+        self.tutorialHighlight = tutorialHighlight
     }
     
     static var exit: Tile {
@@ -40,6 +43,14 @@ struct Tile: Hashable {
         return Tile(type: .greenRock)
     }
     
+    static var purpleRock: Tile {
+        return Tile(type: .purpleRock)
+    }
+    
+    static var brownRock: Tile {
+        return Tile(type: .brownRock)
+    }
+    
     static var gold: Tile {
         return Tile(type: .gold)
     }
@@ -58,7 +69,7 @@ extension Tile: Equatable {
 
 enum TileType: Equatable, Hashable, CaseIterable {
     
-    static var rockCases: [TileType] = [.blueRock, .blackRock, .greenRock]
+    static var rockCases: [TileType] = [.blueRock, .blackRock, .greenRock, .purpleRock, .brownRock]
     static var allCases: [TileType] = [.blueRock, .blackRock ,.greenRock, .player(.zero), .exit, .empty, .monster(.zero), .item(.zero), .fireball]
     typealias AllCases = [TileType]
 
@@ -69,6 +80,10 @@ enum TileType: Equatable, Hashable, CaseIterable {
         case (.blackRock, .blackRock):
             return true
         case (.greenRock, .greenRock):
+            return true
+        case (.brownRock, .brownRock):
+            return true
+        case (.purpleRock, .purpleRock):
             return true
         case (.player, .player):
             return true
@@ -88,6 +103,8 @@ enum TileType: Equatable, Hashable, CaseIterable {
     case blueRock
     case blackRock
     case greenRock
+    case purpleRock
+    case brownRock
     case player(EntityModel)
     case monster(EntityModel)
     case empty
@@ -96,12 +113,7 @@ enum TileType: Equatable, Hashable, CaseIterable {
     case fireball
     
     func isARock() -> Bool {
-        switch self {
-        case .blackRock, .blueRock, .greenRock:
-            return true
-        default:
-            return false
-        }
+        return TileType.rockCases.contains(self)
     }
     
     var isInspectable: Bool {
@@ -148,6 +160,10 @@ enum TileType: Equatable, Hashable, CaseIterable {
             return item.textureName
         case .fireball:
             return TextueName.fireball.rawValue
+        case .purpleRock:
+            return TextueName.purpleRock.rawValue
+        case .brownRock:
+            return TextueName.brownRock.rawValue
         }
     }
     
@@ -155,7 +171,9 @@ enum TileType: Equatable, Hashable, CaseIterable {
     enum TextueName: String {
         case blueRock
         case blackRock
-        case greenRock
+        case greenRock = "greenRockv2"
+        case purpleRock
+        case brownRock
         case player = "player2"
         case empty
         case exit

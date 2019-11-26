@@ -26,7 +26,7 @@ class Label: SKLabelNode {
         super.init()
         self.delegate = delegate
         self.text = text
-        fontName = "Times"
+        fontName = ParagraphNode.defaultFontName
         name = identifier.rawValue
         self.fontSize = fontSize
         self.fontColor = fontColor

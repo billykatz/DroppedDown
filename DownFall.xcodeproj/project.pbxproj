@@ -15,9 +15,12 @@
 		3D06390B22EEB56100C4D5E9 /* AnimatingState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D06390A22EEB56100C4D5E9 /* AnimatingState.swift */; };
 		3D06390D22EEB57300C4D5E9 /* WinState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D06390C22EEB57300C4D5E9 /* WinState.swift */; };
 		3D06390F22F1DB8300C4D5E9 /* StoreScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D06390E22F1DB8300C4D5E9 /* StoreScene.swift */; };
+		3D0F47D723789CBD0004454B /* HighlightView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D0F47D623789CBD0004454B /* HighlightView.swift */; };
+		3D0F47D92378A23F0004454B /* TutorialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D0F47D82378A23F0004454B /* TutorialView.swift */; };
 		3D106098232E9A0200ECE7E6 /* Animator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D106097232E9A0200ECE7E6 /* Animator.swift */; };
 		3D10609B233DD05500ECE7E6 /* TurnWatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D10609A233DD05500ECE7E6 /* TurnWatcher.swift */; };
 		3D18A39D224D68D300343C29 /* Dispatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D18A39C224D68D300343C29 /* Dispatch.swift */; };
+		3D1D3D11238D9D37004E255C /* TutorialModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D1D3D10238D9D37004E255C /* TutorialModel.swift */; };
 		3D2C757322C85362009ABD36 /* Direction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D2C757222C85362009ABD36 /* Direction.swift */; };
 		3D2C757522C854F8009ABD36 /* ItemModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D2C757422C854F8009ABD36 /* ItemModel.swift */; };
 		3D30A4292216899E00AFA1E1 /* BoardMocker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D30A4232216892A00AFA1E1 /* BoardMocker.swift */; };
@@ -91,6 +94,9 @@
 		3DE87C92223D555A00D750CF /* InputQueueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE87C91223D555A00D750CF /* InputQueueTests.swift */; };
 		3DE87C94223D691100D750CF /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE87C93223D691100D750CF /* GameState.swift */; };
 		3DE87C96224068FA00D750CF /* GameStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE87C95224068FA00D750CF /* GameStateTests.swift */; };
+		3DEF7FF3237DB8B90070FB3D /* InputType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DEF7FF2237DB8B90070FB3D /* InputType.swift */; };
+		3DF0A6B02379C4DC00941305 /* ParagraphNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF0A6AF2379C4DC00941305 /* ParagraphNode.swift */; };
+		3DF0A6B32379CC4600941305 /* pixel-font.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3DF0A6B22379CC4600941305 /* pixel-font.ttf */; };
 		3DF2924E20A37FEE006671AC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2924D20A37FEE006671AC /* AppDelegate.swift */; };
 		3DF2925420A37FEE006671AC /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2925320A37FEE006671AC /* GameScene.swift */; };
 		3DF2925620A37FEE006671AC /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2925520A37FEE006671AC /* GameViewController.swift */; };
@@ -121,9 +127,12 @@
 		3D06390A22EEB56100C4D5E9 /* AnimatingState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatingState.swift; sourceTree = "<group>"; };
 		3D06390C22EEB57300C4D5E9 /* WinState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WinState.swift; sourceTree = "<group>"; };
 		3D06390E22F1DB8300C4D5E9 /* StoreScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreScene.swift; sourceTree = "<group>"; };
+		3D0F47D623789CBD0004454B /* HighlightView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighlightView.swift; sourceTree = "<group>"; };
+		3D0F47D82378A23F0004454B /* TutorialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialView.swift; sourceTree = "<group>"; };
 		3D106097232E9A0200ECE7E6 /* Animator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animator.swift; sourceTree = "<group>"; };
 		3D10609A233DD05500ECE7E6 /* TurnWatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurnWatcher.swift; sourceTree = "<group>"; };
 		3D18A39C224D68D300343C29 /* Dispatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dispatch.swift; sourceTree = "<group>"; };
+		3D1D3D10238D9D37004E255C /* TutorialModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialModel.swift; sourceTree = "<group>"; };
 		3D2C757222C85362009ABD36 /* Direction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Direction.swift; sourceTree = "<group>"; };
 		3D2C757422C854F8009ABD36 /* ItemModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemModel.swift; sourceTree = "<group>"; };
 		3D30A4232216892A00AFA1E1 /* BoardMocker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardMocker.swift; sourceTree = "<group>"; };
@@ -196,6 +205,9 @@
 		3DE87C91223D555A00D750CF /* InputQueueTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputQueueTests.swift; sourceTree = "<group>"; };
 		3DE87C93223D691100D750CF /* GameState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameState.swift; sourceTree = "<group>"; };
 		3DE87C95224068FA00D750CF /* GameStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameStateTests.swift; sourceTree = "<group>"; };
+		3DEF7FF2237DB8B90070FB3D /* InputType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputType.swift; sourceTree = "<group>"; };
+		3DF0A6AF2379C4DC00941305 /* ParagraphNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParagraphNode.swift; sourceTree = "<group>"; };
+		3DF0A6B22379CC4600941305 /* pixel-font.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "pixel-font.ttf"; sourceTree = "<group>"; };
 		3DF2924A20A37FEE006671AC /* DownFall.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DownFall.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3DF2924D20A37FEE006671AC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		3DF2925320A37FEE006671AC /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
@@ -277,6 +289,7 @@
 			children = (
 				3D18A39C224D68D300343C29 /* Dispatch.swift */,
 				3DAFBD3621B8E6E7009B116A /* InputQueue.swift */,
+				3DEF7FF2237DB8B90070FB3D /* InputType.swift */,
 			);
 			path = Input;
 			sourceTree = "<group>";
@@ -295,7 +308,6 @@
 			children = (
 				3DA0087C21E6D1960017D8DA /* TileCreator.swift */,
 				3DC072C023748D100046F224 /* Quadrant.swift */,
-				3DC072BE23748CF80046F224 /* TutorialTileCreator.swift */,
 				3DD36ECA21E5B86100AC4873 /* TileStrategy.swift */,
 			);
 			path = TileCreation;
@@ -317,13 +329,23 @@
 			path = "Sprite Sheet";
 			sourceTree = "<group>";
 		};
+		3D1D3D12238DB0C3004E255C /* Tutorial */ = {
+			isa = PBXGroup;
+			children = (
+				3DC072BE23748CF80046F224 /* TutorialTileCreator.swift */,
+				3DC072B82373AAC50046F224 /* TutorialScene.sks */,
+				3DC072B62373AA710046F224 /* TutorialScene.swift */,
+				3D0F47D82378A23F0004454B /* TutorialView.swift */,
+				3D1D3D10238D9D37004E255C /* TutorialModel.swift */,
+			);
+			path = Tutorial;
+			sourceTree = "<group>";
+		};
 		3D528FDD2155B17200EF65CA /* Scenes */ = {
 			isa = PBXGroup;
 			children = (
 				3D528FD52154A50300EF65CA /* GameScene.sks */,
-				3DC072B82373AAC50046F224 /* TutorialScene.sks */,
 				3DF2925320A37FEE006671AC /* GameScene.swift */,
-				3DC072B62373AA710046F224 /* TutorialScene.swift */,
 				3D73D2E521C2226F00DB6FB7 /* PlayerWait.sks */,
 				3D674C9222C9D54C0003AEB4 /* LevelSelect.sks */,
 				3D674C9422C9D6640003AEB4 /* LevelSelect.swift */,
@@ -431,6 +453,7 @@
 			isa = PBXGroup;
 			children = (
 				3DE87C8F22374C2C00D750CF /* Button.swift */,
+				3DF0A6AF2379C4DC00941305 /* ParagraphNode.swift */,
 				3DC072BA2373AF510046F224 /* SwipeRecognizerView.swift */,
 				3DA4E88C228FC7FC006E90D1 /* Label.swift */,
 				3D7D8B322253E5BC0016FE4C /* HUD.swift */,
@@ -438,8 +461,17 @@
 				3D6AACDF222C996900C77B24 /* Header */,
 				3D6AACE2222CD22100C77B24 /* Controls */,
 				3DE87C8D2235D05300D750CF /* MenuSpriteNode.swift */,
+				3D0F47D623789CBD0004454B /* HighlightView.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		3DF0A6B12379CC0500941305 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				3DF0A6B22379CC4600941305 /* pixel-font.ttf */,
+			);
+			path = Fonts;
 			sourceTree = "<group>";
 		};
 		3DF2924120A37FEE006671AC = {
@@ -464,9 +496,10 @@
 		3DF2924C20A37FEE006671AC /* DownFall */ = {
 			isa = PBXGroup;
 			children = (
+				3DF0A6B12379CC0500941305 /* Fonts */,
+				3DC072C22375451D0046F224 /* Rules */,
 				3DF2924D20A37FEE006671AC /* AppDelegate.swift */,
 				3DF2925520A37FEE006671AC /* GameViewController.swift */,
-				3DC072C22375451D0046F224 /* Rules */,
 				3D10609A233DD05500ECE7E6 /* TurnWatcher.swift */,
 				3D7D8B2C2252857E0016FE4C /* CombatSimulator.swift */,
 				3DF2925F20A37FF0006671AC /* Info.plist */,
@@ -479,6 +512,7 @@
 				3D106099232E9A0B00ECE7E6 /* Rendering */,
 				3D1060A02340408100ECE7E6 /* TileCreation */,
 				3D0638FF22EEB4E600C4D5E9 /* GameState */,
+				3D1D3D12238DB0C3004E255C /* Tutorial */,
 				3DE87C8C2235D03300D750CF /* Views */,
 				3DF2928120A66A4E006671AC /* Models */,
 				3DA4E8932290A78E006E90D1 /* Animations */,
@@ -631,6 +665,7 @@
 				3DA4E8912290A722006E90D1 /* entities.json in Resources */,
 				3D528FDF2155BD7300EF65CA /* Assets.xcassets in Resources */,
 				3DB270A522ADBD0100D9BF8B /* player.png in Resources */,
+				3DF0A6B32379CC4600941305 /* pixel-font.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -651,7 +686,9 @@
 			files = (
 				3D4F569422B33B44003695D8 /* Helpers.swift in Sources */,
 				3DF2925420A37FEE006671AC /* GameScene.swift in Sources */,
+				3D0F47D723789CBD0004454B /* HighlightView.swift in Sources */,
 				3D06390B22EEB56100C4D5E9 /* AnimatingState.swift in Sources */,
+				3DEF7FF3237DB8B90070FB3D /* InputType.swift in Sources */,
 				3D5FB09420AE768700ACD716 /* AnimationSettings.swift in Sources */,
 				3D68BF9622FF3D9000FC9B10 /* AbilityModel.swift in Sources */,
 				3DF2925620A37FEE006671AC /* GameViewController.swift in Sources */,
@@ -668,6 +705,7 @@
 				3DA0A384230455B90041EF34 /* CGPoint+Extension.swift in Sources */,
 				3DA0A386230457580041EF34 /* SKLabelNode+Extension.swift in Sources */,
 				3D6AACD8222A324D00C77B24 /* CGRectHelpers.swift in Sources */,
+				3D0F47D92378A23F0004454B /* TutorialView.swift in Sources */,
 				3DE657CD20B0AFD2003492DA /* Int+Extensions.swift in Sources */,
 				3DA0087D21E6D1960017D8DA /* TileCreator.swift in Sources */,
 				3D06390522EEB52300C4D5E9 /* LoseState.swift in Sources */,
@@ -699,12 +737,14 @@
 				3DD36ECB21E5B86100AC4873 /* TileStrategy.swift in Sources */,
 				3DA0A37822FFA6250041EF34 /* StoreItem.swift in Sources */,
 				3D06390F22F1DB8300C4D5E9 /* StoreScene.swift in Sources */,
+				3D1D3D11238D9D37004E255C /* TutorialModel.swift in Sources */,
 				3D90AAD321D8869200C7428A /* Referee.swift in Sources */,
 				3DA0A37D2300CDFC0041EF34 /* DoubleAttack.swift in Sources */,
 				3DC072B72373AA710046F224 /* TutorialScene.swift in Sources */,
 				3DC072BD23747F6B0046F224 /* CGSize+Extension.swift in Sources */,
 				3D9C506021FE206000A2210D /* Renderer.swift in Sources */,
 				3DA4E88F228FC860006E90D1 /* SKNode+Extension.swift in Sources */,
+				3DF0A6B02379C4DC00941305 /* ParagraphNode.swift in Sources */,
 				3DC9CA1321D1DDD4004D05D5 /* Difficulty.swift in Sources */,
 				3D06390D22EEB57300C4D5E9 /* WinState.swift in Sources */,
 				3D4F569222B2D087003695D8 /* SpriteSheet.swift in Sources */,

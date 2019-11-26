@@ -9,7 +9,9 @@
 import SpriteKit
 import UIKit
 
+
 class TutorialScene: SKScene {
+    var gameSceneDelegate: GameSceneDelegate?
     
     // only strong reference to the Board
     private var board: Board!
@@ -70,22 +72,32 @@ class TutorialScene: SKScene {
                                                         swiped: #selector(swiped))
         view.addSubview(swipingRecognizerView)
         
+        // TutorialView
+        let tutorialView = TutorialView(tutorialData: GameScope.tutorialOne,
+                                        texture: nil,
+                                        color: .clear,
+                                        size:  CGSize(width: size.playableRect.width, height: size.playableRect.height))
+        tutorialView.position = .zero
+        tutorialView.zPosition = Precedence.menu.rawValue
+        
+        foreground.addChild(tutorialView)
+        
         // Register for inputs we care about
         Dispatch.shared.register { [weak self] input in
-            if input.type == .playAgain {
-                guard let self = self,
-                    let playerIndex = tileIndices(of: .player(.zero), in: self.board.tiles).first
-                    else { return }
-                
-                self.foreground.removeAllChildren()
-                if case let TileType.player(data) = self.board.tiles[playerIndex].type {
-                    let revivedData = data.revive()
-                    self.removeFromParent()
-                    // TODO: figure out how to restar
+                if input.type == .playAgain {
+                    guard let self = self,
+                        let playerIndex = tileIndices(of: .player(.zero), in: self.board.tiles).first
+                        else { return }
+                    
+                    self.foreground.removeAllChildren()
+                    if case let TileType.player(data) = self.board.tiles[playerIndex].type {
+                        _ = data.revive()
+                        self.removeFromParent()
+                        // TODO: figure out how to restar
+                    }
+                    //TODO: investigate if this is a memory leak
+                    swipingRecognizerView.removeFromSuperview()
                 }
-                //TODO: investigate if this is a memory leak
-                swipingRecognizerView.removeFromSuperview()
-            }
         }
 
         //Turn watcher
@@ -143,10 +155,20 @@ extension TutorialScene {
 //MARK: - Rotate
 extension TutorialScene {
     private func rotateRight() {
-        InputQueue.append(Input(.rotateRight))
+        if allowedToRotate(clockwise: true) {
+            InputQueue.append(Input(.rotateClockwise))
+        }
     }
     private func rotateLeft() {
-        InputQueue.append(Input(.rotateLeft))
+        if allowedToRotate(clockwise: false) {
+            InputQueue.append(Input(.rotateCounterClockwise))
+        }
+    }
+    
+    func allowedToRotate(clockwise: Bool) -> Bool {
+        let rotateDirectionInput : InputType = clockwise ? .rotateClockwise : .rotateCounterClockwise
+        let data = GameScope.tutorialOne
+        return  rotateDirectionInput == data.currentStep.inputToContinue
     }
 }
 
@@ -194,7 +216,7 @@ extension TutorialScene {
             if self.nodes(at: newTouch).contains(where: { node in
                 (node as? SKSpriteNode)?.name == "setting"
             }) {
-//                gameSceneDelegate?.reset()
+                gameSceneDelegate?.reset(self)
             }
         }
     }

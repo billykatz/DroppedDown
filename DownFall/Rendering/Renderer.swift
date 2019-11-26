@@ -15,7 +15,7 @@ class Renderer : SKSpriteNode {
     private var sprites: [[DFTileSpriteNode]] = []
     private let bottomLeft: CGPoint
     private let boardSize: CGFloat!
-    private let tileSize: CGFloat = 150
+    private let tileSize: CGFloat = 115
     private let precedence: Precedence
     
     private var spriteForeground = SKNode()
@@ -31,6 +31,11 @@ class Renderer : SKSpriteNode {
     private var gameWinSpriteNode: MenuSpriteNode {
         return MenuSpriteNode(.gameWin, playableRect: playableRect, precedence: .menu)
     }
+    
+    private var rotateSprite: MenuSpriteNode {
+        return MenuSpriteNode(.rotate, playableRect: playableRect, precedence: .menu)
+    }
+
     
     private var header  = Header()
     private var hud = HUD()
@@ -61,7 +66,7 @@ class Renderer : SKSpriteNode {
 
         foreground.position = playableRect.center
         menuForeground.position = playableRect.center
-        menuForeground.addChild(menuSpriteNode)
+//        menuForeground.addChild(menuSpriteNode)
         
         // add settings button to board
         header = Header.build(color: .black,
@@ -70,21 +75,13 @@ class Renderer : SKSpriteNode {
         header.position = CGPoint(x: playableRect.midX, y: playableRect.maxY - 100.0)
         header.zPosition = precedence.rawValue
         
-        // add left and right rotate button to board
-//        let controls = Controls.build(color: .black,
-//                                      size: CGSize(width: playableRect.width, height: 400.0),
-//                                      precedence: precedence)
-//        controls.position = CGPoint(x: playableRect.midX, y: playableRect.minY + 100.0)
-//        controls.isUserInteractionEnabled = true
-//        controls.zPosition = precedence.rawValue
-        
         //create the hud
         hud = HUD.build(color: .lightGray, size: CGSize(width: playableRect.width * 0.9, height: 150))
         hud.position = CGPoint(x: playableRect.midX, y: playableRect.minY + 400.0 + 16)
         
         //create the helper text view
-        helperTextView = HelperTextView.build(color: UIColor(rgb: 0x9c461f), size: CGSize(width: playableRect.width * 0.9, height: 200))
-        helperTextView.position = CGPoint(x: playableRect.midX, y: playableRect.maxY - header.size.height - 116)
+        helperTextView = HelperTextView.build(color: UIColor(rgb: 0x9c461f), size: CGSize(width: playableRect.width * 0.8, height: 400))
+        helperTextView.position = CGPoint(x: playableRect.midX, y: playableRect.maxY - header.size.height - 216)
         
 
         [spriteForeground, header, hud, helperTextView].forEach { foreground.addChild($0) }
@@ -108,7 +105,7 @@ class Renderer : SKSpriteNode {
     private func renderTransformation(_ trans: Transformation) {
         if let inputType = trans.inputType {
             switch inputType {
-            case .rotateLeft, .rotateRight:
+            case .rotateCounterClockwise, .rotateClockwise:
                 rotate(for: trans)
             case .touch:
                 //TODO: sometimes remove and replace has a monster for the touch(_, type).  not sure why
@@ -156,7 +153,22 @@ class Renderer : SKSpriteNode {
             gameWin()
         case .playAgain:
             menuForeground.removeFromParent()
-        case .touch, .rotateLeft, .rotateRight,
+        case .tutorial(let step):
+            let types = step.highlightType
+            for sprite in sprites.flatMap({ $0 }) {
+                sprite.removeAllChildren()
+                if types.contains(sprite.type) {
+                    sprite.tutorialHighlight()
+                }
+            }
+            
+            if step.showClockwiseRotate {
+                menuForeground.removeFromParent()
+                menuForeground.addChild(rotateSprite)
+                foreground.addChild(menuForeground)
+            }
+            
+        case .touch, .rotateCounterClockwise, .rotateClockwise,
              .monsterDies, .attack, .gameWin,
              .animationsFinished, .reffingFinished,
              .boardBuilt,. collectItem, .selectLevel,
@@ -395,6 +407,7 @@ extension Renderer {
             guard let strongSelf = self else { return }
             strongSelf.menuForeground.removeAllChildren()
             strongSelf.menuForeground.addChild(strongSelf.gameWinSpriteNode)
+            strongSelf.menuForeground.removeFromParent()
             strongSelf.foreground.addChild(strongSelf.menuForeground)
         }
     }

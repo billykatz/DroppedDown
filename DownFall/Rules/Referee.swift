@@ -86,11 +86,6 @@ class Referee {
         
         func playerWins() -> Input? {
             return Win().apply(tiles)
-//            
-//            guard let pp = playerPosition,
-//                isWithinBounds(pp.rowBelow),
-//                case Tile.exit = tiles[pp.rowBelow] else { return nil }
-//            return Input(.gameWin)
         }
         
         func boardHasMoreMoves() -> Bool {

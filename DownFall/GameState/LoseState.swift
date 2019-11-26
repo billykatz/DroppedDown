@@ -27,8 +27,8 @@ struct LoseState: GameState {
             return AnyGameState(PlayState())
         case .touch,
              .touchBegan,
-             .rotateLeft,
-             .rotateRight,
+             .rotateCounterClockwise,
+             .rotateClockwise,
              .monsterDies,
              .attack,
              .gameWin,
@@ -40,7 +40,8 @@ struct LoseState: GameState {
              .reffingFinished,
              .boardBuilt,
              .collectItem,
-             .newTurn:
+             .newTurn,
+             .tutorial:
             return nil
         }
     }

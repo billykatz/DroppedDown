@@ -31,6 +31,9 @@ class RefereeTests: XCTestCase {
         //same for all tests in this function
         let expectedOutput = Input(.gameWin)
         
+        // need to explicitly set this or else the Referee does not know what rule book to use
+        GameScope.shared.difficulty = .normal
+        
         let gameWin = allBlack >>> win(mockBoard)
         let gameBoard = gameWin(mockBoard)
         let actualOutput = Referee.enforceRules(gameBoard.tiles)

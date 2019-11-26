@@ -10,7 +10,7 @@ import SpriteKit
 import UIKit
 
 protocol GameSceneDelegate: class {
-    func reset()
+    func reset(_ scene: SKScene)
     func selectLevel()
     func visitStore(_ playerData: EntityModel)
 }
@@ -156,10 +156,10 @@ extension GameScene {
 //MARK: - Rotate
 extension GameScene {
     private func rotateRight() {
-        InputQueue.append(Input(.rotateRight))
+        InputQueue.append(Input(.rotateClockwise))
     }
     private func rotateLeft() {
-        InputQueue.append(Input(.rotateLeft))
+        InputQueue.append(Input(.rotateCounterClockwise))
     }
 }
 
@@ -175,7 +175,7 @@ extension GameScene {
             if self.nodes(at: newTouch).contains(where: { node in
                 (node as? SKSpriteNode)?.name == "setting"
             }) {
-                gameSceneDelegate?.reset()
+                gameSceneDelegate?.reset(self)
             }
         }
     }

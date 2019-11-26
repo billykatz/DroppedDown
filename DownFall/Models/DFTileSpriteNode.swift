@@ -37,5 +37,23 @@ class DFTileSpriteNode: SKSpriteNode {
         blinkingSprite.run(action)
         self.addChild(blinkingSprite)
     }
+    
+    func tutorialHighlight(){
+        if TileType.rockCases.contains(type) {
+            let blinkingSprite = SKSpriteNode(color: .white, size: size)
+            blinkingSprite.zPosition = Precedence.background.rawValue
+            blinkingSprite.alpha = 0.75
+            self.addChild(blinkingSprite)
+
+        } else {
+            let border = SKShapeNode(circleOfRadius: 100.0)
+            border.strokeColor = .highlightGold
+            border.lineWidth = 7.5
+            border.position = .zero
+            border.zPosition = Precedence.menu.rawValue
+            
+            self.addChild(border)
+        }
+    }
 }
 

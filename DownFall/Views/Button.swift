@@ -15,6 +15,7 @@ enum ButtonIdentifier: String {
     case selectLevel
     case leaveStore
     case storeItem
+    case rotate
     
     var title: String {
         switch self {
@@ -28,6 +29,8 @@ enum ButtonIdentifier: String {
             return "Leave Store"
         case .storeItem:
             return ""
+        case .rotate:
+            return "Got it!"
         }
     }
 }

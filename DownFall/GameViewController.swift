@@ -13,6 +13,42 @@ import GameplayKit
 struct GameScope {
     static var shared: GameScope = GameScope(difficulty: .normal)
     var difficulty: Difficulty
+    
+    static let tutorialOne = TutorialData(sections:
+        [
+            TutorialSection(steps:
+                [
+                    TutorialStep(dialog: "Welcome to the Mine! You're a coal minter with extraordinary powers",
+                                 highlightType: [.player(.zero)],
+                                 tapToContinue: true,
+                                 inputToContinue: InputType.tutorial(.zero)),
+                    TutorialStep(dialog: "This is a rare gem, let's collect it!",
+                                 highlightType: [.gold],
+                                 tapToContinue: true,
+                                 inputToContinue: InputType.tutorial(.zero)),
+                    TutorialStep(dialog: "These are rocks, you can destory them with a tap of your finger",
+                                 highlightType: TileType.rockCases,
+                                 inputToContinue: InputType.touch(.zero, .empty))
+                ]
+            ),
+            TutorialSection(steps:
+                [
+                    TutorialStep(dialog: "You're very close to the gem, but you can only move down",
+                                 highlightType: [.gold],
+                                 tapToContinue: true,
+                                 inputToContinue: InputType.tutorial(.zero)),
+                    TutorialStep(dialog: "Fear not! You can use your powers to rotate the board and fall on to the gem",
+                                 highlightType: [],
+                                 tapToContinue: true,
+                                 inputToContinue: InputType.tutorial(.zero)),
+                    TutorialStep(dialog: "Rotate to collect the gem",
+                                            highlightType: [],
+                                            showClockwiseRotate: true,
+                                            inputToContinue: InputType.rotateCounterClockwise)
+                ]
+            )
+        ]
+    )
 }
 
 class GameViewController: UIViewController {
@@ -28,7 +64,12 @@ class GameViewController: UIViewController {
         let entityData = try! Data.data(from: "entities")!
         entities = try! JSONDecoder().decode(EntitiesModel.self, from: entityData).entities
         visitStore(entities![0])
+        
+        
+        //MARK: Set default difficulty
+        GameScope.shared.difficulty = .tutorial1
     }
+    
 
     override var shouldAutorotate: Bool {
         return false
@@ -92,10 +133,10 @@ extension GameViewController {
     
     private func startTutorial(_ updatedPlayerData: EntityModel? = nil) {
         tutorialSceneNode?.prepareForReuse()
-        GameScope.shared.difficulty = .tutorial1
         if let scene = GKScene(fileNamed: "TutorialScene")?.rootNode as? TutorialScene,
             let entities = entities {
             tutorialSceneNode = scene
+            tutorialSceneNode!.gameSceneDelegate = self
             tutorialSceneNode!.scaleMode = .aspectFill
             tutorialSceneNode!.commonInit(boardSize: 4, //FIXME: dont hardcode 
                                       entities: entities,
@@ -162,10 +203,10 @@ extension GameViewController: GameSceneDelegate {
         
     }
     
-    func reset() {
+    func reset(_ scene: SKScene) {
         let fadeOut = SKAction.fadeOut(withDuration: 0.75)
         let remove = SKAction.removeFromParent()
-        gameSceneNode?.run(SKAction.group([fadeOut, remove])) { [weak self] in
+        scene.run(SKAction.group([fadeOut, remove])) { [weak self] in
             self?.startLevel()
         }
     }

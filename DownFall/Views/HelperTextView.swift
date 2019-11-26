@@ -59,7 +59,7 @@ class HelperTextView: SKSpriteNode {
             }
         case .touch(_, let type):
             switch type {
-            case .blackRock, .blueRock, .greenRock:
+            case .blackRock, .blueRock, .greenRock, .purpleRock, .brownRock:
                 descriptionText = "Remove rocks by tapping on groups\n of 3 or more anywhere on the board."
             case .exit:
                 descriptionText = "That's the mine shaft,\n but you cant exit until you find the gem!"
@@ -77,8 +77,10 @@ class HelperTextView: SKSpriteNode {
             }
         case .boardBuilt, .pause:
             ()
-        case .rotateLeft, .rotateRight:
+        case .rotateCounterClockwise, .rotateClockwise:
             descriptionText = "Try swiping up or down on the\n right side of the screen!!"
+        case .tutorial(let step):
+            showStep(step)
         default:
             descriptionText = ""
         }
@@ -96,7 +98,7 @@ class HelperTextView: SKSpriteNode {
         descLabel.position = CGPoint(x: 0, y: -45)
         descLabel.numberOfLines = 0
         
-        self.addChild(descLabel)
+//        self.addChild(descLabel)
         
         if showGem {
             let spriteNode = SKSpriteNode(texture: SKTexture(imageNamed: "gem1"), size: CGSize(width: 100, height: 100))
@@ -104,4 +106,31 @@ class HelperTextView: SKSpriteNode {
             self.addChild(spriteNode)
         }
     }
+    
+    var paragraphWidth: CGFloat {
+        return frame.width - 16
+    }
+    
+    func showStep(_ step: TutorialStep) {
+        self.removeAllChildren()
+        let paragraph = ParagraphNode.labelNode(text: step.dialog,
+                                                paragraphWidth: paragraphWidth,
+                                                fontSize: 96.0)
+        paragraph.position = CGPoint(x: 0.0, y: 24)
+        paragraph.zPosition = Precedence.foreground.rawValue
+        
+        
+        addChild(paragraph)
+
+        if step.tapToContinue {
+            let tapToContinue = ParagraphNode.labelNode(text: "Tap to continue",
+                                                        paragraphWidth: paragraphWidth,
+                                                        fontSize: 50.0)
+            let y = -frame.size.height/2 + 24
+            tapToContinue.position = CGPoint(x: 0.0, y: y)
+            
+            addChild(tapToContinue)
+        }
+    }
+        
 }

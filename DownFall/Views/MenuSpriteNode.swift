@@ -10,6 +10,9 @@ import SpriteKit
 
 class MenuSpriteNode: SKSpriteNode {
     
+    let rotateClockwise = SpriteSheet(texture: SKTexture(imageNamed: "rotateClockwise"), rows: 1, columns: 12)
+
+    
     struct Constants {
         static let resume = "Resume"
         static let win = "You Won!!"
@@ -19,6 +22,7 @@ class MenuSpriteNode: SKSpriteNode {
     enum MenuType {
         case pause
         case gameWin
+        case rotate
         
         var buttonText: String {
             switch self {
@@ -26,6 +30,8 @@ class MenuSpriteNode: SKSpriteNode {
                 return Constants.resume
             case .gameWin:
                 return Constants.playAgain
+            case .rotate:
+                return ""
             }
         }
         
@@ -35,14 +41,34 @@ class MenuSpriteNode: SKSpriteNode {
                 return ButtonIdentifier.resume
             case .gameWin:
                 return ButtonIdentifier.playAgain
+            case .rotate:
+                return ButtonIdentifier.rotate
             }
             
+        }
+        
+        var widthCoefficient: CGFloat {
+            switch self {
+            case .rotate:
+                return 0.9
+            default:
+                return 0.7
+            }
+        }
+        
+        var heightCoefficient: CGFloat {
+            switch self {
+            case .rotate:
+                return 0.9
+            default:
+                return 0.33
+            }
         }
     }
     
     init(_ menuType: MenuType, playableRect: CGRect, precedence: Precedence) {
-        let menuSizeWidth = playableRect.size.width * 0.7
-        let menuSizeHeight = playableRect.size.height * 0.33
+        let menuSizeWidth = playableRect.size.width * menuType.widthCoefficient
+        let menuSizeHeight = playableRect.size.height * menuType.heightCoefficient
         
         
         super.init(texture: SKTexture(imageNamed: "menu"),
@@ -55,24 +81,93 @@ class MenuSpriteNode: SKSpriteNode {
     }
     
     func setupButtons(_ menuType: MenuType, _ playableRect: CGRect, precedence: Precedence) {
-        let menuSizeWidth = playableRect.size.width * 0.7
-        let menuSizeHeight = playableRect.size.height * 0.33
-        let buttonSize = CGSize(width: menuSizeWidth * 0.8, height: menuSizeHeight/4)
+        let menuSizeWidth = playableRect.size.width * menuType.widthCoefficient
+        let menuSizeHeight = playableRect.size.height * menuType.heightCoefficient
+        let buttonSize = CGSize(width: menuSizeWidth * 0.4, height: 80)
         let button = Button(size: buttonSize,
                             delegate: self,
                             identifier: menuType.buttonIdentifer,
                             precedence: precedence)
-        button.position = CGPoint(x: 0, y: -buttonSize.height/2 - 15)
+        button.position = CGPoint(x: 0, y: -buttonSize.height - 175)
         addChild(button)
         
-        let button2 = Button(size: buttonSize,
-                             delegate: self,
-                             identifier: .selectLevel,
-                             precedence: precedence)
-        button2.position = CGPoint(x: 0, y: buttonSize.height/2 + 15)
-        addChild(button2)
+        if menuType == .rotate {
+            
+            // Heights and widths
+            let topHeight: CGFloat = menuSizeHeight/3 - 56
+            let bottomHeight: CGFloat = -menuSizeHeight/3 + 56
+            
+            let rightWidth: CGFloat = menuSizeWidth/2 - 56
+            let leftWidth: CGFloat = -menuSizeWidth/2 + 56
+            
+            // Points
+            let topRight = CGPoint(x: rightWidth, y: topHeight)
+            let topLeft = CGPoint(x: leftWidth, y: topHeight)
+            
+            let bottomRight = CGPoint(x: rightWidth, y: bottomHeight)
+            let bottomLeft = CGPoint(x: leftWidth, y: bottomHeight)
+            
+            let startStopTarget: [(CGPoint, CGPoint)] = [
+                (topRight, topLeft),
+                (topLeft, bottomLeft),
+                (bottomLeft, bottomRight),
+                (bottomRight, topRight)
+            ]
+            
+            for startStop in startStopTarget {
+                let fingerSprite = SKSpriteNode(texture: SKTexture(imageNamed: "finger"))
+                fingerSprite.size = CGSize(width: 80, height: 80)
+                
+                let start = startStop.0
+                let stop = startStop.1
+                
+                //initial position
+                fingerSprite.position = start
+                
+                //actions
+                let swipeAction = SKAction.move(to: stop, duration: 1.25)
+                swipeAction.timingMode = .easeOut
+                let resetAction = SKAction.move(to: start, duration: 0.0)
+                let instructAction = SKAction.sequence([swipeAction, resetAction])
+                
+                //adding to scene
+                fingerSprite.zPosition = precedence.rawValue
+                addChild(fingerSprite)
+                fingerSprite.run(SKAction.repeatForever(instructAction))
+            }
 
+            
+            let paragraphNode = ParagraphNode.labelNode(text: "Swipe like this to rotate the board counter clockwise", paragraphWidth: playableRect.width)
+            paragraphNode.position = .zero
+            paragraphNode.zPosition = precedence.rawValue
+            
+            addChild(paragraphNode)
+            
+        } else {
+            let button2 = Button(size: buttonSize,
+                                 delegate: self,
+                                 identifier: .selectLevel,
+                                 precedence: precedence)
+            button2.position = CGPoint(x: 0, y: buttonSize.height/2 + 15)
+            addChild(button2)
+        }
+    }
+    
+    func showRotate(_ frames: [SKTexture]) {
+        let sprite = SKSpriteNode(color: .blue, size: size)
+        sprite.position = .zero
+        sprite.zPosition = 100
         
+        let rotateSprite =  SKSpriteNode(texture: frames.first, color: .white, size: self.size)
+        rotateSprite.position = .zero
+        rotateSprite.zPosition = self.zPosition
+
+        sprite.addChild(rotateSprite)
+        
+        let action = SKAction.animate(with: frames, timePerFrame: 0.5)
+
+        self.addChild(sprite)
+        rotateSprite.run(action)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -95,6 +190,9 @@ extension MenuSpriteNode: ButtonDelegate {
             InputQueue.append(Input(.playAgain))
         case .selectLevel:
             InputQueue.append(Input(.selectLevel))
+        case .rotate:
+            //TODO: use the input queue for this?
+            self.removeFromParent()
         case .leaveStore, .storeItem:
             fatalError("These buttons dont appear in game")
         }

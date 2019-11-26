@@ -70,7 +70,7 @@ class TileCreator: TileStrategy {
             let nextTile = Tile(type: randomTile(randomSource.nextInt()))
             
             switch nextTile.type {
-            case .blueRock, .blackRock, .greenRock:
+            case .blueRock, .blackRock, .greenRock, .purpleRock, .brownRock:
                 newTiles.append(nextTile)
             case .empty, .item, .player, .fireball:
                 ()
@@ -108,7 +108,7 @@ class TileCreator: TileStrategy {
             let nextTile = Tile(type: randomRock(randomSource.nextInt()))
             
             switch nextTile.type {
-            case .blueRock, .blackRock, .greenRock:
+            case .blueRock, .blackRock, .greenRock, .purpleRock, .brownRock:
                 newTiles.append(nextTile)
             case .exit, .player, .monster, .item, .empty, .fireball:
                 assertionFailure("randomRock should only create rocks")

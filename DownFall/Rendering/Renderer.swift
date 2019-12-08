@@ -66,7 +66,6 @@ class Renderer : SKSpriteNode {
 
         foreground.position = playableRect.center
         menuForeground.position = playableRect.center
-//        menuForeground.addChild(menuSpriteNode)
         
         // add settings button to board
         header = Header.build(color: .black,
@@ -172,7 +171,8 @@ class Renderer : SKSpriteNode {
              .monsterDies, .attack, .gameWin,
              .animationsFinished, .reffingFinished,
              .boardBuilt,. collectItem, .selectLevel,
-             .newTurn, .transformation, .touchBegan:
+             .newTurn, .transformation, .touchBegan,
+             .visitStore:
             ()
         }
     }

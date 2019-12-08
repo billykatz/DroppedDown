@@ -73,6 +73,7 @@
 		3DA4E89C2290ACB3006E90D1 /* EntityTest.json in Resources */ = {isa = PBXBuildFile; fileRef = 3DA4E89B2290ACB3006E90D1 /* EntityTest.json */; };
 		3DA4E89D2290B156006E90D1 /* EntityTest.json in Resources */ = {isa = PBXBuildFile; fileRef = 3DA4E89B2290ACB3006E90D1 /* EntityTest.json */; };
 		3DAFBD3721B8E6E7009B116A /* InputQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DAFBD3621B8E6E7009B116A /* InputQueue.swift */; };
+		3DB0CEE9239DB072002A8FF3 /* GameScope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DB0CEE8239DB072002A8FF3 /* GameScope.swift */; };
 		3DB270A522ADBD0100D9BF8B /* player.png in Resources */ = {isa = PBXBuildFile; fileRef = 3DB270A422ADBD0100D9BF8B /* player.png */; };
 		3DB270A722AE065300D9BF8B /* Data+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DB270A622AE065300D9BF8B /* Data+Extensions.swift */; };
 		3DB270A922B00E0D00D9BF8B /* TileTypeTest+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DB270A822B00E0D00D9BF8B /* TileTypeTest+Extensions.swift */; };
@@ -88,6 +89,7 @@
 		3DCB38AB232DCE88001D148F /* TileCoordTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DCB38AA232DCE88001D148F /* TileCoordTests.swift */; };
 		3DD36ECB21E5B86100AC4873 /* TileStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DD36ECA21E5B86100AC4873 /* TileStrategy.swift */; };
 		3DD36ECD21E5BD9100AC4873 /* TileStrategyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DD36ECC21E5BD9100AC4873 /* TileStrategyTests.swift */; };
+		3DD5AA0D2398025400FB63F4 /* Styling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DD5AA0C2398025400FB63F4 /* Styling.swift */; };
 		3DE657CD20B0AFD2003492DA /* Int+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE657CC20B0AFD2003492DA /* Int+Extensions.swift */; };
 		3DE87C8E2235D05300D750CF /* MenuSpriteNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE87C8D2235D05300D750CF /* MenuSpriteNode.swift */; };
 		3DE87C9022374C2C00D750CF /* Button.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE87C8F22374C2C00D750CF /* Button.swift */; };
@@ -184,6 +186,7 @@
 		3DA4E8982290AC82006E90D1 /* EntityModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntityModelTests.swift; sourceTree = "<group>"; };
 		3DA4E89B2290ACB3006E90D1 /* EntityTest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = EntityTest.json; sourceTree = "<group>"; };
 		3DAFBD3621B8E6E7009B116A /* InputQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = InputQueue.swift; path = DownFall/Input/InputQueue.swift; sourceTree = SOURCE_ROOT; };
+		3DB0CEE8239DB072002A8FF3 /* GameScope.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScope.swift; sourceTree = "<group>"; };
 		3DB270A422ADBD0100D9BF8B /* player.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = player.png; sourceTree = "<group>"; };
 		3DB270A622AE065300D9BF8B /* Data+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+Extensions.swift"; sourceTree = "<group>"; };
 		3DB270A822B00E0D00D9BF8B /* TileTypeTest+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TileTypeTest+Extensions.swift"; sourceTree = "<group>"; };
@@ -199,6 +202,7 @@
 		3DCB38AA232DCE88001D148F /* TileCoordTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileCoordTests.swift; sourceTree = "<group>"; };
 		3DD36ECA21E5B86100AC4873 /* TileStrategy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileStrategy.swift; sourceTree = "<group>"; };
 		3DD36ECC21E5BD9100AC4873 /* TileStrategyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileStrategyTests.swift; sourceTree = "<group>"; };
+		3DD5AA0C2398025400FB63F4 /* Styling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Styling.swift; sourceTree = "<group>"; };
 		3DE657CC20B0AFD2003492DA /* Int+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int+Extensions.swift"; sourceTree = "<group>"; };
 		3DE87C8D2235D05300D750CF /* MenuSpriteNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuSpriteNode.swift; sourceTree = "<group>"; };
 		3DE87C8F22374C2C00D750CF /* Button.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Button.swift; sourceTree = "<group>"; };
@@ -453,6 +457,7 @@
 			isa = PBXGroup;
 			children = (
 				3DE87C8F22374C2C00D750CF /* Button.swift */,
+				3DD5AA0C2398025400FB63F4 /* Styling.swift */,
 				3DF0A6AF2379C4DC00941305 /* ParagraphNode.swift */,
 				3DC072BA2373AF510046F224 /* SwipeRecognizerView.swift */,
 				3DA4E88C228FC7FC006E90D1 /* Label.swift */,
@@ -500,6 +505,7 @@
 				3DC072C22375451D0046F224 /* Rules */,
 				3DF2924D20A37FEE006671AC /* AppDelegate.swift */,
 				3DF2925520A37FEE006671AC /* GameViewController.swift */,
+				3DB0CEE8239DB072002A8FF3 /* GameScope.swift */,
 				3D10609A233DD05500ECE7E6 /* TurnWatcher.swift */,
 				3D7D8B2C2252857E0016FE4C /* CombatSimulator.swift */,
 				3DF2925F20A37FF0006671AC /* Info.plist */,
@@ -738,6 +744,7 @@
 				3DA0A37822FFA6250041EF34 /* StoreItem.swift in Sources */,
 				3D06390F22F1DB8300C4D5E9 /* StoreScene.swift in Sources */,
 				3D1D3D11238D9D37004E255C /* TutorialModel.swift in Sources */,
+				3DB0CEE9239DB072002A8FF3 /* GameScope.swift in Sources */,
 				3D90AAD321D8869200C7428A /* Referee.swift in Sources */,
 				3DA0A37D2300CDFC0041EF34 /* DoubleAttack.swift in Sources */,
 				3DC072B72373AA710046F224 /* TutorialScene.swift in Sources */,
@@ -750,6 +757,7 @@
 				3D4F569222B2D087003695D8 /* SpriteSheet.swift in Sources */,
 				3D2C757322C85362009ABD36 /* Direction.swift in Sources */,
 				3D7D8B332253E5BC0016FE4C /* HUD.swift in Sources */,
+				3DD5AA0D2398025400FB63F4 /* Styling.swift in Sources */,
 				3D2C757522C854F8009ABD36 /* ItemModel.swift in Sources */,
 				3D18A39D224D68D300343C29 /* Dispatch.swift in Sources */,
 				3D7D8B2D2252857E0016FE4C /* CombatSimulator.swift in Sources */,

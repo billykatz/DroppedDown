@@ -41,12 +41,9 @@ class StoreItem: SKSpriteNode {
         self.ability = ability
         super.init(texture: nil, color: color, size: size)
         
-        let costLabel = Label(text: "\(ability.cost)",
-            delegate: self,
-            precedence: .menu,
-            identifier: .storeItem,
-            fontSize: fontSize,
-            fontColor: .black)
+        let costLabel = Label(text: "\(ability.cost)", width: self.frame.width, delegate: self, precedence: .menu, identifier: .storeItem,
+            fontSize: fontSize)
+            
         if let abilityForeground = ability.sprite {
             abilityForeground.position = .zero
             abilityForeground.name = ability.textureName

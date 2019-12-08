@@ -16,6 +16,9 @@ enum ButtonIdentifier: String {
     case leaveStore
     case storeItem
     case rotate
+    case wallet
+    case infoPopup
+    case visitStore
     
     var title: String {
         switch self {
@@ -30,7 +33,11 @@ enum ButtonIdentifier: String {
         case .storeItem:
             return ""
         case .rotate:
-            return "Got it!"
+            return "Got it! 👍"
+        case .visitStore:
+            return "Visit Store"
+        case .wallet, .infoPopup:
+            return ""
         }
     }
 }
@@ -40,6 +47,11 @@ protocol ButtonDelegate: class {
 }
 
 class Button: SKSpriteNode {
+    
+    static let small = CGSize(width: 75, height: 30)
+    static let medium = CGSize(width: 100, height: 50)
+    static let large = CGSize(width: 150, height: 75)
+    
     weak var delegate: ButtonDelegate?
     
     init(size: CGSize,
@@ -58,7 +70,8 @@ class Button: SKSpriteNode {
          delegate: ButtonDelegate,
          identifier: ButtonIdentifier,
          precedence: Precedence,
-         fontSize: CGFloat = 80) {
+         fontSize: CGFloat,
+         fontColor: UIColor) {
         
         //Set properties
         self.delegate = delegate
@@ -72,16 +85,17 @@ class Button: SKSpriteNode {
         
         //Create Label
         let label = Label(text: identifier.title,
-                          delegate: self,
-                          precedence: precedence,
-                          identifier: identifier,
-                          fontSize: fontSize)
+                               width: self.frame.width,
+                               delegate: self,
+                               precedence: precedence,
+                               identifier: identifier,
+                               fontSize: fontSize,
+                               fontColor: fontColor)
         label.position = self.frame.center
         
         // Add Label
         addChild(label)
     }
-    
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")

@@ -11,11 +11,11 @@ import CoreGraphics
 extension CGSize {
     var playableRect: CGRect {
         let maxAspectRatio : CGFloat = 19.5/9.0
-        let playableWidth = self.height / maxAspectRatio
+        let playableWidth = height / maxAspectRatio
         return CGRect(x: -playableWidth/2,
-                      y: -self.height/2,
+                      y: -height/2,
                       width: playableWidth,
-                      height: self.height)
+                      height: height)
 
     }
 }

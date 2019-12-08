@@ -14,7 +14,7 @@ struct WinState: GameState {
     
     func shouldAppend(_ input: Input) -> Bool {
         switch input.type {
-        case .playAgain, .selectLevel:
+        case .playAgain, .selectLevel, .visitStore:
             return true
         case .transformation(let trans):
             switch trans.inputType! {
@@ -30,7 +30,7 @@ struct WinState: GameState {
     
     func transitionState(given input: Input) -> AnyGameState? {
         switch input.type {
-        case .playAgain, .selectLevel:
+        case .playAgain, .selectLevel, .visitStore:
             return AnyGameState(PlayState())
         case .transformation(let trans):
             switch trans.inputType! {

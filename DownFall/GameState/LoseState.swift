@@ -41,7 +41,8 @@ struct LoseState: GameState {
              .boardBuilt,
              .collectItem,
              .newTurn,
-             .tutorial:
+             .tutorial,
+             .visitStore:
             return nil
         }
     }

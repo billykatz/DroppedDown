@@ -57,7 +57,7 @@ class ParagraphNode: SKSpriteNode {
         self.text = text
         self.fontSize = fontSize
         self.fontColor = fontColor
-        self.paragraphWidth = paragraphWidth
+        self.paragraphWidth = paragraphWidth - 2 * Style.paragraphPadding
         super.init(texture: nil, color: .clear, size: .zero)
         
         retexture()
@@ -109,7 +109,7 @@ class ParagraphNode: SKSpriteNode {
 
         attributes[NSAttributedString.Key.font] = customFont
         attributes[NSAttributedString.Key.paragraphStyle] = paragraphStyle
-        attributes[NSAttributedString.Key.foregroundColor] = UIColor.white
+        attributes[NSAttributedString.Key.foregroundColor] = fontColor
 
 
         let size = CGSize(width: paragraphWidth, height: 2000.0)

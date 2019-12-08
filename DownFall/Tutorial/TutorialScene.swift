@@ -9,7 +9,6 @@
 import SpriteKit
 import UIKit
 
-
 class TutorialScene: SKScene {
     var gameSceneDelegate: GameSceneDelegate?
     
@@ -84,20 +83,18 @@ class TutorialScene: SKScene {
         
         // Register for inputs we care about
         Dispatch.shared.register { [weak self] input in
-                if input.type == .playAgain {
-                    guard let self = self,
-                        let playerIndex = tileIndices(of: .player(.zero), in: self.board.tiles).first
-                        else { return }
-                    
-                    self.foreground.removeAllChildren()
-                    if case let TileType.player(data) = self.board.tiles[playerIndex].type {
-                        _ = data.revive()
-                        self.removeFromParent()
-                        // TODO: figure out how to restar
-                    }
-                    //TODO: investigate if this is a memory leak
-                    swipingRecognizerView.removeFromSuperview()
+            if input.type == .visitStore {
+                guard let self = self,
+                    let playerIndex = tileIndices(of: .player(.zero), in: self.board.tiles).first
+                    else { return }
+                
+                self.foreground.removeAllChildren()
+                if case let TileType.player(data) = self.board.tiles[playerIndex].type {
+                    let revivedData = data.revive()
+                    self.removeFromParent()
+                    self.gameSceneDelegate?.visitStore(revivedData)
                 }
+            }
         }
 
         //Turn watcher

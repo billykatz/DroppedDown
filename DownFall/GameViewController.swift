@@ -10,47 +10,6 @@ import UIKit
 import SpriteKit
 import GameplayKit
 
-struct GameScope {
-    static var shared: GameScope = GameScope(difficulty: .normal)
-    var difficulty: Difficulty
-    
-    static let tutorialOne = TutorialData(sections:
-        [
-            TutorialSection(steps:
-                [
-                    TutorialStep(dialog: "Welcome to the Mine! You're a coal minter with extraordinary powers",
-                                 highlightType: [.player(.zero)],
-                                 tapToContinue: true,
-                                 inputToContinue: InputType.tutorial(.zero)),
-                    TutorialStep(dialog: "This is a rare gem, let's collect it!",
-                                 highlightType: [.gold],
-                                 tapToContinue: true,
-                                 inputToContinue: InputType.tutorial(.zero)),
-                    TutorialStep(dialog: "These are rocks, you can destory them with a tap of your finger",
-                                 highlightType: TileType.rockCases,
-                                 inputToContinue: InputType.touch(.zero, .empty))
-                ]
-            ),
-            TutorialSection(steps:
-                [
-                    TutorialStep(dialog: "You're very close to the gem, but you can only move down",
-                                 highlightType: [.gold],
-                                 tapToContinue: true,
-                                 inputToContinue: InputType.tutorial(.zero)),
-                    TutorialStep(dialog: "Fear not! You can use your powers to rotate the board and fall on to the gem",
-                                 highlightType: [],
-                                 tapToContinue: true,
-                                 inputToContinue: InputType.tutorial(.zero)),
-                    TutorialStep(dialog: "Rotate to collect the gem",
-                                            highlightType: [],
-                                            showClockwiseRotate: true,
-                                            inputToContinue: InputType.rotateCounterClockwise)
-                ]
-            )
-        ]
-    )
-}
-
 class GameViewController: UIViewController {
 
     private var gameSceneNode: GameScene?
@@ -60,17 +19,19 @@ class GameViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        //TODO: handle failure more gracefully. ie redownload or retry
-        let entityData = try! Data.data(from: "entities")!
-        entities = try! JSONDecoder().decode(EntitiesModel.self, from: entityData).entities
-        visitStore(entities![0])
-        
+        do {
+            guard let entityData = try Data.data(from: "entities") else { fatalError("Crashing here is okay because we failed to parse our entity json file") }
+            entities = try JSONDecoder().decode(EntitiesModel.self, from: entityData).entities
+            visitStore(entities![0])
+        }
+        catch(let error) {
+            fatalError("Crashing due to \(error) while trying to parse json entity file")
+        }
         
         //MARK: Set default difficulty
         GameScope.shared.difficulty = .tutorial1
     }
     
-
     override var shouldAutorotate: Bool {
         return false
     }
@@ -122,9 +83,10 @@ extension GameViewController {
                     view.ignoresSiblingOrder = true
 
                     //Debug settings
-                    //TODO: remove for release
+                    #if DEBUG
                     view.showsFPS = true
                     view.showsNodeCount = true
+                    #endif
 
                 }
             }
@@ -138,20 +100,19 @@ extension GameViewController {
             tutorialSceneNode = scene
             tutorialSceneNode!.gameSceneDelegate = self
             tutorialSceneNode!.scaleMode = .aspectFill
-            tutorialSceneNode!.commonInit(boardSize: 4, //FIXME: dont hardcode 
-                                      entities: entities,
-                                      difficulty: GameScope.shared.difficulty,
-                                      updatedEntity: nil)
+            tutorialSceneNode!.commonInit(boardSize: 4,
+                                          entities: entities,
+                                          difficulty: GameScope.shared.difficulty,
+                                          updatedEntity: nil)
 
             if let view = self.view as! SKView? {
                 view.presentScene(tutorialSceneNode)
                 view.ignoresSiblingOrder = true
 
-                //Debug settings
-                //TODO: remove for release
+                #if DEBUG
                 view.showsFPS = true
                 view.showsNodeCount = true
-
+                #endif
             }
         }
 

@@ -16,7 +16,7 @@ extension CGPoint {
                               height: CGFloat,
                               bottomLeft: CGPoint) -> [CGPoint] {
         
-        let inset: CGFloat = 40.0
+        let inset: CGFloat = 10.0
         let columnPadding = (width - (columns * itemSize.width) - (2 * inset)) / (columns-1)
         let rowPadding = (height - (rows * itemSize.height)) / (rows - 1)
         
@@ -33,5 +33,10 @@ extension CGPoint {
         }
         
         return points
+    }
+    
+    static func positionThis(_ this: CGRect, inTopRightOf that: CGRect) -> CGPoint {
+        return CGPoint(x: that.width/2 - this.width/2,
+                       y: that.height/2 - this.height/2)
     }
 }

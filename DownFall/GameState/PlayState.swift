@@ -21,7 +21,8 @@ struct PlayState: GameState {
             return true
         case .animationsFinished, .play,
              .reffingFinished, .playAgain, .collectItem,
-             .selectLevel, .newTurn:
+             .selectLevel, .newTurn,
+             .visitStore:
             return false
         }
     }
@@ -38,9 +39,15 @@ struct PlayState: GameState {
              .rotateCounterClockwise, .rotateClockwise, .collectItem,
              .touchBegan:
             return AnyGameState(ComputingState())
-        case .boardBuilt, .tutorial:
+        case .boardBuilt:
             return AnyGameState(PlayState())
-        case .animationsFinished, .play, .transformation, .reffingFinished, .playAgain,. selectLevel, .newTurn:
+        case .tutorial(let step):
+            if step.showCounterClockwiseRotate || step.showClockwiseRotate {
+                return AnyGameState(PauseState())
+            } else {
+                return AnyGameState(PlayState())
+            }
+        case .animationsFinished, .play, .transformation, .reffingFinished, .playAgain,. selectLevel,       .newTurn, .visitStore:
             return nil
         }
         

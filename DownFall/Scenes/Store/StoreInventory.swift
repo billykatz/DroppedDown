@@ -23,7 +23,6 @@ class StoreInventory {
                      DoubleAttack(),
                      ShieldEast(),
                      DoubleAttack(),
-                     ShieldEast(),
                      ShieldEast()]
     }
 }

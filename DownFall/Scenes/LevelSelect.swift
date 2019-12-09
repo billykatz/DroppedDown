@@ -21,7 +21,7 @@ class LevelSelect: SKScene {
     
     override func didMove(to view: SKView) {
         background = self.childNode(withName: "background") as? SKSpriteNode
-        background.color = UIColor(rgb: 0x9c461f)
+        background.color = UIColor.clayRed
         
         easy = self.childNode(withName: "easy") as? SKLabelNode
         normal = self.childNode(withName: "normal") as? SKLabelNode

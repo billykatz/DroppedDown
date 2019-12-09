@@ -91,7 +91,7 @@ class HelperTextView: SKSpriteNode {
         
         
         let descLabel = SKLabelNode(text: descriptionText)
-        descLabel.fontSize = 45
+        descLabel.fontSize = UIFont.mediumSize
         descLabel.zPosition = 11
         descLabel.fontColor = .lightText
         descLabel.fontName = "Helvetica"
@@ -108,14 +108,14 @@ class HelperTextView: SKSpriteNode {
     }
     
     var paragraphWidth: CGFloat {
-        return frame.width - 16
+        return frame.width - Style.Padding.more
     }
     
     func showStep(_ step: TutorialStep) {
         self.removeAllChildren()
         let paragraph = ParagraphNode.labelNode(text: step.dialog,
                                                 paragraphWidth: paragraphWidth,
-                                                fontSize: 96.0)
+                                                fontSize: UIFont.extraLargeSize)
         paragraph.position = CGPoint(x: 0.0, y: 24)
         paragraph.zPosition = Precedence.foreground.rawValue
         
@@ -125,7 +125,7 @@ class HelperTextView: SKSpriteNode {
         if step.tapToContinue {
             let tapToContinue = ParagraphNode.labelNode(text: "Tap to continue",
                                                         paragraphWidth: paragraphWidth,
-                                                        fontSize: 50.0)
+                                                        fontSize: UIFont.mediumSize)
             let y = -frame.size.height/2 + 24
             tapToContinue.position = CGPoint(x: 0.0, y: y)
             

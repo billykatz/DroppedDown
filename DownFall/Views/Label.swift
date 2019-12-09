@@ -18,10 +18,10 @@ class Label: ParagraphNode {
     
     init(text: String,
          width: CGFloat,
-         delegate: LabelDelegate,
+         delegate: LabelDelegate?,
          precedence: Precedence,
          identifier: ButtonIdentifier,
-         fontSize: CGFloat = 80,
+         fontSize: CGFloat = UIFont.largeSize,
          fontColor: UIColor = .black) {
         
         super.init(text: text, paragraphWidth: width, fontSize: fontSize, fontColor: fontColor)

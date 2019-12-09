@@ -93,7 +93,7 @@ class HUD: SKSpriteNode {
         }
         else {
             let goldLabel = SKLabelNode(fontNamed: "Helvetica")
-            goldLabel.fontSize = 75
+            goldLabel.fontSize = UIFont.largeSize
             goldLabel.position = CGPoint(x: 355, y: -22)
             goldLabel.text = "0"
             goldLabel.fontColor = .lightText

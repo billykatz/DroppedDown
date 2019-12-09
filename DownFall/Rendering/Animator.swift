@@ -12,8 +12,6 @@ import SpriteKit
 
 struct Animator {
     
-    var clockRotate = SpriteSheet(texture: SKTexture(imageNamed: "rotateClockwise"), rows: 1, columns: 12)
-    
     func animate(_ transformation: [TileTransformation]?,
                  boardSize: CGFloat,
                  bottomLeft: CGPoint,

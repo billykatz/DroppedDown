@@ -9,12 +9,6 @@
 import SpriteKit
 import UIKit
 
-protocol GameSceneDelegate: class {
-    func reset(_ scene: SKScene)
-    func selectLevel()
-    func visitStore(_ playerData: EntityModel)
-}
-
 class GameScene: SKScene {
     
     // only strong reference to the Board
@@ -27,7 +21,7 @@ class GameScene: SKScene {
     private var foreground: SKNode!
     
     // delegate
-    weak var gameSceneDelegate: GameSceneDelegate?
+    weak var gameSceneDelegate: GameSceneCoordinatingDelegate?
     
     //renderer
     private var renderer: Renderer?
@@ -37,6 +31,7 @@ class GameScene: SKScene {
     
     //touch state
     private var touchWasSwipe = false
+    private var touchWasCanceled = false
     
     required init?(coder aDecoder: NSCoder) { super.init(coder: aDecoder) }
     
@@ -123,42 +118,33 @@ class GameScene: SKScene {
 
 //MARK: Swiping logic
 extension GameScene {
-    
     @objc func swiped(_ gestureRecognizer: UISwipeGestureRecognizer) {
-        let inTop = isInTop(gestureRecognizer: gestureRecognizer)
-        let onRight = isOnRight(gestureRecognizer: gestureRecognizer)
+        guard let inTop = self.view?.isInTop(gestureRecognizer),
+            let onRight = self.view?.isOnRight(gestureRecognizer)
+            else { return }
+        
         touchWasSwipe = true
         switch gestureRecognizer.direction {
         case .down:
-            onRight ? rotateRight() : rotateLeft()
+            onRight ? rotateClockwise() : rotateCounterClockwise()
         case .up:
-            !onRight ? rotateRight() : rotateLeft()
+            !onRight ? rotateClockwise() : rotateCounterClockwise()
         case .left:
-            !inTop ? rotateRight() : rotateLeft()
+            !inTop ? rotateClockwise() : rotateCounterClockwise()
         case .right:
-            inTop ? rotateRight() : rotateLeft()
+            inTop ? rotateClockwise() : rotateCounterClockwise()
         default:
             fatalError("There should only be four directions in our swipe gesture recognizer")
         }
-    }
-    
-    private func isOnRight(gestureRecognizer: UISwipeGestureRecognizer) -> Bool {
-        let location = gestureRecognizer.location(in: self.view)
-        return location.x > (self.view?.frame.width ?? 0)/2
-    }
-    
-    private func isInTop(gestureRecognizer: UISwipeGestureRecognizer) -> Bool {
-        let location = gestureRecognizer.location(in: self.view)
-        return location.y < (self.view?.frame.height ?? 0)/2
     }
 }
 
 //MARK: - Rotate
 extension GameScene {
-    private func rotateRight() {
+    private func rotateClockwise() {
         InputQueue.append(Input(.rotateClockwise))
     }
-    private func rotateLeft() {
+    private func rotateCounterClockwise() {
         InputQueue.append(Input(.rotateCounterClockwise))
     }
 }
@@ -201,12 +187,15 @@ extension GameScene {
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         // avoid inputing touchEnded when a touch is cancelled.
-        // FIXME: there is probably a better way to fix this
-        touchWasSwipe = true
+        touchWasCanceled = true
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         if !touchWasSwipe {
+            guard !touchWasCanceled else {
+                touchWasCanceled = false
+                return
+            }
             self.renderer?.touchesEnded(touches, with: event)
         }
     }

@@ -7,8 +7,8 @@
 //
 
 /*
- var array = Array(repeating: Tile.blackRock, count: 4)
- var playerArray = Array(repeating: Tile.blackRock, count: 3)
+ var array = Array(repeating: Tile.greenRock, count: 4)
+ var playerArray = Array(repeating: Tile.greenRock, count: 3)
  playerArray.append(Tile.player)
  return [array, playerArray, array, array]
 
@@ -36,7 +36,7 @@ struct TutorialTileCreator: TileStrategy {
     }
     
     func board(_ boardSize: Int, difficulty: Difficulty) -> [[Tile]] {
-        let blackRow = Array(repeating: Tile.blackRock, count: 4)
+        let greenRow = Array(repeating: Tile.greenRock, count: 4)
         
         var tiles: [[Tile]] = []
         switch difficulty {
@@ -44,10 +44,10 @@ struct TutorialTileCreator: TileStrategy {
             fatalError("You cant create a tutorial board with one of these diffculties")
         case .tutorial1:
             tiles = [
-                [.blackRock, .gold, .blackRock, .blackRock],
-                blackRow,
-                blackRow,
-                [.blackRock, .blackRock, Tile(type: .player(playerEntityData)), .blackRock]
+                [.greenRock, .gold, .greenRock, .greenRock],
+                greenRow,
+                greenRow,
+                [.greenRock, .greenRock, Tile(type: .player(playerEntityData)), .greenRock]
             ]
         }
         return tiles
@@ -56,7 +56,7 @@ struct TutorialTileCreator: TileStrategy {
     
     func tiles(for tiles: [[Tile]]) -> [Tile] {
         let count = typeCount(for: tiles, of: .empty).count
-        let array = Array(repeating: randomSource.nextInt() % 2 == 0 ? Tile.blackRock : Tile.blackRock, count: count)
+        let array = Array(repeating: randomSource.nextInt() % 2 == 0 ? Tile.greenRock : Tile.greenRock, count: count)
         return array
     }
     

@@ -85,12 +85,12 @@ class Button: SKSpriteNode {
         
         //Create Label
         let label = Label(text: identifier.title,
-                               width: self.frame.width,
-                               delegate: self,
-                               precedence: precedence,
-                               identifier: identifier,
-                               fontSize: fontSize,
-                               fontColor: fontColor)
+                          width: self.frame.width,
+                          delegate: self,
+                          precedence: precedence,
+                          identifier: identifier,
+                          fontSize: fontSize,
+                          fontColor: fontColor)
         label.position = self.frame.center
         
         // Add Label
@@ -123,7 +123,7 @@ extension Button {
     }
     
     private func buttonPressBegan() {
-       color = .lightGray
+        color = .lightGray
     }
 }
 

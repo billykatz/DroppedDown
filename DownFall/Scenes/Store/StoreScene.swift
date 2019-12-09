@@ -94,7 +94,7 @@ class StoreScene: SKScene {
                                    delegate: self,
                                    identifier: .storeItem,
                                    precedence: .foreground,
-                                   fontSize: 25))
+                                   fontSize: UIFont.smallSize))
         }
         return items
     }
@@ -121,7 +121,7 @@ class StoreScene: SKScene {
         let coin = SKSpriteNode(texture: SKTexture(imageNamed: "gold"), size: CGSize(width: 35, height: 35))
         coin.position = CGPoint(x: walletView.size.width/2 - coin.size.width/2, y: 0)
         
-        let coinLabel = Label(text: "\(playerData.carry.totalGold)", width: self.frame.width, delegate: self, precedence: .foreground, identifier: .wallet)
+        let coinLabel = Label(text: "\(playerData.carry.totalGold)", width: self.frame.width, delegate: nil, precedence: .foreground, identifier: .wallet)
         
         walletView.addChild(coin)
         walletView.addChild(coinLabel)
@@ -154,7 +154,7 @@ class StoreScene: SKScene {
         
         let descriptionLabel = Label(text: text,
                                      width: popupNode.frame.width,
-                                     delegate: self,
+                                     delegate: nil,
                                      precedence: .foreground,
                                      identifier: .infoPopup,
                                      fontSize: UIFont.mediumSize,
@@ -323,16 +323,4 @@ extension StoreScene: ButtonDelegate {
         }
 
     }
-}
-
-extension StoreScene: LabelDelegate {
-    func labelPressed(_ label: Label) {
-        
-    }
-    
-    func labelPressBegan(_ label: Label) {
-        
-    }
-    
-    
 }

@@ -64,6 +64,8 @@ extension GameViewController {
     }
     
     private func startLevel(_ updatedPlayerData: EntityModel? = nil) {
+        
+        //TODO: this needs to be coordinated in an intelligent way
         if true {
             startTutorial(updatedPlayerData)
         } else {
@@ -140,7 +142,7 @@ extension GameViewController: StoreSceneDelegate {
 }
 
 
-extension GameViewController: GameSceneDelegate {
+extension GameViewController: GameSceneCoordinatingDelegate {
     func selectLevel() {
         if let view = self.view as! SKView? {
             view.presentScene(nil)

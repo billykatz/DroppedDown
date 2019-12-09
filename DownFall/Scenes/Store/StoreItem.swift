@@ -33,11 +33,11 @@ class StoreItem: SKSpriteNode {
     
     init(ability: Ability,
          size: CGSize,
-         color: UIColor = UIColor(rgb: 0x8fa9af),
+         color: UIColor = UIColor.storeItemBackground,
          delegate: StoreItemDelegate,
          identifier: ButtonIdentifier,
          precedence: Precedence,
-         fontSize: CGFloat = 80) {
+         fontSize: CGFloat = UIFont.largeSize) {
         self.ability = ability
         super.init(texture: nil, color: color, size: size)
         

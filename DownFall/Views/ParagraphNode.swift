@@ -10,11 +10,12 @@ import SpriteKit
 import Foundation
 import UIKit
 
+//TODO: find what we used as a resource and credit it here
+
 class ParagraphNode: SKSpriteNode {
     static let defaultFontName = "Alterebro-Pixel-Font"
     static let defaultFontColor = UIColor.white
-    static let defaultFontSize: CGFloat = 96.0
-    
+    static let defaultFontSize: CGFloat = UIFont.extraLargeSize
     
     var fontName: String
     var fontColor: UIColor

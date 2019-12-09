@@ -15,7 +15,7 @@ class Renderer : SKSpriteNode {
     private var sprites: [[DFTileSpriteNode]] = []
     private let bottomLeft: CGPoint
     private let boardSize: CGFloat!
-    private let tileSize: CGFloat = 115
+    private let tileSize: CGFloat = Style.Tile.size
     private let precedence: Precedence
     
     private var spriteForeground = SKNode()
@@ -34,6 +34,10 @@ class Renderer : SKSpriteNode {
     
     private var rotateSprite: MenuSpriteNode {
         return MenuSpriteNode(.rotate, playableRect: playableRect, precedence: .menu)
+    }
+    
+    private var tutorial1WinSprite: MenuSpriteNode {
+        return MenuSpriteNode(.tutorial1Win, playableRect: playableRect, precedence: .menu)
     }
 
     
@@ -79,7 +83,7 @@ class Renderer : SKSpriteNode {
         hud.position = CGPoint(x: playableRect.midX, y: playableRect.minY + 400.0 + 16)
         
         //create the helper text view
-        helperTextView = HelperTextView.build(color: UIColor(rgb: 0x9c461f), size: CGSize(width: playableRect.width * 0.8, height: 400))
+        helperTextView = HelperTextView.build(color: UIColor.clayRed, size: CGSize(width: playableRect.width * 0.8, height: 400))
         helperTextView.position = CGPoint(x: playableRect.midX, y: playableRect.maxY - header.size.height - 216)
         
 
@@ -406,7 +410,8 @@ extension Renderer {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { [weak self] in
             guard let strongSelf = self else { return }
             strongSelf.menuForeground.removeAllChildren()
-            strongSelf.menuForeground.addChild(strongSelf.gameWinSpriteNode)
+            let gameWinMenu = GameScope.shared.difficulty == .tutorial1 ? strongSelf.tutorial1WinSprite : strongSelf.gameWinSpriteNode
+            strongSelf.menuForeground.addChild(gameWinMenu)
             strongSelf.menuForeground.removeFromParent()
             strongSelf.foreground.addChild(strongSelf.menuForeground)
         }

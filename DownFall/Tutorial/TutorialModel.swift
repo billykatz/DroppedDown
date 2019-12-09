@@ -8,16 +8,6 @@
 
 import Foundation
 
-extension IndexPath {
-    mutating func incrStepIndex() {
-        self = IndexPath(item: item+1, section: section)
-    }
-
-    mutating func incrSectionIndex() {
-        self = IndexPath(item: item, section: section+1)
-    }
-}
-
 class TutorialData {
     let sections: [TutorialSection]
     var currentIndexPath: IndexPath = IndexPath(item: 0, section: 0)

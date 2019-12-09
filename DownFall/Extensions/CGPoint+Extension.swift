@@ -35,8 +35,10 @@ extension CGPoint {
         return points
     }
     
-    static func positionThis(_ this: CGRect, inTopRightOf that: CGRect) -> CGPoint {
-        return CGPoint(x: that.width/2 - this.width/2,
-                       y: that.height/2 - this.height/2)
+    static func positionThis(_ this: CGRect,
+                             inTopRightOf that: CGRect,
+                             padding: CGFloat = Style.Padding.normal) -> CGPoint {
+        return CGPoint(x: that.width/2 - this.width/2 - padding,
+                       y: that.height/2 - this.height/2 - padding)
     }
 }

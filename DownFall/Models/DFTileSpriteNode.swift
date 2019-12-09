@@ -40,15 +40,15 @@ class DFTileSpriteNode: SKSpriteNode {
     
     func tutorialHighlight(){
         if TileType.rockCases.contains(type) {
-            let blinkingSprite = SKSpriteNode(color: .white, size: size)
-            blinkingSprite.zPosition = Precedence.background.rawValue
-            blinkingSprite.alpha = 0.75
-            self.addChild(blinkingSprite)
+            let whiteSprite = SKSpriteNode(color: .white, size: size)
+            whiteSprite.zPosition = Precedence.background.rawValue
+            whiteSprite.alpha = 0.75
+            self.addChild(whiteSprite)
 
         } else {
-            let border = SKShapeNode(circleOfRadius: 100.0)
+            let border = SKShapeNode(circleOfRadius: Style.TutorialHighlight.radius)
             border.strokeColor = .highlightGold
-            border.lineWidth = 7.5
+            border.lineWidth = Style.TutorialHighlight.lineWidth
             border.position = .zero
             border.zPosition = Precedence.menu.rawValue
             

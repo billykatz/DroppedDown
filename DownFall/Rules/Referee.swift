@@ -84,10 +84,6 @@ class Referee {
         let playerPosition = getTilePosition(.player(.zero), tiles: tiles)
         let exitPosition = getTilePosition(.exit, tiles: tiles)
         
-        func playerWins() -> Input? {
-            return Win().apply(tiles)
-        }
-        
         func boardHasMoreMoves() -> Bool {
             guard let playerPosition = playerPosition else { return false }
             for (i, row) in tiles.enumerated() {

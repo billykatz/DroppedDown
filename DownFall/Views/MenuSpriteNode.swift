@@ -10,59 +10,7 @@ import SpriteKit
 
 class MenuSpriteNode: SKSpriteNode {
 
-    
-    struct Constants {
-        static let resume = "Resume"
-        static let win = "You Won!!"
-        static let playAgain = "Play Again?"
-    }
-    
-    enum MenuType {
-        case pause
-        case gameWin
-        case rotate
-        
-        var buttonText: String {
-            switch self {
-            case .pause:
-                return Constants.resume
-            case .gameWin:
-                return Constants.playAgain
-            case .rotate:
-                return ""
-            }
-        }
-        
-        var buttonIdentifer: ButtonIdentifier {
-            switch self {
-            case .pause:
-                return ButtonIdentifier.resume
-            case .gameWin:
-                return ButtonIdentifier.playAgain
-            case .rotate:
-                return ButtonIdentifier.rotate
-            }
-            
-        }
-        
-        var widthCoefficient: CGFloat {
-            switch self {
-            case .rotate:
-                return 0.9
-            default:
-                return 0.7
-            }
-        }
-        
-        var heightCoefficient: CGFloat {
-            switch self {
-            case .rotate:
-                return 0.65
-            default:
-                return 0.33
-            }
-        }
-    }
+    //TODO: Generally, we need to capture all the constants and move them to our Style struct.
     
     init(_ menuType: MenuType, playableRect: CGRect, precedence: Precedence) {
         let menuSizeWidth = playableRect.size.width * menuType.widthCoefficient
@@ -90,8 +38,6 @@ class MenuSpriteNode: SKSpriteNode {
         let menuSizeWidth = playableRect.size.width * menuType.widthCoefficient
         let menuSizeHeight = playableRect.size.height * menuType.heightCoefficient
         let buttonSize = CGSize(width: menuSizeWidth * 0.4, height: 120)
-        
-        var addDefaultButton = true
         
         if menuType == .rotate {
             
@@ -146,7 +92,7 @@ class MenuSpriteNode: SKSpriteNode {
             
             addChild(paragraphNode)
             
-        } else if menuType == .gameWin && GameScope.shared.difficulty == .tutorial1 {
+        } else if menuType == .tutorial1Win {
             // In this case, we want to inform the player about how smart they are
             // and encourage them to continue to tutorial.  There should only be one button
             // and it should say "Continue"
@@ -161,18 +107,6 @@ class MenuSpriteNode: SKSpriteNode {
             paragraphNode.zPosition = precedence.rawValue
             
             addChild(paragraphNode)
-            
-            // turn off default button for .gameWin and create our own
-            addDefaultButton = false
-            
-            let button = Button(size: buttonSize,
-                                delegate: self,
-                                identifier: .visitStore,
-                                precedence: precedence,
-                                fontSize: 80,
-                                fontColor: .black)
-            button.position = CGPoint(x: 0, y: -buttonSize.height - 175)
-            addChild(button)
             
 
         }
@@ -189,17 +123,16 @@ class MenuSpriteNode: SKSpriteNode {
             addChild(button2)
         }
         
-        if (addDefaultButton) {
-            // This button is added no matter what
-            let button = Button(size: buttonSize,
-                                delegate: self,
-                                identifier: menuType.buttonIdentifer,
-                                precedence: precedence,
-                                fontSize: 80,
-                                fontColor: .black)
-            button.position = CGPoint(x: 0, y: -buttonSize.height - 175)
-            addChild(button)
-        }
+        // Add the default button
+        // This button is added no matter what
+        let button = Button(size: buttonSize,
+                            delegate: self,
+                            identifier: menuType.buttonIdentifer,
+                            precedence: precedence,
+                            fontSize: UIFont.largeSize,
+                            fontColor: .black)
+        button.position = CGPoint(x: 0, y: -buttonSize.height - 175)
+        addChild(button)
     }
     
     private func showRotate(_ frames: [SKTexture]) {

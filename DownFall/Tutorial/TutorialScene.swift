@@ -10,7 +10,7 @@ import SpriteKit
 import UIKit
 
 class TutorialScene: SKScene {
-    var gameSceneDelegate: GameSceneDelegate?
+    var gameSceneDelegate: GameSceneCoordinatingDelegate?
     
     // only strong reference to the Board
     private var board: Board!
@@ -29,6 +29,7 @@ class TutorialScene: SKScene {
     
     //touch state
     private var touchWasSwipe = false
+    private var touchWasCanceled = false
     
     required init?(coder aDecoder: NSCoder) { super.init(coder: aDecoder) }
     
@@ -121,8 +122,9 @@ class TutorialScene: SKScene {
 extension TutorialScene {
     
     @objc func swiped(_ gestureRecognizer: UISwipeGestureRecognizer) {
-        let inTop = isInTop(gestureRecognizer: gestureRecognizer)
-        let onRight = isOnRight(gestureRecognizer: gestureRecognizer)
+        guard let inTop = self.view?.isInTop(gestureRecognizer),
+            let onRight = self.view?.isOnRight(gestureRecognizer)
+            else { return }
         touchWasSwipe = true
         switch gestureRecognizer.direction {
         case .down:
@@ -136,16 +138,6 @@ extension TutorialScene {
         default:
             fatalError("There should only be four directions in our swipe gesture recognizer")
         }
-    }
-    
-    private func isOnRight(gestureRecognizer: UISwipeGestureRecognizer) -> Bool {
-        let location = gestureRecognizer.location(in: self.view)
-        return location.x > (self.view?.frame.width ?? 0)/2
-    }
-    
-    private func isInTop(gestureRecognizer: UISwipeGestureRecognizer) -> Bool {
-        let location = gestureRecognizer.location(in: self.view)
-        return location.y < (self.view?.frame.height ?? 0)/2
     }
 }
 
@@ -189,12 +181,15 @@ extension TutorialScene {
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         // avoid inputing touchEnded when a touch is cancelled.
-        // FIXME: there is probably a better way to fix this
-        touchWasSwipe = true
+        touchWasCanceled = true
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         if !touchWasSwipe {
+            guard !touchWasCanceled else {
+                touchWasCanceled = false
+                return
+            }
             self.renderer?.touchesEnded(touches, with: event)
         }
     }

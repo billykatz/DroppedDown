@@ -8,53 +8,6 @@
 
 import SpriteKit
 
-class TutorialWatcher {
-    var tutorialData: TutorialData
-    
-    var sectionIndex: Int {
-        return tutorialData.currentIndexPath.section
-    }
-    
-    var stepIndex: Int {
-        return tutorialData.currentIndexPath.item
-    }
-    
-    init(tutorialData: TutorialData) {
-        self.tutorialData = tutorialData
-        
-        
-        Dispatch.shared.register { [weak self] (input) in
-            guard let self = self else { return }
-            let inputToContinue = tutorialData.step(sectionIndex: self.sectionIndex,
-                                                    stepIndex: self.stepIndex).inputToContinue
-            if InputType.fuzzyEqual(input.type, inputToContinue) {
-                
-                let step = tutorialData.step(sectionIndex: self.sectionIndex,
-                                             stepIndex: self.stepIndex)
-                
-                self.tutorialData.incrStepIndex()
-                InputQueue.append(
-                    Input(
-                        .tutorial(step)
-                    )
-                )
-
-            } else if input.type == .boardBuilt {
-                
-                //START THE TUTORIAL
-                
-                let step = tutorialData.step(sectionIndex: self.sectionIndex,
-                                             stepIndex: self.stepIndex)
-                InputQueue.append(
-                    Input(
-                        .tutorial(step)
-                    )
-                )
-            }
-        }
-    }
-}
-
 class TutorialView: SKSpriteNode {
     
     let tutorialData: TutorialData
@@ -81,7 +34,17 @@ class TutorialView: SKSpriteNode {
                         .tutorial(step)
                     )
                 )
+            } else if case .boardBuilt = input.type {
+                //START THE TUTORIAL
+
+                let step = tutorialData.currentStep
+                InputQueue.append(
+                    Input(
+                        .tutorial(step)
+                    )
+                )
             }
+            
         }
     }
     

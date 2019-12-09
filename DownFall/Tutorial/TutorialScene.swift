@@ -95,6 +95,8 @@ class TutorialScene: SKScene {
                     self.removeFromParent()
                     self.gameSceneDelegate?.visitStore(revivedData)
                 }
+                
+                swipingRecognizerView.removeFromSuperview()
             }
         }
 

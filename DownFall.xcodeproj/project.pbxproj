@@ -93,6 +93,7 @@
 		3DD72591239DC37B005933B2 /* SKView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DD72590239DC37B005933B2 /* SKView+Extensions.swift */; };
 		3DD72593239DC47F005933B2 /* IndexPath+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DD72592239DC47F005933B2 /* IndexPath+Extensions.swift */; };
 		3DD72595239DC4FE005933B2 /* MenuType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DD72594239DC4FE005933B2 /* MenuType.swift */; };
+		3DD72597239DD056005933B2 /* TutorialModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DD72596239DD056005933B2 /* TutorialModelTests.swift */; };
 		3DE657CD20B0AFD2003492DA /* Int+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE657CC20B0AFD2003492DA /* Int+Extensions.swift */; };
 		3DE87C8E2235D05300D750CF /* MenuSpriteNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE87C8D2235D05300D750CF /* MenuSpriteNode.swift */; };
 		3DE87C9022374C2C00D750CF /* Button.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE87C8F22374C2C00D750CF /* Button.swift */; };
@@ -209,6 +210,7 @@
 		3DD72590239DC37B005933B2 /* SKView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SKView+Extensions.swift"; sourceTree = "<group>"; };
 		3DD72592239DC47F005933B2 /* IndexPath+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IndexPath+Extensions.swift"; sourceTree = "<group>"; };
 		3DD72594239DC4FE005933B2 /* MenuType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuType.swift; sourceTree = "<group>"; };
+		3DD72596239DD056005933B2 /* TutorialModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialModelTests.swift; sourceTree = "<group>"; };
 		3DE657CC20B0AFD2003492DA /* Int+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int+Extensions.swift"; sourceTree = "<group>"; };
 		3DE87C8D2235D05300D750CF /* MenuSpriteNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuSpriteNode.swift; sourceTree = "<group>"; };
 		3DE87C8F22374C2C00D750CF /* Button.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Button.swift; sourceTree = "<group>"; };
@@ -549,6 +551,7 @@
 				3DCB38AA232DCE88001D148F /* TileCoordTests.swift */,
 				3D90AACF21D8854300C7428A /* RefereeTests.swift */,
 				3DE87C95224068FA00D750CF /* GameStateTests.swift */,
+				3DD72596239DD056005933B2 /* TutorialModelTests.swift */,
 				3DD36ECC21E5BD9100AC4873 /* TileStrategyTests.swift */,
 				3D30A4232216892A00AFA1E1 /* BoardMocker.swift */,
 				3DF2926A20A37FF0006671AC /* Info.plist */,
@@ -786,6 +789,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3DD72597239DD056005933B2 /* TutorialModelTests.swift in Sources */,
 				3DE87C92223D555A00D750CF /* InputQueueTests.swift in Sources */,
 				3D6F09A7236B3EA50069CDF2 /* TestHelpers.swift in Sources */,
 				3D30A4292216899E00AFA1E1 /* BoardMocker.swift in Sources */,

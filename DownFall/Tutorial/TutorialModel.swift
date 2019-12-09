@@ -24,18 +24,23 @@ class TutorialData {
         return currentIndexPath.section
     }
     
+    /// Try to increment that section index.
+    /// Note: If the currentSection is the last section this resets the index to be the last item in the last section
     func incrSectionIndex() {
         //make sure we dont go out of bounds
         if currentSection < sections.count - 1 {
             currentIndexPath.incrSectionIndex()
             currentIndexPath = IndexPath(item: 0, section: currentIndexPath.section)
+        } else {
+            // lets reset the item index to be in bounds
+            currentIndexPath = IndexPath(item: currentIndexPath.item - 1, section: currentIndexPath.section)
         }
     }
     
     func incrStepIndex() {
         currentIndexPath.incrStepIndex()
         if currentIndexPath.item >= countStepsIn(sectionIndex: currentIndexPath.section) {
-            currentIndexPath = IndexPath(item: currentIndexPath.item - 1, section: currentIndexPath.section)
+            // NOTE: This may not increment the section index because we dont increment when there are no sections left
             incrSectionIndex()
         }
         

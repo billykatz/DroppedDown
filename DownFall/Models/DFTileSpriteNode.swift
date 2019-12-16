@@ -28,13 +28,13 @@ class DFTileSpriteNode: SKSpriteNode {
     func indicateAboutToAttack() {
         let blinkingSprite = SKSpriteNode(color: .yellow, size: self.size)
         blinkingSprite.zPosition = Precedence.background.rawValue
-        let blink = SKAction.run {
-            blinkingSprite.alpha = abs(blinkingSprite.alpha - 1)
-        }
-        let wait = SKAction.wait(forDuration: 0.2)
-        let group = SKAction.sequence([blink, wait])
-        let action = SKAction.repeatForever(group)
-        blinkingSprite.run(action)
+//        let blink = SKAction.run {
+//            blinkingSprite.alpha = abs(blinkingSprite.alpha - 1)
+//        }
+//        let wait = SKAction.wait(forDuration: 0.2)
+//        let group = SKAction.sequence([blink, wait])
+//        let action = SKAction.repeatForever(group)
+//        blinkingSprite.run(action)
         self.addChild(blinkingSprite)
     }
     

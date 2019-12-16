@@ -35,8 +35,12 @@ struct InputQueue {
     /// Attempts to append the input given the current game state
     static func append(_ input: Input, given: AnyGameState = gameState) {
         
+        print("Before shouldAppend input \(input.debugDescription)")
         if gameState.shouldAppend(input) {
             queue.append(input)
+            print(input.debugDescription)
+        } else {
+            print("Not appending because  \(gameState.state)")
         }
     }
     

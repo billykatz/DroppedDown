@@ -18,7 +18,10 @@ struct Animator {
                  spriteForeground: SKNode,
                  tileSize: CGFloat,
                  _ completion: (() -> Void)? = nil) {
-        guard let transformation = transformation else { return }
+        guard let transformation = transformation else {
+            completion?()
+            return
+        }
         var childActionDict : [SKNode : SKAction] = [:]
         for transIdx in 0..<transformation.count {
             let trans = transformation[transIdx]

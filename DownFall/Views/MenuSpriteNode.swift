@@ -109,10 +109,24 @@ class MenuSpriteNode: SKSpriteNode {
             addChild(paragraphNode)
             
 
-        }
-        
-        
-        else {
+        } else if menuType == .tutorial2Win {
+            // In this case, we want to inform the player about how smart they are
+            // and encourage them to continue to tutorial.  There should only be one button
+            // and it should say "Continue"
+            let paragraphNode = ParagraphNode.labelNode(text:
+                """
+                    Great job!
+                    Most monsters drop gold when they die.
+                    You can use gold to buy items at the store.
+                """
+                ,paragraphWidth: playableRect.width * 0.70)
+            paragraphNode.position = .zero
+            paragraphNode.zPosition = precedence.rawValue
+            
+            addChild(paragraphNode)
+            
+
+        } else {
             let button2 = Button(size: buttonSize,
                                  delegate: self,
                                  identifier: .selectLevel,

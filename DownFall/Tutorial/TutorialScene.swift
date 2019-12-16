@@ -27,6 +27,9 @@ class TutorialScene: SKScene {
     //Generator
     private var generator: HapticGenerator?
     
+    //input to queue
+    private var inputQueue: InputType?
+    
     //touch state
     private var touchWasSwipe = false
     private var touchWasCanceled = false
@@ -73,12 +76,20 @@ class TutorialScene: SKScene {
         view.addSubview(swipingRecognizerView)
         
         // TutorialView
-        let tutorialView = TutorialView(tutorialData: GameScope.tutorialOne,
+        let tutorialData: TutorialData
+        switch GameScope.shared.difficulty {
+        case .tutorial1:
+            tutorialData = GameScope.tutorialOne
+        default:
+            tutorialData = GameScope.tutorialTwo
+        }
+        let tutorialView = TutorialView(tutorialData: tutorialData,
                                         texture: nil,
                                         color: .clear,
                                         size:  CGSize(width: size.playableRect.width, height: size.playableRect.height))
         tutorialView.position = .zero
         tutorialView.zPosition = Precedence.menu.rawValue
+        tutorialView.delegate = self
         
         foreground.addChild(tutorialView)
         
@@ -167,9 +178,14 @@ extension TutorialScene {
 
 extension TutorialScene {
     /// We try to digest the top of the queue every frame
+    
     override func update(_ currentTime: TimeInterval) {
-        guard let input = InputQueue.pop() else { return }
-        Dispatch.shared.send(input)
+        if let input = InputQueue.pop() {
+            Dispatch.shared.send(input)
+        } else if let queuedInput = inputQueue {
+            Dispatch.shared.send(Input(queuedInput))
+            inputQueue = nil
+        }
     }
 }
 
@@ -213,5 +229,11 @@ extension TutorialScene {
                 gameSceneDelegate?.reset(self)
             }
         }
+    }
+}
+
+extension TutorialScene: TutorialViewDelegate {
+    func queue(inputType: InputType) {
+        self.inputQueue = inputType
     }
 }

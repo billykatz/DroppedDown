@@ -37,6 +37,6 @@ struct Style {
     }
     
     struct Tile {
-        static let size: CGFloat = 115.0
+        static let size: CGFloat = 105.0
     }
 }

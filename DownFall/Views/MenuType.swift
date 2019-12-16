@@ -13,6 +13,7 @@ enum MenuType {
     case gameWin
     case rotate
     case tutorial1Win
+    case tutorial2Win
     
     struct Constants {
         static let resume = "Resume"
@@ -30,7 +31,7 @@ enum MenuType {
             return ButtonIdentifier.playAgain
         case .rotate:
             return ButtonIdentifier.rotate
-        case .tutorial1Win:
+        case .tutorial1Win, .tutorial2Win:
             return ButtonIdentifier.visitStore
         }
         

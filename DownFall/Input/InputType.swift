@@ -10,9 +10,12 @@ import Foundation
 
 indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringConvertible{
     static func fuzzyEqual(_ lhs: InputType, _ rhs: InputType) -> Bool {
-        if case InputType.touch = lhs,
-            case InputType.touch = rhs {
-            return true
+        if case InputType.touch(let lhsCoord, _) = lhs,
+            case InputType.touch(let rhsCoord, _) = rhs {
+            return lhsCoord == rhsCoord
+        } else if case InputType.animationsFinished(let lhsRef) = lhs,
+            case InputType.animationsFinished(let rhsRef) = rhs {
+            return lhsRef == rhsRef
         }
         return lhs == rhs
     }

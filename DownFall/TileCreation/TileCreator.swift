@@ -30,6 +30,8 @@ class TileCreator: TileStrategy {
         switch TileType.allCases[index] {
         case .monster:
             return randomMonster(given)
+        case .blackRock, .blueRock, .purpleRock, .brownRock, .greenRock:
+            return randomRock(given)
         default:
             return TileType.allCases[index]
         }
@@ -70,7 +72,8 @@ class TileCreator: TileStrategy {
             let nextTile = Tile(type: randomTile(randomSource.nextInt()))
             
             switch nextTile.type {
-            case .blueRock, .blackRock, .greenRock, .purpleRock, .brownRock:
+                
+            case .greenRock, .purpleRock, .brownRock, .blueRock,. blackRock:
                 newTiles.append(nextTile)
             case .empty, .item, .player, .fireball:
                 ()
@@ -108,7 +111,7 @@ class TileCreator: TileStrategy {
             let nextTile = Tile(type: randomRock(randomSource.nextInt()))
             
             switch nextTile.type {
-            case .blueRock, .blackRock, .greenRock, .purpleRock, .brownRock:
+            case .blueRock, .greenRock, .purpleRock, .brownRock, .blackRock:
                 newTiles.append(nextTile)
             case .exit, .player, .monster, .item, .empty, .fireball:
                 assertionFailure("randomRock should only create rocks")
@@ -162,7 +165,7 @@ class TileCreator: TileStrategy {
             return entities[1]
         case .hard:
             return entities[2]
-        case .tutorial1:
+        case .tutorial1, .tutorial2:
             return entities[0]
         }
     }

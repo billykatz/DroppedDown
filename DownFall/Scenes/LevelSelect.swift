@@ -9,7 +9,7 @@
 import SpriteKit
 
 protocol LevelSelectDelegate: class {
-    func didSelect(_ difficulty: Difficulty)
+    func didSelect(_ difficulty: Difficulty, _ playerModel: EntityModel?)
 }
 
 class LevelSelect: SKScene {
@@ -18,6 +18,7 @@ class LevelSelect: SKScene {
     private var normal: SKLabelNode!
     private var hard: SKLabelNode!
     weak var levelSelectDelegate: LevelSelectDelegate?
+    var playerModel: EntityModel?
     
     override func didMove(to view: SKView) {
         background = self.childNode(withName: "background") as? SKSpriteNode
@@ -32,11 +33,11 @@ class LevelSelect: SKScene {
         guard let touch = touches.first else { return }
         let positionInScene = touch.location(in: self.background)
         if easy.contains(positionInScene) {
-            levelSelectDelegate?.didSelect(.easy)
+            levelSelectDelegate?.didSelect(.normal, playerModel)
         } else if normal.contains(positionInScene) {
-            levelSelectDelegate?.didSelect(.normal)
+            levelSelectDelegate?.didSelect(.tutorial1, playerModel)
         } else if hard.contains(positionInScene) {
-            levelSelectDelegate?.didSelect(.hard)
+            levelSelectDelegate?.didSelect(.tutorial2, playerModel)
         }
     }
     

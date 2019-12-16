@@ -12,8 +12,4 @@ extension IndexPath {
     mutating func incrStepIndex() {
         self = IndexPath(item: item+1, section: section)
     }
-
-    mutating func incrSectionIndex() {
-        self = IndexPath(item: item, section: section+1)
-    }
 }

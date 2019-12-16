@@ -11,6 +11,7 @@ import Foundation
 enum AttackType: String, Decodable {
     case targets
     case areaOfEffect
+    case charges
 }
 
 struct AttackModel: Equatable, Decodable {
@@ -22,6 +23,7 @@ struct AttackModel: Equatable, Decodable {
     var attacksThisTurn: Int = 0
     var turns: Int = 1
     let attacksPerTurn: Int
+    var charge: Int?
     
     private enum CodingKeys: String, CodingKey {
         typealias RawValue = String
@@ -33,7 +35,6 @@ struct AttackModel: Equatable, Decodable {
         case attacksPerTurn
     }
 
-    
     static let zero = AttackModel(type: .targets,
                                   frequency: 0,
                                   range: RangeModel(lower: 0, upper: 0),
@@ -41,7 +42,8 @@ struct AttackModel: Equatable, Decodable {
                                   directions: [],
                                   attacksThisTurn: 0,
                                   turns: 0,
-                                  attacksPerTurn: 0)
+                                  attacksPerTurn: 0,
+                                  charge: 0)
     
     func didAttack() -> AttackModel {
         return AttackModel(type: type,
@@ -51,7 +53,8 @@ struct AttackModel: Equatable, Decodable {
                            directions: directions,
                            attacksThisTurn: attacksThisTurn + 1,
                            turns: turns,
-                           attacksPerTurn: attacksPerTurn)
+                           attacksPerTurn: attacksPerTurn,
+                           charge: 0)
     }
     
     func resetAttack() -> AttackModel {
@@ -62,10 +65,12 @@ struct AttackModel: Equatable, Decodable {
                            directions: directions,
                            attacksThisTurn: 0,
                            turns: turns,
-                           attacksPerTurn: attacksPerTurn)
+                           attacksPerTurn: attacksPerTurn,
+                           charge: charge ?? 0)
     }
     
     func incrementTurns() -> AttackModel {
+        let charge = self.charge ?? 0
         return AttackModel(type: type,
                            frequency: frequency,
                            range: range,
@@ -73,13 +78,17 @@ struct AttackModel: Equatable, Decodable {
                            directions: directions,
                            attacksThisTurn: attacksThisTurn,
                            turns:  turns + 1,
-                           attacksPerTurn: attacksPerTurn)
-
+                           attacksPerTurn: attacksPerTurn,
+                           charge: min(frequency, charge + 1))
     }
     
     func willAttackNextTurn() -> Bool {
         let shouldAttack = (self.turns + 1) % self.frequency == 0
         return shouldAttack && type == .areaOfEffect
+    }
+    
+    var isCharged: Bool {
+        return (charge ?? 0) == frequency
     }
     
 }

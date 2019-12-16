@@ -279,15 +279,16 @@
             "originalHp": 1,
             "hp": 1,
             "attack": {
-                "type": "targets",
-                "frequency" : 1,
+                "type": "charges",
+                "frequency" : 3,
                 "directions": ["northEast", "northWest", "southEast", "southWest"],
                 "damage": 1,
                 "range": {
                     "lower": 1,
-                    "upper": 10
+                    "upper": 3
                 },
-                "attacksPerTurn": 1
+                "attacksPerTurn": 1,
+                "charge" : 1
             },
             "animations": {
                 "attack": {

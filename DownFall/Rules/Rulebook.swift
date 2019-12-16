@@ -13,7 +13,7 @@ struct Rulebook {
         switch GameScope.shared.difficulty {
         case .easy, .normal, .hard:
             return Win()
-        case .tutorial1:
+        case .tutorial1, .tutorial2:
             return Tutorial1Win()
         }
     }

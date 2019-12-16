@@ -39,6 +39,10 @@ class Renderer : SKSpriteNode {
     private var tutorial1WinSprite: MenuSpriteNode {
         return MenuSpriteNode(.tutorial1Win, playableRect: playableRect, precedence: .menu)
     }
+    
+    private var tutorial2WinSprite: MenuSpriteNode {
+        return MenuSpriteNode(.tutorial2Win, playableRect: playableRect, precedence: .menu)
+    }
 
     
     private var header  = Header()
@@ -158,10 +162,18 @@ class Renderer : SKSpriteNode {
             menuForeground.removeFromParent()
         case .tutorial(let step):
             let types = step.highlightType
-            for sprite in sprites.flatMap({ $0 }) {
-                sprite.removeAllChildren()
-                if types.contains(sprite.type) {
-                    sprite.tutorialHighlight()
+            let coords = step.highlightCoordinates
+            for (row, spriteRow) in sprites.enumerated() {
+                for (col, _) in spriteRow.enumerated() {
+                    let sprite = sprites[row][col]
+                    sprite.removeAllChildren()
+                    if types.contains(sprite.type) {
+                        sprite.tutorialHighlight()
+                    }
+                    
+                    if coords.contains(TileCoord(row, col)) {
+                        sprite.indicateAboutToAttack()
+                    }
                 }
             }
             
@@ -390,10 +402,36 @@ extension Renderer {
                         guard let lastTouchInput = InputQueue.lastTouchInput(),
                             case let InputType.touchBegan(lastTileCoord, _) = lastTouchInput.type,
                             newTileCoord == lastTileCoord else { return }
-                        InputQueue.append(
-                            Input(.touch(TileCoord(row, col),
-                                         sprites[row][col].type))
-                        )
+                        
+                        //special case for tutorial
+                        if GameScope.shared.difficulty == .tutorial2 {
+                            if InputType.fuzzyEqual(GameScope.tutorialTwo.currentStep.inputToContinue,
+                                                    .touch(TileCoord(row, col), sprites[row][col].type)) {
+                                InputQueue.append(
+                                    Input(.touch(TileCoord(row, col),
+                                                 sprites[row][col].type))
+                                )
+                            }
+                            
+                                // the following logic is specific to the tutorial at hand.
+                                // if we want to constrain where a user can click, then we need to
+                                // understand where and when they are clicking
+                                // where on the board
+                                // and when in the tutorial
+                            else if InputType.fuzzyEqual(GameScope.tutorialTwo.currentStep.inputToContinue,
+                                                           .monsterDies(.zero)) {
+                                InputQueue.append(
+                                    Input(.touch(TileCoord(row, col),
+                                                 sprites[row][col].type))
+                                )
+                            }
+
+                        } else {
+                            InputQueue.append(
+                                Input(.touch(TileCoord(row, col),
+                                             sprites[row][col].type))
+                            )
+                        }
                     }
                 }
             }
@@ -410,7 +448,15 @@ extension Renderer {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { [weak self] in
             guard let strongSelf = self else { return }
             strongSelf.menuForeground.removeAllChildren()
-            let gameWinMenu = GameScope.shared.difficulty == .tutorial1 ? strongSelf.tutorial1WinSprite : strongSelf.gameWinSpriteNode
+            let gameWinMenu: SKSpriteNode
+            switch GameScope.shared.difficulty {
+            case .easy, .normal, .hard:
+                gameWinMenu = strongSelf.gameWinSpriteNode
+            case .tutorial1:
+                gameWinMenu = strongSelf.tutorial1WinSprite
+            case .tutorial2:
+                gameWinMenu = strongSelf.tutorial2WinSprite
+            }
             strongSelf.menuForeground.addChild(gameWinMenu)
             strongSelf.menuForeground.removeFromParent()
             strongSelf.foreground.addChild(strongSelf.menuForeground)

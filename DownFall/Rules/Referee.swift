@@ -233,7 +233,14 @@ class Referee {
                     
                     let attackFrequency = monsterData.attack.frequency
                     let totalTurns = monsterData.attack.turns
-                    let shouldAttack = totalTurns % attackFrequency == 0
+                    let shouldAttack: Bool
+                    
+                    switch monsterData.attack.type {
+                    case .charges:
+                        shouldAttack = monsterData.attack.isCharged
+                    case .areaOfEffect, .targets:
+                        shouldAttack = totalTurns % attackFrequency == 0
+                    }
                     
                     guard shouldAttack else { continue }
                     

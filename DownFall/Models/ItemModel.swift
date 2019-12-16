@@ -9,7 +9,7 @@
 struct Item: Decodable, Equatable, Hashable {
     enum ItemType: String, Decodable {
         case gold
-        case gem = "gem1"
+        case gem = "gem2"
     }
     
     let type: ItemType

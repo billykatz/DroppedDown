@@ -37,6 +37,7 @@ struct TutorialTileCreator: TileStrategy {
     
     func board(_ boardSize: Int, difficulty: Difficulty) -> [[Tile]] {
         let greenRow = Array(repeating: Tile.greenRock, count: 4)
+        let purpleRow = Array(repeating: Tile.purpleRock, count: 4)
         
         var tiles: [[Tile]] = []
         switch difficulty {
@@ -44,10 +45,18 @@ struct TutorialTileCreator: TileStrategy {
             fatalError("You cant create a tutorial board with one of these diffculties")
         case .tutorial1:
             tiles = [
-                [.greenRock, .gold, .greenRock, .greenRock],
+                [.greenRock, .gem, .greenRock, .greenRock],
                 greenRow,
                 greenRow,
                 [.greenRock, .greenRock, Tile(type: .player(playerEntityData)), .greenRock]
+            ]
+        case .tutorial2:
+            guard let rat = entityData(for: .rat) else { fatalError("Could not find a rat in the entities array") }
+            tiles = [
+                [.greenRock, .greenRock, .monster(rat), .brownRock],
+                [.greenRock, .greenRock, .brownRock , .purpleRock],
+                purpleRow,
+                [.purpleRock, .purpleRock, Tile(type: .player(playerEntityData)), .brownRock]
             ]
         }
         return tiles
@@ -56,7 +65,7 @@ struct TutorialTileCreator: TileStrategy {
     
     func tiles(for tiles: [[Tile]]) -> [Tile] {
         let count = typeCount(for: tiles, of: .empty).count
-        let array = Array(repeating: randomSource.nextInt() % 2 == 0 ? Tile.greenRock : Tile.greenRock, count: count)
+        let array = Array(repeating: randomSource.nextInt() % 2 == 0 ? Tile.greenRock : Tile.brownRock, count: count)
         return array
     }
     
@@ -73,9 +82,13 @@ struct TutorialTileCreator: TileStrategy {
             return entities[1]
         case .hard:
             return entities[2]
-        case .tutorial1:
+        case .tutorial1, .tutorial2:
             return entities[1]
         }
+    }
+    
+    func entityData(for type: EntityModel.EntityType) -> EntityModel? {
+        return entities.filter { $0.type == type }.first
     }
 
     

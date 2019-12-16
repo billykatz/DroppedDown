@@ -55,6 +55,14 @@ struct Tile: Hashable {
         return Tile(type: .gold)
     }
     
+    static var gem: Tile {
+        return Tile(type: .gem)
+    }
+    
+    static func monster(_ model: EntityModel) -> Tile {
+        return Tile(type: TileType.monster(model))
+    }
+    
     func willAttackNextTurn() -> Bool {
         return type.willAttackNextTurn()
     }
@@ -69,8 +77,8 @@ extension Tile: Equatable {
 
 enum TileType: Equatable, Hashable, CaseIterable {
     
-    static var rockCases: [TileType] = [.blueRock, .blackRock, .greenRock, .purpleRock, .brownRock]
-    static var allCases: [TileType] = [.blueRock, .blackRock ,.greenRock, .player(.zero), .exit, .empty, .monster(.zero), .item(.zero), .fireball]
+    static var rockCases: [TileType] = [.blueRock, .greenRock, .purpleRock, .brownRock]
+    static var allCases: [TileType] = [.blueRock, .blackRock,.greenRock, .player(.zero), .exit, .empty, .monster(.zero), .item(.zero), .fireball]
     typealias AllCases = [TileType]
 
     static func == (lhs: TileType, rhs: TileType) -> Bool {
@@ -178,7 +186,7 @@ enum TileType: Equatable, Hashable, CaseIterable {
         case empty
         case exit
         case greenMonster
-        case gem1
+        case gem1 = "gem2"
         case fireball
     }
 }

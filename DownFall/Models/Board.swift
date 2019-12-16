@@ -563,7 +563,9 @@ extension Board : CustomDebugStringConvertible {
 extension Board {
     func gameWin() -> Transformation {
         guard let playerPosition = getTileStructPosition(TileType.player(.zero)),
-            isWithinBounds(playerPosition.rowBelow) else { return Transformation.zero  }
+            isWithinBounds(playerPosition.rowBelow) else {
+                return Transformation(transformation: [], inputType: .gameWin)
+        }
         return Transformation(transformation: [[TileTransformation(playerPosition, playerPosition.rowBelow)]], inputType: .gameWin)
     }
 }

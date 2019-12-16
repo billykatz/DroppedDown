@@ -22,14 +22,15 @@ class GameViewController: UIViewController {
         do {
             guard let entityData = try Data.data(from: "entities") else { fatalError("Crashing here is okay because we failed to parse our entity json file") }
             entities = try JSONDecoder().decode(EntitiesModel.self, from: entityData).entities
-            visitStore(entities![0])
+//            visitStore(entities![0])
+            levelSelect(entities![0])
         }
         catch(let error) {
             fatalError("Crashing due to \(error) while trying to parse json entity file")
         }
         
         //MARK: Set default difficulty
-        GameScope.shared.difficulty = .tutorial1
+        GameScope.shared.difficulty = .tutorial2
     }
     
     override var shouldAutorotate: Bool {
@@ -50,10 +51,11 @@ class GameViewController: UIViewController {
 }
 
 extension GameViewController {
-    private func levelSelect() {
+    private func levelSelect(_ updatedPlayerData: EntityModel) {
         if let levelSelectScene = GKScene(fileNamed: "LevelSelect")?.rootNode as? LevelSelect {
             levelSelectScene.scaleMode = .aspectFill
             levelSelectScene.levelSelectDelegate = self
+            levelSelectScene.playerModel = updatedPlayerData
             
             if let view = self.view as! SKView? {
                 view.presentScene(levelSelectScene)
@@ -66,9 +68,10 @@ extension GameViewController {
     private func startLevel(_ updatedPlayerData: EntityModel? = nil) {
         
         //TODO: this needs to be coordinated in an intelligent way
-        if true {
+        switch GameScope.shared.difficulty {
+        case .tutorial2, .tutorial1:
             startTutorial(updatedPlayerData)
-        } else {
+        case .easy, .normal, .hard:
             gameSceneNode?.prepareForReuse()
             if let scene = GKScene(fileNamed: "GameScene")?.rootNode as? GameScene,
                 let entities = entities {
@@ -122,11 +125,11 @@ extension GameViewController {
 }
 
 extension GameViewController: LevelSelectDelegate {
-    func didSelect(_ difficulty: Difficulty) {
+    func didSelect(_ difficulty: Difficulty, _ playerModel: EntityModel?) {
         if let view = self.view as! SKView? {
             view.presentScene(nil)
             GameScope.shared.difficulty = difficulty
-            startLevel()
+            startLevel(playerModel)
         }
     }
 }
@@ -135,7 +138,7 @@ extension GameViewController: StoreSceneDelegate {
     func leave(_ storeScene: StoreScene, updatedPlayerData: EntityModel) {
         if let view = self.view as! SKView? {
             view.presentScene(nil)
-            startLevel(updatedPlayerData)
+            levelSelect(updatedPlayerData)
         }
 
     }
@@ -143,13 +146,6 @@ extension GameViewController: StoreSceneDelegate {
 
 
 extension GameViewController: GameSceneCoordinatingDelegate {
-    func selectLevel() {
-        if let view = self.view as! SKView? {
-            view.presentScene(nil)
-            levelSelect()
-        }
-
-    }
     
     func visitStore(_ playerData: EntityModel) {
         if let view = self.view as! SKView? {

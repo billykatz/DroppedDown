@@ -566,7 +566,13 @@ extension Board {
             isWithinBounds(playerPosition.rowBelow) else {
                 return Transformation(transformation: [], inputType: .gameWin)
         }
-        return Transformation(transformation: [[TileTransformation(playerPosition, playerPosition.rowBelow)]], inputType: .gameWin)
+        if GameScope.shared.difficulty == .tutorial1 || GameScope.shared.difficulty == .tutorial2 {
+            return Transformation(transformation: [], inputType: .gameWin)
+        }
+        
+        return Transformation(transformation: [[TileTransformation(playerPosition, playerPosition.rowBelow)]],
+                              inputType: .gameWin,
+                              endTiles: tiles)
     }
 }
 

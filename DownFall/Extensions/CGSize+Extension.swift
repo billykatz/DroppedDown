@@ -18,4 +18,8 @@ extension CGSize {
                       height: height)
 
     }
+    
+    func adjusted(by coefficient: CGFloat) -> CGSize {
+        return CGSize(width: width * coefficient, height: height * coefficient)
+    }
 }

@@ -77,9 +77,10 @@ class Renderer : SKSpriteNode {
         
         // add settings button to board
         header = Header.build(color: .black,
-                              size: CGSize(width: playableRect.width, height: 200.0),
-                              precedence: precedence)
-        header.position = CGPoint(x: playableRect.midX, y: playableRect.maxY - 100.0)
+                              size: CGSize(width: playableRect.width, height: Style.Header.height),
+                              precedence: precedence,
+                              delegate: self)
+        header.position = CGPoint.positionThis(header.frame, inTopOf: playableRect)
         header.zPosition = precedence.rawValue
         
         //create the hud
@@ -127,7 +128,7 @@ class Renderer : SKSpriteNode {
                 animateAttack(attackInput: inputType, endTiles: trans.endTiles)
             case .gameWin:
                 animate(trans.tileTransformation?.first) { [weak self] in
-                    self?.gameWin()
+                    self?.gameWin(transformation: trans)
                 }
             case .monsterDies:
                 let sprites = createSprites(from: trans.endTiles)
@@ -157,18 +158,23 @@ class Renderer : SKSpriteNode {
             // show the menu
             foreground.addChild(menuForeground)
         case .gameLose:
-            gameWin()
+            //TODO: what should we do here?
+            ()
         case .playAgain:
             menuForeground.removeFromParent()
         case .tutorial(let step):
             let types = step.highlightType
             let coords = step.highlightCoordinates
+            let showFinger = step.showFinger
             for (row, spriteRow) in sprites.enumerated() {
                 for (col, _) in spriteRow.enumerated() {
                     let sprite = sprites[row][col]
                     sprite.removeAllChildren()
                     if types.contains(sprite.type) {
                         sprite.tutorialHighlight()
+                        if showFinger {
+                            sprite.showFinger()
+                        }
                     }
                     
                     if coords.contains(TileCoord(row, col)) {
@@ -444,8 +450,9 @@ extension Renderer {
 }
 
 extension Renderer {
-    private func gameWin() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { [weak self] in
+    private func gameWin(transformation: Transformation?) {
+        animator.gameWin(transformation: transformation, sprites: sprites) { [weak self] in
+    
             guard let strongSelf = self else { return }
             strongSelf.menuForeground.removeAllChildren()
             let gameWinMenu: SKSpriteNode
@@ -504,4 +511,10 @@ extension Renderer {
         print(output)
     }
 
+}
+
+extension Renderer: HeaderDelegate {
+    func settingsTapped(_ header: Header) {
+        InputQueue.append(Input(.pause))
+    }
 }

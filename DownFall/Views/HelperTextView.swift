@@ -26,7 +26,6 @@ class HelperTextView: SKSpriteNode {
     }
     
     func show(_ input: Input) {
-        var showGem = false
         var descriptionText = ""
         switch input.type {
         case .gameLose(let text):
@@ -63,7 +62,6 @@ class HelperTextView: SKSpriteNode {
                 descriptionText = "Remove rocks by tapping on groups\n of 3 or more anywhere on the board."
             case .exit:
                 descriptionText = "That's the mine shaft,\n but you cant exit until you find the gem!"
-                showGem = true
             case .player:
                 descriptionText = "That's you! Stay alive and find the exit"
             case .monster(let data):
@@ -88,8 +86,6 @@ class HelperTextView: SKSpriteNode {
         if descriptionText.count == 0 { return }
         self.removeAllChildren()
         
-        
-        
         let descLabel = SKLabelNode(text: descriptionText)
         descLabel.fontSize = UIFont.mediumSize
         descLabel.zPosition = 11
@@ -97,14 +93,13 @@ class HelperTextView: SKSpriteNode {
         descLabel.fontName = "Helvetica"
         descLabel.position = CGPoint(x: 0, y: -45)
         descLabel.numberOfLines = 0
+  
         
-//        self.addChild(descLabel)
-        
-        if showGem {
-            let spriteNode = SKSpriteNode(texture: SKTexture(imageNamed: "gem1"), size: CGSize(width: 100, height: 100))
-            spriteNode.position = CGPoint(x: 300, y: 20)
-            self.addChild(spriteNode)
-        }
+//        if showGem {
+//            let spriteNode = SKSpriteNode(texture: SKTexture(imageNamed: "gem1"), size: CGSize(width: 100, height: 100))
+//            spriteNode.position = CGPoint(x: 300, y: 20)
+//            self.addChild(spriteNode)
+//        }
     }
     
     var paragraphWidth: CGFloat {
@@ -116,18 +111,18 @@ class HelperTextView: SKSpriteNode {
         let paragraph = ParagraphNode.labelNode(text: step.dialog,
                                                 paragraphWidth: paragraphWidth,
                                                 fontSize: UIFont.extraLargeSize)
-        paragraph.position = CGPoint(x: 0.0, y: 24)
+        paragraph.position = CGPoint(x: 0.0, y: Style.Padding.most)
         paragraph.zPosition = Precedence.foreground.rawValue
         
         
         addChild(paragraph)
 
         if step.tapToContinue {
-            let tapToContinue = ParagraphNode.labelNode(text: "Tap to continue",
+            let tapToContinue = ParagraphNode.labelNode(text: "Tap anywhere to continue",
                                                         paragraphWidth: paragraphWidth,
                                                         fontSize: UIFont.mediumSize)
-            let y = -frame.size.height/2 + 24
-            tapToContinue.position = CGPoint(x: 0.0, y: y)
+        
+            tapToContinue.position = CGPoint.positionThis(tapToContinue.frame, inBottomOf: self.frame, padding: Style.Padding.most)
             
             addChild(tapToContinue)
         }

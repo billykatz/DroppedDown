@@ -12,6 +12,44 @@ import SpriteKit
 
 struct Animator {
     
+    func gameWin(transformation: Transformation?,
+                 sprites: [[DFTileSpriteNode]],
+                 completion: (() -> Void)? = nil) {
+        guard let transformation = transformation,
+            let playerWinTransformation = transformation.tileTransformation?.first?.first else {
+            completion?()
+            return
+        }
+        
+        let exitSprite = sprites[playerWinTransformation.end]
+        exitSprite.removeMinecart()
+        let playerSprite = sprites[playerWinTransformation.initial]
+        playerSprite.removeFromParent()
+        
+        let minecart = SKSpriteNode(imageNamed: "minecart")
+        minecart.size = exitSprite.size.adjusted(by: Style.DFTileSpriteNode.Exit.minecartSizeCoefficient)
+        minecart.zPosition = Precedence.foreground.rawValue
+        minecart.position = CGPoint.positionThis(minecart.frame, inBottomOf: exitSprite.frame)
+        
+        let playerWin = SKSpriteNode(imageNamed: "playerWin")
+        playerWin.size = exitSprite.size.adjusted(by: Style.DFTileSpriteNode.Exit.minecartSizeCoefficient)
+        playerWin.zPosition = Precedence.foreground.rawValue
+        playerWin.position = .zero
+        
+        minecart.addChild(playerWin)
+        
+        exitSprite.addChild(minecart)
+        
+        let shrinkAnimation = SKAction.scale(to: Style.DFTileSpriteNode.Exit.winSizeCoefficient, duration: 1.0)
+        let moveVector = CGVector(dx: 0.0, dy: 20.0)
+        let moveAnimation = SKAction.move(by: moveVector, duration: 1.0)
+        
+        
+        minecart.run(SKAction.group([shrinkAnimation, moveAnimation])) {
+            completion?()
+        }
+    }
+    
     func animate(_ transformation: [TileTransformation]?,
                  boardSize: CGFloat,
                  bottomLeft: CGPoint,

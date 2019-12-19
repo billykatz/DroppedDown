@@ -50,6 +50,7 @@ class TutorialStep: Equatable {
     
     var dialog: String
     var highlightType: [TileType] = []
+    var showFinger: Bool = false
     var showClockwiseRotate: Bool = false
     var showCounterClockwiseRotate: Bool = false
     var highlightCoordinates: [TileCoord] = []
@@ -73,7 +74,8 @@ class TutorialStep: Equatable {
          inputToContinue: InputType,
          inputToEnter: InputType? = nil,
          started: Bool = false,
-         completed: Bool = false)
+         completed: Bool = false,
+         showFinger: Bool = false)
     {
         self.dialog = dialog
         self.highlightType = highlightType
@@ -84,6 +86,7 @@ class TutorialStep: Equatable {
         self.inputToContinue = inputToContinue
         self.started = started
         self.completed = completed
+        self.showFinger = showFinger
     }
     
     static var zero: TutorialStep {

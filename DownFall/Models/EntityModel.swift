@@ -18,6 +18,9 @@ struct EntityModel: Equatable, Decodable {
         case bat
         case rat
         case dragon
+        case alamo
+        case wizard
+        case lavaHorse
         case player
     }
     

@@ -19,6 +19,7 @@ enum ButtonIdentifier: String {
     case wallet
     case infoPopup
     case visitStore
+    case newGame
     
     var title: String {
         switch self {
@@ -36,6 +37,8 @@ enum ButtonIdentifier: String {
             return "Got it! 👍"
         case .visitStore:
             return "Visit Store"
+        case .newGame:
+            return "New Game"
         case .wallet, .infoPopup:
             return ""
         }
@@ -43,7 +46,7 @@ enum ButtonIdentifier: String {
 }
 
 protocol ButtonDelegate: class {
-    func buttonPressed(_ button: Button)
+    func buttonTapped(_ button: Button)
 }
 
 class Button: SKSpriteNode {
@@ -71,7 +74,8 @@ class Button: SKSpriteNode {
          identifier: ButtonIdentifier,
          precedence: Precedence,
          fontSize: CGFloat,
-         fontColor: UIColor) {
+         fontColor: UIColor,
+         backgroundColor: UIColor = .menuPurple) {
         
         //Set properties
         self.delegate = delegate
@@ -95,7 +99,11 @@ class Button: SKSpriteNode {
         
         // Add Label
         addChild(label)
+        
+        self.color = backgroundColor
     }
+    
+    
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -119,7 +127,7 @@ extension Button {
     
     private func buttonWasPressed() {
         color = .white
-        delegate?.buttonPressed(self)
+        delegate?.buttonTapped(self)
     }
     
     private func buttonPressBegan() {

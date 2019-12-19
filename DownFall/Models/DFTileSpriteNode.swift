@@ -11,31 +11,52 @@ import Foundation
 
 class DFTileSpriteNode: SKSpriteNode {
     var type: TileType
-    init(type: TileType, size: CGFloat) {
-        self.type = type
-        super.init(texture: SKTexture(imageNamed: type.textureString()), color: .clear, size: CGSize.init(width: size, height: size))
-    }
-    
     init(type: TileType, height: CGFloat, width: CGFloat) {
         self.type = type
-        super.init(texture: SKTexture(imageNamed: type.textureString()),
+        switch type {
+        case .exit:
+            let mineshaft = SKTexture(imageNamed: "mineshaft")
+            let tracks = SKTexture(imageNamed: "tracks")
+            let minecart = SKTexture(imageNamed: "minecart")
+            
+            let size = CGSize(width: width, height: height)
+            let minecartSize = CGSize(width: width*Style.DFTileSpriteNode.Exit.minecartSizeCoefficient,
+                                      height: height*Style.DFTileSpriteNode.Exit.minecartSizeCoefficient)
+            super.init(texture: mineshaft,
+                       color: .clear,
+                       size: size)
+            
+            
+            addChild(SKSpriteNode(texture: tracks, size: size))
+            let minecartSprite = SKSpriteNode(texture: minecart, size: minecartSize)
+            minecartSprite.zPosition = Precedence.menu.rawValue
+            minecartSprite.position = CGPoint.positionThis(minecartSprite.frame, inBottomOf: self.frame, padding: Style.Padding.less)
+            minecartSprite.name = "minecart"
+            addChild(minecartSprite)
+            
+        default:
+
+            super.init(texture: SKTexture(imageNamed: type.textureString()),
                    color: .clear,
                    size: CGSize.init(width: width, height: height))
+        }
     }
     
     required init?(coder aDecoder: NSCoder) { fatalError("DFTileSpriteNode init?(coder:) is not implemented") }
     
+    func removeMinecart() {
+        guard self.type == .exit else { return }
+        for child in children {
+            if child.name == "minecart" {
+                child.removeFromParent()
+            }
+        }
+    }
+    
     func indicateAboutToAttack() {
-        let blinkingSprite = SKSpriteNode(color: .yellow, size: self.size)
-        blinkingSprite.zPosition = Precedence.background.rawValue
-//        let blink = SKAction.run {
-//            blinkingSprite.alpha = abs(blinkingSprite.alpha - 1)
-//        }
-//        let wait = SKAction.wait(forDuration: 0.2)
-//        let group = SKAction.sequence([blink, wait])
-//        let action = SKAction.repeatForever(group)
-//        blinkingSprite.run(action)
-        self.addChild(blinkingSprite)
+        let indicatorSprite = SKSpriteNode(color: .yellow, size: self.size)
+        indicatorSprite.zPosition = Precedence.background.rawValue
+        self.addChild(indicatorSprite)
     }
     
     func tutorialHighlight(){
@@ -51,9 +72,33 @@ class DFTileSpriteNode: SKSpriteNode {
             border.lineWidth = Style.TutorialHighlight.lineWidth
             border.position = .zero
             border.zPosition = Precedence.menu.rawValue
-            
+           
             self.addChild(border)
         }
+    }
+    
+    func showFinger() {
+        let finger = SKSpriteNode(imageNamed: "finger")
+       finger.position = CGPoint.positionThis(finger.frame,
+                                              inBottomOf: self.frame,
+                                              padding: -Style.Padding.most,
+                                              offset: Style.Offset.less)
+       finger.size = Style.TutorialHighlight.fingerSize
+        
+        let moveDownVector = CGVector.init(dx: 0.0, dy: -20.0)
+        let moveUpVector = CGVector.init(dx: 0.0, dy: 20.0)
+        let moveDownAnimation = SKAction.move(by: moveDownVector, duration: Style.TutorialHighlight.fingerTimeInterval)
+        let moveUpAnimation = SKAction.move(by: moveUpVector, duration: Style.TutorialHighlight.fingerTimeInterval)
+        
+        let indicateAnimation = SKAction.repeatForever(SKAction.sequence([moveDownAnimation, moveUpAnimation]))
+        finger.run(indicateAnimation)
+        finger.zPosition = Precedence.menu.rawValue
+                   
+       self.addChild(finger)
+    }
+    
+    func createExit() {
+        
     }
 }
 

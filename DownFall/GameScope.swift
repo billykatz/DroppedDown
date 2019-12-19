@@ -16,11 +16,11 @@ struct GameScope {
                                  highlightType: [.player(.zero)],
                                  tapToContinue: true,
                                  inputToContinue: InputType.tutorial(.zero)),
-                    TutorialStep(dialog: "This is a rare gem, let's collect it!",
+                    TutorialStep(dialog: "This is a rare gemstone, let's collect it!",
                                  highlightType: [.gem],
                                  tapToContinue: true,
                                  inputToContinue: InputType.tutorial(.zero)),
-                    TutorialStep(dialog: "These are rocks, you can destory them with a tap of your finger",
+                    TutorialStep(dialog: "You can mine groups of rocks of three or more.  Tap on the rock grouping to mine them away.",
                                  highlightType: TileType.rockCases,
                                  inputToContinue: InputType.animationsFinished(ref: true)),
                     TutorialStep(dialog: "You're very close to the gem, but you can only fall down",
@@ -47,7 +47,8 @@ struct GameScope {
                     TutorialStep(dialog: "That's a baddie.  Baddies are bad.  Tap on it to see where it attacks",
                                  highlightType: [.monster(.zero)],
                                  tapToContinue: false,
-                                 inputToContinue: InputType.touch(TileCoord(0, 2), .monster(.zero))),
+                                 inputToContinue: InputType.touch(TileCoord(0, 2), .monster(.zero)),
+                                 showFinger: true),
                     TutorialStep(dialog: "It will attack you if you land on either side of it.",
                                  highlightCoordinates: [TileCoord(0, 1), TileCoord(0, 3)],
                                  tapToContinue: true,
@@ -55,10 +56,9 @@ struct GameScope {
                                  inputToEnter: .animationsFinished(ref: false)),
                     TutorialStep(dialog: "All enemies are weak when attacked from above.  Mine some rocks and kill that rat!",
                                  highlightType: [],
-                                 tapToContinue: true,
+                                 tapToContinue: false,
                                  inputToContinue: InputType.monsterDies(.zero))
         ]
     )
-    
 }
 

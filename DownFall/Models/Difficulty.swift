@@ -6,15 +6,15 @@
 //  Copyright © 2018 William Katz LLC. All rights reserved.
 //
 
-enum Difficulty: Double {
+enum Difficulty: Int, CaseIterable {
     case easy = 1
-    case normal = 1.5
-    case hard = 2.0
-    case tutorial1 = 3
-    case tutorial2 = 4
+    case normal = 2
+    case hard = 3
+    case tutorial1 = 4
+    case tutorial2 = 5
     
     func maxExpectedMonsters(for boardSize: Int) -> Int {
-        return max(Int(Double(boardSize) * self.rawValue / 2.0), 1)
+        return max(Int(boardSize * self.rawValue / 2), 1)
     }
 }
 

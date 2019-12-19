@@ -199,7 +199,9 @@ extension TutorialScene {
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         // avoid inputing touchEnded when a touch is cancelled.
-        touchWasCanceled = true
+        if !touchWasSwipe {
+            touchWasCanceled = true
+        }
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {

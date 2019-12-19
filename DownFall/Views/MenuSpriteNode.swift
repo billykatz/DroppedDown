@@ -26,7 +26,7 @@ class MenuSpriteNode: SKSpriteNode {
         
         let border = SKShapeNode(rect: self.frame)
         border.strokeColor = UIColor.darkGray
-        border.lineWidth = 10.0
+        border.lineWidth = Style.Menu.borderWidth
         addChild(border)
         
         zPosition = precedence.rawValue
@@ -176,7 +176,7 @@ class MenuSpriteNode: SKSpriteNode {
 extension MenuSpriteNode: ButtonDelegate {
     func buttonPressBegan(_ button: Button) { }
     
-    func buttonPressed(_ button: Button) {
+    func buttonTapped(_ button: Button) {
         guard let identifier = ButtonIdentifier(rawValue: button.name ?? "") else { return }
         
         switch identifier {
@@ -188,7 +188,7 @@ extension MenuSpriteNode: ButtonDelegate {
             InputQueue.append(Input(.selectLevel))
         case .visitStore:
             InputQueue.append(Input(.visitStore))
-        case .leaveStore, .storeItem, .wallet, .infoPopup:
+        case .leaveStore, .storeItem, .wallet, .infoPopup, .newGame:
             fatalError("These buttons dont appear in game")
         }
     }

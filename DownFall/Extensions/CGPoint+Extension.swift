@@ -7,6 +7,7 @@
 //
 
 import CoreGraphics
+import Foundation
 
 extension CGPoint {
     static func gridPositions(rows: CGFloat,
@@ -41,4 +42,31 @@ extension CGPoint {
         return CGPoint(x: that.width/2 - this.width/2 - padding,
                        y: that.height/2 - this.height/2 - padding)
     }
+    
+    
+    static func positionThis(_ this: CGRect,
+                             inBottomOf that: CGRect,
+                             padding: CGFloat = Style.Padding.normal,
+                             offset: CGFloat = 0.0) -> CGPoint {
+        return CGPoint(x: 0.0 + offset,
+                       y: -that.height/2 + this.height/2 + padding)
+    }
+    
+    static func positionThis(_ this: CGRect,
+                             inTopOf that: CGRect,
+                             padding: CGFloat = 0.0,
+                             xOffset: CGFloat = 0.0) -> CGPoint {
+        return CGPoint(x: 0.0 + xOffset,
+                       y: that.height/2 - this.height/2 - padding)
+    }
+    
+    static func positionThis(_ this: CGRect,
+                        toTheRightOf that: CGRect,
+                        padding: CGFloat = 0.0,
+                        yOffset: CGFloat = 0.0) -> CGPoint {
+        return CGPoint(x: that.width/2 - this.width/2 - padding,
+                       y: 0.0 + yOffset)
+    }
+        
+
 }

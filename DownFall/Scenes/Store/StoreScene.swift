@@ -67,10 +67,8 @@ class StoreScene: SKScene {
                             precedence: .foreground,
                             fontSize:  UIFont.mediumSize,
                             fontColor: .black)
-        button.position = CGPoint(x: 0,
-                                  y: background.frame.minY +
-                                     button.frame.height/2 +
-                                     Style.buttonToBottomPadding)
+        
+        button.position = CGPoint.positionThis(button.frame, inBottomOf: self.frame, padding: Style.buttonToBottomPadding)
         
         
         items = createStoreItems(from: inventory)
@@ -90,7 +88,7 @@ class StoreScene: SKScene {
         var items: [StoreItem] = []
         for item in inventory.items {
             items.append(StoreItem(ability: item,
-                                   size: CGSize(width: 50, height: 50),
+                                   size: Style.Store.Item.size,
                                    delegate: self,
                                    identifier: .storeItem,
                                    precedence: .foreground,
@@ -102,10 +100,10 @@ class StoreScene: SKScene {
     private func positionStore(_ items: [StoreItem],_ playableWidth: CGFloat) {
         let gridPoints = CGPoint.gridPositions(rows: 3,
                                                columns: 3,
-                                               itemSize: CGSize(width: 50, height: 50),
+                                               itemSize: Style.Store.Item.size,
                                                width: playableWidth,
                                                height: 330,
-                                               bottomLeft: CGPoint(x: -frame.width/2, y: -125))
+                                               bottomLeft: CGPoint(x: -frame.width/2, y: -frame.height/2))
         for (index, position) in gridPoints.enumerated() {
             if items.count - 1 >= index {
                 items[index].position = position
@@ -309,7 +307,7 @@ extension StoreScene: StoreItemDelegate {
 }
 
 extension StoreScene: ButtonDelegate {
-    func buttonPressed(_ button: Button) {
+    func buttonTapped(_ button: Button) {
         if button.name == "leaveStore" {
             storeSceneDelegate?.leave(self, updatedPlayerData: playerData)
         } else if button.name == Constants.buyButton,

@@ -29,6 +29,9 @@ class GameScene: SKScene {
     //Generator
     private var generator: HapticGenerator?
     
+    //swipe recognizer view
+    private var swipeRecognizerView: SwipeRecognizerView?
+    
     //touch state
     private var touchWasSwipe = false
     private var touchWasCanceled = false
@@ -69,10 +72,10 @@ class GameScene: SKScene {
         
         
         // SwipeRecognizerView
-        let swipingRecognizerView = SwipeRecognizerView(frame: view.frame,
+        swipeRecognizerView = SwipeRecognizerView(frame: view.frame,
                                                         target: self,
                                                         swiped: #selector(swiped))
-        view.addSubview(swipingRecognizerView)
+        view.addSubview(swipeRecognizerView!)
         
         // Register for inputs we care about
         Dispatch.shared.register { [weak self] input in
@@ -87,12 +90,7 @@ class GameScene: SKScene {
                     self.removeFromParent()
                     self.gameSceneDelegate?.visitStore(revivedData)
                 }
-                //TODO: investigate if this is a memory leak
-                swipingRecognizerView.removeFromSuperview()
             }
-//            else if input.type == .selectLevel {
-//                self?.gameSceneDelegate?.selectLevel()
-//            }
         }
 
         //Turn watcher
@@ -110,6 +108,7 @@ class GameScene: SKScene {
         foreground = nil
         gameSceneDelegate = nil
         generator = nil
+        swipeRecognizerView?.removeFromSuperview()
         InputQueue.reset()
         Dispatch.shared.reset()
         print("deiniting")

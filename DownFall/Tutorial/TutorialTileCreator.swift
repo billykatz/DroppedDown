@@ -27,12 +27,14 @@ struct TutorialTileCreator: TileStrategy {
     var updatedEntity: EntityModel?
     var difficulty: Difficulty
     var entities: [EntityModel]
+    var level: Level?
     var randomSource: GKLinearCongruentialRandomSource = GKLinearCongruentialRandomSource()
     
-    init(_ entities: [EntityModel], difficulty: Difficulty, updatedEntity: EntityModel?) {
+    init(_ entities: [EntityModel], difficulty: Difficulty, updatedEntity: EntityModel?, level: Level?) {
         self.entities = entities
         self.difficulty = difficulty
         self.updatedEntity = updatedEntity
+        self.level = level
     }
     
     func board(_ boardSize: Int, difficulty: Difficulty) -> [[Tile]] {

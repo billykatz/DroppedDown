@@ -37,7 +37,7 @@ struct Tutorial2Win: Rule {
         guard
             let playerPosition = getTilePosition(.player(.zero), tiles: tiles),
             case let TileType.player(player) = tiles[playerPosition].type,
-            player.canAfford(1)
+            player.canAfford(1, inCurrency: .gold)
             else { return nil }
         return Input(.gameWin)
     }

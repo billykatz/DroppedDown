@@ -177,7 +177,7 @@ enum TileType: Equatable, Hashable, CaseIterable {
     
     
     enum TextueName: String {
-        case blueRock
+        case blueRock = "blueRockv2"
         case blackRock
         case greenRock = "greenRockv2"
         case purpleRock

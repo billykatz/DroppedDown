@@ -29,13 +29,16 @@ extension AnyAbility: Ability {
         return _ability.flavorText
     }
     
-    
     var textureName: String {
          return _ability.textureName
     }
     
     var cost: Int {
         return _ability.cost
+    }
+    
+    var currency: Currency {
+        return _ability.currency
     }
     
     var affectsCombat: Bool {
@@ -48,6 +51,10 @@ extension AnyAbility: Ability {
     
     var grantsExtraAttacks: Int? {
         return _ability.grantsExtraAttacks
+    }
+    
+    var usage: Usage {
+        return _ability.usage
     }
     
 }
@@ -63,10 +70,12 @@ protocol Ability {
     var type: AbilityType { get }
     var textureName: String { get }
     var cost: Int { get }
+    var currency: Currency { get }
     var description: String { get }
     var flavorText: String { get }
     var grantsExtraAttacks: Int? { get }
     var sprite: SKSpriteNode? { get }
+    var usage: Usage { get }
     func blocksDamage(from: Direction) -> Int?
 }
 
@@ -76,8 +85,23 @@ extension Ability {
     }
 }
 
-enum AbilityType {
+enum AbilityType: String, Decodable {
     case doubleAttack
     case sheildEast
+    case rockASwap
+    case dynamite
+    case lesserHealingPotion
+    case greaterHealingPotion
+    case swordPickAxe
 }
 
+enum Usage {
+    case once
+    case oneRun
+    case permanent
+}
+
+enum Currency: String, CaseIterable  {
+    case gold = "gold"
+    case gem = "gem2"
+}

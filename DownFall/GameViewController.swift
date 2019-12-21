@@ -16,6 +16,8 @@ class GameViewController: UIViewController, LevelCoordinating {
     internal var tutorialSceneNode: TutorialScene?
     internal var boardSize = 8
     internal var entities: [EntityModel]?
+    internal var levelIndex: Int = 0
+    internal var levels: [Level]?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -68,7 +70,8 @@ extension GameViewController: LevelSelectDelegate {
         if let view = self.view as! SKView? {
             view.presentScene(nil)
             difficultySelected(difficulty)
-            presentNextLevel(playerModel)
+            presentStore(playerModel!)
+//            presentNextLevel(playerModel)
         }
     }
 }

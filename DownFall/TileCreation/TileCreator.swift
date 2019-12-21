@@ -9,20 +9,22 @@
 import GameplayKit
 
 class TileCreator: TileStrategy {
-
     var spawnedGem = false
     var randomSource = GKLinearCongruentialRandomSource()
     let entities: [EntityModel]
     let difficulty: Difficulty
     var updatedEntity: EntityModel?
     var boardSize: Int = 0
+    var level: Level?
     
     required init(_ entities: [EntityModel],
-         difficulty: Difficulty,
-         updatedEntity: EntityModel? = nil) {
+                  difficulty: Difficulty,
+                  updatedEntity: EntityModel? = nil,
+                  level: Level?) {
         self.entities = entities
         self.difficulty = difficulty
         self.updatedEntity = updatedEntity
+        self.level = level
     }
     
     func randomTile(_ given: Int) -> TileType {
@@ -46,8 +48,8 @@ class TileCreator: TileStrategy {
             return TileType.monster(entities[4])
         case .bat:
             return TileType.monster(entities[5])
-        case .player:
-            fatalError("monstersCases should not included player")
+        case .player, .alamo, .lavaHorse, .wizard:
+            fatalError("monstersCases should not included player or some unused monsters")
         }
         
     }
@@ -57,15 +59,21 @@ class TileCreator: TileStrategy {
         return TileType.rockCases[index]
     }
     
-    var maxMonsters: Int {
+    var maxMonstersTotal: Int {
         //TODO: dont hardcode
-        return difficulty.maxExpectedMonsters(for: 10)
+        return level?.maxMonstersTotal ?? 20
     }
+    
+    var maxMonstersOnScreen: Int {
+        return level?.maxMonstersOnScreen ?? 10
+    }
+    
+    var totalMonstersAdded = 0
 
     func tiles(for tiles: [[Tile]]) -> [Tile] {
         var newTiles: [Tile] = []
         var newMonsterCount = 0
-        let currentMonsterCount =  typeCount(for: tiles, of: .monster(.zero)).count
+        let currentMonsterCount = typeCount(for: tiles, of: .monster(.zero)).count
         // The paramter tiles array has .empty tiles in it
         // Create new tiles until we have enough to cover the empty tiles
         while (newTiles.count < typeCount(for: tiles, of: .empty).count) {
@@ -84,9 +92,10 @@ class TileCreator: TileStrategy {
                     newTiles.append(nextTile)
                 }
             case .monster:
-                if currentMonsterCount + newMonsterCount < maxMonsters  {
+                if totalMonstersAdded < maxMonstersTotal && currentMonsterCount < maxMonstersOnScreen  {
                     newMonsterCount += 1
                     newTiles.append(nextTile)
+                    totalMonstersAdded += 1
                 }
             }
         }
@@ -134,17 +143,18 @@ class TileCreator: TileStrategy {
         
         let upperMonsterbound = Int(Double(tiles.count))
         
-        for _ in 0..<maxMonsters {
+        for _ in 0..<maxMonstersOnScreen {
             let randomRow = Int.random(upperMonsterbound)
             let randomCol = Int.random(upperMonsterbound)
             guard playerPosition != TileCoord(randomRow,randomCol),
                 !TileCoord(randomRow, randomCol).isOrthogonallyAdjacent(to: playerPosition) else { continue }
             tiles[randomRow][randomCol] = Tile(type: randomMonster(randomSource.nextInt()))
+            totalMonstersAdded += 1
         }
         
         //place the exit on the opposite side of the grid
-//        let exitQuadrant = playerQuadrant.opposite
-        let exitQuadrant = playerQuadrant
+        let exitQuadrant = playerQuadrant.opposite
+//        let exitQuadrant = playerQuadrant
         let exitPosition = exitQuadrant.randomCoord(for: boardSize)
         
         tiles[exitPosition.x][exitPosition.y] = Tile.exit

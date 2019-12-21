@@ -32,6 +32,9 @@ class GameScene: SKScene {
     //swipe recognizer view
     private var swipeRecognizerView: SwipeRecognizerView?
     
+    //level
+    private var level: Level?
+    
     //touch state
     private var touchWasSwipe = false
     private var touchWasCanceled = false
@@ -42,7 +45,11 @@ class GameScene: SKScene {
     public func commonInit(boardSize: Int,
                            entities: [EntityModel],
                            difficulty: Difficulty = .normal,
-                           updatedEntity: EntityModel? = nil) {
+                           updatedEntity: EntityModel? = nil,
+                           level: Level) {
+        // init our level
+        self.level = level
+        
         //create the foreground node
         foreground = SKNode()
         foreground.position = .zero
@@ -50,8 +57,9 @@ class GameScene: SKScene {
         
         //init our tile creator
         let tileCreator = TileCreator(entities,
-                                  difficulty: difficulty,
-                                  updatedEntity: updatedEntity)
+                                      difficulty: difficulty,
+                                      updatedEntity: updatedEntity,
+                                      level: level)
         
         //board
         board = Board.build(size: boardSize, tileCreator: tileCreator, difficulty: difficulty)
@@ -80,6 +88,12 @@ class GameScene: SKScene {
         // Register for inputs we care about
         Dispatch.shared.register { [weak self] input in
             if input.type == .playAgain {
+                guard let self = self else { return }
+                
+                self.foreground.removeAllChildren()
+                self.removeFromParent()
+                self.gameSceneDelegate?.reset(self)
+            } else if input.type == .visitStore {
                 guard let self = self,
                     let playerIndex = tileIndices(of: .player(.zero), in: self.board.tiles).first
                     else { return }
@@ -90,6 +104,7 @@ class GameScene: SKScene {
                     self.removeFromParent()
                     self.gameSceneDelegate?.visitStore(revivedData)
                 }
+
             }
         }
 

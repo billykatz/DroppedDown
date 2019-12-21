@@ -15,9 +15,11 @@ protocol TileStrategy {
     var entities: [EntityModel] { get }
     var difficulty: Difficulty { get }
     var updatedEntity: EntityModel? { get }
+    var level: Level? { get }
     init(_ entities: [EntityModel],
          difficulty: Difficulty,
-         updatedEntity: EntityModel?)
+         updatedEntity: EntityModel?,
+         level: Level?)
 
 }
     

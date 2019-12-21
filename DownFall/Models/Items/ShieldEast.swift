@@ -25,6 +25,8 @@ struct ShieldEast: Ability {
         return 5
     }
     
+    var currency: Currency { return .gold }
+    
     var description: String {
         return "A shield that blocks 1 damage from attacks to your right"
     }
@@ -48,5 +50,9 @@ struct ShieldEast: Ability {
         let compositeSprite = SKSpriteNode(texture: blankShield, size: CGSize(width: 50, height: 50))
         compositeSprite.addChild(SKSpriteNode(texture: arrowEast, size: CGSize(width: 20, height: 20)))
         return compositeSprite
+    }
+    
+    var usage: Usage {
+        return .oneRun
     }
 }

@@ -321,16 +321,16 @@ class Referee {
             return attack
         }
         
-        if let monsterAttack = monsterAttacks() {
-            return monsterAttack
-        }
-        
         if let deadMonster = monsterDies() {
             return deadMonster
         }
         
         if let collectItem = playerCollectsItem() {
             return collectItem
+        }
+        
+        if let monsterAttack = monsterAttacks() {
+            return monsterAttack
         }
         
         let newTurn = TurnWatcher.shared.getNewTurnAndReset()

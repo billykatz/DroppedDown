@@ -32,6 +32,10 @@ class Renderer : SKSpriteNode {
         return MenuSpriteNode(.gameWin, playableRect: playableRect, precedence: .menu)
     }
     
+    private var gameLoseSpriteNode: MenuSpriteNode {
+        return MenuSpriteNode(.gameLose, playableRect: playableRect, precedence: .menu)
+    }
+    
     private var rotateSprite: MenuSpriteNode {
         return MenuSpriteNode(.rotate, playableRect: playableRect, precedence: .menu)
     }
@@ -159,7 +163,9 @@ class Renderer : SKSpriteNode {
             foreground.addChild(menuForeground)
         case .gameLose:
             //TODO: what should we do here?
-            ()
+            menuForeground.addChild(gameLoseSpriteNode)
+            menuForeground.removeFromParent()
+            foreground.addChild(menuForeground)
         case .playAgain:
             menuForeground.removeFromParent()
         case .tutorial(let step):

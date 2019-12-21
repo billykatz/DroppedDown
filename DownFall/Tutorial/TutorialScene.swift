@@ -49,7 +49,8 @@ class TutorialScene: SKScene {
         //init our tile creator
         let tileCreator = TutorialTileCreator(entities,
                                               difficulty: difficulty,
-                                              updatedEntity: updatedEntity)
+                                              updatedEntity: updatedEntity,
+                                              level: nil)
         
         //board
         board = Board.build(size: boardSize, tileCreator: tileCreator, difficulty:  difficulty)

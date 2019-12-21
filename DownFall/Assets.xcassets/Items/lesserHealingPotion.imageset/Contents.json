@@ -2,14 +2,17 @@
   "images" : [
     {
       "idiom" : "universal",
+      "filename" : "lesserHealingPotion.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
+      "filename" : "lesserHealingPotion@2x.png",
       "scale" : "2x"
     },
     {
       "idiom" : "universal",
+      "filename" : "lesserHealingPotion@3x.png",
       "scale" : "3x"
     }
   ],

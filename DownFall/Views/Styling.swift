@@ -23,6 +23,15 @@ struct Style {
         struct Item {
             static let size: CGSize = CGSize(width: 50.0, height: 50.0)
         }
+        
+        struct ItemGrid {
+            static let height: CGFloat = 330.0
+        }
+        
+        struct Wallet {
+            static let viewSize = CGSize(width: 150, height: 50)
+            static let currencySize = CGSize(width: 30.0, height: 30.0)
+        }
     }
     
     struct CloseButton {
@@ -68,5 +77,9 @@ struct Style {
     
     struct RunMenu {
         static let buttonSize = CGSize(width: 300.0, height: 150.0)
+    }
+    
+    struct Button {
+        static let size = CGSize(width: 50.0, height: 50.0)
     }
 }

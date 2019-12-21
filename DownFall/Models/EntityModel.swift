@@ -122,15 +122,22 @@ struct EntityModel: Equatable, Decodable {
     }
     
     func buy(_ ability: Ability) -> EntityModel {
-        return update(carry: carry.pay(ability.cost))
+        return update(carry: carry.pay(ability.cost, inCurrency: ability.currency))
     }
     
     func sell(_ ability: Ability) -> EntityModel {
-        return update(carry: carry.earn(ability.cost))
+        return update(carry: carry.earn(ability.cost, inCurrency: ability.currency))
     }
     
-    func canAfford(_ cost: Int) -> Bool {
-        return carry.totalGold >= cost
+    func canAfford(_ cost: Int, inCurrency currency: Currency) -> Bool {
+        let totalAmount : Int
+        switch currency{
+        case .gold:
+            totalAmount = carry.totalGold
+        case .gem:
+            totalAmount = carry.totalGem
+        }
+        return totalAmount >= cost
     }
     
     func willAttackNextTurn() -> Bool {

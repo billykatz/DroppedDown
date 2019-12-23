@@ -29,7 +29,7 @@ class DFTileSpriteNode: SKSpriteNode {
             
             addChild(SKSpriteNode(texture: tracks, size: size))
             let minecartSprite = SKSpriteNode(texture: minecart, size: minecartSize)
-            minecartSprite.zPosition = Precedence.menu.rawValue
+            minecartSprite.zPosition = Precedence.foreground.rawValue
             minecartSprite.position = CGPoint.positionThis(minecartSprite.frame, inBottomOf: self.frame, padding: Style.Padding.less)
             minecartSprite.name = "minecart"
             addChild(minecartSprite)
@@ -95,10 +95,6 @@ class DFTileSpriteNode: SKSpriteNode {
         finger.zPosition = Precedence.menu.rawValue
                    
        self.addChild(finger)
-    }
-    
-    func createExit() {
-        
     }
 }
 

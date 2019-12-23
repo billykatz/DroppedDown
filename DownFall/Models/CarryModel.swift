@@ -15,12 +15,21 @@ struct CarryModel: Decodable, Equatable {
         return items.contains { $0.type == .gem }
     }
     
-    var totalGold: Int {
-        return items.filter({ $0.type == .gold }).count
+    private var totalGold: Int {
+        return items.filter({ $0.type == .gold }).first?.amount ?? 0
     }
     
-    var totalGem: Int {
+    private var totalGem: Int {
         return items.filter({ $0.type == .gem }).count
+    }
+    
+    func total(in currency: Currency) -> Int {
+        switch currency {
+        case .gem:
+            return totalGem
+        case .gold:
+            return totalGold
+        }
     }
     
     func pay(_ price: Int, inCurrency currency: Currency) -> CarryModel {
@@ -40,9 +49,14 @@ struct CarryModel: Decodable, Equatable {
     
     func earn(_ money: Int, inCurrency currency: Currency) -> CarryModel {
         var newItems = items
-        for _ in 0..<money {
-            newItems.append(Item(type: currency == .gold ? .gold : .gem, range: .one))
+        var newAmount = money
+        let itemType: Item.ItemType = currency == .gold ? .gold : .gem
+        if let currentAmount = items.first(where: { $0.type == itemType })?.amount {
+            newAmount += currentAmount
         }
+        newItems.removeAll { $0.type == itemType }
+        newItems.append(Item(type: itemType, amount: newAmount))
+        
         return CarryModel(items: newItems)
     }
 

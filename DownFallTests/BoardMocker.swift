@@ -91,7 +91,7 @@ func xTiles(_ numTiles: Int, _ tile: Tile, _ board: Board) -> Builder {
 
 extension TileType {
     static var playerWithGem: TileType {
-        let gemCarry = CarryModel(items: [Item(type: .gem, range: .one)])
+        let gemCarry = CarryModel(items: [Item(type: .gem, amount: 1)])
         return TileType.createPlayer(carry: gemCarry)
     }
 }

@@ -74,7 +74,7 @@ class Board: Equatable {
             transformation = monsterDied(at: tileCoord, input: input)
         case .gameWin:
             transformation = gameWin()
-        case .collectItem(let tileCoord, _):
+        case .collectItem(let tileCoord, _, _):
             transformation = collectItem(at: tileCoord, input: input)
         case .reffingFinished(let newTurn):
             transformation = resetAttacks(newTurn: newTurn)
@@ -116,13 +116,13 @@ class Board: Equatable {
         }
         
         func calculateAttacks(for entity: EntityModel, from position: TileCoord) -> [TileCoord] {
-            let attackDirections = entity.attack.directions
             let attackRange = entity.attack.range
             var affectedTiles: [TileCoord] = []
-            for direction in attackDirections {
+            
+            // TODO: Let's add a property to attacks that says if the attack goes thru targets or not
+            for attackSlope in entity.attack.attackSlope ?? [] {
                 for i in attackRange.lower...attackRange.upper {
-                    // TODO: Let's add a property to attacks that says if the attack goes thru targets or not
-                    let target = calculateTarget(in: direction, distance: i, from: position)
+                    let target = calculateTargetSlope(in: attackSlope, distance: i, from: position)
                     if isWithinBounds(target) {
                         affectedTiles.append(target)
                     }
@@ -130,41 +130,16 @@ class Board: Equatable {
             }
             return affectedTiles
         }
-        
-        func calculateTarget(in direction: Direction, distance i: Int, from position: TileCoord) -> TileCoord {
+
+        func calculateTargetSlope(in slopedDirection: AttackSlope, distance i: Int, from position: TileCoord) -> TileCoord {
             let (initialRow, initialCol) = position.tuple
-            let targetRow: Int
-            let targetCol: Int
-            switch direction {
-            case .north:
-                targetRow = initialRow + i
-                targetCol = initialCol
-            case .south:
-                targetRow = initialRow - i
-                targetCol = initialCol
-            case .east:
-                targetCol = initialCol + i
-                targetRow = initialRow
-            case .west:
-                targetCol = initialCol - i
-                targetRow = initialRow
-            case .northEast:
-                targetRow = initialRow + i
-                targetCol = initialCol + i
-            case .southEast:
-                targetRow = initialRow - i
-                targetCol = initialCol + i
-            case .northWest:
-                targetRow = initialRow + i
-                targetCol = initialCol - i
-            case .southWest:
-                targetRow = initialRow - i
-                targetCol = initialCol - i
-            }
             
-            return TileCoord(targetRow, targetCol)
+            // Take the initial position and calculate the target
+            // Add the slope's "up" value multiplied by the distance to the row
+            // Add the slope's "over" value multipled by the distane to the column
+            return TileCoord(initialRow + (i * slopedDirection.up), initialCol + (i * slopedDirection.over))
         }
-        
+
         var newTiles = tiles
         let affectedTile = attackedTiles(in: tiles, from: coord)
         for coord in affectedTile {
@@ -361,41 +336,39 @@ extension Board {
         
         //save the item
         guard case let TileType.item(item) = selectedTile.type,
-            var updatedTiles = transformation.endTiles else { return Transformation.zero }
+            var updatedTiles = transformation.endTiles,
+            let pp = playerPosition,
+            case let .player(data) = updatedTiles[pp].type
+            else { return Transformation.zero }
+            
+        let newCarryModel = data.carry.earn(item.amount, inCurrency: item.type.currencyType)
+        let playerData = EntityModel(originalHp: data.originalHp,
+                                     hp: data.hp,
+                                     name: data.name,
+                                     // Orend
+            // we have to reset attack here because the player has moved but the turn may not be over
+            // Eg: it is possible that there could be two or more monsters
+            // under the player and the player should be able to attack
+            attack: data.attack.resetAttack(),
+            type: data.type,
+            carry: newCarryModel,
+            animations: data.animations,
+            abilities: data.abilities)
         
-        if let pp = playerPosition,
-            case let .player(data) = updatedTiles[pp].type {
-            
-            var items = data.carry.items
-            items.append(item)
-            let newCarryModel = CarryModel(items: items)
-            let playerData = EntityModel(originalHp: data.originalHp,
-                                         hp: data.hp,
-                                         name: data.name,
-                                         // Orend
-                // we have to reset attack here because the player has moved but the turn may not be over
-                // Eg: it is possible that there could be two or more monsters
-                // under the player and the player should be able to attack
-                attack: data.attack.resetAttack(),
-                type: data.type,
-                carry: newCarryModel,
-                animations: data.animations,
-                abilities: data.abilities)
-            
-            updatedTiles[pp.x][pp.y] = Tile(type: .player(playerData))
-        }
+        updatedTiles[pp.x][pp.y] = Tile(type: .player(playerData))
         
         tiles = updatedTiles
         
         return Transformation(transformation: transformation.tileTransformation,
-                              inputType: .collectItem(coord, item),
+                              inputType: .collectItem(coord, item, data.carry.total(in: .gold)),
                               endTiles: updatedTiles)
     }
     
     
     private func monsterDied(at coord: TileCoord, input: Input) -> Transformation {
-        if case let .monster(monsterData) = tiles[coord].type,
-            let item = monsterData.carry.items.first {
+        if case let .monster(monsterData) = tiles[coord].type {
+            let gold = tileCreator.goldDropped(from: monsterData)
+            let item = Item.init(type: .gold, amount: gold)
             let itemTile = TileType.item(item)
             tiles[coord.x][coord.y] = Tile(type: itemTile)
             return Transformation(transformation: nil,

@@ -12,24 +12,28 @@ struct LevelConstructor {
     static let monstersOnScreenDivisor = 2
     
     static func buildLevels(_ difficulty: Difficulty) -> [Level]? {
+        if difficulty == .tutorial1 || difficulty == .tutorial2 { return [Level.zero] }
         var levels: [Level] = []
-        for index in 0..<3 {
-            guard let levelType = LevelType(rawValue: index) else { return nil }
-            let maxMonstersTotal = LevelConstructor.maxMonstersTotalPer(levelType, difficulty: difficulty)
-            let maxMonstersOnScreen = maxMonstersTotal/LevelConstructor.monstersOnScreenDivisor
-            levels.append(
-                Level(type: levelType,
-                                  monsters: monstersPerLevel(levelType, difficulty: difficulty),
-                                  maxMonstersTotal: maxMonstersTotal,
-                                  maxMonstersOnScreen: maxMonstersOnScreen,
-                                  maxGems: 1,
-                                  maxTime: timePer(levelType, difficulty: difficulty),
-                                  //TODO: update board size
-                                  boardSize: 8,
-                                  abilities: availableAbilities(per: levelType, difficulty: difficulty))
-            )
+        for levelType in LevelType.allCases {
+            switch levelType {
+            case .first, .second, .third:
+                let maxMonstersTotal = LevelConstructor.maxMonstersTotalPer(levelType, difficulty: difficulty)
+                let maxMonstersOnScreen = maxMonstersTotal/LevelConstructor.monstersOnScreenDivisor
+                levels.append(
+                    Level(type: levelType,
+                          monsters: monstersPerLevel(levelType, difficulty: difficulty),
+                          maxMonstersTotal: maxMonstersTotal,
+                          maxMonstersOnScreen: maxMonstersOnScreen,
+                          maxGems: 1,
+                          maxTime: timePer(levelType, difficulty: difficulty),
+                          boardSize: 8,
+                          abilities: availableAbilities(per: levelType, difficulty: difficulty))
+                )
+            case .tutorial1, .tutorial2, .boss:
+                levels.append(Level.zero)
+            }
+            
         }
-        
         return levels
     }
     
@@ -40,7 +44,7 @@ struct LevelConstructor {
             case .easy:
                 return [EntityModel.EntityType.rat: 0.5, .bat: 0.5]
             case .normal, .hard:
-                return [EntityModel.EntityType.rat: 0.33, .bat: 0.33, .dragon: 0.33]
+                return [EntityModel.EntityType.rat: 0.33, .bat: 0.33, .alamo: 0.33]
             default:
                 fatalError("Dont call this to create tutorial levels")
             }
@@ -159,15 +163,15 @@ struct LevelConstructor {
             }
         case .second:
             switch difficulty {
-                case .easy, .normal, .hard:
-                    abilities = [LesserHealingPotion(), Dynamite(), GreaterHealingPotion()]
+            case .easy, .normal, .hard:
+                abilities = [LesserHealingPotion(), Dynamite(), GreaterHealingPotion()]
             default:
                 fatalError("Dont call this to create tutorial levels")
             }
         case .third:
             switch difficulty {
-                case .easy, .normal, .hard:
-                    abilities = [LesserHealingPotion(), Dynamite(), GreaterHealingPotion(), ShieldEast()]
+            case .easy, .normal, .hard:
+                abilities = [LesserHealingPotion(), Dynamite(), GreaterHealingPotion(), ShieldEast()]
             default:
                 fatalError("Dont call this to create tutorial levels")
             }

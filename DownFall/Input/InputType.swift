@@ -37,7 +37,7 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
                                         .animationsFinished(ref: true),
                                         .playAgain,
                                         .reffingFinished(newTurn: false),
-                                        .collectItem(TileCoord(0,0), .zero),
+                                        .collectItem(TileCoord(0,0), .zero, 0),
                                         .tutorial(.zero)
     ]
     
@@ -58,7 +58,7 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
     case transformation(Transformation)
     case reffingFinished(newTurn: Bool)
     case boardBuilt
-    case collectItem(TileCoord, Item)
+    case collectItem(TileCoord, Item, Int)
     case selectLevel
     case newTurn
     case tutorial(TutorialStep)

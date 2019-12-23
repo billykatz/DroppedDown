@@ -9,7 +9,7 @@
 import Foundation
 import SpriteKit
 
-class Renderer : SKSpriteNode {
+class Renderer: SKSpriteNode {
     private let playableRect: CGRect
     private let foreground: SKNode
     private var sprites: [[DFTileSpriteNode]] = []
@@ -88,8 +88,8 @@ class Renderer : SKSpriteNode {
         header.zPosition = precedence.rawValue
         
         //create the hud
-        hud = HUD.build(color: .lightGray, size: CGSize(width: playableRect.width * 0.9, height: 150))
-        hud.position = CGPoint(x: playableRect.midX, y: playableRect.minY + 400.0 + 16)
+        hud = HUD.build(color: .lightGray, size: CGSize(width: playableRect.width * 0.9, height: Style.HUD.height))
+        hud.position = CGPoint.positionThis(hud.frame, inBottomOf: playableRect, padding: Style.Padding.most)
         
         //create the helper text view
         helperTextView = HelperTextView.build(color: UIColor.clayRed, size: CGSize(width: playableRect.width * 0.8, height: 400))
@@ -138,7 +138,9 @@ class Renderer : SKSpriteNode {
                 let sprites = createSprites(from: trans.endTiles)
                 animationsFinished(for: sprites, endTiles: trans.endTiles)
             case .collectItem:
-                computeNewBoard(for: trans)
+                foreground.run(SKAction.wait(forDuration: 0.25)) { [weak self] in
+                    self?.computeNewBoard(for: trans)
+                }
             case .reffingFinished:
                 () // Purposely left blank.
             case .touchBegan:

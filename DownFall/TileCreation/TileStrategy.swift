@@ -12,6 +12,7 @@ protocol TileStrategy {
     var randomSource: GKLinearCongruentialRandomSource { get }
     func tiles(for tiles: [[Tile]]) -> [Tile]
     func board(_ boardSize: Int, difficulty: Difficulty) -> [[Tile]]
+    func goldDropped(from monster: EntityModel) -> Int
     var entities: [EntityModel] { get }
     var difficulty: Difficulty { get }
     var updatedEntity: EntityModel? { get }

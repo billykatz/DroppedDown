@@ -15,7 +15,7 @@ class TutorialSelectionScene: SKScene, ButtonDelegate {
     }
     
 
-    let levels: [Level]
+    let levels: [Level?]
     
     init(size: CGSize, levels: [Level]) {
         self.levels = levels

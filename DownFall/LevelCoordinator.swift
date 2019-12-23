@@ -12,7 +12,7 @@ import GameplayKit
 
 
 
-enum LevelType: Int, Codable {
+enum LevelType: Int, Codable, CaseIterable {
     case first
     case second
     case third
@@ -30,6 +30,8 @@ struct Level {
     let maxTime: Int
     let boardSize: Int
     let abilities: [AnyAbility]
+    
+    static let zero = Level(type: .boss, monsters: [:], maxMonstersTotal: 0, maxMonstersOnScreen: 0, maxGems: 0, maxTime: 0, boardSize: 0, abilities: [])
 }
 
 protocol LevelCoordinating: StoreSceneDelegate, GameSceneCoordinatingDelegate {
@@ -119,10 +121,8 @@ extension LevelCoordinating where Self: UIViewController {
     
     func difficultySelected(_ difficulty: Difficulty) {
         switch difficulty {
-        case .easy, .normal, .hard:
+        case .easy, .normal, .hard, .tutorial2, .tutorial1:
             levels = LevelConstructor.buildLevels(difficulty)
-        case .tutorial2, .tutorial1:
-            presentNextLevel(nil)
         }
         levelIndex = 0
         

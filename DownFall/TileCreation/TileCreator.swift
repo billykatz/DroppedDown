@@ -48,7 +48,9 @@ class TileCreator: TileStrategy {
             return TileType.monster(entities[4])
         case .bat:
             return TileType.monster(entities[5])
-        case .player, .alamo, .lavaHorse, .wizard:
+        case .alamo:
+            return TileType.monster(entities[6])
+        case .player, .lavaHorse, .wizard:
             fatalError("monstersCases should not included player or some unused monsters")
         }
         
@@ -69,6 +71,15 @@ class TileCreator: TileStrategy {
     }
     
     var totalMonstersAdded = 0
+    
+    var goldVariance = 2
+    func goldDropped(from monster: EntityModel) -> Int {
+        if let goldItem = monster.carry.items.first(where: { $0.type == .gold }) {
+            let medianAmount = goldItem.amount * GameScope.shared.difficulty.goldMultiplier
+            return Int.random(lower: max(1, medianAmount-goldVariance), upper: medianAmount+goldVariance)
+        }
+        return 0
+    }
 
     func tiles(for tiles: [[Tile]]) -> [Tile] {
         var newTiles: [Tile] = []

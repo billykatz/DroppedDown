@@ -82,4 +82,8 @@ struct Style {
     struct Button {
         static let size = CGSize(width: 50.0, height: 50.0)
     }
+    
+    struct HUD {
+        static let height: CGFloat = 300.0
+    }
 }

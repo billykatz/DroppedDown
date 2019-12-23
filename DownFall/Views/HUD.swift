@@ -53,11 +53,11 @@ class HUD: SKSpriteNode {
             default:
                 ()
             }
-        case .collectItem(_, let item):
+        case .collectItem(_, let item, let totalGold):
             if item.type == .gem {
                 showGem()
             } else {
-                incrementGoldCounter()
+                incrementGoldCounter(totalGold)
             }
         case .boardBuilt:
             //TODO: check this logic out thoroughly
@@ -88,14 +88,15 @@ class HUD: SKSpriteNode {
         coinNode.position = CGPoint(x: 250, y: 0)
         self.addChild(coinNode)
         
-        if let _ = self.childNode(withName: "goldLabel") {
-            
+        if let goldLabel = self.childNode(withName: "goldLabel") as? SKLabelNode {
+            goldLabel.text = "\(data.carry.total(in: .gold))"
         }
+            
         else {
             let goldLabel = SKLabelNode(fontNamed: "Helvetica")
             goldLabel.fontSize = UIFont.largeSize
             goldLabel.position = CGPoint(x: 355, y: -22)
-            goldLabel.text = "0"
+            goldLabel.text = "\(data.carry.total(in: .gold))"
             goldLabel.fontColor = .lightText
             goldLabel.name = "goldLabel"
             self.addChild(goldLabel)
@@ -108,13 +109,9 @@ class HUD: SKSpriteNode {
         self.addChild(spriteNode)
     }
     
-    func incrementGoldCounter() {
-        if let goldLabel = self.childNode(withName: "goldLabel") as? SKLabelNode,
-            let text = goldLabel.text,
-            let gold = Int(text) {
-            goldLabel.text = ""
-            goldLabel.text = "\(gold + 1)"
-            
+    func incrementGoldCounter(_ totalGold: Int) {
+        if let goldLabel = self.childNode(withName: "goldLabel") as? SKLabelNode {
+            goldLabel.text = "\(totalGold)"
         }
     }
 }

@@ -24,7 +24,7 @@ struct EntityModel: Equatable, Decodable {
         case player
     }
     
-    static let monsterCases: [EntityType] = [.rat, .bat, .dragon]
+    static let monsterCases: [EntityType] = [.rat, .bat, .dragon, .alamo]
     
     static let zero: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .rat, carry: .zero, animations: .zero, abilities: [])
     
@@ -130,13 +130,7 @@ struct EntityModel: Equatable, Decodable {
     }
     
     func canAfford(_ cost: Int, inCurrency currency: Currency) -> Bool {
-        let totalAmount : Int
-        switch currency{
-        case .gold:
-            totalAmount = carry.totalGold
-        case .gem:
-            totalAmount = carry.totalGem
-        }
+        let totalAmount = carry.total(in: currency)
         return totalAmount >= cost
     }
     
@@ -178,7 +172,7 @@ extension EntityModel: CustomDebugStringConvertible {
 
 extension AttackModel: CustomDebugStringConvertible {
     var debugDescription: String {
-        return "Attacks \(self.directions) for \(self.damage)"
+        return "Attacks \(self.attackSlope) for \(self.damage)"
     }
 }
 

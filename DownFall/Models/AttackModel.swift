@@ -8,10 +8,26 @@
 
 import Foundation
 
+struct AttackSlope: Equatable, Decodable {
+    let over: Int
+    let up: Int
+    
+    static var playerPossibleAttacks: [AttackSlope] {
+        return [
+            AttackSlope(over: -1, up: 0),
+            AttackSlope(over: 0, up: 1),
+            AttackSlope(over: 0, up: -1),
+            AttackSlope(over: 1, up: 0)
+        ]
+    }
+}
+
+
 enum AttackType: String, Decodable {
     case targets
     case areaOfEffect
     case charges
+    case slope
 }
 
 struct AttackModel: Equatable, Decodable {
@@ -19,11 +35,11 @@ struct AttackModel: Equatable, Decodable {
     let frequency: Int
     let range: RangeModel
     let damage: Int
-    let directions: [Direction]
     var attacksThisTurn: Int = 0
     var turns: Int = 1
     let attacksPerTurn: Int
     var charge: Int?
+    var attackSlope: [AttackSlope]?
     
     private enum CodingKeys: String, CodingKey {
         typealias RawValue = String
@@ -31,30 +47,31 @@ struct AttackModel: Equatable, Decodable {
         case frequency
         case range
         case damage
-        case directions
         case attacksPerTurn
+        case charge
+        case attackSlope
     }
 
     static let zero = AttackModel(type: .targets,
                                   frequency: 0,
                                   range: RangeModel(lower: 0, upper: 0),
                                   damage: 0,
-                                  directions: [],
                                   attacksThisTurn: 0,
                                   turns: 0,
                                   attacksPerTurn: 0,
-                                  charge: 0)
+                                  charge: 0,
+                                  attackSlope: [])
     
     func didAttack() -> AttackModel {
         return AttackModel(type: type,
                            frequency: frequency,
                            range: range,
                            damage: damage,
-                           directions: directions,
                            attacksThisTurn: attacksThisTurn + 1,
                            turns: turns,
                            attacksPerTurn: attacksPerTurn,
-                           charge: 0)
+                           charge: 0,
+                           attackSlope: attackSlope)
     }
     
     func resetAttack() -> AttackModel {
@@ -62,11 +79,11 @@ struct AttackModel: Equatable, Decodable {
                            frequency: frequency,
                            range: range,
                            damage: damage,
-                           directions: directions,
                            attacksThisTurn: 0,
                            turns: turns,
                            attacksPerTurn: attacksPerTurn,
-                           charge: charge ?? 0)
+                           charge: charge ?? 0,
+                           attackSlope: attackSlope)
     }
     
     func incrementTurns() -> AttackModel {
@@ -75,11 +92,11 @@ struct AttackModel: Equatable, Decodable {
                            frequency: frequency,
                            range: range,
                            damage: damage,
-                           directions: directions,
                            attacksThisTurn: attacksThisTurn,
                            turns:  turns + 1,
                            attacksPerTurn: attacksPerTurn,
-                           charge: min(frequency, charge + 1))
+                           charge: min(frequency, charge + 1),
+                           attackSlope: attackSlope)
     }
     
     func willAttackNextTurn() -> Bool {

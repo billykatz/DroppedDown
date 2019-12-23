@@ -13,8 +13,15 @@ enum Difficulty: Int, CaseIterable {
     case tutorial1 = 4
     case tutorial2 = 5
     
-    func maxExpectedMonsters(for boardSize: Int) -> Int {
-        return max(Int(boardSize * self.rawValue / 2), 1)
+    var goldMultiplier: Int {
+        switch self {
+        case .easy:
+            return 3
+        case .normal:
+            return 2
+        case .hard, .tutorial2, .tutorial1:
+            return 1
+        }
     }
 }
 

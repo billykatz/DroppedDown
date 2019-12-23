@@ -134,7 +134,7 @@ class StoreScene: SKScene {
         
         let amountLabel = Label(text:
             """
-            \(playerData.carry.totalGem)
+            \(playerData.carry.total(in: currency))
             """,
                                 width: self.frame.width,
                                 delegate: nil, precedence: .foreground,

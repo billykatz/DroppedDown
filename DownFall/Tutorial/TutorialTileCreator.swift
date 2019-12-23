@@ -24,6 +24,10 @@
 import GameplayKit
 
 struct TutorialTileCreator: TileStrategy {
+    func goldDropped(from monster: EntityModel) -> Int {
+        return 5
+    }
+    
     var updatedEntity: EntityModel?
     var difficulty: Difficulty
     var entities: [EntityModel]

@@ -34,13 +34,21 @@ class TutorialScene: SKScene {
     private var touchWasSwipe = false
     private var touchWasCanceled = false
     
+    //level
+    private var level: Level?
+    
     required init?(coder aDecoder: NSCoder) { super.init(coder: aDecoder) }
     
     /// Creates an instance of board and does preparation neccessary for didMove(to:) to be called
     public func commonInit(boardSize: Int,
                            entities: [EntityModel],
                            difficulty: Difficulty = .normal,
-                           updatedEntity: EntityModel? = nil) {
+                           updatedEntity: EntityModel? = nil,
+                           level: Level) {
+        
+        //Level stuff
+        self.level = level
+        
         //create the foreground node
         foreground = SKNode()
         foreground.position = .zero
@@ -50,10 +58,10 @@ class TutorialScene: SKScene {
         let tileCreator = TutorialTileCreator(entities,
                                               difficulty: difficulty,
                                               updatedEntity: updatedEntity,
-                                              level: nil)
+                                              level: level)
         
         //board
-        board = Board.build(size: boardSize, tileCreator: tileCreator, difficulty:  difficulty)
+        board = Board.build(size: boardSize, tileCreator: tileCreator, difficulty: difficulty, level: level)
         self.boardSize = boardSize
         
         // create haptic generator
@@ -67,7 +75,8 @@ class TutorialScene: SKScene {
         self.renderer = Renderer(playableRect: size.playableRect,
                                  foreground: foreground,
                                  boardSize: boardSize,
-                                 precedence: Precedence.foreground)
+                                 precedence: Precedence.foreground,
+                                 level: level!)
         
         
         // SwipeRecognizerView
@@ -77,14 +86,8 @@ class TutorialScene: SKScene {
         view.addSubview(swipingRecognizerView)
         
         // TutorialView
-        let tutorialData: TutorialData
-        switch GameScope.shared.difficulty {
-        case .tutorial1:
-            tutorialData = GameScope.tutorialOne
-        default:
-            tutorialData = GameScope.tutorialTwo
-        }
-        let tutorialView = TutorialView(tutorialData: tutorialData,
+        guard let data = level?.tutorialData else { fatalError("You must have tutorial data on the Level to continue") }
+        let tutorialView = TutorialView(tutorialData: data,
                                         texture: nil,
                                         color: .clear,
                                         size:  CGSize(width: size.playableRect.width, height: size.playableRect.height))

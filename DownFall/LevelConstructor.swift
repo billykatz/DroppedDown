@@ -11,7 +11,7 @@ import Foundation
 struct LevelConstructor {
     static let monstersOnScreenDivisor = 2
     
-    static func buildLevels(_ difficulty: Difficulty) -> [Level]? {
+    static func buildLevels(_ difficulty: Difficulty) -> [Level] {
         if difficulty == .tutorial1 || difficulty == .tutorial2 { return [Level.zero] }
         var levels: [Level] = []
         for levelType in LevelType.allCases {
@@ -35,6 +35,20 @@ struct LevelConstructor {
             
         }
         return levels
+    }
+    
+    static func buildTutorialLevels() -> [Level] {
+        return (0..<LevelType.tutorialCases.count).map { index in
+            Level(type: LevelType.tutorialCases[index],
+                  monsters: [:],
+                  maxMonstersTotal: 0,
+                  maxMonstersOnScreen: 0,
+                  maxGems: 0,
+                  maxTime: 0,
+                  boardSize: 4,
+                  abilities: [],
+                  tutorialData: GameScope.shared.tutorials[index])
+        }
     }
     
     static func monstersPerLevel(_ levelType: LevelType, difficulty: Difficulty) -> [EntityModel.EntityType: Double] {

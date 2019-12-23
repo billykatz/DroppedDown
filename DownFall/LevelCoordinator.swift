@@ -19,6 +19,8 @@ enum LevelType: Int, Codable, CaseIterable {
     case boss
     case tutorial1
     case tutorial2
+    
+    static var tutorialCases: [LevelType] = [.tutorial1, .tutorial2]
 }
 
 struct Level {
@@ -31,7 +33,15 @@ struct Level {
     let boardSize: Int
     let abilities: [AnyAbility]
     
-    static let zero = Level(type: .boss, monsters: [:], maxMonstersTotal: 0, maxMonstersOnScreen: 0, maxGems: 0, maxTime: 0, boardSize: 0, abilities: [])
+    var tutorialData: TutorialData?
+    
+    var isTutorial: Bool {
+        return tutorialData != nil
+    }
+    
+    //TODO: add gold multiplier based on difficulty
+    
+    static let zero = Level(type: .boss, monsters: [:], maxMonstersTotal: 0, maxMonstersOnScreen: 0, maxGems: 0, maxTime: 0, boardSize: 0, abilities: [], tutorialData: nil)
 }
 
 protocol LevelCoordinating: StoreSceneDelegate, GameSceneCoordinatingDelegate {
@@ -71,14 +81,16 @@ extension LevelCoordinating where Self: UIViewController {
         case .tutorial2, .tutorial1:
             tutorialSceneNode?.prepareForReuse()
             if let scene = GKScene(fileNamed: "TutorialScene")?.rootNode as? TutorialScene,
-                let entities = entities {
+                let entities = entities,
+                let level = levels?[levelIndex] {
                 tutorialSceneNode = scene
                 tutorialSceneNode!.gameSceneDelegate = self
                 tutorialSceneNode!.scaleMode = .aspectFill
                 tutorialSceneNode!.commonInit(boardSize: 4,
                                               entities: entities,
                                               difficulty: GameScope.shared.difficulty,
-                                              updatedEntity: nil)
+                                              updatedEntity: nil,
+                                              level: level)
                 
                 if let view = self.view as! SKView? {
                     view.presentScene(tutorialSceneNode)
@@ -121,8 +133,10 @@ extension LevelCoordinating where Self: UIViewController {
     
     func difficultySelected(_ difficulty: Difficulty) {
         switch difficulty {
-        case .easy, .normal, .hard, .tutorial2, .tutorial1:
+        case .easy, .normal, .hard:
             levels = LevelConstructor.buildLevels(difficulty)
+        case .tutorial1, .tutorial2:
+            levels = LevelConstructor.buildTutorialLevels()
         }
         levelIndex = 0
         

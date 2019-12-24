@@ -172,7 +172,7 @@ extension EntityModel: CustomDebugStringConvertible {
 
 extension AttackModel: CustomDebugStringConvertible {
     var debugDescription: String {
-        return "Attacks \(self.attackSlope) for \(self.damage)"
+        return "Attacks \(String(describing: self.attackSlope)) for \(self.damage)"
     }
 }
 

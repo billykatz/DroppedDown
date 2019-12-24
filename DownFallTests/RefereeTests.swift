@@ -32,7 +32,7 @@ class RefereeTests: XCTestCase {
         let expectedOutput = Input(.gameWin)
         
         // need to explicitly set this or else the Referee does not know what rule book to use
-        GameScope.shared.difficulty = .normal
+        Referee.injectLevel(Level(type: .first, monsters: [:], maxMonstersTotal: 0, maxMonstersOnScreen: 0, maxGems: 0, maxTime: 0, boardSize: 0, abilities: [], tutorialData: nil))
         
         let gameWin = allBlack >>> win(mockBoard)
         let gameBoard = gameWin(mockBoard)

@@ -45,6 +45,10 @@ struct Style {
         static let most: CGFloat = 24.0
     }
     
+    struct Spacing {
+        static let normal: CGFloat = 8.0
+    }
+    
     struct Offset {
         static let less: CGFloat = 5.0
     }

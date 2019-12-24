@@ -48,6 +48,7 @@ class TutorialScene: SKScene {
         
         //Level stuff
         self.level = level
+        Referee.injectLevel(level)
         
         //create the foreground node
         foreground = SKNode()

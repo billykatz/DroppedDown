@@ -84,6 +84,13 @@ extension CGPoint {
                        y: 0.0 + yOffset)
     }
     
+    static func positionThis(_ this: CGRect,
+                             below that: CGRect,
+                             spacing: CGFloat = 0.0) -> CGPoint {
+        return CGPoint(x: that.center.x,
+                       y: that.center.y - this.height - spacing)
+    }
+    
     enum Anchor {
         case left
         case right

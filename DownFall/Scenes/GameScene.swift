@@ -49,6 +49,7 @@ class GameScene: SKScene {
                            level: Level) {
         // init our level
         self.level = level
+        Referee.injectLevel(level)
         
         //create the foreground node
         foreground = SKNode()

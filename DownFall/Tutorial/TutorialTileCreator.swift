@@ -46,8 +46,8 @@ struct TutorialTileCreator: TileStrategy {
         let purpleRow = Array(repeating: Tile.purpleRock, count: 4)
         
         var tiles: [[Tile]] = []
-        switch difficulty {
-        case .easy, .normal, .hard:
+        switch level?.type {
+        case .first, .second, .third, .boss, .none:
             fatalError("You cant create a tutorial board with one of these diffculties")
         case .tutorial1:
             tiles = [
@@ -81,16 +81,8 @@ struct TutorialTileCreator: TileStrategy {
         guard updatedEntity == nil else {
             return updatedEntity!
         }
-        switch difficulty {
-        case .easy:
-            return entities[0]
-        case .normal:
-            return entities[1]
-        case .hard:
-            return entities[2]
-        case .tutorial1, .tutorial2:
-            return entities[1]
-        }
+        
+        return entities[0]
     }
     
     func entityData(for type: EntityModel.EntityType) -> EntityModel? {

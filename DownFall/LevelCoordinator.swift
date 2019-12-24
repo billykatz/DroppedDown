@@ -20,6 +20,7 @@ enum LevelType: Int, Codable, CaseIterable {
     case tutorial1
     case tutorial2
     
+    static var gameCases: [LevelType] = [.first, .second, .third]
     static var tutorialCases: [LevelType] = [.tutorial1, .tutorial2]
 }
 
@@ -32,6 +33,7 @@ struct Level {
     let maxTime: Int
     let boardSize: Int
     let abilities: [AnyAbility]
+    let goldMultiplier: Int
     
     var tutorialData: TutorialData?
     
@@ -41,7 +43,7 @@ struct Level {
     
     //TODO: add gold multiplier based on difficulty
     
-    static let zero = Level(type: .boss, monsters: [:], maxMonstersTotal: 0, maxMonstersOnScreen: 0, maxGems: 0, maxTime: 0, boardSize: 0, abilities: [], tutorialData: nil)
+    static let zero = Level(type: .boss, monsters: [:], maxMonstersTotal: 0, maxMonstersOnScreen: 0, maxGems: 0, maxTime: 0, boardSize: 0, abilities: [], goldMultiplier: 1, tutorialData: nil)
 }
 
 protocol LevelCoordinating: StoreSceneDelegate, GameSceneCoordinatingDelegate {
@@ -77,7 +79,7 @@ extension LevelCoordinating where Self: UIViewController {
     }
     
     func presentNextLevel(_ playerData: EntityModel?) {
-        switch GameScope.shared.difficulty {
+        switch currentLevel.type {
         case .tutorial2, .tutorial1:
             tutorialSceneNode?.prepareForReuse()
             if let scene = GKScene(fileNamed: "TutorialScene")?.rootNode as? TutorialScene,
@@ -102,7 +104,7 @@ extension LevelCoordinating where Self: UIViewController {
                     #endif
                 }
             }
-        case .easy, .normal, .hard:
+        case .first, .second, .third, .boss:
             gameSceneNode?.prepareForReuse()
             if let scene = GKScene(fileNamed: "GameScene")?.rootNode as? GameScene,
                 let entities = entities,
@@ -132,12 +134,7 @@ extension LevelCoordinating where Self: UIViewController {
     }
     
     func difficultySelected(_ difficulty: Difficulty) {
-        switch difficulty {
-        case .easy, .normal, .hard:
-            levels = LevelConstructor.buildLevels(difficulty)
-        case .tutorial1, .tutorial2:
-            levels = LevelConstructor.buildTutorialLevels()
-        }
+        levels = LevelConstructor.buildLevels(difficulty)
         levelIndex = 0
         
     }

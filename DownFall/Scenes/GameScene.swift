@@ -49,6 +49,7 @@ class GameScene: SKScene {
                            level: Level) {
         // init our level
         self.level = level
+        Referee.injectLevel(level)
         
         //create the foreground node
         foreground = SKNode()
@@ -62,7 +63,7 @@ class GameScene: SKScene {
                                       level: level)
         
         //board
-        board = Board.build(size: boardSize, tileCreator: tileCreator, difficulty: difficulty)
+        board = Board.build(size: boardSize, tileCreator: tileCreator, difficulty: difficulty, level: level)
         self.boardSize = boardSize
         
         // create haptic generator
@@ -76,7 +77,8 @@ class GameScene: SKScene {
         self.renderer = Renderer(playableRect: size.playableRect,
                                  foreground: foreground,
                                  boardSize: boardSize,
-                                 precedence: Precedence.foreground)
+                                 precedence: Precedence.foreground,
+                                 level: level!)
         
         
         // SwipeRecognizerView

@@ -18,6 +18,9 @@ class Renderer: SKSpriteNode {
     private let tileSize: CGFloat = Style.Tile.size
     private let precedence: Precedence
     
+    // Used to determine what special UI consdierations to make for what level we are on
+    private let level: Level
+    
     private var spriteForeground = SKNode()
     private var menuForeground = SKNode()
     
@@ -56,11 +59,13 @@ class Renderer: SKSpriteNode {
     init(playableRect: CGRect,
          foreground givenForeground: SKNode,
          boardSize theBoardSize: Int,
-         precedence: Precedence) {
+         precedence: Precedence,
+         level: Level) {
         
         self.precedence = precedence
         self.playableRect = playableRect
         self.boardSize = CGFloat(theBoardSize)
+        self.level = level
         
         //center the board in the playable rect
         let marginWidth = playableRect.width - CGFloat(tileSize * boardSize)
@@ -418,8 +423,8 @@ extension Renderer {
                             newTileCoord == lastTileCoord else { return }
                         
                         //special case for tutorial
-                        if GameScope.shared.difficulty == .tutorial2 {
-                            if InputType.fuzzyEqual(GameScope.tutorialTwo.currentStep.inputToContinue,
+                        if level.type == .tutorial2, let data = level.tutorialData {
+                            if InputType.fuzzyEqual(data.currentStep.inputToContinue,
                                                     .touch(TileCoord(row, col), sprites[row][col].type)) {
                                 InputQueue.append(
                                     Input(.touch(TileCoord(row, col),
@@ -432,7 +437,7 @@ extension Renderer {
                                 // understand where and when they are clicking
                                 // where on the board
                                 // and when in the tutorial
-                            else if InputType.fuzzyEqual(GameScope.tutorialTwo.currentStep.inputToContinue,
+                            else if InputType.fuzzyEqual(data.currentStep.inputToContinue,
                                                            .monsterDies(.zero)) {
                                 InputQueue.append(
                                     Input(.touch(TileCoord(row, col),
@@ -464,8 +469,9 @@ extension Renderer {
             guard let strongSelf = self else { return }
             strongSelf.menuForeground.removeAllChildren()
             let gameWinMenu: SKSpriteNode
-            switch GameScope.shared.difficulty {
-            case .easy, .normal, .hard:
+            switch strongSelf.level.type {
+            case .first, .second, .third, .boss:
+                //TODO: program the boss win sprite
                 gameWinMenu = strongSelf.gameWinSpriteNode
             case .tutorial1:
                 gameWinMenu = strongSelf.tutorial1WinSprite

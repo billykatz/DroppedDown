@@ -33,18 +33,17 @@ struct CarryModel: Decodable, Equatable {
     }
     
     func pay(_ price: Int, inCurrency currency: Currency) -> CarryModel {
-        var newItems: [Item] = []
-        var pricePaid = 0
         let itemType: Item.ItemType = currency == .gold ? .gold : .gem
-        for item in items {
-            if item.type == itemType && pricePaid < price {
-                pricePaid += 1
-            } else {
-                newItems.append(item)
-            }
-        }
         
-        return CarryModel(items: newItems)
+        return CarryModel(items: items.map { item in
+                if item.type == itemType {
+                    return Item(type: itemType, amount: item.amount - price)
+                } else {
+                    return item
+                }
+            }
+        )
+        
     }
     
     func earn(_ money: Int, inCurrency currency: Currency) -> CarryModel {

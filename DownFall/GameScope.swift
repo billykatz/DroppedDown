@@ -10,6 +10,8 @@ struct GameScope {
     static var shared: GameScope = GameScope(difficulty: .normal)
     var difficulty: Difficulty
     
+    var tutorials: [TutorialData] = [GameScope.tutorialOne, GameScope.tutorialTwo]
+    
     static let tutorialOne = TutorialData(steps:
         [
                     TutorialStep(dialog: "Welcome to the Mine! You're a coal minter with extraordinary powers",

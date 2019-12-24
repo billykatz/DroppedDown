@@ -75,7 +75,7 @@ class TileCreator: TileStrategy {
     var goldVariance = 2
     func goldDropped(from monster: EntityModel) -> Int {
         if let goldItem = monster.carry.items.first(where: { $0.type == .gold }) {
-            let medianAmount = goldItem.amount * GameScope.shared.difficulty.goldMultiplier
+            let medianAmount = goldItem.amount * (level?.goldMultiplier ?? 1)
             return Int.random(lower: max(1, medianAmount-goldVariance), upper: medianAmount+goldVariance)
         }
         return 0
@@ -187,8 +187,6 @@ class TileCreator: TileStrategy {
             return entities[1]
         case .hard:
             return entities[2]
-        case .tutorial1, .tutorial2:
-            return entities[0]
         }
     }
 }

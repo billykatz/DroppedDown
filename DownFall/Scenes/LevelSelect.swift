@@ -10,6 +10,7 @@ import SpriteKit
 
 protocol LevelSelectDelegate: class {
     func didSelect(_ difficulty: Difficulty, _ playerModel: EntityModel?)
+    func didSelectStartTutorial(_ playerModel: EntityModel?)
 }
 
 class LevelSelect: SKScene {
@@ -33,6 +34,17 @@ class LevelSelect: SKScene {
         
         startButton.position = .zero
         addChild(startButton)
+        
+        let tutorialButton = Button(size: Style.RunMenu.buttonSize,
+                                    delegate: self,
+                                    identifier: .startTutorial,
+                                    precedence: .menu,
+                                    fontSize: UIFont.largeSize,
+                                    fontColor: .white)
+        
+        tutorialButton.position = CGPoint.positionThis(tutorialButton.frame, below: startButton.frame, spacing: Style.Spacing.normal)
+        addChild(tutorialButton)
+        
         
         let playableRect = size.playableRect
         
@@ -68,6 +80,14 @@ extension LevelSelect: HeaderDelegate {
 
 extension LevelSelect: ButtonDelegate {
     func buttonTapped(_ button: Button) {
-        levelSelectDelegate?.didSelect(GameScope.shared.difficulty, playerModel)
+        guard let identifier = button.identifier else { return }
+        switch identifier {
+        case .newGame:
+            levelSelectDelegate?.didSelect(GameScope.shared.difficulty, playerModel)
+        case .startTutorial:
+            levelSelectDelegate?.didSelectStartTutorial(playerModel)
+        default:
+            ()
+        }
     }
 }

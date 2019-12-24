@@ -37,8 +37,10 @@ struct Tutorial2Win: Rule {
         guard
             let playerPosition = getTilePosition(.player(.zero), tiles: tiles),
             case let TileType.player(player) = tiles[playerPosition].type,
-            player.canAfford(1, inCurrency: .gold)
+            player.canAfford(16, inCurrency: .gold)
             else { return nil }
+        //TODO: this is a filmsy check, lets check to see the position of the player or if the player has killed any monsters
+        // This could also be the start of tracking stats for a player
         return Input(.gameWin)
     }
 }

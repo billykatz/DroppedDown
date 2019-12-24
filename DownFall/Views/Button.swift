@@ -21,6 +21,7 @@ enum ButtonIdentifier: String {
     case visitStore
     case newGame
     case back
+    case startTutorial
     
     var title: String {
         switch self {
@@ -42,6 +43,8 @@ enum ButtonIdentifier: String {
             return "New Game"
         case .back:
             return "Back"
+        case .startTutorial:
+            return "Start Tutorial"
         case .wallet, .infoPopup:
             return ""
         }
@@ -59,6 +62,8 @@ class Button: SKSpriteNode {
     static let large = CGSize(width: 150, height: 75)
     
     weak var delegate: ButtonDelegate?
+    
+    var identifier: ButtonIdentifier?
     
     init(size: CGSize,
          delegate: ButtonDelegate,
@@ -82,9 +87,12 @@ class Button: SKSpriteNode {
         
         //Set properties
         self.delegate = delegate
+        self.identifier = identifier
         
         //Call super
         super.init(texture: nil, color: .white, size: size)
+        
+        // set the name to the identifier
         name = identifier.rawValue
         isUserInteractionEnabled = true
         zPosition = precedence.rawValue

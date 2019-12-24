@@ -10,8 +10,6 @@ enum Difficulty: Int, CaseIterable {
     case easy = 1
     case normal = 2
     case hard = 3
-    case tutorial1 = 4
-    case tutorial2 = 5
     
     var goldMultiplier: Int {
         switch self {
@@ -19,7 +17,7 @@ enum Difficulty: Int, CaseIterable {
             return 3
         case .normal:
             return 2
-        case .hard, .tutorial2, .tutorial1:
+        case .hard:
             return 1
         }
     }

@@ -19,6 +19,9 @@ enum LevelType: Int, Codable, CaseIterable {
     case boss
     case tutorial1
     case tutorial2
+    
+    static var gameCases: [LevelType] = [.first, .second, .third]
+    static var tutorialCases: [LevelType] = [.tutorial1, .tutorial2]
 }
 
 struct Level {
@@ -30,8 +33,15 @@ struct Level {
     let maxTime: Int
     let boardSize: Int
     let abilities: [AnyAbility]
+    let goldMultiplier: Int
     
-    static let zero = Level(type: .boss, monsters: [:], maxMonstersTotal: 0, maxMonstersOnScreen: 0, maxGems: 0, maxTime: 0, boardSize: 0, abilities: [])
+    var tutorialData: TutorialData?
+    
+    var isTutorial: Bool {
+        return tutorialData != nil
+    }
+        
+    static let zero = Level(type: .boss, monsters: [:], maxMonstersTotal: 0, maxMonstersOnScreen: 0, maxGems: 0, maxTime: 0, boardSize: 0, abilities: [], goldMultiplier: 1, tutorialData: nil)
 }
 
 protocol LevelCoordinating: StoreSceneDelegate, GameSceneCoordinatingDelegate {
@@ -67,18 +77,20 @@ extension LevelCoordinating where Self: UIViewController {
     }
     
     func presentNextLevel(_ playerData: EntityModel?) {
-        switch GameScope.shared.difficulty {
+        switch currentLevel.type {
         case .tutorial2, .tutorial1:
             tutorialSceneNode?.prepareForReuse()
             if let scene = GKScene(fileNamed: "TutorialScene")?.rootNode as? TutorialScene,
-                let entities = entities {
+                let entities = entities,
+                let level = levels?[levelIndex] {
                 tutorialSceneNode = scene
                 tutorialSceneNode!.gameSceneDelegate = self
                 tutorialSceneNode!.scaleMode = .aspectFill
                 tutorialSceneNode!.commonInit(boardSize: 4,
                                               entities: entities,
                                               difficulty: GameScope.shared.difficulty,
-                                              updatedEntity: nil)
+                                              updatedEntity: nil,
+                                              level: level)
                 
                 if let view = self.view as! SKView? {
                     view.presentScene(tutorialSceneNode)
@@ -90,7 +102,7 @@ extension LevelCoordinating where Self: UIViewController {
                     #endif
                 }
             }
-        case .easy, .normal, .hard:
+        case .first, .second, .third, .boss:
             gameSceneNode?.prepareForReuse()
             if let scene = GKScene(fileNamed: "GameScene")?.rootNode as? GameScene,
                 let entities = entities,
@@ -120,10 +132,7 @@ extension LevelCoordinating where Self: UIViewController {
     }
     
     func difficultySelected(_ difficulty: Difficulty) {
-        switch difficulty {
-        case .easy, .normal, .hard, .tutorial2, .tutorial1:
-            levels = LevelConstructor.buildLevels(difficulty)
-        }
+        levels = LevelConstructor.buildLevels(difficulty)
         levelIndex = 0
         
     }

@@ -19,6 +19,8 @@ class Board: Equatable {
     var boardSize: Int { return tiles.count }
     var tileCreator: TileStrategy
     
+    private let level: Level
+    
     subscript(index: TileCoord) -> TileType? {
         guard isWithinBounds(index) else { return nil }
         return tiles[index.x][index.y].type
@@ -26,9 +28,11 @@ class Board: Equatable {
     }
     
     init(tileCreator: TileStrategy,
-         tiles: [[Tile]]) {
+         tiles: [[Tile]],
+         level: Level) {
         self.tileCreator = tileCreator
         self.tiles = tiles
+        self.level = level
         
         Dispatch.shared.register { [weak self] in self?.handle(input: $0) }
     }
@@ -451,7 +455,8 @@ extension Board {
 extension Board {
     static func build(size: Int,
                       tileCreator: TileStrategy,
-                      difficulty: Difficulty) -> Board {
+                      difficulty: Difficulty,
+                      level: Level) -> Board {
         //create a boardful of tiles
         let tilesStruct: [[Tile]] = tileCreator.board(size, difficulty: difficulty)
         
@@ -459,7 +464,7 @@ extension Board {
         InputQueue.append(Input(.boardBuilt, tilesStruct))
         
         //init new board
-        return Board(tileCreator: tileCreator, tiles: tilesStruct)
+        return Board(tileCreator: tileCreator, tiles: tilesStruct, level: level)
     }
 }
 
@@ -539,7 +544,7 @@ extension Board {
             isWithinBounds(playerPosition.rowBelow) else {
                 return Transformation(transformation: [], inputType: .gameWin)
         }
-        if GameScope.shared.difficulty == .tutorial1 || GameScope.shared.difficulty == .tutorial2 {
+        if level.type == .tutorial1 || level.type == .tutorial2 {
             return Transformation(transformation: [], inputType: .gameWin)
         }
         

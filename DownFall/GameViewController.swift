@@ -66,6 +66,14 @@ extension GameViewController {
 }
 
 extension GameViewController: LevelSelectDelegate {
+    func didSelectStartTutorial(_ playerModel: EntityModel?) {
+        if let view = self.view as! SKView? {
+                view.presentScene(nil)
+                levels = LevelConstructor.buildTutorialLevels()
+                presentNextLevel(playerModel)
+        }
+    }
+    
     func didSelect(_ difficulty: Difficulty, _ playerModel: EntityModel?) {
         if let view = self.view as! SKView? {
             view.presentScene(nil)

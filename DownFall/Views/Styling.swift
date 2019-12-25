@@ -32,12 +32,19 @@ struct Style {
             static let viewSize = CGSize(width: 150, height: 50)
             static let currencySize = CGSize(width: 30.0, height: 30.0)
         }
+        
+        struct CTAButton {
+            static let size = CGSize(width: 200, height: 50)
+            static let bottomPadding = CGFloat(200)
+        }
+        
+        struct CloseButton {
+            static let size = CGSize(width: 100, height: 35)
+        }
+
     }
     
-    struct CloseButton {
-        static let size = CGSize(width: 35, height: 35)
-    }
-    
+        
     struct Padding {
         static let less: CGFloat = 4.0
         static let normal: CGFloat = 8.0
@@ -67,7 +74,6 @@ struct Style {
     struct DFTileSpriteNode {
         struct Exit {
             static let minecartSizeCoefficient: CGFloat = 0.7
-            static let winSizeCoefficient: CGFloat = 0.2
         }
     }
     

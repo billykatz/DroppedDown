@@ -9,7 +9,7 @@
 struct Item: Decodable, Equatable, Hashable {
     enum ItemType: String, Decodable {
         case gold
-        case gem = "gem2"
+        case gem
         
         var currencyType: Currency {
             switch self {
@@ -29,7 +29,7 @@ struct Item: Decodable, Equatable, Hashable {
         case .gold:
             return goldTextureName()
         case .gem:
-            return type.rawValue
+            return "gem2"
         }
     }
     

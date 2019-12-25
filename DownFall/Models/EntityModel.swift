@@ -29,8 +29,6 @@ struct EntityModel: Equatable, Decodable {
     
     static let playerCases: [EntityType] = [.easyPlayer, .normalPlayer, .hardPlayer]
     
-    static let monsterCases: [EntityType] = [.rat, .bat, .dragon, .alamo]
-    
     static let zero: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .rat, carry: .zero, animations: .zero, abilities: [])
     
     let originalHp: Int

@@ -35,6 +35,8 @@
 		3D4F569222B2D087003695D8 /* SpriteSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4F569122B2D087003695D8 /* SpriteSheet.swift */; };
 		3D4F569422B33B44003695D8 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4F569322B33B44003695D8 /* Helpers.swift */; };
 		3D4F569622B88A90003695D8 /* HapticGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4F569522B88A90003695D8 /* HapticGenerator.swift */; };
+		3D508DEA23B3EDA10067F53A /* AttackModel+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D508DE923B3EDA10067F53A /* AttackModel+Extensions.swift */; };
+		3D508DED23B3EE7C0067F53A /* CarryModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D508DEC23B3EE7C0067F53A /* CarryModelTests.swift */; };
 		3D528FD62154A50300EF65CA /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3D528FD52154A50300EF65CA /* GameScene.sks */; };
 		3D528FDF2155BD7300EF65CA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3D528FDE2155BD7200EF65CA /* Assets.xcassets */; };
 		3D58468822A6322900EDD845 /* RangeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D58468722A6322900EDD845 /* RangeModel.swift */; };
@@ -167,6 +169,8 @@
 		3D4F569122B2D087003695D8 /* SpriteSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteSheet.swift; sourceTree = "<group>"; };
 		3D4F569322B33B44003695D8 /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
 		3D4F569522B88A90003695D8 /* HapticGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticGenerator.swift; sourceTree = "<group>"; };
+		3D508DE923B3EDA10067F53A /* AttackModel+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AttackModel+Extensions.swift"; sourceTree = "<group>"; };
+		3D508DEC23B3EE7C0067F53A /* CarryModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarryModelTests.swift; sourceTree = "<group>"; };
 		3D528FD52154A50300EF65CA /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
 		3D528FDE2155BD7200EF65CA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3D58468722A6322900EDD845 /* RangeModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RangeModel.swift; sourceTree = "<group>"; };
@@ -402,6 +406,15 @@
 			name = Level;
 			sourceTree = "<group>";
 		};
+		3D508DEB23B3EDB60067F53A /* Test Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				3DB270A822B00E0D00D9BF8B /* TileTypeTest+Extensions.swift */,
+				3D508DE923B3EDA10067F53A /* AttackModel+Extensions.swift */,
+			);
+			name = "Test Extensions";
+			sourceTree = "<group>";
+		};
 		3D528FDD2155B17200EF65CA /* Scenes */ = {
 			isa = PBXGroup;
 			children = (
@@ -612,13 +625,14 @@
 				3DE87C91223D555A00D750CF /* InputQueueTests.swift */,
 				3D6F09A6236B3EA50069CDF2 /* TestHelpers.swift */,
 				3D4A470C23B3CEFC000165FB /* RandomTests.swift */,
-				3DB270A822B00E0D00D9BF8B /* TileTypeTest+Extensions.swift */,
+				3D508DEB23B3EDB60067F53A /* Test Extensions */,
 				3DF2926820A37FF0006671AC /* BoardTests.swift */,
 				3DCB38AA232DCE88001D148F /* TileCoordTests.swift */,
 				3D90AACF21D8854300C7428A /* RefereeTests.swift */,
 				3DE87C95224068FA00D750CF /* GameStateTests.swift */,
 				3DD72596239DD056005933B2 /* TutorialModelTests.swift */,
 				3D4A471223B3DCB7000165FB /* RangeModelTests.swift */,
+				3D508DEC23B3EE7C0067F53A /* CarryModelTests.swift */,
 				3DD36ECC21E5BD9100AC4873 /* TileStrategyTests.swift */,
 				3D30A4232216892A00AFA1E1 /* BoardMocker.swift */,
 				3DF2926A20A37FF0006671AC /* Info.plist */,
@@ -870,6 +884,7 @@
 				3D4A470D23B3CEFC000165FB /* RandomTests.swift in Sources */,
 				3DD72597239DD056005933B2 /* TutorialModelTests.swift in Sources */,
 				3DE87C92223D555A00D750CF /* InputQueueTests.swift in Sources */,
+				3D508DEA23B3EDA10067F53A /* AttackModel+Extensions.swift in Sources */,
 				3D6F09A7236B3EA50069CDF2 /* TestHelpers.swift in Sources */,
 				3D4A471323B3DCB7000165FB /* RangeModelTests.swift in Sources */,
 				3D30A4292216899E00AFA1E1 /* BoardMocker.swift in Sources */,
@@ -878,6 +893,7 @@
 				3DA4E8992290AC82006E90D1 /* EntityModelTests.swift in Sources */,
 				3DB270A922B00E0D00D9BF8B /* TileTypeTest+Extensions.swift in Sources */,
 				3D90AAD021D8854300C7428A /* RefereeTests.swift in Sources */,
+				3D508DED23B3EE7C0067F53A /* CarryModelTests.swift in Sources */,
 				3DE87C96224068FA00D750CF /* GameStateTests.swift in Sources */,
 				3DCB38AB232DCE88001D148F /* TileCoordTests.swift in Sources */,
 			);

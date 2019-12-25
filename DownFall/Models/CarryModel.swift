@@ -20,7 +20,7 @@ struct CarryModel: Decodable, Equatable {
     }
     
     private var totalGem: Int {
-        return items.filter({ $0.type == .gem }).count
+        return items.filter({ $0.type == .gem }).first?.amount ?? 0
     }
     
     func total(in currency: Currency) -> Int {
@@ -47,16 +47,15 @@ struct CarryModel: Decodable, Equatable {
     }
     
     func earn(_ money: Int, inCurrency currency: Currency) -> CarryModel {
-        var newItems = items
-        var newAmount = money
         let itemType: Item.ItemType = currency == .gold ? .gold : .gem
-        if let currentAmount = items.first(where: { $0.type == itemType })?.amount {
-            newAmount += currentAmount
-        }
-        newItems.removeAll { $0.type == itemType }
-        newItems.append(Item(type: itemType, amount: newAmount))
         
-        return CarryModel(items: newItems)
+        return CarryModel(items: items.map { item in
+            if item.type == itemType {
+                return Item(type: itemType, amount: item.amount + money)
+            } else {
+                return item
+            }
+        })
     }
 
 }

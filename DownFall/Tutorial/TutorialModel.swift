@@ -32,13 +32,13 @@ class TutorialData {
         currentIndexPath = IndexPath(item: min(currentIndexPath.item + 1, steps.count - 1), section: currentIndexPath.section)
     }
     
-    func countStepsIn() -> Int {
-        return steps.count
-    }
-    
     func step(stepIndex: Int) -> TutorialStep {
         guard stepIndex < steps.count else { fatalError() }
         return steps[stepIndex]
+    }
+    
+    func reset() {
+        self.currentIndexPath = IndexPath(row: 0, section: 0)
     }
     
 }
@@ -50,7 +50,7 @@ class TutorialStep: Equatable {
     
     var dialog: String
     var highlightType: [TileType] = []
-    var showFinger: Bool = false
+    var showFingerWithHighlight: Bool = false
     var showClockwiseRotate: Bool = false
     var showCounterClockwiseRotate: Bool = false
     var highlightCoordinates: [TileCoord] = []
@@ -86,7 +86,7 @@ class TutorialStep: Equatable {
         self.inputToContinue = inputToContinue
         self.started = started
         self.completed = completed
-        self.showFinger = showFinger
+        self.showFingerWithHighlight = showFinger
     }
     
     static var zero: TutorialStep {

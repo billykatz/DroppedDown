@@ -52,6 +52,11 @@
                         "type": "gold",
                         "amount": 15
                         
+                    },
+                    {
+                        "type": "gem",
+                        "amount": 0
+                        
                     }
                 ]
             },
@@ -104,7 +109,18 @@
                 }
             },
             "carry": {
-                "items": []
+                "items": [
+                {
+                    "type": "gold",
+                    "amount": 15
+                    
+                },
+                {
+                    "type": "gem",
+                    "amount": 0
+                    
+                }
+                ]
             },
             "abilities": []
         },
@@ -155,7 +171,18 @@
                 }
             },
             "carry": {
-                "items": []
+                "items": [
+                {
+                    "type": "gold",
+                    "amount": 15
+                    
+                },
+                {
+                    "type": "gem",
+                    "amount": 0
+                    
+                }
+                ]
             },
             "abilities": []
         },

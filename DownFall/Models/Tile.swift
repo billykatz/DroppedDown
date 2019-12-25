@@ -56,7 +56,8 @@ struct Tile: Hashable {
     }
     
     static var gem: Tile {
-        return Tile(type: .gem)
+        let gem = TileType.item(Item(type: .gem, amount: 1))
+        return Tile(type: gem)
     }
     
     static func monster(_ model: EntityModel) -> Tile {

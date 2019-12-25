@@ -33,15 +33,15 @@ class TileCreator: TileStrategy {
         let index = abs(given) % TileType.allCases.count
         switch TileType.allCases[index] {
         case .monster:
-            return randomMonster(given)
+            return randomMonster()
         case .blackRock, .blueRock, .purpleRock, .brownRock, .greenRock, .redRock:
-            return randomRock(given)
+            return randomRock()
         default:
             return TileType.allCases[index]
         }
     }
     
-    private func randomMonster(_ given: Int) -> TileType {
+    private func randomMonster() -> TileType {
         
         guard let level = level else { fatalError("You need to init with a level") }
         let totalNumber = level.monsterRatio.values.max { (first, second) -> Bool in
@@ -60,7 +60,7 @@ class TileCreator: TileStrategy {
         
     }
     
-    private func randomRock(_ given: Int) -> TileType {
+    private func randomRock() -> TileType {
         guard let level = level else { fatalError("You need to init with a level") }
         let totalNumber = level.rocksRatio.values.max { (first, second) -> Bool in
             return first.upper < second.upper
@@ -77,11 +77,13 @@ class TileCreator: TileStrategy {
     }
     
     var maxMonstersTotal: Int {
-        return level?.maxMonstersTotal ?? 20
+        guard let level = level else { fatalError("We must have a level to continue") }
+        return level.maxMonstersTotal
     }
     
     var maxMonstersOnScreen: Int {
-        return level?.maxMonstersOnScreen ?? 10
+        guard let level = level else { fatalError("We must have a level to continue") }
+        return level.maxMonstersOnScreen
     }
     
     var totalMonstersAdded = 0
@@ -146,7 +148,7 @@ class TileCreator: TileStrategy {
     func board(difficulty: Difficulty) -> [[Tile]] {
         var newTiles: [Tile] = []
         while (newTiles.count < boardSize * boardSize) {
-            let nextTile = Tile(type: randomRock(randomSource.nextInt()))
+            let nextTile = Tile(type: randomRock())
             
             switch nextTile.type {
             case .blueRock, .purpleRock, .brownRock, .blackRock, .redRock:
@@ -185,13 +187,13 @@ class TileCreator: TileStrategy {
             let randomCol = Int.random(upperMonsterbound)
             guard playerPosition != TileCoord(randomRow,randomCol),
                 !TileCoord(randomRow, randomCol).isOrthogonallyAdjacent(to: playerPosition) else { continue }
-            tiles[randomRow][randomCol] = Tile(type: randomMonster(randomSource.nextInt()))
+            tiles[randomRow][randomCol] = Tile(type: randomMonster())
             totalMonstersAdded += 1
         }
         
         //place the exit on the opposite side of the grid
-//        let exitQuadrant = playerQuadrant.opposite
-        let exitQuadrant = playerQuadrant
+        let exitQuadrant = playerQuadrant.opposite
+//        let exitQuadrant = playerQuadrant
         let exitPosition = exitQuadrant.randomCoord(for: boardSize)
         
         tiles[exitPosition.x][exitPosition.y] = Tile.exit

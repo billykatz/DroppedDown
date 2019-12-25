@@ -80,8 +80,7 @@ extension LevelSelect: HeaderDelegate {
 
 extension LevelSelect: ButtonDelegate {
     func buttonTapped(_ button: Button) {
-        guard let identifier = button.identifier else { return }
-        switch identifier {
+        switch button.identifier {
         case .newGame:
             levelSelectDelegate?.newGame(GameScope.shared.difficulty, playerModel)
         case .startTutorial:

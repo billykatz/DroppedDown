@@ -217,7 +217,7 @@ class Referee {
                     switch monsterData.attack.type {
                     case .charges:
                         shouldAttack = monsterData.attack.isCharged
-                    case .areaOfEffect, .targets, .slope:
+                    case .areaOfEffect, .targets:
                         shouldAttack = totalTurns % attackFrequency == 0
                     }
                     
@@ -273,7 +273,7 @@ class Referee {
                 isWithinBounds(playerPosition.rowBelow),
                 case TileType.item(let item) = tiles[playerPosition.rowBelow].type
                 else { return nil }
-            return Input(.collectItem(playerPosition.rowBelow, item, playerData.carry.total(in: .gold)), tiles)
+            return Input(.collectItem(playerPosition.rowBelow, item, playerData.carry.total(in: item.type.currencyType)), tiles)
         }
         
         

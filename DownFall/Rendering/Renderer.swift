@@ -167,7 +167,6 @@ class Renderer: SKSpriteNode {
             // show the menu
             foreground.addChild(menuForeground)
         case .gameLose:
-            //TODO: what should we do here?
             menuForeground.addChild(gameLoseSpriteNode)
             menuForeground.removeFromParent()
             foreground.addChild(menuForeground)
@@ -176,7 +175,7 @@ class Renderer: SKSpriteNode {
         case .tutorial(let step):
             let types = step.highlightType
             let coords = step.highlightCoordinates
-            let showFinger = step.showFinger
+            let showFinger = step.showFingerWithHighlight
             for (row, spriteRow) in sprites.enumerated() {
                 for (col, _) in spriteRow.enumerated() {
                     let sprite = sprites[row][col]
@@ -189,7 +188,7 @@ class Renderer: SKSpriteNode {
                     }
                     
                     if coords.contains(TileCoord(row, col)) {
-                        sprite.indicateAboutToAttack()
+                        sprite.indicateSpriteWillBeAttacked()
                     }
                 }
             }
@@ -236,9 +235,9 @@ class Renderer: SKSpriteNode {
         for (row, innerSprites) in sprites.enumerated() {
             for (col, sprite) in innerSprites.enumerated() {
                 if tiles?[row][col].shouldHighlight ?? false {
-                    sprite.indicateAboutToAttack()
+                    sprite.indicateSpriteWillBeAttacked()
                 } else if tiles?[row][col].willAttackNextTurn() ?? false {
-                    sprite.indicateAboutToAttack()
+                    sprite.indicateSpriteWillBeAttacked()
                 }
                 spriteForeground.addChild(sprite)
             }
@@ -277,7 +276,7 @@ class Renderer: SKSpriteNode {
                                               height: height,
                                               width: width)
                 if tiles[row][col].shouldHighlight {
-                    sprite.indicateAboutToAttack()
+                    sprite.indicateSpriteWillBeAttacked()
                 }
                 sprites[row].append(sprite)
                 sprites[row][col].position = CGPoint(x: x, y: y)
@@ -421,7 +420,12 @@ extension Renderer {
                             newTileCoord == lastTileCoord else { return }
                         
                         //special case for tutorial
-                        if level.type == .tutorial2, let data = level.tutorialData {
+                        if level.type != .tutorial2 {
+                            InputQueue.append(
+                                Input(.touch(TileCoord(row, col),
+                                             sprites[row][col].type))
+                            )
+                        } else if level.type == .tutorial2, let data = level.tutorialData {
                             if InputType.fuzzyEqual(data.currentStep.inputToContinue,
                                                     .touch(TileCoord(row, col), sprites[row][col].type)) {
                                 InputQueue.append(
@@ -429,25 +433,20 @@ extension Renderer {
                                                  sprites[row][col].type))
                                 )
                             }
-                            
+                                
                                 // the following logic is specific to the tutorial at hand.
                                 // if we want to constrain where a user can click, then we need to
                                 // understand where and when they are clicking
                                 // where on the board
                                 // and when in the tutorial
                             else if InputType.fuzzyEqual(data.currentStep.inputToContinue,
-                                                           .monsterDies(.zero)) {
+                                                         .monsterDies(.zero)) {
                                 InputQueue.append(
                                     Input(.touch(TileCoord(row, col),
                                                  sprites[row][col].type))
                                 )
                             }
-
-                        } else {
-                            InputQueue.append(
-                                Input(.touch(TileCoord(row, col),
-                                             sprites[row][col].type))
-                            )
+    
                         }
                     }
                 }

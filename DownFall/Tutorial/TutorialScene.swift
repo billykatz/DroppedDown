@@ -27,8 +27,10 @@ class TutorialScene: SKScene {
     //Generator
     private var generator: HapticGenerator?
     
-    //input to queue
-    private var inputQueue: InputType?
+    // Sometimes we need to append an input as soon as possible to move along the tutorial.
+    // This variable is used tomaintain a reference to pending input
+    // Checkout the update() function to see how it is used
+    private var pendingInput: InputType?
     
     //touch state
     private var touchWasSwipe = false
@@ -112,6 +114,7 @@ class TutorialScene: SKScene {
                     self.gameSceneDelegate?.visitStore(revivedData)
                 }
                 
+                self.level?.tutorialData?.reset()
                 swipingRecognizerView.removeFromSuperview()
             }
         }
@@ -187,9 +190,9 @@ extension TutorialScene {
     override func update(_ currentTime: TimeInterval) {
         if let input = InputQueue.pop() {
             Dispatch.shared.send(input)
-        } else if let queuedInput = inputQueue {
+        } else if let queuedInput = pendingInput {
             Dispatch.shared.send(Input(queuedInput))
-            inputQueue = nil
+            pendingInput = nil
         }
     }
 }
@@ -248,6 +251,6 @@ extension TutorialScene {
 
 extension TutorialScene: TutorialViewDelegate {
     func queue(inputType: InputType) {
-        self.inputQueue = inputType
+        self.pendingInput = inputType
     }
 }

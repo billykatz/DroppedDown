@@ -10,9 +10,6 @@ import UIKit
 import SpriteKit
 import GameplayKit
 
-
-
-
 protocol LevelCoordinating: StoreSceneDelegate, GameSceneCoordinatingDelegate {
     var gameSceneNode: GameScene? { get set }
     var tutorialSceneNode: TutorialScene? { get set }
@@ -57,7 +54,7 @@ extension LevelCoordinating where Self: UIViewController {
                 tutorialSceneNode!.commonInit(boardSize: level.boardSize,
                                               entities: entities,
                                               difficulty: GameScope.shared.difficulty,
-                                              updatedEntity: nil,
+                                              updatedEntity: playerData,
                                               level: level)
                 
                 if let view = self.view as! SKView? {

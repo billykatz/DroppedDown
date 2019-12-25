@@ -20,9 +20,6 @@ protocol StoreSceneInventory {
 class StoreScene: SKScene {
     
     struct Constants {
-        static let closeButton = "closeButton"
-        static let buyButton = "buyButton"
-        static let sellButton = "sellButton"
         static let goldWallet = "goldWallet"
         static let gemWallet = "gemWallet"
         static let popup  = "popup"
@@ -151,11 +148,18 @@ class StoreScene: SKScene {
     
     private var transactionButton: Button {
         let purchased = selectedItem?.isPurchased ?? false
-        let purchaseButton = Button(size: CGSize(width: 200, height: 50),
+        
+        let purchaseButton = Button(size: Style.Store.CTAButton.size,
                                     delegate: self,
-                                    textureName: purchased ? Constants.sellButton : Constants.buyButton,
-                                    precedence: .foreground)
-        purchaseButton.position = CGPoint(x: frame.maxX, y: -200)
+                                    identifier: !purchased ? .purchase : .sell,
+                                    precedence: .foreground,
+                                    fontSize: UIFont.mediumSize,
+                                    fontColor: .white,
+                                    backgroundColor: !purchased ? .green : .blue)
+        purchaseButton.position = CGPoint.positionThis(purchaseButton.frame,
+                                                       inBottomOf: frame,
+                                                       padding: Style.Store.CTAButton.bottomPadding,
+                                                       anchor: .right)
         return purchaseButton
     }
     
@@ -181,12 +185,15 @@ class StoreScene: SKScene {
                                      fontColor: .white)
         popupNode.addChild(descriptionLabel)
         
-        let closeBtn = Button(size: Style.CloseButton.size,
-                              delegate: self,
-                              textureName: Constants.closeButton,
-                              precedence: .menu)
-        closeBtn.position = CGPoint.positionThis(closeBtn.frame, inTopRightOf: popupNode.frame)
-        popupNode.addChild(closeBtn)
+        let closeButton = Button(size: Style.Store.CloseButton.size,
+                                 delegate: self,
+                                 identifier: .close,
+                                 precedence: .foreground,
+                                 fontSize: UIFont.smallSize,
+                                 fontColor: .white,
+                                 backgroundColor: .darkGray)
+        closeButton.position = CGPoint.positionThis(closeButton.frame, inTopRightOf: popupNode.frame)
+        popupNode.addChild(closeButton)
         popupNode.name = Constants.popup
         return popupNode
     }
@@ -247,9 +254,9 @@ class StoreScene: SKScene {
             if child.name == "popup" {
                 child.removeAllChildren()
                 child.removeFromParent()
-            } else if child.name == Constants.buyButton {
+            } else if child.name == ButtonIdentifier.purchase.rawValue {
                 let slideOut = SKAction.moveTo(x: frame.maxX + child.frame.width/2,
-                                               duration: TimeInterval(exactly: 0.3)!)
+                                               duration: 0.3)
                 child.run(slideOut) {
                     child.removeFromParent()
                 }
@@ -262,7 +269,7 @@ class StoreScene: SKScene {
         for child in self.children {
             if child.name == name {
                 let slideOut = SKAction.moveTo(x: frame.maxX + child.frame.width/2,
-                                               duration: TimeInterval(exactly: 0.3)!)
+                                               duration: 0.3)
                 child.run(slideOut) {
                     child.removeFromParent()
                 }
@@ -305,17 +312,17 @@ class StoreScene: SKScene {
     }
     
     private func toggleTransactionButton() {
-        hideButton(with: Constants.buyButton)
-        hideButton(with: Constants.sellButton)
+        hideButton(with: ButtonIdentifier.purchase.rawValue)
+        hideButton(with: ButtonIdentifier.sell.rawValue)
         if let selectedItem = selectedItem {
-            showButton(selectedItem.isPurchased ? Constants.sellButton : Constants.buyButton)
+            showButton(selectedItem.isPurchased ? ButtonIdentifier.sell.rawValue : ButtonIdentifier.purchase.rawValue)
         }
     }
     
     private func showButton(_ buttonName: String) {
         let button = transactionButton
         let slideIn = SKAction.moveTo(x: frame.maxX - transactionButton.size.width/2,
-                                      duration: TimeInterval(exactly: 0.5)!)
+                                      duration: 0.5)
         show(button)
         button.run(slideIn)
     }
@@ -335,13 +342,13 @@ extension StoreScene: ButtonDelegate {
     func buttonTapped(_ button: Button) {
         if button.name == "leaveStore" {
             storeSceneDelegate?.leave(self, updatedPlayerData: playerData)
-        } else if button.name == Constants.buyButton,
+        } else if button.name == ButtonIdentifier.purchase.rawValue,
             let storeItem = selectedItem {
             buy(storeItem)
-        } else if button.name == Constants.sellButton,
+        } else if button.name == ButtonIdentifier.sell.rawValue,
             let storeItem = selectedItem {
             sell(storeItem)
-        } else if button.name == Constants.closeButton {
+        } else if button.name == ButtonIdentifier.close.rawValue {
             selectedItem = nil
         }
         

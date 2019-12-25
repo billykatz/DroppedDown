@@ -54,7 +54,7 @@ class DFTileSpriteNode: SKSpriteNode {
         }
     }
     
-    func indicateAboutToAttack() {
+    func indicateSpriteWillBeAttacked() {
         let indicatorSprite = SKSpriteNode(color: .yellow, size: self.size)
         indicatorSprite.zPosition = Precedence.background.rawValue
         self.addChild(indicatorSprite)

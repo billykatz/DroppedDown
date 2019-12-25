@@ -78,12 +78,6 @@ struct TutorialTileCreator: TileStrategy {
     }
     
     var playerEntityData: EntityModel? {
-        
-        //TODO remove this hack
-        guard updatedEntity == nil else {
-            return updatedEntity
-        }
-        
-        return entities.easyPlayer
+        return updatedEntity ?? entities.easyPlayer
     }
 }

@@ -23,10 +23,9 @@ struct Win: Rule {
 
 struct Tutorial1Win: Rule {
     func apply(_ tiles: [[Tile]]) -> Input? {
-        guard
-            let playerPosition = getTilePosition(.player(.zero), tiles: tiles),
+        guard let playerPosition = getTilePosition(.player(.zero), tiles: tiles),
             case let TileType.player(player) = tiles[playerPosition].type,
-            player.carry.hasGem
+            player.canAfford(1, inCurrency: .gem)
             else { return nil }
         return Input(.gameWin)
     }

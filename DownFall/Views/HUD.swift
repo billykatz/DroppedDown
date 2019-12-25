@@ -56,7 +56,7 @@ class HUD: SKSpriteNode {
         case .collectItem(_, let item, let totalGold):
             if item.type == .gem {
                 showGem()
-            } else {
+            } else if item.type == .gold {
                 incrementGoldCounter(totalGold)
             }
         case .boardBuilt:

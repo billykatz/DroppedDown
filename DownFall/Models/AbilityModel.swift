@@ -102,6 +102,15 @@ enum Usage {
 }
 
 enum Currency: String, CaseIterable  {
-    case gold = "gold"
+    case gold
     case gem = "gem2"
+    
+    var itemTyp: Item.ItemType {
+        switch self {
+        case .gold:
+            return Item.ItemType.gold
+        case .gem:
+            return Item.ItemType.gem
+        }
+    }
 }

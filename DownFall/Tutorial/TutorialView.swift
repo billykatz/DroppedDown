@@ -88,10 +88,6 @@ class TutorialView: SKSpriteNode {
         }
     }
     
-    func startStep(_ currentStep: TutorialStep) {
-        currentStep.started = true
-    }
-    
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         if tutorialData.currentStep.started
             && tutorialData.currentStep.inputToContinue == .tutorial(.zero) {

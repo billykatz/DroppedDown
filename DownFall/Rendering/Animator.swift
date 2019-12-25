@@ -27,12 +27,12 @@ struct Animator {
         playerSprite.removeFromParent()
         
         let minecart = SKSpriteNode(imageNamed: "minecart")
-        minecart.size = exitSprite.size.adjusted(by: Style.DFTileSpriteNode.Exit.minecartSizeCoefficient)
+        minecart.size = exitSprite.size.scale(by: Style.DFTileSpriteNode.Exit.minecartSizeCoefficient)
         minecart.zPosition = Precedence.foreground.rawValue
         minecart.position = CGPoint.positionThis(minecart.frame, inBottomOf: exitSprite.frame)
         
         let playerWin = SKSpriteNode(imageNamed: "playerWin")
-        playerWin.size = exitSprite.size.adjusted(by: Style.DFTileSpriteNode.Exit.minecartSizeCoefficient)
+        playerWin.size = exitSprite.size.scale(by: Style.DFTileSpriteNode.Exit.minecartSizeCoefficient)
         playerWin.zPosition = Precedence.foreground.rawValue
         playerWin.position = .zero
         

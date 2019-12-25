@@ -12,6 +12,21 @@ struct AttackSlope: Equatable, Decodable {
     let over: Int
     let up: Int
     
+    static var south: AttackSlope {
+        return AttackSlope(over: 0, up: -1)
+    }
+    
+    static var sideways: [AttackSlope] {
+        return [AttackSlope(over: -1, up: 0), AttackSlope(over: 1, up: 0)]
+    }
+    
+    static var diagonals: [AttackSlope] {
+        return [AttackSlope(over: -1, up: 1),
+                AttackSlope(over: 1, up: 1),
+                AttackSlope(over: -1, up: -1),
+                AttackSlope(over: 1, up: -1)]
+    }
+    
     static var playerPossibleAttacks: [AttackSlope] {
         return [
             AttackSlope(over: -1, up: 0),

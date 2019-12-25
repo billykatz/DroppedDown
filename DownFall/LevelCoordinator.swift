@@ -43,7 +43,7 @@ struct Level {
         return tutorialData != nil
     }
         
-    static let zero = Level(type: .boss, monsterRatio: [:], maxMonstersTotal: 0, maxMonstersOnScreen: 0, maxGems: 0, maxTime: 0, boardSize: 0, abilities: [], goldMultiplier: 1, rocksRatio: [:], tutorialData: nil)
+    static let zero = Level(type: .first, monsterRatio: [:], maxMonstersTotal: 0, maxMonstersOnScreen: 0, maxGems: 0, maxTime: 0, boardSize: 0, abilities: [], goldMultiplier: 1, rocksRatio: [:], tutorialData: nil)
 }
 
 protocol LevelCoordinating: StoreSceneDelegate, GameSceneCoordinatingDelegate {

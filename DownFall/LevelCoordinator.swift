@@ -26,7 +26,7 @@ enum LevelType: Int, Codable, CaseIterable {
 
 struct Level {
     let type: LevelType
-    let monsters: [EntityModel.EntityType: Double]
+    let monsterRatio: [EntityModel.EntityType: RangeModel]
     let maxMonstersTotal: Int
     let maxMonstersOnScreen: Int
     let maxGems: Int
@@ -34,6 +34,8 @@ struct Level {
     let boardSize: Int
     let abilities: [AnyAbility]
     let goldMultiplier: Int
+    let rocksRatio: [TileType: RangeModel]
+    let maxSpecialRocks = 5
     
     var tutorialData: TutorialData?
     
@@ -41,14 +43,13 @@ struct Level {
         return tutorialData != nil
     }
         
-    static let zero = Level(type: .boss, monsters: [:], maxMonstersTotal: 0, maxMonstersOnScreen: 0, maxGems: 0, maxTime: 0, boardSize: 0, abilities: [], goldMultiplier: 1, tutorialData: nil)
+    static let zero = Level(type: .boss, monsterRatio: [:], maxMonstersTotal: 0, maxMonstersOnScreen: 0, maxGems: 0, maxTime: 0, boardSize: 0, abilities: [], goldMultiplier: 1, rocksRatio: [:], tutorialData: nil)
 }
 
 protocol LevelCoordinating: StoreSceneDelegate, GameSceneCoordinatingDelegate {
     var gameSceneNode: GameScene? { get set }
     var tutorialSceneNode: TutorialScene? { get set }
-    var entities: [EntityModel]? { get set }
-    var boardSize: Int { get set }
+    var entities: EntitiesModel? { get set }
     var levels: [Level]? { get set }
     var levelIndex: Int { get set }
     
@@ -86,7 +87,7 @@ extension LevelCoordinating where Self: UIViewController {
                 tutorialSceneNode = scene
                 tutorialSceneNode!.gameSceneDelegate = self
                 tutorialSceneNode!.scaleMode = .aspectFill
-                tutorialSceneNode!.commonInit(boardSize: 4,
+                tutorialSceneNode!.commonInit(boardSize: level.boardSize,
                                               entities: entities,
                                               difficulty: GameScope.shared.difficulty,
                                               updatedEntity: nil,
@@ -110,7 +111,7 @@ extension LevelCoordinating where Self: UIViewController {
                 gameSceneNode = scene
                 gameSceneNode!.scaleMode = .aspectFill
                 gameSceneNode!.gameSceneDelegate = self
-                gameSceneNode!.commonInit(boardSize: boardSize,
+                gameSceneNode!.commonInit(boardSize: level.boardSize,
                                           entities: entities,
                                           difficulty: GameScope.shared.difficulty,
                                           updatedEntity: playerData,
@@ -149,12 +150,12 @@ extension LevelCoordinating where Self: UIViewController {
     
     // MARK: - GameSceneCoordinatingDelegate
     
-    func reset(_ scene: SKScene) {
+    func reset(_ scene: SKScene, playerData: EntityModel ) {
         let fadeOut = SKAction.fadeOut(withDuration: 0.75)
         let remove = SKAction.removeFromParent()
         scene.run(SKAction.group([fadeOut, remove])) { [weak self] in
             guard let self = self else { return }
-            self.presentNextLevel(self.entities![0])
+            self.presentNextLevel(playerData.revive())
         }
         
     }

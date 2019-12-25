@@ -58,7 +58,7 @@ class HelperTextView: SKSpriteNode {
             }
         case .touch(_, let type):
             switch type {
-            case .blackRock, .blueRock, .greenRock, .purpleRock, .brownRock:
+            case .blackRock, .blueRock, .greenRock, .purpleRock, .brownRock, .redRock:
                 descriptionText = "Remove rocks by tapping on groups\n of 3 or more anywhere on the board."
             case .exit:
                 descriptionText = "That's the mine shaft,\n but you cant exit until you find the gem!"

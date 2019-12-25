@@ -43,7 +43,7 @@ class GameScene: SKScene {
     
     /// Creates an instance of board and does preparation neccessary for didMove(to:) to be called
     public func commonInit(boardSize: Int,
-                           entities: [EntityModel],
+                           entities: EntitiesModel,
                            difficulty: Difficulty = .normal,
                            updatedEntity: EntityModel? = nil,
                            level: Level) {
@@ -63,7 +63,7 @@ class GameScene: SKScene {
                                       level: level)
         
         //board
-        board = Board.build(size: boardSize, tileCreator: tileCreator, difficulty: difficulty, level: level)
+        board = Board.build(tileCreator: tileCreator, difficulty: difficulty, level: level)
         self.boardSize = boardSize
         
         // create haptic generator
@@ -90,11 +90,16 @@ class GameScene: SKScene {
         // Register for inputs we care about
         Dispatch.shared.register { [weak self] input in
             if input.type == .playAgain {
-                guard let self = self else { return }
+                guard let self = self,
+                let playerIndex = tileIndices(of: .player(.zero), in: self.board.tiles).first
+                else { return }
                 
                 self.foreground.removeAllChildren()
-                self.removeFromParent()
-                self.gameSceneDelegate?.reset(self)
+                if case let TileType.player(data) = self.board.tiles[playerIndex].type {
+                    self.removeFromParent()
+                    self.gameSceneDelegate?.reset(self, playerData: data)
+                }
+
             } else if input.type == .visitStore {
                 guard let self = self,
                     let playerIndex = tileIndices(of: .player(.zero), in: self.board.tiles).first
@@ -176,7 +181,13 @@ extension GameScene {
             if self.nodes(at: newTouch).contains(where: { node in
                 (node as? SKSpriteNode)?.name == "setting"
             }) {
-                gameSceneDelegate?.reset(self)
+                guard let playerIndex = tileIndices(of: .player(.zero), in: self.board.tiles).first else { return }
+                
+                self.foreground.removeAllChildren()
+                if case let TileType.player(data) = self.board.tiles[playerIndex].type {
+                    self.removeFromParent()
+                    self.gameSceneDelegate?.reset(self, playerData: data)
+                }
             }
         }
     }

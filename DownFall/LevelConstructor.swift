@@ -16,21 +16,22 @@ struct LevelConstructor {
             let maxMonstersTotal = LevelConstructor.maxMonstersTotalPer(levelType, difficulty: difficulty)
             let maxMonstersOnScreen = maxMonstersTotal/LevelConstructor.monstersOnScreenDivisor
             return Level(type: levelType,
-                         monsters: monstersPerLevel(levelType, difficulty: difficulty),
+                         monsterRatio: monstersPerLevel(levelType, difficulty: difficulty),
                          maxMonstersTotal: maxMonstersTotal,
                          maxMonstersOnScreen: maxMonstersOnScreen,
                          maxGems: 1,
                          maxTime: timePer(levelType, difficulty: difficulty),
                          boardSize: 8,
                          abilities: availableAbilities(per: levelType, difficulty: difficulty),
-                         goldMultiplier: difficulty.goldMultiplier)
+                         goldMultiplier: difficulty.goldMultiplier,
+                         rocksRatio: availableRocksPerLevel(levelType, difficulty: difficulty))
         }
     }
     
     static func buildTutorialLevels() -> [Level] {
         return (0..<LevelType.tutorialCases.count).map { index in
             Level(type: LevelType.tutorialCases[index],
-                  monsters: [:],
+                  monsterRatio: [:],
                   maxMonstersTotal: 0,
                   maxMonstersOnScreen: 0,
                   maxGems: 0,
@@ -38,32 +39,84 @@ struct LevelConstructor {
                   boardSize: 4,
                   abilities: [],
                   goldMultiplier: 1,
+                  rocksRatio: [:],
                   tutorialData: GameScope.shared.tutorials[index])
         }
     }
     
-    static func monstersPerLevel(_ levelType: LevelType, difficulty: Difficulty) -> [EntityModel.EntityType: Double] {
+    static func availableRocksPerLevel(_ levelType: LevelType, difficulty: Difficulty) -> [TileType: RangeModel] {
+        let normalRockRange = RangeModel(lower: 0, upper: 90)
+        switch levelType {
+        case .first:
+            let dividedRockRanges = normalRockRange.divivdedIntoSubRanges(3)
+            return [.redRock: dividedRockRanges[0],
+                    .blueRock: dividedRockRanges[1],
+                    .purpleRock: dividedRockRanges[2],
+                    .greenRock: dividedRockRanges[2].next(10)]
+        case .second:
+            let dividedRockRanges = normalRockRange.divivdedIntoSubRanges(4)
+            return [.redRock: dividedRockRanges[0],
+                    .blueRock: dividedRockRanges[1],
+                    .purpleRock: dividedRockRanges[2],
+                    .brownRock: dividedRockRanges[3],
+                    .greenRock: dividedRockRanges[3].next(10)]
+        case .third:
+            let dividedRockRanges = normalRockRange.divivdedIntoSubRanges(5)
+            return [.redRock: dividedRockRanges[0],
+                    .blueRock: dividedRockRanges[1],
+                    .purpleRock: dividedRockRanges[2],
+                    .brownRock: dividedRockRanges[3],
+                    .blackRock: dividedRockRanges[4],
+                    .greenRock: dividedRockRanges[4].next(10)]
+        case .boss, .tutorial1, .tutorial2:
+            fatalError("Gotta do boss and or not call this for tutorial")
+        }
+    }
+    
+    static func monstersPerLevel(_ levelType: LevelType, difficulty: Difficulty) -> [EntityModel.EntityType: RangeModel] {
+        let normalRockRange = RangeModel(lower: 0, upper: 100)
         switch levelType {
         case .first:
             switch difficulty{
             case .easy:
-                return [EntityModel.EntityType.rat: 0.5, .bat: 0.5]
+                let dividedRockRanges = normalRockRange.divivdedIntoSubRanges(2)
+                return [.rat: dividedRockRanges[0],
+                        .bat: dividedRockRanges[1]]
             case .normal, .hard:
-                return [EntityModel.EntityType.rat: 0.33, .bat: 0.33, .alamo: 0.33]
+                let dividedRockRanges = normalRockRange.divivdedIntoSubRanges(3)
+                return [.rat: dividedRockRanges[0],
+                        .bat: dividedRockRanges[1],
+                        .alamo: dividedRockRanges[2]]
             }
         case .second:
             switch difficulty{
             case .easy:
-                return [EntityModel.EntityType.rat: 0.33, .bat: 0.33, .dragon: 0.33]
+                let dividedRockRanges = normalRockRange.divivdedIntoSubRanges(3)
+                return [.rat: dividedRockRanges[0],
+                        .bat: dividedRockRanges[1],
+                        .dragon: dividedRockRanges[2]]
             case .normal, .hard:
-                return [EntityModel.EntityType.rat: 0.25, .bat: 0.25, .dragon: 0.25, .alamo: 0.25]
+                let dividedRockRanges = normalRockRange.divivdedIntoSubRanges(4)
+                return [.rat: dividedRockRanges[0],
+                        .bat: dividedRockRanges[1],
+                        .dragon: dividedRockRanges[2],
+                        .alamo: dividedRockRanges[3]]
             }
         case .third:
             switch difficulty{
             case .easy:
-                return [.bat: 0.25, .dragon: 0.25, .alamo: 0.25, .wizard: 0.25]
+                let dividedRockRanges = normalRockRange.divivdedIntoSubRanges(4)
+                return [.bat: dividedRockRanges[0],
+                        .dragon: dividedRockRanges[1],
+                        .alamo: dividedRockRanges[2],
+                        .wizard: dividedRockRanges[3]]
             case .normal, .hard:
-                return [.bat: 0.20, .dragon: 0.20, .alamo: 0.20, .wizard: 0.20, .lavaHorse: 0.20]
+                let dividedRockRanges = normalRockRange.divivdedIntoSubRanges(5)
+                return [.bat: dividedRockRanges[0],
+                        .dragon: dividedRockRanges[1],
+                        .alamo: dividedRockRanges[2],
+                        .wizard: dividedRockRanges[3],
+                        .lavaHorse: dividedRockRanges[4]]
             }
         case .boss, .tutorial1, .tutorial2:
             fatalError("Boss level not implemented yet")

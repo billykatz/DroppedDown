@@ -14,8 +14,7 @@ class GameViewController: UIViewController, LevelCoordinating {
 
     internal var gameSceneNode: GameScene?
     internal var tutorialSceneNode: TutorialScene?
-    internal var boardSize = 8
-    internal var entities: [EntityModel]?
+    internal var entities: EntitiesModel?
     internal var levelIndex: Int = 0
     internal var levels: [Level]?
     
@@ -23,8 +22,8 @@ class GameViewController: UIViewController, LevelCoordinating {
         super.viewDidLoad()
         do {
             guard let entityData = try Data.data(from: "entities") else { fatalError("Crashing here is okay because we failed to parse our entity json file") }
-            entities = try JSONDecoder().decode(EntitiesModel.self, from: entityData).entities
-            levelSelect(entities![0])
+            entities = try JSONDecoder().decode(EntitiesModel.self, from: entityData)
+            levelSelect(entities!.entities[0])
         }
         catch(let error) {
             fatalError("Crashing due to \(error) while trying to parse json entity file")

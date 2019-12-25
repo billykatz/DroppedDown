@@ -22,7 +22,12 @@ struct EntityModel: Equatable, Decodable {
         case wizard
         case lavaHorse
         case player
+        case easyPlayer
+        case normalPlayer
+        case hardPlayer
     }
+    
+    static let playerCases: [EntityType] = [.easyPlayer, .normalPlayer, .hardPlayer]
     
     static let monsterCases: [EntityType] = [.rat, .bat, .dragon, .alamo]
     
@@ -161,6 +166,22 @@ extension EntityModel: Hashable {
 
 struct EntitiesModel: Equatable, Decodable {
     let entities: [EntityModel]
+    
+    func entity(with type: EntityModel.EntityType) -> EntityModel? {
+        return entities.first(where: { $0.type == type})
+    }
+    
+    var easyPlayer: EntityModel? {
+        return entity(with: .easyPlayer)
+    }
+    
+    var normalPlayer: EntityModel? {
+        return entity(with: .normalPlayer)
+    }
+    
+    var hardPlayer: EntityModel? {
+        return entity(with: .hardPlayer)
+    }
 }
 
 

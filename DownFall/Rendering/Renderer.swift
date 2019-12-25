@@ -143,9 +143,7 @@ class Renderer: SKSpriteNode {
                 let sprites = createSprites(from: trans.endTiles)
                 animationsFinished(for: sprites, endTiles: trans.endTiles)
             case .collectItem:
-                foreground.run(SKAction.wait(forDuration: 0.25)) { [weak self] in
-                    self?.computeNewBoard(for: trans)
-                }
+                computeNewBoard(for: trans)
             case .reffingFinished:
                 () // Purposely left blank.
             case .touchBegan:

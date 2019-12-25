@@ -11,13 +11,14 @@ import GameplayKit
 class TileCreator: TileStrategy {
     var spawnedGem = false
     var randomSource = GKLinearCongruentialRandomSource()
-    let entities: [EntityModel]
+    let entities: EntitiesModel
     let difficulty: Difficulty
     var updatedEntity: EntityModel?
-    var boardSize: Int = 0
+    let boardSize: Int
     var level: Level?
+    var specialRocks = 0
     
-    required init(_ entities: [EntityModel],
+    required init(_ entities: EntitiesModel,
                   difficulty: Difficulty,
                   updatedEntity: EntityModel? = nil,
                   level: Level?) {
@@ -25,44 +26,57 @@ class TileCreator: TileStrategy {
         self.difficulty = difficulty
         self.updatedEntity = updatedEntity
         self.level = level
+        self.boardSize = level?.boardSize ?? 0
     }
     
-    func randomTile(_ given: Int) -> TileType {
+    private func randomTile(_ given: Int) -> TileType {
         let index = abs(given) % TileType.allCases.count
         switch TileType.allCases[index] {
         case .monster:
             return randomMonster(given)
-        case .blackRock, .blueRock, .purpleRock, .brownRock, .greenRock:
+        case .blackRock, .blueRock, .purpleRock, .brownRock, .greenRock, .redRock:
             return randomRock(given)
         default:
             return TileType.allCases[index]
         }
     }
     
-    func randomMonster(_ given: Int) -> TileType {
-        let index = Int.random(EntityModel.monsterCases.count)
-        switch EntityModel.monsterCases[index] {
-        case .dragon:
-            return TileType.monster(entities[3])
-        case .rat:
-            return TileType.monster(entities[4])
-        case .bat:
-            return TileType.monster(entities[5])
-        case .alamo:
-            return TileType.monster(entities[6])
-        case .player, .lavaHorse, .wizard:
-            fatalError("monstersCases should not included player or some unused monsters")
+    private func randomMonster(_ given: Int) -> TileType {
+        
+        guard let level = level else { fatalError("You need to init with a level") }
+        let totalNumber = level.monsterRatio.values.max { (first, second) -> Bool in
+            return first.upper < second.upper
         }
+        guard let upperRange = totalNumber?.upper else { fatalError("You need to init with a level") }
+
+        let randomNumber = Int.random(upperRange)
+        for (key, value) in level.monsterRatio {
+            if value.contains(randomNumber), let data = entities.entity(with: key) {
+                return TileType.monster(data)
+            }
+        }
+        
+        fatalError("We should always return a random monster from this function.")
         
     }
     
-    func randomRock(_ given: Int) -> TileType {
-        let index = abs(given) % TileType.rockCases.count
-        return TileType.rockCases[index]
+    private func randomRock(_ given: Int) -> TileType {
+        guard let level = level else { fatalError("You need to init with a level") }
+        let totalNumber = level.rocksRatio.values.max { (first, second) -> Bool in
+            return first.upper < second.upper
+        }
+        guard let upperRange = totalNumber?.upper else { fatalError("You need to init with a level") }
+        let randomNumber = Int.random(upperRange)
+        for (key, value) in level.rocksRatio {
+            if value.contains(randomNumber) {
+                return key
+            }
+        }
+        
+        fatalError("The randomNumber between 0-\(upperRange-1) should find itself in the range of one of the rocks")
     }
     
     var maxMonstersTotal: Int {
-        //TODO: dont hardcode
         return level?.maxMonstersTotal ?? 20
     }
     
@@ -92,10 +106,16 @@ class TileCreator: TileStrategy {
             
             switch nextTile.type {
                 
-            case .greenRock, .purpleRock, .brownRock, .blueRock,. blackRock:
+            case .purpleRock, .brownRock, .blueRock, .blackRock, .redRock:
                 newTiles.append(nextTile)
             case .empty, .item, .player, .fireball:
                 ()
+            case .greenRock:
+                if specialRocks < level?.maxSpecialRocks ?? 0 {
+                    specialRocks += 1
+                    newTiles.append(nextTile)
+                }
+
             case .exit:
                 if typeCount(for: tiles, of: .exit).count < 1,
                     !newTiles.contains(Tile.exit)
@@ -123,16 +143,19 @@ class TileCreator: TileStrategy {
  
     */
     
-    func board(_ boardSize: Int,
-               difficulty: Difficulty) -> [[Tile]] {
-        self.boardSize = boardSize
+    func board(difficulty: Difficulty) -> [[Tile]] {
         var newTiles: [Tile] = []
         while (newTiles.count < boardSize * boardSize) {
             let nextTile = Tile(type: randomRock(randomSource.nextInt()))
             
             switch nextTile.type {
-            case .blueRock, .greenRock, .purpleRock, .brownRock, .blackRock:
+            case .blueRock, .purpleRock, .brownRock, .blackRock, .redRock:
                 newTiles.append(nextTile)
+            case .greenRock:
+                if specialRocks < level?.maxSpecialRocks ?? 0 {
+                    specialRocks += 1
+                    newTiles.append(nextTile)
+                }
             case .exit, .player, .monster, .item, .empty, .fireball:
                 assertionFailure("randomRock should only create rocks")
             }
@@ -150,7 +173,10 @@ class TileCreator: TileStrategy {
         
         let playerQuadrant = Quadrant.allCases[Int.random(Quadrant.allCases.count)]
         let playerPosition = playerQuadrant.randomCoord(for: boardSize)
-        tiles[playerPosition.x][playerPosition.y] = Tile(type: .player(playerEntityData))
+        
+        
+        guard let playerData = playerEntityData else { fatalError("We must get a playerData or else we cannot continue") }
+        tiles[playerPosition.x][playerPosition.y] = Tile(type: .player(playerData))
         
         let upperMonsterbound = Int(Double(tiles.count))
         
@@ -164,29 +190,26 @@ class TileCreator: TileStrategy {
         }
         
         //place the exit on the opposite side of the grid
-        let exitQuadrant = playerQuadrant.opposite
-//        let exitQuadrant = playerQuadrant
+//        let exitQuadrant = playerQuadrant.opposite
+        let exitQuadrant = playerQuadrant
         let exitPosition = exitQuadrant.randomCoord(for: boardSize)
         
         tiles[exitPosition.x][exitPosition.y] = Tile.exit
         
         return tiles
-        
     }
     
-    var playerEntityData: EntityModel {
-        
-        //TODO remove this hack
+    var playerEntityData: EntityModel? {
         guard updatedEntity == nil else {
-            return updatedEntity!
+            return updatedEntity
         }
         switch difficulty {
         case .easy:
-            return entities[0]
+            return entities.easyPlayer
         case .normal:
-            return entities[1]
+            return entities.normalPlayer
         case .hard:
-            return entities[2]
+            return entities.hardPlayer
         }
     }
 }

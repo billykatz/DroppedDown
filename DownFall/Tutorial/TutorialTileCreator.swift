@@ -30,18 +30,20 @@ struct TutorialTileCreator: TileStrategy {
     
     var updatedEntity: EntityModel?
     var difficulty: Difficulty
-    var entities: [EntityModel]
+    var entities: EntitiesModel
     var level: Level?
     var randomSource: GKLinearCongruentialRandomSource = GKLinearCongruentialRandomSource()
     
-    init(_ entities: [EntityModel], difficulty: Difficulty, updatedEntity: EntityModel?, level: Level?) {
+    init(_ entities: EntitiesModel, difficulty: Difficulty, updatedEntity: EntityModel?, level: Level?) {
         self.entities = entities
         self.difficulty = difficulty
         self.updatedEntity = updatedEntity
         self.level = level
     }
     
-    func board(_ boardSize: Int, difficulty: Difficulty) -> [[Tile]] {
+    func board(difficulty: Difficulty) -> [[Tile]] {
+        guard let playerData = playerEntityData else { fatalError("We must have player data to continue") }
+        
         let greenRow = Array(repeating: Tile.greenRock, count: 4)
         let purpleRow = Array(repeating: Tile.purpleRock, count: 4)
         
@@ -54,15 +56,15 @@ struct TutorialTileCreator: TileStrategy {
                 [.greenRock, .gem, .greenRock, .greenRock],
                 greenRow,
                 greenRow,
-                [.greenRock, .greenRock, Tile(type: .player(playerEntityData)), .greenRock]
+                [.greenRock, .greenRock, Tile(type: .player(playerData)), .greenRock]
             ]
         case .tutorial2:
-            guard let rat = entityData(for: .rat) else { fatalError("Could not find a rat in the entities array") }
+            guard let rat = entities.entity(with: .rat) else { fatalError("Could not find a rat in the entities array") }
             tiles = [
                 [.greenRock, .greenRock, .monster(rat), .brownRock],
                 [.greenRock, .greenRock, .brownRock , .purpleRock],
                 purpleRow,
-                [.purpleRock, .purpleRock, Tile(type: .player(playerEntityData)), .brownRock]
+                [.purpleRock, .purpleRock, Tile(type: .player(playerData)), .brownRock]
             ]
         }
         return tiles
@@ -75,20 +77,13 @@ struct TutorialTileCreator: TileStrategy {
         return array
     }
     
-    var playerEntityData: EntityModel {
+    var playerEntityData: EntityModel? {
         
         //TODO remove this hack
         guard updatedEntity == nil else {
-            return updatedEntity!
+            return updatedEntity
         }
         
-        return entities[0]
+        return entities.easyPlayer
     }
-    
-    func entityData(for type: EntityModel.EntityType) -> EntityModel? {
-        return entities.filter { $0.type == type }.first
-    }
-
-    
-    
 }

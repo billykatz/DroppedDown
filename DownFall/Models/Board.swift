@@ -453,12 +453,11 @@ extension Board {
 // MARK: - Factory
 
 extension Board {
-    static func build(size: Int,
-                      tileCreator: TileStrategy,
+    static func build(tileCreator: TileStrategy,
                       difficulty: Difficulty,
                       level: Level) -> Board {
         //create a boardful of tiles
-        let tilesStruct: [[Tile]] = tileCreator.board(size, difficulty: difficulty)
+        let tilesStruct: [[Tile]] = tileCreator.board(difficulty: difficulty)
         
         //let the world know we built the board
         InputQueue.append(Input(.boardBuilt, tilesStruct))

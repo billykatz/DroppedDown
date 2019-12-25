@@ -41,7 +41,7 @@ class TutorialScene: SKScene {
     
     /// Creates an instance of board and does preparation neccessary for didMove(to:) to be called
     public func commonInit(boardSize: Int,
-                           entities: [EntityModel],
+                           entities: EntitiesModel,
                            difficulty: Difficulty = .normal,
                            updatedEntity: EntityModel? = nil,
                            level: Level) {
@@ -62,7 +62,7 @@ class TutorialScene: SKScene {
                                               level: level)
         
         //board
-        board = Board.build(size: boardSize, tileCreator: tileCreator, difficulty: difficulty, level: level)
+        board = Board.build(tileCreator: tileCreator, difficulty: difficulty, level: level)
         self.boardSize = boardSize
         
         // create haptic generator
@@ -233,7 +233,14 @@ extension TutorialScene {
             if self.nodes(at: newTouch).contains(where: { node in
                 (node as? SKSpriteNode)?.name == "setting"
             }) {
-                gameSceneDelegate?.reset(self)
+                
+                guard let playerIndex = tileIndices(of: .player(.zero), in: self.board.tiles).first else { return }
+                
+                self.foreground.removeAllChildren()
+                if case let TileType.player(data) = self.board.tiles[playerIndex].type {
+                    self.removeFromParent()
+                    self.gameSceneDelegate?.reset(self, playerData: data)
+                }
             }
         }
     }

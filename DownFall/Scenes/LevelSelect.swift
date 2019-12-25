@@ -9,7 +9,7 @@
 import SpriteKit
 
 protocol LevelSelectDelegate: class {
-    func didSelect(_ difficulty: Difficulty, _ playerModel: EntityModel?)
+    func newGame(_ difficulty: Difficulty, _ playerModel: EntityModel?)
     func didSelectStartTutorial(_ playerModel: EntityModel?)
 }
 
@@ -83,7 +83,7 @@ extension LevelSelect: ButtonDelegate {
         guard let identifier = button.identifier else { return }
         switch identifier {
         case .newGame:
-            levelSelectDelegate?.didSelect(GameScope.shared.difficulty, playerModel)
+            levelSelectDelegate?.newGame(GameScope.shared.difficulty, playerModel)
         case .startTutorial:
             levelSelectDelegate?.didSelectStartTutorial(playerModel)
         default:

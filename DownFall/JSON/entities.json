@@ -348,8 +348,8 @@
                 "frequency" : 3,
                 "damage": 1,
                 "range": {
-                    "lower": 2,
-                    "upper": 2
+                    "lower": 1,
+                    "upper": 1
                 },
                 "attacksPerTurn": 1,
                 "charges": 1,

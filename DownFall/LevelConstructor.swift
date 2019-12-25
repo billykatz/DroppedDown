@@ -44,79 +44,77 @@ struct LevelConstructor {
         }
     }
     
+    
     static func availableRocksPerLevel(_ levelType: LevelType, difficulty: Difficulty) -> [TileType: RangeModel] {
         let normalRockRange = RangeModel(lower: 0, upper: 90)
+        
+        func matchUp(_ types: [TileType], range: RangeModel, subRanges: Int) -> [TileType: RangeModel] {
+            guard types.count == subRanges else { fatalError("The number of types nust match the number of subranges") }
+            let dividedRockRanges = range.divivdedIntoSubRanges(subRanges)
+            var count = 0
+            return types.reduce([:], { (prior, type) -> [TileType: RangeModel] in
+                var new = prior
+                new[type] = dividedRockRanges[count]
+                count += 1
+                return new
+            })
+        }
+        
         switch levelType {
         case .first:
-            let dividedRockRanges = normalRockRange.divivdedIntoSubRanges(3)
-            return [.redRock: dividedRockRanges[0],
-                    .blueRock: dividedRockRanges[1],
-                    .purpleRock: dividedRockRanges[2],
-                    .greenRock: dividedRockRanges[2].next(10)]
+            var rocks = matchUp([.redRock, .blueRock, .purpleRock], range: normalRockRange, subRanges: 3)
+            rocks[.greenRock] = normalRockRange.next(10)
+            return rocks
         case .second:
-            let dividedRockRanges = normalRockRange.divivdedIntoSubRanges(4)
-            return [.redRock: dividedRockRanges[0],
-                    .blueRock: dividedRockRanges[1],
-                    .purpleRock: dividedRockRanges[2],
-                    .brownRock: dividedRockRanges[3],
-                    .greenRock: dividedRockRanges[3].next(10)]
+            var rocks = matchUp([.redRock, .blueRock, .purpleRock, .brownRock], range: normalRockRange, subRanges: 4)
+            rocks[.greenRock] = normalRockRange.next(10)
+            return rocks
         case .third:
-            let dividedRockRanges = normalRockRange.divivdedIntoSubRanges(5)
-            return [.redRock: dividedRockRanges[0],
-                    .blueRock: dividedRockRanges[1],
-                    .purpleRock: dividedRockRanges[2],
-                    .brownRock: dividedRockRanges[3],
-                    .blackRock: dividedRockRanges[4],
-                    .greenRock: dividedRockRanges[4].next(10)]
+            var rocks = matchUp([.redRock, .blueRock, .purpleRock, .brownRock, .blackRock], range: normalRockRange, subRanges: 5)
+            rocks[.greenRock] = normalRockRange.next(10)
+            return rocks
         case .boss, .tutorial1, .tutorial2:
             fatalError("Gotta do boss and or not call this for tutorial")
         }
     }
     
     static func monstersPerLevel(_ levelType: LevelType, difficulty: Difficulty) -> [EntityModel.EntityType: RangeModel] {
+        func matchUp(_ types: [EntityModel.EntityType], range: RangeModel, subRanges: Int) -> [EntityModel.EntityType: RangeModel] {
+            guard types.count == subRanges else { fatalError("The number of types nust match the number of subranges") }
+            let dividedMonsterRanges = range.divivdedIntoSubRanges(subRanges)
+            var count = 0
+            return types.reduce([:], { (prior, type) -> [EntityModel.EntityType: RangeModel] in
+                var new = prior
+                new[type] = dividedMonsterRanges[count]
+                count += 1
+                return new
+            })
+        }
+
+        
+        
         let normalRockRange = RangeModel(lower: 0, upper: 100)
         switch levelType {
         case .first:
             switch difficulty{
             case .easy:
-                let dividedRockRanges = normalRockRange.divivdedIntoSubRanges(2)
-                return [.rat: dividedRockRanges[0],
-                        .bat: dividedRockRanges[1]]
+                return matchUp([.rat, .bat], range: normalRockRange, subRanges: 2)
             case .normal, .hard:
-                let dividedRockRanges = normalRockRange.divivdedIntoSubRanges(3)
-                return [.rat: dividedRockRanges[0],
-                        .bat: dividedRockRanges[1],
-                        .alamo: dividedRockRanges[2]]
+                return matchUp([.rat, .bat, .alamo], range: normalRockRange, subRanges: 3)
             }
         case .second:
             switch difficulty{
             case .easy:
-                let dividedRockRanges = normalRockRange.divivdedIntoSubRanges(3)
-                return [.rat: dividedRockRanges[0],
-                        .bat: dividedRockRanges[1],
-                        .dragon: dividedRockRanges[2]]
+                return matchUp([.rat, .bat, .dragon], range: normalRockRange, subRanges: 3)
             case .normal, .hard:
-                let dividedRockRanges = normalRockRange.divivdedIntoSubRanges(4)
-                return [.rat: dividedRockRanges[0],
-                        .bat: dividedRockRanges[1],
-                        .dragon: dividedRockRanges[2],
-                        .alamo: dividedRockRanges[3]]
+                return matchUp([.rat, .bat, .dragon, .alamo], range: normalRockRange, subRanges: 4)
             }
         case .third:
             switch difficulty{
             case .easy:
-                let dividedRockRanges = normalRockRange.divivdedIntoSubRanges(4)
-                return [.bat: dividedRockRanges[0],
-                        .dragon: dividedRockRanges[1],
-                        .alamo: dividedRockRanges[2],
-                        .wizard: dividedRockRanges[3]]
+                return matchUp([.wizard, .bat, .dragon, .alamo], range: normalRockRange, subRanges: 4)
             case .normal, .hard:
-                let dividedRockRanges = normalRockRange.divivdedIntoSubRanges(5)
-                return [.bat: dividedRockRanges[0],
-                        .dragon: dividedRockRanges[1],
-                        .alamo: dividedRockRanges[2],
-                        .wizard: dividedRockRanges[3],
-                        .lavaHorse: dividedRockRanges[4]]
+                return matchUp([.wizard, .bat, .dragon, .alamo, .lavaHorse], range: normalRockRange, subRanges: 5)
             }
         case .boss, .tutorial1, .tutorial2:
             fatalError("Boss level not implemented yet")

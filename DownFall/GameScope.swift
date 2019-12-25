@@ -14,7 +14,7 @@ struct GameScope {
     
     static let tutorialOne = TutorialData(steps:
         [
-                    TutorialStep(dialog: "Welcome to the Mine! You're a coal minter with extraordinary powers",
+                    TutorialStep(dialog: "Welcome to Shift Shaft! You're a coal miner with extraordinary powers",
                                  highlightType: [.player(.zero)],
                                  tapToContinue: true,
                                  inputToContinue: InputType.tutorial(.zero)),

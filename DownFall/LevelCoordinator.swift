@@ -12,39 +12,6 @@ import GameplayKit
 
 
 
-enum LevelType: Int, Codable, CaseIterable {
-    case first
-    case second
-    case third
-    case boss
-    case tutorial1
-    case tutorial2
-    
-    static var gameCases: [LevelType] = [.first, .second, .third]
-    static var tutorialCases: [LevelType] = [.tutorial1, .tutorial2]
-}
-
-struct Level {
-    let type: LevelType
-    let monsterRatio: [EntityModel.EntityType: RangeModel]
-    let maxMonstersTotal: Int
-    let maxMonstersOnScreen: Int
-    let maxGems: Int
-    let maxTime: Int
-    let boardSize: Int
-    let abilities: [AnyAbility]
-    let goldMultiplier: Int
-    let rocksRatio: [TileType: RangeModel]
-    let maxSpecialRocks = 5
-    
-    var tutorialData: TutorialData?
-    
-    var isTutorial: Bool {
-        return tutorialData != nil
-    }
-        
-    static let zero = Level(type: .first, monsterRatio: [:], maxMonstersTotal: 0, maxMonstersOnScreen: 0, maxGems: 0, maxTime: 0, boardSize: 0, abilities: [], goldMultiplier: 1, rocksRatio: [:], tutorialData: nil)
-}
 
 protocol LevelCoordinating: StoreSceneDelegate, GameSceneCoordinatingDelegate {
     var gameSceneNode: GameScene? { get set }
@@ -55,7 +22,7 @@ protocol LevelCoordinating: StoreSceneDelegate, GameSceneCoordinatingDelegate {
     
     func presentStore(_ playerData: EntityModel)
     func presentNextLevel(_ playerData: EntityModel?)
-    func difficultySelected(_ difficulty: Difficulty)
+    func startGame(player playerData: EntityModel, difficulty: Difficulty)
 }
 
 extension LevelCoordinating where Self: UIViewController {
@@ -66,7 +33,7 @@ extension LevelCoordinating where Self: UIViewController {
     }
     
     func presentStore(_ playerData: EntityModel) {
-        if let view = self.view as! SKView? {
+        if let view = self.view as? SKView {
             view.presentScene(nil)
             let storeScene = StoreScene(size: self.view!.frame.size,
                                         playerData: playerData,
@@ -138,11 +105,16 @@ extension LevelCoordinating where Self: UIViewController {
         
     }
     
+    func startGame(player: EntityModel, difficulty: Difficulty) {
+        difficultySelected(difficulty)
+        presentStore(player)
+    }
+    
     
     // MARK: - StoreSceneDelegate
     
     func leave(_ storeScene: StoreScene, updatedPlayerData: EntityModel) {
-        if let view = self.view as! SKView? {
+        if let view = self.view as? SKView {
             view.presentScene(nil)
             presentNextLevel(updatedPlayerData)
         }

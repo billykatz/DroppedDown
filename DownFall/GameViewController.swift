@@ -73,12 +73,10 @@ extension GameViewController: LevelSelectDelegate {
         }
     }
     
-    func didSelect(_ difficulty: Difficulty, _ playerModel: EntityModel?) {
-        if let view = self.view as! SKView? {
+    func newGame(_ difficulty: Difficulty, _ playerModel: EntityModel?) {
+        if let view = self.view as! SKView?, let player = playerModel {
             view.presentScene(nil)
-            difficultySelected(difficulty)
-            presentStore(playerModel!)
-//            presentNextLevel(playerModel)
+            startGame(player: player, difficulty: difficulty)
         }
     }
 }

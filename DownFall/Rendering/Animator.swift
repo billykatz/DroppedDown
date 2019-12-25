@@ -43,9 +43,10 @@ struct Animator {
         let shrinkAnimation = SKAction.scale(to: Style.DFTileSpriteNode.Exit.winSizeCoefficient, duration: 1.0)
         let moveVector = CGVector(dx: 0.0, dy: 20.0)
         let moveAnimation = SKAction.move(by: moveVector, duration: 1.0)
+        let removeAction = SKAction.removeFromParent()
         
         
-        minecart.run(SKAction.group([shrinkAnimation, moveAnimation])) {
+        minecart.run(SKAction.sequence([SKAction.group([shrinkAnimation, moveAnimation]), removeAction])) {
             completion?()
         }
     }

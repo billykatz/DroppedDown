@@ -28,6 +28,10 @@
 		3D30A4292216899E00AFA1E1 /* BoardMocker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D30A4232216892A00AFA1E1 /* BoardMocker.swift */; };
 		3D30A42B2217F63500AFA1E1 /* TileCoord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D30A42A2217F63500AFA1E1 /* TileCoord.swift */; };
 		3D3D31EC23ABEFA8002B87EE /* LevelConstructor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D3D31EB23ABEFA8002B87EE /* LevelConstructor.swift */; };
+		3D4A470D23B3CEFC000165FB /* RandomTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4A470C23B3CEFC000165FB /* RandomTests.swift */; };
+		3D4A470F23B3D33B000165FB /* LevelType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4A470E23B3D33B000165FB /* LevelType.swift */; };
+		3D4A471123B3D34F000165FB /* LevelModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4A471023B3D34F000165FB /* LevelModel.swift */; };
+		3D4A471323B3DCB7000165FB /* RangeModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4A471223B3DCB7000165FB /* RangeModelTests.swift */; };
 		3D4F569222B2D087003695D8 /* SpriteSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4F569122B2D087003695D8 /* SpriteSheet.swift */; };
 		3D4F569422B33B44003695D8 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4F569322B33B44003695D8 /* Helpers.swift */; };
 		3D4F569622B88A90003695D8 /* HapticGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4F569522B88A90003695D8 /* HapticGenerator.swift */; };
@@ -156,6 +160,10 @@
 		3D30A4232216892A00AFA1E1 /* BoardMocker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardMocker.swift; sourceTree = "<group>"; };
 		3D30A42A2217F63500AFA1E1 /* TileCoord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileCoord.swift; sourceTree = "<group>"; };
 		3D3D31EB23ABEFA8002B87EE /* LevelConstructor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelConstructor.swift; sourceTree = "<group>"; };
+		3D4A470C23B3CEFC000165FB /* RandomTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomTests.swift; sourceTree = "<group>"; };
+		3D4A470E23B3D33B000165FB /* LevelType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelType.swift; sourceTree = "<group>"; };
+		3D4A471023B3D34F000165FB /* LevelModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelModel.swift; sourceTree = "<group>"; };
+		3D4A471223B3DCB7000165FB /* RangeModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangeModelTests.swift; sourceTree = "<group>"; };
 		3D4F569122B2D087003695D8 /* SpriteSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteSheet.swift; sourceTree = "<group>"; };
 		3D4F569322B33B44003695D8 /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
 		3D4F569522B88A90003695D8 /* HapticGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticGenerator.swift; sourceTree = "<group>"; };
@@ -387,6 +395,8 @@
 			isa = PBXGroup;
 			children = (
 				3D14C82023A83D93003E211D /* LevelCoordinator.swift */,
+				3D4A471023B3D34F000165FB /* LevelModel.swift */,
+				3D4A470E23B3D33B000165FB /* LevelType.swift */,
 				3D3D31EB23ABEFA8002B87EE /* LevelConstructor.swift */,
 			);
 			name = Level;
@@ -601,12 +611,14 @@
 			children = (
 				3DE87C91223D555A00D750CF /* InputQueueTests.swift */,
 				3D6F09A6236B3EA50069CDF2 /* TestHelpers.swift */,
+				3D4A470C23B3CEFC000165FB /* RandomTests.swift */,
 				3DB270A822B00E0D00D9BF8B /* TileTypeTest+Extensions.swift */,
 				3DF2926820A37FF0006671AC /* BoardTests.swift */,
 				3DCB38AA232DCE88001D148F /* TileCoordTests.swift */,
 				3D90AACF21D8854300C7428A /* RefereeTests.swift */,
 				3DE87C95224068FA00D750CF /* GameStateTests.swift */,
 				3DD72596239DD056005933B2 /* TutorialModelTests.swift */,
+				3D4A471223B3DCB7000165FB /* RangeModelTests.swift */,
 				3DD36ECC21E5BD9100AC4873 /* TileStrategyTests.swift */,
 				3D30A4232216892A00AFA1E1 /* BoardMocker.swift */,
 				3DF2926A20A37FF0006671AC /* Info.plist */,
@@ -796,6 +808,7 @@
 				3DA0A37A22FFAECE0041EF34 /* UIFont+Extensions.swift in Sources */,
 				3DE87C9022374C2C00D750CF /* Button.swift in Sources */,
 				3D14C82123A83D93003E211D /* LevelCoordinator.swift in Sources */,
+				3D4A471123B3D34F000165FB /* LevelModel.swift in Sources */,
 				3DA0A37F2300CE3B0041EF34 /* ShieldEast.swift in Sources */,
 				3D106098232E9A0200ECE7E6 /* Animator.swift in Sources */,
 				3DF2924E20A37FEE006671AC /* AppDelegate.swift in Sources */,
@@ -832,6 +845,7 @@
 				3D7D8B332253E5BC0016FE4C /* HUD.swift in Sources */,
 				3D6279C723ACA8350048EB76 /* Dynamite.swift in Sources */,
 				3D6279CB23ACA90E0048EB76 /* GreaterHealingPoition.swift in Sources */,
+				3D4A470F23B3D33B000165FB /* LevelType.swift in Sources */,
 				3DD5AA0D2398025400FB63F4 /* Styling.swift in Sources */,
 				3DD72593239DC47F005933B2 /* IndexPath+Extensions.swift in Sources */,
 				3D2C757522C854F8009ABD36 /* ItemModel.swift in Sources */,
@@ -853,9 +867,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3D4A470D23B3CEFC000165FB /* RandomTests.swift in Sources */,
 				3DD72597239DD056005933B2 /* TutorialModelTests.swift in Sources */,
 				3DE87C92223D555A00D750CF /* InputQueueTests.swift in Sources */,
 				3D6F09A7236B3EA50069CDF2 /* TestHelpers.swift in Sources */,
+				3D4A471323B3DCB7000165FB /* RangeModelTests.swift in Sources */,
 				3D30A4292216899E00AFA1E1 /* BoardMocker.swift in Sources */,
 				3DF2926920A37FF0006671AC /* BoardTests.swift in Sources */,
 				3DD36ECD21E5BD9100AC4873 /* TileStrategyTests.swift in Sources */,

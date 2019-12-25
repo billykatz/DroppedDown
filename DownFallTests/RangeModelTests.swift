@@ -34,24 +34,20 @@ class RangeModelTests: XCTestCase {
             }
         }
         
-        let negativeRange = RangeModel(lower: -200, upper: -100)
-        
-        for idx in 1..<5 {
-            var array = Array(repeating: false, count: 90)
-            for subrange in negativeRange.divivdedIntoSubRanges(idx) {
-                for number in 0..<90 {
-                    if subrange.contains(number) {
-                        array[number] = true
-                    }
-                }
-            }
-            
-            XCTAssertFalse(array.contains(false), "Every number between lower and upper of original range is contained within the subranges. Subranges \(idx) \(normalRange.divivdedIntoSubRanges(idx))")
-        
-        }
     }
     
     func testNext() {
+        for _ in 0..<5 {
+            let randomLower = Int.random(60)
+            let randomUpper = Int.random(60) + randomLower
+            let normalRange = RangeModel(lower: randomLower, upper: randomUpper)
+            
+            let randomNext = Int.random(15)
+            let nextRange = normalRange.next(randomNext)
+            let expectedNextRange = RangeModel(lower: randomUpper, upper: randomUpper+randomNext-1)
+            XCTAssertEqual(nextRange, expectedNextRange)
+        }
+        
         
     }
 }

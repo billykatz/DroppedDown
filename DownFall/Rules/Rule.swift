@@ -23,11 +23,24 @@ struct Win: Rule {
 
 struct Tutorial1Win: Rule {
     func apply(_ tiles: [[Tile]]) -> Input? {
-        guard
-            let playerPosition = getTilePosition(.player(.zero), tiles: tiles),
+        guard let playerPosition = getTilePosition(.player(.zero), tiles: tiles),
             case let TileType.player(player) = tiles[playerPosition].type,
-            player.canAfford(1)
+            player.canAfford(1, inCurrency: .gem)
             else { return nil }
         return Input(.gameWin)
     }
 }
+
+struct Tutorial2Win: Rule {
+    func apply(_ tiles: [[Tile]]) -> Input? {
+        guard
+            let playerPosition = getTilePosition(.player(.zero), tiles: tiles),
+            case let TileType.player(player) = tiles[playerPosition].type,
+            player.canAfford(16, inCurrency: .gold)
+            else { return nil }
+        //TODO: this is a filmsy check, lets check to see the position of the player or if the player has killed any monsters
+        // This could also be the start of tracking stats for a player
+        return Input(.gameWin)
+    }
+}
+

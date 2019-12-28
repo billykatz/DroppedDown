@@ -2,18 +2,23 @@
     "entities": [
         { "name": "player2",
             "type": "player",
-            "originalHp": 3,
-            "hp": 3,
+            "originalHp": 5,
+            "hp": 5,
             "attack": {
                 "type": "targets",
                 "frequency" : 1,
-                "directions": ["south"],
                 "damage": 1,
                 "range": {
                     "lower": 1,
                     "upper": 1
                 },
-                "attacksPerTurn": 1
+                "attacksPerTurn": 1,
+                "attackSlope": [
+                    {
+                        "over": 0,
+                        "up": -1
+                    }
+                ]
             },
             "animations": {
                 "attack": {
@@ -43,35 +48,15 @@
             },
             "carry": {
                 "items": [
-                    { "type": "gold",
-                        "range": {
-                            "lower" : 1,
-                            "upper" : 1
-                        }
+                    {
+                        "type": "gold",
+                        "amount": 15
+                        
                     },
-                    { "type": "gold",
-                        "range": {
-                            "lower" : 1,
-                            "upper" : 1
-                        }
-                    },
-                    { "type": "gold",
-                        "range": {
-                            "lower" : 1,
-                            "upper" : 1
-                        }
-                    },
-                    { "type": "gold",
-                        "range": {
-                            "lower" : 1,
-                            "upper" : 1
-                        }
-                    },
-                    { "type": "gold",
-                        "range": {
-                            "lower" : 1,
-                            "upper" : 1
-                        }
+                    {
+                        "type": "gem",
+                        "amount": 0
+                        
                     }
                 ]
             },
@@ -84,13 +69,18 @@
             "attack": {
                 "type": "targets",
                 "frequency" : 1,
-                "directions": ["south"],
                 "damage": 1,
                 "range": {
                     "lower": 1,
                     "upper": 1
                 },
-                "attacksPerTurn": 1
+                "attacksPerTurn": 1,
+                "attackSlope": [
+                    {
+                        "over": 0,
+                        "up": -1
+                    }
+                ]
             },
             "animations": {
                 "attack": {
@@ -119,7 +109,18 @@
                 }
             },
             "carry": {
-                "items": []
+                "items": [
+                {
+                    "type": "gold",
+                    "amount": 15
+                    
+                },
+                {
+                    "type": "gem",
+                    "amount": 0
+                    
+                }
+                ]
             },
             "abilities": []
         },
@@ -130,13 +131,18 @@
             "attack": {
                 "type": "targets",
                 "frequency" : 1,
-                "directions": ["south"],
                 "damage": 1,
                 "range": {
                     "lower": 1,
                     "upper": 1
                 },
-                "attacksPerTurn": 1
+                "attacksPerTurn": 1,
+                "attackSlope": [
+                    {
+                        "over": 0,
+                        "up": -1
+                    }
+                ]
             },
             "animations": {
                 "attack": {
@@ -165,7 +171,18 @@
                 }
             },
             "carry": {
-                "items": []
+                "items": [
+                {
+                    "type": "gold",
+                    "amount": 15
+                    
+                },
+                {
+                    "type": "gem",
+                    "amount": 0
+                    
+                }
+                ]
             },
             "abilities": []
         },
@@ -176,13 +193,18 @@
             "attack": {
                 "type": "targets",
                 "frequency" : 1,
-                "directions": ["north"],
                 "damage": 1,
                 "range": {
                     "lower": 1,
                     "upper": 10
                 },
-                "attacksPerTurn": 1
+                "attacksPerTurn": 1,
+                "attackSlope": [
+                    {
+                        "over": 0,
+                        "up": 1
+                    }
+                ]
             },
             "animations": {
                 "attack": {
@@ -213,10 +235,7 @@
             "carry": {
                 "items": [{
                     "type": "gold",
-                    "range": {
-                        "lower": 5,
-                        "upper": 10
-                    }
+                    "amount": 10
                 }]
                 
             },
@@ -229,13 +248,22 @@
             "attack": {
                 "type": "targets",
                 "frequency" : 1,
-                "directions": ["east", "west"],
                 "damage": 1,
                 "range": {
                     "lower": 1,
                     "upper": 1
                 },
-                "attacksPerTurn": 1
+                "attacksPerTurn": 1,
+                "attackSlope": [
+                    {
+                        "over": 1,
+                        "up": 0
+                    },
+                    {
+                        "over": -1,
+                        "up": 0
+                    }
+                ]
             },
             "animations": {
                 "attack": {
@@ -266,10 +294,7 @@
             "carry": {
                 "items": [{
                     "type": "gold",
-                    "range": {
-                        "lower": 5,
-                        "upper": 10
-                    }
+                    "amount": 3
                 }]
             },
             "abilities": []
@@ -279,15 +304,33 @@
             "originalHp": 1,
             "hp": 1,
             "attack": {
-                "type": "targets",
-                "frequency" : 1,
-                "directions": ["northEast", "northWest", "southEast", "southWest"],
+                "type": "charges",
+                "frequency" : 3,
                 "damage": 1,
                 "range": {
                     "lower": 1,
-                    "upper": 10
+                    "upper": 3
                 },
-                "attacksPerTurn": 1
+                "attacksPerTurn": 1,
+                "charge" : 1,
+                "attackSlope": [
+                    {
+                        "over": 1,
+                        "up": 1
+                    },
+                    {
+                        "over": 1,
+                        "up": -1
+                    },
+                    {
+                        "over": -1,
+                        "up": 1
+                    },
+                    {
+                        "over": -1,
+                        "up": -1
+                    }
+                ]
             },
             "animations": {
                 "attack": {
@@ -318,10 +361,90 @@
             "carry": {
                 "items": [{
                     "type": "gold",
-                    "range": {
-                        "lower": 5,
-                        "upper": 10
+                    "amount": 5
+                }]
+            },
+            "abilities": []
+        },
+        { "name": "alamo",
+            "type": "alamo",
+            "originalHp": 1,
+            "hp": 1,
+            "attack": {
+                "type": "charges",
+                "frequency" : 3,
+                "damage": 1,
+                "range": {
+                    "lower": 1,
+                    "upper": 1
+                },
+                "attacksPerTurn": 1,
+                "charges": 1,
+                "attackSlope": [
+                    {
+                        "over": 1,
+                        "up": 1
+                    },
+                    {
+                        "over": 1,
+                        "up": -1
+                    },
+                    {
+                        "over": -1,
+                        "up": 1
+                    },
+                    {
+                        "over": -1,
+                        "up": -1
+                    },
+                    {
+                        "over": 0,
+                        "up": 1
+                    },
+                    {
+                        "over": 0,
+                        "up": -1
+                    },
+                    {
+                        "over": 1,
+                        "up": 0
+                    },
+                    {
+                        "over": -1,
+                        "up": 0
                     }
+                ]
+            },
+            "animations": {
+                "attack": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "hurt": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "dying": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "idle": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "fall":{
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                },
+                "projectile": {
+                    "animationFilename": "",
+                    "numberOfFrames": 0
+                }
+            },
+            "carry": {
+                "items": [{
+                    "type": "gold",
+                    "amount": 7
                 }]
             },
             "abilities": []

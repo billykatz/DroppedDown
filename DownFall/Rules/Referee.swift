@@ -9,7 +9,12 @@
 import Foundation
 
 class Referee {
+    static var level: Level = .zero
 
+    static func injectLevel(_ level: Level) {
+        Referee.level = level
+    }
+    
     static func enterRules(_ tiles: [[Tile]]?) {
         InputQueue.append(Referee.enforceRules(tiles))
     }
@@ -96,48 +101,23 @@ class Referee {
             return false
         }
         
-        func calculateTarget(in direction: Direction, distance i: Int, from position: TileCoord) -> TileCoord {
+        func calculateTargetSlope(in slopedDirection: AttackSlope, distance i: Int, from position: TileCoord) -> TileCoord {
             let (initialRow, initialCol) = position.tuple
-            let targetRow: Int
-            let targetCol: Int
-            switch direction {
-            case .north:
-                targetRow = initialRow + i
-                targetCol = initialCol
-            case .south:
-                targetRow = initialRow - i
-                targetCol = initialCol
-            case .east:
-                targetCol = initialCol + i
-                targetRow = initialRow
-            case .west:
-                targetCol = initialCol - i
-                targetRow = initialRow
-            case .northEast:
-                targetRow = initialRow + i
-                targetCol = initialCol + i
-            case .southEast:
-                targetRow = initialRow - i
-                targetCol = initialCol + i
-            case .northWest:
-                targetRow = initialRow + i
-                targetCol = initialCol - i
-            case .southWest:
-                targetRow = initialRow - i
-                targetCol = initialCol - i
-            }
             
-            return TileCoord(targetRow, targetCol)
+            // Take the initial position and calculate the target
+            // Add the slope's "up" value multiplied by the distance to the row
+            // Add the slope's "over" value multipled by the distane to the column
+            return TileCoord(initialRow + (i * slopedDirection.up), initialCol + (i * slopedDirection.over))
         }
         
         func calculateAttacks(for entity: EntityModel, from position: TileCoord) -> [TileCoord] {
-            let attackDirections = entity.attack.directions
             let attackRange = entity.attack.range
             var affectedTiles: [TileCoord] = []
-            for direction in attackDirections {
+            
+            // TODO: Let's add a property to attacks that says if the attack goes thru targets or not
+            for attackSlope in entity.attack.attackSlope ?? [] {
                 for i in attackRange.lower...attackRange.upper {
-                    // TODO: Let's add a property to attacks that says if the attack goes thru targets or not
-                    let target = calculateTarget(in: direction, distance: i, from: position)
+                    let target = calculateTargetSlope(in: attackSlope, distance: i, from: position)
                     if isWithinBounds(target) {
                         affectedTiles.append(target)
                     }
@@ -149,17 +129,16 @@ class Referee {
         func calculatePossibleAttacks(for entity: EntityModel, from position: TileCoord) -> [TileCoord] {
             let attackRange = entity.attack.range
             var affectedTiles: [TileCoord] = []
-            for direction in Directions.all {
+            for attackSlopes in AttackSlope.playerPossibleAttacks {
                 for i in attackRange.lower...attackRange.upper {
                     // TODO: Let's add a property to attacks that says if the attack goes thru targets or not
-                    let target = calculateTarget(in: direction, distance: i, from: position)
+                    let target = calculateTargetSlope(in: attackSlopes, distance: i, from: position)
                     if isWithinBounds(target) {
                         affectedTiles.append(target)
                     }
                 }
             }
             return affectedTiles
-            
         }
         
         func isWithinBounds(_ tileCoord: TileCoord) -> Bool {
@@ -233,7 +212,14 @@ class Referee {
                     
                     let attackFrequency = monsterData.attack.frequency
                     let totalTurns = monsterData.attack.turns
-                    let shouldAttack = totalTurns % attackFrequency == 0
+                    let shouldAttack: Bool
+                    
+                    switch monsterData.attack.type {
+                    case .charges:
+                        shouldAttack = monsterData.attack.isCharged
+                    case .areaOfEffect, .targets:
+                        shouldAttack = totalTurns % attackFrequency == 0
+                    }
                     
                     guard shouldAttack else { continue }
                     
@@ -283,11 +269,11 @@ class Referee {
         
         func playerCollectsItem() -> Input? {
             guard let playerPosition = playerPosition,
-                case TileType.player = tiles[playerPosition].type,
+                case let TileType.player(playerData) = tiles[playerPosition].type,
                 isWithinBounds(playerPosition.rowBelow),
                 case TileType.item(let item) = tiles[playerPosition.rowBelow].type
                 else { return nil }
-            return Input(.collectItem(playerPosition.rowBelow, item), tiles)
+            return Input(.collectItem(playerPosition.rowBelow, item, playerData.carry.total(in: item.type.currencyType)), tiles)
         }
         
         
@@ -314,16 +300,16 @@ class Referee {
             return attack
         }
         
-        if let monsterAttack = monsterAttacks() {
-            return monsterAttack
-        }
-        
         if let deadMonster = monsterDies() {
             return deadMonster
         }
         
         if let collectItem = playerCollectsItem() {
             return collectItem
+        }
+        
+        if let monsterAttack = monsterAttacks() {
+            return monsterAttack
         }
         
         let newTurn = TurnWatcher.shared.getNewTurnAndReset()

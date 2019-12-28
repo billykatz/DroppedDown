@@ -9,75 +9,95 @@
 import Foundation
 
 class TutorialData {
-    let sections: [TutorialSection]
+    let steps: [TutorialStep]
     var currentIndexPath: IndexPath = IndexPath(item: 0, section: 0)
     
-    init(sections: [TutorialSection]) {
-        self.sections = sections
+    var lastStep: TutorialStep? {
+        return steps.last
+    }
+    
+    var finished: Bool {
+        return steps.filter { !$0.completed }.count == 0
+    }
+    
+    init(steps: [TutorialStep]) {
+        self.steps = steps
     }
     
     var currentStep: TutorialStep {
-        return step(sectionIndex: currentIndexPath.section, stepIndex: currentIndexPath.item)
-    }
-    
-    var currentSection: Int {
-        return currentIndexPath.section
-    }
-    
-    /// Try to increment that section index.
-    /// Note: If the currentSection is the last section this resets the index to be the last item in the last section
-    func incrSectionIndex() {
-        //make sure we dont go out of bounds
-        if currentSection < sections.count - 1 {
-            currentIndexPath.incrSectionIndex()
-            currentIndexPath = IndexPath(item: 0, section: currentIndexPath.section)
-        } else {
-            // lets reset the item index to be in bounds
-            currentIndexPath = IndexPath(item: currentIndexPath.item - 1, section: currentIndexPath.section)
-        }
+        return step(stepIndex: currentIndexPath.item)
     }
     
     func incrStepIndex() {
-        currentIndexPath.incrStepIndex()
-        if currentIndexPath.item >= countStepsIn(sectionIndex: currentIndexPath.section) {
-            // NOTE: This may not increment the section index because we dont increment when there are no sections left
-            incrSectionIndex()
-        }
-        
+        currentIndexPath = IndexPath(item: min(currentIndexPath.item + 1, steps.count - 1), section: currentIndexPath.section)
     }
     
-    func countStepsIn(sectionIndex: Int) -> Int {
-        guard sectionIndex < sections.count else { return 0 }
-        return sections[sectionIndex].steps.count
+    func step(stepIndex: Int) -> TutorialStep {
+        guard stepIndex < steps.count else { fatalError() }
+        return steps[stepIndex]
     }
     
-    func step(sectionIndex: Int, stepIndex: Int) -> TutorialStep {
-        guard sectionIndex < sections.count else { fatalError() }
-        guard stepIndex < sections[sectionIndex].steps.count else { fatalError() }
-        
-        return sections[sectionIndex].steps[stepIndex]
+    func reset() {
+        self.currentIndexPath = IndexPath(row: 0, section: 0)
     }
-
+    
 }
 
-struct TutorialSection: Equatable {
-    let steps: [TutorialStep]
-}
-
-struct TutorialStep: Equatable, Hashable {
+class TutorialStep: Equatable {
+    static func == (lhs: TutorialStep, rhs: TutorialStep) -> Bool {
+        return lhs.dialog == rhs.dialog
+    }
+    
     var dialog: String
-    var highlightType: [TileType]
+    var highlightType: [TileType] = []
+    var showFingerWithHighlight: Bool = false
     var showClockwiseRotate: Bool = false
     var showCounterClockwiseRotate: Bool = false
+    var highlightCoordinates: [TileCoord] = []
     
     // a flag indicate if we should display text "tap to continue"
     var tapToContinue: Bool = false
     
     // the input that allows users to move to the next step
     var inputToContinue: InputType
+    var inputToEnter: InputType?
+    
+    var started: Bool = false
+    var completed: Bool = false
+    
+    init(dialog: String,
+         highlightType: [TileType] = [],
+         showClockwiseRotate: Bool = false,
+         showCounterClockwiseRotate: Bool = false,
+         highlightCoordinates: [TileCoord] = [],
+         tapToContinue: Bool = false,
+         inputToContinue: InputType,
+         inputToEnter: InputType? = nil,
+         started: Bool = false,
+         completed: Bool = false,
+         showFinger: Bool = false)
+    {
+        self.dialog = dialog
+        self.highlightType = highlightType
+        self.showClockwiseRotate = showClockwiseRotate
+        self.showCounterClockwiseRotate = showCounterClockwiseRotate
+        self.highlightCoordinates = highlightCoordinates
+        self.tapToContinue = tapToContinue
+        self.inputToContinue = inputToContinue
+        self.started = started
+        self.completed = completed
+        self.showFingerWithHighlight = showFinger
+    }
     
     static var zero: TutorialStep {
-        return TutorialStep(dialog: "", highlightType: [], inputToContinue: .play)
+        return TutorialStep(dialog: "Zeroth step", inputToContinue: .play)
+    }
+}
+
+
+extension TutorialStep: Hashable {
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(dialog)
     }
 }
 

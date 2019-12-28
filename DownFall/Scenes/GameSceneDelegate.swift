@@ -9,7 +9,6 @@
 import SpriteKit
 
 protocol GameSceneCoordinatingDelegate: class {
-    func reset(_ scene: SKScene)
-    func selectLevel()
+    func reset(_ scene: SKScene, playerData: EntityModel)
     func visitStore(_ playerData: EntityModel)
 }

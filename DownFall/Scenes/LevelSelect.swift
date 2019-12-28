@@ -9,36 +9,84 @@
 import SpriteKit
 
 protocol LevelSelectDelegate: class {
-    func didSelect(_ difficulty: Difficulty)
+    func newGame(_ difficulty: Difficulty, _ playerModel: EntityModel?)
+    func didSelectStartTutorial(_ playerModel: EntityModel?)
 }
 
 class LevelSelect: SKScene {
     private var background: SKSpriteNode!
-    private var easy: SKLabelNode!
-    private var normal: SKLabelNode!
-    private var hard: SKLabelNode!
+    private var header: Header?
+    private var difficultyLabel: ParagraphNode?
     weak var levelSelectDelegate: LevelSelectDelegate?
+    var playerModel: EntityModel?
     
     override func didMove(to view: SKView) {
         background = self.childNode(withName: "background") as? SKSpriteNode
         background.color = UIColor.clayRed
         
-        easy = self.childNode(withName: "easy") as? SKLabelNode
-        normal = self.childNode(withName: "normal") as? SKLabelNode
-        hard = self.childNode(withName: "hard") as? SKLabelNode
+        
+        let startButton = Button(size: Style.RunMenu.buttonSize,
+                                 delegate: self,
+                                 identifier: .newGame,
+                                 precedence: .menu,
+                                 fontSize: UIFont.largeSize,
+                                 fontColor: UIColor.white)
+        
+        startButton.position = .zero
+        addChild(startButton)
+        
+        let tutorialButton = Button(size: Style.RunMenu.buttonSize,
+                                    delegate: self,
+                                    identifier: .startTutorial,
+                                    precedence: .menu,
+                                    fontSize: UIFont.largeSize,
+                                    fontColor: .white)
+        
+        tutorialButton.position = CGPoint.positionThis(tutorialButton.frame, below: startButton.frame, spacing: Style.Spacing.normal)
+        addChild(tutorialButton)
+        
+        
+        let playableRect = size.playableRect
+        
+        header = Header.build(color: .black,
+                              size: CGSize(width: playableRect.width, height: Style.Header.height),
+                              precedence: .foreground,
+                              delegate: self)
+        header?.position = CGPoint.positionThis(header?.frame ?? .zero, inTopOf: playableRect)
+        
+        addChild(header)
+        
+        updateDifficultyLabel()
     }
-    
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard let touch = touches.first else { return }
-        let positionInScene = touch.location(in: self.background)
-        if easy.contains(positionInScene) {
-            levelSelectDelegate?.didSelect(.easy)
-        } else if normal.contains(positionInScene) {
-            levelSelectDelegate?.didSelect(.normal)
-        } else if hard.contains(positionInScene) {
-            levelSelectDelegate?.didSelect(.hard)
+
+    func updateDifficultyLabel() {
+        difficultyLabel?.removeFromParent()
+        difficultyLabel = ParagraphNode(text: "\(GameScope.shared.difficulty)",paragraphWidth: header!.frame.width/2, fontColor: .white)
+        difficultyLabel?.zPosition = Precedence.menu.rawValue
+        
+        header?.addChild(difficultyLabel!)
+    }
+}
+
+
+
+extension LevelSelect: HeaderDelegate {
+    func settingsTapped(_ header: Header) {
+        let difficultyIndex = GameScope.shared.difficulty.rawValue - 1
+        GameScope.shared.difficulty = Difficulty.allCases[(difficultyIndex + 1) % Difficulty.allCases.count]
+        updateDifficultyLabel()
+    }
+}
+
+extension LevelSelect: ButtonDelegate {
+    func buttonTapped(_ button: Button) {
+        switch button.identifier {
+        case .newGame:
+            levelSelectDelegate?.newGame(GameScope.shared.difficulty, playerModel)
+        case .startTutorial:
+            levelSelectDelegate?.didSelectStartTutorial(playerModel)
+        default:
+            ()
         }
     }
-    
-    
 }

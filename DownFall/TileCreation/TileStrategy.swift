@@ -11,13 +11,16 @@ import GameplayKit
 protocol TileStrategy {
     var randomSource: GKLinearCongruentialRandomSource { get }
     func tiles(for tiles: [[Tile]]) -> [Tile]
-    func board(_ boardSize: Int, difficulty: Difficulty) -> [[Tile]]
-    var entities: [EntityModel] { get }
+    func board(difficulty: Difficulty) -> [[Tile]]
+    func goldDropped(from monster: EntityModel) -> Int
+    var entities: EntitiesModel { get }
     var difficulty: Difficulty { get }
     var updatedEntity: EntityModel? { get }
-    init(_ entities: [EntityModel],
+    var level: Level? { get }
+    init(_ entities: EntitiesModel,
          difficulty: Difficulty,
-         updatedEntity: EntityModel?)
+         updatedEntity: EntityModel?,
+         level: Level?)
 
 }
     

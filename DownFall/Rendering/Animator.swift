@@ -12,13 +12,55 @@ import SpriteKit
 
 struct Animator {
     
+    func gameWin(transformation: Transformation?,
+                 sprites: [[DFTileSpriteNode]],
+                 completion: (() -> Void)? = nil) {
+        guard let transformation = transformation,
+            let playerWinTransformation = transformation.tileTransformation?.first?.first else {
+            completion?()
+            return
+        }
+        
+        let exitSprite = sprites[playerWinTransformation.end]
+        exitSprite.removeMinecart()
+        let playerSprite = sprites[playerWinTransformation.initial]
+        playerSprite.removeFromParent()
+        
+        let minecart = SKSpriteNode(imageNamed: "minecart")
+        minecart.size = exitSprite.size.scale(by: Style.DFTileSpriteNode.Exit.minecartSizeCoefficient)
+        minecart.zPosition = Precedence.foreground.rawValue
+        minecart.position = CGPoint.positionThis(minecart.frame, inBottomOf: exitSprite.frame)
+        
+        let playerWin = SKSpriteNode(imageNamed: "playerWin")
+        playerWin.size = exitSprite.size.scale(by: Style.DFTileSpriteNode.Exit.minecartSizeCoefficient)
+        playerWin.zPosition = Precedence.foreground.rawValue
+        playerWin.position = .zero
+        
+        minecart.addChild(playerWin)
+        
+        exitSprite.addChild(minecart)
+        
+        let shrinkAnimation = SKAction.scale(to: AnimationSettings.WinSprite.shrinkCoefficient, duration: 1.0)
+        let moveVector = AnimationSettings.WinSprite.moveVector
+        let moveAnimation = SKAction.move(by: moveVector, duration: 1.0)
+        let removeAction = SKAction.removeFromParent()
+        
+        
+        minecart.run(SKAction.sequence([SKAction.group([shrinkAnimation, moveAnimation]), removeAction])) {
+            completion?()
+        }
+    }
+    
     func animate(_ transformation: [TileTransformation]?,
                  boardSize: CGFloat,
                  bottomLeft: CGPoint,
                  spriteForeground: SKNode,
                  tileSize: CGFloat,
                  _ completion: (() -> Void)? = nil) {
-        guard let transformation = transformation else { return }
+        guard let transformation = transformation else {
+            completion?()
+            return
+        }
         var childActionDict : [SKNode : SKAction] = [:]
         for transIdx in 0..<transformation.count {
             let trans = transformation[transIdx]

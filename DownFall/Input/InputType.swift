@@ -10,9 +10,12 @@ import Foundation
 
 indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringConvertible{
     static func fuzzyEqual(_ lhs: InputType, _ rhs: InputType) -> Bool {
-        if case InputType.touch = lhs,
-            case InputType.touch = rhs {
-            return true
+        if case InputType.touch(let lhsCoord, _) = lhs,
+            case InputType.touch(let rhsCoord, _) = rhs {
+            return lhsCoord == rhsCoord
+        } else if case InputType.animationsFinished(let lhsRef) = lhs,
+            case InputType.animationsFinished(let rhsRef) = rhs {
+            return lhsRef == rhsRef
         }
         return lhs == rhs
     }
@@ -34,7 +37,7 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
                                         .animationsFinished(ref: true),
                                         .playAgain,
                                         .reffingFinished(newTurn: false),
-                                        .collectItem(TileCoord(0,0), .zero),
+                                        .collectItem(TileCoord(0,0), .zero, 0),
                                         .tutorial(.zero)
     ]
     
@@ -55,7 +58,7 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
     case transformation(Transformation)
     case reffingFinished(newTurn: Bool)
     case boardBuilt
-    case collectItem(TileCoord, Item)
+    case collectItem(TileCoord, Item, Int)
     case selectLevel
     case newTurn
     case tutorial(TutorialStep)

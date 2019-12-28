@@ -24,30 +24,47 @@
 import GameplayKit
 
 struct TutorialTileCreator: TileStrategy {
+    func goldDropped(from monster: EntityModel) -> Int {
+        return 5
+    }
+    
     var updatedEntity: EntityModel?
     var difficulty: Difficulty
-    var entities: [EntityModel]
+    var entities: EntitiesModel
+    var level: Level?
     var randomSource: GKLinearCongruentialRandomSource = GKLinearCongruentialRandomSource()
     
-    init(_ entities: [EntityModel], difficulty: Difficulty, updatedEntity: EntityModel?) {
+    init(_ entities: EntitiesModel, difficulty: Difficulty, updatedEntity: EntityModel?, level: Level?) {
         self.entities = entities
         self.difficulty = difficulty
         self.updatedEntity = updatedEntity
+        self.level = level
     }
     
-    func board(_ boardSize: Int, difficulty: Difficulty) -> [[Tile]] {
+    func board(difficulty: Difficulty) -> [[Tile]] {
+        guard let playerData = playerEntityData else { fatalError("We must have player data to continue") }
+        
         let greenRow = Array(repeating: Tile.greenRock, count: 4)
+        let purpleRow = Array(repeating: Tile.purpleRock, count: 4)
         
         var tiles: [[Tile]] = []
-        switch difficulty {
-        case .easy, .normal, .hard:
+        switch level?.type {
+        case .first, .second, .third, .boss, .none:
             fatalError("You cant create a tutorial board with one of these diffculties")
         case .tutorial1:
             tiles = [
-                [.greenRock, .gold, .greenRock, .greenRock],
+                [.greenRock, .gem, .greenRock, .greenRock],
                 greenRow,
                 greenRow,
-                [.greenRock, .greenRock, Tile(type: .player(playerEntityData)), .greenRock]
+                [.greenRock, .greenRock, Tile(type: .player(playerData)), .greenRock]
+            ]
+        case .tutorial2:
+            guard let rat = entities.entity(with: .rat) else { fatalError("Could not find a rat in the entities array") }
+            tiles = [
+                [.greenRock, .greenRock, .monster(rat), .brownRock],
+                [.greenRock, .greenRock, .brownRock , .purpleRock],
+                purpleRow,
+                [.purpleRock, .purpleRock, Tile(type: .player(playerData)), .brownRock]
             ]
         }
         return tiles
@@ -56,28 +73,11 @@ struct TutorialTileCreator: TileStrategy {
     
     func tiles(for tiles: [[Tile]]) -> [Tile] {
         let count = typeCount(for: tiles, of: .empty).count
-        let array = Array(repeating: randomSource.nextInt() % 2 == 0 ? Tile.greenRock : Tile.greenRock, count: count)
+        let array = Array(repeating: randomSource.nextInt() % 2 == 0 ? Tile.greenRock : Tile.brownRock, count: count)
         return array
     }
     
-    var playerEntityData: EntityModel {
-        
-        //TODO remove this hack
-        guard updatedEntity == nil else {
-            return updatedEntity!
-        }
-        switch difficulty {
-        case .easy:
-            return entities[0]
-        case .normal:
-            return entities[1]
-        case .hard:
-            return entities[2]
-        case .tutorial1:
-            return entities[1]
-        }
+    var playerEntityData: EntityModel? {
+        return updatedEntity ?? entities.easyPlayer
     }
-
-    
-    
 }

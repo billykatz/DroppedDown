@@ -9,7 +9,7 @@
 import Foundation
 import SpriteKit
 
-class Renderer : SKSpriteNode {
+class Renderer: SKSpriteNode {
     private let playableRect: CGRect
     private let foreground: SKNode
     private var sprites: [[DFTileSpriteNode]] = []
@@ -17,6 +17,9 @@ class Renderer : SKSpriteNode {
     private let boardSize: CGFloat!
     private let tileSize: CGFloat = Style.Tile.size
     private let precedence: Precedence
+    
+    // Used to determine what special UI consdierations to make for what level we are on
+    private let level: Level
     
     private var spriteForeground = SKNode()
     private var menuForeground = SKNode()
@@ -32,12 +35,20 @@ class Renderer : SKSpriteNode {
         return MenuSpriteNode(.gameWin, playableRect: playableRect, precedence: .menu)
     }
     
+    private var gameLoseSpriteNode: MenuSpriteNode {
+        return MenuSpriteNode(.gameLose, playableRect: playableRect, precedence: .menu)
+    }
+    
     private var rotateSprite: MenuSpriteNode {
         return MenuSpriteNode(.rotate, playableRect: playableRect, precedence: .menu)
     }
     
     private var tutorial1WinSprite: MenuSpriteNode {
         return MenuSpriteNode(.tutorial1Win, playableRect: playableRect, precedence: .menu)
+    }
+    
+    private var tutorial2WinSprite: MenuSpriteNode {
+        return MenuSpriteNode(.tutorial2Win, playableRect: playableRect, precedence: .menu)
     }
 
     
@@ -48,11 +59,13 @@ class Renderer : SKSpriteNode {
     init(playableRect: CGRect,
          foreground givenForeground: SKNode,
          boardSize theBoardSize: Int,
-         precedence: Precedence) {
+         precedence: Precedence,
+         level: Level) {
         
         self.precedence = precedence
         self.playableRect = playableRect
         self.boardSize = CGFloat(theBoardSize)
+        self.level = level
         
         //center the board in the playable rect
         let marginWidth = playableRect.width - CGFloat(tileSize * boardSize)
@@ -73,14 +86,15 @@ class Renderer : SKSpriteNode {
         
         // add settings button to board
         header = Header.build(color: .black,
-                              size: CGSize(width: playableRect.width, height: 200.0),
-                              precedence: precedence)
-        header.position = CGPoint(x: playableRect.midX, y: playableRect.maxY - 100.0)
+                              size: CGSize(width: playableRect.width, height: Style.Header.height),
+                              precedence: precedence,
+                              delegate: self)
+        header.position = CGPoint.positionThis(header.frame, inTopOf: playableRect)
         header.zPosition = precedence.rawValue
         
         //create the hud
-        hud = HUD.build(color: .lightGray, size: CGSize(width: playableRect.width * 0.9, height: 150))
-        hud.position = CGPoint(x: playableRect.midX, y: playableRect.minY + 400.0 + 16)
+        hud = HUD.build(color: .lightGray, size: CGSize(width: playableRect.width * 0.9, height: Style.HUD.height))
+        hud.position = CGPoint.positionThis(hud.frame, inBottomOf: playableRect, padding: Style.Padding.most)
         
         //create the helper text view
         helperTextView = HelperTextView.build(color: UIColor.clayRed, size: CGSize(width: playableRect.width * 0.8, height: 400))
@@ -123,7 +137,7 @@ class Renderer : SKSpriteNode {
                 animateAttack(attackInput: inputType, endTiles: trans.endTiles)
             case .gameWin:
                 animate(trans.tileTransformation?.first) { [weak self] in
-                    self?.gameWin()
+                    self?.gameWin(transformation: trans)
                 }
             case .monsterDies:
                 let sprites = createSprites(from: trans.endTiles)
@@ -153,15 +167,29 @@ class Renderer : SKSpriteNode {
             // show the menu
             foreground.addChild(menuForeground)
         case .gameLose:
-            gameWin()
+            menuForeground.addChild(gameLoseSpriteNode)
+            menuForeground.removeFromParent()
+            foreground.addChild(menuForeground)
         case .playAgain:
             menuForeground.removeFromParent()
         case .tutorial(let step):
             let types = step.highlightType
-            for sprite in sprites.flatMap({ $0 }) {
-                sprite.removeAllChildren()
-                if types.contains(sprite.type) {
-                    sprite.tutorialHighlight()
+            let coords = step.highlightCoordinates
+            let showFinger = step.showFingerWithHighlight
+            for (row, spriteRow) in sprites.enumerated() {
+                for (col, _) in spriteRow.enumerated() {
+                    let sprite = sprites[row][col]
+                    sprite.removeAllChildren()
+                    if types.contains(sprite.type) {
+                        sprite.tutorialHighlight()
+                        if showFinger {
+                            sprite.showFinger()
+                        }
+                    }
+                    
+                    if coords.contains(TileCoord(row, col)) {
+                        sprite.indicateSpriteWillBeAttacked()
+                    }
                 }
             }
             
@@ -207,9 +235,9 @@ class Renderer : SKSpriteNode {
         for (row, innerSprites) in sprites.enumerated() {
             for (col, sprite) in innerSprites.enumerated() {
                 if tiles?[row][col].shouldHighlight ?? false {
-                    sprite.indicateAboutToAttack()
+                    sprite.indicateSpriteWillBeAttacked()
                 } else if tiles?[row][col].willAttackNextTurn() ?? false {
-                    sprite.indicateAboutToAttack()
+                    sprite.indicateSpriteWillBeAttacked()
                 }
                 spriteForeground.addChild(sprite)
             }
@@ -248,7 +276,7 @@ class Renderer : SKSpriteNode {
                                               height: height,
                                               width: width)
                 if tiles[row][col].shouldHighlight {
-                    sprite.indicateAboutToAttack()
+                    sprite.indicateSpriteWillBeAttacked()
                 }
                 sprites[row].append(sprite)
                 sprites[row][col].position = CGPoint(x: x, y: y)
@@ -390,10 +418,36 @@ extension Renderer {
                         guard let lastTouchInput = InputQueue.lastTouchInput(),
                             case let InputType.touchBegan(lastTileCoord, _) = lastTouchInput.type,
                             newTileCoord == lastTileCoord else { return }
-                        InputQueue.append(
-                            Input(.touch(TileCoord(row, col),
-                                         sprites[row][col].type))
-                        )
+                        
+                        //special case for tutorial
+                        if level.type != .tutorial2 {
+                            InputQueue.append(
+                                Input(.touch(TileCoord(row, col),
+                                             sprites[row][col].type))
+                            )
+                        } else if level.type == .tutorial2, let data = level.tutorialData {
+                            if InputType.fuzzyEqual(data.currentStep.inputToContinue,
+                                                    .touch(TileCoord(row, col), sprites[row][col].type)) {
+                                InputQueue.append(
+                                    Input(.touch(TileCoord(row, col),
+                                                 sprites[row][col].type))
+                                )
+                            }
+                                
+                                // the following logic is specific to the tutorial at hand.
+                                // if we want to constrain where a user can click, then we need to
+                                // understand where and when they are clicking
+                                // where on the board
+                                // and when in the tutorial
+                            else if InputType.fuzzyEqual(data.currentStep.inputToContinue,
+                                                         .monsterDies(.zero)) {
+                                InputQueue.append(
+                                    Input(.touch(TileCoord(row, col),
+                                                 sprites[row][col].type))
+                                )
+                            }
+    
+                        }
                     }
                 }
             }
@@ -406,11 +460,21 @@ extension Renderer {
 }
 
 extension Renderer {
-    private func gameWin() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { [weak self] in
+    private func gameWin(transformation: Transformation?) {
+        animator.gameWin(transformation: transformation, sprites: sprites) { [weak self] in
+    
             guard let strongSelf = self else { return }
             strongSelf.menuForeground.removeAllChildren()
-            let gameWinMenu = GameScope.shared.difficulty == .tutorial1 ? strongSelf.tutorial1WinSprite : strongSelf.gameWinSpriteNode
+            let gameWinMenu: SKSpriteNode
+            switch strongSelf.level.type {
+            case .first, .second, .third, .boss:
+                //TODO: program the boss win sprite
+                gameWinMenu = strongSelf.gameWinSpriteNode
+            case .tutorial1:
+                gameWinMenu = strongSelf.tutorial1WinSprite
+            case .tutorial2:
+                gameWinMenu = strongSelf.tutorial2WinSprite
+            }
             strongSelf.menuForeground.addChild(gameWinMenu)
             strongSelf.menuForeground.removeFromParent()
             strongSelf.foreground.addChild(strongSelf.menuForeground)
@@ -458,4 +522,10 @@ extension Renderer {
         print(output)
     }
 
+}
+
+extension Renderer: HeaderDelegate {
+    func settingsTapped(_ header: Header) {
+        InputQueue.append(Input(.pause))
+    }
 }

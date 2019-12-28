@@ -15,6 +15,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        
+        //TODO: Consider init the GameViewController here and injecting everything it needs to function
+        // Use this as a resource https://medium.com/ios-os-x-development/ios-start-an-app-without-storyboard-5f57e3251a25
+        
         return true
     }
 

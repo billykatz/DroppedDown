@@ -29,6 +29,12 @@ class GameScene: SKScene {
     //Generator
     private var generator: HapticGenerator?
     
+    //swipe recognizer view
+    private var swipeRecognizerView: SwipeRecognizerView?
+    
+    //level
+    private var level: Level?
+    
     //touch state
     private var touchWasSwipe = false
     private var touchWasCanceled = false
@@ -37,9 +43,14 @@ class GameScene: SKScene {
     
     /// Creates an instance of board and does preparation neccessary for didMove(to:) to be called
     public func commonInit(boardSize: Int,
-                           entities: [EntityModel],
+                           entities: EntitiesModel,
                            difficulty: Difficulty = .normal,
-                           updatedEntity: EntityModel? = nil) {
+                           updatedEntity: EntityModel? = nil,
+                           level: Level) {
+        // init our level
+        self.level = level
+        Referee.injectLevel(level)
+        
         //create the foreground node
         foreground = SKNode()
         foreground.position = .zero
@@ -47,11 +58,12 @@ class GameScene: SKScene {
         
         //init our tile creator
         let tileCreator = TileCreator(entities,
-                                  difficulty: difficulty,
-                                  updatedEntity: updatedEntity)
+                                      difficulty: difficulty,
+                                      updatedEntity: updatedEntity,
+                                      level: level)
         
         //board
-        board = Board.build(size: boardSize, tileCreator: tileCreator, difficulty: difficulty)
+        board = Board.build(tileCreator: tileCreator, difficulty: difficulty, level: level)
         self.boardSize = boardSize
         
         // create haptic generator
@@ -65,33 +77,40 @@ class GameScene: SKScene {
         self.renderer = Renderer(playableRect: size.playableRect,
                                  foreground: foreground,
                                  boardSize: boardSize,
-                                 precedence: Precedence.foreground)
+                                 precedence: Precedence.foreground,
+                                 level: level!)
         
         
         // SwipeRecognizerView
-        let swipingRecognizerView = SwipeRecognizerView(frame: view.frame,
+        swipeRecognizerView = SwipeRecognizerView(frame: view.frame,
                                                         target: self,
                                                         swiped: #selector(swiped))
-        view.addSubview(swipingRecognizerView)
+        view.addSubview(swipeRecognizerView!)
         
         // Register for inputs we care about
         Dispatch.shared.register { [weak self] input in
             if input.type == .playAgain {
+                guard let self = self,
+                let playerIndex = tileIndices(of: .player(.zero), in: self.board.tiles).first
+                else { return }
+                
+                self.foreground.removeAllChildren()
+                if case let TileType.player(data) = self.board.tiles[playerIndex].type {
+                    self.removeFromParent()
+                    self.gameSceneDelegate?.reset(self, playerData: data)
+                }
+
+            } else if input.type == .visitStore {
                 guard let self = self,
                     let playerIndex = tileIndices(of: .player(.zero), in: self.board.tiles).first
                     else { return }
                 
                 self.foreground.removeAllChildren()
                 if case let TileType.player(data) = self.board.tiles[playerIndex].type {
-                    let revivedData = data.revive()
                     self.removeFromParent()
-                    self.gameSceneDelegate?.visitStore(revivedData)
+                    self.gameSceneDelegate?.visitStore(data)
                 }
-                //TODO: investigate if this is a memory leak
-                swipingRecognizerView.removeFromSuperview()
-            }
-            else if input.type == .selectLevel {
-                self?.gameSceneDelegate?.selectLevel()
+
             }
         }
 
@@ -110,6 +129,7 @@ class GameScene: SKScene {
         foreground = nil
         gameSceneDelegate = nil
         generator = nil
+        swipeRecognizerView?.removeFromSuperview()
         InputQueue.reset()
         Dispatch.shared.reset()
         print("deiniting")
@@ -161,7 +181,13 @@ extension GameScene {
             if self.nodes(at: newTouch).contains(where: { node in
                 (node as? SKSpriteNode)?.name == "setting"
             }) {
-                gameSceneDelegate?.reset(self)
+                guard let playerIndex = tileIndices(of: .player(.zero), in: self.board.tiles).first else { return }
+                
+                self.foreground.removeAllChildren()
+                if case let TileType.player(data) = self.board.tiles[playerIndex].type {
+                    self.removeFromParent()
+                    self.gameSceneDelegate?.reset(self, playerData: data)
+                }
             }
         }
     }
@@ -187,7 +213,9 @@ extension GameScene {
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         // avoid inputing touchEnded when a touch is cancelled.
-        touchWasCanceled = true
+        if !touchWasSwipe {
+            touchWasCanceled = true
+        }
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {

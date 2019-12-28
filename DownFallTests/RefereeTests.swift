@@ -32,7 +32,7 @@ class RefereeTests: XCTestCase {
         let expectedOutput = Input(.gameWin)
         
         // need to explicitly set this or else the Referee does not know what rule book to use
-        GameScope.shared.difficulty = .normal
+        Referee.injectLevel(Level.zero)
         
         let gameWin = allBlack >>> win(mockBoard)
         let gameBoard = gameWin(mockBoard)
@@ -205,7 +205,7 @@ class RefereeTests: XCTestCase {
         expectedOutput = Input(.attack(attackType: .targets ,
                                        attacker: TileCoord(2, 1),
                                        defender: TileCoord(2, 0),
-                                       affectedTiles: [TileCoord(2, 2), TileCoord(2, 0)]))
+                                       affectedTiles: [TileCoord(2, 0), TileCoord(2, 2)]))
         actualOutput = Referee.enforceRules(toTileStructs(tileTypes: tiles))
         XCTAssertEqual(expectedOutput, actualOutput, "Mouthy monsters attacked things on it's sides")
 

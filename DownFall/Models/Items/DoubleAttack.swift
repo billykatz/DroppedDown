@@ -17,6 +17,8 @@ struct DoubleAttack: Ability {
     
     var cost: Int { return 2 }
     
+    var currency: Currency { return .gold }
+    
     var type: AbilityType { return .doubleAttack }
     
     var description: String {
@@ -33,5 +35,9 @@ struct DoubleAttack: Ability {
     
     func blocksDamage(from: Direction) -> Int? {
         return nil
+    }
+    
+    var usage: Usage {
+        return .oneRun
     }
 }

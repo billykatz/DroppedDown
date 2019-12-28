@@ -15,12 +15,12 @@ extension Int: Sequence {
     }
 }
 
-func entities() -> [EntityModel] {
+func entities() -> EntitiesModel {
     guard let data = try! Data.data(from: "EntityTest") else {
-        return []
+        return EntitiesModel(entities: [])
     }
     do {
-        return try JSONDecoder().decode(EntitiesModel.self, from: data).entities
+        return try JSONDecoder().decode(EntitiesModel.self, from: data)
     }
     catch {
         fatalError("\(error)")
@@ -29,10 +29,10 @@ func entities() -> [EntityModel] {
 
 extension Board {
     convenience init(tiles: [[Tile]]) {
-        self.init(tileCreator: TileCreator(entities(),
-                                           difficulty: .normal),
-                  tiles: tiles
-                  )
+        let tileCreator = TileCreator(entities(),
+                                      difficulty: .normal,
+                                      level: Level.zero)
+        self.init(tileCreator: tileCreator, tiles: tiles, level: Level.zero)
     }
 }
 
@@ -91,7 +91,7 @@ func xTiles(_ numTiles: Int, _ tile: Tile, _ board: Board) -> Builder {
 
 extension TileType {
     static var playerWithGem: TileType {
-        let gemCarry = CarryModel(items: [Item(type: .gem, range: .one)])
+        let gemCarry = CarryModel(items: [Item(type: .gem, amount: 1)])
         return TileType.createPlayer(carry: gemCarry)
     }
 }

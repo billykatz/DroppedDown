@@ -96,6 +96,9 @@ struct Style {
     struct HUD {
         static let height: CGFloat = 200.0
         static let heartSize = CGSize(width: 100.0, height: 100.0)
-        static let gemSize = CGSize(width: 60.0, height: 60.0)
+        static let gemSize = CGSize(width: 75.0, height: 75.0)
+        static let labelParagraphWidth = CGFloat(200.0)
+        static let coinLabelPadding = CGFloat (50.0)
+        static let gemSpritePadding = CGFloat(16.0)
     }
 }

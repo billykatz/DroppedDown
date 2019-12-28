@@ -50,17 +50,14 @@ class HUD: SKSpriteNode {
             switch inputType {
             case .attack:
                 showAttack(attackInput: input, endTiles: trans.endTiles)
-            case .collectItem(_, let item, let totalGold):
-                if item.type == .gem {
-                    showGem()
-                } else if item.type == .gold {
-                    incrementGoldCounter(totalGold)
-                }
+            case .collectItem(_, let item, let total):
+                incrementCurrencyCounter(item, total: total)
             default:
                 ()
             }
         case .boardBuilt:
-            //TODO: check this logic out thoroughly
+            //TODO: check this logic out thoroughly.
+            // Update 12/28: not sure why I wrote this/
             guard let tiles = input.endTilesStruct,
                 let playerPosition = getTilePosition(.player(.zero), tiles: tiles),
                 case let TileType.player(data) = tiles[playerPosition].type else { return }
@@ -72,14 +69,7 @@ class HUD: SKSpriteNode {
 
     func show(_ data: EntityModel) {
         // Remove all the hearts so that we can redraw
-        for child in self.children {
-//            if child.name == Identifiers.heart ||
-//                child.name == Identifiers.gold ||
-//                child.name == Identifiers.gem ||
-//                child.name == Identifiers.gemSpriteLabel {
-            child.removeFromParent()
-//            }
-        }
+        removeAllChildren()
         
         
         // create and display the full and empty hearts
@@ -96,8 +86,8 @@ class HUD: SKSpriteNode {
             self.addChild(heartNode)
         }
         
-        let goldLabel = ParagraphNode(text: "\(data.carry.total(in: .gold))", paragraphWidth: 200.0, fontName: UIFont.pixelFontName, fontSize: UIFont.extraLargeSize, fontColor: .lightText)
-        goldLabel.position = CGPoint.positionThis(goldLabel.frame, in: self.frame, verticaliy: .bottom, anchor: .left)
+        let goldLabel = ParagraphNode(text: "\(data.carry.total(in: .gold))", paragraphWidth: Style.HUD.labelParagraphWidth, fontName: UIFont.pixelFontName, fontSize: UIFont.extraLargeSize, fontColor: .lightText)
+        goldLabel.position = CGPoint.positionThis(goldLabel.frame, in: self.frame, verticaliy: .bottom, anchor: .left, xOffset: Style.HUD.coinLabelPadding)
         goldLabel.name = Identifiers.goldSpriteLabel
         self.addChild(goldLabel)
 
@@ -109,36 +99,42 @@ class HUD: SKSpriteNode {
                                                  anchor: .right)
         self.addChild(coinNode)
         
-        let gemSpriteLabel = ParagraphNode(text: "\(data.carry.total(in: .gem))", paragraphWidth: 200.0, fontName: UIFont.pixelFontName, fontSize: UIFont.extraLargeSize, fontColor: .lightText)
+        let gemSpriteLabel = ParagraphNode(text: "\(data.carry.total(in: .gem))", paragraphWidth: Style.HUD.labelParagraphWidth, fontName: UIFont.pixelFontName, fontSize: UIFont.extraLargeSize, fontColor: .lightText)
         gemSpriteLabel.position = CGPoint.positionThis(gemSpriteLabel.frame,
                                                        relativeTo: coinNode.frame,
                                                        verticaliy: .center,
-                                                       anchor: .right)
+                                                       anchor: .right,
+                                                       xOffset: Style.HUD.coinLabelPadding)
         gemSpriteLabel.name = Identifiers.gemSpriteLabel
         self.addChild(gemSpriteLabel)
         
         let gemSprite = SKSpriteNode(texture: SKTexture(imageNamed: Identifiers.gem), size: Style.HUD.gemSize)
-        gemSprite.position = CGPoint.positionThis(gemSprite.frame, relativeTo: gemSpriteLabel.frame, verticaliy: .center, anchor: .right)
+        gemSprite.position = CGPoint.positionThis(gemSprite.frame, relativeTo: gemSpriteLabel.frame, verticaliy: .center, anchor: .right, xOffset: Style.HUD.gemSpritePadding)
         self.addChild(gemSprite)
         
         
         
     }
     
-    func showGem() {
-        let spriteNode = SKSpriteNode(texture: SKTexture(imageNamed: "gem1"), size: CGSize(width: 100, height: 100))
-        spriteNode.position = CGPoint(x: -300, y: 0)
-        self.addChild(spriteNode)
-    }
-    
-    func incrementGoldCounter(_ totalGold: Int) {
-        if let goldLabel = self.childNode(withName: Identifiers.goldSpriteLabel) as? ParagraphNode {
+    func incrementCurrencyCounter(_ item: Item, total: Int) {
+        if item.type == .gold,
+            let goldLabel = self.childNode(withName: Identifiers.goldSpriteLabel) as? ParagraphNode {
+            let oldPosition = goldLabel.position
             goldLabel.removeFromParent()
             
-            let newGoldLabel = ParagraphNode(text: "\(totalGold)", paragraphWidth: 200.0, fontName: UIFont.pixelFontName, fontSize: UIFont.extraLargeSize, fontColor: .lightText)
-            newGoldLabel.position = CGPoint.positionThis(goldLabel.frame, in: self.frame, verticaliy: .bottom, anchor: .left)
+            let newGoldLabel = ParagraphNode(text: "\(total)", paragraphWidth: Style.HUD.labelParagraphWidth, fontName: UIFont.pixelFontName, fontSize: UIFont.extraLargeSize, fontColor: .lightText)
+            newGoldLabel.position = oldPosition
             newGoldLabel.name = Identifiers.goldSpriteLabel
             self.addChild(newGoldLabel)
+        } else if item.type == .gem,
+            let gemLabel = self.childNode(withName: Identifiers.gemSpriteLabel) as? ParagraphNode {
+            let oldPosition = gemLabel.position
+            gemLabel.removeFromParent()
+            
+            let gemSpriteLabel = ParagraphNode(text: "\(total)", paragraphWidth: Style.HUD.labelParagraphWidth, fontName: UIFont.pixelFontName, fontSize: UIFont.extraLargeSize, fontColor: .lightText)
+            gemSpriteLabel.position = oldPosition
+            gemSpriteLabel.name = Identifiers.gemSpriteLabel
+            self.addChild(gemSpriteLabel)
         }
     }
 }

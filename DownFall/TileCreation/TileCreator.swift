@@ -97,6 +97,7 @@ class TileCreator: TileStrategy {
         return 0
     }
 
+    var specialGems = 0
     func tiles(for tiles: [[Tile]]) -> [Tile] {
         var newTiles: [Tile] = []
         var newMonsterCount = 0
@@ -110,14 +111,18 @@ class TileCreator: TileStrategy {
                 
             case .purpleRock, .brownRock, .blueRock, .blackRock, .redRock:
                 newTiles.append(nextTile)
-            case .empty, .item, .player, .fireball:
+            case .empty, .player, .fireball:
                 ()
             case .greenRock:
                 if specialRocks < level?.maxSpecialRocks ?? 0 {
                     specialRocks += 1
                     newTiles.append(nextTile)
                 }
-
+            case .item(let item):
+                if specialGems < 2 {
+                    specialGems  += 1
+                    newTiles.append(Tile(type: .item(Item(type: .gem, amount: 1))) )
+                }
             case .exit:
                 if typeCount(for: tiles, of: .exit).count < 1,
                     !newTiles.contains(Tile.exit)

@@ -66,6 +66,66 @@ extension CGPoint {
                            y: -that.height/2 + this.height/2 + padding)
         }
     }
+    
+    static func positionThis(_ this: CGRect,
+                             in that: CGRect,
+                             padding: CGFloat = Style.Padding.normal,
+                             verticaliy: Verticality,
+                             anchor: Anchor,
+                             xOffset: CGFloat = 0.0) -> CGPoint {
+        
+        
+        let y: CGFloat
+        switch verticaliy {
+        case .top:
+            y = that.height/2 - this.height/2 - padding
+        case .center:
+            y = that.center.y
+        case .bottom:
+            y = -that.height/2 + this.height/2 + padding
+        }
+        
+        let x: CGFloat
+        switch anchor {
+        case .left:
+            x = -that.width/2 + this.width/2 + xOffset
+        case .right:
+            x = that.width/2 - this.width/2 + xOffset
+        }
+        
+        return CGPoint(x: x, y: y)
+    }
+    
+    static func positionThis(_ this: CGRect,
+                             relativeTo that: CGRect,
+                             verticaliy: Verticality,
+                             anchor: Anchor,
+                             xOffset: CGFloat = 0.0,
+                             yOffset: CGFloat = 0.0) -> CGPoint {
+        
+        
+        let y: CGFloat
+        switch verticaliy {
+        case .top:
+            y = that.center.y + that.height/2 + this.height/2 + yOffset
+        case .center:
+            y = that.center.y
+        case .bottom:
+            y = that.center.y - that.height - this.height/2 - yOffset
+        }
+        
+        let x: CGFloat
+        switch anchor {
+        case .left:
+            x = that.center.x - that.width/2 - this.width/2 - xOffset
+        case .right:
+            x = that.center.x + that.width/2 + this.width/2 + xOffset
+        }
+        
+        return CGPoint(x: x, y: y)
+    }
+
+
 
     
     static func positionThis(_ this: CGRect,
@@ -75,6 +135,8 @@ extension CGPoint {
         return CGPoint(x: 0.0 + xOffset,
                        y: that.height/2 - this.height/2 - padding)
     }
+    
+    
     
     static func positionThis(_ this: CGRect,
                         toTheRightOf that: CGRect,
@@ -88,11 +150,17 @@ extension CGPoint {
                              below that: CGRect,
                              spacing: CGFloat = 0.0) -> CGPoint {
         return CGPoint(x: that.center.x,
-                       y: that.center.y - this.height - spacing)
+                       y: that.center.y - (that.height/2) - (this.height/2) - spacing)
     }
     
     enum Anchor {
         case left
         case right
+    }
+    
+    enum Verticality {
+        case top
+        case center
+        case bottom
     }
 }

@@ -10,7 +10,7 @@ import SpriteKit
 
 class HUD: SKSpriteNode {
     static func build(color: UIColor, size: CGSize) -> HUD {
-        let header = HUD(texture: nil, color: .clear, size: size)
+        let header = HUD(texture: nil, color: color, size: size)
         Dispatch.shared.register {
             header.handle($0)
         }
@@ -50,14 +50,14 @@ class HUD: SKSpriteNode {
             switch inputType {
             case .attack:
                 showAttack(attackInput: input, endTiles: trans.endTiles)
+            case .collectItem(_, let item, let totalGold):
+                if item.type == .gem {
+                    showGem()
+                } else if item.type == .gold {
+                    incrementGoldCounter(totalGold)
+                }
             default:
                 ()
-            }
-        case .collectItem(_, let item, let totalGold):
-            if item.type == .gem {
-                showGem()
-            } else if item.type == .gold {
-                incrementGoldCounter(totalGold)
             }
         case .boardBuilt:
             //TODO: check this logic out thoroughly
@@ -71,36 +71,58 @@ class HUD: SKSpriteNode {
     }
 
     func show(_ data: EntityModel) {
+        // Remove all the hearts so that we can redraw
         for child in self.children {
-            if child.name == "heart" {
-                child.removeFromParent()
-            }
+//            if child.name == Identifiers.heart ||
+//                child.name == Identifiers.gold ||
+//                child.name == Identifiers.gem ||
+//                child.name == Identifiers.gemSpriteLabel {
+            child.removeFromParent()
+//            }
         }
         
-        for health in 0..<data.hp {
-            let heartNode = SKSpriteNode(texture: SKTexture(imageNamed: "heart"), size: CGSize(width: 100, height: 100))
-            heartNode.position = CGPoint(x: -150 + (health * 100), y:0)
-            heartNode.name = "heart"
+        
+        // create and display the full and empty hearts
+        for health in 0..<data.originalHp {
+            
+            let identifier = health < data.hp ? Identifiers.fullHeart: Identifiers.emptyHeart
+            let heartNode = SKSpriteNode(texture: SKTexture(imageNamed: identifier), size: Style.HUD.heartSize)
+            heartNode.position = CGPoint.positionThis(heartNode.frame,
+                                                      in: self.frame,
+                                                      verticaliy: .top,
+                                                      anchor: .left,
+                                                      xOffset: CGFloat(health) * Style.HUD.heartSize.width)
+            heartNode.name = Identifiers.heart
             self.addChild(heartNode)
         }
         
-        let coinNode = SKSpriteNode(texture: SKTexture(imageNamed: "gold"), size: CGSize(width: 100, height: 100))
-        coinNode.position = CGPoint(x: 250, y: 0)
+        let goldLabel = ParagraphNode(text: "\(data.carry.total(in: .gold))", paragraphWidth: 200.0, fontName: UIFont.pixelFontName, fontSize: UIFont.extraLargeSize, fontColor: .lightText)
+        goldLabel.position = CGPoint.positionThis(goldLabel.frame, in: self.frame, verticaliy: .bottom, anchor: .left)
+        goldLabel.name = Identifiers.goldSpriteLabel
+        self.addChild(goldLabel)
+
+        
+        let coinNode = SKSpriteNode(texture: SKTexture(imageNamed: Identifiers.gold), size: Style.HUD.heartSize)
+        coinNode.position = CGPoint.positionThis(coinNode.frame,
+                                                 relativeTo: goldLabel.frame,
+                                                 verticaliy: .center,
+                                                 anchor: .right)
         self.addChild(coinNode)
         
-        if let goldLabel = self.childNode(withName: "goldLabel") as? SKLabelNode {
-            goldLabel.text = "\(data.carry.total(in: .gold))"
-        }
-            
-        else {
-            let goldLabel = SKLabelNode(fontNamed: "Helvetica")
-            goldLabel.fontSize = UIFont.largeSize
-            goldLabel.position = CGPoint(x: 355, y: -22)
-            goldLabel.text = "\(data.carry.total(in: .gold))"
-            goldLabel.fontColor = .lightText
-            goldLabel.name = "goldLabel"
-            self.addChild(goldLabel)
-        }
+        let gemSpriteLabel = ParagraphNode(text: "\(data.carry.total(in: .gem))", paragraphWidth: 200.0, fontName: UIFont.pixelFontName, fontSize: UIFont.extraLargeSize, fontColor: .lightText)
+        gemSpriteLabel.position = CGPoint.positionThis(gemSpriteLabel.frame,
+                                                       relativeTo: coinNode.frame,
+                                                       verticaliy: .center,
+                                                       anchor: .right)
+        gemSpriteLabel.name = Identifiers.gemSpriteLabel
+        self.addChild(gemSpriteLabel)
+        
+        let gemSprite = SKSpriteNode(texture: SKTexture(imageNamed: Identifiers.gem), size: Style.HUD.gemSize)
+        gemSprite.position = CGPoint.positionThis(gemSprite.frame, relativeTo: gemSpriteLabel.frame, verticaliy: .center, anchor: .right)
+        self.addChild(gemSprite)
+        
+        
+        
     }
     
     func showGem() {
@@ -110,8 +132,13 @@ class HUD: SKSpriteNode {
     }
     
     func incrementGoldCounter(_ totalGold: Int) {
-        if let goldLabel = self.childNode(withName: "goldLabel") as? SKLabelNode {
-            goldLabel.text = "\(totalGold)"
+        if let goldLabel = self.childNode(withName: Identifiers.goldSpriteLabel) as? ParagraphNode {
+            goldLabel.removeFromParent()
+            
+            let newGoldLabel = ParagraphNode(text: "\(totalGold)", paragraphWidth: 200.0, fontName: UIFont.pixelFontName, fontSize: UIFont.extraLargeSize, fontColor: .lightText)
+            newGoldLabel.position = CGPoint.positionThis(goldLabel.frame, in: self.frame, verticaliy: .bottom, anchor: .left)
+            newGoldLabel.name = Identifiers.goldSpriteLabel
+            self.addChild(newGoldLabel)
         }
     }
 }

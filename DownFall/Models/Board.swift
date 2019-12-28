@@ -364,7 +364,7 @@ extension Board {
         tiles = updatedTiles
         
         return Transformation(transformation: transformation.tileTransformation,
-                              inputType: .collectItem(coord, item, data.carry.total(in: item.type.currencyType)),
+                              inputType: .collectItem(coord, item, playerData.carry.total(in: item.type.currencyType)),
                               endTiles: updatedTiles)
     }
     

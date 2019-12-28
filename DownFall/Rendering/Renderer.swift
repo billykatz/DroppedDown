@@ -93,12 +93,12 @@ class Renderer: SKSpriteNode {
         header.zPosition = precedence.rawValue
         
         //create the hud
-        hud = HUD.build(color: .lightGray, size: CGSize(width: playableRect.width * 0.9, height: Style.HUD.height))
-        hud.position = CGPoint.positionThis(hud.frame, inBottomOf: playableRect, padding: Style.Padding.most)
+        hud = HUD.build(color: UIColor.darkGray, size: CGSize(width: playableRect.width, height: Style.HUD.height))
+        hud.position = CGPoint.positionThis(hud.frame, below: header.frame)
         
         //create the helper text view
         helperTextView = HelperTextView.build(color: UIColor.clayRed, size: CGSize(width: playableRect.width * 0.8, height: 400))
-        helperTextView.position = CGPoint(x: playableRect.midX, y: playableRect.maxY - header.size.height - 216)
+        helperTextView.position = CGPoint.positionThis(helperTextView.frame, inBottomOf: playableRect)
         
 
         [spriteForeground, header, hud, helperTextView].forEach { foreground.addChild($0) }

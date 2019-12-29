@@ -18,7 +18,7 @@ class Controls: SKSpriteNode {
     static func build(color: UIColor,
                       size: CGSize,
                       precedence: Precedence) -> Controls {
-        let controls = Controls(texture: SKTexture(imageNamed: "header"), color: color, size: size)
+        let controls = Controls(texture: SKTexture(imageNamed: Identifiers.header), color: color, size: size)
         let rotateRight = SKSpriteNode(imageNamed: "rotateRight")
         rotateRight.scale(to: CGSize(width: 200.0, height: 200.0))
         rotateRight.zPosition = precedence.rawValue
@@ -48,10 +48,10 @@ class Controls: SKSpriteNode {
         
         for node in nodes {
             if node.name == Constants.rotateLeft {
-                InputQueue.append(Input(.rotateLeft))
+                InputQueue.append(Input(.rotateCounterClockwise))
             }
             if node.name == Constants.rotateRight {
-                InputQueue.append(Input(.rotateRight))
+                InputQueue.append(Input(.rotateClockwise))
             }
         }
         

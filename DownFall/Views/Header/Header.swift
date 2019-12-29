@@ -8,29 +8,38 @@
 
 import SpriteKit
 
+protocol HeaderDelegate: class {
+    func settingsTapped(_ header: Header)
+}
+
 class Header: SKSpriteNode {
+    
+    weak var delegate: HeaderDelegate?
     
     static func build(color: UIColor,
                       size: CGSize,
-                      precedence: Precedence) -> Header {
-        let header = Header(texture: SKTexture(imageNamed: "header"), color: color, size: size)
-        let setting = SKSpriteNode(imageNamed: "setting")
-        setting.name = "setting"
-        let settingX = header.frame.maxX - setting.frame.width
-        setting.position = CGPoint(x: settingX, y: size.height/2 - setting.frame.height)
+                      precedence: Precedence,
+                      delegate: HeaderDelegate) -> Header {
+        let header = Header(texture: SKTexture(imageNamed: Identifiers.header), color: color, size: size)
+        let setting = SKSpriteNode(imageNamed: Identifiers.settings)
+        setting.name = Identifiers.settings
+        setting.position = CGPoint.positionThis(setting.frame, toTheRightOf: header.frame, padding: Style.Padding.more)
         setting.zPosition = precedence.rawValue
         
         header.addChild(setting)
         header.isUserInteractionEnabled = true
         
+        header.delegate = delegate
+        
         return header
     }
+    
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
         let position = touch.location(in: self)
         for node in self.nodes(at: position) {
-            if node.name == "setting" {
-                InputQueue.append(Input(.pause))
+            if node.name == Identifiers.settings {
+                delegate?.settingsTapped(self)
             }
         }
     }

@@ -15,6 +15,16 @@ enum ButtonIdentifier: String {
     case selectLevel
     case leaveStore
     case storeItem
+    case rotate
+    case wallet
+    case infoPopup
+    case visitStore
+    case newGame
+    case back
+    case startTutorial
+    case purchase
+    case sell
+    case close
     
     var title: String {
         switch self {
@@ -28,40 +38,62 @@ enum ButtonIdentifier: String {
             return "Leave Store"
         case .storeItem:
             return ""
+        case .rotate:
+            return "Got it! 👍"
+        case .visitStore:
+            return "Visit Store"
+        case .newGame:
+            return "New Game"
+        case .back:
+            return "Back"
+        case .startTutorial:
+            return "Start Tutorial"
+        case .purchase:
+            return "Purchase"
+        case .sell:
+            return "Sell"
+        case .close:
+            return "Close"
+        case .wallet, .infoPopup:
+            return ""
         }
     }
 }
 
 protocol ButtonDelegate: class {
-    func buttonPressed(_ button: Button)
+    func buttonTapped(_ button: Button)
 }
 
 class Button: SKSpriteNode {
+    
+    static let small = CGSize(width: 75, height: 30)
+    static let medium = CGSize(width: 100, height: 50)
+    static let large = CGSize(width: 150, height: 75)
+    
     weak var delegate: ButtonDelegate?
     
-    init(size: CGSize,
-         delegate: ButtonDelegate,
-         textureName: String,
-         precedence: Precedence) {
-        
-        self.delegate = delegate
-        super.init(texture: SKTexture(imageNamed: textureName), color: .white, size: size)
-        name = textureName
-        isUserInteractionEnabled = true
-        zPosition = precedence.rawValue
-    }
+    var identifier: ButtonIdentifier
+    let originalBackground: UIColor
     
     init(size: CGSize,
          delegate: ButtonDelegate,
          identifier: ButtonIdentifier,
          precedence: Precedence,
-         fontSize: CGFloat = 80) {
+         fontSize: CGFloat,
+         fontColor: UIColor,
+         backgroundColor: UIColor = .menuPurple) {
         
         //Set properties
         self.delegate = delegate
+        self.identifier = identifier
+        
+        // set the original color so that we can toggle between that and the selected state
+        originalBackground = backgroundColor
         
         //Call super
         super.init(texture: nil, color: .white, size: size)
+        
+        // set the name to the identifier
         name = identifier.rawValue
         isUserInteractionEnabled = true
         zPosition = precedence.rawValue
@@ -69,15 +101,20 @@ class Button: SKSpriteNode {
         
         //Create Label
         let label = Label(text: identifier.title,
+                          width: self.frame.width,
                           delegate: self,
                           precedence: precedence,
                           identifier: identifier,
-                          fontSize: fontSize)
+                          fontSize: fontSize,
+                          fontColor: fontColor)
         label.position = self.frame.center
         
         // Add Label
         addChild(label)
+        
+        self.color = backgroundColor
     }
+    
     
     
     required init?(coder aDecoder: NSCoder) {
@@ -101,12 +138,12 @@ extension Button {
     }
     
     private func buttonWasPressed() {
-        color = .white
-        delegate?.buttonPressed(self)
+        color = originalBackground
+        delegate?.buttonTapped(self)
     }
     
     private func buttonPressBegan() {
-       color = .lightGray
+        color = .lightGray
     }
 }
 

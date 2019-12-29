@@ -26,7 +26,6 @@ class HelperTextView: SKSpriteNode {
     }
     
     func show(_ input: Input) {
-        var showGem = false
         var descriptionText = ""
         switch input.type {
         case .gameLose(let text):
@@ -59,11 +58,10 @@ class HelperTextView: SKSpriteNode {
             }
         case .touch(_, let type):
             switch type {
-            case .blackRock, .blueRock, .greenRock:
+            case .blackRock, .blueRock, .greenRock, .purpleRock, .brownRock, .redRock:
                 descriptionText = "Remove rocks by tapping on groups\n of 3 or more anywhere on the board."
             case .exit:
                 descriptionText = "That's the mine shaft,\n but you cant exit until you find the gem!"
-                showGem = true
             case .player:
                 descriptionText = "That's you! Stay alive and find the exit"
             case .monster(let data):
@@ -77,8 +75,10 @@ class HelperTextView: SKSpriteNode {
             }
         case .boardBuilt, .pause:
             ()
-        case .rotateLeft, .rotateRight:
+        case .rotateCounterClockwise, .rotateClockwise:
             descriptionText = "Try swiping up or down on the\n right side of the screen!!"
+        case .tutorial(let step):
+            showStep(step)
         default:
             descriptionText = ""
         }
@@ -86,22 +86,46 @@ class HelperTextView: SKSpriteNode {
         if descriptionText.count == 0 { return }
         self.removeAllChildren()
         
-        
-        
         let descLabel = SKLabelNode(text: descriptionText)
-        descLabel.fontSize = 45
+        descLabel.fontSize = UIFont.mediumSize
         descLabel.zPosition = 11
         descLabel.fontColor = .lightText
         descLabel.fontName = "Helvetica"
         descLabel.position = CGPoint(x: 0, y: -45)
         descLabel.numberOfLines = 0
+  
         
-        self.addChild(descLabel)
+//        if showGem {
+//            let spriteNode = SKSpriteNode(texture: SKTexture(imageNamed: "gem1"), size: CGSize(width: 100, height: 100))
+//            spriteNode.position = CGPoint(x: 300, y: 20)
+//            self.addChild(spriteNode)
+//        }
+    }
+    
+    var paragraphWidth: CGFloat {
+        return frame.width - Style.Padding.more
+    }
+    
+    func showStep(_ step: TutorialStep) {
+        self.removeAllChildren()
+        let paragraph = ParagraphNode.labelNode(text: step.dialog,
+                                                paragraphWidth: paragraphWidth,
+                                                fontSize: UIFont.extraLargeSize)
+        paragraph.position = CGPoint(x: 0.0, y: Style.Padding.most)
+        paragraph.zPosition = Precedence.foreground.rawValue
         
-        if showGem {
-            let spriteNode = SKSpriteNode(texture: SKTexture(imageNamed: "gem1"), size: CGSize(width: 100, height: 100))
-            spriteNode.position = CGPoint(x: 300, y: 20)
-            self.addChild(spriteNode)
+        
+        addChild(paragraph)
+
+        if step.tapToContinue {
+            let tapToContinue = ParagraphNode.labelNode(text: "Tap anywhere to continue",
+                                                        paragraphWidth: paragraphWidth,
+                                                        fontSize: UIFont.mediumSize)
+        
+            tapToContinue.position = CGPoint.positionThis(tapToContinue.frame, inBottomOf: self.frame, padding: Style.Padding.most)
+            
+            addChild(tapToContinue)
         }
     }
+        
 }

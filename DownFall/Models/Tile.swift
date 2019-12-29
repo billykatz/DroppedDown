@@ -9,11 +9,14 @@
 struct Tile: Hashable {
     let type: TileType
     var shouldHighlight: Bool
+    var tutorialHighlight: Bool
     
     init(type: TileType,
-         shouldHighlight: Bool = false) {
+         shouldHighlight: Bool = false,
+         tutorialHighlight: Bool = false) {
         self.type = type
         self.shouldHighlight = shouldHighlight
+        self.tutorialHighlight = tutorialHighlight
     }
     
     static var exit: Tile {
@@ -26,6 +29,39 @@ struct Tile: Hashable {
     
     static var player: Tile {
         return Tile(type: .player(.zero))
+    }
+    
+    static var blackRock: Tile {
+        return Tile(type: .blackRock)
+    }
+    
+    static var blueRock: Tile {
+        return Tile(type: .blueRock)
+    }
+    
+    static var greenRock: Tile {
+        return Tile(type: .greenRock)
+    }
+    
+    static var purpleRock: Tile {
+        return Tile(type: .purpleRock)
+    }
+    
+    static var brownRock: Tile {
+        return Tile(type: .brownRock)
+    }
+    
+    static var gold: Tile {
+        return Tile(type: .gold)
+    }
+    
+    static var gem: Tile {
+        let gem = TileType.item(Item(type: .gem, amount: 1))
+        return Tile(type: gem)
+    }
+    
+    static func monster(_ model: EntityModel) -> Tile {
+        return Tile(type: TileType.monster(model))
     }
     
     func willAttackNextTurn() -> Bool {
@@ -42,8 +78,8 @@ extension Tile: Equatable {
 
 enum TileType: Equatable, Hashable, CaseIterable {
     
-    static var rockCases: [TileType] = [.blueRock, .blackRock, .greenRock]
-    static var allCases: [TileType] = [.blueRock, .blackRock ,.greenRock, .player(.zero), .exit, .empty, .monster(.zero), .item(.zero), .fireball]
+    static var rockCases: [TileType] = [.blueRock, .greenRock, .purpleRock, .brownRock, .redRock]
+    static var allCases: [TileType] = [.blueRock, .blackRock,.greenRock, .player(.zero), .exit, .empty, .monster(.zero), .item(.zero), .fireball, .redRock]
     typealias AllCases = [TileType]
 
     static func == (lhs: TileType, rhs: TileType) -> Bool {
@@ -53,6 +89,12 @@ enum TileType: Equatable, Hashable, CaseIterable {
         case (.blackRock, .blackRock):
             return true
         case (.greenRock, .greenRock):
+            return true
+        case (.brownRock, .brownRock):
+            return true
+        case (.purpleRock, .purpleRock):
+            return true
+        case (.redRock, .redRock):
             return true
         case (.player, .player):
             return true
@@ -72,6 +114,9 @@ enum TileType: Equatable, Hashable, CaseIterable {
     case blueRock
     case blackRock
     case greenRock
+    case purpleRock
+    case brownRock
+    case redRock
     case player(EntityModel)
     case monster(EntityModel)
     case empty
@@ -80,12 +125,7 @@ enum TileType: Equatable, Hashable, CaseIterable {
     case fireball
     
     func isARock() -> Bool {
-        switch self {
-        case .blackRock, .blueRock, .greenRock:
-            return true
-        default:
-            return false
-        }
+        return TileType.rockCases.contains(self)
     }
     
     var isInspectable: Bool {
@@ -115,36 +155,45 @@ enum TileType: Equatable, Hashable, CaseIterable {
     func textureString() -> String {
         switch self {
         case .blueRock:
-            return TextueName.blueRock.rawValue
+            return TextureName.blueRock.rawValue
         case .blackRock:
-            return TextueName.blackRock.rawValue
+            return TextureName.blackRock.rawValue
         case .greenRock:
-            return TextueName.greenRock.rawValue
+            return TextureName.greenRock.rawValue
         case .player:
-            return TextueName.player.rawValue
+            return TextureName.player.rawValue
         case .empty:
-            return TextueName.empty.rawValue
+            return TextureName.empty.rawValue
         case .exit:
-            return TextueName.exit.rawValue
+            return TextureName.exit.rawValue
         case .monster(let data):
             return data.name
         case .item(let item):
             return item.textureName
         case .fireball:
-            return TextueName.fireball.rawValue
+            return TextureName.fireball.rawValue
+        case .purpleRock:
+            return TextureName.purpleRock.rawValue
+        case .brownRock:
+            return TextureName.brownRock.rawValue
+        case .redRock:
+            return TextureName.redRock.rawValue
         }
     }
     
     
-    enum TextueName: String {
-        case blueRock
+    enum TextureName: String {
+        case blueRock = "blueRockv2"
         case blackRock
-        case greenRock
+        case greenRock = "greenRockv2"
+        case purpleRock
+        case brownRock
+        case redRock
         case player = "player2"
         case empty
         case exit
         case greenMonster
-        case gem1
+        case gem1 = "gem2"
         case fireball
     }
 }

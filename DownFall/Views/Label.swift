@@ -13,41 +13,23 @@ protocol LabelDelegate: class {
     func labelPressBegan(_ label: Label)
 }
 
-class Label: SKLabelNode {
+class Label: ParagraphNode {
     weak var delegate: LabelDelegate?
     
     init(text: String,
-         delegate: LabelDelegate,
+         width: CGFloat,
+         delegate: LabelDelegate?,
          precedence: Precedence,
          identifier: ButtonIdentifier,
-         fontSize: CGFloat = 80,
-         fontColor: UIColor = .blue) {
+         fontSize: CGFloat = UIFont.largeSize,
+         fontColor: UIColor = .black) {
         
-        super.init()
+        super.init(text: text, paragraphWidth: width, fontSize: fontSize, fontColor: fontColor)
         self.delegate = delegate
-        self.text = text
-        fontName = "Times"
+        fontName = ParagraphNode.defaultFontName
         name = identifier.rawValue
-        self.fontSize = fontSize
-        self.fontColor = fontColor
         zPosition = precedence.rawValue
         isUserInteractionEnabled = true
-    }
-    
-    init(text: String,
-         precedence: Precedence,
-         font: UIFont,
-         fontColor: UIColor = .blue,
-         maxWidth: CGFloat) {
-        
-        super.init()
-        self.text = text
-        self.fontName = font.fontName
-        self.fontSize = font.pointSize
-        zPosition = precedence.rawValue
-        preferredMaxLayoutWidth = maxWidth
-        numberOfLines = 0
-        lineBreakMode = .byWordWrapping
     }
 
     

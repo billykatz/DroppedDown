@@ -24,3 +24,9 @@ func toTileStructs(tileTypes: [[TileType]]) -> [[Tile]] {
     }
     return newTiles
 }
+
+extension Level {
+    static var test: Level {
+        return Level(type: .first, monsterRatio: LevelConstructor.monstersPerLevel(.first, difficulty: .easy), maxMonstersTotal: 10, maxMonstersOnScreen: 5, maxGems: 1, maxTime: 30, boardSize: 4, abilities: [], goldMultiplier: 2, rocksRatio: LevelConstructor.availableRocksPerLevel(.first, difficulty: .easy), tutorialData: nil)
+    }
+}

@@ -14,28 +14,29 @@ extension AttackModel {
                                      frequency: 1,
                                      range: .one,
                                      damage: 1,
-                                     directions: [Direction.south],
                                      attacksThisTurn: 0,
                                      turns: 1,
-                                     attacksPerTurn: 1)
+                                     attacksPerTurn: 1,
+                                     attackSlope: [AttackSlope.south])
+    
     
     static var swipe = AttackModel(type: .targets,
                                    frequency: 1,
                                    range: .one,
                                    damage: 1,
-                                   directions: [.east, .west],
                                    attacksThisTurn: 0,
                                    turns: 1,
-                                   attacksPerTurn: 1)
+                                   attacksPerTurn: 1,
+                                   attackSlope: AttackSlope.sideways)
     
     static var scream = AttackModel(type: .areaOfEffect,
                                     frequency: 3,
                                     range: .init(lower: 1, upper: 10),
                                     damage: 1,
-                                    directions: [.northEast, .northWest, .southEast, .southWest],
                                     attacksThisTurn: 0,
                                     turns: 1,
-                                    attacksPerTurn: 1)
+                                    attacksPerTurn: 1,
+                                    attackSlope: AttackSlope.diagonals)
 }
 
 extension TileType {
@@ -62,10 +63,10 @@ extension TileType {
                                                  frequency: 1,
                                                  range: .one,
                                                  damage: 1,
-                                                 directions: [.east, .west],
                                                  attacksThisTurn: 1,
                                                  turns: 1,
-                                                 attacksPerTurn: 1))
+                                                 attacksPerTurn: 1,
+                                                 attackSlope: AttackSlope.sideways))
     }
     
     static func createMonster(originalHp: Int = 1,
@@ -75,10 +76,10 @@ extension TileType {
                                                                 frequency: 1,
                                                                 range: .one,
                                                                 damage: 1,
-                                                                directions: [.east, .west],
                                                                 attacksThisTurn: 0,
                                                                 turns: 1,
-                                                                attacksPerTurn: 1),
+                                                                attacksPerTurn: 1,
+                                                                attackSlope: AttackSlope.sideways),
                               type: EntityModel.EntityType = .rat,
                               carry: CarryModel = .zero,
                               animations: AllAnimationsModel = .zero,
@@ -147,9 +148,9 @@ extension TileType {
                                                 frequency: 1,
                                                 range: .one,
                                                 damage: 2,
-                                                directions: [.south],
                                                 attacksThisTurn: 0,
                                                 turns: 1,
-                                                attacksPerTurn: 1))
+                                                attacksPerTurn: 1,
+                                                attackSlope: [AttackSlope.south]))
     }
 }

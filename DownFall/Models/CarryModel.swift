@@ -15,30 +15,47 @@ struct CarryModel: Decodable, Equatable {
         return items.contains { $0.type == .gem }
     }
     
-    var totalGold: Int {
-        return items.filter({ $0.type == .gold }).count
+    private var totalGold: Int {
+        return items.filter({ $0.type == .gold }).first?.amount ?? 0
     }
     
-    func pay(_ price: Int) -> CarryModel {
-        var newItems: [Item] = []
-        var pricePaid = 0
-        for item in items {
-            if item.type == .gold && pricePaid < price {
-                pricePaid += 1
-            } else {
-                newItems.append(item)
-            }
+    private var totalGem: Int {
+        return items.filter({ $0.type == .gem }).first?.amount ?? 0
+    }
+    
+    func total(in currency: Currency) -> Int {
+        switch currency {
+        case .gem:
+            return totalGem
+        case .gold:
+            return totalGold
         }
+    }
+    
+    func pay(_ price: Int, inCurrency currency: Currency) -> CarryModel {
+        let itemType: Item.ItemType = currency == .gold ? .gold : .gem
         
-        return CarryModel(items: newItems)
+        return CarryModel(items: items.map { item in
+                if item.type == itemType {
+                    return Item(type: itemType, amount: item.amount - price)
+                } else {
+                    return item
+                }
+            }
+        )
+        
     }
     
-    func earn(_ money: Int) -> CarryModel {
-        var newItems = items
-        for _ in 0..<money {
-            newItems.append(Item(type: .gold, range: .one))
-        }
-        return CarryModel(items: newItems)
+    func earn(_ money: Int, inCurrency currency: Currency) -> CarryModel {
+        let itemType: Item.ItemType = currency == .gold ? .gold : .gem
+        
+        return CarryModel(items: items.map { item in
+            if item.type == itemType {
+                return Item(type: itemType, amount: item.amount + money)
+            } else {
+                return item
+            }
+        })
     }
 
 }

@@ -33,20 +33,21 @@ class StoreItem: SKSpriteNode {
     
     init(ability: Ability,
          size: CGSize,
-         color: UIColor = UIColor(rgb: 0x8fa9af),
+         color: UIColor = UIColor.storeItemBackground,
          delegate: StoreItemDelegate,
          identifier: ButtonIdentifier,
          precedence: Precedence,
-         fontSize: CGFloat = 80) {
+         fontSize: CGFloat = UIFont.smallSize) {
         self.ability = ability
         super.init(texture: nil, color: color, size: size)
         
         let costLabel = Label(text: "\(ability.cost)",
-            delegate: self,
-            precedence: .menu,
-            identifier: .storeItem,
-            fontSize: fontSize,
-            fontColor: .black)
+                              width: self.frame.width,
+                              delegate: self,
+                              precedence: .menu,
+                              identifier: .storeItem,
+                              fontSize: fontSize)
+            
         if let abilityForeground = ability.sprite {
             abilityForeground.position = .zero
             abilityForeground.name = ability.textureName
@@ -61,13 +62,13 @@ class StoreItem: SKSpriteNode {
         addChild(boxShapeNode!)
         
         
-        let coin = SKTexture(imageNamed: "gold")
-        let coinSprite = SKSpriteNode(texture: coin)
-        coinSprite.position = CGPoint(x: 20, y: 8)
-        costLabel.addChild(coinSprite)
+        let currencyTexture = SKTexture(imageNamed: ability.currency.rawValue)
+        let currencySprite = SKSpriteNode(texture: currencyTexture)
+        currencySprite.position = CGPoint.positionThis(currencySprite.frame, inBottomOf: frame, padding: -30.0, anchor: .right)
         
-        costLabel.position = CGPoint(x: 0, y: -50)
+        costLabel.position = CGPoint.positionThis(costLabel.frame, inBottomOf: frame, padding: -25.0 , anchor:.left, xOffset: 10.0)
         
+        addChild(currencySprite)
         addChild(costLabel)
         position = .zero
         zPosition = precedence.rawValue

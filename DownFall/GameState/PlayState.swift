@@ -16,12 +16,13 @@ struct PlayState: GameState {
         switch input.type {
         case .gameWin,. gameLose,. pause,
              .attack, .transformation,
-             .touch, .monsterDies, .rotateLeft, .rotateRight,
-             .boardBuilt, .touchBegan:
+             .touch, .monsterDies, .rotateCounterClockwise, .rotateClockwise,
+             .boardBuilt, .touchBegan, .tutorial:
             return true
         case .animationsFinished, .play,
              .reffingFinished, .playAgain, .collectItem,
-             .selectLevel, .newTurn:
+             .selectLevel, .newTurn,
+             .visitStore:
             return false
         }
     }
@@ -35,16 +36,20 @@ struct PlayState: GameState {
         case .pause:
             return AnyGameState(PauseState())
         case .attack, .touch, .monsterDies,
-             .rotateLeft, .rotateRight, .collectItem,
+             .rotateCounterClockwise, .rotateClockwise, .collectItem,
              .touchBegan:
             return AnyGameState(ComputingState())
         case .boardBuilt:
             return AnyGameState(PlayState())
-        case .animationsFinished, .play, .transformation, .reffingFinished, .playAgain,. selectLevel, .newTurn:
+        case .tutorial(let step):
+            if step.showCounterClockwiseRotate || step.showClockwiseRotate {
+                return AnyGameState(PauseState())
+            } else {
+                return AnyGameState(PlayState())
+            }
+        case .animationsFinished, .play, .transformation, .reffingFinished, .playAgain,. selectLevel,       .newTurn, .visitStore:
             return nil
         }
         
     }
 }
-
-

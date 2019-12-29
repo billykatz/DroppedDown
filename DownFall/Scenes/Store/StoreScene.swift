@@ -8,10 +8,6 @@
 
 import SpriteKit
 
-let closeButton = "closeButton"
-let buyButton = "buyButton"
-let sellButton = "sellButton"
-let wallet = "wllet"
 
 protocol StoreSceneDelegate: class {
     func leave(_ storeScene: StoreScene, updatedPlayerData: EntityModel)
@@ -22,9 +18,17 @@ protocol StoreSceneInventory {
 }
 
 class StoreScene: SKScene {
+    
+    struct Constants {
+        static let goldWallet = "goldWallet"
+        static let gemWallet = "gemWallet"
+        static let popup  = "popup"
+    }
+    
     private let background: SKSpriteNode
     private var playerData: EntityModel
     private var items: [StoreItem] = []
+    private let level: Level
     var selectedItem: StoreItem? {
         didSet {
             guard oldValue != selectedItem else { return }
@@ -41,28 +45,34 @@ class StoreScene: SKScene {
     
     init(size: CGSize,
          playerData: EntityModel,
-         inventory: StoreSceneInventory) {
+         inventory: StoreSceneInventory,
+         level: Level) {
         //playable rect
         let maxAspectRatio : CGFloat = 19.5/9.0
         let playableWidth = size.height / maxAspectRatio
+        
         background = SKSpriteNode(color: .clayRed,
                                   size: CGSize(width: playableWidth,
                                                height: size.height))
         
         self.playerData = playerData
+        self.level = level
         super.init(size: size)
+        self.backgroundColor = .clayRed
         
         
         
-        let button = Button(size: CGSize(width: 150, height: 50),
+        let button = Button(size: Button.large,
                             delegate: self,
                             identifier: .leaveStore,
                             precedence: .foreground,
-                            fontSize:  25)
-        button.position = CGPoint(x: 0, y: -300)
+                            fontSize:  UIFont.mediumSize,
+                            fontColor: .black)
+        
+        button.position = CGPoint.positionThis(button.frame, inBottomOf: self.frame, padding: Style.buttonToBottomPadding)
         
         
-        items = createStoreItems(from: inventory)
+        items = createStoreItems(from: level)
         positionStore(items, playableWidth)
         items.forEach {
             addChild($0)
@@ -72,65 +82,84 @@ class StoreScene: SKScene {
         background.addChild(button)
         anchorPoint = CGPoint(x: 0.5, y: 0.5)
         addChild(background)
-        addChild(walletView)
+        
+        let goldWallet = walletView(.gold, order: 0)
+        let gemWallet = walletView(.gem, order: 1)
+        addChild(goldWallet)
+        addChild(gemWallet)
     }
     
-    private func createStoreItems(from inventory: StoreSceneInventory) -> [StoreItem] {
+    private func createStoreItems(from level: Level) -> [StoreItem] {
         var items: [StoreItem] = []
-        for item in inventory.items {
+        for item in level.abilities {
             items.append(StoreItem(ability: item,
-                                   size: CGSize(width: 50, height: 50),
+                                   size: Style.Store.Item.size,
                                    delegate: self,
                                    identifier: .storeItem,
                                    precedence: .foreground,
-                                   fontSize: 25))
+                                   fontSize: UIFont.smallSize))
         }
         return items
     }
     
     private func positionStore(_ items: [StoreItem],_ playableWidth: CGFloat) {
-        let gridPoints = CGPoint.gridPositions(rows: 3,
-                                               columns: 3,
-                                               itemSize: CGSize(width: 50, height: 50),
-                                               width: playableWidth,
-                                               height: 330,
-                                               bottomLeft: CGPoint(x: -frame.width/2, y: -125))
+        let gridPoints = CGPoint.gridPositions(
+            rows: 3,
+            columns: 3,
+            itemSize: Style.Store.Item.size,
+            width: playableWidth,
+            height: Style.Store.ItemGrid.height,
+            bottomLeft: CGPoint(x: -frame.width/2, y: 0)
+        )
         for (index, position) in gridPoints.enumerated() {
-            if items.count >= index {
+            if items.count - 1 >= index {
                 items[index].position = position
             }
             
         }
     }
-
-    private var walletView: SKSpriteNode {
-        let walletView = SKSpriteNode(color: .storeBlack, size: CGSize(width: 150, height: 50))
-        walletView.position = CGPoint(x: frame.minX + walletView.size.width/2, y: -200)
+    
+    func walletView(_ currency: Currency, order: CGFloat) -> SKSpriteNode {
+        let walletView = SKSpriteNode(color: .storeBlack, size: Style.Store.Wallet.viewSize)
+        walletView.position = CGPoint.positionThis(walletView.frame,
+                                                   inBottomOf: frame,
+                                                   padding: (2 + order) * walletView.frame.height,
+                                                   anchor: .left)
         
-        let coin = SKSpriteNode(texture: SKTexture(imageNamed: "gold"), size: CGSize(width: 35, height: 35))
-        coin.position = CGPoint(x: walletView.size.width/2 - coin.size.width/2, y: 0)
+        let currencySprite = SKSpriteNode(texture: SKTexture(imageNamed: currency.rawValue), size: Style.Store.Wallet.currencySize)
+        currencySprite.position = CGPoint.positionThis(currencySprite.frame, toTheRightOf: walletView.frame)
         
-        let coinLabel = Label(text: "\(playerData.carry.totalGold)",
-                              precedence: .foreground,
-                              font: UIFont.storeItemDescription,
-                              fontColor: .storeDarkGray,
-                              maxWidth: walletView.frame.width)
-        coinLabel.centeredInSuperview()
+        let amountLabel = Label(text:
+            """
+            \(playerData.carry.total(in: currency))
+            """,
+                                width: self.frame.width,
+                                delegate: nil, precedence: .foreground,
+                                identifier: .wallet,
+                                fontSize: UIFont.largeSize,
+                                fontColor: .white)
         
-        
-        walletView.addChild(coin)
-        walletView.addChild(coinLabel)
-        walletView.name = wallet
+        walletView.addChild(currencySprite)
+        walletView.addChild(amountLabel)
+        walletView.name = currencyWalletName(currency)
         return walletView
+
     }
     
     private var transactionButton: Button {
         let purchased = selectedItem?.isPurchased ?? false
-        let purchaseButton = Button(size: CGSize(width: 200, height: 50),
+        
+        let purchaseButton = Button(size: Style.Store.CTAButton.size,
                                     delegate: self,
-                                    textureName: purchased ? sellButton : buyButton,
-                                    precedence: .foreground)
-        purchaseButton.position = CGPoint(x: frame.maxX, y: -200)
+                                    identifier: !purchased ? .purchase : .sell,
+                                    precedence: .foreground,
+                                    fontSize: UIFont.mediumSize,
+                                    fontColor: .white,
+                                    backgroundColor: !purchased ? .green : .blue)
+        purchaseButton.position = CGPoint.positionThis(purchaseButton.frame,
+                                                       inBottomOf: frame,
+                                                       padding: Style.Store.CTAButton.bottomPadding,
+                                                       anchor: .right)
         return purchaseButton
     }
     
@@ -143,25 +172,29 @@ class StoreScene: SKScene {
     
     private func informationPopup(with text: String) -> SKSpriteNode {
         let popupNode = SKSpriteNode(color: .storeItemBackground,
-                                     size: CGSize(width: self.frame.width - 100, height: 200))
-        popupNode.position = CGPoint(x: frame.midX, y: frame.maxY - 150)
+                                     size: CGSize(width: self.frame.width - Style.Store.InfoPopup.sidePadding, height: Style.Store.InfoPopup.height))
+        popupNode.position = CGPoint(x: frame.midX,
+                                     y: frame.maxY - (popupNode.frame.height / 2) - Style.Store.InfoPopup.topPadding)
+        
         let descriptionLabel = Label(text: text,
+                                     width: popupNode.frame.width,
+                                     delegate: nil,
                                      precedence: .foreground,
-                                     font: UIFont.storeItemDescription,
-                                     fontColor: .storeDarkGray,
-                                     maxWidth: popupNode.frame.width - 8)
-        descriptionLabel.horizontalAlignmentMode = .center
-        descriptionLabel.verticalAlignmentMode = .center
+                                     identifier: .infoPopup,
+                                     fontSize: UIFont.mediumSize,
+                                     fontColor: .white)
         popupNode.addChild(descriptionLabel)
         
-        let closeBtn = Button(size: CGSize(width: 35, height: 35),
+        let closeButton = Button(size: Style.Store.CloseButton.size,
                                  delegate: self,
-                                 textureName: closeButton,
-                                 precedence: .menu)
-        closeBtn.position = CGPoint(x: popupNode.frame.width/2 - closeBtn.frame.width/2,
-                                    y: popupNode.frame.height/2 - closeBtn.frame.height/2)
-        popupNode.addChild(closeBtn)
-        popupNode.name = "popup"
+                                 identifier: .close,
+                                 precedence: .foreground,
+                                 fontSize: UIFont.smallSize,
+                                 fontColor: .white,
+                                 backgroundColor: .darkGray)
+        closeButton.position = CGPoint.positionThis(closeButton.frame, inTopRightOf: popupNode.frame)
+        popupNode.addChild(closeButton)
+        popupNode.name = Constants.popup
         return popupNode
     }
     
@@ -180,6 +213,7 @@ class StoreScene: SKScene {
                 item.deselect()
             }
         }
+        
         func select() {
             for item in items {
                 if item == selectedItem {
@@ -213,20 +247,20 @@ class StoreScene: SKScene {
         showPopup()
     }
     
-
+    
     
     private func hidePopup() {
         for child in self.children {
             if child.name == "popup" {
                 child.removeAllChildren()
                 child.removeFromParent()
-            } else if child.name == buyButton {
+            } else if child.name == ButtonIdentifier.purchase.rawValue {
                 let slideOut = SKAction.moveTo(x: frame.maxX + child.frame.width/2,
-                                              duration: TimeInterval(exactly: 0.3)!)
+                                               duration: 0.3)
                 child.run(slideOut) {
                     child.removeFromParent()
                 }
-
+                
             }
         }
     }
@@ -235,21 +269,24 @@ class StoreScene: SKScene {
         for child in self.children {
             if child.name == name {
                 let slideOut = SKAction.moveTo(x: frame.maxX + child.frame.width/2,
-                                               duration: TimeInterval(exactly: 0.3)!)
+                                               duration: 0.3)
                 child.run(slideOut) {
                     child.removeFromParent()
                 }
                 
             }
         }
-
     }
     
-    private func reloadWalletView() {
-        let newWalletView = walletView
+    func currencyWalletName(_ currency: Currency) -> String {
+        return (currency == Currency.gold) ? Constants.goldWallet : Constants.gemWallet
+    }
+    
+    private func reloadWalletView(_ currency: Currency) {
+        let newWalletView = walletView(currency, order: CGFloat(Currency.allCases.firstIndex(of: currency) ?? 0))
         
         for child in children {
-            if child.name == wallet {
+            if child.name == currencyWalletName(currency) {
                 removeFromParent()
             }
         }
@@ -259,11 +296,11 @@ class StoreScene: SKScene {
     
     private func buy(_ storeItem: StoreItem) {
         let ability = storeItem.ability
-        if playerData.canAfford(ability.cost) {
+        if playerData.canAfford(ability.cost, inCurrency: ability.currency) {
             playerData = playerData.add(ability)
             playerData = playerData.buy(ability)
             storeItem.purchase()
-            reloadWalletView()
+            reloadWalletView(ability.currency)
         }
     }
     
@@ -271,21 +308,21 @@ class StoreScene: SKScene {
         playerData = playerData.remove(storeItem.ability)
         playerData = playerData.sell(storeItem.ability)
         storeItem.sell()
-        reloadWalletView()
+        reloadWalletView(storeItem.ability.currency)
     }
     
     private func toggleTransactionButton() {
-        hideButton(with: buyButton)
-        hideButton(with: sellButton)
+        hideButton(with: ButtonIdentifier.purchase.rawValue)
+        hideButton(with: ButtonIdentifier.sell.rawValue)
         if let selectedItem = selectedItem {
-            showButton(selectedItem.isPurchased ? sellButton : buyButton)
+            showButton(selectedItem.isPurchased ? ButtonIdentifier.sell.rawValue : ButtonIdentifier.purchase.rawValue)
         }
     }
     
     private func showButton(_ buttonName: String) {
         let button = transactionButton
         let slideIn = SKAction.moveTo(x: frame.maxX - transactionButton.size.width/2,
-                                      duration: TimeInterval(exactly: 0.5)!)
+                                      duration: 0.5)
         show(button)
         button.run(slideIn)
     }
@@ -301,19 +338,19 @@ extension StoreScene: StoreItemDelegate {
     }
 }
 
-extension StoreScene : ButtonDelegate {
-    func buttonPressed(_ button: Button) {
+extension StoreScene: ButtonDelegate {
+    func buttonTapped(_ button: Button) {
         if button.name == "leaveStore" {
             storeSceneDelegate?.leave(self, updatedPlayerData: playerData)
-        } else if button.name == buyButton,
+        } else if button.name == ButtonIdentifier.purchase.rawValue,
             let storeItem = selectedItem {
             buy(storeItem)
-        } else if button.name == sellButton,
+        } else if button.name == ButtonIdentifier.sell.rawValue,
             let storeItem = selectedItem {
             sell(storeItem)
-        } else if button.name == closeButton {
+        } else if button.name == ButtonIdentifier.close.rawValue {
             selectedItem = nil
         }
-
+        
     }
 }

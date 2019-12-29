@@ -18,10 +18,16 @@ struct EntityModel: Equatable, Decodable {
         case bat
         case rat
         case dragon
+        case alamo
+        case wizard
+        case lavaHorse
         case player
+        case easyPlayer
+        case normalPlayer
+        case hardPlayer
     }
     
-    static let monsterCases: [EntityType] = [.rat, .bat, .dragon]
+    static let playerCases: [EntityType] = [.easyPlayer, .normalPlayer, .hardPlayer]
     
     static let zero: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .rat, carry: .zero, animations: .zero, abilities: [])
     
@@ -119,15 +125,16 @@ struct EntityModel: Equatable, Decodable {
     }
     
     func buy(_ ability: Ability) -> EntityModel {
-        return update(carry: carry.pay(ability.cost))
+        return update(carry: carry.pay(ability.cost, inCurrency: ability.currency))
     }
     
     func sell(_ ability: Ability) -> EntityModel {
-        return update(carry: carry.earn(ability.cost))
+        return update(carry: carry.earn(ability.cost, inCurrency: ability.currency))
     }
     
-    func canAfford(_ cost: Int) -> Bool {
-        return carry.totalGold >= cost
+    func canAfford(_ cost: Int, inCurrency currency: Currency) -> Bool {
+        let totalAmount = carry.total(in: currency)
+        return totalAmount >= cost
     }
     
     func willAttackNextTurn() -> Bool {
@@ -157,6 +164,22 @@ extension EntityModel: Hashable {
 
 struct EntitiesModel: Equatable, Decodable {
     let entities: [EntityModel]
+    
+    func entity(with type: EntityModel.EntityType) -> EntityModel? {
+        return entities.first(where: { $0.type == type})
+    }
+    
+    var easyPlayer: EntityModel? {
+        return entity(with: .easyPlayer)
+    }
+    
+    var normalPlayer: EntityModel? {
+        return entity(with: .normalPlayer)
+    }
+    
+    var hardPlayer: EntityModel? {
+        return entity(with: .hardPlayer)
+    }
 }
 
 
@@ -168,7 +191,7 @@ extension EntityModel: CustomDebugStringConvertible {
 
 extension AttackModel: CustomDebugStringConvertible {
     var debugDescription: String {
-        return "Attacks \(self.directions) for \(self.damage)"
+        return "Attacks \(String(describing: self.attackSlope)) for \(self.damage)"
     }
 }
 

@@ -9,221 +9,171 @@
 import SpriteKit
 import UIKit
 
-protocol GameSceneDelegate: class {
-    func reset()
-    func selectLevel()
-    func visitStore(_ playerData: EntityModel)
-}
-
 class GameScene: SKScene {
     
-    private var boardSize: Int?
-    private var board: Board?
+    // only strong reference to the Board
+    private var board: Board!
+    
+    // the board size
+    private var boardSize: Int!
     
     //foreground
     private var foreground: SKNode!
     
-    //delegate
-    weak var gameSceneDelegate: GameSceneDelegate?
-    
-    //game referee
-    private var referee: Referee?
+    // delegate
+    weak var gameSceneDelegate: GameSceneCoordinatingDelegate?
     
     //renderer
     private var renderer: Renderer?
     
-    //TileCreator
-    private var tileCreator: TileCreator?
-    
     //Generator
     private var generator: HapticGenerator?
     
-    //playable margin
-    private var playableRect: CGRect?
+    //swipe recognizer view
+    private var swipeRecognizerView: SwipeRecognizerView?
+    
+    //level
+    private var level: Level?
     
     //touch state
     private var touchWasSwipe = false
+    private var touchWasCanceled = false
     
     required init?(coder aDecoder: NSCoder) { super.init(coder: aDecoder) }
     
-    /// Creates an instance of board and does preparationg necessary for didMove(to:) to be called
-    public func commonInit(boardSize bsize: Int,
-                           entities: [EntityModel],
+    /// Creates an instance of board and does preparation neccessary for didMove(to:) to be called
+    public func commonInit(boardSize: Int,
+                           entities: EntitiesModel,
                            difficulty: Difficulty = .normal,
-                           updatedEntity: EntityModel? = nil){
-        //TODO: the  order of the following lines of code matter.  (bottom left has to happen before create and position. Consider refactoring
-        InputQueue.reset()
+                           updatedEntity: EntityModel? = nil,
+                           level: Level) {
+        // init our level
+        self.level = level
+        Referee.injectLevel(level)
+        
+        //create the foreground node
         foreground = SKNode()
         foreground.position = .zero
         addChild(foreground)
         
-        //playable rect
-        let maxAspectRatio : CGFloat = 19.5/9.0
-        let playableWidth = size.height / maxAspectRatio
-        playableRect = CGRect(x: -playableWidth/2,
-                              y: -size.height/2,
-                              width: playableWidth,
-                              height: size.height)
-          
-        
-        //tile creatore
-        tileCreator = TileCreator(entities,
-                                  difficulty: difficulty,
-                                  updatedEntity: updatedEntity)
+        //init our tile creator
+        let tileCreator = TileCreator(entities,
+                                      difficulty: difficulty,
+                                      updatedEntity: updatedEntity,
+                                      level: level)
         
         //board
-        board = Board.build(size: bsize, tileCreator: tileCreator!)
-        boardSize = bsize
+        board = Board.build(tileCreator: tileCreator, difficulty: difficulty, level: level)
+        self.boardSize = boardSize
+        
+        // create haptic generator
         generator = HapticGenerator()
         
     }
     
     override func didMove(to view: SKView) {
-        guard let board = board else { fatalError("failed to init board in commonInit()")}
-        
-        //Adjust the playbale rect depending on the size of the device
-        let maxAspectRatio : CGFloat = 19.5/9.0
-        let playableWidth = size.height / maxAspectRatio
-        playableRect = CGRect(x: -playableWidth/2,
-                              y: -size.height/2,
-                              width: playableWidth,
-                              height: size.height)
-        self.renderer = Renderer(playableRect: playableRect!,
+    
+        // create the renderer
+        self.renderer = Renderer(playableRect: size.playableRect,
                                  foreground: foreground,
-                                 board: board,
-                                 precedence: Precedence.foreground)
+                                 boardSize: boardSize,
+                                 precedence: Precedence.foreground,
+                                 level: level!)
         
-        let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(tripleTap))
-        tapRecognizer.numberOfTapsRequired = 3
-        view.addGestureRecognizer(tapRecognizer)
         
-        let swipeUpGestureReconizer = UISwipeGestureRecognizer(target: self, action: #selector(swipedUp))
-        swipeUpGestureReconizer.direction = .up
+        // SwipeRecognizerView
+        swipeRecognizerView = SwipeRecognizerView(frame: view.frame,
+                                                        target: self,
+                                                        swiped: #selector(swiped))
+        view.addSubview(swipeRecognizerView!)
         
-        view.addGestureRecognizer(swipeUpGestureReconizer)
-        
-        let swipeDownGestureReconizer = UISwipeGestureRecognizer(target: self, action: #selector(swipedDown))
-        swipeDownGestureReconizer.direction = .down
-        view.addGestureRecognizer(swipeDownGestureReconizer)
-        
-        let swipeLeftGestureReconizer = UISwipeGestureRecognizer(target: self, action: #selector(swipedLeft))
-        swipeLeftGestureReconizer.direction = .left
-        view.addGestureRecognizer(swipeLeftGestureReconizer)
-        
-        let swipeRightGestureReconizer = UISwipeGestureRecognizer(target: self, action: #selector(swipedRight(_:)))
-        swipeRightGestureReconizer.direction = .right
-        view.addGestureRecognizer(swipeRightGestureReconizer)
-        
+        // Register for inputs we care about
         Dispatch.shared.register { [weak self] input in
             if input.type == .playAgain {
-                self?.foreground.removeAllChildren()
-                let player = board.tiles[board.tiles(of: .player(.zero)).first!]
-                if case let TileType.player(data) = player.type {
-                    let revivedData = data.revive()
-                    self?.removeFromParent()
-                    self?.gameSceneDelegate?.visitStore(revivedData)
-                    view.removeGestureRecognizer(swipeUpGestureReconizer)
-                    view.removeGestureRecognizer(swipeDownGestureReconizer)
+                guard let self = self,
+                let playerIndex = tileIndices(of: .player(.zero), in: self.board.tiles).first
+                else { return }
+                
+                self.foreground.removeAllChildren()
+                if case let TileType.player(data) = self.board.tiles[playerIndex].type {
+                    self.removeFromParent()
+                    self.gameSceneDelegate?.reset(self, playerData: data)
                 }
-            }
-            else if input.type == .selectLevel {
-                self?.gameSceneDelegate?.selectLevel()
+
+            } else if input.type == .visitStore {
+                guard let self = self,
+                    let playerIndex = tileIndices(of: .player(.zero), in: self.board.tiles).first
+                    else { return }
+                
+                self.foreground.removeAllChildren()
+                if case let TileType.player(data) = self.board.tiles[playerIndex].type {
+                    self.removeFromParent()
+                    self.gameSceneDelegate?.visitStore(data)
+                }
+
             }
         }
 
         //Turn watcher
         TurnWatcher.shared.register()
+        
+        //Debug settings triple tap
+        let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(tripleTap))
+        tapRecognizer.numberOfTapsRequired = 3
+        view.addGestureRecognizer(tapRecognizer)
     }
     
-    func prepareForReuse() {
+    public func prepareForReuse() {
         board = nil
         renderer = nil
-        tileCreator = nil
         foreground = nil
         gameSceneDelegate = nil
-        referee = nil
         generator = nil
-        playableRect = nil
+        swipeRecognizerView?.removeFromSuperview()
         InputQueue.reset()
         Dispatch.shared.reset()
         print("deiniting")
     }
-    
-    @objc func swipedUp(_ gestureRecognizer: UISwipeGestureRecognizer) {
-        let location = gestureRecognizer.location(in: self.view)
-        let onRight = location.x > (self.view?.frame.width ?? 0)/2
-        
-        if onRight {
-            touchWasSwipe = true
-            rotateLeft()
-        } else {
-            touchWasSwipe = true
-            rotateRight()
-        }
+}
 
-    }
-    
-    @objc func swipedDown(_ gestureRecognizer: UISwipeGestureRecognizer) {
-        let location = gestureRecognizer.location(in: self.view)
-        let onRight = location.x > (self.view?.frame.width ?? 0)/2
-        if onRight {
-            touchWasSwipe = true
-            rotateRight()
-        } else {
-            touchWasSwipe = true
-            rotateLeft()
-        }
-    }
-    
-    @objc func swipedLeft(_ gestureRecognizer: UISwipeGestureRecognizer) {
-        let location = gestureRecognizer.location(in: self.view)
-        let inTop = location.y < (self.view?.frame.height ?? 0)/2
-
+//MARK: Swiping logic
+extension GameScene {
+    @objc func swiped(_ gestureRecognizer: UISwipeGestureRecognizer) {
+        guard let inTop = self.view?.isInTop(gestureRecognizer),
+            let onRight = self.view?.isOnRight(gestureRecognizer)
+            else { return }
         
-        if !inTop {
-            touchWasSwipe = true
-            rotateRight()
-        } else {
-            touchWasSwipe = true
-            rotateLeft()
+        touchWasSwipe = true
+        switch gestureRecognizer.direction {
+        case .down:
+            onRight ? rotateClockwise() : rotateCounterClockwise()
+        case .up:
+            !onRight ? rotateClockwise() : rotateCounterClockwise()
+        case .left:
+            !inTop ? rotateClockwise() : rotateCounterClockwise()
+        case .right:
+            inTop ? rotateClockwise() : rotateCounterClockwise()
+        default:
+            fatalError("There should only be four directions in our swipe gesture recognizer")
         }
     }
-    
-    @objc func swipedRight(_ gestureRecognizer: UISwipeGestureRecognizer) {
-        let location = gestureRecognizer.location(in: self.view)
-        let inTop = location.y < (self.view?.frame.height ?? 0)/2
-        
-        if inTop {
-            touchWasSwipe = true
-            rotateRight()
-        } else {
-            touchWasSwipe = true
-            rotateLeft()
-        }
-    }
-    
-    
 }
 
 //MARK: - Rotate
 extension GameScene {
-    func rotateRight() {
-        let input = Input(.rotateRight)
-        InputQueue.append(input)
+    private func rotateClockwise() {
+        InputQueue.append(Input(.rotateClockwise))
     }
-    func rotateLeft() {
-        let input = Input(.rotateLeft)
-        InputQueue.append(input)
+    private func rotateCounterClockwise() {
+        InputQueue.append(Input(.rotateCounterClockwise))
     }
 }
-
 
 // MARK: - Debug
 
 extension GameScene {
     
-    @objc func tripleTap(_ sender: UITapGestureRecognizer) {
-        
+    @objc private func tripleTap(_ sender: UITapGestureRecognizer) {
         if sender.numberOfTapsRequired == 3 {
             let touchLocation = sender.location(in: view)
             let newTouch = convertPoint(fromView: touchLocation)
@@ -231,18 +181,14 @@ extension GameScene {
             if self.nodes(at: newTouch).contains(where: { node in
                 (node as? SKSpriteNode)?.name == "setting"
             }) {
-                gameSceneDelegate?.reset()
+                guard let playerIndex = tileIndices(of: .player(.zero), in: self.board.tiles).first else { return }
+                
+                self.foreground.removeAllChildren()
+                if case let TileType.player(data) = self.board.tiles[playerIndex].type {
+                    self.removeFromParent()
+                    self.gameSceneDelegate?.reset(self, playerData: data)
+                }
             }
-        } else  if sender.numberOfTapsRequired == 2 {
-            let touchLocation = sender.location(in: view)
-            let newTouch = convertPoint(fromView: touchLocation)
-            
-            if self.nodes(at: newTouch).contains(where: { node in
-                (node as? SKSpriteNode)?.name == "setting"
-            }) {
-                debugPrint(InputQueue.debugDescription)
-            }
-            
         }
     }
 }
@@ -265,8 +211,19 @@ extension GameScene {
         self.renderer?.touchesBegan(touches, with: event)
     }
     
+    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+        // avoid inputing touchEnded when a touch is cancelled.
+        if !touchWasSwipe {
+            touchWasCanceled = true
+        }
+    }
+    
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         if !touchWasSwipe {
+            guard !touchWasCanceled else {
+                touchWasCanceled = false
+                return
+            }
             self.renderer?.touchesEnded(touches, with: event)
         }
     }

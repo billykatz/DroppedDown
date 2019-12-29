@@ -51,7 +51,7 @@ struct RangeModel: Decodable, Equatable, Hashable {
     }
     
     func next(_ extraRange: Int) -> RangeModel {
-        /// given a range of 60-70 the next range of 10 would be 71-81
+        /// given a range of 60-70 the next range of 10 would be 70-79
         return RangeModel(lower: upper, upper: upper + extraRange - 1)
     }
     

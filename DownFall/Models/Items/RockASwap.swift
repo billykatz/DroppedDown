@@ -29,7 +29,7 @@ struct RockASwap: Ability {
         return "Goblins use this spell all the time to swap goblin husbands."
     }
     
-    var grantsExtraAttacks: Int? {
+    var extraAttacksGranted: Int? {
         return nil
     }
     

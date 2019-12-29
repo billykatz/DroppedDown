@@ -38,6 +38,10 @@ class TutorialData {
     }
     
     func reset() {
+        for step in steps {
+            step.started = false
+            step.completed = false
+        }
         self.currentIndexPath = IndexPath(row: 0, section: 0)
     }
     

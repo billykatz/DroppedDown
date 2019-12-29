@@ -119,29 +119,14 @@ class Board: Equatable {
             return []
         }
         
+        
         func calculateAttacks(for entity: EntityModel, from position: TileCoord) -> [TileCoord] {
-            let attackRange = entity.attack.range
-            var affectedTiles: [TileCoord] = []
-            
-            // TODO: Let's add a property to attacks that says if the attack goes thru targets or not
-            for attackSlope in entity.attack.attackSlope ?? [] {
-                for i in attackRange.lower...attackRange.upper {
-                    let target = calculateTargetSlope(in: attackSlope, distance: i, from: position)
-                    if isWithinBounds(target) {
-                        affectedTiles.append(target)
-                    }
+            return entity.attack.targets(from: position).compactMap { target in
+                if isWithinBounds(target) {
+                    return target
                 }
+                return nil
             }
-            return affectedTiles
-        }
-
-        func calculateTargetSlope(in slopedDirection: AttackSlope, distance i: Int, from position: TileCoord) -> TileCoord {
-            let (initialRow, initialCol) = position.tuple
-            
-            // Take the initial position and calculate the target
-            // Add the slope's "up" value multiplied by the distance to the row
-            // Add the slope's "over" value multipled by the distane to the column
-            return TileCoord(initialRow + (i * slopedDirection.up), initialCol + (i * slopedDirection.over))
         }
 
         var newTiles = tiles
@@ -349,15 +334,14 @@ extension Board {
         let playerData = EntityModel(originalHp: data.originalHp,
                                      hp: data.hp,
                                      name: data.name,
-                                     // Orend
-            // we have to reset attack here because the player has moved but the turn may not be over
-            // Eg: it is possible that there could be two or more monsters
-            // under the player and the player should be able to attack
-            attack: data.attack.resetAttack(),
-            type: data.type,
-            carry: newCarryModel,
-            animations: data.animations,
-            abilities: data.abilities)
+                                     // we have to reset attack here because the player has moved but the turn may not be over
+                                     // Eg: it is possible that there could be two or more monsters
+                                     // under the player and the player should be able to attack
+                                     attack: data.attack.resetAttack(),
+                                     type: data.type,
+                                     carry: newCarryModel,
+                                     animations: data.animations,
+                                     abilities: data.abilities)
         
         updatedTiles[pp.x][pp.y] = Tile(type: .player(playerData))
         

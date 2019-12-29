@@ -36,62 +36,11 @@ class MenuSpriteNode: SKSpriteNode {
     
     private func setupButtons(_ menuType: MenuType, _ playableRect: CGRect, precedence: Precedence) {
         let menuSizeWidth = playableRect.size.width * menuType.widthCoefficient
-        let menuSizeHeight = playableRect.size.height * menuType.heightCoefficient
         let buttonSize = CGSize(width: menuSizeWidth * 0.4, height: 120)
         
         if menuType == .rotate {
-            
-            // Heights and widths
-            let topHeight: CGFloat = menuSizeHeight/3 - 56
-            let bottomHeight: CGFloat = -menuSizeHeight/3 + 56
-            
-            let rightWidth: CGFloat = menuSizeWidth/2 - 56
-            let leftWidth: CGFloat = -menuSizeWidth/2 + 56
-            
-            // Points
-            let topRight = CGPoint(x: rightWidth, y: topHeight)
-            let topLeft = CGPoint(x: leftWidth, y: topHeight)
-            
-            let bottomRight = CGPoint(x: rightWidth, y: bottomHeight)
-            let bottomLeft = CGPoint(x: leftWidth, y: bottomHeight)
-            
-            let startStopTarget: [(CGPoint, CGPoint)] = [
-                (topRight, topLeft),
-                (topLeft, bottomLeft),
-                (bottomLeft, bottomRight),
-                (bottomRight, topRight)
-            ]
-            
-            var actions: [SKAction] = []
-            
-            let fingerSprite = SKSpriteNode(texture: SKTexture(imageNamed: "finger"))
-            fingerSprite.size = CGSize(width: 80, height: 80)
-            
-            // initial positions
-            fingerSprite.position = topRight
-            fingerSprite.zPosition = precedence.rawValue
-            
-            // add to scene
-            addChild(fingerSprite)
-            
-            for startStop in startStopTarget {
-                let stop = startStop.1
-                
-                //actions
-                let swipeAction = SKAction.move(to: stop, duration: 1.25)
-                swipeAction.timingMode = .easeOut
-                
-                actions.append(swipeAction)
-            }
-            
-            fingerSprite.run(SKAction.repeatForever(SKAction.sequence(actions)))
-            
-            let paragraphNode = ParagraphNode.labelNode(text: "Swipe like this to rotate the board counter-clockwise", paragraphWidth: playableRect.width * 0.70)
-            paragraphNode.position = .zero
-            paragraphNode.zPosition = precedence.rawValue
-            
-            addChild(paragraphNode)
-            
+            addFingerSprite(menuType, playableRect, precedence)
+            addRotateParagraph(menuType, playableRect, precedence)
         } else if menuType == .tutorial1Win {
             // In this case, we want to inform the player about how smart they are
             // and encourage them to continue to tutorial.  There should only be one button
@@ -168,6 +117,65 @@ class MenuSpriteNode: SKSpriteNode {
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func addFingerSprite(_ menuType: MenuType, _ playableRect: CGRect, _ precedence: Precedence) {
+        let menuSizeWidth = playableRect.size.width * menuType.widthCoefficient
+        let menuSizeHeight = playableRect.size.height * menuType.heightCoefficient
+        
+        // Heights and widths
+        let topHeight: CGFloat = menuSizeHeight/3 - 56
+        let bottomHeight: CGFloat = -menuSizeHeight/3 + 56
+        
+        let rightWidth: CGFloat = menuSizeWidth/2 - 56
+        let leftWidth: CGFloat = -menuSizeWidth/2 + 56
+        
+        // Points
+        let topRight = CGPoint(x: rightWidth, y: topHeight)
+        let topLeft = CGPoint(x: leftWidth, y: topHeight)
+        
+        let bottomRight = CGPoint(x: rightWidth, y: bottomHeight)
+        let bottomLeft = CGPoint(x: leftWidth, y: bottomHeight)
+        
+        let startStopTarget: [(CGPoint, CGPoint)] = [
+            (topRight, topLeft),
+            (topLeft, bottomLeft),
+            (bottomLeft, bottomRight),
+            (bottomRight, topRight)
+        ]
+        
+        var actions: [SKAction] = []
+        
+        let fingerSprite = SKSpriteNode(texture: SKTexture(imageNamed: "finger"))
+        fingerSprite.size = CGSize(width: 80, height: 80)
+        
+        // initial positions
+        fingerSprite.position = topRight
+        fingerSprite.zPosition = precedence.rawValue
+        
+        // add to scene
+        addChild(fingerSprite)
+        
+        for startStop in startStopTarget {
+            let stop = startStop.1
+            
+            //actions
+            let swipeAction = SKAction.move(to: stop, duration: 1.25)
+            swipeAction.timingMode = .easeOut
+            
+            actions.append(swipeAction)
+        }
+        
+        fingerSprite.run(SKAction.repeatForever(SKAction.sequence(actions)))
+    }
+    
+    func addRotateParagraph(_ menuType: MenuType, _ playableRect: CGRect, _ precedence: Precedence) {
+        
+        let paragraphNode = ParagraphNode.labelNode(text: "Swipe like this to rotate the board counter-clockwise", paragraphWidth: playableRect.width * 0.70)
+        paragraphNode.position = .zero
+        paragraphNode.zPosition = precedence.rawValue
+        
+        addChild(paragraphNode)
     }
 }
 

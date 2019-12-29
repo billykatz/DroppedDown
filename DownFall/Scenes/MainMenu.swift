@@ -1,5 +1,5 @@
 //
-//  LevelSelect.swift
+//  MainMenu.swift
 //  DownFall
 //
 //  Created by William Katz on 6/30/19.
@@ -8,16 +8,16 @@
 
 import SpriteKit
 
-protocol LevelSelectDelegate: class {
+protocol MainMenuDelegate: class {
     func newGame(_ difficulty: Difficulty, _ playerModel: EntityModel?)
     func didSelectStartTutorial(_ playerModel: EntityModel?)
 }
 
-class LevelSelect: SKScene {
+class MainMenu: SKScene {
     private var background: SKSpriteNode!
     private var header: Header?
     private var difficultyLabel: ParagraphNode?
-    weak var levelSelectDelegate: LevelSelectDelegate?
+    weak var mainMenuDelegate: MainMenuDelegate?
     var playerModel: EntityModel?
     
     override func didMove(to view: SKView) {
@@ -54,7 +54,7 @@ class LevelSelect: SKScene {
                               delegate: self)
         header?.position = CGPoint.positionThis(header?.frame ?? .zero, inTopOf: playableRect)
         
-        addChild(header)
+        addOptionalChild(header)
         
         updateDifficultyLabel()
     }
@@ -70,7 +70,7 @@ class LevelSelect: SKScene {
 
 
 
-extension LevelSelect: HeaderDelegate {
+extension MainMenu: HeaderDelegate {
     func settingsTapped(_ header: Header) {
         let difficultyIndex = GameScope.shared.difficulty.rawValue - 1
         GameScope.shared.difficulty = Difficulty.allCases[(difficultyIndex + 1) % Difficulty.allCases.count]
@@ -78,13 +78,13 @@ extension LevelSelect: HeaderDelegate {
     }
 }
 
-extension LevelSelect: ButtonDelegate {
+extension MainMenu: ButtonDelegate {
     func buttonTapped(_ button: Button) {
         switch button.identifier {
         case .newGame:
-            levelSelectDelegate?.newGame(GameScope.shared.difficulty, playerModel)
+            mainMenuDelegate?.newGame(GameScope.shared.difficulty, playerModel)
         case .startTutorial:
-            levelSelectDelegate?.didSelectStartTutorial(playerModel)
+            mainMenuDelegate?.didSelectStartTutorial(playerModel)
         default:
             ()
         }

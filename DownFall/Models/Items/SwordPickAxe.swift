@@ -31,8 +31,8 @@ struct SwordPickAxe: Ability {
         return "This is always more useful than just a pick axe or just a sword."
     }
     
-    var grantsExtraAttacks: Int? {
-        return 1
+    var extraAttacksGranted: Int? {
+        return nil
     }
     
     func blocksDamage(from: Direction) -> Int? {

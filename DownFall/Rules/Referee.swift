@@ -111,19 +111,12 @@ class Referee {
         }
         
         func calculateAttacks(for entity: EntityModel, from position: TileCoord) -> [TileCoord] {
-            let attackRange = entity.attack.range
-            var affectedTiles: [TileCoord] = []
-            
-            // TODO: Let's add a property to attacks that says if the attack goes thru targets or not
-            for attackSlope in entity.attack.attackSlope ?? [] {
-                for i in attackRange.lower...attackRange.upper {
-                    let target = calculateTargetSlope(in: attackSlope, distance: i, from: position)
-                    if isWithinBounds(target) {
-                        affectedTiles.append(target)
-                    }
+            return entity.attack.targets(from: position).compactMap { target in
+                if isWithinBounds(target) {
+                    return target
                 }
+                return nil
             }
-            return affectedTiles
         }
         
         func calculatePossibleAttacks(for entity: EntityModel, from position: TileCoord) -> [TileCoord] {

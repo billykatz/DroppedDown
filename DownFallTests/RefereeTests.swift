@@ -32,7 +32,7 @@ class RefereeTests: XCTestCase {
         let expectedOutput = Input(.gameWin)
         
         // need to explicitly set this or else the Referee does not know what rule book to use
-        Referee.injectLevel(Level.zero)
+        Referee.injectLevel(Level.test)
         
         let gameWin = allBlack >>> win(mockBoard)
         let gameBoard = gameWin(mockBoard)

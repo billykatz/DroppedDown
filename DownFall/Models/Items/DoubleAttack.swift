@@ -29,7 +29,7 @@ struct DoubleAttack: Ability {
         return "Gives whole new meaning to the ol' saying 'kill two birds with one pickaxe.'"
     }
     
-    var grantsExtraAttacks: Int? {
+    var extraAttacksGranted: Int? {
         return 1
     }
     

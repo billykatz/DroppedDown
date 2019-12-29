@@ -38,7 +38,7 @@ struct AttackModel: Equatable, Decodable {
     var turns: Int = 1
     let attacksPerTurn: Int
     var charge: Int?
-    var attackSlope: [AttackSlope]?
+    var attackSlope: [AttackSlope]
     
     private enum CodingKeys: String, CodingKey {
         typealias RawValue = String
@@ -105,6 +105,23 @@ struct AttackModel: Equatable, Decodable {
     
     var isCharged: Bool {
         return (charge ?? 0) == frequency
+    }
+    
+    public func targets(from position: TileCoord) -> [TileCoord] {
+        func calculateTargetSlope(in slopedDirection: AttackSlope, distance i: Int, from position: TileCoord) -> TileCoord {
+            let (initialRow, initialCol) = position.tuple
+            
+            // Take the initial position and calculate the target
+            // Add the slope's "up" value multiplied by the distance to the row
+            // Add the slope's "over" value multipled by the distane to the column
+            return TileCoord(initialRow + (i * slopedDirection.up), initialCol + (i * slopedDirection.over))
+        }
+        
+        return attackSlope.flatMap { attackSlope in
+            return (range.lower...range.upper).map { range in
+                return calculateTargetSlope(in: attackSlope, distance: range, from: position)
+            }
+        }
     }
     
 }

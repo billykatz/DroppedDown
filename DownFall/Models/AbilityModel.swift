@@ -49,8 +49,8 @@ extension AnyAbility: Ability {
         return _ability.type
     }
     
-    var grantsExtraAttacks: Int? {
-        return _ability.grantsExtraAttacks
+    var extraAttacksGranted: Int? {
+        return _ability.extraAttacksGranted
     }
     
     var usage: Usage {
@@ -73,7 +73,7 @@ protocol Ability {
     var currency: Currency { get }
     var description: String { get }
     var flavorText: String { get }
-    var grantsExtraAttacks: Int? { get }
+    var extraAttacksGranted: Int? { get }
     var sprite: SKSpriteNode? { get }
     var usage: Usage { get }
     func blocksDamage(from: Direction) -> Int?

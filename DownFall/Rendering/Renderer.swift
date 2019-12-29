@@ -173,31 +173,7 @@ class Renderer: SKSpriteNode {
         case .playAgain:
             menuForeground.removeFromParent()
         case .tutorial(let step):
-            let types = step.highlightType
-            let coords = step.highlightCoordinates
-            let showFinger = step.showFingerWithHighlight
-            for (row, spriteRow) in sprites.enumerated() {
-                for (col, _) in spriteRow.enumerated() {
-                    let sprite = sprites[row][col]
-                    sprite.removeAllChildren()
-                    if types.contains(sprite.type) {
-                        sprite.tutorialHighlight()
-                        if showFinger {
-                            sprite.showFinger()
-                        }
-                    }
-                    
-                    if coords.contains(TileCoord(row, col)) {
-                        sprite.indicateSpriteWillBeAttacked()
-                    }
-                }
-            }
-            
-            if step.showClockwiseRotate {
-                menuForeground.removeFromParent()
-                menuForeground.addChild(rotateSprite)
-                foreground.addChild(menuForeground)
-            }
+            renderTutorial(step)
             
         case .touch, .rotateCounterClockwise, .rotateClockwise,
              .monsterDies, .attack, .gameWin,
@@ -206,6 +182,34 @@ class Renderer: SKSpriteNode {
              .newTurn, .transformation, .touchBegan,
              .visitStore:
             ()
+        }
+    }
+    
+    private func renderTutorial(_ step: TutorialStep) {
+        let types = step.highlightType
+        let coords = step.highlightCoordinates
+        let showFinger = step.showFingerWithHighlight
+        for (row, spriteRow) in sprites.enumerated() {
+            for (col, _) in spriteRow.enumerated() {
+                let sprite = sprites[row][col]
+                sprite.removeAllChildren()
+                if types.contains(sprite.type) {
+                    sprite.tutorialHighlight()
+                    if showFinger {
+                        sprite.showFinger()
+                    }
+                }
+                
+                if coords.contains(TileCoord(row, col)) {
+                    sprite.indicateSpriteWillBeAttacked()
+                }
+            }
+        }
+        
+        if step.showClockwiseRotate {
+            menuForeground.removeFromParent()
+            menuForeground.addChild(rotateSprite)
+            foreground.addChild(menuForeground)
         }
     }
     

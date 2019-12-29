@@ -31,7 +31,7 @@ struct Dynamite: Ability {
         return "Boom boom boom boom, I want you to go boom."
     }
     
-    var grantsExtraAttacks: Int? {
+    var extraAttacksGranted: Int? {
         return nil
     }
     

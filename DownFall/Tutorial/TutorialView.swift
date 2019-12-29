@@ -29,10 +29,12 @@ class TutorialView: SKSpriteNode {
         
         Dispatch.shared.register { [weak self] (input) in
             guard let self = self else { return }
+            
+            // This is the input specifically for tutorial steps that are just "Tap to continue"
             if case let InputType.tutorial(step) = input.type {
                 self.step(step)
             } else if case .boardBuilt = input.type {
-                // START THE TUTORIAL
+                // start the tutorial
 
                 let step = tutorialData.currentStep
                 InputQueue.append(
@@ -40,18 +42,25 @@ class TutorialView: SKSpriteNode {
                         .tutorial(step)
                     )
                 )
-            } else if InputType.fuzzyEqual(input.type, tutorialData.currentStep.inputToContinue) {
+            }
+            // Certain inputs match up with the input needed to finish a tutorial step
+            else if InputType.fuzzyEqual(input.type, tutorialData.currentStep.inputToContinue) {
                 tutorialData.currentStep.completed = true
                 tutorialData.incrStepIndex()
                 
                 if tutorialData.finished {
                     self.removeFromParent()
                 } else {
+                    // Often, we will know we need to continue the tutorial, but cannot because of the current game state
+                    // Use our delegate method to "queue" input which should be digested at the next possible update
+                    // This is heavily coupled with TutorialScene and its update method
                     let step = tutorialData.currentStep
                     self.delegate?.queue(inputType: .tutorial(step))
                 }
                 
-            } else if let inputToEnter = tutorialData.currentStep.inputToEnter,
+            }
+            // Ceratin inputs match up with the input needed to begin the next tutorial step
+            else if let inputToEnter = tutorialData.currentStep.inputToEnter,
                 InputType.fuzzyEqual(input.type, inputToEnter) {
                 self.step(tutorialData.currentStep)
             }
@@ -63,6 +72,8 @@ class TutorialView: SKSpriteNode {
     }
     
     func step(_ currentStep: TutorialStep) {
+        // start the step
+        // enable or disable user interaction depending on the the input to continue
         if !currentStep.started {
             currentStep.started = true
             self.isUserInteractionEnabled = true
@@ -71,7 +82,10 @@ class TutorialView: SKSpriteNode {
                 // stop intercepting calls
                 self.isUserInteractionEnabled = false
             }
-        } else {
+        }
+        // mark this step as completed and finish the tutorial if we are at the end
+        // else proceed to the next step
+        else {
             currentStep.completed = true
             if tutorialData.finished {
                 self.removeFromParent()
@@ -89,8 +103,12 @@ class TutorialView: SKSpriteNode {
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if tutorialData.currentStep.started
-            && tutorialData.currentStep.inputToContinue == .tutorial(.zero) {
+        // If we are receving touches that means that our user interation is enabled
+        // If the current step is started and we receive a touch
+        // We send out the current step which will eventually progress the tutorial
+        
+        if tutorialData.currentStep.started &&
+            tutorialData.currentStep.inputToContinue == .tutorial(.zero) {
 
             let step = tutorialData.currentStep
             InputQueue.append(

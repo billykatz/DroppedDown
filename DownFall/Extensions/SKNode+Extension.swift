@@ -13,4 +13,12 @@ extension SKNode {
         guard let _ = touches.first else { return false }
         return true
     }
+    
+    func addOptionalChild(_ child: SKNode?) {
+        guard let nonNilChild = child else {
+            fatalError("Error: trying to add a nil child to a node")
+        }
+        addChild(nonNilChild)
+    }
+
 }

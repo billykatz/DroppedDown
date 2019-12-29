@@ -173,8 +173,8 @@ class StoreScene: SKScene {
     private func informationPopup(with text: String) -> SKSpriteNode {
         let popupNode = SKSpriteNode(color: .storeItemBackground,
                                      size: CGSize(width: self.frame.width - Style.Store.InfoPopup.sidePadding, height: Style.Store.InfoPopup.height))
-        popupNode.position = CGPoint(x: frame.midX,
-                                     y: frame.maxY - (popupNode.frame.height / 2) - Style.Store.InfoPopup.topPadding)
+        
+        popupNode.position = CGPoint.positionThis(popupNode.frame, inTopOf: frame, padding: Style.Store.InfoPopup.topPadding)
         
         let descriptionLabel = Label(text: text,
                                      width: popupNode.frame.width,
@@ -340,17 +340,21 @@ extension StoreScene: StoreItemDelegate {
 
 extension StoreScene: ButtonDelegate {
     func buttonTapped(_ button: Button) {
-        if button.name == "leaveStore" {
+        switch button.identifier {
+        case .leaveStore:
             storeSceneDelegate?.leave(self, updatedPlayerData: playerData)
-        } else if button.name == ButtonIdentifier.purchase.rawValue,
-            let storeItem = selectedItem {
-            buy(storeItem)
-        } else if button.name == ButtonIdentifier.sell.rawValue,
-            let storeItem = selectedItem {
-            sell(storeItem)
-        } else if button.name == ButtonIdentifier.close.rawValue {
+        case .purchase:
+            if let storeItem = selectedItem {
+                buy(storeItem)
+            }
+        case .sell:
+            if let storeItem = selectedItem {
+                sell(storeItem)
+            }
+        case .close:
             selectedItem = nil
+        default:
+            fatalError("You must add a case for added buttons here")
         }
-        
     }
 }

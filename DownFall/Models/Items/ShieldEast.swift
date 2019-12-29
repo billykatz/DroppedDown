@@ -35,7 +35,7 @@ struct ShieldEast: Ability {
         return "It would certainly help to learn to use this on my left side"
     }
     
-    var grantsExtraAttacks: Int? {
+    var extraAttacksGranted: Int? {
         return nil
     }
     

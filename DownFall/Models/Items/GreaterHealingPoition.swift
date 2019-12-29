@@ -31,7 +31,7 @@ struct GreaterHealingPotion: Ability {
         return "I held my nose, I closed my eyes, I took a drink."
     }
     
-    var grantsExtraAttacks: Int? {
+    var extraAttacksGranted: Int? {
         return nil
     }
     

@@ -71,7 +71,6 @@ class HUD: SKSpriteNode {
         // Remove all the hearts so that we can redraw
         removeAllChildren()
         
-        
         // create and display the full and empty hearts
         for health in 0..<data.originalHp {
             
@@ -86,12 +85,14 @@ class HUD: SKSpriteNode {
             self.addChild(heartNode)
         }
         
+        // the label with the palyer's amount of gold
         let goldLabel = ParagraphNode(text: "\(data.carry.total(in: .gold))", paragraphWidth: Style.HUD.labelParagraphWidth, fontName: UIFont.pixelFontName, fontSize: UIFont.extraLargeSize, fontColor: .lightText)
         goldLabel.position = CGPoint.positionThis(goldLabel.frame, in: self.frame, verticaliy: .bottom, anchor: .left, xOffset: Style.HUD.coinLabelPadding)
         goldLabel.name = Identifiers.goldSpriteLabel
         self.addChild(goldLabel)
 
         
+        // the sprite of the coin
         let coinNode = SKSpriteNode(texture: SKTexture(imageNamed: Identifiers.gold), size: Style.HUD.heartSize)
         coinNode.position = CGPoint.positionThis(coinNode.frame,
                                                  relativeTo: goldLabel.frame,
@@ -99,6 +100,7 @@ class HUD: SKSpriteNode {
                                                  anchor: .right)
         self.addChild(coinNode)
         
+        // the label with the player's amount of gems
         let gemSpriteLabel = ParagraphNode(text: "\(data.carry.total(in: .gem))", paragraphWidth: Style.HUD.labelParagraphWidth, fontName: UIFont.pixelFontName, fontSize: UIFont.extraLargeSize, fontColor: .lightText)
         gemSpriteLabel.position = CGPoint.positionThis(gemSpriteLabel.frame,
                                                        relativeTo: coinNode.frame,
@@ -108,6 +110,7 @@ class HUD: SKSpriteNode {
         gemSpriteLabel.name = Identifiers.gemSpriteLabel
         self.addChild(gemSpriteLabel)
         
+        // The sprite of the gem
         let gemSprite = SKSpriteNode(texture: SKTexture(imageNamed: Identifiers.gem), size: Style.HUD.gemSize)
         gemSprite.position = CGPoint.positionThis(gemSprite.frame, relativeTo: gemSpriteLabel.frame, verticaliy: .center, anchor: .right, xOffset: Style.HUD.gemSpritePadding)
         self.addChild(gemSprite)
@@ -117,24 +120,16 @@ class HUD: SKSpriteNode {
     }
     
     func incrementCurrencyCounter(_ item: Item, total: Int) {
-        if item.type == .gold,
-            let goldLabel = self.childNode(withName: Identifiers.goldSpriteLabel) as? ParagraphNode {
-            let oldPosition = goldLabel.position
-            goldLabel.removeFromParent()
+        let currencyLabelIdentifier = item.type == .gold ? Identifiers.goldSpriteLabel : Identifiers.gemSpriteLabel
+        
+        if let currencyLabel = self.childNode(withName: currencyLabelIdentifier) as? ParagraphNode {
+            let oldPosition = currencyLabel.position
+            currencyLabel.removeFromParent()
             
-            let newGoldLabel = ParagraphNode(text: "\(total)", paragraphWidth: Style.HUD.labelParagraphWidth, fontName: UIFont.pixelFontName, fontSize: UIFont.extraLargeSize, fontColor: .lightText)
-            newGoldLabel.position = oldPosition
-            newGoldLabel.name = Identifiers.goldSpriteLabel
-            self.addChild(newGoldLabel)
-        } else if item.type == .gem,
-            let gemLabel = self.childNode(withName: Identifiers.gemSpriteLabel) as? ParagraphNode {
-            let oldPosition = gemLabel.position
-            gemLabel.removeFromParent()
-            
-            let gemSpriteLabel = ParagraphNode(text: "\(total)", paragraphWidth: Style.HUD.labelParagraphWidth, fontName: UIFont.pixelFontName, fontSize: UIFont.extraLargeSize, fontColor: .lightText)
-            gemSpriteLabel.position = oldPosition
-            gemSpriteLabel.name = Identifiers.gemSpriteLabel
-            self.addChild(gemSpriteLabel)
+            let newCurrencyLabel = ParagraphNode(text: "\(total)", paragraphWidth: Style.HUD.labelParagraphWidth, fontName: UIFont.pixelFontName, fontSize: UIFont.extraLargeSize, fontColor: .lightText)
+            newCurrencyLabel.position = oldPosition
+            newCurrencyLabel.name = currencyLabelIdentifier
+            self.addChild(newCurrencyLabel)
         }
     }
 }

@@ -67,7 +67,6 @@ class TileStrategyTests: XCTestCase {
                     .tiles(for: emptyButOnePlayer(board).tiles)
                 let monsterCount = newTiles.filter { $0 == Tile(type: .monster(.zero)) }.count
                 let maxExpectedMonsters = 10
-                //TODO: fix test when we add back monsters
                 XCTAssertTrue(monsterCount <= maxExpectedMonsters, "Difficulty \(difficulty) - Tile God added \(monsterCount), we expected at most \(maxExpectedMonsters)")
             }
         }

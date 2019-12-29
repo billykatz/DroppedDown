@@ -15,9 +15,6 @@ class TutorialScene: SKScene {
     // only strong reference to the Board
     private var board: Board!
     
-    // the board size
-    private var boardSize: Int!
-    
     //foreground
     private var foreground: SKNode!
     
@@ -65,7 +62,6 @@ class TutorialScene: SKScene {
         
         //board
         board = Board.build(tileCreator: tileCreator, difficulty: difficulty, level: level)
-        self.boardSize = boardSize
         
         // create haptic generator
         generator = HapticGenerator()
@@ -73,13 +69,13 @@ class TutorialScene: SKScene {
     }
     
     override func didMove(to view: SKView) {
-    
+        guard let level = level, let data = level.tutorialData else { fatalError("I need a level to function!!!") }
         // create the renderer
         self.renderer = Renderer(playableRect: size.playableRect,
                                  foreground: foreground,
-                                 boardSize: boardSize,
+                                 boardSize: level.boardSize,
                                  precedence: Precedence.foreground,
-                                 level: level!)
+                                 level: level)
         
         
         // SwipeRecognizerView
@@ -89,11 +85,10 @@ class TutorialScene: SKScene {
         view.addSubview(swipingRecognizerView)
         
         // TutorialView
-        guard let data = level?.tutorialData else { fatalError("You must have tutorial data on the Level to continue") }
         let tutorialView = TutorialView(tutorialData: data,
                                         texture: nil,
                                         color: .clear,
-                                        size:  CGSize(width: size.playableRect.width, height: size.playableRect.height))
+                                        size:  size)
         tutorialView.position = .zero
         tutorialView.zPosition = Precedence.menu.rawValue
         tutorialView.delegate = self
@@ -176,8 +171,8 @@ extension TutorialScene {
     }
     
     func allowedToRotate(clockwise: Bool) -> Bool {
+        guard let data = level?.tutorialData else { return false }
         let rotateDirectionInput : InputType = clockwise ? .rotateClockwise : .rotateCounterClockwise
-        let data = GameScope.tutorialOne
         return  rotateDirectionInput == data.currentStep.inputToContinue
     }
 }
@@ -241,6 +236,7 @@ extension TutorialScene {
                 
                 self.foreground.removeAllChildren()
                 if case let TileType.player(data) = self.board.tiles[playerIndex].type {
+                    self.level?.tutorialData?.reset()
                     self.removeFromParent()
                     self.gameSceneDelegate?.reset(self, playerData: data)
                 }

@@ -53,7 +53,7 @@ struct Item: Decodable, Equatable, Hashable {
     }
     
     static var gem: Item{
-        return Item(type: .gem, amount: 0)
+        return Item(type: .gem, amount: 1)
     }
     
     static var gold: Item{

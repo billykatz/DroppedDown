@@ -83,7 +83,7 @@ struct EntityModel: Equatable, Decodable {
     var canAttack: Bool {
         var bonusAttacks = 0
         for ability in abilities {
-            if let attacks = ability.grantsExtraAttacks  {
+            if let attacks = ability.extraAttacksGranted  {
                 bonusAttacks += attacks
             }
         }

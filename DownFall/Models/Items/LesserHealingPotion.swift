@@ -31,7 +31,7 @@ struct LesserHealingPotion: Ability {
         return "It smells like turpentine."
     }
     
-    var grantsExtraAttacks: Int? {
+    var extraAttacksGranted: Int? {
         return nil
     }
     

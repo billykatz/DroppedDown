@@ -50,13 +50,13 @@ class GameViewController: UIViewController, LevelCoordinating {
 extension GameViewController {
     
     private func levelSelect(_ updatedPlayerData: EntityModel) {
-        if let levelSelectScene = GKScene(fileNamed: "LevelSelect")?.rootNode as? LevelSelect {
-            levelSelectScene.scaleMode = .aspectFill
-            levelSelectScene.levelSelectDelegate = self
-            levelSelectScene.playerModel = updatedPlayerData
+        if let mainMenuScene = GKScene(fileNamed: Identifiers.mainMenuScene)?.rootNode as? MainMenu {
+            mainMenuScene.scaleMode = .aspectFill
+            mainMenuScene.mainMenuDelegate = self
+            mainMenuScene.playerModel = updatedPlayerData
             
             if let view = self.view as! SKView? {
-                view.presentScene(levelSelectScene)
+                view.presentScene(mainMenuScene)
                 view.ignoresSiblingOrder = true
             }
             
@@ -64,7 +64,7 @@ extension GameViewController {
     }
 }
 
-extension GameViewController: LevelSelectDelegate {
+extension GameViewController: MainMenuDelegate {
     func didSelectStartTutorial(_ playerModel: EntityModel?) {
         if let view = self.view as! SKView? {
             view.presentScene(nil)

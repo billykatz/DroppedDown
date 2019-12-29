@@ -47,7 +47,7 @@ class TileCreator: TileStrategy {
         let totalNumber = level.monsterRatio.values.max { (first, second) -> Bool in
             return first.upper < second.upper
         }
-        guard let upperRange = totalNumber?.upper else { fatalError("You need to init with a level") }
+        guard let upperRange = totalNumber?.upper else { fatalError("We need the max number or else we cannot continue") }
 
         let randomNumber = Int.random(upperRange)
         for (key, value) in level.monsterRatio {
@@ -65,7 +65,7 @@ class TileCreator: TileStrategy {
         let totalNumber = level.rocksRatio.values.max { (first, second) -> Bool in
             return first.upper < second.upper
         }
-        guard let upperRange = totalNumber?.upper else { fatalError("You need to init with a level") }
+        guard let upperRange = totalNumber?.upper else { fatalError("We need the max number or sel we cannot continue") }
         let randomNumber = Int.random(upperRange)
         for (key, value) in level.rocksRatio {
             if value.contains(randomNumber) {
@@ -118,7 +118,7 @@ class TileCreator: TileStrategy {
                     specialRocks += 1
                     newTiles.append(nextTile)
                 }
-            case .item(let item):
+            case .item:
                 if specialGems < 2 {
                     specialGems  += 1
                     newTiles.append(Tile(type: .item(Item(type: .gem, amount: 1))) )
@@ -197,6 +197,7 @@ class TileCreator: TileStrategy {
         }
         
         //place the exit on the opposite side of the grid
+        #warning ("make sure this is set properly for release")
         let exitQuadrant = playerQuadrant.opposite
 //        let exitQuadrant = playerQuadrant
         let exitPosition = exitQuadrant.randomCoord(for: boardSize)

@@ -420,7 +420,7 @@ class BoardTests: XCTestCase {
     
     func testRemoveFirstRow() {
         let size = 3
-        let board = MockBoardHelper.createBoardWithRowOfSameColor(Tile(type: .blackRock), size: size, rowIdx: 0)
+        let board = MockBoardHelper.createBoardWithRowOfSameColor(Tile(type: .blueRock), size: size, rowIdx: 0)
         
         var expectedTransformation: [TileTransformation] = []
         for colIdx in 0..<size{
@@ -440,12 +440,13 @@ class BoardTests: XCTestCase {
 
         
         
-//        let actualTransformation = board.removeAndReplace(TileCoord(0,0),
-//                                                          input: Input(.touch(TileCoord(0,0), .blackRock)))
-//            .tileTransformation![2]
-//        
-//        XCTAssertEqual(expectedTransformation.count, actualTransformation.count, "Shift down transformations should be the same")
-//        arrayEquality(actualTransformation, expectedTransformation)
+        let transformation = board.removeAndReplace(TileCoord(0,0),
+                                                          input: Input(.touch(TileCoord(0,0), .blackRock)))
+            
+        let actualTransformation = transformation.tileTransformation![2]
+        
+        XCTAssertEqual(expectedTransformation.count, actualTransformation.count, "Shift down transformations should be the same")
+        arrayEquality(actualTransformation, expectedTransformation)
         
     }
     

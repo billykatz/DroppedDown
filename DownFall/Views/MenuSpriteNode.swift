@@ -75,16 +75,17 @@ class MenuSpriteNode: SKSpriteNode {
             addChild(paragraphNode)
             
 
-        } else {
-            let button2 = Button(size: buttonSize,
-                                 delegate: self,
-                                 identifier: .selectLevel,
-                                 precedence: precedence,
-                                 fontSize: UIFont.largeSize,
-                                 fontColor: .black)
-            button2.position = CGPoint(x: 0, y: buttonSize.height/2 + 15)
-            addChild(button2)
         }
+//        else {
+//            let button2 = Button(size: buttonSize,
+//                                 delegate: self,
+//                                 identifier: .selectLevel,
+//                                 precedence: precedence,
+//                                 fontSize: UIFont.largeSize,
+//                                 fontColor: .black)
+//            button2.position = CGPoint(x: 0, y: buttonSize.height/2 + 15)
+//            addChild(button2)
+//        }
         
         // Add the default button
         // This button is added no matter what
@@ -93,8 +94,9 @@ class MenuSpriteNode: SKSpriteNode {
                             identifier: menuType.buttonIdentifer,
                             precedence: precedence,
                             fontSize: UIFont.largeSize,
-                            fontColor: .black)
-        button.position = CGPoint(x: 0, y: -buttonSize.height - 175)
+                            fontColor: .black,
+                            backgroundColor: .clayRed)
+        button.position = CGPoint.positionThis(button.frame, inBottomOf: self.frame)
         addChild(button)
     }
     

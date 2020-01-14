@@ -30,7 +30,8 @@ class MainMenu: SKScene {
                                  identifier: .newGame,
                                  precedence: .menu,
                                  fontSize: UIFont.largeSize,
-                                 fontColor: UIColor.white)
+                                 fontColor: UIColor.white,
+                                 backgroundColor: .menuPurple)
         
         startButton.position = .zero
         addChild(startButton)
@@ -40,7 +41,8 @@ class MainMenu: SKScene {
                                     identifier: .startTutorial,
                                     precedence: .menu,
                                     fontSize: UIFont.largeSize,
-                                    fontColor: .white)
+                                    fontColor: .white,
+                                    backgroundColor: .menuPurple)
         
         tutorialButton.position = CGPoint.positionThis(tutorialButton.frame, below: startButton.frame, spacing: Style.Spacing.normal)
         addChild(tutorialButton)

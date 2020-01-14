@@ -21,7 +21,7 @@ struct LevelConstructor {
                          maxMonstersOnScreen: maxMonstersOnScreen,
                          maxGems: 1,
                          maxTime: timePer(levelType, difficulty: difficulty),
-                         boardSize: 8,
+                         boardSize: boardSize(per: levelType, difficulty: difficulty),
                          abilities: availableAbilities(per: levelType, difficulty: difficulty),
                          goldMultiplier: difficulty.goldMultiplier,
                          rocksRatio: availableRocksPerLevel(levelType, difficulty: difficulty))
@@ -41,6 +41,21 @@ struct LevelConstructor {
                   goldMultiplier: 1,
                   rocksRatio: [:],
                   tutorialData: GameScope.shared.tutorials[index])
+        }
+    }
+    
+    static func boardSize(per levelType: LevelType, difficulty: Difficulty) -> Int {
+        switch levelType {
+        case .first:
+            return 8
+        case .second:
+            return 9
+        case .third:
+            return 10
+        case .boss:
+            fatalError()
+        case .tutorial1, .tutorial2:
+            fatalError()
         }
     }
     
@@ -70,7 +85,7 @@ struct LevelConstructor {
             rocks[.greenRock] = normalRockRange.next(10)
             return rocks
         case .third:
-            var rocks = matchUp([.redRock, .blueRock, .purpleRock, .brownRock, .blackRock], range: normalRockRange, subRanges: 5)
+            var rocks = matchUp([.redRock, .blueRock, .purpleRock, .brownRock], range: normalRockRange, subRanges: 4)
             rocks[.greenRock] = normalRockRange.next(10)
             return rocks
         case .boss, .tutorial1, .tutorial2:
@@ -112,7 +127,7 @@ struct LevelConstructor {
         case .third:
             switch difficulty{
             case .easy:
-                return matchUp([.wizard, .bat, .dragon, .alamo], range: normalRockRange, subRanges: 4)
+                return matchUp([.bat, .dragon, .alamo], range: normalRockRange, subRanges: 3)
             case .normal, .hard:
                 return matchUp([.wizard, .bat, .dragon, .alamo, .lavaHorse], range: normalRockRange, subRanges: 5)
             }

@@ -15,7 +15,7 @@ class Renderer: SKSpriteNode {
     private var sprites: [[DFTileSpriteNode]] = []
     private let bottomLeft: CGPoint
     private let boardSize: CGFloat!
-    private let tileSize: CGFloat = Style.Tile.size
+    private var tileSize: CGFloat
     private let precedence: Precedence
     
     // Used to determine what special UI consdierations to make for what level we are on
@@ -66,6 +66,8 @@ class Renderer: SKSpriteNode {
         self.playableRect = playableRect
         self.boardSize = CGFloat(theBoardSize)
         self.level = level
+        
+        self.tileSize = 0.9 * (playableRect.width / boardSize)
         
         //center the board in the playable rect
         let marginWidth = playableRect.width - CGFloat(tileSize * boardSize)

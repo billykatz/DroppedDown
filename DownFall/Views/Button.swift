@@ -81,7 +81,7 @@ class Button: SKSpriteNode {
          precedence: Precedence,
          fontSize: CGFloat,
          fontColor: UIColor,
-         backgroundColor: UIColor = .menuPurple) {
+         backgroundColor: UIColor = .clayRed) {
         
         //Set properties
         self.delegate = delegate

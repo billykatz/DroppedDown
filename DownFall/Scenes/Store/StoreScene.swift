@@ -67,7 +67,8 @@ class StoreScene: SKScene {
                             identifier: .leaveStore,
                             precedence: .foreground,
                             fontSize:  UIFont.mediumSize,
-                            fontColor: .black)
+                            fontColor: .black,
+                            backgroundColor: .menuPurple)
         
         button.position = CGPoint.positionThis(button.frame, inBottomOf: self.frame, padding: Style.buttonToBottomPadding)
         

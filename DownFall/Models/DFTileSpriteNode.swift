@@ -57,7 +57,68 @@ class DFTileSpriteNode: SKSpriteNode {
     func indicateSpriteWillBeAttacked() {
         let indicatorSprite = SKSpriteNode(color: .yellow, size: self.size)
         indicatorSprite.zPosition = Precedence.background.rawValue
+        
         self.addChild(indicatorSprite)
+        
+        let wait = SKAction.wait(forDuration: 2.0)
+        let remove = SKAction.removeFromParent()
+        indicatorSprite.run(SKAction.sequence([wait, remove]))
+    }
+    
+    func indicateSpriteWillAttack(in turns: Int?) {
+        guard let turns = turns else { return }
+        var color: UIColor = .clear
+        if turns == 0 {
+            color = .green
+        } else if turns <= 1 {
+            color = .red
+        } else if turns > 1 {
+            color = .yellow
+        }
+        
+        let indicatorSprite = SKSpriteNode(color: color, size: self.size)
+        indicatorSprite.zPosition = Precedence.background.rawValue
+        
+        self.addChild(indicatorSprite)
+        
+    }
+    
+    func showAttackTiming(_ frequency: Int,
+                          _ turns: Int) {
+        
+        let size = CGSize(width: self.frame.width * 0.1, height: frame.height * 0.1)
+        
+        var previousSquare: SKSpriteNode?
+        
+        for index in 0..<frequency {
+            var color = UIColor.clear
+            if turns == 0 {
+                color = .green
+            } else if turns == 1 {
+                color = .yellow
+            } else {
+                color = .red
+            }
+            
+            guard index < frequency - turns || turns == 0 else {
+                // there are no more squares to display
+                return
+            }
+            
+            if let prevSqaure = previousSquare {
+                // there is a square already palced.  place this one on top of it
+                let newSquare = SKSpriteNode(color: color, size: size)
+                newSquare.position = CGPoint.positionThisOutside(newSquare.frame, of: prevSqaure.frame, verticality: .top, spacing: Style.Spacing.normal)
+                addChild(newSquare)
+                previousSquare = newSquare
+            } else {
+                //this is the first square
+                previousSquare = SKSpriteNode(color: color, size: size)
+                previousSquare!.position = CGPoint.positionThis(previousSquare!.frame, inBottomOf: frame, anchor: .right)
+                addOptionalChild(previousSquare)
+            }
+        }
+        
     }
     
     func tutorialHighlight(){

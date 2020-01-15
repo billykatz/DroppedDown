@@ -153,6 +153,24 @@ extension CGPoint {
                        y: that.center.y - (that.height/2) - (this.height/2) - spacing)
     }
     
+    static func positionThisOutside(_ this: CGRect,
+                                    of that: CGRect,
+                                    verticality: Verticality,
+                                    spacing: CGFloat = 0.0) -> CGPoint {
+        
+        switch verticality {
+        case .top:
+            return CGPoint(x: that.center.x,
+                           y: that.center.y + (that.height/2) + (this.height/2) + spacing)
+        case .bottom:
+            return CGPoint(x: that.center.x,
+                           y: that.center.y - (that.height/2) - (this.height/2) - spacing)
+        case .center:
+            fatalError("This doesnt make sense")
+        }
+    }
+
+    
     enum Anchor {
         case left
         case right

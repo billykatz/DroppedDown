@@ -140,6 +140,10 @@ struct EntityModel: Equatable, Decodable {
     func willAttackNextTurn() -> Bool {
         return attack.willAttackNextTurn()
     }
+    
+    func turnsUntilAttack() -> Int? {
+        return attack.turnsUntilNextAttack()
+    }
 
 }
 

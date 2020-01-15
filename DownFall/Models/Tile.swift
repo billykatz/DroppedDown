@@ -63,11 +63,6 @@ struct Tile: Hashable {
     static func monster(_ model: EntityModel) -> Tile {
         return Tile(type: TileType.monster(model))
     }
-    
-    func willAttackNextTurn() -> Bool {
-        return type.willAttackNextTurn()
-    }
-
 }
 
 extension Tile: Equatable {
@@ -141,6 +136,21 @@ enum TileType: Equatable, Hashable, CaseIterable {
             return data.willAttackNextTurn()
         }
         return false
+    }
+    
+    func turnsUntilAttack() -> Int? {
+        if case let .monster(data) = self {
+            return data.turnsUntilAttack()
+        }
+        return nil
+
+    }
+    
+    func attackFrequency() -> Int? {
+        if case let .monster(data) = self {
+            return data.attack.frequency
+       }
+        return nil
     }
     
     static var gem: TileType {

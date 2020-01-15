@@ -103,6 +103,12 @@ struct AttackModel: Equatable, Decodable {
         return shouldAttack && type == .areaOfEffect
     }
     
+    func turnsUntilNextAttack() -> Int? {
+        if type == .targets { return nil }
+        if isCharged { return 0 }
+        return self.frequency - self.turns % self.frequency
+    }
+    
     var isCharged: Bool {
         return (charge ?? 0) == frequency
     }

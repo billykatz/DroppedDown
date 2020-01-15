@@ -81,7 +81,7 @@ struct LevelConstructor {
             rocks[.greenRock] = normalRockRange.next(10)
             return rocks
         case .second:
-            var rocks = matchUp([.redRock, .blueRock, .purpleRock, .brownRock], range: normalRockRange, subRanges: 4)
+            var rocks = matchUp([.redRock, .blueRock, .purpleRock], range: normalRockRange, subRanges: 3)
             rocks[.greenRock] = normalRockRange.next(10)
             return rocks
         case .third:

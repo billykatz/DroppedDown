@@ -36,10 +36,10 @@ class DFTileSpriteNode: SKSpriteNode {
             addChild(minecartSprite)
             
         default:
-
+            
             super.init(texture: SKTexture(imageNamed: type.textureString()),
-                   color: .clear,
-                   size: CGSize.init(width: width, height: height))
+                       color: .clear,
+                       size: CGSize.init(width: width, height: height))
         }
     }
     
@@ -83,41 +83,35 @@ class DFTileSpriteNode: SKSpriteNode {
         
     }
     
+    /**
+     Indicates that attack timing of a sprite
+     
+     - Parameter frequency:  The frequency of an attack
+     - Parameter turns:  The turns until the next attack
+     
+     */
+    
     func showAttackTiming(_ frequency: Int,
                           _ turns: Int) {
         
         let size = CGSize(width: self.frame.width * 0.1, height: frame.height * 0.1)
         
-        var previousSquare: SKSpriteNode?
+        var previousSquare: SKShapeNode?
         
-        for index in 0..<frequency {
-            var color = UIColor.clear
-            if turns == 0 {
-                color = .green
-            } else if turns == 1 {
-                color = .yellow
-            } else {
-                color = .red
-            }
-            
-            guard index < frequency - turns || turns == 0 else {
-                // there are no more squares to display
-                return
-            }
-            
-            if let prevSqaure = previousSquare {
-                // there is a square already palced.  place this one on top of it
-                let newSquare = SKSpriteNode(color: color, size: size)
-                newSquare.position = CGPoint.positionThisOutside(newSquare.frame, of: prevSqaure.frame, verticality: .top, spacing: Style.Spacing.normal)
-                addChild(newSquare)
-                previousSquare = newSquare
-            } else {
-                //this is the first square
-                previousSquare = SKSpriteNode(color: color, size: size)
-                previousSquare!.position = CGPoint.positionThis(previousSquare!.frame, inBottomOf: frame, anchor: .right)
-                addOptionalChild(previousSquare)
-            }
+        var color = UIColor.clear
+        if turns == 0 {
+            color = .green
+        } else if turns == 1 {
+            color = .yellow
+        } else {
+            color = .red
         }
+        previousSquare = SKShapeNode(circleOfRadius: size.width)
+        previousSquare?.fillColor = color
+        previousSquare?.strokeColor = color
+        previousSquare?.position = CGPoint.positionThis(previousSquare!.frame, inBottomOf: frame, anchor: .right)
+        previousSquare?.zPosition = Precedence.foreground.rawValue
+        addOptionalChild(previousSquare)
         
     }
     
@@ -127,25 +121,25 @@ class DFTileSpriteNode: SKSpriteNode {
             whiteSprite.zPosition = Precedence.background.rawValue
             whiteSprite.alpha = 0.75
             self.addChild(whiteSprite)
-
+            
         } else {
             let border = SKShapeNode(circleOfRadius: Style.TutorialHighlight.radius)
             border.strokeColor = .highlightGold
             border.lineWidth = Style.TutorialHighlight.lineWidth
             border.position = .zero
             border.zPosition = Precedence.menu.rawValue
-           
+            
             self.addChild(border)
         }
     }
     
     func showFinger() {
         let finger = SKSpriteNode(imageNamed: "finger")
-       finger.position = CGPoint.positionThis(finger.frame,
-                                              inBottomOf: self.frame,
-                                              padding: -Style.Padding.most,
-                                              offset: Style.Offset.less)
-       finger.size = Style.TutorialHighlight.fingerSize
+        finger.position = CGPoint.positionThis(finger.frame,
+                                               inBottomOf: self.frame,
+                                               padding: -Style.Padding.most,
+                                               offset: Style.Offset.less)
+        finger.size = Style.TutorialHighlight.fingerSize
         
         let moveDownVector = CGVector.init(dx: 0.0, dy: -20.0)
         let moveUpVector = CGVector.init(dx: 0.0, dy: 20.0)
@@ -155,8 +149,8 @@ class DFTileSpriteNode: SKSpriteNode {
         let indicateAnimation = SKAction.repeatForever(SKAction.sequence([moveDownAnimation, moveUpAnimation]))
         finger.run(indicateAnimation)
         finger.zPosition = Precedence.menu.rawValue
-                   
-       self.addChild(finger)
+        
+        self.addChild(finger)
     }
 }
 

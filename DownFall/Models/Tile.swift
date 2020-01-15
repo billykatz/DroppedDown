@@ -140,7 +140,7 @@ enum TileType: Equatable, Hashable, CaseIterable {
     
     func turnsUntilAttack() -> Int? {
         if case let .monster(data) = self {
-            return data.turnsUntilAttack()
+            return data.attack.turnsUntilNextAttack()
         }
         return nil
 

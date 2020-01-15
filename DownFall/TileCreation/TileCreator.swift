@@ -198,8 +198,8 @@ class TileCreator: TileStrategy {
         
         //place the exit on the opposite side of the grid
         #warning ("make sure this is set properly for release")
-//        let exitQuadrant = playerQuadrant.opposite
-        let exitQuadrant = playerQuadrant
+        let exitQuadrant = playerQuadrant.opposite
+//        let exitQuadrant = playerQuadrant
         let exitPosition = exitQuadrant.randomCoord(for: boardSize)
         
         tiles[exitPosition.x][exitPosition.y] = Tile.exit

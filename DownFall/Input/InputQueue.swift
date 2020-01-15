@@ -37,7 +37,11 @@ struct InputQueue {
         
         if gameState.shouldAppend(input) {
             queue.append(input)
+            return
         }
+        
+        print("\(input.type) Being ignored.")
+        
     }
     
     static func pop() -> Input? {

@@ -107,7 +107,7 @@ class Renderer: SKSpriteNode {
         
         // Register for Dispatch
         Dispatch.shared.register { [weak self] input in
-            switch input.type{
+            switch input.type {
             case .transformation(let trans):
                 self?.renderTransformation(trans)
             case .boardBuilt:
@@ -150,6 +150,9 @@ class Renderer: SKSpriteNode {
                 () // Purposely left blank.
             case .touchBegan:
                 ()
+            case .newTurn:
+                let sprites = createSprites(from: trans.endTiles)
+                animationsFinished(for: sprites, endTiles: trans.endTiles, ref: false)
             default:
                 // Transformation assoc value should ony exist for certain inputs
                 fatalError()
@@ -176,12 +179,13 @@ class Renderer: SKSpriteNode {
             menuForeground.removeFromParent()
         case .tutorial(let step):
             renderTutorial(step)
-            
+        case .newTurn:
+            let sprites = createSprites(from: input.endTilesStruct)
+            animationsFinished(for: sprites, endTiles: input.endTilesStruct, ref: false)
         case .touch, .rotateCounterClockwise, .rotateClockwise,
              .monsterDies, .attack, .gameWin,
              .animationsFinished, .reffingFinished,
-             .boardBuilt,. collectItem, .selectLevel,
-             .newTurn, .transformation, .touchBegan,
+             .boardBuilt,. collectItem, .selectLevel, .transformation, .touchBegan,
              .visitStore:
             ()
         }
@@ -245,7 +249,7 @@ class Renderer: SKSpriteNode {
                 } else if tiles?[row][col].type.willAttackNextTurn() ?? false {
                     sprite.indicateSpriteWillBeAttacked()
                 } else if let turns = tiles?[row][col].type.turnsUntilAttack(),
-                    let frequency = tiles?[row][col].type.attackFrequency(){
+                    let frequency = tiles?[row][col].type.attackFrequency() {
                     sprite.showAttackTiming(frequency, turns)
                 }
                 spriteForeground.addChild(sprite)
@@ -284,9 +288,6 @@ class Renderer: SKSpriteNode {
                 let sprite = DFTileSpriteNode(type: tiles[row][col].type,
                                               height: height,
                                               width: width)
-                if tiles[row][col].shouldHighlight {
-                    sprite.indicateSpriteWillBeAttacked()
-                }
                 sprites[row].append(sprite)
                 sprites[row][col].position = CGPoint(x: x, y: y)
             }

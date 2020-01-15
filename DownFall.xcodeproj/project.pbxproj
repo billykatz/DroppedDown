@@ -127,6 +127,7 @@
 		3DF2928320A66BEB006671AC /* Tile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2928220A66BEB006671AC /* Tile.swift */; };
 		3DF2928520A76242006671AC /* Board.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2928420A76242006671AC /* Board.swift */; };
 		5605D6D321CC2DF400C1C5C2 /* DFTileSpriteNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5605D6D221CC2DF400C1C5C2 /* DFTileSpriteNode.swift */; };
+		586AE77723CF91AA00302347 /* AttackModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 586AE77623CF91AA00302347 /* AttackModelTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -263,6 +264,7 @@
 		3DF2928220A66BEB006671AC /* Tile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tile.swift; sourceTree = "<group>"; };
 		3DF2928420A76242006671AC /* Board.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Board.swift; sourceTree = "<group>"; };
 		5605D6D221CC2DF400C1C5C2 /* DFTileSpriteNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DFTileSpriteNode.swift; sourceTree = "<group>"; };
+		586AE77623CF91AA00302347 /* AttackModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttackModelTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -634,6 +636,7 @@
 				3D30A4232216892A00AFA1E1 /* BoardMocker.swift */,
 				3DF2926A20A37FF0006671AC /* Info.plist */,
 				3DA4E8982290AC82006E90D1 /* EntityModelTests.swift */,
+				586AE77623CF91AA00302347 /* AttackModelTests.swift */,
 				3DA4E89A2290AC99006E90D1 /* JSON */,
 			);
 			path = DownFallTests;
@@ -890,6 +893,7 @@
 				3DB270A922B00E0D00D9BF8B /* TileTypeTest+Extensions.swift in Sources */,
 				3D90AAD021D8854300C7428A /* RefereeTests.swift in Sources */,
 				3D508DED23B3EE7C0067F53A /* CarryModelTests.swift in Sources */,
+				586AE77723CF91AA00302347 /* AttackModelTests.swift in Sources */,
 				3DE87C96224068FA00D750CF /* GameStateTests.swift in Sources */,
 				3DCB38AB232DCE88001D148F /* TileCoordTests.swift in Sources */,
 			);

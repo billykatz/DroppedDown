@@ -26,7 +26,7 @@ class TurnWatcher {
                     ()
                 case .touch(_, let type):
                     if case TileType.monster = type {
-                        ()
+                        self?.newTurn = false
                     } else {
                         fallthrough
                     }

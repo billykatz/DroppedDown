@@ -9,6 +9,11 @@
 import SpriteKit
 
 struct ShieldEast: Ability {
+    
+    func animatedColumns() -> Int? {
+           return nil
+    }
+    
     var affectsCombat: Bool {
         return true
     }
@@ -22,7 +27,7 @@ struct ShieldEast: Ability {
     }
     
     var cost: Int {
-        return 5
+        return 40
     }
     
     var currency: Currency { return .gold }

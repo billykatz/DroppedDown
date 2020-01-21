@@ -198,7 +198,7 @@ enum TileType: Equatable, Hashable, CaseIterable {
         case greenRock = "greenRockv2"
         case purpleRock
         case brownRock
-        case redRock
+        case redRock = "redRockv2"
         case player = "player2"
         case empty
         case exit

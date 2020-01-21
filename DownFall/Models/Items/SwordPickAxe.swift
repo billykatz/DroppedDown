@@ -9,6 +9,11 @@
 import Foundation
 
 struct SwordPickAxe: Ability {
+    
+    func animatedColumns() -> Int? {
+        return nil
+    }
+    
     var affectsCombat: Bool {
         return true
     }

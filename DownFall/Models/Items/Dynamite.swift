@@ -9,6 +9,10 @@
 import Foundation
 
 struct Dynamite: Ability {
+    func animatedColumns() -> Int? {
+        return nil
+    }
+    
     var affectsCombat: Bool {
         return false
     }
@@ -17,14 +21,14 @@ struct Dynamite: Ability {
         return "dynamite"
     }
     
-    var cost: Int { return 14 }
+    var cost: Int { return 58 }
     
     var currency: Currency { return .gold }
     
     var type: AbilityType { return .dynamite }
     
     var description: String {
-        return "Destroys rocks in a 3x3 grid."
+        return "Destroys one of any kind of rock."
     }
     
     var flavorText: String {

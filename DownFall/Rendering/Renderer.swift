@@ -55,6 +55,7 @@ class Renderer: SKSpriteNode {
     private var header  = Header()
     private var hud = HUD()
     private var helperTextView = HelperTextView()
+    private var backpackView: BackpackView
     
     init(playableRect: CGRect,
          foreground givenForeground: SKNode,
@@ -78,6 +79,7 @@ class Renderer: SKSpriteNode {
         
         foreground = givenForeground
         
+        self.backpackView = BackpackView(playableRect: playableRect)
         
         super.init(texture: nil, color: .clear, size: CGSize.zero)
         
@@ -103,7 +105,7 @@ class Renderer: SKSpriteNode {
         helperTextView.position = CGPoint.positionThis(helperTextView.frame, inBottomOf: playableRect)
         
 
-        [spriteForeground, header, hud, helperTextView].forEach { foreground.addChild($0) }
+        [spriteForeground, header, hud, self.backpackView].forEach { foreground.addChild($0) }
         
         // Register for Dispatch
         Dispatch.shared.register { [weak self] input in
@@ -115,6 +117,10 @@ class Renderer: SKSpriteNode {
                     let tiles = input.endTilesStruct else { return }
                 self.sprites = self.createSprites(from: tiles)
                 self.add(sprites: self.sprites, tiles: tiles)
+                
+                if let playerData = playerData(in: tiles) {
+                    self.backpackView.update(with: playerData)
+                }
             default:
                 self?.renderInput(input)
             }

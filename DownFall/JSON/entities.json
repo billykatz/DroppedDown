@@ -50,7 +50,7 @@
                 "items": [
                     {
                         "type": "gold",
-                        "amount": 15
+                        "amount": 800
                         
                     },
                     {
@@ -196,7 +196,7 @@
                 "damage": 1,
                 "range": {
                     "lower": 1,
-                    "upper": 10
+                    "upper": 3
                 },
                 "attacksPerTurn": 1,
                 "attackSlope": [
@@ -309,7 +309,7 @@
                 "damage": 1,
                 "range": {
                     "lower": 1,
-                    "upper": 3
+                    "upper": 2
                 },
                 "attacksPerTurn": 1,
                 "attackSlope": [

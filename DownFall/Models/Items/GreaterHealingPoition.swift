@@ -9,15 +9,19 @@
 import Foundation
 
 struct GreaterHealingPotion: Ability {
+    func animatedColumns() -> Int? {
+        return 5
+    }
+    
     var affectsCombat: Bool {
         return false
     }
     
     var textureName: String {
-        return "greaterHealingPotion"
+        return "greaterHealingPotionSpriteSheet"
     }
     
-    var cost: Int { return 15 }
+    var cost: Int { return 80 }
     
     var currency: Currency { return .gold }
     

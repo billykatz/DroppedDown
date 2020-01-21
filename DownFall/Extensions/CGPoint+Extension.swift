@@ -17,17 +17,16 @@ extension CGPoint {
                               height: CGFloat,
                               bottomLeft: CGPoint) -> [CGPoint] {
         
-        let inset: CGFloat = 10.0
+        let inset: CGFloat = 15.0
         let columnPadding = (width - (columns * itemSize.width) - (2 * inset)) / (columns-1)
-        let rowPadding = (height - (rows * itemSize.height)) / (rows - 1)
-        
+        let rowPadding = min(30.0, (height - (rows * itemSize.height)) / (rows - 1))
         
         var points: [CGPoint] = []
         for row in 0..<Int(rows) {
             for column in 0..<Int(columns) {
                 let rowFloat = CGFloat(row)
                 let columnFloat = CGFloat(column)
-                let y = bottomLeft.y + itemSize.height/2 + (rowFloat * rowPadding)
+                let y = bottomLeft.y + itemSize.height/2 + (rowFloat * rowPadding) + (rowFloat * itemSize.height)
                 let x = bottomLeft.x + inset + itemSize.width/2 + (columnFloat * columnPadding) + (columnFloat * itemSize.width)
                 points.append(CGPoint(x: x, y: y))
             }
@@ -52,11 +51,12 @@ extension CGPoint {
                        y: -that.height/2 + this.height/2 + padding)
     }
     
-    static func positionThis(_ this: CGRect,
+    static func positionThis(_ this: CGRect?,
                              inBottomOf that: CGRect,
                              padding: CGFloat = Style.Padding.normal,
                              anchor: Anchor,
                              xOffset: CGFloat = 0.0) -> CGPoint {
+        guard let this = this else { return .zero}
         switch anchor {
         case .left:
             return CGPoint(x: -that.width/2 + this.width/2 + xOffset,
@@ -66,6 +66,8 @@ extension CGPoint {
                            y: -that.height/2 + this.height/2 + padding)
         }
     }
+    
+    
     
     static func positionThis(_ this: CGRect,
                              in that: CGRect,
@@ -124,9 +126,9 @@ extension CGPoint {
         
         return CGPoint(x: x, y: y)
     }
-
-
-
+    
+    
+    
     
     static func positionThis(_ this: CGRect,
                              inTopOf that: CGRect,
@@ -139,9 +141,9 @@ extension CGPoint {
     
     
     static func positionThis(_ this: CGRect,
-                        toTheRightOf that: CGRect,
-                        padding: CGFloat = 0.0,
-                        yOffset: CGFloat = 0.0) -> CGPoint {
+                             toTheRightOf that: CGRect,
+                             padding: CGFloat = 0.0,
+                             yOffset: CGFloat = 0.0) -> CGPoint {
         return CGPoint(x: that.width/2 - this.width/2 - padding,
                        y: 0.0 + yOffset)
     }
@@ -153,11 +155,11 @@ extension CGPoint {
                        y: that.center.y - (that.height/2) - (this.height/2) - spacing)
     }
     
-    static func positionThisOutside(_ this: CGRect,
-                                    of that: CGRect,
-                                    verticality: Verticality,
-                                    spacing: CGFloat = 0.0) -> CGPoint {
-        
+    static func positionThis(_ this: CGRect?,
+                             outsideOf that: CGRect?,
+                             verticality: Verticality,
+                             spacing: CGFloat = 0.0) -> CGPoint {
+        guard let this = this, let that = that else { return .zero}
         switch verticality {
         case .top:
             return CGPoint(x: that.center.x,
@@ -169,7 +171,21 @@ extension CGPoint {
             fatalError("This doesnt make sense")
         }
     }
-
+    
+    static func positionThis(_ this: CGRect?,
+                             outside that: CGRect,
+                             anchor: Anchor,
+                             padding: CGFloat = 0.0,
+                             spacing: CGFloat = 0.0) -> CGPoint {
+        guard let this = this else { return .zero }
+        switch anchor {
+        case .left:
+            return CGPoint(x: that.minX - this.width/2, y: this.center.y + padding)
+        case .right:
+            return CGPoint(x: that.maxX + this.width/2, y: this.center.y + padding)
+        }
+    }
+    
     
     enum Anchor {
         case left

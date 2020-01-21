@@ -9,7 +9,6 @@
 import GameplayKit
 
 class TileCreator: TileStrategy {
-    var spawnedGem = false
     var randomSource = GKLinearCongruentialRandomSource()
     let entities: EntitiesModel
     let difficulty: Difficulty
@@ -119,7 +118,7 @@ class TileCreator: TileStrategy {
                     newTiles.append(nextTile)
                 }
             case .item:
-                if specialGems < 2 {
+                if specialGems < 0  {
                     specialGems  += 1
                     newTiles.append(Tile(type: .item(Item(type: .gem, amount: 1))) )
                 }

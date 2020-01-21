@@ -10,7 +10,7 @@ import UIKit
 import SpriteKit
 import GameplayKit
 
-protocol LevelCoordinating: StoreSceneDelegate, GameSceneCoordinatingDelegate {
+protocol LevelCoordinating: StoreSceneDelegate, GameSceneCoordinatingDelegate, MainMenuDelegate {
     var gameSceneNode: GameScene? { get set }
     var tutorialSceneNode: TutorialScene? { get set }
     var entities: EntitiesModel? { get set }
@@ -19,6 +19,7 @@ protocol LevelCoordinating: StoreSceneDelegate, GameSceneCoordinatingDelegate {
     
     func presentStore(_ playerData: EntityModel)
     func presentNextLevel(_ playerData: EntityModel?)
+    func levelSelect(_ updatedPlayerData: EntityModel)
     func startGame(player playerData: EntityModel, difficulty: Difficulty)
 }
 
@@ -119,6 +120,16 @@ extension LevelCoordinating where Self: UIViewController {
     
     // MARK: - GameSceneCoordinatingDelegate
     
+    func resetToMain(_ scene: SKScene) {
+        let fadeOut = SKAction.fadeOut(withDuration: 0.75)
+        let remove = SKAction.removeFromParent()
+        scene.run(SKAction.group([fadeOut, remove])) { [weak self] in
+            guard let self = self else { return }
+            self.levelSelect(self.entities!.entities[0])
+        }
+
+    }
+    
     func reset(_ scene: SKScene, playerData: EntityModel ) {
         let fadeOut = SKAction.fadeOut(withDuration: 0.75)
         let remove = SKAction.removeFromParent()
@@ -126,7 +137,6 @@ extension LevelCoordinating where Self: UIViewController {
             guard let self = self else { return }
             self.presentNextLevel(playerData.revive())
         }
-        
     }
     
     func visitStore(_ playerData: EntityModel) {

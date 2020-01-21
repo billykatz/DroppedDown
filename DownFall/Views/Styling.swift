@@ -13,6 +13,12 @@ struct Style {
     static let buttonToBottomPadding: CGFloat = 16.0
     static let paragraphPadding: CGFloat = 8.0
     
+    struct Backpack {
+        static let heightCoefficient = CGFloat(0.25)
+        static let backpackViewSizeCoefficient = CGFloat(0.75)
+        static let itemSize = CGSize(width: 100, height: 100)
+    }
+    
     struct Store {
         struct InfoPopup {
             static let topPadding: CGFloat = 16.0
@@ -21,11 +27,11 @@ struct Style {
         }
         
         struct Item {
-            static let size: CGSize = CGSize(width: 50.0, height: 50.0)
+            static let size: CGSize = CGSize(width: 75.0, height: 75.0)
         }
         
         struct ItemGrid {
-            static let height: CGFloat = 330.0
+            static let height: CGFloat = 450.0
         }
         
         struct Wallet {

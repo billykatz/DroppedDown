@@ -25,6 +25,7 @@ enum ButtonIdentifier: String {
     case purchase
     case sell
     case close
+    case backpack
     
     var title: String {
         switch self {
@@ -36,8 +37,6 @@ enum ButtonIdentifier: String {
             return "Level Select"
         case .leaveStore:
             return "Leave Store"
-        case .storeItem:
-            return ""
         case .rotate:
             return "Got it! 👍"
         case .visitStore:
@@ -54,7 +53,7 @@ enum ButtonIdentifier: String {
             return "Sell"
         case .close:
             return "Close"
-        case .wallet, .infoPopup:
+        case .wallet, .infoPopup, .storeItem, .backpack:
             return ""
         }
     }
@@ -74,6 +73,7 @@ class Button: SKSpriteNode {
     
     var identifier: ButtonIdentifier
     let originalBackground: UIColor
+    var showSelection = false
     
     init(size: CGSize,
          delegate: ButtonDelegate,
@@ -81,11 +81,13 @@ class Button: SKSpriteNode {
          precedence: Precedence,
          fontSize: CGFloat,
          fontColor: UIColor,
-         backgroundColor: UIColor = .clayRed) {
+         backgroundColor: UIColor = .clayRed,
+         showSelection: Bool = true) {
         
         //Set properties
         self.delegate = delegate
         self.identifier = identifier
+        self.showSelection = showSelection
         
         // set the original color so that we can toggle between that and the selected state
         originalBackground = backgroundColor
@@ -138,12 +140,16 @@ extension Button {
     }
     
     private func buttonWasPressed() {
-        color = originalBackground
+        if showSelection {
+            color = originalBackground
+        }
         delegate?.buttonTapped(self)
     }
     
     private func buttonPressBegan() {
-        color = .lightGray
+        if showSelection {
+            color = .lightGray
+        }
     }
 }
 

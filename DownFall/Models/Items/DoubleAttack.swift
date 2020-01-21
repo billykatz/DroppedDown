@@ -7,6 +7,11 @@
 //
 
 struct DoubleAttack: Ability {
+    
+    func animatedColumns() -> Int? {
+        return nil
+    }
+    
     var affectsCombat: Bool {
         return true
     }

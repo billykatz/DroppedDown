@@ -97,7 +97,7 @@ class GameScene: SKScene {
                 self.foreground.removeAllChildren()
                 if case let TileType.player(data) = self.board.tiles[playerIndex].type {
                     self.removeFromParent()
-                    self.gameSceneDelegate?.reset(self, playerData: data)
+                    self.gameSceneDelegate?.resetToMain(self)
                 }
 
             } else if input.type == .visitStore {

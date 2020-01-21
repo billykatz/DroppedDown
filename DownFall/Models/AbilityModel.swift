@@ -17,6 +17,10 @@ struct AnyAbility {
 }
 
 extension AnyAbility: Ability {
+    func animatedColumns() -> Int? {
+        return _ability.animatedColumns()
+    }
+    
     func blocksDamage(from: Direction) -> Int? {
         return _ability.blocksDamage(from: from)
     }
@@ -77,11 +81,18 @@ protocol Ability {
     var sprite: SKSpriteNode? { get }
     var usage: Usage { get }
     func blocksDamage(from: Direction) -> Int?
+    
+    func animatedColumns() -> Int?
 }
 
 extension Ability {
     var sprite: SKSpriteNode? {
         return SKSpriteNode(texture: SKTexture(imageNamed: textureName), size: CGSize(width: 50.0, height: 50.0))
+    }
+    
+    var spriteSheet: SpriteSheet?  {
+        guard let cols = animatedColumns() else { return nil }
+        return SpriteSheet.init(texture: SKTexture(imageNamed: textureName), rows: 1, columns: cols)
     }
 }
 
@@ -93,6 +104,8 @@ enum AbilityType: String, Decodable {
     case lesserHealingPotion
     case greaterHealingPotion
     case swordPickAxe
+    case transmogrificationPotion
+    case killMonsterPotion
 }
 
 enum Usage {

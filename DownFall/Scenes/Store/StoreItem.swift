@@ -48,10 +48,17 @@ class StoreItem: SKSpriteNode {
                               identifier: .storeItem,
                               fontSize: fontSize)
             
-        if let abilityForeground = ability.sprite {
-            abilityForeground.position = .zero
-            abilityForeground.name = ability.textureName
-            addChild(abilityForeground)
+        if let abilityFrames = ability.spriteSheet?.animationFrames(), let first = abilityFrames.first  {
+            let sprite = SKSpriteNode(texture: first, color: .clear, size: Style.Store.Item.size)
+            sprite.position = .zero
+            sprite.name = ability.textureName
+            sprite.run(SKAction.repeatForever(SKAction.animate(with: abilityFrames, timePerFrame: AnimationSettings.Store.itemFrameRate)))
+            
+            addChild(sprite)
+        } else if let sprite = ability.sprite {
+            sprite.position = .zero
+            sprite.name = ability.textureName
+            addChild(sprite)
         }
         
         

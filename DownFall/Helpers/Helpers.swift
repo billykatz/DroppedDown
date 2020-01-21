@@ -25,3 +25,14 @@ func isWithinBounds(_ tileCoord: TileCoord, within tiles: [[Tile]]?) -> Bool {
         tileRow < tiles.count && // upper bound
         tileCol < tiles.count
 }
+
+func playerData(in tiles: [[Tile]]) -> EntityModel? {
+    for (i, _) in tiles.enumerated() {
+        for (j, _) in tiles[i].enumerated() {
+            if case TileType.player(let data) = tiles[i][j].type {
+                return data
+            }
+        }
+    }
+    return nil
+}

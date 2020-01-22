@@ -45,4 +45,7 @@ struct DoubleAttack: Ability {
     var usage: Usage {
         return .oneRun
     }
+    
+    var targets: Int? { return nil }
+    var targetTypes: [TileType]? { return nil }
 }

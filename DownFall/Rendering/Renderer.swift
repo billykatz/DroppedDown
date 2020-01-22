@@ -55,7 +55,7 @@ class Renderer: SKSpriteNode {
     private var header  = Header()
     private var hud = HUD()
     private var helperTextView = HelperTextView()
-    private var backpackView: BackpackView
+    public var backpackView: BackpackView
     
     init(playableRect: CGRect,
          foreground givenForeground: SKNode,

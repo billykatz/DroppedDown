@@ -17,6 +17,7 @@ struct Style {
         static let heightCoefficient = CGFloat(0.25)
         static let backpackViewSizeCoefficient = CGFloat(0.75)
         static let itemSize = CGSize(width: 100, height: 100)
+        static let ctaButton = CGFloat(300)
     }
     
     struct Store {
@@ -59,7 +60,7 @@ struct Style {
     }
     
     struct Spacing {
-        static let normal: CGFloat = 8.0
+        static let normal: CGFloat = 20.0
     }
     
     struct Offset {

@@ -9,6 +9,12 @@
 import SpriteKit
 import UIKit
 
+extension CGRect {
+    func subtractBottomFourth() -> CGRect {
+        return CGRect(x: self.origin.x, y: self.origin.y, width: self.width, height: self.height - self.height/4)
+    }
+}
+
 class GameScene: SKScene {
     
     // only strong reference to the Board
@@ -82,7 +88,8 @@ class GameScene: SKScene {
         
         
         // SwipeRecognizerView
-        swipeRecognizerView = SwipeRecognizerView(frame: view.frame,
+    
+        swipeRecognizerView = SwipeRecognizerView(frame: view.frame.subtractBottomFourth(),
                                                         target: self,
                                                         swiped: #selector(swiped))
         view.addSubview(swipeRecognizerView!)
@@ -95,7 +102,7 @@ class GameScene: SKScene {
                 else { return }
                 
                 self.foreground.removeAllChildren()
-                if case let TileType.player(data) = self.board.tiles[playerIndex].type {
+                if case let TileType.player = self.board.tiles[playerIndex].type {
                     self.removeFromParent()
                     self.gameSceneDelegate?.resetToMain(self)
                 }
@@ -120,6 +127,7 @@ class GameScene: SKScene {
         //Debug settings triple tap
         let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(tripleTap))
         tapRecognizer.numberOfTapsRequired = 3
+        tapRecognizer.delaysTouchesEnded = false
         view.addGestureRecognizer(tapRecognizer)
     }
     

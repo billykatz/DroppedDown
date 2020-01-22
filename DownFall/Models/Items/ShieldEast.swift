@@ -60,4 +60,7 @@ struct ShieldEast: Ability {
     var usage: Usage {
         return .oneRun
     }
+    
+    var targets: Int? { return nil }
+    var targetTypes: [TileType]? { nil }
 }

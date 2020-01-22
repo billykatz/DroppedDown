@@ -19,10 +19,12 @@ class BackpackView: SKSpriteNode {
     let playableRect: CGRect
     var itemArea: SKSpriteNode?
     var descriptionArea: SKSpriteNode?
+    var ctaButton: SKShapeNode?
     var abilities: [AnyAbility] = []
     var selectedAbility: AnyAbility? = nil {
         didSet {
             updateDescription(with: selectedAbility)
+            updateCTAButton(with: selectedAbility)
         }
     }
     
@@ -32,6 +34,7 @@ class BackpackView: SKSpriteNode {
         self.playableRect = playableRect
         //height and width set ups
         height = playableRect.height * Style.Backpack.heightCoefficient
+        let backPackHeight: CGFloat = 280
         let backPackWidth = height * 2/3
         
         super.init(texture: nil, color: .clear, size: CGSize(width: playableRect.width, height: height))
@@ -47,15 +50,18 @@ class BackpackView: SKSpriteNode {
         descriptionArea = SKSpriteNode(color: .clear, size: CGSize(width: playableRect.width - backPackWidth, height: height/2))
         descriptionArea?.position = CGPoint.positionThis(descriptionArea?.frame, outsideOf: itemArea?.frame, verticality: .top)
         
-
+        ctaButton = Button(size: CGSize(width: Style.Backpack.ctaButton, height: 125.0), delegate: self, identifier: .backpackUse, precedence: .foreground, fontSize: UIFont.extraLargeSize, fontColor: UIColor.black, backgroundColor: .highlightGold)
+        ctaButton?.position = CGPoint.positionThis(ctaButton?.frame, outside: descriptionArea?.frame, anchor: .right, align: .top, padding: -Style.Padding.more)
+        
         
         addOptionalChild(itemArea)
         addOptionalChild(descriptionArea)
+        addOptionalChild(ctaButton)
         
         // backpack views
-        let backpackContainer = SKSpriteNode(color: .clear, size: CGSize(width: backPackWidth, height: height))
+        let backpackContainer = SKSpriteNode(color: .clear, size: CGSize(width: backPackWidth, height: backPackHeight))
         
-        let backpackSprite = SKSpriteNode(texture: SKTexture(imageNamed: Identifiers.backpackSprite), size: CGSize(width: 240, height: 280))
+        let backpackSprite = SKSpriteNode(texture: SKTexture(imageNamed: Identifiers.backpackSprite), size: CGSize(width: 240, height: backPackHeight))
         
         let backpackButton = Button(size: backpackSprite.frame.size,
                                     delegate: self,
@@ -157,6 +163,10 @@ class BackpackView: SKSpriteNode {
         }
     }
     
+    func updateCTAButton(with ability: AnyAbility?) {
+        
+    }
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -179,8 +189,12 @@ extension BackpackView {
 }
 
 extension BackpackView: ButtonDelegate {
-    func buttonTapped(_ button: Button) { 
-        toggleItemArea()
-        selectedAbility = nil
+    func buttonTapped(_ button: Button) {
+        if button.identifier == ButtonIdentifier.backpack {
+            toggleItemArea()
+            selectedAbility = nil
+        } else if button.identifier == ButtonIdentifier.backpackUse {
+            print("use selected ability \(selectedAbility)")
+        }
     }
 }

@@ -61,6 +61,9 @@ extension AnyAbility: Ability {
         return _ability.usage
     }
     
+    
+    var targets: Int? { return _ability.targets }
+    var targetTypes: [TileType]? { _ability.targetTypes }
 }
 
 extension AnyAbility: Equatable {
@@ -68,6 +71,7 @@ extension AnyAbility: Equatable {
         return lhs.type == rhs.type
     }
 }
+
 
 protocol Ability {
     var affectsCombat: Bool { get }
@@ -80,8 +84,10 @@ protocol Ability {
     var extraAttacksGranted: Int? { get }
     var sprite: SKSpriteNode? { get }
     var usage: Usage { get }
-    func blocksDamage(from: Direction) -> Int?
+    var targets: Int? { get }
+    var targetTypes: [TileType]? { get }
     
+    func blocksDamage(from: Direction) -> Int?
     func animatedColumns() -> Int?
 }
 

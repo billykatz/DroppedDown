@@ -46,4 +46,8 @@ struct GreaterHealingPotion: Ability {
     var usage: Usage {
         return .once
     }
+    
+    
+    var targets: Int? { return 1 }
+    var targetTypes: [TileType]? { return [TileType.player(.zero)] }
 }

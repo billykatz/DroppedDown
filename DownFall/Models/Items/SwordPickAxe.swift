@@ -47,4 +47,8 @@ struct SwordPickAxe: Ability {
     var usage: Usage {
         return .oneRun
     }
+    
+    
+    var targets: Int? { return nil }
+    var targetTypes: [TileType]? { return nil }
 }

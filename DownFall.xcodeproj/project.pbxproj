@@ -128,6 +128,7 @@
 		3DF2928520A76242006671AC /* Board.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2928420A76242006671AC /* Board.swift */; };
 		5605D6D321CC2DF400C1C5C2 /* DFTileSpriteNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5605D6D221CC2DF400C1C5C2 /* DFTileSpriteNode.swift */; };
 		586AE77723CF91AA00302347 /* AttackModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 586AE77623CF91AA00302347 /* AttackModelTests.swift */; };
+		589A27CF23D8EA1C00174DE7 /* SKShapeNode+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589A27CE23D8EA1C00174DE7 /* SKShapeNode+Extensions.swift */; };
 		58B39BD723D21C9600915858 /* BackpackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58B39BD623D21C9600915858 /* BackpackView.swift */; };
 		58C1AE4A23D19CEE003B5B5A /* TransmogrificationPotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C1AE4923D19CEE003B5B5A /* TransmogrificationPotion.swift */; };
 		58C1AE4C23D19E03003B5B5A /* KillMonsterPotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C1AE4B23D19E03003B5B5A /* KillMonsterPotion.swift */; };
@@ -268,6 +269,7 @@
 		3DF2928420A76242006671AC /* Board.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Board.swift; sourceTree = "<group>"; };
 		5605D6D221CC2DF400C1C5C2 /* DFTileSpriteNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DFTileSpriteNode.swift; sourceTree = "<group>"; };
 		586AE77623CF91AA00302347 /* AttackModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttackModelTests.swift; sourceTree = "<group>"; };
+		589A27CE23D8EA1C00174DE7 /* SKShapeNode+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SKShapeNode+Extensions.swift"; sourceTree = "<group>"; };
 		58B39BD623D21C9600915858 /* BackpackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackpackView.swift; sourceTree = "<group>"; };
 		58C1AE4923D19CEE003B5B5A /* TransmogrificationPotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransmogrificationPotion.swift; sourceTree = "<group>"; };
 		58C1AE4B23D19E03003B5B5A /* KillMonsterPotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KillMonsterPotion.swift; sourceTree = "<group>"; };
@@ -499,6 +501,7 @@
 			children = (
 				3DB270A622AE065300D9BF8B /* Data+Extensions.swift */,
 				3DA4E88A228FC156006E90D1 /* Util.swift */,
+				589A27CE23D8EA1C00174DE7 /* SKShapeNode+Extensions.swift */,
 				3DE657CC20B0AFD2003492DA /* Int+Extensions.swift */,
 				3DA4E882228E5D2F006E90D1 /* SKSpriteNode+Extensions.swift */,
 				3DA4E88E228FC860006E90D1 /* SKNode+Extension.swift */,
@@ -814,6 +817,7 @@
 				5605D6D321CC2DF400C1C5C2 /* DFTileSpriteNode.swift in Sources */,
 				3DA0A384230455B90041EF34 /* CGPoint+Extension.swift in Sources */,
 				3DA0A386230457580041EF34 /* SKLabelNode+Extension.swift in Sources */,
+				589A27CF23D8EA1C00174DE7 /* SKShapeNode+Extensions.swift in Sources */,
 				3D6AACD8222A324D00C77B24 /* CGRectHelpers.swift in Sources */,
 				3D0F47D92378A23F0004454B /* TutorialView.swift in Sources */,
 				3DE657CD20B0AFD2003492DA /* Int+Extensions.swift in Sources */,

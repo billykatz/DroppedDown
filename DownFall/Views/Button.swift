@@ -26,6 +26,7 @@ enum ButtonIdentifier: String {
     case sell
     case close
     case backpack
+    case backpackUse
     
     var title: String {
         switch self {
@@ -53,6 +54,8 @@ enum ButtonIdentifier: String {
             return "Sell"
         case .close:
             return "Close"
+        case .backpackUse:
+            return "Use"
         case .wallet, .infoPopup, .storeItem, .backpack:
             return ""
         }
@@ -63,7 +66,7 @@ protocol ButtonDelegate: class {
     func buttonTapped(_ button: Button)
 }
 
-class Button: SKSpriteNode {
+class Button: SKShapeNode {
     
     static let small = CGSize(width: 75, height: 30)
     static let medium = CGSize(width: 100, height: 50)
@@ -74,6 +77,11 @@ class Button: SKSpriteNode {
     var identifier: ButtonIdentifier
     let originalBackground: UIColor
     var showSelection = false
+    
+    var dropShadow: SKShapeNode?
+    var dropShadowOffset: CGFloat = 10.0
+    var unpressedPosition: CGPoint? = nil
+    var depressedPosition: CGPoint? = nil
     
     init(size: CGSize,
          delegate: ButtonDelegate,
@@ -92,8 +100,21 @@ class Button: SKSpriteNode {
         // set the original color so that we can toggle between that and the selected state
         originalBackground = backgroundColor
         
+        self._position = .zero
         //Call super
-        super.init(texture: nil, color: .white, size: size)
+        super.init()
+        self.path = CGPath(roundedRect: CGRect(x: -size.width/2, y: -size.height/2, width: size.width, height: size.height), cornerWidth: 5.0, cornerHeight: 5.0, transform: nil)
+        
+        //add the shadow
+        let shadowPath = CGPath(roundedRect: CGRect(x: -size.width/2, y: -size.height/2 - dropShadowOffset, width: size.width, height: size.height), cornerWidth: 5.0, cornerHeight: 5.0, transform: nil)
+        let shadowShape = SKShapeNode(path: shadowPath)
+        shadowShape.color = .storeBlack
+        self.dropShadow = shadowShape
+        
+        shadowShape.zPosition = -1
+        addChild(shadowShape)
+        
+        self.zPosition = precedence.rawValue
         
         // set the name to the identifier
         name = identifier.rawValue
@@ -117,6 +138,22 @@ class Button: SKSpriteNode {
         self.color = backgroundColor
     }
     
+    var _position: CGPoint
+    override var position: CGPoint {
+        get { return _position }
+        set {
+            super.position = newValue
+            _position = newValue
+            
+            // only set these once
+            if unpressedPosition == nil {
+                unpressedPosition = newValue
+            }
+            if depressedPosition == nil {
+                depressedPosition = newValue.translateVertically(-dropShadowOffset)
+            }
+        }
+    }
     
     
     required init?(coder aDecoder: NSCoder) {
@@ -133,6 +170,22 @@ extension Button {
         }
     }
     
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        //touch moved off our thing?
+//        guard let touch = touches.first else { return }
+//        let position = touch.location(in: self)
+//        for node in self.nodes(at: position) {
+//            if self.name != node.name {
+//                print(node.name)
+//            }
+//        }
+
+    }
+    
+    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+    
+    }
+    
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         if self.wasTouched(touches, with: event) {
             buttonPressBegan()
@@ -144,12 +197,26 @@ extension Button {
             color = originalBackground
         }
         delegate?.buttonTapped(self)
+        unpress()
     }
     
     private func buttonPressBegan() {
         if showSelection {
             color = .lightGray
         }
+        depress()
+    }
+    
+    private func depress() {
+        guard let newPosition = depressedPosition else { return }
+        self.position = newPosition
+        dropShadow?.removeFromParent()
+    }
+    
+    private func unpress() {
+        guard let newPosition = unpressedPosition else { return }
+        self.position = newPosition
+        addOptionalChild(dropShadow)
     }
 }
 

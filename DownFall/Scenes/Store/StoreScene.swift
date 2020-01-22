@@ -199,7 +199,7 @@ class StoreScene: SKScene {
         return popupNode
     }
     
-    private func show(_ node: SKSpriteNode) {
+    private func show(_ node: SKNode) {
         children.forEach {
             if $0.name == node.name {
                 $0.removeFromParent()
@@ -322,7 +322,7 @@ class StoreScene: SKScene {
     
     private func showButton(_ buttonName: String) {
         let button = transactionButton
-        let slideIn = SKAction.moveTo(x: frame.maxX - transactionButton.size.width/2,
+        let slideIn = SKAction.moveTo(x: frame.maxX - transactionButton.frame.width/2,
                                       duration: 0.5)
         show(button)
         button.run(slideIn)

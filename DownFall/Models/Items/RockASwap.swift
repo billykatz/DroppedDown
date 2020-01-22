@@ -44,5 +44,9 @@ struct RockASwap: Ability {
     var usage: Usage {
         return .once
     }
+    
+    
+    var targets: Int? { return 2 }
+    var targetTypes: [TileType]? { return TileType.rockCases }
 }
 

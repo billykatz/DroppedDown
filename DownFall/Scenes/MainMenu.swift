@@ -44,8 +44,8 @@ class MainMenu: SKScene {
                                     fontColor: .white,
                                     backgroundColor: .menuPurple)
         
-        tutorialButton.position = CGPoint.positionThis(tutorialButton.frame, below: startButton.frame, spacing: Style.Spacing.normal)
-        addChild(tutorialButton)
+//        tutorialButton.position = CGPoint.positionThis(tutorialButton.frame, below: startButton.frame, spacing: Style.Spacing.normal)
+//        addChild(tutorialButton)
         
         
         let playableRect = size.playableRect

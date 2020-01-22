@@ -173,16 +173,30 @@ extension CGPoint {
     }
     
     static func positionThis(_ this: CGRect?,
-                             outside that: CGRect,
+                             outside that: CGRect?,
                              anchor: Anchor,
+                             align: Verticality = .center,
                              padding: CGFloat = 0.0,
                              spacing: CGFloat = 0.0) -> CGPoint {
-        guard let this = this else { return .zero }
-        switch anchor {
-        case .left:
-            return CGPoint(x: that.minX - this.width/2, y: this.center.y + padding)
-        case .right:
-            return CGPoint(x: that.maxX + this.width/2, y: this.center.y + padding)
+        guard let this = this, let that = that else { return .zero }
+        switch (anchor, align) {
+        case (.left, .top):
+            return CGPoint(x: that.minX - this.width/2, y: that.maxY - this.height/2 + padding)
+            
+        case (.left, .center):
+            return CGPoint(x: that.minX - this.width/2, y: that.center.y + padding)
+            
+        case (.left, .bottom):
+            return CGPoint(x: that.minX - this.width/2, y: that.minY + this.height/2 + padding)
+            
+        case (.right, .top):
+            return CGPoint(x: that.maxX + this.width/2, y: that.maxY - this.height/2 + padding)
+            
+        case (.right, .center):
+            return CGPoint(x: that.maxX + this.width/2, y: that.center.y + padding)
+            
+        case (.right, .bottom):
+            return CGPoint(x: that.maxX + this.width/2, y: that.minY + this.height/2 + padding)
         }
     }
     
@@ -197,4 +211,9 @@ extension CGPoint {
         case center
         case bottom
     }
+    
+    func translateVertically(_ yOffset: CGFloat) -> CGPoint {
+        return CGPoint(x: self.x, y: self.y + yOffset)
+    }
 }
+

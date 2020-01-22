@@ -51,6 +51,10 @@ struct TransmogrificationPotion: Ability {
     func blocksDamage(from: Direction) -> Int? {
         return nil
     }
+    
+    
+    var targets: Int? { return 1 }
+    var targetTypes: [TileType]? { return [TileType.monster(.zero)] }
 }
 
 

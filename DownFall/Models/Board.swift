@@ -99,7 +99,7 @@ class Board: Equatable {
              .selectLevel,
              .newTurn,
              .tutorial,
-             .visitStore:
+             .visitStore, .itemUseSelected, .itemUseCanceled:
             transformation = nil
         }
         

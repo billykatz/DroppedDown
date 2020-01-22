@@ -63,6 +63,8 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
     case newTurn
     case tutorial(TutorialStep)
     case visitStore
+    case itemUseSelected
+    case itemUseCanceled
     
     var debugDescription: String {
         switch self {
@@ -106,6 +108,10 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
             return "Tutorial with \(dialog)"
         case .visitStore:
             return "Visiting store between levels"
+        case .itemUseCanceled:
+            return "Item use canceled"
+        case .itemUseSelected:
+            return "Item use selected"
         }
     }
 }

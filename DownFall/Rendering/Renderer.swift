@@ -192,7 +192,7 @@ class Renderer: SKSpriteNode {
              .monsterDies, .attack, .gameWin,
              .animationsFinished, .reffingFinished,
              .boardBuilt,. collectItem, .selectLevel, .transformation, .touchBegan,
-             .visitStore:
+             .visitStore, .itemUseSelected, .itemUseCanceled:
             ()
         }
     }

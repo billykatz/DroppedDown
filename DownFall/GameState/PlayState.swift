@@ -17,12 +17,12 @@ struct PlayState: GameState {
         case .gameWin,. gameLose,. pause,
              .attack, .transformation,
              .touch, .monsterDies, .rotateCounterClockwise, .rotateClockwise,
-             .boardBuilt, .touchBegan, .tutorial:
+             .boardBuilt, .touchBegan, .tutorial, .itemUseSelected:
             return true
         case .animationsFinished, .play,
              .reffingFinished, .playAgain, .collectItem,
              .selectLevel, .newTurn,
-             .visitStore:
+             .visitStore, .itemUseCanceled:
             return false
         }
     }
@@ -47,7 +47,9 @@ struct PlayState: GameState {
             } else {
                 return AnyGameState(PlayState())
             }
-        case .animationsFinished, .play, .transformation, .reffingFinished, .playAgain,. selectLevel,       .newTurn, .visitStore:
+        case .itemUseSelected:
+            return AnyGameState(TargetingState())
+        case .animationsFinished, .play, .transformation, .reffingFinished, .playAgain,. selectLevel,       .newTurn, .visitStore, .itemUseCanceled:
             return nil
         }
         

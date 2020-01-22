@@ -11,6 +11,7 @@ import SpriteKit
 protocol LabelDelegate: class {
     func labelPressed(_ label: Label)
     func labelPressBegan(_ label: Label)
+    func labelPressCancelled(_ label: Label)
 }
 
 class Label: ParagraphNode {
@@ -42,10 +43,23 @@ class Label: ParagraphNode {
 
 extension Label {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if self.wasTouched(touches, with: event) {
+        guard let touch = touches.first else { return }
+        let position = touch.location(in: self)
+        let translatedPosition = CGPoint(x: self.frame.center.x + position.x, y: self.frame.center.y + position.y)
+        if self.frame.contains(translatedPosition) {
             self.delegate?.labelPressed(self)
+        } else {
+            self.delegate?.labelPressCancelled(self)
         }
         
+    }
+    
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        
+    }
+    
+    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+        self.delegate?.labelPressCancelled(self)
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {

@@ -165,34 +165,40 @@ class Button: SKShapeNode {
 
 extension Button {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if self.wasTouched(touches, with: event) {
-            buttonWasPressed()
+        guard let touch = touches.first else { return }
+        let position = touch.location(in: self)
+        let translatedPosition = CGPoint(x: self.frame.center.x + position.x, y: self.frame.center.y + position.y)
+        if self.frame.contains(translatedPosition) {
+            buttonWasTapped()
+        } else {
+            buttonTapWasCancelled()
         }
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        //touch moved off our thing?
-//        guard let touch = touches.first else { return }
-//        let position = touch.location(in: self)
-//        for node in self.nodes(at: position) {
-//            if self.name != node.name {
-//                print(node.name)
-//            }
-//        }
 
     }
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-    
+        if self.wasTouched(touches, with: event) {
+            buttonTapWasCancelled()
+        }
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         if self.wasTouched(touches, with: event) {
-            buttonPressBegan()
+            buttonTapBegan()
         }
     }
     
-    private func buttonWasPressed() {
+    private func buttonTapWasCancelled() {
+        if showSelection {
+            color = originalBackground
+        }
+        unpress()
+    }
+    
+    private func buttonWasTapped() {
         if showSelection {
             color = originalBackground
         }
@@ -200,7 +206,7 @@ extension Button {
         unpress()
     }
     
-    private func buttonPressBegan() {
+    private func buttonTapBegan() {
         if showSelection {
             color = .lightGray
         }
@@ -224,11 +230,15 @@ extension Button {
 
 extension Button: LabelDelegate {
     func labelPressed(_ label: Label) {
-        buttonWasPressed()
+        buttonWasTapped()
     }
     
     func labelPressBegan(_ label: Label) {
-        buttonPressBegan()
+        buttonTapBegan()
+    }
+    
+    func labelPressCancelled(_ label: Label) {
+        buttonTapWasCancelled()
     }
     
 }

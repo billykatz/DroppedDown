@@ -79,10 +79,13 @@ class Renderer: SKSpriteNode {
         
         foreground = givenForeground
         
-        self.backpackView = BackpackView(playableRect: playableRect)
+        self.backpackView = BackpackView(playableRect: playableRect, viewModel: TargetingViewModel(), levelSize: level.boardSize)
+
         
         super.init(texture: nil, color: .clear, size: CGSize.zero)
         
+        
+        self.backpackView.touchDelegate = self
         isUserInteractionEnabled = true
 
         foreground.position = playableRect.center
@@ -150,11 +153,18 @@ class Renderer: SKSpriteNode {
             case .monsterDies:
                 let sprites = createSprites(from: trans.endTiles)
                 animationsFinished(for: sprites, endTiles: trans.endTiles)
+            case .itemUsed:
+                if let tiles = trans.endTiles, let playerCoord = getTilePosition(.player(.zero), tiles: tiles), case TileType.player(let data) = tiles[playerCoord].type {
+                    backpackView.update(with: data)
+                }
+                
+                let sprites = createSprites(from: trans.endTiles)
+                animationsFinished(for: sprites, endTiles: trans.endTiles)
             case .collectItem:
                 computeNewBoard(for: trans)
             case .reffingFinished:
                 () // Purposely left blank.
-            case .touchBegan:
+            case .touchBegan, .itemUseSelected:
                 ()
             case .newTurn:
                 let sprites = createSprites(from: trans.endTiles)
@@ -192,7 +202,7 @@ class Renderer: SKSpriteNode {
              .monsterDies, .attack, .gameWin,
              .animationsFinished, .reffingFinished,
              .boardBuilt,. collectItem, .selectLevel, .transformation, .touchBegan,
-             .visitStore, .itemUseSelected, .itemUseCanceled, .itemCanBeUsed:
+             .visitStore, .itemUseSelected, .itemUseCanceled, .itemCanBeUsed, .itemUsed:
             ()
         }
     }

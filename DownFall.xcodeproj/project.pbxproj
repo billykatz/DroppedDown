@@ -132,6 +132,7 @@
 		589A27D123D90CD900174DE7 /* TargetingState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589A27D023D90CD900174DE7 /* TargetingState.swift */; };
 		589A27D423D90FE000174DE7 /* TargetingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589A27D323D90FE000174DE7 /* TargetingViewModel.swift */; };
 		589A27D623D9210900174DE7 /* TargetingViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589A27D523D9210900174DE7 /* TargetingViewModelTests.swift */; };
+		589A27D823D9351A00174DE7 /* TargetingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589A27D723D9351A00174DE7 /* TargetingView.swift */; };
 		58B39BD723D21C9600915858 /* BackpackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58B39BD623D21C9600915858 /* BackpackView.swift */; };
 		58C1AE4A23D19CEE003B5B5A /* TransmogrificationPotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C1AE4923D19CEE003B5B5A /* TransmogrificationPotion.swift */; };
 		58C1AE4C23D19E03003B5B5A /* KillMonsterPotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C1AE4B23D19E03003B5B5A /* KillMonsterPotion.swift */; };
@@ -276,6 +277,7 @@
 		589A27D023D90CD900174DE7 /* TargetingState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetingState.swift; sourceTree = "<group>"; };
 		589A27D323D90FE000174DE7 /* TargetingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetingViewModel.swift; sourceTree = "<group>"; };
 		589A27D523D9210900174DE7 /* TargetingViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetingViewModelTests.swift; sourceTree = "<group>"; };
+		589A27D723D9351A00174DE7 /* TargetingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetingView.swift; sourceTree = "<group>"; };
 		58B39BD623D21C9600915858 /* BackpackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackpackView.swift; sourceTree = "<group>"; };
 		58C1AE4923D19CEE003B5B5A /* TransmogrificationPotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransmogrificationPotion.swift; sourceTree = "<group>"; };
 		58C1AE4B23D19E03003B5B5A /* KillMonsterPotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KillMonsterPotion.swift; sourceTree = "<group>"; };
@@ -561,6 +563,7 @@
 		3DE87C8C2235D03300D750CF /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				589A27D223D90FD500174DE7 /* Targeting */,
 				3DE87C8F22374C2C00D750CF /* Button.swift */,
 				58B39BD623D21C9600915858 /* BackpackView.swift */,
 				3DD5AA0C2398025400FB63F4 /* Styling.swift */,
@@ -606,7 +609,6 @@
 		3DF2924C20A37FEE006671AC /* DownFall */ = {
 			isa = PBXGroup;
 			children = (
-				589A27D223D90FD500174DE7 /* Targeting */,
 				3DF0A6B12379CC0500941305 /* Fonts */,
 				3DC072C22375451D0046F224 /* Rules */,
 				3DF2924D20A37FEE006671AC /* AppDelegate.swift */,
@@ -689,8 +691,10 @@
 			isa = PBXGroup;
 			children = (
 				589A27D323D90FE000174DE7 /* TargetingViewModel.swift */,
+				589A27D723D9351A00174DE7 /* TargetingView.swift */,
 			);
 			name = Targeting;
+			path = ..;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -821,6 +825,7 @@
 				3D68BF9622FF3D9000FC9B10 /* AbilityModel.swift in Sources */,
 				3DF2925620A37FEE006671AC /* GameViewController.swift in Sources */,
 				3D7EF45C21D18D9000A2D9E8 /* Transformation.swift in Sources */,
+				589A27D823D9351A00174DE7 /* TargetingView.swift in Sources */,
 				3D6AACE4222CD38E00C77B24 /* Controls.swift in Sources */,
 				3D4F569622B88A90003695D8 /* HapticGenerator.swift in Sources */,
 				3D3D31EC23ABEFA8002B87EE /* LevelConstructor.swift in Sources */,

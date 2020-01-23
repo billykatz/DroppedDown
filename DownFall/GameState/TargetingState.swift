@@ -16,8 +16,10 @@ struct TargetingState: GameState {
         switch input.type {
         case .itemUseCanceled:
             return AnyGameState(PlayState())
-        case .itemCanBeUsed:
+        case .itemCanBeUsed, .itemUseSelected:
             return AnyGameState(TargetingState())
+        case .itemUsed:
+            return AnyGameState(ComputingState())
         case .transformation(let trans):
             guard let inputType = trans.inputType else { fatalError() }
             if case InputType.itemUseSelected(_) = inputType {
@@ -31,7 +33,7 @@ struct TargetingState: GameState {
 
     func shouldAppend(_ input: Input) -> Bool {
         switch input.type {
-        case .itemUseCanceled, .itemCanBeUsed:
+        case .itemUseCanceled, .itemCanBeUsed, .itemUseSelected, .itemUsed:
             return true
         case .transformation(let trans):
             guard let inputType = trans.inputType else { fatalError() }

@@ -41,7 +41,8 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
                                         .tutorial(.zero),
                                         .itemUseCanceled,
                                         .itemUseSelected(.zero),
-                                        .itemCanBeUsed(false)
+                                        .itemCanBeUsed(false),
+                                        .itemUsed(.zero, [])
     ]
     
     typealias AllCases = [InputType]
@@ -69,6 +70,7 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
     case itemUseSelected(AnyAbility)
     case itemUseCanceled
     case itemCanBeUsed(Bool)
+    case itemUsed(AnyAbility, [TileCoord])
     
     var debugDescription: String {
         switch self {
@@ -77,9 +79,9 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
         case .touch:
             return "Touch"
         case .rotateCounterClockwise:
-            return "Rotate Left"
+            return "Rotate Counter clockwise"
         case .rotateClockwise:
-            return "Rotate Right"
+            return "Rotate clockwise"
         case .monsterDies:
             return "Monster Dies"
         case .gameWin:
@@ -118,6 +120,8 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
             return "Item use selected"
         case .itemCanBeUsed(let used):
             return "item can be used: \(used)"
+        case .itemUsed(let ability, let targets):
+            return "\(ability.textureName) used on targets \(targets)"
         }
     }
 }

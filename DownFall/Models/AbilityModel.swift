@@ -68,6 +68,10 @@ extension AnyAbility: Ability {
         return _ability.usage
     }
     
+    var heal: Int? {
+        return _ability.heal
+    }
+    
     
     var targets: Int? { return _ability.targets }
     var targetTypes: [TileType]? { _ability.targetTypes }
@@ -93,6 +97,7 @@ protocol Ability {
     var usage: Usage { get }
     var targets: Int? { get }
     var targetTypes: [TileType]? { get }
+    var heal: Int? { get }
     
     func blocksDamage(from: Direction) -> Int?
     func animatedColumns() -> Int?

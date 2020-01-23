@@ -140,6 +140,16 @@ struct EntityModel: Equatable, Decodable {
     func willAttackNextTurn() -> Bool {
         return attack.willAttackNextTurn()
     }
+    
+    func heal(for amount: Int) -> EntityModel {
+        return update(hp: self.hp + amount)
+    }
+    
+    func use(_ ability: Ability) -> EntityModel {
+        var newAbilities = self.abilities
+        newAbilities.removeFirst( where: { $0 == AnyAbility(ability) })
+        return update(abilities: newAbilities)
+    }
 
 }
 

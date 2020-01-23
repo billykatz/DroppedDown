@@ -20,6 +20,8 @@ struct Identifiers {
     static let gemSpriteLabel = "gemSpriteLabel"
     static let goldSpriteLabel = "goldSpriteLabel"
     static let backpackSprite = "backpack"
+    static let redReticleSprite = "redReticle"
+    static let greenReticleSprite = "greenReticle"
     
     static let mainMenuScene = "MainMenu"
 }

@@ -10,8 +10,8 @@ import SpriteKit
 import UIKit
 
 extension CGRect {
-    func subtractBottomFourth() -> CGRect {
-        return CGRect(x: self.origin.x, y: self.origin.y, width: self.width, height: self.height - self.height/4)
+    func subtractBottomFifth() -> CGRect {
+        return CGRect(x: self.origin.x, y: self.origin.y, width: self.width, height: self.height - self.height/5)
     }
 }
 
@@ -43,6 +43,7 @@ class GameScene: SKScene {
     
     // targeting
     private var targetingViewModel: TargetingViewModel?
+    private var targetingView: TargetingView?
     
     //touch state
     private var touchWasSwipe = false
@@ -91,13 +92,10 @@ class GameScene: SKScene {
         
         
         // SwipeRecognizerView
-        swipeRecognizerView = SwipeRecognizerView(frame: view.frame.subtractBottomFourth(),
+        swipeRecognizerView = SwipeRecognizerView(frame: view.frame.subtractBottomFifth(),
                                                         target: self,
                                                         swiped: #selector(swiped))
         view.addSubview(swipeRecognizerView!)
-        
-        //targeting view model
-        self.targetingViewModel = TargetingViewModel()
         
         // Register for inputs we care about
         Dispatch.shared.register { [weak self] input in

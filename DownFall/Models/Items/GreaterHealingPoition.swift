@@ -47,7 +47,7 @@ struct GreaterHealingPotion: Ability {
         return .once
     }
     
-    
+    var heal: Int? { return 2 }
     var targets: Int? { return 1 }
     var targetTypes: [TileType]? { return [TileType.player(.zero)] }
 }

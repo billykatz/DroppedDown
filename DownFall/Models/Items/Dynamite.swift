@@ -47,7 +47,7 @@ struct Dynamite: Ability {
         return .once
     }
     
-    
+    var heal: Int? { return nil }
     var targets: Int? { return 1 }
     var targetTypes: [TileType]? { return TileType.rockCases }
 }

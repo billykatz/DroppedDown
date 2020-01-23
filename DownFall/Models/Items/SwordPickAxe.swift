@@ -48,7 +48,7 @@ struct SwordPickAxe: Ability {
         return .oneRun
     }
     
-    
+    var heal: Int? { return nil }
     var targets: Int? { return nil }
     var targetTypes: [TileType]? { return nil }
 }

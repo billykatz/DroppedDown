@@ -17,52 +17,76 @@ protocol TargetingOutputs {
     var toastMessage: String { get }
     var currentTargets: [Target] { get }
     var legallyTargeted: Bool { get }
+    
 }
 
 protocol TargetingInputs {
     
     /// Use this to choose targets
     func didTarget(_ coord: TileCoord)
+    
+    /// Use this to consume the item
+    func didUse()
 }
 
 protocol Targeting: TargetingOutputs, TargetingInputs {}
 
 class TargetingViewModel: Targeting {
     
-    var ability: AnyAbility?
+    public var updateCallback: (() -> Void)?
+    
+    var ability: AnyAbility? {
+        didSet {
+            
+            currentTargets = []
+            
+            if ability == nil {
+                InputQueue.append(Input(InputType.itemUseCanceled))
+            } else {
+                if oldValue == nil {
+                    InputQueue.append(Input(InputType.itemUseSelected(ability!)))
+                }
+                autoTarget()
+            }
+            updateCallback?()
+        }
+    }
     
     var numberOfTargets: Int {
         return ability?.targets ?? 0
     }
     
-    lazy var typesOfTargets: [TileType] = {
+    var typesOfTargets: [TileType] {
         return ability?.targetTypes ?? []
-    }()
+    }
     
-    lazy var toastMessage: String = {
-        var baseString = "Choose "
-        var targetTypeString = ""
-        let types = self.typesOfTargets.map {
+    var toastMessage: String {
+        if ability == nil {
+            return ""
+        }
+        let baseString = "Choose "
+        let types = Set<String>(self.typesOfTargets.map {
             return $0.humanReadable
-            }.joined(separator: ",")
-        return baseString + "\(self.numberOfTargets)" + targetTypeString
-    }()
+        }).joined(separator: ",")
+        return baseString + "\(self.numberOfTargets) " + types
+    }
     
     var currentTargets: [Target] = [] {
         didSet {
+            self.updateCallback?()
             InputQueue.append(Input(InputType.itemCanBeUsed(legallyTargeted)))
         }
     }
     
     
-    lazy var legallyTargeted: Bool = {
+    var legallyTargeted: Bool {
         return self.currentTargets.allSatisfy({
             return $0.isLegal
         }) && self.currentTargets.count == self.numberOfTargets
-    }()
+    }
     
     
-    private var tiles: [[Tile]]? = [] {
+    private var tiles: [[Tile]]? = nil {
         didSet {
             autoTarget()
         }
@@ -73,15 +97,20 @@ class TargetingViewModel: Targeting {
             switch input.type {
             case .itemUseSelected(let ability):
                 self?.ability = ability
+                self?.updateCallback?()
             case .transformation(let trans):
                 if let inputType = trans.inputType,
                     case InputType.itemUseSelected(_) = inputType,
                     let endTiles = trans.endTiles
                 {
                     self?.tiles = endTiles
+                    self?.updateCallback?()
                 }
+                
             case .itemUseCanceled:
                 ()
+            case .itemUsed:
+                self?.ability = nil
             default:
                 ()
             }
@@ -113,11 +142,23 @@ class TargetingViewModel: Targeting {
             //add the new target
            currentTargets.append(Target(coord: coord, isLegal: isTargetLegal(coord)))
         } else {
-            // move the most recently placed
-            currentTargets.removeLast()
+            // move the most recently placed unless there is one that is "illegal" then move that one.
+            let count = currentTargets.count
+            currentTargets.removeFirst(where: { !$0.isLegal })
+            if currentTargets.count == count {
+                currentTargets.removeLast()
+            }
             //add the new target
             currentTargets.append(Target(coord: coord, isLegal: isTargetLegal(coord)))
         }
+    }
+    
+    func didUse() {
+        guard legallyTargeted, let ability = ability else { fatalError("Something is out of sync. Use button should only be clickable when we legally targeted") }
+        InputQueue.append(
+            Input(.itemUsed(ability, currentTargets.map { $0.coord }))
+        )
+        
     }
     
     private func autoTarget() {
@@ -129,6 +170,21 @@ class TargetingViewModel: Targeting {
         if targetCoords.count <= numberOfTargets {
             // targets are necessarily legal because we looped over types of targets
             currentTargets = targetCoords.map { Target(coord: $0, isLegal: true) }
+        }
+    }
+}
+
+extension Array {
+    mutating func removeFirst(where predicate: (Element) -> Bool) {
+        var indexToRemove: Int?
+        for (index, el) in self.enumerated() {
+            if predicate(el) {
+                indexToRemove = index
+                break
+            }
+        }
+        if indexToRemove != nil {
+            self.remove(at: indexToRemove!)
         }
     }
 }

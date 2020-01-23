@@ -14,10 +14,10 @@ struct Style {
     static let paragraphPadding: CGFloat = 8.0
     
     struct Backpack {
-        static let heightCoefficient = CGFloat(0.25)
+        static let heightCoefficient = CGFloat(0.20)
         static let backpackViewSizeCoefficient = CGFloat(0.75)
-        static let itemSize = CGSize(width: 100, height: 100)
-        static let ctaButton = CGFloat(300)
+        static let itemSize = CGSize(width: 150, height: 150)
+        static let ctaButton = CGFloat(200)
     }
     
     struct Store {

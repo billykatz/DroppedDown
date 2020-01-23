@@ -7,6 +7,8 @@
 //
 
 struct DoubleAttack: Ability {
+    var heal: Int? { return nil }
+    
     
     func animatedColumns() -> Int? {
         return nil

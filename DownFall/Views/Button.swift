@@ -27,6 +27,8 @@ enum ButtonIdentifier: String {
     case close
     case backpack
     case backpackUse
+    case backpackCancel
+    case next
     
     var title: String {
         switch self {
@@ -56,6 +58,10 @@ enum ButtonIdentifier: String {
             return "Close"
         case .backpackUse:
             return "Use"
+        case .backpackCancel:
+            return "Cancel"
+        case .next:
+            return "Next"
         case .wallet, .infoPopup, .storeItem, .backpack:
             return ""
         }
@@ -82,6 +88,8 @@ class Button: SKShapeNode {
     var dropShadowOffset: CGFloat = 10.0
     var unpressedPosition: CGPoint? = nil
     var depressedPosition: CGPoint? = nil
+    
+    var isDisabled: Bool = false
     
     init(size: CGSize,
          delegate: ButtonDelegate,
@@ -191,6 +199,15 @@ extension Button {
         }
     }
     
+    public func removeShadow() {
+        dropShadow?.removeFromParent()
+    }
+    public func addShadow() {
+        dropShadow?.removeFromParent()
+        self.addOptionalChild(dropShadow)
+    }
+    
+    
     private func buttonTapWasCancelled() {
         if showSelection {
             color = originalBackground
@@ -199,6 +216,7 @@ extension Button {
     }
     
     private func buttonWasTapped() {
+        guard !isDisabled else { return }
         if showSelection {
             color = originalBackground
         }
@@ -207,6 +225,7 @@ extension Button {
     }
     
     private func buttonTapBegan() {
+        guard !isDisabled else { return }
         if showSelection {
             color = .lightGray
         }

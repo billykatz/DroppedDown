@@ -38,7 +38,10 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
                                         .playAgain,
                                         .reffingFinished(newTurn: false),
                                         .collectItem(TileCoord(0,0), .zero, 0),
-                                        .tutorial(.zero)
+                                        .tutorial(.zero),
+                                        .itemUseCanceled,
+                                        .itemUseSelected(.zero),
+                                        .itemCanBeUsed(false)
     ]
     
     typealias AllCases = [InputType]
@@ -63,8 +66,9 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
     case newTurn
     case tutorial(TutorialStep)
     case visitStore
-    case itemUseSelected
+    case itemUseSelected(AnyAbility)
     case itemUseCanceled
+    case itemCanBeUsed(Bool)
     
     var debugDescription: String {
         switch self {
@@ -112,6 +116,8 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
             return "Item use canceled"
         case .itemUseSelected:
             return "Item use selected"
+        case .itemCanBeUsed(let used):
+            return "item can be used: \(used)"
         }
     }
 }

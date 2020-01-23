@@ -41,6 +41,9 @@ class GameScene: SKScene {
     //level
     private var level: Level?
     
+    // targeting
+    private var targetingViewModel: TargetingViewModel?
+    
     //touch state
     private var touchWasSwipe = false
     private var touchWasCanceled = false
@@ -88,11 +91,13 @@ class GameScene: SKScene {
         
         
         // SwipeRecognizerView
-    
         swipeRecognizerView = SwipeRecognizerView(frame: view.frame.subtractBottomFourth(),
                                                         target: self,
                                                         swiped: #selector(swiped))
         view.addSubview(swipeRecognizerView!)
+        
+        //targeting view model
+        self.targetingViewModel = TargetingViewModel()
         
         // Register for inputs we care about
         Dispatch.shared.register { [weak self] input in
@@ -102,7 +107,7 @@ class GameScene: SKScene {
                 else { return }
                 
                 self.foreground.removeAllChildren()
-                if case let TileType.player = self.board.tiles[playerIndex].type {
+                if case TileType.player = self.board.tiles[playerIndex].type {
                     self.removeFromParent()
                     self.gameSceneDelegate?.resetToMain(self)
                 }

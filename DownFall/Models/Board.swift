@@ -90,6 +90,14 @@ class Board: Equatable {
                 InputQueue.append(input)
                 transformation = nil
             }
+        case .itemUseSelected(let ability):
+            InputQueue.append(
+                Input(
+                    InputType.transformation(
+                        Transformation(transformation: nil, inputType: .itemUseSelected(ability), endTiles: self.tiles)
+                    )
+                )
+            )
         case .gameLose(_),
              .play,
              .pause,
@@ -99,7 +107,8 @@ class Board: Equatable {
              .selectLevel,
              .newTurn,
              .tutorial,
-             .visitStore, .itemUseSelected, .itemUseCanceled:
+             .visitStore,
+             .itemUseCanceled, .itemCanBeUsed:
             transformation = nil
         }
         

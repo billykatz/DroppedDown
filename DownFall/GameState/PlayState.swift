@@ -22,7 +22,7 @@ struct PlayState: GameState {
         case .animationsFinished, .play,
              .reffingFinished, .playAgain, .collectItem,
              .selectLevel, .newTurn,
-             .visitStore, .itemUseCanceled:
+             .visitStore, .itemUseCanceled, .itemCanBeUsed:
             return false
         }
     }
@@ -49,7 +49,7 @@ struct PlayState: GameState {
             }
         case .itemUseSelected:
             return AnyGameState(TargetingState())
-        case .animationsFinished, .play, .transformation, .reffingFinished, .playAgain,. selectLevel,       .newTurn, .visitStore, .itemUseCanceled:
+        case .animationsFinished, .play, .transformation, .reffingFinished, .playAgain,. selectLevel,       .newTurn, .visitStore, .itemUseCanceled, .itemCanBeUsed:
             return nil
         }
         

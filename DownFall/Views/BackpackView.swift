@@ -194,8 +194,8 @@ extension BackpackView: ButtonDelegate {
             toggleItemArea()
             selectedAbility = nil
         } else if button.identifier == ButtonIdentifier.backpackUse {
-            InputQueue.append(Input(.itemUseSelected))
-            print("use selected ability \(selectedAbility)")
+            guard let selectedAbility = selectedAbility else { return }
+            InputQueue.append(Input(.itemUseSelected(selectedAbility)))
         }
     }
 }

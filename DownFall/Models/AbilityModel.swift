@@ -9,11 +9,18 @@
 import Foundation
 import SpriteKit
 
-struct AnyAbility {
+struct AnyAbility: Hashable {
     let _ability: Ability
     init(_ ability: Ability) {
         _ability = ability
     }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(_ability.textureName.hashValue)
+    }
+    
+    //TODO: make hack better
+    static let zero: AnyAbility = AnyAbility(DoubleAttack())
 }
 
 extension AnyAbility: Ability {

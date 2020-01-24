@@ -28,7 +28,6 @@ enum ButtonIdentifier: String {
     case backpack
     case backpackUse
     case backpackCancel
-    case next
     
     var title: String {
         switch self {
@@ -60,8 +59,6 @@ enum ButtonIdentifier: String {
             return "Use"
         case .backpackCancel:
             return "Cancel"
-        case .next:
-            return "Next"
         case .wallet, .infoPopup, .storeItem, .backpack:
             return ""
         }

@@ -7,6 +7,13 @@
 //
 
 struct DoubleAttack: Ability {
+    
+    var count: Int
+    
+    init(count: Int = 0) {
+        self.count = 0
+    }
+    
     var heal: Int? { return nil }
     
     

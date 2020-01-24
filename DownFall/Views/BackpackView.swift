@@ -16,40 +16,50 @@ import SpriteKit
 
 class BackpackView: SKSpriteNode {
     
-    let viewModel: TargetingViewModel
+    // view model
+    private let viewModel: TargetingViewModel
     
+    // touch delegate
     weak var touchDelegate: Renderer?
     
+    // constants
+    private let targetingAreaName = "targetingArea"
     
-    private var tileSize: CGFloat
-    private var boardSize: CGFloat
-    
-    private var toastMessageContainer: SKShapeNode?
-    private let playableRect: CGRect
-    private var background: SKSpriteNode
-    private var targetingArea: SKSpriteNode
-    private var viewContainer: SKSpriteNode
-    
-    private var inventoryArea: SKSpriteNode
-    
-    private var itemArea: SKSpriteNode?
-    private var descriptionArea: SKSpriteNode?
-    private var ctaButton: Button?
-    private var cancelButton: Button?
-    private var nextItemsButton: Button?
+    // variables
+    private var height: CGFloat = 0.0
     private var abilities: [AnyAbility] = []
     
-    let targetingAreaName = "targetingArea"
+    // tile sizes and coordinates
+    private var tileSize: CGFloat
+    private var boardSize: CGFloat
+    private var bottomLeft: CGPoint
+    private let playableRect: CGRect
+        
+    //container views
+    private var background: SKSpriteNode
+    private var viewContainer: SKSpriteNode
+    private var inventoryArea: SKSpriteNode
+
+    // targeting area
+    private var targetingArea: SKSpriteNode
     
-    var selectedAbility: AnyAbility? = nil {
-        didSet {
-            viewModel.ability = selectedAbility
-            updateDescription(with: selectedAbility)
-            updateCTAButton(with: selectedAbility)
-        }
-    }
+    // views with content
+    private var itemArea: SKSpriteNode
+    private var descriptionArea: SKSpriteNode
+    private var toastMessageContainer: SKShapeNode?
     
-    var height: CGFloat = 0.0
+    // buttons
+    private lazy var ctaButton: Button = {
+        let button = Button(size: CGSize(width: Style.Backpack.ctaButton, height: 100.0), delegate: self, identifier: .backpackUse, precedence: .foreground, fontSize: UIFont.extraLargeSize, fontColor: UIColor.black, backgroundColor: .highlightGold)
+        button.position = CGPoint.positionThis(button.frame, outside: descriptionArea.frame, anchor: .right, align: .top, padding: -Style.Padding.more)
+        return button
+    }()
+    
+    private lazy var cancelButton: Button = {
+        let button = Button(size: CGSize(width: Style.Backpack.ctaButton, height: 100.0), delegate: self, identifier: .backpackCancel, precedence: .foreground, fontSize: UIFont.extraLargeSize, fontColor: UIColor.red, backgroundColor: UIColor.eggshellWhite)
+        button.position = CGPoint.positionThis(button.frame, outsideOf: ctaButton.frame, verticality: .bottom, spacing: Style.Padding.more)
+        return button
+    }()
     
     init(playableRect: CGRect, viewModel: TargetingViewModel, levelSize: Int) {
         self.playableRect = playableRect
@@ -61,14 +71,14 @@ class BackpackView: SKSpriteNode {
         self.viewModel = viewModel
         
         //get the tile size
-        self.tileSize = 0.9 * (playableRect.width / CGFloat(levelSize))
+        self.tileSize = GameScope.boardSizeCoefficient * (playableRect.width / CGFloat(levelSize))
         
         // view container
         self.viewContainer = SKSpriteNode(texture: nil, color: .clear, size: playableRect.size)
         self.viewContainer.zPosition = Precedence.foreground.rawValue
         
         // background view
-        self.background = SKSpriteNode(color: .foregroundBlue, size: CGSize(width: playableRect.width, height: height))//setting the background position
+        self.background = SKSpriteNode(color: .foregroundBlue, size: CGSize(width: playableRect.width, height: height))
         self.background.position = CGPoint.positionThis(background.frame, inBottomOf: self.viewContainer.frame)
         
         //targeting area
@@ -87,171 +97,75 @@ class BackpackView: SKSpriteNode {
         let bottomLeftY = playableRect.minY + marginHeight/2 + tileSize/2
         self.bottomLeft = CGPoint(x: bottomLeftX, y: bottomLeftY)
         
-        super.init(texture: nil, color: .clear, size: CGSize(width: playableRect.width, height: height))
-        // "bind" to to the view model
-        self.viewModel.updateCallback = self.updated
-        
-        // setting our frame size
-//        self.size = CGSize(width: playableRect.width, height: playableRect.height)
-        
         // item and description areas
         itemArea = SKSpriteNode(color: .clear, size: CGSize(width: playableRect.width * 3 / 4, height: height/2))
-        itemArea?.position = CGPoint.positionThis(itemArea?.frame, inBottomOf: self.inventoryArea.frame, anchor: .left)
+        itemArea.position = CGPoint.positionThis(itemArea.frame, inBottomOf: self.inventoryArea.frame, anchor: .left)
         
         descriptionArea = SKSpriteNode(color: .clear, size: CGSize(width: playableRect.width * 3 / 4, height: height/2))
-        descriptionArea?.position = CGPoint.positionThis(descriptionArea?.frame, outsideOf: itemArea?.frame, verticality: .top, spacing: -20)
-        
-        //cta button
-        ctaButton = Button(size: CGSize(width: Style.Backpack.ctaButton, height: 100.0), delegate: self, identifier: .backpackUse, precedence: .foreground, fontSize: UIFont.extraLargeSize, fontColor: UIColor.black, backgroundColor: .highlightGold)
-        ctaButton?.position = CGPoint.positionThis(ctaButton?.frame, outside: descriptionArea?.frame, anchor: .right, align: .top, padding: -Style.Padding.more)
-        
-        
-        //cancel button
-        self.cancelButton = Button(size: CGSize(width: Style.Backpack.ctaButton, height: 100.0), delegate: self, identifier: .backpackCancel, precedence: .foreground, fontSize: UIFont.extraLargeSize, fontColor: UIColor.red, backgroundColor: UIColor.eggshellWhite)
-        self.cancelButton?.position = CGPoint.positionThis(self.cancelButton?.frame, outsideOf: ctaButton?.frame, verticality: .bottom, spacing: Style.Padding.more)
-        
-        //next button
-        self.nextItemsButton = Button(size: CGSize(width: Style.Backpack.ctaButton, height: 100.0), delegate: self, identifier: .backpackCancel, precedence: .foreground, fontSize: UIFont.extraLargeSize, fontColor: UIColor.black, backgroundColor: UIColor.menuPurple)
-        self.nextItemsButton?.position = CGPoint.positionThis(self.nextItemsButton?.frame, outsideOf: cancelButton?.frame, verticality: .bottom, spacing: Style.Padding.more)
+        descriptionArea.position = CGPoint.positionThis(descriptionArea.frame, outsideOf: itemArea.frame, verticality: .top, spacing: -20)
+
+        // init ourselves
+        super.init(texture: nil, color: .clear, size: CGSize(width: playableRect.width, height: height))
+        // "bind" to to the view model
+        self.viewModel.updateCallback = { [weak self] in self?.updated() }
         
         
-        inventoryArea.addOptionalChild(itemArea)
-        inventoryArea.addOptionalChild(descriptionArea)
-        inventoryArea.addOptionalChild(ctaButton)
-        inventoryArea.addOptionalChild(cancelButton)
-        inventoryArea.addOptionalChild(nextItemsButton)
+        // add sprites to the inventory area
+        inventoryArea.addChild(itemArea)
+        inventoryArea.addChild(descriptionArea)
+        inventoryArea.addChild(ctaButton)
+        inventoryArea.addChild(cancelButton)
         
-        updateCTAButton(with: nil)
-        
-//        background.isUserInteractionEnabled = true
-//        inventoryArea.isUserInteractionEnabled = true
-//        targetingArea.isUserInteractionEnabled = true
         
         viewContainer.addChild(self.background)
-//        viewContainer.addChild(self.targetingArea)
         viewContainer.addChild(self.inventoryArea)
         
         self.addChild(viewContainer)
     
         self.isUserInteractionEnabled = true
+        
+        updated()
     }
     
     
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    //MARK: - public update function
+    
+    
+    /**
+     Passed into our viewModel as a callback function to "bind" everything together
+     */
     func updated() {
         updateToastMessage()
         updateReticles()
         updateDescription(with: viewModel.ability)
         updateCTAButton(with: viewModel.ability)
         updateTargetArea()
+        updateItemArea()
     }
     
-    
-    func updateTargetArea() {
-        if viewModel.ability == nil {
-            targetingArea.removeFromParent()
-        } else {
-            targetingArea.removeFromParent()
-            addChild(targetingArea)
-        }
-    }
-    
-    func updateReticles() {
-        targetingArea.removeAllChildren()
-        
-        for target in viewModel.currentTargets {
-            let position = translateCoord(target.coord)
-            let identifier: String = target.isLegal ? Identifiers.greenReticleSprite : Identifiers.redReticleSprite
-            let reticle = SKSpriteNode(texture: SKTexture(imageNamed: identifier), size: CGSize(width: tileSize, height: tileSize))
-            reticle.position = position
-            reticle.zPosition = Precedence.menu.rawValue
-            targetingArea.addChild(reticle)
-        }
-    }
-    
-    private var bottomLeft: CGPoint
-    
-    func translateCoord(_ coord: TileCoord) -> CGPoint {
-        
-        //tricky, but the row (x) corresponds to the y axis. and the col (y) corresponds to the x-axis.
-        let x = CGFloat(coord.y) * tileSize + bottomLeft.x
-        let y = CGFloat(coord.x) * tileSize + bottomLeft.y
-        
-        return CGPoint(x: x, y: y)
-    }
-    
-    func translatePoint(_ point: CGPoint) -> TileCoord {
-        var x =
-            Int(
-                round(
-                    (point.x - bottomLeft.x) / tileSize
-                )
-            )
-        
-        var y =
-            Int(
-                round(
-                    (point.y - bottomLeft.y) / tileSize
-                )
-            )
-        
-        y = max(0, y)
-        y = min(Int(boardSize-1), y)
-        
-        x = max(0, x)
-        x = min(Int(boardSize-1), x)
-        
-        return TileCoord(y, x)
-    }
-    
-    func updateToastMessage() {
-        
-        if viewModel.toastMessage.isEmpty {
-            toastMessageContainer?.run(SKAction.sequence([SKAction.move(by: CGVector(dx: 0.0, dy: -200), duration: 1.0), SKAction.removeFromParent()]))
-            toastMessageContainer?.removeAllChildren()
-            return
-        } else {
-            toastMessageContainer?.removeAllChildren()
-            toastMessageContainer?.removeFromParent()
-        }
-        
-        // Display the toast message
-        
-        let fontColor: UIColor = viewModel.legallyTargeted ? .green : .red
-        
-        let toastWidth = CGFloat(600)
-        
-        //toast shape
-        let path = CGPath(roundedRect: CGRect(x: -toastWidth/2, y: -100, width: toastWidth, height: 200), cornerWidth: 50.0, cornerHeight: 50.0, transform: nil)
-        let toastContainer = SKShapeNode(path: path)
-        toastContainer.color = .storeBlack
-        
-        //toast paragraph
-        let toastMessageParagraph = ParagraphNode(text: viewModel.toastMessage, paragraphWidth: toastWidth, fontSize: UIFont.largeSize, fontColor: fontColor)
-        toastMessageParagraph.position = CGPoint.positionThis(toastMessageParagraph.frame, inTopOfHalf: toastContainer.frame)
-        
-        //toast container
-        toastContainer.addOptionalChild(toastMessageParagraph)
-        toastContainer.zPosition = Precedence.underground.rawValue
-        toastContainer.position = CGPoint.positionThis(toastContainer.frame, outsideOf: self.background.frame, verticality: .top, spacing: -toastContainer.frame.height/2)
-        
-        self.addChild(toastContainer)
-        toastMessageContainer = toastContainer
-    }
+    /**
+     Meant to be called from the Renderer to inject the new player data.
+     */
     
     func update(with playerData: EntityModel) {
-        print("update player data \(playerData)")
-        guard let itemArea = itemArea else { fatalError("we need item area") }
-        
-        // display these on screen
-        // give them button and identifier
-        // only display a few at a time
-        updated()
-        itemArea.removeAllChildren()
-        
         self.abilities = playerData.abilities
         
+                
+        
+        // update when positions have been updated
+        updated()
+    }
+
+    
+    //MARK: - private functions
+    private func updateItemArea() {
         var sprites: [SKSpriteNode?] = []
-        for ability in playerData.abilities {
+        for ability in self.abilities {
             var sprite: SKSpriteNode?
             if let abilityFrames = ability.spriteSheet?.animationFrames(), let first = abilityFrames.first  {
                 sprite = SKSpriteNode(texture: first, color: .clear, size: Style.Backpack.itemSize)
@@ -280,60 +194,145 @@ class BackpackView: SKSpriteNode {
         for index in 0..<sprites.count {
             assert(sprites.count <= gridPoints.count, "We hard coded \(rows*columns) items total, this will break if there are more than 10 items")
             sprites[index]?.position = gridPoints[index]
-            itemArea.addOptionalChild(sprites[index])
+            itemArea.addChildSafely(sprites[index])
+        }
+
+        
+        
+        addChildSafely(itemArea)
+    }
+    
+    private func updateTargetArea() {
+        if viewModel.ability == nil {
+            targetingArea.removeFromParent()
+        } else {
+            addChildSafely(targetingArea)
         }
     }
     
-    func toggleItemArea() {
-        if itemArea?.position.x ?? 0.0 < playableRect.origin.x {
+    private func updateReticles() {
+        targetingArea.removeAllChildren()
+        
+        for target in viewModel.currentTargets {
+            let position = translateCoord(target.coord)
+            let identifier: String = target.isLegal ? Identifiers.Sprite.greenReticle : Identifiers.Sprite.redReticle
+            let reticle = SKSpriteNode(texture: SKTexture(imageNamed: identifier), size: CGSize(width: tileSize, height: tileSize))
+            reticle.position = position
+            reticle.zPosition = Precedence.menu.rawValue
+            targetingArea.addChild(reticle)
+        }
+    }
+    
+    private func translateCoord(_ coord: TileCoord) -> CGPoint {
+        
+        //tricky, but the row (x) corresponds to the y axis. and the col (y) corresponds to the x-axis.
+        let x = CGFloat(coord.column) * tileSize + bottomLeft.x
+        let y = CGFloat(coord.row) * tileSize + bottomLeft.y
+        
+        return CGPoint(x: x, y: y)
+    }
+    
+    private func translatePoint(_ point: CGPoint) -> TileCoord {
+        var x = Int(round((point.x - bottomLeft.x) / tileSize))
+        
+        var y = Int(round((point.y - bottomLeft.y) / tileSize))
+        
+        //ensure that the coords are in bounds because we allow some touches outside the board
+        y = max(0, y)
+        y = min(Int(boardSize-1), y)
+        
+        x = max(0, x)
+        x = min(Int(boardSize-1), x)
+        
+        return TileCoord(y, x)
+    }
+    
+    private func updateToastMessage() {
+        
+        if viewModel.toastMessage.isEmpty {
+            toastMessageContainer?.run(SKAction.sequence([SKAction.move(by: CGVector(dx: 0.0, dy: -200), duration: 1.0), SKAction.removeFromParent()]))
+            toastMessageContainer?.removeAllChildren()
+            return
+        } else {
+            toastMessageContainer?.removeAllChildren()
+            toastMessageContainer?.removeFromParent()
+        }
+        
+        // Display the toast message
+        
+        let fontColor: UIColor = viewModel.legallyTargeted ? .green : .red
+        
+        let toastWidth = Style.Backpack.Toast.width
+        let toastHeight = Style.Backpack.Toast.height
+        
+        //toast shape
+        let path = CGPath(roundedRect: CGRect(x: -toastWidth/2, y: -toastHeight/2,
+                                              width: toastWidth, height: toastHeight),
+                          cornerWidth: Style.Backpack.Toast.cornerRadius,
+                          cornerHeight: Style.Backpack.Toast.cornerRadius,
+                          transform: nil)
+        let toastContainer = SKShapeNode(path: path)
+        toastContainer.color = .storeBlack
+        
+        //toast paragraph
+        let toastMessageParagraph = ParagraphNode(text: viewModel.toastMessage, paragraphWidth: toastWidth, fontSize: UIFont.largeSize, fontColor: fontColor)
+        toastMessageParagraph.position = CGPoint.position(this: toastMessageParagraph.frame, centeredVerticallyInTopHalfOf: toastContainer.frame)
+        
+        //toast container
+        toastContainer.addOptionalChild(toastMessageParagraph)
+        toastContainer.zPosition = Precedence.underground.rawValue
+        toastContainer.position = CGPoint.positionThis(toastContainer.frame, outsideOf: self.background.frame, verticality: .top, spacing: -toastContainer.frame.height/2)
+        
+        self.addChild(toastContainer)
+        toastMessageContainer = toastContainer
+    }
+    
+    private func toggleItemArea() {
+        if itemArea.position.x < playableRect.origin.x {
             // items are hidden
-            let position = CGPoint.positionThis(itemArea?.frame, inBottomOf: self.frame, padding: Style.Padding.most, anchor: .left)
+            let position = CGPoint.positionThis(itemArea.frame, inBottomOf: self.frame, padding: Style.Padding.most, anchor: .left)
             let moveAction = SKAction.move(to: position,  duration: 0.25)
             moveAction.timingMode = .easeIn
             
-            itemArea?.run(moveAction)
+            itemArea.run(moveAction)
         } else {
             // items are showing
-            let position = CGPoint.positionThis(itemArea?.frame, outside: self.frame, anchor: .left, padding: Style.Padding.most)
+            let position = CGPoint.positionThis(itemArea.frame, outside: self.frame, anchor: .left, padding: Style.Padding.most)
             let moveAction = SKAction.move(to: position, duration: 0.25)
             moveAction.timingMode = .easeOut
             
-            itemArea?.run(moveAction)
+            itemArea.run(moveAction)
         }
     }
     
-    func updateDescription(with ability: AnyAbility?) {
-        descriptionArea?.removeAllChildren()
+    private func updateDescription(with ability: AnyAbility?) {
+        descriptionArea.removeAllChildren()
         
         if let ability = ability {
-            let descriptionLabel = ParagraphNode(text: ability.description, paragraphWidth: descriptionArea?.frame.width ?? 0, fontSize: UIFont.largeSize, fontColor: UIColor.storeBlack)
-            descriptionArea?.addChild(descriptionLabel)
+            let descriptionLabel = ParagraphNode(text: ability.description, paragraphWidth: descriptionArea.frame.width, fontSize: UIFont.largeSize, fontColor: UIColor.storeBlack)
+            descriptionArea.addChild(descriptionLabel)
         }
     }
     
-    func updateCTAButton(with ability: AnyAbility?) {
+    private func updateCTAButton(with ability: AnyAbility?) {
         if let _ = ability {
             if viewModel.legallyTargeted {
-                ctaButton?.color = .highlightGold
-                ctaButton?.addShadow()
-                ctaButton?.isDisabled = false
+                ctaButton.color = .highlightGold
+                ctaButton.addShadow()
+                ctaButton.isDisabled = false
             } else {
-                ctaButton?.color = .gray
-                ctaButton?.removeShadow()
-                ctaButton?.isDisabled = true
+                ctaButton.color = .gray
+                ctaButton.removeShadow()
+                ctaButton.isDisabled = true
             }
             
             
-            ctaButton?.isHidden = false
-            cancelButton?.isHidden = false
+            ctaButton.isHidden = false
+            cancelButton.isHidden = false
         } else {
-            ctaButton?.isHidden = true
-            cancelButton?.isHidden = true
+            ctaButton.isHidden = true
+            cancelButton.isHidden = true
         }
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 }
 
@@ -351,7 +350,7 @@ extension BackpackView {
             else if let abilityType = node.name {
                 for ability in self.abilities {
                     if ability.type.rawValue == abilityType {
-                        selectedAbility = ability
+                        viewModel.didSelect(ability)
                     }
                 }
             }
@@ -367,11 +366,11 @@ extension BackpackView: ButtonDelegate {
     func buttonTapped(_ button: Button) {
         if button.identifier == ButtonIdentifier.backpack {
             toggleItemArea()
-            selectedAbility = nil
+            viewModel.didSelect(nil)
         } else if button.identifier == ButtonIdentifier.backpackUse {
-            viewModel.didUse()
+            viewModel.didUse(viewModel.ability)
         } else  if button.identifier == ButtonIdentifier.backpackCancel {
-            selectedAbility = nil
+            viewModel.didSelect(nil)
         }
     }
 }

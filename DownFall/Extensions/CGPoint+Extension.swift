@@ -140,14 +140,14 @@ extension CGPoint {
                        y: that.height/2 - this.height/2 - padding)
     }
     
-    static func positionThis(_ this: CGRect,
-                             inTopOfHalf that: CGRect,
-                             xOffset: CGFloat = 0.0) -> CGPoint {
+    static func position(this: CGRect,
+                         centeredVerticallyInTopHalfOf that: CGRect,
+                         xOffset: CGFloat = 0.0) -> CGPoint {
         let padding = (that.height - this.height) / 4
         return CGPoint(x: this.center.x,
                        y: that.height/2 - this.height/4 - padding)
     }
-
+    
     
     
     

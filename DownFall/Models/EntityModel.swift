@@ -90,10 +90,23 @@ struct EntityModel: Equatable, Decodable {
         return attack.attacksPerTurn + bonusAttacks - attack.attacksThisTurn > 0
     }
     
+    /**
+     Add an ability to entities model.  If the model already contains that ability, then just increment the count
+     
+     - Returns: an updated entity model
+     
+     */
     func add(_ ability: Ability) -> EntityModel {
-        let anyAbility = AnyAbility(ability)
         var newAbilities = abilities
-        newAbilities.append(anyAbility)
+        if let index = newAbilities.firstIndex(of: AnyAbility(ability)) {
+            var updatedAbility = newAbilities[index]
+            updatedAbility.count += 1
+            newAbilities[index] = updatedAbility
+        } else {
+            let anyAbility = AnyAbility(ability)
+            newAbilities.append(anyAbility)
+        }
+        
         return self.update(abilities: newAbilities)
 
     }
@@ -142,7 +155,7 @@ struct EntityModel: Equatable, Decodable {
     }
     
     func heal(for amount: Int) -> EntityModel {
-        return update(hp: self.hp + amount)
+        return update(hp: min(originalHp, self.hp + amount))
     }
     
     func use(_ ability: Ability) -> EntityModel {

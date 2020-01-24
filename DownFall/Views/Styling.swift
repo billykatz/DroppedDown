@@ -18,6 +18,12 @@ struct Style {
         static let backpackViewSizeCoefficient = CGFloat(0.75)
         static let itemSize = CGSize(width: 150, height: 150)
         static let ctaButton = CGFloat(200)
+        
+        struct Toast {
+            static let width = CGFloat(300)
+            static let height = CGFloat(200)
+            static let cornerRadius = CGFloat(50)
+        }
     }
     
     struct Store {

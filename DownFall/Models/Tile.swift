@@ -226,7 +226,7 @@ extension TileType {
         case .gold:
             return "gold"
         default:
-            fatalError("We probably shouldnt be here.  Investigate")
+            preconditionFailure("We probably shouldnt be here. Investigate")
         }
     }
 }

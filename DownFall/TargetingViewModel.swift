@@ -26,7 +26,10 @@ protocol TargetingInputs {
     func didTarget(_ coord: TileCoord)
     
     /// Use this to consume the item
-    func didUse()
+    func didUse(_ ability: AnyAbility?)
+    
+    /// Use this to select an ability
+    func didSelect(_ ability: AnyAbility?)
 }
 
 protocol Targeting: TargetingOutputs, TargetingInputs {}
@@ -43,8 +46,8 @@ class TargetingViewModel: Targeting {
             if ability == nil {
                 InputQueue.append(Input(InputType.itemUseCanceled))
             } else {
-                if oldValue == nil {
-                    InputQueue.append(Input(InputType.itemUseSelected(ability!)))
+                if oldValue == nil, let ability = ability {
+                    InputQueue.append(Input(InputType.itemUseSelected(ability)))
                 }
                 autoTarget()
             }
@@ -65,15 +68,26 @@ class TargetingViewModel: Targeting {
             return ""
         }
         let baseString = "Choose "
-        let types = Set<String>(self.typesOfTargets.map {
-            return $0.humanReadable
-        }).joined(separator: ",")
-        return baseString + "\(self.numberOfTargets) " + types
+        let types: String
+        if typesOfTargets.count == 1 {
+            types = typesOfTargets.first?.humanReadable ?? ""
+        } else if typesOfTargets.count == 2 {
+            types = "\(typesOfTargets.first?.humanReadable ?? "") and/or \(typesOfTargets.last?.humanReadable ?? "")"
+        } else {
+            let allButLastTypes = typesOfTargets.dropLast()
+            var allButLastString = allButLastTypes.map {
+                return $0.humanReadable
+            }.joined(separator: ", ")
+            
+            allButLastString.append("and \(typesOfTargets.last?.humanReadable ?? "")")
+            types = allButLastString
+        }
+        return baseString + "\(self.numberOfTargets) " + types + "\(self.numberOfTargets > 1 ? "s" : "")"
     }
     
     var currentTargets: [Target] = [] {
         didSet {
-            self.updateCallback?()
+            updateCallback?()
             InputQueue.append(Input(InputType.itemCanBeUsed(legallyTargeted)))
         }
     }
@@ -89,6 +103,7 @@ class TargetingViewModel: Targeting {
     private var tiles: [[Tile]]? = nil {
         didSet {
             autoTarget()
+            updateCallback?()
         }
     }
     
@@ -97,14 +112,12 @@ class TargetingViewModel: Targeting {
             switch input.type {
             case .itemUseSelected(let ability):
                 self?.ability = ability
-                self?.updateCallback?()
             case .transformation(let trans):
                 if let inputType = trans.inputType,
                     case InputType.itemUseSelected(_) = inputType,
                     let endTiles = trans.endTiles
                 {
                     self?.tiles = endTiles
-                    self?.updateCallback?()
                 }
                 
             case .itemUseCanceled:
@@ -119,7 +132,6 @@ class TargetingViewModel: Targeting {
     
     private func isTargetLegal(_ coord: TileCoord) -> Bool {
         guard let tiles = tiles else { return false }
-        //need to access what the actualy tile is
         if typesOfTargets.contains(tiles[coord].type) {
             return true
         }
@@ -134,7 +146,7 @@ class TargetingViewModel: Targeting {
      - Returns: Nothing
      */
     func didTarget(_ coord: TileCoord) {
-        guard numberOfTargets > 0 else { fatalError("Something funcky is happening") }
+        guard ability != nil else { preconditionFailure("We should be able to target if we dont have an ability selected") }
         if currentTargets.contains(where: { return $0.coord == coord } ) {
             //remove the new target
             currentTargets.removeAll(where: { return $0.coord == coord })
@@ -153,12 +165,16 @@ class TargetingViewModel: Targeting {
         }
     }
     
-    func didUse() {
+    func didUse(_ ability: AnyAbility?) {
         guard legallyTargeted, let ability = ability else { fatalError("Something is out of sync. Use button should only be clickable when we legally targeted") }
         InputQueue.append(
             Input(.itemUsed(ability, currentTargets.map { $0.coord }))
         )
         
+    }
+    
+    func didSelect(_ ability: AnyAbility?) {
+        self.ability = ability
     }
     
     private func autoTarget() {

@@ -68,7 +68,7 @@ class Renderer: SKSpriteNode {
         self.boardSize = CGFloat(theBoardSize)
         self.level = level
         
-        self.tileSize = 0.9 * (playableRect.width / boardSize)
+        self.tileSize = GameScope.boardSizeCoefficient * (playableRect.width / boardSize)
         
         //center the board in the playable rect
         let marginWidth = playableRect.width - CGFloat(tileSize * boardSize)

@@ -10,7 +10,7 @@ import Foundation
 import SpriteKit
 
 struct AnyAbility: Hashable {
-    let _ability: Ability
+    var _ability: Ability
     init(_ ability: Ability) {
         _ability = ability
     }
@@ -20,10 +20,20 @@ struct AnyAbility: Hashable {
     }
     
     //TODO: make hack better
-    static let zero: AnyAbility = AnyAbility(DoubleAttack())
+    static let zero: AnyAbility = AnyAbility(Empty())
 }
 
 extension AnyAbility: Ability {
+    
+    var count : Int {
+        set {
+            _ability.count = newValue
+        }
+        get {
+            return _ability.count
+        }
+    }
+    
     func animatedColumns() -> Int? {
         return _ability.animatedColumns()
     }
@@ -98,6 +108,7 @@ protocol Ability {
     var targets: Int? { get }
     var targetTypes: [TileType]? { get }
     var heal: Int? { get }
+    var count: Int { get set }
     
     func blocksDamage(from: Direction) -> Int?
     func animatedColumns() -> Int?

@@ -10,6 +10,12 @@ import SpriteKit
 
 struct ShieldEast: Ability {
     
+    var count: Int
+    
+    init(count: Int = 0) {
+        self.count = 0
+    }
+    
     func animatedColumns() -> Int? {
            return nil
     }

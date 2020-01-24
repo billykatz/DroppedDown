@@ -9,12 +9,6 @@
 import SpriteKit
 import UIKit
 
-extension CGRect {
-    func subtractBottomFifth() -> CGRect {
-        return CGRect(x: self.origin.x, y: self.origin.y, width: self.width, height: self.height - self.height/5)
-    }
-}
-
 class GameScene: SKScene {
     
     // only strong reference to the Board
@@ -40,10 +34,6 @@ class GameScene: SKScene {
     
     //level
     private var level: Level?
-    
-    // targeting
-    private var targetingViewModel: TargetingViewModel?
-    private var targetingView: TargetingView?
     
     //touch state
     private var touchWasSwipe = false
@@ -92,7 +82,7 @@ class GameScene: SKScene {
         
         
         // SwipeRecognizerView
-        swipeRecognizerView = SwipeRecognizerView(frame: view.frame.subtractBottomFifth(),
+        swipeRecognizerView = SwipeRecognizerView(frame: view.frame.subtractBottom(0.20),
                                                         target: self,
                                                         swiped: #selector(swiped))
         view.addSubview(swipeRecognizerView!)
@@ -118,6 +108,7 @@ class GameScene: SKScene {
                 self.foreground.removeAllChildren()
                 if case let TileType.player(data) = self.board.tiles[playerIndex].type {
                     self.removeFromParent()
+                    self.swipeRecognizerView?.removeFromSuperview()
                     self.gameSceneDelegate?.visitStore(data)
                 }
 

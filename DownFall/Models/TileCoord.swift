@@ -17,7 +17,15 @@ enum Axis {
 
 
 struct TileCoord: Hashable {
-    let x, y: Int
+    var column: Int {
+        return y
+    }
+    var row: Int {
+        return x
+    }
+    
+    let x: Int
+    let y: Int
     var tuple : (Int, Int) { return (x, y) }
     static var zero: TileCoord = TileCoord(0,0)
     

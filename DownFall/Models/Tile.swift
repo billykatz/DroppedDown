@@ -207,3 +207,26 @@ enum TileType: Equatable, Hashable, CaseIterable {
         case fireball
     }
 }
+
+extension TileType {
+    var humanReadable: String {
+        switch self {
+        case .blackRock, .blueRock, .brownRock, .greenRock, .purpleRock, .redRock:
+            return "rock"
+        case .player:
+            return "player"
+        case .exit:
+            return "mineshaft"
+        case .item:
+            return "item"
+        case .monster:
+            return "monster"
+        case .gem:
+            return "gem"
+        case .gold:
+            return "gold"
+        default:
+            preconditionFailure("We probably shouldnt be here. Investigate")
+        }
+    }
+}

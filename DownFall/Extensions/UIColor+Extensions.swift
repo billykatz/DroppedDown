@@ -33,4 +33,5 @@ extension UIColor {
     static let highlightGreen = UIColor(rgb: 0x2a4f36)
     static let menuPurple = UIColor(rgb: 0x4c2f84)
     static let foregroundBlue = UIColor(rgb: 0x6885ac)
+    static let eggshellWhite = UIColor(rgb: 0xc7c6c2)
 }

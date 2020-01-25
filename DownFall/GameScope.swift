@@ -6,7 +6,10 @@
 //  Copyright © 2019 William Katz LLC. All rights reserved.
 //
 
+import CoreGraphics
+
 struct GameScope {
+    static let boardSizeCoefficient = CGFloat(0.9)
     static var shared: GameScope = GameScope(difficulty: .normal)
     var difficulty: Difficulty
     

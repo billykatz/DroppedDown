@@ -90,6 +90,26 @@ class Board: Equatable {
                 InputQueue.append(input)
                 transformation = nil
             }
+        case .itemUseSelected(let ability):
+            InputQueue.append(
+                Input(
+                    InputType.transformation(
+                        Transformation(transformation: nil, inputType: .itemUseSelected(ability), endTiles: self.tiles)
+                    )
+                )
+            )
+            
+        case .itemUsed(let ability, let targets):
+            let trans = use(ability, on: targets)
+            
+            InputQueue.append(
+                Input(
+                    InputType.transformation(
+                        trans
+                    )
+                )
+            )
+
         case .gameLose(_),
              .play,
              .pause,
@@ -99,7 +119,8 @@ class Board: Equatable {
              .selectLevel,
              .newTurn,
              .tutorial,
-             .visitStore:
+             .visitStore,
+             .itemUseCanceled, .itemCanBeUsed:
             transformation = nil
         }
         
@@ -154,6 +175,30 @@ class Board: Equatable {
         return nil
     }
 
+}
+
+//MARK: - use ability
+
+extension Board {
+    private func use(_ ability: AnyAbility, on targets: [TileCoord]) -> Transformation {
+        if ability.type == .greaterHealingPotion || ability.type == .lesserHealingPotion {
+            if let playerCoord = self.tiles(of: .player(.zero)).first {
+                if case TileType.player(let data) = tiles[playerCoord].type, let heal = ability.heal {
+                    let newData = data.heal(for: heal).use(ability)
+                    tiles[playerCoord.x][playerCoord.y] = Tile(type: .player(newData))
+                    return Transformation(transformation: nil,
+                                          inputType: .itemUsed(ability, targets),
+                                          endTiles: tiles)
+
+                    
+                    
+                    
+                }
+            }
+        }
+        
+        return .zero
+    }
 }
 
 
@@ -548,12 +593,6 @@ extension Board {
             }
         }
         return tileCoords
-    }
-}
-
-extension Array where Element: Collection, Element.Index == Int {
-    subscript(tileCoord: TileCoord) -> Element.Iterator.Element {
-        return self[tileCoord.x][tileCoord.y]
     }
 }
 

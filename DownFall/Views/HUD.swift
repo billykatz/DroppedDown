@@ -52,6 +52,12 @@ class HUD: SKSpriteNode {
                 showAttack(attackInput: input, endTiles: trans.endTiles)
             case .collectItem(_, let item, let total):
                 incrementCurrencyCounter(item, total: total)
+            case .itemUsed:
+                if let tiles = trans.endTiles,
+                    let playerCoord = getTilePosition(.player(.zero), tiles: tiles),
+                    case TileType.player(let data) = tiles[playerCoord].type {
+                    show(data)
+                }
             default:
                 ()
             }
@@ -78,7 +84,7 @@ class HUD: SKSpriteNode {
             let heartNode = SKSpriteNode(texture: SKTexture(imageNamed: identifier), size: Style.HUD.heartSize)
             heartNode.position = CGPoint.positionThis(heartNode.frame,
                                                       in: self.frame,
-                                                      verticaliy: .top,
+                                                      verticality: .top,
                                                       anchor: .left,
                                                       xOffset: CGFloat(health) * Style.HUD.heartSize.width)
             heartNode.name = Identifiers.heart
@@ -87,7 +93,7 @@ class HUD: SKSpriteNode {
         
         // the label with the palyer's amount of gold
         let goldLabel = ParagraphNode(text: "\(data.carry.total(in: .gold))", paragraphWidth: Style.HUD.labelParagraphWidth, fontName: UIFont.pixelFontName, fontSize: UIFont.extraLargeSize, fontColor: .lightText)
-        goldLabel.position = CGPoint.positionThis(goldLabel.frame, in: self.frame, verticaliy: .bottom, anchor: .left, xOffset: Style.HUD.coinLabelPadding)
+        goldLabel.position = CGPoint.positionThis(goldLabel.frame, in: self.frame, verticality: .bottom, anchor: .left, xOffset: Style.HUD.coinLabelPadding)
         goldLabel.name = Identifiers.goldSpriteLabel
         self.addChild(goldLabel)
 

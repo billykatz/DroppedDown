@@ -16,6 +16,7 @@ enum State: CaseIterable, Equatable {
     case gameLose
     case computing
     case reffing
+    case targeting
 }
 
 protocol GameState: Equatable {

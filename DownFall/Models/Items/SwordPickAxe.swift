@@ -10,6 +10,12 @@ import Foundation
 
 struct SwordPickAxe: Ability {
     
+    var count: Int
+    
+    init(count: Int = 0) {
+        self.count = 0
+    }
+    
     func animatedColumns() -> Int? {
         return nil
     }
@@ -48,7 +54,7 @@ struct SwordPickAxe: Ability {
         return .oneRun
     }
     
-    
+    var heal: Int? { return nil }
     var targets: Int? { return nil }
     var targetTypes: [TileType]? { return nil }
 }

@@ -38,7 +38,11 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
                                         .playAgain,
                                         .reffingFinished(newTurn: false),
                                         .collectItem(TileCoord(0,0), .zero, 0),
-                                        .tutorial(.zero)
+                                        .tutorial(.zero),
+                                        .itemUseCanceled,
+                                        .itemUseSelected(.zero),
+                                        .itemCanBeUsed(false),
+                                        .itemUsed(.zero, [])
     ]
     
     typealias AllCases = [InputType]
@@ -63,6 +67,10 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
     case newTurn
     case tutorial(TutorialStep)
     case visitStore
+    case itemUseSelected(AnyAbility)
+    case itemUseCanceled
+    case itemCanBeUsed(Bool)
+    case itemUsed(AnyAbility, [TileCoord])
     
     var debugDescription: String {
         switch self {
@@ -71,9 +79,9 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
         case .touch:
             return "Touch"
         case .rotateCounterClockwise:
-            return "Rotate Left"
+            return "Rotate Counter clockwise"
         case .rotateClockwise:
-            return "Rotate Right"
+            return "Rotate clockwise"
         case .monsterDies:
             return "Monster Dies"
         case .gameWin:
@@ -106,6 +114,14 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
             return "Tutorial with \(dialog)"
         case .visitStore:
             return "Visiting store between levels"
+        case .itemUseCanceled:
+            return "Item use canceled"
+        case .itemUseSelected:
+            return "Item use selected"
+        case .itemCanBeUsed(let used):
+            return "item can be used: \(used)"
+        case .itemUsed(let ability, let targets):
+            return "\(ability.textureName) used on targets \(targets)"
         }
     }
 }

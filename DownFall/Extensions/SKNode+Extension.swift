@@ -20,5 +20,16 @@ extension SKNode {
         }
         addChild(nonNilChild)
     }
+    
+    func addChildSafely(_ child: SKNode?) {
+        let childPosition = child?.position
+        if child?.parent != nil {
+            child?.removeFromParent()
+            addOptionalChild(child)
+        } else {
+            addOptionalChild(child)
+        }
+        child?.position = childPosition ?? .zero
+    }
 
 }

@@ -10,6 +10,12 @@ import Foundation
 
 struct KillMonsterPotion: Ability {
     
+    var count: Int
+    
+    init(count: Int = 0) {
+        self.count = 0
+    }
+    
     func animatedColumns() -> Int? {
         return 7
     }
@@ -52,7 +58,7 @@ struct KillMonsterPotion: Ability {
         return nil
     }
     
-    
+    var heal: Int? { return nil }
     var targets: Int? { return 1 }
     var targetTypes: [TileType]? { return [TileType.monster(.zero)] }
 }

@@ -65,24 +65,6 @@ class DFTileSpriteNode: SKSpriteNode {
         indicatorSprite.run(SKAction.sequence([wait, remove]))
     }
     
-    func indicateSpriteWillAttack(in turns: Int?) {
-        guard let turns = turns else { return }
-        var color: UIColor = .clear
-        if turns == 0 {
-            color = .green
-        } else if turns <= 1 {
-            color = .red
-        } else if turns > 1 {
-            color = .yellow
-        }
-        
-        let indicatorSprite = SKSpriteNode(color: color, size: self.size)
-        indicatorSprite.zPosition = Precedence.background.rawValue
-        
-        self.addChild(indicatorSprite)
-        
-    }
-    
     /**
      Indicates that attack timing of a sprite
      
@@ -96,7 +78,7 @@ class DFTileSpriteNode: SKSpriteNode {
         
         let size = CGSize(width: self.frame.width * 0.1, height: frame.height * 0.1)
         
-        var previousSquare: SKShapeNode?
+        var previousCircle: SKShapeNode?
         
         var color = UIColor.clear
         if turns == 0 {
@@ -106,12 +88,12 @@ class DFTileSpriteNode: SKSpriteNode {
         } else {
             color = .red
         }
-        previousSquare = SKShapeNode(circleOfRadius: size.width)
-        previousSquare?.fillColor = color
-        previousSquare?.strokeColor = color
-        previousSquare?.position = CGPoint.positionThis(previousSquare!.frame, inBottomOf: frame, anchor: .right)
-        previousSquare?.zPosition = Precedence.foreground.rawValue
-        addOptionalChild(previousSquare)
+        previousCircle = SKShapeNode(circleOfRadius: size.width)
+        previousCircle?.fillColor = color
+        previousCircle?.strokeColor = color
+        previousCircle?.position = CGPoint.positionThis(previousCircle!.frame, inBottomOf: frame, anchor: .right)
+        previousCircle?.zPosition = Precedence.foreground.rawValue
+        addOptionalChild(previousCircle)
         
     }
     

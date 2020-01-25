@@ -151,10 +151,6 @@ struct EntityModel: Equatable, Decodable {
         return totalAmount >= cost
     }
     
-    func willAttackNextTurn() -> Bool {
-        return attack.willAttackNextTurn()
-    }
-    
     func heal(for amount: Int) -> EntityModel {
         return update(hp: min(originalHp, self.hp + amount))
     }

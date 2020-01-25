@@ -54,7 +54,7 @@ class GameStateTests: XCTestCase {
                  .monsterDies, .pause, .play, .touch, .rotateClockwise,
                  .rotateCounterClockwise, .transformation, .reffingFinished,
                  .boardBuilt, .collectItem,. newTurn, .touchBegan, .tutorial,
-                 .itemUseSelected, .itemUseCanceled, .itemCanBeUsed:
+                 .itemUseSelected, .itemUseCanceled, .itemCanBeUsed, .itemUsed:
                 XCTAssertNil(gameState.transitionState(given: Input(input)))
             }
         }
@@ -69,7 +69,8 @@ class GameStateTests: XCTestCase {
                  .monsterDies, .pause, .play, .touch, .rotateClockwise,
                  .rotateCounterClockwise, .attack, .transformation, .reffingFinished,
                  .collectItem, .selectLevel, .newTurn, .touchBegan, .tutorial,
-                 .visitStore, .itemUseSelected, .itemUseCanceled, .itemCanBeUsed:
+                 .visitStore, .itemUseSelected, .itemUseCanceled, .itemCanBeUsed,
+                 .itemUsed:
                 XCTAssertNil(gameState.transitionState(given: Input(input)), "\(gameState.state) should not transition to \(input)")
             }
         }
@@ -86,7 +87,7 @@ class GameStateTests: XCTestCase {
                  .monsterDies, .animationsFinished, .touch, .rotateClockwise,
                  .rotateCounterClockwise, .attack, .pause, .transformation,
                  .reffingFinished, .collectItem, .newTurn, .touchBegan, .tutorial,
-                 .visitStore, .itemUseSelected, .itemUseCanceled, .itemCanBeUsed:
+                 .visitStore, .itemUseSelected, .itemUseCanceled, .itemCanBeUsed, .itemUsed:
                 XCTAssertNil(gameState.transitionState(given: Input(input)))
             }
         }
@@ -116,7 +117,7 @@ class GameStateTests: XCTestCase {
                                gameState.transitionState(given: Input(input)))
             case .play, .playAgain, .animationsFinished,
                  .transformation, .reffingFinished, .selectLevel,
-                 .newTurn, .visitStore, .itemUseCanceled, .itemCanBeUsed:
+                 .newTurn, .visitStore, .itemUseCanceled, .itemCanBeUsed, .itemUsed:
                 XCTAssertNil(gameState.transitionState(given: Input(input)), "\(gameState.state) should not transition to \(input)")
             }
         }
@@ -132,7 +133,7 @@ class GameStateTests: XCTestCase {
                  .monsterDies, .animationsFinished, .touch, .rotateClockwise,
                  .rotateCounterClockwise, .pause, .play, .reffingFinished,
                  .collectItem, .selectLevel,. touchBegan, .tutorial,
-                 .visitStore, .itemUseSelected, .itemUseCanceled, .itemCanBeUsed:
+                 .visitStore, .itemUseSelected, .itemUseCanceled, .itemCanBeUsed, .itemUsed:
                 XCTAssertNil(gameState.transitionState(given: Input(input)))
             }
         }
@@ -157,7 +158,7 @@ class GameStateTests: XCTestCase {
                 XCTAssertEqual(AnyGameState(LoseState()),
                                gameState.transitionState(given: Input(input)))
             case .touch, .rotateCounterClockwise, .rotateClockwise, .play, .pause, .animationsFinished, .playAgain, .transformation, .boardBuilt, .selectLevel, .newTurn, .touchBegan, .tutorial,
-                 .visitStore, .itemUseSelected, .itemUseCanceled, .itemCanBeUsed:
+                 .visitStore, .itemUseSelected, .itemUseCanceled, .itemCanBeUsed, .itemUsed:
                 XCTAssertNil(gameState.transitionState(given: Input(input)))
             }
         }
@@ -172,6 +173,9 @@ class GameStateTests: XCTestCase {
             case .itemUseCanceled:
                 XCTAssertEqual(AnyGameState(PlayState()),
                                gameState.transitionState(given: Input(input)))
+            case .itemUsed:
+                XCTAssertEqual(AnyGameState(ComputingState()),
+                gameState.transitionState(given: Input(input)))
             case .touch, .rotateCounterClockwise, .rotateClockwise, .play, .pause, .animationsFinished, .playAgain, .transformation, .boardBuilt, .selectLevel, .newTurn, .touchBegan, .tutorial,
                  .visitStore, .itemUseSelected, .reffingFinished, .attack, .monsterDies, .collectItem, .gameWin, .gameLose:
                 XCTAssertNil(gameState.transitionState(given: Input(input)))

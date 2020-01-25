@@ -44,3 +44,4 @@ extension Array where Element: Collection, Element.Index == Int {
         return self[tileCoord.x][tileCoord.y]
     }
 }
+

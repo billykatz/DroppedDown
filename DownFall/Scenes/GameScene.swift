@@ -119,10 +119,10 @@ class GameScene: SKScene {
         TurnWatcher.shared.register()
         
         //Debug settings triple tap
-        let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(tripleTap))
-        tapRecognizer.numberOfTapsRequired = 3
-        tapRecognizer.delaysTouchesEnded = false
-        view.addGestureRecognizer(tapRecognizer)
+//        let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(tripleTap))
+//        tapRecognizer.numberOfTapsRequired = 3
+//        tapRecognizer.delaysTouchesEnded = false
+//        view.addGestureRecognizer(tapRecognizer)
     }
     
     public func prepareForReuse() {

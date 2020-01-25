@@ -154,7 +154,9 @@ class Renderer: SKSpriteNode {
                 let sprites = createSprites(from: trans.endTiles)
                 animationsFinished(for: sprites, endTiles: trans.endTiles)
             case .itemUsed:
-                if let tiles = trans.endTiles, let playerCoord = getTilePosition(.player(.zero), tiles: tiles), case TileType.player(let data) = tiles[playerCoord].type {
+                if let tiles = trans.endTiles,
+                    let playerCoord = getTilePosition(.player(.zero), tiles: tiles),
+                    case TileType.player(let data) = tiles[playerCoord].type {
                     backpackView.update(with: data)
                 }
                 
@@ -189,8 +191,7 @@ class Renderer: SKSpriteNode {
             foreground.addChild(menuForeground)
         case .gameLose:
             menuForeground.addChild(gameLoseSpriteNode)
-            menuForeground.removeFromParent()
-            foreground.addChild(menuForeground)
+            foreground.addChildSafely(menuForeground)
         case .playAgain:
             menuForeground.removeFromParent()
         case .tutorial(let step):
@@ -229,9 +230,8 @@ class Renderer: SKSpriteNode {
         }
         
         if step.showClockwiseRotate {
-            menuForeground.removeFromParent()
-            menuForeground.addChild(rotateSprite)
-            foreground.addChild(menuForeground)
+            menuForeground.addChildSafely(rotateSprite)
+            foreground.addChildSafely(menuForeground)
         }
     }
     

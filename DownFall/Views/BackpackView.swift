@@ -76,10 +76,11 @@ class BackpackView: SKSpriteNode {
         // view container
         self.viewContainer = SKSpriteNode(texture: nil, color: .clear, size: playableRect.size)
         self.viewContainer.zPosition = Precedence.foreground.rawValue
+        self.viewContainer.position = .zero
         
         // background view
         self.background = SKSpriteNode(color: .foregroundBlue, size: CGSize(width: playableRect.width, height: height))
-        self.background.position = CGPoint.positionThis(background.frame, inBottomOf: self.viewContainer.frame)
+        self.background.position = CGPoint.positionThis(background.frame, inBottomOf: viewContainer.frame)
         
         //targeting area
         self.targetingArea = SKSpriteNode(color: .clear, size: CGSize(width: playableRect.width, height: playableRect.height))
@@ -88,7 +89,8 @@ class BackpackView: SKSpriteNode {
         
         //inventory area
         self.inventoryArea = SKSpriteNode(texture: nil, color: .clear, size: CGSize(width: playableRect.width, height: height))
-        self.inventoryArea.position = CGPoint.positionThis(self.inventoryArea.frame, inBottomOf: self.viewContainer.frame)
+        self.inventoryArea.position = CGPoint.positionThis(inventoryArea.frame, inBottomOf: viewContainer.frame)
+        self.inventoryArea.color = .brown
 
         // center target area reticles
         let marginWidth = playableRect.width - CGFloat(tileSize * boardSize)
@@ -97,10 +99,12 @@ class BackpackView: SKSpriteNode {
         let bottomLeftY = playableRect.minY + marginHeight/2 + tileSize/2
         self.bottomLeft = CGPoint(x: bottomLeftX, y: bottomLeftY)
         
-        // item and description areas
-        itemArea = SKSpriteNode(color: .clear, size: CGSize(width: playableRect.width * 3 / 4, height: height/2))
-        itemArea.position = CGPoint.positionThis(itemArea.frame, inBottomOf: self.inventoryArea.frame, anchor: .left)
+        // item  areas
+        itemArea = SKSpriteNode(color: .eggshellWhite, size: CGSize(width: playableRect.width * 3 / 4, height: height/2))
+        itemArea.position = CGPoint.positionThis(itemArea.frame, inBottomOf: inventoryArea.frame, anchor: .left)
         
+        
+        // description area
         descriptionArea = SKSpriteNode(color: .clear, size: CGSize(width: playableRect.width * 3 / 4, height: height/2))
         descriptionArea.position = CGPoint.positionThis(descriptionArea.frame, outsideOf: itemArea.frame, verticality: .top, spacing: -20)
 
@@ -108,7 +112,6 @@ class BackpackView: SKSpriteNode {
         super.init(texture: nil, color: .clear, size: CGSize(width: playableRect.width, height: height))
         // "bind" to to the view model
         self.viewModel.updateCallback = { [weak self] in self?.updated() }
-        
         
         // add sprites to the inventory area
         inventoryArea.addChild(itemArea)
@@ -199,7 +202,7 @@ class BackpackView: SKSpriteNode {
 
         
         
-        addChildSafely(itemArea)
+        inventoryArea.addChildSafely(itemArea)
     }
     
     private func updateTargetArea() {
@@ -219,7 +222,7 @@ class BackpackView: SKSpriteNode {
             let reticle = SKSpriteNode(texture: SKTexture(imageNamed: identifier), size: CGSize(width: tileSize, height: tileSize))
             reticle.position = position
             reticle.zPosition = Precedence.menu.rawValue
-            targetingArea.addChild(reticle)
+            targetingArea.addChildSafely(reticle)
         }
     }
     
@@ -283,26 +286,8 @@ class BackpackView: SKSpriteNode {
         toastContainer.zPosition = Precedence.underground.rawValue
         toastContainer.position = CGPoint.positionThis(toastContainer.frame, outsideOf: self.background.frame, verticality: .top, spacing: -toastContainer.frame.height/2)
         
-        self.addChild(toastContainer)
+        self.addChildSafely(toastContainer)
         toastMessageContainer = toastContainer
-    }
-    
-    private func toggleItemArea() {
-        if itemArea.position.x < playableRect.origin.x {
-            // items are hidden
-            let position = CGPoint.positionThis(itemArea.frame, inBottomOf: self.frame, padding: Style.Padding.most, anchor: .left)
-            let moveAction = SKAction.move(to: position,  duration: 0.25)
-            moveAction.timingMode = .easeIn
-            
-            itemArea.run(moveAction)
-        } else {
-            // items are showing
-            let position = CGPoint.positionThis(itemArea.frame, outside: self.frame, anchor: .left, padding: Style.Padding.most)
-            let moveAction = SKAction.move(to: position, duration: 0.25)
-            moveAction.timingMode = .easeOut
-            
-            itemArea.run(moveAction)
-        }
     }
     
     private func updateDescription(with ability: AnyAbility?) {
@@ -310,7 +295,7 @@ class BackpackView: SKSpriteNode {
         
         if let ability = ability {
             let descriptionLabel = ParagraphNode(text: ability.description, paragraphWidth: descriptionArea.frame.width, fontSize: UIFont.largeSize, fontColor: UIColor.storeBlack)
-            descriptionArea.addChild(descriptionLabel)
+            descriptionArea.addChildSafely(descriptionLabel)
         }
     }
     
@@ -364,10 +349,7 @@ extension BackpackView {
 
 extension BackpackView: ButtonDelegate {
     func buttonTapped(_ button: Button) {
-        if button.identifier == ButtonIdentifier.backpack {
-            toggleItemArea()
-            viewModel.didSelect(nil)
-        } else if button.identifier == ButtonIdentifier.backpackUse {
+        if button.identifier == ButtonIdentifier.backpackUse {
             viewModel.didUse(viewModel.ability)
         } else  if button.identifier == ButtonIdentifier.backpackCancel {
             viewModel.didSelect(nil)

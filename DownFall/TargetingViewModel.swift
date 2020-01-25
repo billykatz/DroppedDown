@@ -122,8 +122,6 @@ class TargetingViewModel: Targeting {
                 
             case .itemUseCanceled:
                 ()
-            case .itemUsed:
-                self?.ability = nil
             default:
                 ()
             }
@@ -170,6 +168,7 @@ class TargetingViewModel: Targeting {
         InputQueue.append(
             Input(.itemUsed(ability, currentTargets.map { $0.coord }))
         )
+        self.ability = nil
         
     }
     

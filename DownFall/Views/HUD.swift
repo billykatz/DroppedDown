@@ -53,7 +53,9 @@ class HUD: SKSpriteNode {
             case .collectItem(_, let item, let total):
                 incrementCurrencyCounter(item, total: total)
             case .itemUsed:
-                if let tiles = trans.endTiles, let playerCoord = getTilePosition(.player(.zero), tiles: tiles), case TileType.player(let data) = tiles[playerCoord].type {
+                if let tiles = trans.endTiles,
+                    let playerCoord = getTilePosition(.player(.zero), tiles: tiles),
+                    case TileType.player(let data) = tiles[playerCoord].type {
                     show(data)
                 }
             default:

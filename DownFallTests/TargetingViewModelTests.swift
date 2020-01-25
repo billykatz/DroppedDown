@@ -178,4 +178,19 @@ class TargetingViewModelTests: XCTestCase {
         XCTAssertEqual(vm.currentTargets.count, 0)
         
     }
+    
+    func testDidUseAbility() {
+        // given
+        let vm = TargetingViewModel()
+        
+        //when
+        Dispatch.shared.send(Input(InputType.itemUseSelected(AnyAbility(RockASwap()))))
+        sendTiles()
+        XCTAssertNotNil(vm.ability)
+        vm.currentTargets = [Target(coord: .zero, isLegal: true), Target(coord: TileCoord(1, 2), isLegal: true)]
+        vm.didUse(AnyAbility(RockASwap()))
+        
+        // verify
+        XCTAssertNil(vm.ability)
+    }
 }

@@ -17,12 +17,12 @@ struct PlayState: GameState {
         case .gameWin,. gameLose,. pause,
              .attack, .transformation,
              .touch, .monsterDies, .rotateCounterClockwise, .rotateClockwise,
-             .boardBuilt, .touchBegan, .tutorial, .itemUseSelected, .itemUsed:
+             .boardBuilt, .touchBegan, .tutorial, .itemUseSelected:
             return true
         case .animationsFinished, .play,
              .reffingFinished, .playAgain, .collectItem,
              .selectLevel, .newTurn,
-             .visitStore, .itemUseCanceled, .itemCanBeUsed:
+             .visitStore, .itemUseCanceled, .itemCanBeUsed, .itemUsed:
             return false
         }
     }

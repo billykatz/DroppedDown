@@ -20,7 +20,7 @@ struct Style {
         static let ctaButton = CGFloat(200)
         
         struct Toast {
-            static let width = CGFloat(300)
+            static let width = CGFloat(600)
             static let height = CGFloat(200)
             static let cornerRadius = CGFloat(50)
         }

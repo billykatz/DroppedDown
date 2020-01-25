@@ -103,7 +103,8 @@ struct EntityModel: Equatable, Decodable {
             updatedAbility.count += 1
             newAbilities[index] = updatedAbility
         } else {
-            let anyAbility = AnyAbility(ability)
+            var anyAbility = AnyAbility(ability)
+            anyAbility.count = 1
             newAbilities.append(anyAbility)
         }
         

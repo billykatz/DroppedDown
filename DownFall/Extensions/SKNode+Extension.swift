@@ -22,12 +22,14 @@ extension SKNode {
     }
     
     func addChildSafely(_ child: SKNode?) {
+        let childPosition = child?.position
         if child?.parent != nil {
-            addOptionalChild(child)
-        } else {
             child?.removeFromParent()
             addOptionalChild(child)
+        } else {
+            addOptionalChild(child)
         }
+        child?.position = childPosition ?? .zero
     }
 
 }

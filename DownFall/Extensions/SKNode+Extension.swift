@@ -15,9 +15,7 @@ extension SKNode {
     }
     
     func addOptionalChild(_ child: SKNode?) {
-        guard let nonNilChild = child else {
-            fatalError("Error: trying to add a nil child to a node")
-        }
+        guard let nonNilChild = child else { return }
         addChild(nonNilChild)
     }
     

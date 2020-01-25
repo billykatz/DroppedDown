@@ -47,7 +47,7 @@ struct Style {
         }
         
         struct CTAButton {
-            static let size = CGSize(width: 200, height: 50)
+            static let size = CGSize(width: 175, height: 150)
             static let bottomPadding = CGFloat(200)
         }
         

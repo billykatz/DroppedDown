@@ -40,18 +40,14 @@ class TargetingViewModel: Targeting {
     
     var ability: AnyAbility? {
         didSet {
-            
-            currentTargets = []
-            
-            if ability == nil {
-                InputQueue.append(Input(InputType.itemUseCanceled))
-            } else {
-                if oldValue == nil, let ability = ability {
-                    InputQueue.append(Input(InputType.itemUseSelected(ability)))
-                }
-                autoTarget()
+            if let ability = ability {
+                InputQueue.append(Input(InputType.itemUseSelected(ability)))
             }
-            updateCallback?()
+            else {
+                InputQueue.append(Input(InputType.itemUseCanceled))
+            }
+            currentTargets = []
+            autoTarget()
         }
     }
     
@@ -121,8 +117,6 @@ class TargetingViewModel: Targeting {
     init() {
         Dispatch.shared.register { [weak self] (input) in
             switch input.type {
-            case .itemUseSelected(let ability):
-                self?.ability = ability
             case .transformation(let trans):
                 if let inputType = trans.inputType,
                     case InputType.itemUseSelected(_) = inputType,
@@ -148,7 +142,7 @@ class TargetingViewModel: Targeting {
     }
     
     /**
-    Toggles targeted-ness of a tile.  If a tile is not targeted it becomes targeted.  The opposite is true.
+     Toggles targeted-ness of a tile.  If a tile is not targeted it becomes targeted.  The opposite is true.
      
      - Note: If the max number of targets for an ability is reached and a unique coord is passed in. The most recently placed target is un-targeted. And the passed in coord becomes targeted.
      - Parameters coord: The coord that is being targetted
@@ -161,7 +155,7 @@ class TargetingViewModel: Targeting {
             currentTargets.removeAll(where: { return $0.coord == coord })
         } else if currentTargets.count < self.numberOfTargets {
             //add the new target
-           currentTargets.append(Target(coord: coord, isLegal: isTargetLegal(coord)))
+            currentTargets.append(Target(coord: coord, isLegal: isTargetLegal(coord)))
         } else {
             // move the most recently placed unless there is one that is "illegal" then move that one.
             let count = currentTargets.count
@@ -175,7 +169,8 @@ class TargetingViewModel: Targeting {
     }
     
     func didUse(_ ability: AnyAbility?) {
-        guard legallyTargeted, let ability = ability else { fatalError("Something is out of sync. Use button should only be clickable when we legally targeted") }
+        guard let ability = ability else { return }
+        guard legallyTargeted else { return }
         InputQueue.append(
             Input(.itemUsed(ability, currentTargets.map { $0.coord }))
         )

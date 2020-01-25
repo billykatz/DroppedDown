@@ -131,12 +131,12 @@ enum TileType: Equatable, Hashable, CaseIterable {
         }
     }
     
-    func willAttackNextTurn() -> Bool {
-        if case let .monster(data) = self {
-            return data.willAttackNextTurn()
-        }
-        return false
-    }
+//    func willAttackNextTurn() -> Bool {
+//        if case let .monster(data) = self {
+//            return data.willAttackNextTurn()
+//        }
+//        return false
+//    }
     
     func turnsUntilAttack() -> Int? {
         if case let .monster(data) = self {

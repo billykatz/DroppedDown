@@ -262,7 +262,7 @@ class Renderer: SKSpriteNode {
             for (col, sprite) in innerSprites.enumerated() {
                 if tiles?[row][col].shouldHighlight ?? false {
                     sprite.indicateSpriteWillBeAttacked()
-                } else if tiles?[row][col].type.willAttackNextTurn() ?? false {
+                } else if tiles?[row][col].type.turnsUntilAttack() ?? -1 == 0 {
                     sprite.indicateSpriteWillBeAttacked()
                 } else if let turns = tiles?[row][col].type.turnsUntilAttack(),
                     let frequency = tiles?[row][col].type.attackFrequency() {

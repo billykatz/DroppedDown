@@ -305,11 +305,11 @@ class BackpackView: SKSpriteNode {
             if viewModel.legallyTargeted {
                 ctaButton.color = .highlightGold
                 ctaButton.addShadow()
-                ctaButton.isDisabled = false
+                ctaButton.enabled(true)
             } else {
                 ctaButton.color = .gray
                 ctaButton.removeShadow()
-                ctaButton.isDisabled = true
+                ctaButton.enabled(false)
             }
             
             

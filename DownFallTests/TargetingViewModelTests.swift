@@ -35,19 +35,6 @@ class TargetingViewModelTests: XCTestCase {
         Dispatch.shared.send(Input(InputType.transformation(trans)))
     }
     
-    func testAbilityGetsSet() {
-        // given
-        let vm = TargetingViewModel()
-        XCTAssertNil(vm.ability)
-        
-        // when
-        Dispatch.shared.send(Input(InputType.itemUseSelected(AnyAbility(GreaterHealingPotion()))))
-        
-        //verify
-        XCTAssertNotNil(vm.ability)
-        
-    }
-    
     func testDidTargetSingle() {
         // given
         let vm = TargetingViewModel()
@@ -55,7 +42,7 @@ class TargetingViewModelTests: XCTestCase {
         sendTiles()
         
         //when
-        Dispatch.shared.send(Input(InputType.itemUseSelected(AnyAbility(KillMonsterPotion()))))
+        vm.didSelect(AnyAbility(KillMonsterPotion()))
         
         vm.didTarget(.zero)
         
@@ -71,7 +58,7 @@ class TargetingViewModelTests: XCTestCase {
         XCTAssertEqual(vm.currentTargets.count, 0)
         
         //when
-        Dispatch.shared.send(Input(InputType.itemUseSelected(AnyAbility(RockASwap()))))
+        vm.didSelect(AnyAbility(RockASwap()))
         sendTiles()
         
         vm.didTarget(.zero)
@@ -121,7 +108,7 @@ class TargetingViewModelTests: XCTestCase {
         XCTAssertEqual(vm.currentTargets.count, 0)
         
         //when
-        Dispatch.shared.send(Input(InputType.itemUseSelected(AnyAbility(GreaterHealingPotion()))))
+        vm.didSelect(AnyAbility(GreaterHealingPotion()))
         sendTiles()
         
         // verify
@@ -138,7 +125,7 @@ class TargetingViewModelTests: XCTestCase {
         XCTAssertEqual(vm.currentTargets.count, 0)
         
         //when
-        Dispatch.shared.send(Input(InputType.itemUseSelected(AnyAbility(KillMonsterPotion()))))
+        vm.didSelect(AnyAbility(KillMonsterPotion()))
         
         // with 1 monster
         sendTiles(1)
@@ -184,7 +171,7 @@ class TargetingViewModelTests: XCTestCase {
         let vm = TargetingViewModel()
         
         //when
-        Dispatch.shared.send(Input(InputType.itemUseSelected(AnyAbility(RockASwap()))))
+        vm.didSelect(AnyAbility(RockASwap()))
         sendTiles()
         XCTAssertNotNil(vm.ability)
         vm.currentTargets = [Target(coord: .zero, isLegal: true), Target(coord: TileCoord(1, 2), isLegal: true)]

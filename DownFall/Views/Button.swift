@@ -82,13 +82,14 @@ class Button: SKShapeNode {
     var showSelection = false
     
     var dropShadow: SKShapeNode?
-    var dropShadowOffset: CGFloat = 10.0
+    var dropShadowOffset: CGFloat = 5.0
     var unpressedPosition: CGPoint? = nil
     var depressedPosition: CGPoint? = nil
     
     /// view to expand touch region of button
     lazy var touchTargetExpandingView: SKSpriteNode = {
         let view = SKSpriteNode(texture: nil, color: .clear, size: self.frame.scale(by: Style.Button.touchzone, andYAmount: Style.Button.touchzone).size)
+        view.alpha = 0.0
         view.zPosition = Precedence.underground.rawValue
         view.isUserInteractionEnabled = true
         return view
@@ -97,7 +98,7 @@ class Button: SKShapeNode {
     /// view that is the visual button
     var buttonView: SKShapeNode?
     
-    var isDisabled: Bool = false
+    private var isDisabled: Bool = false
     
     init(size: CGSize,
          delegate: ButtonDelegate,
@@ -158,7 +159,10 @@ class Button: SKShapeNode {
         
         //add touch expanding view
         addChild(touchTargetExpandingView)
+
+
         
+        self.color = .clear
         
         // set points for moving the button slightly
         
@@ -206,8 +210,12 @@ extension Button {
         dropShadow?.removeFromParent()
     }
     public func addShadow() {
-        dropShadow?.removeFromParent()
-        self.addOptionalChild(dropShadow)
+        addChildSafely(dropShadow)
+    }
+    
+    public func enabled(_ on: Bool) {
+        self.isDisabled = !on
+        buttonView?.color = on ? originalBackground : .lightGray
     }
     
     

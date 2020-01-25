@@ -15,10 +15,19 @@ extension SKNode {
     }
     
     func addOptionalChild(_ child: SKNode?) {
-        guard let nonNilChild = child else {
-            fatalError("Error: trying to add a nil child to a node")
-        }
+        guard let nonNilChild = child else { return }
         addChild(nonNilChild)
+    }
+    
+    func addChildSafely(_ child: SKNode?) {
+        let childPosition = child?.position
+        if child?.parent != nil {
+            child?.removeFromParent()
+            addOptionalChild(child)
+        } else {
+            addOptionalChild(child)
+        }
+        child?.position = childPosition ?? .zero
     }
 
 }

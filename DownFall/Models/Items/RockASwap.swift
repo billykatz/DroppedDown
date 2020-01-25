@@ -7,6 +7,17 @@
 //
 
 struct RockASwap: Ability {
+    
+    var count: Int
+    
+    init(count: Int = 0) {
+        self.count = 0
+    }
+    
+    func animatedColumns() -> Int? {
+        return nil
+    }
+    
     var affectsCombat: Bool {
         return false
     }
@@ -15,7 +26,7 @@ struct RockASwap: Ability {
         return "rockaswap"
     }
     
-    var cost: Int { return 16 }
+    var cost: Int { return 160 }
     
     var currency: Currency { return .gold }
     
@@ -40,5 +51,9 @@ struct RockASwap: Ability {
     var usage: Usage {
         return .once
     }
+    
+    var heal: Int? { return nil }
+    var targets: Int? { return 2 }
+    var targetTypes: [TileType]? { return TileType.rockCases }
 }
 

@@ -10,6 +10,7 @@ import Foundation
 import CoreGraphics
 
 enum Precedence: CGFloat {
+    case underground = -10
     case background = 0
     case foreground = 10
     case menu = 20

@@ -89,6 +89,28 @@ func xTiles(_ numTiles: Int, _ tile: Tile, _ board: Board) -> Builder {
     }
 }
 
+func xTiles(_ tiles: [Tile], _ board: Board) -> Builder {
+    guard tiles.count < board.tiles.count else { fatalError("This would lead to a infinite loop.  Choose a bigger board") }
+    return { board in
+        var placesTiles = Set<TileCoord>()
+        var newTiles = board.tiles
+        for tile in tiles {
+            var col = Int.random(board.boardSize)
+            var row = Int.random(board.boardSize)
+            while (placesTiles.contains(TileCoord(row, col))) {
+                // get new random numbers until we find a spot we havent used yet
+                col = Int.random(board.boardSize)
+                row = Int.random(board.boardSize)
+            }
+                
+            //place the tile
+            placesTiles.insert(TileCoord(row, col))
+            newTiles[row][col] = tile
+        }
+        return Board(tiles: newTiles)
+    }
+}
+
 extension TileType {
     static var playerWithGem: TileType {
         let gemCarry = CarryModel(items: [Item(type: .gem, amount: 1)])

@@ -9,14 +9,35 @@
 import Foundation
 import SpriteKit
 
-struct AnyAbility {
-    let _ability: Ability
+struct AnyAbility: Hashable {
+    var _ability: Ability
     init(_ ability: Ability) {
         _ability = ability
     }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(_ability.textureName.hashValue)
+    }
+    
+    //TODO: make hack better
+    static let zero: AnyAbility = AnyAbility(Empty())
 }
 
 extension AnyAbility: Ability {
+    
+    var count : Int {
+        set {
+            _ability.count = newValue
+        }
+        get {
+            return _ability.count
+        }
+    }
+    
+    func animatedColumns() -> Int? {
+        return _ability.animatedColumns()
+    }
+    
     func blocksDamage(from: Direction) -> Int? {
         return _ability.blocksDamage(from: from)
     }
@@ -57,6 +78,13 @@ extension AnyAbility: Ability {
         return _ability.usage
     }
     
+    var heal: Int? {
+        return _ability.heal
+    }
+    
+    
+    var targets: Int? { return _ability.targets }
+    var targetTypes: [TileType]? { _ability.targetTypes }
 }
 
 extension AnyAbility: Equatable {
@@ -64,6 +92,7 @@ extension AnyAbility: Equatable {
         return lhs.type == rhs.type
     }
 }
+
 
 protocol Ability {
     var affectsCombat: Bool { get }
@@ -76,12 +105,23 @@ protocol Ability {
     var extraAttacksGranted: Int? { get }
     var sprite: SKSpriteNode? { get }
     var usage: Usage { get }
+    var targets: Int? { get }
+    var targetTypes: [TileType]? { get }
+    var heal: Int? { get }
+    var count: Int { get set }
+    
     func blocksDamage(from: Direction) -> Int?
+    func animatedColumns() -> Int?
 }
 
 extension Ability {
     var sprite: SKSpriteNode? {
         return SKSpriteNode(texture: SKTexture(imageNamed: textureName), size: CGSize(width: 50.0, height: 50.0))
+    }
+    
+    var spriteSheet: SpriteSheet?  {
+        guard let cols = animatedColumns() else { return nil }
+        return SpriteSheet.init(texture: SKTexture(imageNamed: textureName), rows: 1, columns: cols)
     }
 }
 
@@ -93,6 +133,8 @@ enum AbilityType: String, Decodable {
     case lesserHealingPotion
     case greaterHealingPotion
     case swordPickAxe
+    case transmogrificationPotion
+    case killMonsterPotion
 }
 
 enum Usage {

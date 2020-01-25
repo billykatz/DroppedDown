@@ -9,7 +9,6 @@
 import GameplayKit
 
 class TileCreator: TileStrategy {
-    var spawnedGem = false
     var randomSource = GKLinearCongruentialRandomSource()
     let entities: EntitiesModel
     let difficulty: Difficulty
@@ -119,7 +118,7 @@ class TileCreator: TileStrategy {
                     newTiles.append(nextTile)
                 }
             case .item:
-                if specialGems < 2 {
+                if specialGems < 0  {
                     specialGems  += 1
                     newTiles.append(Tile(type: .item(Item(type: .gem, amount: 1))) )
                 }
@@ -198,8 +197,8 @@ class TileCreator: TileStrategy {
         
         //place the exit on the opposite side of the grid
         #warning ("make sure this is set properly for release")
-//        let exitQuadrant = playerQuadrant.opposite
-        let exitQuadrant = playerQuadrant
+        let exitQuadrant = playerQuadrant.opposite
+//        let exitQuadrant = playerQuadrant
         let exitPosition = exitQuadrant.randomCoord(for: boardSize)
         
         tiles[exitPosition.x][exitPosition.y] = Tile.exit

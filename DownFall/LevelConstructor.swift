@@ -81,7 +81,7 @@ struct LevelConstructor {
             rocks[.greenRock] = normalRockRange.next(10)
             return rocks
         case .second:
-            var rocks = matchUp([.redRock, .blueRock, .purpleRock, .brownRock], range: normalRockRange, subRanges: 4)
+            var rocks = matchUp([.redRock, .blueRock, .purpleRock], range: normalRockRange, subRanges: 3)
             rocks[.greenRock] = normalRockRange.next(10)
             return rocks
         case .third:
@@ -129,7 +129,7 @@ struct LevelConstructor {
             case .easy:
                 return matchUp([.bat, .dragon, .alamo], range: normalRockRange, subRanges: 3)
             case .normal, .hard:
-                return matchUp([.wizard, .bat, .dragon, .alamo, .lavaHorse], range: normalRockRange, subRanges: 5)
+                return matchUp([.rat, .bat, .dragon, .alamo], range: normalRockRange, subRanges: 4)
             }
         case .boss, .tutorial1, .tutorial2:
             fatalError("Boss level not implemented yet")
@@ -205,26 +205,27 @@ struct LevelConstructor {
     }
     
     static func availableAbilities(per levelType: LevelType, difficulty: Difficulty) -> [AnyAbility] {
-        var abilities: [Ability] = []
-        switch levelType {
-        case .first:
-            switch difficulty {
-            case .easy, .normal, .hard:
-                abilities = [LesserHealingPotion(), Dynamite(), SwordPickAxe()]
-            }
-        case .second:
-            switch difficulty {
-            case .easy, .normal, .hard:
-                abilities = [LesserHealingPotion(), Dynamite(), GreaterHealingPotion()]
-            }
-        case .third:
-            switch difficulty {
-            case .easy, .normal, .hard:
-                abilities = [LesserHealingPotion(), Dynamite(), GreaterHealingPotion(), ShieldEast()]
-            }
-        case .boss, .tutorial1, .tutorial2:
-            fatalError("Boss level not implemented yet")
-        }
+        let abilities: [Ability] = [LesserHealingPotion(), Dynamite(), GreaterHealingPotion(), ShieldEast(), TransmogrificationPotion(), KillMonsterPotion(), RockASwap()]
+        
+//        switch levelType {
+//        case .first:
+//            switch difficulty {
+//            case .easy, .normal, .hard:
+//                abilities = [LesserHealingPotion(), Dynamite(), SwordPickAxe()]
+//            }
+//        case .second:
+//            switch difficulty {
+//            case .easy, .normal, .hard:
+//                abilities = [LesserHealingPotion(), Dynamite(), GreaterHealingPotion()]
+//            }
+//        case .third:
+//            switch difficulty {
+//            case .easy, .normal, .hard:
+//                abilities = [LesserHealingPotion(), Dynamite(), GreaterHealingPotion(), ShieldEast()]
+//            }
+//        case .boss, .tutorial1, .tutorial2:
+//            fatalError("Boss level not implemented yet")
+//        }
         
         return abilities.map { AnyAbility($0) }
     }

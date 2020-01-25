@@ -6,7 +6,13 @@
 //  Copyright © 2019 William Katz LLC. All rights reserved.
 //
 
-class Dispatch {
+protocol Dispatching {
+    func send(_ input: Input)
+    func register(_ callback: @escaping (Input) -> ())
+    func reset()
+}
+
+class Dispatch: Dispatching {
     static let shared = Dispatch()
     
     var receivers: [(Input) -> ()] = []

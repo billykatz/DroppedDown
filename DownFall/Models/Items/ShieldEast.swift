@@ -9,6 +9,17 @@
 import SpriteKit
 
 struct ShieldEast: Ability {
+    
+    var count: Int
+    
+    init(count: Int = 0) {
+        self.count = 0
+    }
+    
+    func animatedColumns() -> Int? {
+           return nil
+    }
+    
     var affectsCombat: Bool {
         return true
     }
@@ -22,7 +33,7 @@ struct ShieldEast: Ability {
     }
     
     var cost: Int {
-        return 5
+        return 40
     }
     
     var currency: Currency { return .gold }
@@ -55,4 +66,7 @@ struct ShieldEast: Ability {
     var usage: Usage {
         return .oneRun
     }
+    var heal: Int? { return nil }
+    var targets: Int? { return nil }
+    var targetTypes: [TileType]? { nil }
 }

@@ -2,8 +2,8 @@
     "entities": [
         { "name": "player2",
             "type": "player",
-            "originalHp": 5,
-            "hp": 5,
+            "originalHp": 7,
+            "hp": 4,
             "attack": {
                 "type": "targets",
                 "frequency" : 1,
@@ -50,7 +50,7 @@
                 "items": [
                     {
                         "type": "gold",
-                        "amount": 15
+                        "amount": 800
                         
                     },
                     {
@@ -191,12 +191,12 @@
             "originalHp": 1,
             "hp": 1,
             "attack": {
-                "type": "targets",
-                "frequency" : 1,
+                "type": "charges",
+                "frequency" : 3,
                 "damage": 1,
                 "range": {
                     "lower": 1,
-                    "upper": 10
+                    "upper": 3
                 },
                 "attacksPerTurn": 1,
                 "attackSlope": [
@@ -246,8 +246,8 @@
             "originalHp": 1,
             "hp": 1,
             "attack": {
-                "type": "targets",
-                "frequency" : 1,
+                "type": "charges",
+                "frequency" : 3,
                 "damage": 1,
                 "range": {
                     "lower": 1,
@@ -309,10 +309,9 @@
                 "damage": 1,
                 "range": {
                     "lower": 1,
-                    "upper": 3
+                    "upper": 2
                 },
                 "attacksPerTurn": 1,
-                "charge" : 1,
                 "attackSlope": [
                     {
                         "over": 1,
@@ -379,7 +378,6 @@
                     "upper": 1
                 },
                 "attacksPerTurn": 1,
-                "charges": 1,
                 "attackSlope": [
                     {
                         "over": 1,

@@ -16,4 +16,8 @@ struct AnimationSettings {
         static let moveVector: CGVector = CGVector(dx: 0.0, dy: 20.0)
         static let shrinkCoefficient: CGFloat = 0.2
     }
+    
+    struct Store {
+        static let itemFrameRate = Double(0.3)
+    }
 }

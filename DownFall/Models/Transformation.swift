@@ -6,6 +6,7 @@
 //  Copyright © 2018 William Katz LLC. All rights reserved.
 //
 
+
 struct Transformation: Equatable, Hashable {
     var tileTransformation: [[TileTransformation]]?
     var inputType: InputType? = nil

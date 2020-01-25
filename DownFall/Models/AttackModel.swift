@@ -37,8 +37,8 @@ struct AttackModel: Equatable, Decodable {
     var attacksThisTurn: Int = 0
     var turns: Int = 1
     let attacksPerTurn: Int
-    var charge: Int?
     var attackSlope: [AttackSlope]
+    var lastAttackTurn: Int = 0
     
     private enum CodingKeys: String, CodingKey {
         typealias RawValue = String
@@ -47,7 +47,6 @@ struct AttackModel: Equatable, Decodable {
         case range
         case damage
         case attacksPerTurn
-        case charge
         case attackSlope
     }
 
@@ -58,8 +57,8 @@ struct AttackModel: Equatable, Decodable {
                                   attacksThisTurn: 0,
                                   turns: 0,
                                   attacksPerTurn: 0,
-                                  charge: 0,
-                                  attackSlope: [])
+                                  attackSlope: [],
+                                  lastAttackTurn: 0)
     
     func didAttack() -> AttackModel {
         return AttackModel(type: type,
@@ -69,8 +68,8 @@ struct AttackModel: Equatable, Decodable {
                            attacksThisTurn: attacksThisTurn + 1,
                            turns: turns,
                            attacksPerTurn: attacksPerTurn,
-                           charge: 0,
-                           attackSlope: attackSlope)
+                           attackSlope: attackSlope,
+                           lastAttackTurn: turns)
     }
     
     func resetAttack() -> AttackModel {
@@ -81,12 +80,11 @@ struct AttackModel: Equatable, Decodable {
                            attacksThisTurn: 0,
                            turns: turns,
                            attacksPerTurn: attacksPerTurn,
-                           charge: charge ?? 0,
-                           attackSlope: attackSlope)
+                           attackSlope: attackSlope,
+                           lastAttackTurn: lastAttackTurn)
     }
     
     func incrementTurns() -> AttackModel {
-        let charge = self.charge ?? 0
         return AttackModel(type: type,
                            frequency: frequency,
                            range: range,
@@ -94,17 +92,27 @@ struct AttackModel: Equatable, Decodable {
                            attacksThisTurn: attacksThisTurn,
                            turns:  turns + 1,
                            attacksPerTurn: attacksPerTurn,
-                           charge: min(frequency, charge + 1),
-                           attackSlope: attackSlope)
+                           attackSlope: attackSlope,
+                           lastAttackTurn: lastAttackTurn)
     }
     
     func willAttackNextTurn() -> Bool {
-        let shouldAttack = (self.turns + 1) % self.frequency == 0
-        return shouldAttack && type == .areaOfEffect
+        //TODO: delete this
+        return false
+    }
+    
+    
+    func turnsUntilNextAttack() -> Int? {
+        if type == .targets { return 0 }
+        if isCharged { return 0 }
+        return self.frequency - (self.turns - lastAttackTurn) % self.frequency
     }
     
     var isCharged: Bool {
-        return (charge ?? 0) == frequency
+        if turns == lastAttackTurn { return false }
+        if (turns - lastAttackTurn) / frequency >= 1 { return true }
+        if (turns - lastAttackTurn) < frequency { return false }
+        return (self.turns % self.frequency) == 0
     }
     
     public func targets(from position: TileCoord) -> [TileCoord] {

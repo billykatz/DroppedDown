@@ -36,10 +36,10 @@ class DFTileSpriteNode: SKSpriteNode {
             addChild(minecartSprite)
             
         default:
-
+            
             super.init(texture: SKTexture(imageNamed: type.textureString()),
-                   color: .clear,
-                   size: CGSize.init(width: width, height: height))
+                       color: .clear,
+                       size: CGSize.init(width: width, height: height))
         }
     }
     
@@ -57,7 +57,44 @@ class DFTileSpriteNode: SKSpriteNode {
     func indicateSpriteWillBeAttacked() {
         let indicatorSprite = SKSpriteNode(color: .yellow, size: self.size)
         indicatorSprite.zPosition = Precedence.background.rawValue
+        
         self.addChild(indicatorSprite)
+        
+        let wait = SKAction.wait(forDuration: 2.0)
+        let remove = SKAction.removeFromParent()
+        indicatorSprite.run(SKAction.sequence([wait, remove]))
+    }
+    
+    /**
+     Indicates that attack timing of a sprite
+     
+     - Parameter frequency:  The frequency of an attack
+     - Parameter turns:  The turns until the next attack
+     
+     */
+    
+    func showAttackTiming(_ frequency: Int,
+                          _ turns: Int) {
+        
+        let size = CGSize(width: self.frame.width * 0.1, height: frame.height * 0.1)
+        
+        var previousCircle: SKShapeNode?
+        
+        var color = UIColor.clear
+        if turns == 0 {
+            color = .green
+        } else if turns == 1 {
+            color = .yellow
+        } else {
+            color = .red
+        }
+        previousCircle = SKShapeNode(circleOfRadius: size.width)
+        previousCircle?.fillColor = color
+        previousCircle?.strokeColor = color
+        previousCircle?.position = CGPoint.positionThis(previousCircle!.frame, inBottomOf: frame, anchor: .right)
+        previousCircle?.zPosition = Precedence.foreground.rawValue
+        addOptionalChild(previousCircle)
+        
     }
     
     func tutorialHighlight(){
@@ -66,25 +103,25 @@ class DFTileSpriteNode: SKSpriteNode {
             whiteSprite.zPosition = Precedence.background.rawValue
             whiteSprite.alpha = 0.75
             self.addChild(whiteSprite)
-
+            
         } else {
             let border = SKShapeNode(circleOfRadius: Style.TutorialHighlight.radius)
             border.strokeColor = .highlightGold
             border.lineWidth = Style.TutorialHighlight.lineWidth
             border.position = .zero
             border.zPosition = Precedence.menu.rawValue
-           
+            
             self.addChild(border)
         }
     }
     
     func showFinger() {
         let finger = SKSpriteNode(imageNamed: "finger")
-       finger.position = CGPoint.positionThis(finger.frame,
-                                              inBottomOf: self.frame,
-                                              padding: -Style.Padding.most,
-                                              offset: Style.Offset.less)
-       finger.size = Style.TutorialHighlight.fingerSize
+        finger.position = CGPoint.positionThis(finger.frame,
+                                               inBottomOf: self.frame,
+                                               padding: -Style.Padding.most,
+                                               offset: Style.Offset.less)
+        finger.size = Style.TutorialHighlight.fingerSize
         
         let moveDownVector = CGVector.init(dx: 0.0, dy: -20.0)
         let moveUpVector = CGVector.init(dx: 0.0, dy: 20.0)
@@ -94,8 +131,8 @@ class DFTileSpriteNode: SKSpriteNode {
         let indicateAnimation = SKAction.repeatForever(SKAction.sequence([moveDownAnimation, moveUpAnimation]))
         finger.run(indicateAnimation)
         finger.zPosition = Precedence.menu.rawValue
-                   
-       self.addChild(finger)
+        
+        self.addChild(finger)
     }
 }
 

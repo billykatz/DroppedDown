@@ -63,11 +63,6 @@ struct Tile: Hashable {
     static func monster(_ model: EntityModel) -> Tile {
         return Tile(type: TileType.monster(model))
     }
-    
-    func willAttackNextTurn() -> Bool {
-        return type.willAttackNextTurn()
-    }
-
 }
 
 extension Tile: Equatable {
@@ -136,11 +131,26 @@ enum TileType: Equatable, Hashable, CaseIterable {
         }
     }
     
-    func willAttackNextTurn() -> Bool {
+//    func willAttackNextTurn() -> Bool {
+//        if case let .monster(data) = self {
+//            return data.willAttackNextTurn()
+//        }
+//        return false
+//    }
+    
+    func turnsUntilAttack() -> Int? {
         if case let .monster(data) = self {
-            return data.willAttackNextTurn()
+            return data.attack.turnsUntilNextAttack()
         }
-        return false
+        return nil
+
+    }
+    
+    func attackFrequency() -> Int? {
+        if case let .monster(data) = self {
+            return data.attack.frequency
+       }
+        return nil
     }
     
     static var gem: TileType {
@@ -188,12 +198,35 @@ enum TileType: Equatable, Hashable, CaseIterable {
         case greenRock = "greenRockv2"
         case purpleRock
         case brownRock
-        case redRock
+        case redRock = "redRockv2"
         case player = "player2"
         case empty
         case exit
         case greenMonster
         case gem1 = "gem2"
         case fireball
+    }
+}
+
+extension TileType {
+    var humanReadable: String {
+        switch self {
+        case .blackRock, .blueRock, .brownRock, .greenRock, .purpleRock, .redRock:
+            return "rock"
+        case .player:
+            return "player"
+        case .exit:
+            return "mineshaft"
+        case .item:
+            return "item"
+        case .monster:
+            return "monster"
+        case .gem:
+            return "gem"
+        case .gold:
+            return "gold"
+        default:
+            preconditionFailure("We probably shouldnt be here. Investigate")
+        }
     }
 }

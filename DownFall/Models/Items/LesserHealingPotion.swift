@@ -9,15 +9,26 @@
 import Foundation
 
 struct LesserHealingPotion: Ability {
+    
+    var count: Int
+    
+    init(count: Int = 0) {
+        self.count = 0
+    }
+    
+    func animatedColumns() -> Int? {
+        return 5
+    }
+    
     var affectsCombat: Bool {
         return false
     }
     
     var textureName: String {
-        return "lesserHealingPotion"
+        return "lesserHealingPotionSpriteSheet"
     }
     
-    var cost: Int { return 8 }
+    var cost: Int { return 35 }
     
     var currency: Currency { return .gold }
     
@@ -42,5 +53,8 @@ struct LesserHealingPotion: Ability {
     var usage: Usage {
         return .once
     }
+    var heal: Int? { return 1 }
+    var targets: Int? { return 1 }
+    var targetTypes: [TileType]? { return [TileType.player(.zero)] }
 }
 

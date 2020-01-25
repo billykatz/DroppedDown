@@ -48,10 +48,17 @@ class StoreItem: SKSpriteNode {
                               identifier: .storeItem,
                               fontSize: fontSize)
             
-        if let abilityForeground = ability.sprite {
-            abilityForeground.position = .zero
-            abilityForeground.name = ability.textureName
-            addChild(abilityForeground)
+        if let abilityFrames = ability.spriteSheet?.animationFrames(), let first = abilityFrames.first  {
+            let sprite = SKSpriteNode(texture: first, color: .clear, size: Style.Store.Item.size)
+            sprite.position = .zero
+            sprite.name = ability.textureName
+            sprite.run(SKAction.repeatForever(SKAction.animate(with: abilityFrames, timePerFrame: AnimationSettings.Store.itemFrameRate)))
+            
+            addChild(sprite)
+        } else if let sprite = ability.sprite {
+            sprite.position = .zero
+            sprite.name = ability.textureName
+            addChild(sprite)
         }
         
         
@@ -161,15 +168,22 @@ extension StoreItem: LabelDelegate {
     func labelPressBegan(_ label: Label) {
         self.storeItemDelegate?.storeItemTapped(self, ability: ability)
     }
+    
+    func labelPressCancelled(_ label: Label) {}
 }
 
 //MARK:- Touch Events
 
 extension StoreItem {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if self.wasTouched(touches, with: event) {
+        guard let touch = touches.first else { return }
+        let position = touch.location(in: self)
+        let translatedPosition = CGPoint(x: self.frame.center.x + position.x, y: self.frame.center.y + position.y)
+        if self.frame.contains(translatedPosition) {
             self.storeItemDelegate?.storeItemTapped(self, ability: ability)
+        } else {
+            
+            //TODO: make the store UI better
         }
-        
     }
 }

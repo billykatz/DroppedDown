@@ -55,6 +55,7 @@ class Renderer: SKSpriteNode {
     private var header  = Header()
     private var hud = HUD()
     private var helperTextView = HelperTextView()
+    public var backpackView: BackpackView
     
     init(playableRect: CGRect,
          foreground givenForeground: SKNode,
@@ -67,7 +68,7 @@ class Renderer: SKSpriteNode {
         self.boardSize = CGFloat(theBoardSize)
         self.level = level
         
-        self.tileSize = 0.9 * (playableRect.width / boardSize)
+        self.tileSize = GameScope.boardSizeCoefficient * (playableRect.width / boardSize)
         
         //center the board in the playable rect
         let marginWidth = playableRect.width - CGFloat(tileSize * boardSize)
@@ -78,9 +79,13 @@ class Renderer: SKSpriteNode {
         
         foreground = givenForeground
         
+        self.backpackView = BackpackView(playableRect: playableRect, viewModel: TargetingViewModel(), levelSize: level.boardSize)
+
         
         super.init(texture: nil, color: .clear, size: CGSize.zero)
         
+        
+        self.backpackView.touchDelegate = self
         isUserInteractionEnabled = true
 
         foreground.position = playableRect.center
@@ -103,11 +108,11 @@ class Renderer: SKSpriteNode {
         helperTextView.position = CGPoint.positionThis(helperTextView.frame, inBottomOf: playableRect)
         
 
-        [spriteForeground, header, hud, helperTextView].forEach { foreground.addChild($0) }
+        [spriteForeground, header, hud, self.backpackView].forEach { foreground.addChild($0) }
         
         // Register for Dispatch
         Dispatch.shared.register { [weak self] input in
-            switch input.type{
+            switch input.type {
             case .transformation(let trans):
                 self?.renderTransformation(trans)
             case .boardBuilt:
@@ -115,6 +120,10 @@ class Renderer: SKSpriteNode {
                     let tiles = input.endTilesStruct else { return }
                 self.sprites = self.createSprites(from: tiles)
                 self.add(sprites: self.sprites, tiles: tiles)
+                
+                if let playerData = playerData(in: tiles) {
+                    self.backpackView.update(with: playerData)
+                }
             default:
                 self?.renderInput(input)
             }
@@ -144,12 +153,24 @@ class Renderer: SKSpriteNode {
             case .monsterDies:
                 let sprites = createSprites(from: trans.endTiles)
                 animationsFinished(for: sprites, endTiles: trans.endTiles)
+            case .itemUsed:
+                if let tiles = trans.endTiles,
+                    let playerCoord = getTilePosition(.player(.zero), tiles: tiles),
+                    case TileType.player(let data) = tiles[playerCoord].type {
+                    backpackView.update(with: data)
+                }
+                
+                let sprites = createSprites(from: trans.endTiles)
+                animationsFinished(for: sprites, endTiles: trans.endTiles)
             case .collectItem:
                 computeNewBoard(for: trans)
             case .reffingFinished:
                 () // Purposely left blank.
-            case .touchBegan:
+            case .touchBegan, .itemUseSelected:
                 ()
+            case .newTurn:
+                let sprites = createSprites(from: trans.endTiles)
+                animationsFinished(for: sprites, endTiles: trans.endTiles, ref: false)
             default:
                 // Transformation assoc value should ony exist for certain inputs
                 fatalError()
@@ -170,19 +191,19 @@ class Renderer: SKSpriteNode {
             foreground.addChild(menuForeground)
         case .gameLose:
             menuForeground.addChild(gameLoseSpriteNode)
-            menuForeground.removeFromParent()
-            foreground.addChild(menuForeground)
+            foreground.addChildSafely(menuForeground)
         case .playAgain:
             menuForeground.removeFromParent()
         case .tutorial(let step):
             renderTutorial(step)
-            
+        case .newTurn:
+            let sprites = createSprites(from: input.endTilesStruct)
+            animationsFinished(for: sprites, endTiles: input.endTilesStruct, ref: false)
         case .touch, .rotateCounterClockwise, .rotateClockwise,
              .monsterDies, .attack, .gameWin,
              .animationsFinished, .reffingFinished,
-             .boardBuilt,. collectItem, .selectLevel,
-             .newTurn, .transformation, .touchBegan,
-             .visitStore:
+             .boardBuilt,. collectItem, .selectLevel, .transformation, .touchBegan,
+             .visitStore, .itemUseSelected, .itemUseCanceled, .itemCanBeUsed, .itemUsed:
             ()
         }
     }
@@ -209,9 +230,8 @@ class Renderer: SKSpriteNode {
         }
         
         if step.showClockwiseRotate {
-            menuForeground.removeFromParent()
-            menuForeground.addChild(rotateSprite)
-            foreground.addChild(menuForeground)
+            menuForeground.addChildSafely(rotateSprite)
+            foreground.addChildSafely(menuForeground)
         }
     }
     
@@ -242,8 +262,11 @@ class Renderer: SKSpriteNode {
             for (col, sprite) in innerSprites.enumerated() {
                 if tiles?[row][col].shouldHighlight ?? false {
                     sprite.indicateSpriteWillBeAttacked()
-                } else if tiles?[row][col].willAttackNextTurn() ?? false {
+                } else if tiles?[row][col].type.turnsUntilAttack() ?? -1 == 0 {
                     sprite.indicateSpriteWillBeAttacked()
+                } else if let turns = tiles?[row][col].type.turnsUntilAttack(),
+                    let frequency = tiles?[row][col].type.attackFrequency() {
+                    sprite.showAttackTiming(frequency, turns)
                 }
                 spriteForeground.addChild(sprite)
             }
@@ -265,7 +288,7 @@ class Renderer: SKSpriteNode {
     }
     
     private func createSprites(from tiles: [[Tile]]?) -> [[DFTileSpriteNode]] {
-        guard let tiles = tiles else { fatalError() }
+        guard let tiles = tiles else { preconditionFailure() }
         guard tiles.count == Int(boardSize) else { fatalError("For now, the board must be a square, and the boardSize must match the tiles.count") }
         var x : CGFloat = 0
         var y : CGFloat = 0
@@ -281,9 +304,6 @@ class Renderer: SKSpriteNode {
                 let sprite = DFTileSpriteNode(type: tiles[row][col].type,
                                               height: height,
                                               width: width)
-                if tiles[row][col].shouldHighlight {
-                    sprite.indicateSpriteWillBeAttacked()
-                }
                 sprites[row].append(sprite)
                 sprites[row][col].position = CGPoint(x: x, y: y)
             }

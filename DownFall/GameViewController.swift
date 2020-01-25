@@ -49,17 +49,18 @@ class GameViewController: UIViewController, LevelCoordinating {
 
 extension GameViewController {
     
-    private func levelSelect(_ updatedPlayerData: EntityModel) {
+    func levelSelect(_ updatedPlayerData: EntityModel) {
         if let mainMenuScene = GKScene(fileNamed: Identifiers.mainMenuScene)?.rootNode as? MainMenu {
             mainMenuScene.scaleMode = .aspectFill
             mainMenuScene.mainMenuDelegate = self
             mainMenuScene.playerModel = updatedPlayerData
-            
+
             if let view = self.view as! SKView? {
+//                setFrame()
                 view.presentScene(mainMenuScene)
                 view.ignoresSiblingOrder = true
             }
-            
+
         }
     }
 }
@@ -67,14 +68,23 @@ extension GameViewController {
 extension GameViewController: MainMenuDelegate {
     func didSelectStartTutorial(_ playerModel: EntityModel?) {
         if let view = self.view as! SKView? {
+//            view.frame = self.view.safeAreaLayoutGuide.layoutFrame
             view.presentScene(nil)
             levels = LevelConstructor.buildTutorialLevels()
             presentNextLevel(playerModel)
         }
     }
     
+    func setFrame() {
+        view.frame = CGRect(x: view.frame.origin.x,
+                            y: view.frame.origin.y,
+                            width: self.view.frame.width,
+                            height: self.view.safeAreaLayoutGuide.layoutFrame.height)
+    }
+    
     func newGame(_ difficulty: Difficulty, _ playerModel: EntityModel?) {
         if let view = self.view as! SKView?, let player = playerModel {
+//            setFrame()
             view.presentScene(nil)
             startGame(player: player, difficulty: difficulty)
         }

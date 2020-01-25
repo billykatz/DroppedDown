@@ -20,7 +20,7 @@ struct Style {
         static let ctaButton = CGFloat(200)
         
         struct Toast {
-            static let width = CGFloat(600)
+            static let width = CGFloat(800)
             static let height = CGFloat(200)
             static let cornerRadius = CGFloat(50)
         }
@@ -104,6 +104,7 @@ struct Style {
     
     struct Button {
         static let size = CGSize(width: 50.0, height: 50.0)
+        static let touchzone = CGFloat(12)
     }
     
     struct HUD {

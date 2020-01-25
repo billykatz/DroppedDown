@@ -86,6 +86,17 @@ class Button: SKShapeNode {
     var unpressedPosition: CGPoint? = nil
     var depressedPosition: CGPoint? = nil
     
+    /// view to expand touch region of button
+    lazy var touchTargetExpandingView: SKSpriteNode = {
+        let view = SKSpriteNode(texture: nil, color: .clear, size: self.frame.scale(by: Style.Button.touchzone, andYAmount: Style.Button.touchzone).size)
+        view.zPosition = Precedence.underground.rawValue
+        view.isUserInteractionEnabled = true
+        return view
+    }()
+    
+    /// view that is the visual button
+    var buttonView: SKShapeNode?
+    
     var isDisabled: Bool = false
     
     init(size: CGSize,
@@ -105,10 +116,14 @@ class Button: SKShapeNode {
         // set the original color so that we can toggle between that and the selected state
         originalBackground = backgroundColor
         
-        self._position = .zero
         //Call super
         super.init()
         self.path = CGPath(roundedRect: CGRect(x: -size.width/2, y: -size.height/2, width: size.width, height: size.height), cornerWidth: 5.0, cornerHeight: 5.0, transform: nil)
+        
+        
+        let buttonPath = CGPath(roundedRect: CGRect(x: -size.width/2, y: -size.height/2, width: size.width, height: size.height), cornerWidth: 5.0, cornerHeight: 5.0, transform: nil)
+        self.buttonView = SKShapeNode(path: buttonPath)
+        buttonView?.color = self.originalBackground
         
         //add the shadow
         let shadowPath = CGPath(roundedRect: CGRect(x: -size.width/2, y: -size.height/2 - dropShadowOffset, width: size.width, height: size.height), cornerWidth: 5.0, cornerHeight: 5.0, transform: nil)
@@ -116,10 +131,9 @@ class Button: SKShapeNode {
         shadowShape.color = .storeBlack
         self.dropShadow = shadowShape
         
+        // does this have to be hardcoded?
         shadowShape.zPosition = -1
         addChild(shadowShape)
-        
-        self.zPosition = precedence.rawValue
         
         // set the name to the identifier
         name = identifier.rawValue
@@ -136,28 +150,20 @@ class Button: SKShapeNode {
                           fontSize: fontSize,
                           fontColor: fontColor)
         label.position = self.frame.center
+        label.zPosition = Precedence.menu.rawValue
         
         // Add Label
-        addChild(label)
+        buttonView?.addChild(label)
+        self.addChildSafely(buttonView)
         
-        self.color = backgroundColor
-    }
-    
-    var _position: CGPoint
-    override var position: CGPoint {
-        get { return _position }
-        set {
-            super.position = newValue
-            _position = newValue
-            
-            // only set these once
-            if unpressedPosition == nil {
-                unpressedPosition = newValue
-            }
-            if depressedPosition == nil {
-                depressedPosition = newValue.translateVertically(-dropShadowOffset)
-            }
-        }
+        //add touch expanding view
+        addChild(touchTargetExpandingView)
+        
+        
+        // set points for moving the button slightly
+        
+        unpressedPosition = self.frame.center
+        depressedPosition = self.frame.center.translateVertically(-dropShadowOffset)
     }
     
     
@@ -173,7 +179,7 @@ extension Button {
         guard let touch = touches.first else { return }
         let position = touch.location(in: self)
         let translatedPosition = CGPoint(x: self.frame.center.x + position.x, y: self.frame.center.y + position.y)
-        if self.frame.contains(translatedPosition) {
+        if frame.contains(translatedPosition) {
             buttonWasTapped()
         } else {
             buttonTapWasCancelled()
@@ -206,8 +212,9 @@ extension Button {
     
     
     private func buttonTapWasCancelled() {
+        guard !isDisabled else { return }
         if showSelection {
-            color = originalBackground
+            buttonView?.color = originalBackground
         }
         unpress()
     }
@@ -215,7 +222,7 @@ extension Button {
     private func buttonWasTapped() {
         guard !isDisabled else { return }
         if showSelection {
-            color = originalBackground
+            buttonView?.color = originalBackground
         }
         delegate?.buttonTapped(self)
         unpress()
@@ -224,20 +231,20 @@ extension Button {
     private func buttonTapBegan() {
         guard !isDisabled else { return }
         if showSelection {
-            color = .lightGray
+            buttonView?.color = .lightGray
         }
         depress()
     }
     
     private func depress() {
         guard let newPosition = depressedPosition else { return }
-        self.position = newPosition
+        buttonView?.position = newPosition
         dropShadow?.removeFromParent()
     }
     
     private func unpress() {
         guard let newPosition = unpressedPosition else { return }
-        self.position = newPosition
+        buttonView?.position = newPosition
         addOptionalChild(dropShadow)
     }
 }

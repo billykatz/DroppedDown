@@ -24,4 +24,15 @@ extension CGRect {
         assert(areaRatio <= 1, "The areaRatio must be less than or equal to 1")
         return CGRect(x: self.origin.x, y: self.origin.y, width: self.width, height: self.height - self.height * areaRatio)
     }
+    
+    
+    /// Scale a rect by an factor on the x and y scale.  It keeps the same center
+    func scale(by xAmount: CGFloat, andYAmount yAmount: CGFloat) -> CGRect {
+        return CGRect(
+            x: center.x,
+            y: center.y,
+            width: width + xAmount,
+            height: height + yAmount
+        )
+    }
 }

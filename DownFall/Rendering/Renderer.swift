@@ -288,7 +288,7 @@ class Renderer: SKSpriteNode {
     }
     
     private func createSprites(from tiles: [[Tile]]?) -> [[DFTileSpriteNode]] {
-        guard let tiles = tiles else { fatalError() }
+        guard let tiles = tiles else { preconditionFailure() }
         guard tiles.count == Int(boardSize) else { fatalError("For now, the board must be a square, and the boardSize must match the tiles.count") }
         var x : CGFloat = 0
         var y : CGFloat = 0

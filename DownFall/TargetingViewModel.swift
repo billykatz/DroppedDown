@@ -68,18 +68,29 @@ class TargetingViewModel: Targeting {
             return ""
         }
         let baseString = "Choose "
+        
+        //remove duplicates of human readable strings
+        let typesOfTargetString = typesOfTargets.reduce([]) { (result, tileType) -> [String] in
+            var newResult = result
+            if !result.contains(tileType.humanReadable) {
+                newResult.append(tileType.humanReadable)
+            }
+            return newResult
+        }
+        
+        // build the string of the types
         let types: String
-        if typesOfTargets.count == 1 {
-            types = typesOfTargets.first?.humanReadable ?? ""
-        } else if typesOfTargets.count == 2 {
-            types = "\(typesOfTargets.first?.humanReadable ?? "") and/or \(typesOfTargets.last?.humanReadable ?? "")"
+        if typesOfTargetString.count == 0 {
+            types = ""
+        }
+        else if typesOfTargetString.count == 1 {
+            types = typesOfTargetString.first ?? ""
+        } else if typesOfTargetString.count == 2 {
+            types = "\(typesOfTargetString.first ?? "") and/or \(typesOfTargetString.last ?? "")"
         } else {
-            let allButLastTypes = typesOfTargets.dropLast()
-            var allButLastString = allButLastTypes.map {
-                return $0.humanReadable
-            }.joined(separator: ", ")
+            var allButLastString = typesOfTargetString.dropLast().joined(separator: ", ")
             
-            allButLastString.append("and \(typesOfTargets.last?.humanReadable ?? "")")
+            allButLastString.append(" and/or \(typesOfTargetString.last ?? "")")
             types = allButLastString
         }
         return baseString + "\(self.numberOfTargets) " + types + "\(self.numberOfTargets > 1 ? "s" : "")"

@@ -90,7 +90,6 @@ class BackpackView: SKSpriteNode {
         //inventory area
         self.inventoryArea = SKSpriteNode(texture: nil, color: .clear, size: CGSize(width: playableRect.width, height: height))
         self.inventoryArea.position = CGPoint.positionThis(inventoryArea.frame, inBottomOf: viewContainer.frame)
-        self.inventoryArea.color = .brown
 
         // center target area reticles
         let marginWidth = playableRect.width - CGFloat(tileSize * boardSize)
@@ -100,7 +99,7 @@ class BackpackView: SKSpriteNode {
         self.bottomLeft = CGPoint(x: bottomLeftX, y: bottomLeftY)
         
         // item  areas
-        itemArea = SKSpriteNode(color: .eggshellWhite, size: CGSize(width: playableRect.width * 3 / 4, height: height/2))
+        itemArea = SKSpriteNode(color: .clear, size: CGSize(width: playableRect.width * 3 / 4, height: height/2))
         itemArea.position = CGPoint.positionThis(itemArea.frame, inBottomOf: inventoryArea.frame, anchor: .left)
         
         
@@ -194,6 +193,8 @@ class BackpackView: SKSpriteNode {
                                                bottomLeft: CGPoint(x: -itemArea.frame.width/2,
                                                                    y: -itemArea.frame.height/2))
         
+        
+        itemArea.removeAllChildren()
         for index in 0..<sprites.count {
             assert(sprites.count <= gridPoints.count, "We hard coded \(rows*columns) items total, this will break if there are more than 10 items")
             sprites[index]?.position = gridPoints[index]

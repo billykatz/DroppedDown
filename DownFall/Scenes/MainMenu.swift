@@ -33,7 +33,7 @@ class MainMenu: SKScene {
                                  fontColor: UIColor.white,
                                  backgroundColor: .menuPurple)
         
-        startButton.position = .zero
+        startButton.position = CGPoint(x: 0, y: 400)
         addChild(startButton)
         
         //TODO: reinstate tutorial

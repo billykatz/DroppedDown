@@ -14,9 +14,16 @@ struct Style {
     static let paragraphPadding: CGFloat = 8.0
     
     struct Backpack {
-        static let heightCoefficient = CGFloat(0.25)
+        static let heightCoefficient = CGFloat(0.20)
         static let backpackViewSizeCoefficient = CGFloat(0.75)
-        static let itemSize = CGSize(width: 100, height: 100)
+        static let itemSize = CGSize(width: 150, height: 150)
+        static let ctaButton = CGFloat(200)
+        
+        struct Toast {
+            static let width = CGFloat(800)
+            static let height = CGFloat(200)
+            static let cornerRadius = CGFloat(50)
+        }
     }
     
     struct Store {
@@ -59,7 +66,7 @@ struct Style {
     }
     
     struct Spacing {
-        static let normal: CGFloat = 8.0
+        static let normal: CGFloat = 20.0
     }
     
     struct Offset {
@@ -97,6 +104,7 @@ struct Style {
     
     struct Button {
         static let size = CGSize(width: 50.0, height: 50.0)
+        static let touchzone = CGFloat(12)
     }
     
     struct HUD {

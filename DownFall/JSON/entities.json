@@ -3,7 +3,7 @@
         { "name": "player2",
             "type": "player",
             "originalHp": 7,
-            "hp": 7,
+            "hp": 4,
             "attack": {
                 "type": "targets",
                 "frequency" : 1,

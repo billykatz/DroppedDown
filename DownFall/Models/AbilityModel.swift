@@ -9,14 +9,31 @@
 import Foundation
 import SpriteKit
 
-struct AnyAbility {
-    let _ability: Ability
+struct AnyAbility: Hashable {
+    var _ability: Ability
     init(_ ability: Ability) {
         _ability = ability
     }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(_ability.textureName.hashValue)
+    }
+    
+    //TODO: make hack better
+    static let zero: AnyAbility = AnyAbility(Empty())
 }
 
 extension AnyAbility: Ability {
+    
+    var count : Int {
+        set {
+            _ability.count = newValue
+        }
+        get {
+            return _ability.count
+        }
+    }
+    
     func animatedColumns() -> Int? {
         return _ability.animatedColumns()
     }
@@ -61,6 +78,13 @@ extension AnyAbility: Ability {
         return _ability.usage
     }
     
+    var heal: Int? {
+        return _ability.heal
+    }
+    
+    
+    var targets: Int? { return _ability.targets }
+    var targetTypes: [TileType]? { _ability.targetTypes }
 }
 
 extension AnyAbility: Equatable {
@@ -68,6 +92,7 @@ extension AnyAbility: Equatable {
         return lhs.type == rhs.type
     }
 }
+
 
 protocol Ability {
     var affectsCombat: Bool { get }
@@ -80,8 +105,12 @@ protocol Ability {
     var extraAttacksGranted: Int? { get }
     var sprite: SKSpriteNode? { get }
     var usage: Usage { get }
-    func blocksDamage(from: Direction) -> Int?
+    var targets: Int? { get }
+    var targetTypes: [TileType]? { get }
+    var heal: Int? { get }
+    var count: Int { get set }
     
+    func blocksDamage(from: Direction) -> Int?
     func animatedColumns() -> Int?
 }
 

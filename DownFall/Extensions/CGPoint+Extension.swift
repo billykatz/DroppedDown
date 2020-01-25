@@ -18,7 +18,8 @@ extension CGPoint {
                               bottomLeft: CGPoint) -> [CGPoint] {
         
         let inset: CGFloat = 15.0
-        let columnPadding = (width - (columns * itemSize.width) - (2 * inset)) / (columns-1)
+        let bottomPadding: CGFloat = 30.0
+        let columnPadding = max(0, (width - (columns * itemSize.width) - (2 * inset)) / (columns-1) )
         let rowPadding = min(30.0, (height - (rows * itemSize.height)) / (rows - 1))
         
         var points: [CGPoint] = []
@@ -26,7 +27,7 @@ extension CGPoint {
             for column in 0..<Int(columns) {
                 let rowFloat = CGFloat(row)
                 let columnFloat = CGFloat(column)
-                let y = bottomLeft.y + itemSize.height/2 + (rowFloat * rowPadding) + (rowFloat * itemSize.height)
+                let y = bottomLeft.y + bottomPadding + itemSize.height/2 + (rowFloat * rowPadding) + (rowFloat * itemSize.height)
                 let x = bottomLeft.x + inset + itemSize.width/2 + (columnFloat * columnPadding) + (columnFloat * itemSize.width)
                 points.append(CGPoint(x: x, y: y))
             }
@@ -44,9 +45,10 @@ extension CGPoint {
     
     
     static func positionThis(_ this: CGRect,
-                             inBottomOf that: CGRect,
+                             inBottomOf that: CGRect?,
                              padding: CGFloat = Style.Padding.normal,
                              offset: CGFloat = 0.0) -> CGPoint {
+        guard let that = that else { return .zero }
         return CGPoint(x: 0.0 + offset,
                        y: -that.height/2 + this.height/2 + padding)
     }
@@ -72,13 +74,13 @@ extension CGPoint {
     static func positionThis(_ this: CGRect,
                              in that: CGRect,
                              padding: CGFloat = Style.Padding.normal,
-                             verticaliy: Verticality,
+                             verticality: Verticality,
                              anchor: Anchor,
                              xOffset: CGFloat = 0.0) -> CGPoint {
         
         
         let y: CGFloat
-        switch verticaliy {
+        switch verticality {
         case .top:
             y = that.height/2 - this.height/2 - padding
         case .center:
@@ -138,6 +140,15 @@ extension CGPoint {
                        y: that.height/2 - this.height/2 - padding)
     }
     
+    static func position(this: CGRect,
+                         centeredVerticallyInTopHalfOf that: CGRect,
+                         xOffset: CGFloat = 0.0) -> CGPoint {
+        let padding = (that.height - this.height) / 4
+        return CGPoint(x: this.center.x,
+                       y: that.height/2 - this.height/4 - padding)
+    }
+    
+    
     
     
     static func positionThis(_ this: CGRect,
@@ -173,16 +184,30 @@ extension CGPoint {
     }
     
     static func positionThis(_ this: CGRect?,
-                             outside that: CGRect,
+                             outside that: CGRect?,
                              anchor: Anchor,
+                             align: Verticality = .center,
                              padding: CGFloat = 0.0,
                              spacing: CGFloat = 0.0) -> CGPoint {
-        guard let this = this else { return .zero }
-        switch anchor {
-        case .left:
-            return CGPoint(x: that.minX - this.width/2, y: this.center.y + padding)
-        case .right:
-            return CGPoint(x: that.maxX + this.width/2, y: this.center.y + padding)
+        guard let this = this, let that = that else { return .zero }
+        switch (anchor, align) {
+        case (.left, .top):
+            return CGPoint(x: that.minX - this.width/2, y: that.maxY - this.height/2 + padding)
+            
+        case (.left, .center):
+            return CGPoint(x: that.minX - this.width/2, y: that.center.y + padding)
+            
+        case (.left, .bottom):
+            return CGPoint(x: that.minX - this.width/2, y: that.minY + this.height/2 + padding)
+            
+        case (.right, .top):
+            return CGPoint(x: that.maxX + this.width/2, y: that.maxY - this.height/2 + padding)
+            
+        case (.right, .center):
+            return CGPoint(x: that.maxX + this.width/2, y: that.center.y + padding)
+            
+        case (.right, .bottom):
+            return CGPoint(x: that.maxX + this.width/2, y: that.minY + this.height/2 + padding)
         }
     }
     
@@ -197,4 +222,9 @@ extension CGPoint {
         case center
         case bottom
     }
+    
+    func translateVertically(_ yOffset: CGFloat) -> CGPoint {
+        return CGPoint(x: self.x, y: self.y + yOffset)
+    }
 }
+

@@ -10,6 +10,12 @@ import Foundation
 
 struct TransmogrificationPotion: Ability {
     
+    var count: Int
+    
+    init(count: Int = 0) {
+        self.count = 0
+    }
+    
     func animatedColumns() -> Int? {
         return 6
     }
@@ -51,6 +57,10 @@ struct TransmogrificationPotion: Ability {
     func blocksDamage(from: Direction) -> Int? {
         return nil
     }
+    
+    var heal: Int? { return nil }
+    var targets: Int? { return 1 }
+    var targetTypes: [TileType]? { return [TileType.monster(.zero)] }
 }
 
 

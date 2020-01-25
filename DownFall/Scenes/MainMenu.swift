@@ -33,19 +33,20 @@ class MainMenu: SKScene {
                                  fontColor: UIColor.white,
                                  backgroundColor: .menuPurple)
         
-        startButton.position = .zero
+        startButton.position = CGPoint(x: 0, y: 400)
         addChild(startButton)
         
-        let tutorialButton = Button(size: Style.RunMenu.buttonSize,
-                                    delegate: self,
-                                    identifier: .startTutorial,
-                                    precedence: .menu,
-                                    fontSize: UIFont.largeSize,
-                                    fontColor: .white,
-                                    backgroundColor: .menuPurple)
+        //TODO: reinstate tutorial
+//        let tutorialButton = Button(size: Style.RunMenu.buttonSize,
+//                                    delegate: self,
+//                                    identifier: .startTutorial,
+//                                    precedence: .menu,
+//                                    fontSize: UIFont.largeSize,
+//                                    fontColor: .white,
+//                                    backgroundColor: .menuPurple)
         
-        tutorialButton.position = CGPoint.positionThis(tutorialButton.frame, below: startButton.frame, spacing: Style.Spacing.normal)
-        addChild(tutorialButton)
+//        tutorialButton.position = CGPoint.positionThis(tutorialButton.frame, below: startButton.frame, spacing: Style.Spacing.normal)
+//        addChild(tutorialButton)
         
         
         let playableRect = size.playableRect

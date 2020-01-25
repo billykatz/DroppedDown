@@ -30,6 +30,8 @@ class TurnWatcher {
                     } else {
                         fallthrough
                     }
+                case .itemUsed:
+                    self?.newTurn = false
                 default:
                     if transformation.tileTransformation != nil {
                         self?.newTurn = true

@@ -8,6 +8,15 @@
 
 struct DoubleAttack: Ability {
     
+    var count: Int
+    
+    init(count: Int = 0) {
+        self.count = 0
+    }
+    
+    var heal: Int? { return nil }
+    
+    
     func animatedColumns() -> Int? {
         return nil
     }
@@ -45,4 +54,7 @@ struct DoubleAttack: Ability {
     var usage: Usage {
         return .oneRun
     }
+    
+    var targets: Int? { return nil }
+    var targetTypes: [TileType]? { return nil }
 }

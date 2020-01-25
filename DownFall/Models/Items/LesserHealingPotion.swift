@@ -9,6 +9,13 @@
 import Foundation
 
 struct LesserHealingPotion: Ability {
+    
+    var count: Int
+    
+    init(count: Int = 0) {
+        self.count = 0
+    }
+    
     func animatedColumns() -> Int? {
         return 5
     }
@@ -46,5 +53,8 @@ struct LesserHealingPotion: Ability {
     var usage: Usage {
         return .once
     }
+    var heal: Int? { return 1 }
+    var targets: Int? { return 1 }
+    var targetTypes: [TileType]? { return [TileType.player(.zero)] }
 }
 

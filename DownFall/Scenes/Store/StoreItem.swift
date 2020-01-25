@@ -168,15 +168,22 @@ extension StoreItem: LabelDelegate {
     func labelPressBegan(_ label: Label) {
         self.storeItemDelegate?.storeItemTapped(self, ability: ability)
     }
+    
+    func labelPressCancelled(_ label: Label) {}
 }
 
 //MARK:- Touch Events
 
 extension StoreItem {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if self.wasTouched(touches, with: event) {
+        guard let touch = touches.first else { return }
+        let position = touch.location(in: self)
+        let translatedPosition = CGPoint(x: self.frame.center.x + position.x, y: self.frame.center.y + position.y)
+        if self.frame.contains(translatedPosition) {
             self.storeItemDelegate?.storeItemTapped(self, ability: ability)
+        } else {
+            
+            //TODO: make the store UI better
         }
-        
     }
 }

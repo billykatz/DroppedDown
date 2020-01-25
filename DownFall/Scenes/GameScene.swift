@@ -82,7 +82,7 @@ class GameScene: SKScene {
         
         
         // SwipeRecognizerView
-        swipeRecognizerView = SwipeRecognizerView(frame: view.frame,
+        swipeRecognizerView = SwipeRecognizerView(frame: view.frame.subtractBottom(0.20),
                                                         target: self,
                                                         swiped: #selector(swiped))
         view.addSubview(swipeRecognizerView!)
@@ -95,7 +95,7 @@ class GameScene: SKScene {
                 else { return }
                 
                 self.foreground.removeAllChildren()
-                if case let TileType.player(data) = self.board.tiles[playerIndex].type {
+                if case TileType.player = self.board.tiles[playerIndex].type {
                     self.removeFromParent()
                     self.gameSceneDelegate?.resetToMain(self)
                 }
@@ -108,6 +108,7 @@ class GameScene: SKScene {
                 self.foreground.removeAllChildren()
                 if case let TileType.player(data) = self.board.tiles[playerIndex].type {
                     self.removeFromParent()
+                    self.swipeRecognizerView?.removeFromSuperview()
                     self.gameSceneDelegate?.visitStore(data)
                 }
 
@@ -118,9 +119,11 @@ class GameScene: SKScene {
         TurnWatcher.shared.register()
         
         //Debug settings triple tap
-        let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(tripleTap))
-        tapRecognizer.numberOfTapsRequired = 3
-        view.addGestureRecognizer(tapRecognizer)
+//        let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(tripleTap))
+//        tapRecognizer.numberOfTapsRequired = 3
+//        // this boolean prevents the bug where there is a delay after a user touches the board
+//        tapRecognizer.delaysTouchesEnded = false
+//        view.addGestureRecognizer(tapRecognizer)
     }
     
     public func prepareForReuse() {

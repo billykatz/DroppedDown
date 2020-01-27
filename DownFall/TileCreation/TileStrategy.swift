@@ -13,6 +13,7 @@ protocol TileStrategy {
     func tiles(for tiles: [[Tile]]) -> [Tile]
     func board(difficulty: Difficulty) -> [[Tile]]
     func goldDropped(from monster: EntityModel) -> Int
+    func randomMonster(not: EntityModel.EntityType) -> Tile
     var entities: EntitiesModel { get }
     var difficulty: Difficulty { get }
     var updatedEntity: EntityModel? { get }

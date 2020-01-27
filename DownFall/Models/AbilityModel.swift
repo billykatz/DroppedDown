@@ -126,21 +126,32 @@ extension Ability {
 }
 
 enum AbilityType: String, Decodable {
-    case doubleAttack
-    case sheildEast
-    case rockASwap
-    case dynamite
-    case lesserHealingPotion
-    case greaterHealingPotion
-    case swordPickAxe
-    case transmogrificationPotion
-    case killMonsterPotion
+    case doubleAttack = "Double Attack"
+    case sheildEast = "Side Shield East"
+    case rockASwap = "Rock a Swap"
+    case dynamite = "Dynamite"
+    case lesserHealingPotion = "Lesser Healing Potion"
+    case greaterHealingPotion = "Greater Healing Potion"
+    case swordPickAxe = "Sword Pick Axe"
+    case transmogrificationPotion = "Transmogrification Potion"
+    case killMonsterPotion = "Kill Monster Potion"
 }
 
 enum Usage {
     case once
     case oneRun
     case permanent
+    
+    var message: String {
+        switch self {
+        case .once:
+            return "One time use"
+        case .oneRun:
+            return "Passive ability for one run"
+        case .permanent:
+            return "Permanent upgrade"
+        }
+    }
 }
 
 enum Currency: String, CaseIterable  {

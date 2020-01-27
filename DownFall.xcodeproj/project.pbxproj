@@ -135,6 +135,7 @@
 		589A27D423D90FE000174DE7 /* TargetingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589A27D323D90FE000174DE7 /* TargetingViewModel.swift */; };
 		589A27D623D9210900174DE7 /* TargetingViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589A27D523D9210900174DE7 /* TargetingViewModelTests.swift */; };
 		58B39BD723D21C9600915858 /* BackpackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58B39BD623D21C9600915858 /* BackpackView.swift */; };
+		58B7D3E023DF47CE004E96A3 /* SKAction+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58B7D3DF23DF47CE004E96A3 /* SKAction+Extensions.swift */; };
 		58C1AE4A23D19CEE003B5B5A /* TransmogrificationPotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C1AE4923D19CEE003B5B5A /* TransmogrificationPotion.swift */; };
 		58C1AE4C23D19E03003B5B5A /* KillMonsterPotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C1AE4B23D19E03003B5B5A /* KillMonsterPotion.swift */; };
 /* End PBXBuildFile section */
@@ -281,6 +282,7 @@
 		589A27D323D90FE000174DE7 /* TargetingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetingViewModel.swift; sourceTree = "<group>"; };
 		589A27D523D9210900174DE7 /* TargetingViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetingViewModelTests.swift; sourceTree = "<group>"; };
 		58B39BD623D21C9600915858 /* BackpackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackpackView.swift; sourceTree = "<group>"; };
+		58B7D3DF23DF47CE004E96A3 /* SKAction+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SKAction+Extensions.swift"; sourceTree = "<group>"; };
 		58C1AE4923D19CEE003B5B5A /* TransmogrificationPotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransmogrificationPotion.swift; sourceTree = "<group>"; };
 		58C1AE4B23D19E03003B5B5A /* KillMonsterPotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KillMonsterPotion.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -517,6 +519,7 @@
 				3DE657CC20B0AFD2003492DA /* Int+Extensions.swift */,
 				3DA4E882228E5D2F006E90D1 /* SKSpriteNode+Extensions.swift */,
 				3DA4E88E228FC860006E90D1 /* SKNode+Extension.swift */,
+				58B7D3DF23DF47CE004E96A3 /* SKAction+Extensions.swift */,
 				3D674C9022C9BFDB0003AEB4 /* UIColor+Extensions.swift */,
 				3DA0A37922FFAECE0041EF34 /* UIFont+Extensions.swift */,
 				3DA0A383230455B90041EF34 /* CGPoint+Extension.swift */,
@@ -849,6 +852,7 @@
 				3DA0087D21E6D1960017D8DA /* TileCreator.swift in Sources */,
 				3D06390522EEB52300C4D5E9 /* LoseState.swift in Sources */,
 				3D30A42B2217F63500AFA1E1 /* TileCoord.swift in Sources */,
+				58B7D3E023DF47CE004E96A3 /* SKAction+Extensions.swift in Sources */,
 				3D58468C22A632F100EDD845 /* AttackModel.swift in Sources */,
 				3D06390922EEB54E00C4D5E9 /* ReffingState.swift in Sources */,
 				3DC072C123748D100046F224 /* Quadrant.swift in Sources */,

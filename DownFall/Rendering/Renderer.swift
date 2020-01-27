@@ -101,7 +101,7 @@ class Renderer: SKSpriteNode {
         
         //create the hud
         hud = HUD.build(color: UIColor.darkGray, size: CGSize(width: playableRect.width, height: Style.HUD.height))
-        hud.position = CGPoint.positionThis(hud.frame, below: header.frame)
+        hud.position = CGPoint.positionThis(hud.frame, outside: header.frame, anchor: .center, align: .bottom, padding: 0.0, spacing: 0.0, translatedToBounds: true)
         
         //create the helper text view
         helperTextView = HelperTextView.build(color: UIColor.clayRed, size: CGSize(width: playableRect.width * 0.8, height: 400))
@@ -120,10 +120,7 @@ class Renderer: SKSpriteNode {
                     let tiles = input.endTilesStruct else { return }
                 self.sprites = self.createSprites(from: tiles)
                 self.add(sprites: self.sprites, tiles: tiles)
-                
-                if let playerData = playerData(in: tiles) {
-                    self.backpackView.update(with: playerData)
-                }
+
             default:
                 self?.renderInput(input)
             }
@@ -154,12 +151,6 @@ class Renderer: SKSpriteNode {
                 let sprites = createSprites(from: trans.endTiles)
                 animationsFinished(for: sprites, endTiles: trans.endTiles)
             case .itemUsed:
-                if let tiles = trans.endTiles,
-                    let playerCoord = getTilePosition(.player(.zero), tiles: tiles),
-                    case TileType.player(let data) = tiles[playerCoord].type {
-                    backpackView.update(with: data)
-                }
-                
                 let sprites = createSprites(from: trans.endTiles)
                 animationsFinished(for: sprites, endTiles: trans.endTiles)
             case .collectItem:
@@ -261,8 +252,6 @@ class Renderer: SKSpriteNode {
         for (row, innerSprites) in sprites.enumerated() {
             for (col, sprite) in innerSprites.enumerated() {
                 if tiles?[row][col].shouldHighlight ?? false {
-                    sprite.indicateSpriteWillBeAttacked()
-                } else if tiles?[row][col].type.turnsUntilAttack() ?? -1 == 0 {
                     sprite.indicateSpriteWillBeAttacked()
                 } else if let turns = tiles?[row][col].type.turnsUntilAttack(),
                     let frequency = tiles?[row][col].type.attackFrequency() {

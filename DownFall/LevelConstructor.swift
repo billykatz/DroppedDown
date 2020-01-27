@@ -205,7 +205,7 @@ struct LevelConstructor {
     }
     
     static func availableAbilities(per levelType: LevelType, difficulty: Difficulty) -> [AnyAbility] {
-        let abilities: [Ability] = [LesserHealingPotion(), Dynamite(), GreaterHealingPotion(), ShieldEast(), TransmogrificationPotion(), KillMonsterPotion(), RockASwap()]
+        let abilities: [Ability] = [LesserHealingPotion(), Dynamite(), GreaterHealingPotion(), TransmogrificationPotion(), KillMonsterPotion(), RockASwap()]
         
 //        switch levelType {
 //        case .first:

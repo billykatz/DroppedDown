@@ -12,6 +12,7 @@ protocol LabelDelegate: class {
     func labelPressed(_ label: Label)
     func labelPressBegan(_ label: Label)
     func labelPressCancelled(_ label: Label)
+    func labelPressUnknown(_ label: Label, _ touches: Set<UITouch>, with event: UIEvent?)
 }
 
 class Label: ParagraphNode {
@@ -45,13 +46,12 @@ extension Label {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
         let position = touch.location(in: self)
-        let translatedPosition = CGPoint(x: self.frame.center.x + position.x, y: self.frame.center.y + position.y)
-        if self.frame.contains(translatedPosition) {
-            self.delegate?.labelPressed(self)
+        let translatedPosition = CGPoint(x: frame.center.x + position.x, y: frame.center.y + position.y)
+        if frame.contains(translatedPosition) {
+            delegate?.labelPressed(self)
         } else {
-            self.delegate?.labelPressCancelled(self)
+            delegate?.labelPressUnknown(self, touches, with: event)
         }
-        
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {

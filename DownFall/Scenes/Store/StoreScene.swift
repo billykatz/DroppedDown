@@ -345,9 +345,7 @@ extension StoreScene: ButtonDelegate {
         case .leaveStore:
             storeSceneDelegate?.leave(self, updatedPlayerData: playerData)
         case .purchase:
-            if let storeItem = selectedItem {
-                buy(storeItem)
-            }
+            if let storeItem = selectedItem { buy(storeItem) }
         case .sell:
             if let storeItem = selectedItem {
                 sell(storeItem)

@@ -59,6 +59,17 @@ class TileCreator: TileStrategy {
         
     }
     
+    func randomMonster(not this: EntityModel.EntityType) -> Tile {
+        while true {
+            let ranMonster = randomMonster()
+            if case let TileType.monster(data) = ranMonster {
+                if data.type != this {
+                    return Tile(type: ranMonster)
+                }
+            }
+        }
+    }
+    
     private func randomRock() -> TileType {
         guard let level = level else { fatalError("You need to init with a level") }
         let totalNumber = level.rocksRatio.values.max { (first, second) -> Bool in

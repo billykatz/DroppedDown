@@ -170,6 +170,10 @@ extension StoreItem: LabelDelegate {
     }
     
     func labelPressCancelled(_ label: Label) {}
+    
+    func labelPressUnknown(_ label: Label, _ touches: Set<UITouch>, with event: UIEvent?) {
+        
+    }
 }
 
 //MARK:- Touch Events

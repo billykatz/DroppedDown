@@ -66,9 +66,22 @@ extension CGPoint {
         case .right:
             return CGPoint(x: that.width/2 - this.width/2 + xOffset,
                            y: -that.height/2 + this.height/2 + padding)
+        case .center:
+            return CGPoint(x: that.center.x,
+                           y: -that.height/2 + this.height/2 + padding)
         }
     }
     
+    
+    
+    static func position(_ this: CGRect?,
+                            anchoredLeftToThat that: CGRect) -> CGPoint {
+        guard let this = this else { return .zero}
+        return CGPoint(x: that.minX + this.width/2,
+                       y: this.height/2)
+    }
+    
+
     
     
     static func positionThis(_ this: CGRect,
@@ -95,6 +108,8 @@ extension CGPoint {
             x = -that.width/2 + this.width/2 + xOffset
         case .right:
             x = that.width/2 - this.width/2 + xOffset
+        case .center:
+            x = that.center.x
         }
         
         return CGPoint(x: x, y: y)
@@ -111,23 +126,58 @@ extension CGPoint {
         let y: CGFloat
         switch verticaliy {
         case .top:
-            y = that.center.y + that.height/2 + this.height/2 + yOffset
+            y = that.maxY + this.height/2 + yOffset
         case .center:
             y = that.center.y
         case .bottom:
-            y = that.center.y - that.height - this.height/2 - yOffset
+            y = that.minY - this.height/2 - yOffset
         }
         
         let x: CGFloat
         switch anchor {
         case .left:
-            x = that.center.x - that.width/2 - this.width/2 - xOffset
+            x = that.minX - this.width/2 - xOffset
         case .right:
-            x = that.center.x + that.width/2 + this.width/2 + xOffset
+            x = that.maxX + this.width/2 + xOffset
+        case .center:
+            x = that.center.x
         }
         
         return CGPoint(x: x, y: y)
     }
+    
+    
+    static func position(_ this: CGRect,
+                         inside that: CGRect,
+                         verticaliy: Verticality,
+                         anchor: Anchor,
+                         xOffset: CGFloat = 0.0,
+                         yOffset: CGFloat = 0.0) -> CGPoint {
+        
+        
+        let y: CGFloat
+        switch verticaliy {
+        case .top:
+            y = that.height/2 - this.height/2 - yOffset
+        case .center:
+            y = 0.0
+        case .bottom:
+            y = -that.height/2 + this.height/2 + yOffset
+        }
+        
+        let x: CGFloat
+        switch anchor {
+        case .left:
+            x = -that.width/2 + this.width/2 + xOffset
+        case .center:
+            x = 0.0
+        case .right:
+            x = that.width/2 - this.width/2 - xOffset
+        }
+        
+        return CGPoint(x: x, y: y)
+    }
+
     
     
     
@@ -144,7 +194,7 @@ extension CGPoint {
                          centeredVerticallyInTopHalfOf that: CGRect,
                          xOffset: CGFloat = 0.0) -> CGPoint {
         let padding = (that.height - this.height) / 4
-        return CGPoint(x: this.center.x,
+        return CGPoint(x: 0.0,
                        y: that.height/2 - this.height/4 - padding)
     }
     
@@ -162,59 +212,164 @@ extension CGPoint {
     static func positionThis(_ this: CGRect,
                              below that: CGRect,
                              spacing: CGFloat = 0.0) -> CGPoint {
-        return CGPoint(x: that.center.x,
-                       y: that.center.y - (that.height/2) - (this.height/2) - spacing)
+        return CGPoint(x: 0.0,
+                       y: -that.height/2 - this.height/2 - spacing)
     }
     
     static func positionThis(_ this: CGRect?,
                              outsideOf that: CGRect?,
                              verticality: Verticality,
+                             align: Anchor = .center,
                              spacing: CGFloat = 0.0) -> CGPoint {
         guard let this = this, let that = that else { return .zero}
+        var y = CGFloat(0.0)
+        var x = CGFloat(0.0)
         switch verticality {
         case .top:
-            return CGPoint(x: that.center.x,
-                           y: that.center.y + (that.height/2) + (this.height/2) + spacing)
+            y = that.height/2 + this.height/2 + spacing
         case .bottom:
-            return CGPoint(x: that.center.x,
-                           y: that.center.y - (that.height/2) - (this.height/2) - spacing)
+            y = -that.height/2 - this.height/2 - spacing
         case .center:
-            fatalError("This doesnt make sense")
+            y = 0.0
         }
+        
+        switch align {
+        case .left:
+            x = that.width/2 - this.width/2
+        case .right:
+            x = that.width/2 + this.width/2
+        case .center:
+            x = 0.0
+        }
+        
+        return CGPoint(x: x, y: y)
     }
     
+    /// Align horizontally on the left right or center but place the position on the outside
+    static func alignHorizontally(_ this: CGRect?,
+                      relativeTo that: CGRect?,
+                      anchor: Anchor,
+                      verticalAlign: Verticality,
+                      padding : CGFloat = 0.0,
+                      spacing: CGFloat = 0.0,
+                      translatedToBounds: Bool = false) -> CGPoint {
+        guard let this = this, let that = that else { return .zero }
+        
+        var x = CGFloat(0.0)
+        var y = CGFloat(0.0)
+        
+        switch anchor {
+        case .center:
+            x = 0.0
+        case .left:
+            x = -that.width/2 + this.width/2 + spacing
+        case .right:
+            x = that.width/2 - this.width/2 - spacing
+        }
+        
+        switch verticalAlign {
+        case .center:
+            y = 0.0
+        case .bottom:
+            y = -that.height/2 - this.height/2 - padding
+        case .top:
+            y = that.height/2 + this.height/2 + padding
+        }
+        
+        if translatedToBounds {
+            x = that.center.x + x
+            y = that.center.y + y
+        }
+        return CGPoint(x: x, y: y)
+        
+    }
+    
+    
+    /// Align vertically on the top, bottom or center baseline but place the position on the outside
+    static func alignVertically(_ this: CGRect?,
+                      relativeTo that: CGRect?,
+                      anchor: Anchor,
+                      verticalAlign: Verticality,
+                      padding : CGFloat = 0.0,
+                      spacing: CGFloat = 0.0,
+                      translatedToBounds: Bool = false) -> CGPoint {
+        guard let this = this, let that = that else { return .zero }
+        
+        var x = CGFloat(0.0)
+        var y = CGFloat(0.0)
+        
+        switch anchor {
+        case .center:
+            x = 0.0
+        case .left:
+            x = -that.width/2 - this.width/2 - spacing
+        case .right:
+            x = that.width/2 + this.width/2 + spacing
+        }
+        
+        switch verticalAlign {
+        case .center:
+            y = 0.0
+        case .bottom:
+            y = -that.height/2 + this.height/2 + padding
+        case .top:
+            y = that.height/2 - this.height/2 - padding
+        }
+        
+        if translatedToBounds {
+            x = that.center.x + x
+            y = that.center.y + y
+        }
+        return CGPoint(x: x, y: y)
+        
+    }
+    
+    /// Position this outside of that.
+    /// Anchor represents the left, right or center of that
+    /// Align is the vertical alignment, top, bottom or center
     static func positionThis(_ this: CGRect?,
                              outside that: CGRect?,
                              anchor: Anchor,
                              align: Verticality = .center,
                              padding: CGFloat = 0.0,
-                             spacing: CGFloat = 0.0) -> CGPoint {
+                             spacing: CGFloat = 0.0,
+                             translatedToBounds: Bool = false) -> CGPoint {
         guard let this = this, let that = that else { return .zero }
-        switch (anchor, align) {
-        case (.left, .top):
-            return CGPoint(x: that.minX - this.width/2, y: that.maxY - this.height/2 + padding)
-            
-        case (.left, .center):
-            return CGPoint(x: that.minX - this.width/2, y: that.center.y + padding)
-            
-        case (.left, .bottom):
-            return CGPoint(x: that.minX - this.width/2, y: that.minY + this.height/2 + padding)
-            
-        case (.right, .top):
-            return CGPoint(x: that.maxX + this.width/2, y: that.maxY - this.height/2 + padding)
-            
-        case (.right, .center):
-            return CGPoint(x: that.maxX + this.width/2, y: that.center.y + padding)
-            
-        case (.right, .bottom):
-            return CGPoint(x: that.maxX + this.width/2, y: that.minY + this.height/2 + padding)
+        
+        
+        var x = CGFloat(0.0)
+        var y = CGFloat(0.0)
+        
+        switch anchor {
+        case .center:
+            x = that.center.x
+        case .left:
+            x = -that.width/2 - this.width/2 - spacing
+        case .right:
+            x = that.width/2 + this.width/2 + spacing
         }
+        
+        switch align {
+        case .center:
+            y = that.center.y
+        case .bottom:
+            y = -that.height/2 - this.height/2 + padding
+        case .top:
+            y = that.height/2 - this.height/2 + padding
+        }
+        
+        if translatedToBounds {
+            x = that.center.x + x
+            y = that.center.y + y
+        }
+        return CGPoint(x: x, y: y)
     }
     
     
     enum Anchor {
         case left
         case right
+        case center
     }
     
     enum Verticality {

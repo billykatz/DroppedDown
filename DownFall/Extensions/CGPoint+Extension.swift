@@ -63,7 +63,7 @@ extension CGPoint {
     
     /// Position a view insde relative to another view.
     /// The anchor is the horizontal align.
-    /// Note: this does not translte to a parent coord system.
+    /// Note: this does not translte to a parent coord system.  If 
     static func position(_ this: CGRect?,
                          inside that: CGRect?,
                          verticalAlign: Verticality,

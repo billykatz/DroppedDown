@@ -53,16 +53,6 @@ class BackpackView: SKSpriteNode {
     private var initialPosition = CGPoint.zero
     
     // buttons
-    private lazy var ctaButton: Button = {
-        let button = Button(size: CGSize(width: Style.Backpack.ctaButton, height: 100.0), delegate: self, identifier: .backpackSelect, precedence: .foreground, fontSize: UIFont.extraLargeSize, fontColor: UIColor.black, backgroundColor: .highlightGold)
-        
-        button.position = CGPoint.positionThis(button.frame,
-                                               inBottomOf: self.inventoryArea.frame,
-                                               anchored: .right,
-                                               verticalPadding: Style.Padding.most)
-        return button
-    }()
-    
     private lazy var cancelButton: Button = {
         let button = Button(size: CGSize(width: Style.Backpack.ctaButton, height: 100.0), delegate: self, identifier: .backpackCancel, precedence: .foreground, fontSize: UIFont.extraLargeSize, fontColor: UIColor.red, backgroundColor: UIColor.eggshellWhite)
         
@@ -136,17 +126,18 @@ class BackpackView: SKSpriteNode {
         
         // add sprites to the inventory area
         inventoryArea.addChild(itemArea)
-        inventoryArea.addChild(ctaButton)
         
-        
+        // add children to view container
         viewContainer.addChild(self.background)
         viewContainer.addChild(self.inventoryArea)
         
+        // add out viewcontainter
         self.addChild(viewContainer)
     
+        
+        // enable user interaction
         self.isUserInteractionEnabled = true
         
-        updated()
         
     }
     
@@ -163,7 +154,7 @@ class BackpackView: SKSpriteNode {
     func updated() {
         updateToastMessage()
         updateReticles()
-        updateCTAButton(with: viewModel.ability)
+        updateCancelButton(with: viewModel.ability)
         updateTargetArea()
     }
     
@@ -298,10 +289,6 @@ class BackpackView: SKSpriteNode {
             itemDetailView.addChildSafely(button)
                 
             
-            // move over the name with the original toast
-            // DONT RE-ADD
-//            toastMessageContainer?.run(SKAction.move(by: CGVector(dx: -100, dy: 0.0), duration: 0.5))
-            
             // add it to the main view
             itemDetailView.zPosition = Precedence.menu.rawValue
         }
@@ -310,23 +297,32 @@ class BackpackView: SKSpriteNode {
     /// Given an amount to scroll, this method updates the itemAreas position
     private func scrollItemArea(_ amount: CGFloat) {
         if itemArea.frame.width < playableRect.width { return }
+        
+        // an abritrary value, feel free to tinker with
         let damping: CGFloat = 0.15
+        
+        // our targetPosition
         let targetPositionX = itemArea.position.x + (amount * damping)
         
+        // protect against moving too far left
         guard targetPositionX <= inventoryArea.frame.minX + itemArea.frame.width/2 else {
-            //snap the area to the max value
             
+            //snap the area to the maximum value
             itemArea.position = CGPoint(x: inventoryArea.frame.minX + itemArea.frame.width/2, y: itemArea.position.y)
             return
         }
+        
+        // protect against moving too far right
         guard targetPositionX >= inventoryArea.frame.maxX - itemArea.frame.width/2
         else {
             
-            //snap the are to the min value
+            //snap the are to the minimum value
             itemArea.position = CGPoint(x: inventoryArea.frame.maxX - itemArea.frame.width/2, y: itemArea.position.y)
             return
             
         }
+        
+        // finally set the position
         itemArea.position = CGPoint(x: targetPositionX, y: itemArea.position.y)
     }
     
@@ -465,12 +461,10 @@ class BackpackView: SKSpriteNode {
         toastMessageContainer = toastContainer
     }
     
-    private func updateCTAButton(with ability: AnyAbility?) {
+    private func updateCancelButton(with ability: AnyAbility?) {
         if let _ = ability {
-            ctaButton.isHidden = false
             cancelButton.isHidden = false
         } else {
-            ctaButton.isHidden = true
             cancelButton.isHidden = true
         }
     }
@@ -484,8 +478,8 @@ extension BackpackView {
         guard background.contains(position) else { return }
         
         // we might not have moved far enough from our original position to consider this a swipe
-        // however you may start to swipe and then end up back or close to our original position
-        // consider a swipe a swipe for the entirety of the gesture. i.e. they lift up their finger
+        // however you may start to swipe and then end up back or close to our original position.
+        // So, we consider a swipe a swipe for the entirety of the gesture (until they lift up their finger)
         guard abs(position.x - initialPosition.x) >= swipeThreshold
             || touchIsSwipe
             else {

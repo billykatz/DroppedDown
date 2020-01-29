@@ -203,7 +203,7 @@ class Board: Equatable {
             tiles[target.row][target.column] = newMonster
             return Transformation(transformation: nil, inputType: input.type, endTiles: tiles)
         } else {
-            return Transformation(transformation: nil, inputType: input.type, endTiles: tiles)
+            preconditionFailure("We should never hit this code path")
         }
     }
 }

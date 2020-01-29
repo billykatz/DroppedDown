@@ -82,43 +82,32 @@ class HUD: SKSpriteNode {
             
             let identifier = health < data.hp ? Identifiers.fullHeart: Identifiers.emptyHeart
             let heartNode = SKSpriteNode(texture: SKTexture(imageNamed: identifier), size: Style.HUD.heartSize)
-            heartNode.position = CGPoint.positionThis(heartNode.frame,
-                                                      in: self.frame,
-                                                      verticality: .top,
-                                                      anchor: .left,
-                                                      xOffset: CGFloat(health) * Style.HUD.heartSize.width)
+            heartNode.position = CGPoint.position(heartNode.frame, inside: frame, verticalAlign: .top, horizontalAnchor: .left, xOffset: CGFloat(health) * Style.HUD.heartSize.width)
             heartNode.name = Identifiers.heart
             self.addChild(heartNode)
         }
         
         // the label with the palyer's amount of gold
         let goldLabel = ParagraphNode(text: "\(data.carry.total(in: .gold))", paragraphWidth: Style.HUD.labelParagraphWidth, fontName: UIFont.pixelFontName, fontSize: UIFont.extraLargeSize, fontColor: .lightText)
-        goldLabel.position = CGPoint.positionThis(goldLabel.frame, in: self.frame, verticality: .bottom, anchor: .left, xOffset: Style.HUD.coinLabelPadding)
+        goldLabel.position = CGPoint.position(goldLabel.frame, inside: frame, verticalAlign: .bottom, horizontalAnchor: .left, xOffset: Style.HUD.coinLabelPadding)
         goldLabel.name = Identifiers.goldSpriteLabel
         self.addChild(goldLabel)
 
         
         // the sprite of the coin
         let coinNode = SKSpriteNode(texture: SKTexture(imageNamed: Identifiers.gold), size: Style.HUD.heartSize)
-        coinNode.position = CGPoint.positionThis(coinNode.frame,
-                                                 relativeTo: goldLabel.frame,
-                                                 verticaliy: .center,
-                                                 anchor: .right)
+        coinNode.position = CGPoint.alignVertically(coinNode.frame, relativeTo: goldLabel.frame, horizontalAnchor: .right, verticalAlign: .center, translatedToBounds: true)
         self.addChild(coinNode)
         
         // the label with the player's amount of gems
         let gemSpriteLabel = ParagraphNode(text: "\(data.carry.total(in: .gem))", paragraphWidth: Style.HUD.labelParagraphWidth, fontName: UIFont.pixelFontName, fontSize: UIFont.extraLargeSize, fontColor: .lightText)
-        gemSpriteLabel.position = CGPoint.positionThis(gemSpriteLabel.frame,
-                                                       relativeTo: coinNode.frame,
-                                                       verticaliy: .center,
-                                                       anchor: .right,
-                                                       xOffset: Style.HUD.coinLabelPadding)
+        gemSpriteLabel.position = CGPoint.alignVertically(gemSpriteLabel.frame, relativeTo: coinNode.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding:  Style.HUD.coinLabelPadding, translatedToBounds: true)
         gemSpriteLabel.name = Identifiers.gemSpriteLabel
         self.addChild(gemSpriteLabel)
         
         // The sprite of the gem
         let gemSprite = SKSpriteNode(texture: SKTexture(imageNamed: Identifiers.gem), size: Style.HUD.gemSize)
-        gemSprite.position = CGPoint.positionThis(gemSprite.frame, relativeTo: gemSpriteLabel.frame, verticaliy: .center, anchor: .right, xOffset: Style.HUD.gemSpritePadding)
+        gemSprite.position = CGPoint.alignVertically(gemSprite.frame, relativeTo: gemSpriteLabel.frame, horizontalAnchor: .right, verticalAlign: .center, translatedToBounds: true)
         self.addChild(gemSprite)
         
         

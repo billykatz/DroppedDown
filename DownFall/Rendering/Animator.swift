@@ -29,7 +29,7 @@ struct Animator {
         let minecart = SKSpriteNode(imageNamed: "minecart")
         minecart.size = exitSprite.size.scale(by: Style.DFTileSpriteNode.Exit.minecartSizeCoefficient)
         minecart.zPosition = Precedence.foreground.rawValue
-        minecart.position = CGPoint.positionThis(minecart.frame, inBottomOf: exitSprite.frame)
+        minecart.position = CGPoint.position(minecart.frame, inside: exitSprite.frame, verticaliy: .center, anchor: .center)
         
         let playerWin = SKSpriteNode(imageNamed: "playerWin")
         playerWin.size = exitSprite.size.scale(by: Style.DFTileSpriteNode.Exit.minecartSizeCoefficient)

@@ -97,6 +97,7 @@ class GameScene: SKScene {
                 self.foreground.removeAllChildren()
                 if case TileType.player = self.board.tiles[playerIndex].type {
                     self.removeFromParent()
+                    self.swipeRecognizerView?.removeFromSuperview()
                     self.gameSceneDelegate?.resetToMain(self)
                 }
 

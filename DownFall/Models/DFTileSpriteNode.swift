@@ -31,7 +31,7 @@ class DFTileSpriteNode: SKSpriteNode {
             addChild(trackSprite)
             let minecartSprite = SKSpriteNode(texture: minecart, size: minecartSize)
             minecartSprite.zPosition = Precedence.foreground.rawValue
-            minecartSprite.position = CGPoint.positionThis(minecartSprite.frame, inBottomOf: self.frame, padding: Style.Padding.less)
+            minecartSprite.position = CGPoint.position(this: minecartSprite.frame, centeredInBottomOf: self.frame, verticalPadding: Style.Padding.less)
             minecartSprite.name = "minecart"
             addChild(minecartSprite)
             
@@ -91,7 +91,7 @@ class DFTileSpriteNode: SKSpriteNode {
         previousCircle = SKShapeNode(circleOfRadius: size.width)
         previousCircle?.fillColor = color
         previousCircle?.strokeColor = color
-        previousCircle?.position = CGPoint.positionThis(previousCircle!.frame, inBottomOf: frame, anchor: .right)
+        previousCircle?.position = CGPoint.position(previousCircle?.frame, inside: frame, verticalAlign: .bottom, horizontalAnchor: .right)
         previousCircle?.zPosition = Precedence.foreground.rawValue
         addOptionalChild(previousCircle)
         
@@ -117,10 +117,9 @@ class DFTileSpriteNode: SKSpriteNode {
     
     func showFinger() {
         let finger = SKSpriteNode(imageNamed: "finger")
-        finger.position = CGPoint.positionThis(finger.frame,
-                                               inBottomOf: self.frame,
-                                               padding: -Style.Padding.most,
-                                               offset: Style.Offset.less)
+        finger.position = CGPoint.position(this: finger.frame,
+                                               centeredInBottomOf: self.frame,
+                                               verticalPadding: -Style.Padding.most)
         finger.size = Style.TutorialHighlight.fingerSize
         
         let moveDownVector = CGVector.init(dx: 0.0, dy: -20.0)

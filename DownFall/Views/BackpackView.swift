@@ -44,7 +44,6 @@ class BackpackView: SKSpriteNode {
     
     // views with content
     private var itemArea: SKSpriteNode
-    private var descriptionArea: SKSpriteNode
     private var toastMessageContainer: SKShapeNode?
     private var itemDetailView: SKSpriteNode
     
@@ -57,14 +56,20 @@ class BackpackView: SKSpriteNode {
     private lazy var ctaButton: Button = {
         let button = Button(size: CGSize(width: Style.Backpack.ctaButton, height: 100.0), delegate: self, identifier: .backpackSelect, precedence: .foreground, fontSize: UIFont.extraLargeSize, fontColor: UIColor.black, backgroundColor: .highlightGold)
         
-        button.position = CGPoint.positionThis(button.frame, inBottomOf: self.inventoryArea.frame, padding: Style.Padding.most, anchor: .right)
+        button.position = CGPoint.positionThis(button.frame,
+                                               inBottomOf: self.inventoryArea.frame,
+                                               anchored: .right,
+                                               verticalPadding: Style.Padding.most)
         return button
     }()
     
     private lazy var cancelButton: Button = {
         let button = Button(size: CGSize(width: Style.Backpack.ctaButton, height: 100.0), delegate: self, identifier: .backpackCancel, precedence: .foreground, fontSize: UIFont.extraLargeSize, fontColor: UIColor.red, backgroundColor: UIColor.eggshellWhite)
         
-        button.position = CGPoint.positionThis(button.frame, inBottomOf: self.inventoryArea.frame, padding: Style.Padding.most, anchor: .left)
+        button.position = CGPoint.positionThis(button.frame,
+                                               inBottomOf: self.inventoryArea.frame,
+                                               anchored: .left,
+                                               verticalPadding: Style.Padding.most)
         button.zPosition = Precedence.menu.rawValue
         return button
     }()
@@ -94,7 +99,7 @@ class BackpackView: SKSpriteNode {
         
         // background view
         self.background = SKSpriteNode(color: .foregroundBlue, size: CGSize(width: playableRect.width, height: height))
-        self.background.position = CGPoint.positionThis(background.frame, inBottomOf: viewContainer.frame)
+        self.background.position = CGPoint.position(this: background.frame, centeredInBottomOf: viewContainer.frame)
         
         //targeting area
         self.targetingArea = SKSpriteNode(color: .clear, size: CGSize(width: playableRect.width, height: playableRect.height))
@@ -103,12 +108,12 @@ class BackpackView: SKSpriteNode {
         
         //inventory area
         self.inventoryArea = SKSpriteNode(texture: nil, color: .clear, size: CGSize(width: playableRect.width, height: height))
-        self.inventoryArea.position = CGPoint.positionThis(inventoryArea.frame, inBottomOf: viewContainer.frame)
+        self.inventoryArea.position = CGPoint.position(this: inventoryArea.frame, centeredInBottomOf: viewContainer.frame)
         
         
         // item detail view
         self.itemDetailView = SKSpriteNode(texture: nil, color: .clayRed, size: self.inventoryArea.size)
-        self.itemDetailView.position = CGPoint.positionThis(itemDetailView.frame, inBottomOf: viewContainer.frame)
+        self.itemDetailView.position = CGPoint.position(this: itemDetailView.frame, centeredInBottomOf: viewContainer.frame)
 
         // center target area reticles
         let marginWidth = playableRect.width - CGFloat(tileSize * boardSize)
@@ -119,11 +124,7 @@ class BackpackView: SKSpriteNode {
         
         // item  areas
         itemArea = SKSpriteNode(color: .clear, size: CGSize(width: CGFloat(viewModel.inventory.count) * Style.Backpack.itemSize.width, height: height/2))
-        itemArea.position = CGPoint.positionThis(itemArea.frame, inBottomOf: inventoryArea.frame, anchor: .left)
-        
-        // description area
-        descriptionArea = SKSpriteNode(color: .clear, size: CGSize(width: playableRect.width * 3 / 4, height: height/2))
-        descriptionArea.position = CGPoint.positionThis(descriptionArea.frame, outsideOf: itemArea.frame, verticality: .top, spacing: -20)
+        itemArea.position = CGPoint.position(itemArea.frame, inside: inventoryArea.frame, verticaliy: .bottom, anchor: .left)
 
         // init ourselves
         super.init(texture: nil, color: .clear, size: CGSize(width: playableRect.width, height: height))
@@ -169,7 +170,7 @@ class BackpackView: SKSpriteNode {
     //MARK: - private functions
     
     private func updateViewMode() {
-        let endPosition = CGPoint.positionThis(itemDetailView.frame, inBottomOf: viewContainer.frame)
+        let endPosition = CGPoint.position(this: itemDetailView.frame, centeredInBottomOf: viewContainer.frame)
         if viewModel.viewMode == .itemDetail {
             let initialPosition = endPosition.translateVertically(-itemDetailView.frame.height)
             
@@ -182,7 +183,7 @@ class BackpackView: SKSpriteNode {
             itemArea.isHidden = true
             
         } else {
-            let endPosition = CGPoint.positionThis(itemDetailView.frame, inBottomOf: viewContainer.frame)
+            let endPosition = CGPoint.position(this: itemDetailView.frame, centeredInBottomOf: viewContainer.frame)
             let initialPosition = endPosition.translateVertically(-itemDetailView.frame.height)
             itemDetailView.position = endPosition
             
@@ -246,8 +247,8 @@ class BackpackView: SKSpriteNode {
             itemView.position = .zero
             itemView.position = CGPoint.position(itemView.frame,
                                                  inside: itemDetailView.frame,
-                                                 verticaliy: .top,
-                                                 anchor: .left,
+                                                 verticalAlign: .top,
+                                                 horizontalAnchor: .left,
                                                  xOffset: Style.Padding.normal,
                                                  yOffset: Style.Padding.normal)
             itemDetailView.addChildSafely(itemView)
@@ -255,22 +256,18 @@ class BackpackView: SKSpriteNode {
             if let ability = viewModel.ability {
                 // place the label on the right of the item viem
                 let descriptionLabel = ParagraphNode(text: ability.description, paragraphWidth: itemDetailView.frame.width - itemView.frame.width - Style.Padding.less*2, fontSize: UIFont.largeSize, fontColor: UIColor.storeBlack)
-                descriptionLabel.position = CGPoint.alignVertically(descriptionLabel.frame, relativeTo: itemView.frame, anchor: .right, verticalAlign: .top, padding: Style.Padding.less*2, spacing: Style.Padding.less * 2, translatedToBounds: true)
+                descriptionLabel.position = CGPoint.alignVertically(descriptionLabel.frame, relativeTo: itemView.frame, horizontalAnchor: .right, verticalAlign: .top, verticalPadding: Style.Padding.less*2, horizontalPadding: Style.Padding.less * 2, translatedToBounds: true)
                 itemDetailView.addChildSafely(descriptionLabel)
             }
             
             
             // add the cancel button
-            cancelButton.position = CGPoint.positionThis(cancelButton.frame,
-                                                         inBottomOf: itemDetailView.frame,
-                                                         padding: Style.Padding.most*2,
-                                                         anchor: .right,
-                                                         xOffset: -Style.Padding.most)
+            cancelButton.position = CGPoint.position(cancelButton.frame, inside: itemDetailView.frame, verticaliy: .bottom, anchor: .right, padding: Style.Padding.most*2)
             itemDetailView.addChildSafely(cancelButton)
             
             
             // targeting board sprite
-            targetBoard.position = CGPoint.alignHorizontally(targetBoard.frame, relativeTo: itemView.frame, anchor: .center, verticalAlign: .bottom, padding: Style.Padding.more*2, spacing: 0.0, translatedToBounds: true)
+            targetBoard.position = CGPoint.alignHorizontally(targetBoard.frame, relativeTo: itemView.frame, horizontalAcnhor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.more*2, horizontalPadding: 0.0, translatedToBounds: true)
             itemDetailView.addChildSafely(targetBoard)
             
             // targeting message
@@ -281,12 +278,12 @@ class BackpackView: SKSpriteNode {
             // targeting paragraph paragraph
             let toastMessageParagraph = ParagraphNode(text: viewModel.toastMessage, paragraphWidth: toastWidth, fontSize: UIFont.largeSize, fontColor: fontColor)
             toastMessageParagraph.position =
-                CGPoint.alignVertically(toastMessageParagraph.frame, relativeTo: targetBoard.frame, anchor: .right, verticalAlign: .center, spacing: Style.Padding.more, translatedToBounds: true)
+                CGPoint.alignVertically(toastMessageParagraph.frame, relativeTo: targetBoard.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: Style.Padding.more, translatedToBounds: true)
             
             // usage paragraph
             let usageMessageParagraph = ParagraphNode(text: viewModel.usageMessage, paragraphWidth: toastWidth, fontSize: UIFont.largeSize, fontColor: .lightText)
             usageMessageParagraph.position =
-                CGPoint.alignHorizontally(usageMessageParagraph.frame, relativeTo: toastMessageParagraph.frame, anchor: .left, verticalAlign: .bottom, padding: Style.Padding.normal, spacing: 0.0, translatedToBounds: true)
+                CGPoint.alignHorizontally(usageMessageParagraph.frame, relativeTo: toastMessageParagraph.frame, horizontalAcnhor: .left, verticalAlign: .bottom, verticalPadding: Style.Padding.normal, horizontalPadding: 0.0, translatedToBounds: true)
             
             //targeting and uasage message
             itemDetailView.addOptionalChild(toastMessageParagraph)
@@ -296,7 +293,7 @@ class BackpackView: SKSpriteNode {
             let button = Button(size: CGSize(width: Style.Backpack.ctaButton, height: 100.0), delegate: self, identifier: .backpackConfirm, precedence: .foreground, fontSize: UIFont.extraLargeSize, fontColor: UIColor.black, backgroundColor: .highlightGold)
             
             button.enabled(viewModel.legallyTargeted)
-            button.position = CGPoint.alignHorizontally(button.frame, relativeTo: itemDetailView.frame, anchor: .right, verticalAlign: .top, padding: 0.0, spacing: Style.Padding.more, translatedToBounds: false)
+            button.position = CGPoint.alignHorizontally(button.frame, relativeTo: itemDetailView.frame, horizontalAcnhor: .right, verticalAlign: .top, verticalPadding: 0.0, horizontalPadding: Style.Padding.more, translatedToBounds: false)
             button.zPosition = Precedence.menu.rawValue
             itemDetailView.addChildSafely(button)
                 
@@ -462,34 +459,14 @@ class BackpackView: SKSpriteNode {
         //toast container
         toastContainer.addOptionalChild(toastMessageParagraph)
         toastContainer.zPosition = Precedence.underground.rawValue
-        toastContainer.position = CGPoint.alignHorizontally(toastContainer.frame, relativeTo: self.background.frame, anchor: .left, verticalAlign: .top, padding: -toastContainer.frame.height/2, spacing: Style.Padding.more, translatedToBounds: true)
+        toastContainer.position = CGPoint.alignHorizontally(toastContainer.frame, relativeTo: self.background.frame, horizontalAcnhor: .left, verticalAlign: .top, verticalPadding: -toastContainer.frame.height/2, horizontalPadding: Style.Padding.more, translatedToBounds: true)
 
         self.addChildSafely(toastContainer)
         toastMessageContainer = toastContainer
     }
     
-    private func updateDescription(with ability: AnyAbility?) {
-        descriptionArea.removeAllChildren()
-        
-        if let ability = ability {
-            let descriptionLabel = ParagraphNode(text: ability.description, paragraphWidth: descriptionArea.frame.width, fontSize: UIFont.largeSize, fontColor: UIColor.storeBlack)
-            descriptionArea.addChildSafely(descriptionLabel)
-        }
-    }
-    
     private func updateCTAButton(with ability: AnyAbility?) {
         if let _ = ability {
-//            if viewModel.legallyTargeted {
-//                ctaButton.color = .highlightGold
-//                ctaButton.addShadow()
-//                ctaButton.enabled(true)
-//            } else {
-//                ctaButton.color = .gray
-//                ctaButton.removeShadow()
-//                ctaButton.enabled(false)
-//            }
-            
-            
             ctaButton.isHidden = false
             cancelButton.isHidden = false
         } else {

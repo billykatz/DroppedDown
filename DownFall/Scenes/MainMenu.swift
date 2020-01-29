@@ -55,7 +55,7 @@ class MainMenu: SKScene {
                               size: CGSize(width: playableRect.width, height: Style.Header.height),
                               precedence: .foreground,
                               delegate: self)
-        header?.position = CGPoint.positionThis(header?.frame ?? .zero, inTopOf: playableRect)
+        header?.position = CGPoint.position(header?.frame ?? .zero, centeredInTopOf: playableRect)
         
         addOptionalChild(header)
         

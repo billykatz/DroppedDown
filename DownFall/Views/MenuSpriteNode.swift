@@ -12,7 +12,7 @@ class MenuSpriteNode: SKSpriteNode {
 
     //TODO: Generally, we need to capture all the constants and move them to our Style struct.
     
-    init(_ menuType: MenuType, playableRect: CGRect, precedence: Precedence) {
+    init(_ menuType: MenuType, playableRect: CGRect, precedence: Precedence, level: Level) {
         let menuSizeWidth = playableRect.size.width * menuType.widthCoefficient
         let menuSizeHeight = playableRect.size.height * menuType.heightCoefficient
         
@@ -30,11 +30,11 @@ class MenuSpriteNode: SKSpriteNode {
         addChild(border)
         
         zPosition = precedence.rawValue
-        setupButtons(menuType, playableRect, precedence: precedence)
+        setupButtons(menuType, playableRect, precedence: precedence, level)
         
     }
     
-    private func setupButtons(_ menuType: MenuType, _ playableRect: CGRect, precedence: Precedence) {
+    private func setupButtons(_ menuType: MenuType, _ playableRect: CGRect, precedence: Precedence, _ level: Level) {
         let menuSizeWidth = playableRect.size.width * menuType.widthCoefficient
         let buttonSize = CGSize(width: menuSizeWidth * 0.4, height: 120)
         
@@ -75,17 +75,55 @@ class MenuSpriteNode: SKSpriteNode {
             addChild(paragraphNode)
             
 
+        } else if menuType == .gameWin {
+            
+            let text = level.type == .third ?
+            """
+            You beat the third level!!
+
+            This is also the last designed level.  You can keep playing the level as much as you'd like.
+            """
+                :
+            """
+            You beat the \(level.type) level.
+            
+            Visit the store to buy some items.
+            """
+            let paragraphNode = ParagraphNode.labelNode(text: text, paragraphWidth: menuSizeWidth * 0.95,
+                fontSize: UIFont.largeSize)
+
+            paragraphNode.position = CGPoint.position(paragraphNode.frame, inside: self.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most)
+            paragraphNode.zPosition = precedence.rawValue
+            
+            addChild(paragraphNode)
+        } else if menuType == .pause {
+            
+            let text =
+            """
+            Paused
+
+            You will lose all progress if you tap "Main Menu"
+            """
+            let paragraphNode = ParagraphNode.labelNode(text: text, paragraphWidth: menuSizeWidth * 0.95,
+                fontSize: UIFont.largeSize)
+
+            paragraphNode.position = CGPoint.position(paragraphNode.frame, inside: self.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most)
+            paragraphNode.zPosition = precedence.rawValue
+            
+            addChild(paragraphNode)
+            
+            
+            let mainMenuButton = Button(size: buttonSize,
+                                delegate: self,
+                                identifier: .mainMenu,
+                                precedence: precedence,
+                                fontSize: UIFont.largeSize,
+                                fontColor: .clayRed,
+                                backgroundColor: .eggshellWhite)
+            mainMenuButton.position = CGPoint.position(this: mainMenuButton.frame, centeredInBottomOf: self.frame, verticalPadding: Style.Padding.most*2 + buttonSize.height)
+            addChild(mainMenuButton)
+
         }
-//        else {
-//            let button2 = Button(size: buttonSize,
-//                                 delegate: self,
-//                                 identifier: .selectLevel,
-//                                 precedence: precedence,
-//                                 fontSize: UIFont.largeSize,
-//                                 fontColor: .black)
-//            button2.position = CGPoint(x: 0, y: buttonSize.height/2 + 15)
-//            addChild(button2)
-//        }
         
         // Add the default button
         // This button is added no matter what
@@ -96,7 +134,7 @@ class MenuSpriteNode: SKSpriteNode {
                             fontSize: UIFont.largeSize,
                             fontColor: .black,
                             backgroundColor: .clayRed)
-        button.position = CGPoint.positionThis(button.frame, inBottomOf: self.frame)
+        button.position = CGPoint.position(this: button.frame, centeredInBottomOf: self.frame, verticalPadding: Style.Padding.most)
         addChild(button)
     }
     
@@ -198,6 +236,8 @@ extension MenuSpriteNode: ButtonDelegate {
             InputQueue.append(Input(.selectLevel))
         case .visitStore:
             InputQueue.append(Input(.visitStore))
+        case .mainMenu:
+            InputQueue.append(Input(.playAgain))
         default:
             fatalError("These buttons dont appear in game")
         }

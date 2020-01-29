@@ -24,14 +24,15 @@ class TurnWatcher {
                     ()
                 case .touchBegan:
                     ()
+                case .itemUsed:
+                    self?.newTurn = false
                 case .touch(_, let type):
                     if case TileType.monster = type {
                         self?.newTurn = false
-                    } else {
-                        fallthrough
                     }
-                case .itemUsed:
-                    self?.newTurn = false
+                    if transformation.tileTransformation != nil {
+                        self?.newTurn = true
+                    }
                 default:
                     if transformation.tileTransformation != nil {
                         self?.newTurn = true

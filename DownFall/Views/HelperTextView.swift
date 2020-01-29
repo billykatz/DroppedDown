@@ -122,7 +122,7 @@ class HelperTextView: SKSpriteNode {
                                                         paragraphWidth: paragraphWidth,
                                                         fontSize: UIFont.mediumSize)
         
-            tapToContinue.position = CGPoint.positionThis(tapToContinue.frame, inBottomOf: self.frame, padding: Style.Padding.most)
+            tapToContinue.position = CGPoint.position(this: tapToContinue.frame, centeredInBottomOf: self.frame, verticalPadding: Style.Padding.most)
             
             addChild(tapToContinue)
         }

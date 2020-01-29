@@ -20,4 +20,8 @@ struct AnimationSettings {
     struct Store {
         static let itemFrameRate = Double(0.3)
     }
+    
+    struct Backpack {
+        static let itemDetailMoveRate = Double(0.15)
+    }
 }

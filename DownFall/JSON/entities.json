@@ -3,7 +3,7 @@
         { "name": "player2",
             "type": "player",
             "originalHp": 7,
-            "hp": 4,
+            "hp": 7,
             "attack": {
                 "type": "targets",
                 "frequency" : 1,
@@ -50,7 +50,7 @@
                 "items": [
                     {
                         "type": "gold",
-                        "amount": 800
+                        "amount": 50
                         
                     },
                     {

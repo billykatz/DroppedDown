@@ -8,6 +8,11 @@
 
 import Foundation
 
+enum ViewMode {
+    case inventory
+    case itemDetail
+}
+
 struct Target {
     let coord: TileCoord
     let isLegal: Bool
@@ -15,8 +20,13 @@ struct Target {
 
 protocol TargetingOutputs {
     var toastMessage: String { get }
+    var usageMessage: String { get }
     var currentTargets: [Target] { get }
     var legallyTargeted: Bool { get }
+    var viewMode:  ViewMode { get }
+    
+    //available abilities to the player
+    var inventory: [AnyAbility] { get }
     
 }
 
@@ -37,17 +47,36 @@ protocol Targeting: TargetingOutputs, TargetingInputs {}
 class TargetingViewModel: Targeting {
     
     public var updateCallback: (() -> Void)?
+    public var inventoryUpdated: (() -> Void)?
+    public var targetsUpdated: (() -> Void)?
+    public var viewModeChanged: (() -> Void)?
+    
+    var inventory: [AnyAbility] = [] {
+        didSet {
+            inventoryUpdated?()
+        }
+    }
     
     var ability: AnyAbility? {
         didSet {
             if let ability = ability {
                 InputQueue.append(Input(InputType.itemUseSelected(ability)))
+                self.viewMode = .itemDetail
             }
             else {
                 InputQueue.append(Input(InputType.itemUseCanceled))
+                self.viewMode = .inventory
             }
             currentTargets = []
             autoTarget()
+        }
+    }
+    
+    var viewMode = ViewMode.inventory {
+        didSet {
+            if viewMode != oldValue {
+                viewModeChanged?()
+            }
         }
     }
     
@@ -57,6 +86,15 @@ class TargetingViewModel: Targeting {
     
     var typesOfTargets: [TileType] {
         return ability?.targetTypes ?? []
+    }
+    
+    var nameMessage: String? {
+        return ability?.type.rawValue
+    }
+    
+    var usageMessage: String {
+
+        return ability?.usage.message ?? ""
     }
     
     var toastMessage: String {
@@ -95,6 +133,7 @@ class TargetingViewModel: Targeting {
     var currentTargets: [Target] = [] {
         didSet {
             updateCallback?()
+            targetsUpdated?()
             InputQueue.append(Input(InputType.itemCanBeUsed(legallyTargeted)))
         }
     }
@@ -125,6 +164,22 @@ class TargetingViewModel: Targeting {
                     self?.tiles = endTiles
                 }
                 
+                if let inputType = trans.inputType,
+                    case InputType.itemUsed(_) = inputType,
+                    let tiles = trans.endTiles,
+                    let playerCoord = getTilePosition(.player(.zero), tiles: tiles),
+                    case TileType.player(let data) = tiles[playerCoord].type
+                {
+                    self?.inventory = data.abilities
+                }
+                
+            case .boardBuilt:
+                guard let self = self,
+                    let tiles = input.endTilesStruct else { return }
+                
+                if let playerData = playerData(in: tiles) {
+                    self.inventory = playerData.abilities
+                }
             case .itemUseCanceled:
                 ()
             default:

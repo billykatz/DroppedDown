@@ -26,8 +26,10 @@ enum ButtonIdentifier: String {
     case sell
     case close
     case backpack
-    case backpackUse
+    case backpackSelect
     case backpackCancel
+    case backpackConfirm
+    case mainMenu
     
     var title: String {
         switch self {
@@ -55,10 +57,14 @@ enum ButtonIdentifier: String {
             return "Sell"
         case .close:
             return "Close"
-        case .backpackUse:
-            return "Use"
+        case .backpackSelect:
+            return "Select"
         case .backpackCancel:
             return "Cancel"
+        case .backpackConfirm:
+            return "Confirm"
+        case .mainMenu:
+            return "Main Menu"
         case .wallet, .infoPopup, .storeItem, .backpack:
             return ""
         }
@@ -270,6 +276,10 @@ extension Button: LabelDelegate {
     
     func labelPressCancelled(_ label: Label) {
         buttonTapWasCancelled()
+    }
+    
+    func labelPressUnknown(_ label: Label, _ touches: Set<UITouch>, with event: UIEvent?) {
+        self.touchesEnded(touches, with: event)
     }
     
 }

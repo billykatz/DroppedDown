@@ -29,7 +29,7 @@ class TutorialSelectionScene: SKScene, ButtonDelegate {
                                 fontSize: UIFont.largeSize,
                                 fontColor: .white)
         
-        backButton.position = CGPoint.positionThis(backButton.frame, inBottomOf: frame)
+        backButton.position = CGPoint.position(this: backButton.frame, centeredInBottomOf: frame)
         addChild(backButton)
     }
     

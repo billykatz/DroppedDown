@@ -48,19 +48,22 @@ class StoreItem: SKSpriteNode {
                               identifier: .storeItem,
                               fontSize: fontSize)
             
+        var abilitySprite: SKSpriteNode?
         if let abilityFrames = ability.spriteSheet?.animationFrames(), let first = abilityFrames.first  {
             let sprite = SKSpriteNode(texture: first, color: .clear, size: Style.Store.Item.size)
             sprite.position = .zero
             sprite.name = ability.textureName
             sprite.run(SKAction.repeatForever(SKAction.animate(with: abilityFrames, timePerFrame: AnimationSettings.Store.itemFrameRate)))
             
-            addChild(sprite)
+            abilitySprite = sprite
         } else if let sprite = ability.sprite {
+            sprite.size = Style.Store.Item.size
             sprite.position = .zero
             sprite.name = ability.textureName
-            addChild(sprite)
+            abilitySprite = sprite
         }
         
+        addChildSafely(abilitySprite)
         
         boxShapeNode = SKShapeNode(rect: frame.applying(CGAffineTransform(scaleX: 1.4 , y: 1.7)))
         boxShapeNode?.strokeColor = .white
@@ -71,9 +74,8 @@ class StoreItem: SKSpriteNode {
         
         let currencyTexture = SKTexture(imageNamed: ability.currency.rawValue)
         let currencySprite = SKSpriteNode(texture: currencyTexture)
-        currencySprite.position = CGPoint.positionThis(currencySprite.frame, inBottomOf: frame, padding: -30.0, anchor: .right)
-        
-        costLabel.position = CGPoint.positionThis(costLabel.frame, inBottomOf: frame, padding: -25.0 , anchor:.left, xOffset: 10.0)
+        currencySprite.position = CGPoint.alignHorizontally(currencySprite.frame, relativeTo: abilitySprite?.frame, horizontalAcnhor: .left, verticalAlign: .bottom, translatedToBounds: true)
+        costLabel.position = CGPoint.alignVertically(costLabel.frame, relativeTo: currencySprite.frame, horizontalAnchor: .right, verticalAlign: .center, translatedToBounds: true)
         
         addChild(currencySprite)
         addChild(costLabel)
@@ -170,6 +172,10 @@ extension StoreItem: LabelDelegate {
     }
     
     func labelPressCancelled(_ label: Label) {}
+    
+    func labelPressUnknown(_ label: Label, _ touches: Set<UITouch>, with event: UIEvent?) {
+        
+    }
 }
 
 //MARK:- Touch Events

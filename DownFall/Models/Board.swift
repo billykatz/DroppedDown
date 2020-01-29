@@ -100,7 +100,7 @@ class Board: Equatable {
             )
             
         case .itemUsed(let ability, let targets):
-            let trans = use(ability, on: targets)
+            let trans = use(ability, on: targets, input: input)
             
             InputQueue.append(
                 Input(
@@ -174,27 +174,76 @@ class Board: Equatable {
         }
         return nil
     }
+    
+    private func use(_ ability: AnyAbility) {
+        if let playerCoord = self.tiles(of: .player(.zero)).first {
+            if case TileType.player(let data) = tiles[playerCoord].type {
+                let newData = data.use(ability)
+                var newTiles = tiles
+                newTiles[playerCoord.row][playerCoord.column] = Tile(type: .player(newData))
+                tiles = newTiles
+            }
+        }
 
+    }
+    
+    private func swap(_ first: TileCoord, with second: TileCoord, input: Input) -> Transformation {
+        
+        let tempTile = tiles[first]
+        tiles[first.row][first.column] = tiles[second.row][second.column]
+        tiles[second.row][second.column] = tempTile
+        let tileTransformation = [TileTransformation(first, second), TileTransformation(second, first)]
+        return Transformation(transformation: [tileTransformation], inputType: input.type, endTiles: tiles)
+        
+    }
+    
+    private func transmogrify(_ target: TileCoord, input: Input) -> Transformation {
+        if case let TileType.monster(data) = tiles[target].type {
+            let newMonster = tileCreator.randomMonster(not: data.type)
+            tiles[target.row][target.column] = newMonster
+            return Transformation(transformation: nil, inputType: input.type, endTiles: tiles)
+        } else {
+            preconditionFailure("We should never hit this code path")
+        }
+    }
 }
 
 //MARK: - use ability
 
 extension Board {
-    private func use(_ ability: AnyAbility, on targets: [TileCoord]) -> Transformation {
-        if ability.type == .greaterHealingPotion || ability.type == .lesserHealingPotion {
+    private func use(_ ability: AnyAbility, on targets: [TileCoord], input: Input) -> Transformation {
+        switch ability.type {
+        case .greaterHealingPotion, .lesserHealingPotion:
             if let playerCoord = self.tiles(of: .player(.zero)).first {
                 if case TileType.player(let data) = tiles[playerCoord].type, let heal = ability.heal {
                     let newData = data.heal(for: heal).use(ability)
                     tiles[playerCoord.x][playerCoord.y] = Tile(type: .player(newData))
                     return Transformation(transformation: nil,
-                                          inputType: .itemUsed(ability, targets),
+                                          inputType: input.type,
                                           endTiles: tiles)
-
+                    
                     
                     
                     
                 }
             }
+        case .dynamite:
+            use(ability)
+            return removeAndReplace(targets.first!, singleTile: true, input: input)
+        case .rockASwap:
+            use(ability)
+            let firstTarget = targets.first!
+            let secondTarget = targets.last!
+            return swap(firstTarget, with: secondTarget, input: input)
+        case .transmogrificationPotion:
+            use(ability)
+            let target = targets.first!
+            return transmogrify(target, input: input)
+        case .killMonsterPotion:
+            use(ability)
+            return removeAndReplace(targets.first!, singleTile: true, input: input)
+        default:
+            ()
         }
         
         return .zero

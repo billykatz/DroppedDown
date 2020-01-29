@@ -155,9 +155,17 @@ struct EntityModel: Equatable, Decodable {
         return update(hp: min(originalHp, self.hp + amount))
     }
     
+    /// consume 1 count of the ability.  If the ability only has 1 count, then remove it
     func use(_ ability: Ability) -> EntityModel {
         var newAbilities = self.abilities
-        newAbilities.removeFirst( where: { $0 == AnyAbility(ability) })
+        guard let index = newAbilities.firstIndex(of: AnyAbility(ability)),
+            var newAbility = self.abilities.first(where: { $0 == AnyAbility(ability) }) else { return self }
+        newAbility.count -= 1
+        if newAbility.count > 0, let range = Range(NSRange(location: index, length: 1)) {
+            newAbilities.replaceSubrange(range, with: [AnyAbility(newAbility)])
+        } else {
+            newAbilities.removeFirst(where: { $0 == AnyAbility(ability) })
+        }
         return update(abilities: newAbilities)
     }
 

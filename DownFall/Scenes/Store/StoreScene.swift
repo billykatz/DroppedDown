@@ -70,7 +70,7 @@ class StoreScene: SKScene {
                             fontColor: .black,
                             backgroundColor: .menuPurple)
         
-        button.position = CGPoint.positionThis(button.frame, inBottomOf: self.frame, padding: Style.buttonToBottomPadding)
+        button.position = CGPoint.position(button.frame, inside: frame, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: -Style.Padding.most)
         
         
         items = createStoreItems(from: level)
@@ -124,11 +124,11 @@ class StoreScene: SKScene {
         let walletView = SKSpriteNode(color: .storeBlack, size: Style.Store.Wallet.viewSize)
         walletView.position = CGPoint.positionThis(walletView.frame,
                                                    inBottomOf: frame,
-                                                   padding: (2 + order) * walletView.frame.height,
-                                                   anchor: .left)
+                                                   anchored: .left,
+                                                   verticalPadding: (2 + order) * walletView.frame.height)
         
         let currencySprite = SKSpriteNode(texture: SKTexture(imageNamed: currency.rawValue), size: Style.Store.Wallet.currencySize)
-        currencySprite.position = CGPoint.positionThis(currencySprite.frame, toTheRightOf: walletView.frame)
+        currencySprite.position = CGPoint.position(currencySprite.frame, centeredOnTheRightOf: walletView.frame)
         
         let amountLabel = Label(text:
             """
@@ -159,8 +159,8 @@ class StoreScene: SKScene {
                                     backgroundColor: !purchased ? .green : .blue)
         purchaseButton.position = CGPoint.positionThis(purchaseButton.frame,
                                                        inBottomOf: frame,
-                                                       padding: Style.Store.CTAButton.bottomPadding,
-                                                       anchor: .right)
+                                                       anchored: .right,
+                                                       verticalPadding: Style.Store.CTAButton.bottomPadding)
         return purchaseButton
     }
     
@@ -175,7 +175,7 @@ class StoreScene: SKScene {
         let popupNode = SKSpriteNode(color: .storeItemBackground,
                                      size: CGSize(width: self.frame.width - Style.Store.InfoPopup.sidePadding, height: Style.Store.InfoPopup.height))
         
-        popupNode.position = CGPoint.positionThis(popupNode.frame, inTopOf: frame, padding: Style.Store.InfoPopup.topPadding)
+        popupNode.position = CGPoint.position(popupNode.frame, centeredInTopOf: frame, verticalOffset: Style.Store.InfoPopup.topPadding)
         
         let descriptionLabel = Label(text: text,
                                      width: popupNode.frame.width,
@@ -193,7 +193,7 @@ class StoreScene: SKScene {
                                  fontSize: UIFont.smallSize,
                                  fontColor: .white,
                                  backgroundColor: .darkGray)
-        closeButton.position = CGPoint.positionThis(closeButton.frame, inTopRightOf: popupNode.frame)
+        closeButton.position = CGPoint.position(closeButton.frame, inside: popupNode.frame, verticaliy: .top, anchor: .right)
         popupNode.addChild(closeButton)
         popupNode.name = Constants.popup
         return popupNode
@@ -345,9 +345,7 @@ extension StoreScene: ButtonDelegate {
         case .leaveStore:
             storeSceneDelegate?.leave(self, updatedPlayerData: playerData)
         case .purchase:
-            if let storeItem = selectedItem {
-                buy(storeItem)
-            }
+            if let storeItem = selectedItem { buy(storeItem) }
         case .sell:
             if let storeItem = selectedItem {
                 sell(storeItem)

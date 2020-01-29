@@ -27,29 +27,29 @@ class Renderer: SKSpriteNode {
     //Animator
     private let animator = Animator()
     
-    private var menuSpriteNode: MenuSpriteNode {
-        return MenuSpriteNode(.pause, playableRect: playableRect, precedence: .menu)
-    }
+    private lazy var menuSpriteNode: MenuSpriteNode = {
+        return MenuSpriteNode(.pause, playableRect: self.playableRect, precedence: .menu, level: self.level)
+    }()
     
-    private var gameWinSpriteNode: MenuSpriteNode {
-        return MenuSpriteNode(.gameWin, playableRect: playableRect, precedence: .menu)
-    }
+    private lazy var gameWinSpriteNode: MenuSpriteNode = {
+        return MenuSpriteNode(.gameWin, playableRect: self.playableRect, precedence: .menu, level: self.level)
+    }()
     
-    private var gameLoseSpriteNode: MenuSpriteNode {
-        return MenuSpriteNode(.gameLose, playableRect: playableRect, precedence: .menu)
-    }
+    private lazy var gameLoseSpriteNode: MenuSpriteNode = {
+        return MenuSpriteNode(.gameLose, playableRect: self.playableRect, precedence: .menu, level: self.level)
+    }()
     
-    private var rotateSprite: MenuSpriteNode {
-        return MenuSpriteNode(.rotate, playableRect: playableRect, precedence: .menu)
-    }
+    private lazy var rotateSprite: MenuSpriteNode = {
+        return MenuSpriteNode(.rotate, playableRect: self.playableRect, precedence: .menu, level: self.level)
+    }()
     
-    private var tutorial1WinSprite: MenuSpriteNode {
-        return MenuSpriteNode(.tutorial1Win, playableRect: playableRect, precedence: .menu)
-    }
+    private lazy var tutorial1WinSprite: MenuSpriteNode = {
+        return MenuSpriteNode(.tutorial1Win, playableRect: self.playableRect, precedence: .menu, level: self.level)
+    }()
     
-    private var tutorial2WinSprite: MenuSpriteNode {
-        return MenuSpriteNode(.tutorial2Win, playableRect: playableRect, precedence: .menu)
-    }
+    private lazy var tutorial2WinSprite: MenuSpriteNode = {
+        return MenuSpriteNode(.tutorial2Win, playableRect: self.playableRect, precedence: .menu, level: self.level)
+    }()
 
     
     private var header  = Header()
@@ -96,16 +96,16 @@ class Renderer: SKSpriteNode {
                               size: CGSize(width: playableRect.width, height: Style.Header.height),
                               precedence: precedence,
                               delegate: self)
-        header.position = CGPoint.positionThis(header.frame, inTopOf: playableRect)
+        header.position = CGPoint.position(header.frame, centeredInTopOf: playableRect)
         header.zPosition = precedence.rawValue
         
         //create the hud
         hud = HUD.build(color: UIColor.darkGray, size: CGSize(width: playableRect.width, height: Style.HUD.height))
-        hud.position = CGPoint.positionThis(hud.frame, below: header.frame)
+        hud.position = CGPoint.alignHorizontally(hud.frame, relativeTo: header.frame, horizontalAcnhor: .center, verticalAlign: .bottom, translatedToBounds: true)
         
         //create the helper text view
         helperTextView = HelperTextView.build(color: UIColor.clayRed, size: CGSize(width: playableRect.width * 0.8, height: 400))
-        helperTextView.position = CGPoint.positionThis(helperTextView.frame, inBottomOf: playableRect)
+        helperTextView.position = CGPoint.position(this: helperTextView.frame, centeredInBottomOf: playableRect)
         
 
         [spriteForeground, header, hud, self.backpackView].forEach { foreground.addChild($0) }
@@ -120,10 +120,7 @@ class Renderer: SKSpriteNode {
                     let tiles = input.endTilesStruct else { return }
                 self.sprites = self.createSprites(from: tiles)
                 self.add(sprites: self.sprites, tiles: tiles)
-                
-                if let playerData = playerData(in: tiles) {
-                    self.backpackView.update(with: playerData)
-                }
+
             default:
                 self?.renderInput(input)
             }
@@ -154,12 +151,6 @@ class Renderer: SKSpriteNode {
                 let sprites = createSprites(from: trans.endTiles)
                 animationsFinished(for: sprites, endTiles: trans.endTiles)
             case .itemUsed:
-                if let tiles = trans.endTiles,
-                    let playerCoord = getTilePosition(.player(.zero), tiles: tiles),
-                    case TileType.player(let data) = tiles[playerCoord].type {
-                    backpackView.update(with: data)
-                }
-                
                 let sprites = createSprites(from: trans.endTiles)
                 animationsFinished(for: sprites, endTiles: trans.endTiles)
             case .collectItem:
@@ -189,6 +180,7 @@ class Renderer: SKSpriteNode {
         case .pause:
             // show the menu
             foreground.addChild(menuForeground)
+            menuForeground.addChildSafely(menuSpriteNode)
         case .gameLose:
             menuForeground.addChild(gameLoseSpriteNode)
             foreground.addChildSafely(menuForeground)
@@ -261,8 +253,6 @@ class Renderer: SKSpriteNode {
         for (row, innerSprites) in sprites.enumerated() {
             for (col, sprite) in innerSprites.enumerated() {
                 if tiles?[row][col].shouldHighlight ?? false {
-                    sprite.indicateSpriteWillBeAttacked()
-                } else if tiles?[row][col].type.turnsUntilAttack() ?? -1 == 0 {
                     sprite.indicateSpriteWillBeAttacked()
                 } else if let turns = tiles?[row][col].type.turnsUntilAttack(),
                     let frequency = tiles?[row][col].type.attackFrequency() {

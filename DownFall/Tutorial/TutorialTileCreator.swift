@@ -24,6 +24,10 @@
 import GameplayKit
 
 struct TutorialTileCreator: TileStrategy {
+    func randomMonster(not: EntityModel.EntityType) -> Tile {
+        return Tile(type: .blackRock)
+    }
+    
     func goldDropped(from monster: EntityModel) -> Int {
         return 5
     }

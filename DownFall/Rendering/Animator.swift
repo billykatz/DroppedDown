@@ -51,6 +51,17 @@ struct Animator {
         }
     }
     
+    func animateGold(goldSprites: [SKSpriteNode], gained: Int, from startPosition: CGPoint, to endPosition: CGPoint) { 
+        var index = 0
+        let animations: [(SKSpriteNode, SKAction)] = goldSprites.map { sprite in
+            let wait = SKAction.wait(forDuration: Double(index) * AnimationSettings.Board.goldWaitTime)
+            let moveAction = SKAction.move(to: endPosition, duration: AnimationSettings.Board.goldGainSpeedEnd)
+            index += 1
+            return (sprite, SKAction.sequence([wait,moveAction, SKAction.removeFromParent()]))
+        }
+        animate(animations)
+    }
+    
     func animate(_ spriteActions: [(SKSpriteNode, SKAction)], completion: (() -> Void)? = nil) {
         if spriteActions.count == 0 { completion?() }
         var numActions = spriteActions.count

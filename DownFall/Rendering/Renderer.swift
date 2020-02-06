@@ -101,7 +101,7 @@ class Renderer: SKSpriteNode {
         
         //create the hud
         hud = HUD.build(color: UIColor.darkGray, size: CGSize(width: playableRect.width, height: Style.HUD.height))
-        hud.position = CGPoint.alignHorizontally(hud.frame, relativeTo: header.frame, horizontalAcnhor: .center, verticalAlign: .bottom, translatedToBounds: true)
+        hud.position = CGPoint.alignHorizontally(hud.frame, relativeTo: header.frame, horizontalAnchor: .center, verticalAlign: .bottom, translatedToBounds: true)
         
         //create the helper text view
         helperTextView = HelperTextView.build(color: UIColor.clayRed, size: CGSize(width: playableRect.width * 0.8, height: 400))
@@ -342,7 +342,8 @@ extension Renderer {
         }
         
         guard let transformation = transformation,
-            let transformations = transformation.tileTransformation else {
+            let transformations = transformation.tileTransformation,
+            let inputType = transformation.inputType else {
             animationsFinished(for: sprites, endTiles: endTiles)
             return
         }
@@ -402,6 +403,25 @@ extension Renderer {
             let animation = SKAction.move(to: endPoint, duration: AnimationSettings.fallSpeed)
             let wait = SKAction.wait(forDuration: 0.25)
             shiftDownActions.append((sprite, SKAction.sequence([wait, animation])))
+        }
+        
+        if case let InputType.collectItem(coord, _, amount) = inputType {
+            // add a bunch of gold sprites to the board
+            if let startPoint = positionsInForeground(at: [coord]).first {
+                var goldSprites: [SKSpriteNode] = []
+                for _ in 0..<amount {
+                    let goldSprite = SKSpriteNode(texture: SKTexture(imageNamed: Identifiers.gold),
+                                                  color: .clear,
+                                                  size: Style.Board.goldGainSize)
+                    goldSprite.position = startPoint
+                    spriteForeground.addChild(goldSprite)
+                    goldSprites.append(goldSprite)
+                }
+                let endPosition = CGPoint.alignHorizontally(goldSprites.first?.frame, relativeTo: self.hud.frame, horizontalAnchor: .left, verticalAlign: .top, translatedToBounds: true)
+                animator.animateGold(goldSprites: goldSprites, gained: amount, from: startPoint, to: endPosition)
+            }
+            
+            
         }
         
         

@@ -59,6 +59,10 @@ struct Style {
 
     }
     
+    struct Board {
+        static let goldGainSize = CGSize(width: 50, height: 50)
+    }
+    
         
     struct Padding {
         static let less: CGFloat = 4.0

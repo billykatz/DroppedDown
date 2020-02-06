@@ -74,7 +74,7 @@ class StoreItem: SKSpriteNode {
         
         let currencyTexture = SKTexture(imageNamed: ability.currency.rawValue)
         let currencySprite = SKSpriteNode(texture: currencyTexture)
-        currencySprite.position = CGPoint.alignHorizontally(currencySprite.frame, relativeTo: abilitySprite?.frame, horizontalAcnhor: .left, verticalAlign: .bottom, translatedToBounds: true)
+        currencySprite.position = CGPoint.alignHorizontally(currencySprite.frame, relativeTo: abilitySprite?.frame, horizontalAnchor: .left, verticalAlign: .bottom, translatedToBounds: true)
         costLabel.position = CGPoint.alignVertically(costLabel.frame, relativeTo: currencySprite.frame, horizontalAnchor: .right, verticalAlign: .center, translatedToBounds: true)
         
         addChild(currencySprite)

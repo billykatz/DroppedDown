@@ -25,6 +25,9 @@ class HUD: SKSpriteNode {
         fatalError("init(coder:) has not been implemented")
     }
     
+    var currentTotalGold: Int = 0
+    let animator = Animator()
+    
     //Mark: - Instance Methods
     
     private func showAttack(attackInput: Input, endTiles: [[Tile]]?) {
@@ -92,7 +95,9 @@ class HUD: SKSpriteNode {
         goldLabel.position = CGPoint.position(goldLabel.frame, inside: frame, verticalAlign: .bottom, horizontalAnchor: .left, xOffset: Style.HUD.coinLabelPadding)
         goldLabel.name = Identifiers.goldSpriteLabel
         self.addChild(goldLabel)
-
+        
+        // save this data for later
+        currentTotalGold = data.carry.total(in: .gold)
         
         // the sprite of the coin
         let coinNode = SKSpriteNode(texture: SKTexture(imageNamed: Identifiers.gold), size: Style.HUD.heartSize)
@@ -121,11 +126,43 @@ class HUD: SKSpriteNode {
             let oldPosition = currencyLabel.position
             currencyLabel.removeFromParent()
             
-            let newCurrencyLabel = ParagraphNode(text: "\(total)", paragraphWidth: Style.HUD.labelParagraphWidth, fontName: UIFont.pixelFontName, fontSize: UIFont.extraLargeSize, fontColor: .lightText)
-            newCurrencyLabel.position = oldPosition
-            newCurrencyLabel.name = currencyLabelIdentifier
-            self.addChild(newCurrencyLabel)
+            var animations: [(SKSpriteNode, SKAction)] = []
+            let goldGained = total-currentTotalGold
+            for gain in 1..<goldGained+1 {
+                let newCurrencyLabel = ParagraphNode(text: "\(currentTotalGold + gain)", paragraphWidth: Style.HUD.labelParagraphWidth, fontName: UIFont.pixelFontName, fontSize: UIFont.extraLargeSize, fontColor: .lightText)
+                newCurrencyLabel.position = oldPosition
+                newCurrencyLabel.name = currencyLabelIdentifier
+                newCurrencyLabel.isHidden = true
+                addChildSafely(newCurrencyLabel)
+                // construct the ticker animation
+                
+                var actions: [SKAction] = []
+                // wait before adding it
+                let waitTime = AnimationSettings.Board.goldWaitTime
+                actions.append(SKAction.wait(forDuration: Double(gain) * waitTime))
+                // actually add it
+                actions.append(SKAction.unhide())
+                if gain < goldGained {
+                    // wait before removing it
+                    actions.append(SKAction.wait(forDuration: waitTime))
+                    //remove all but the last one
+                    actions.append(SKAction.removeFromParent())
+                }
+                
+                animations.append((newCurrencyLabel, SKAction.sequence(actions)))
+            }
+            
+            // show exaclty how much gold was gained as well
+            let gainedGoldLabel = ParagraphNode(text: "\(goldGained)", paragraphWidth: Style.HUD.labelParagraphWidth, fontName: UIFont.pixelFontName, fontSize: UIFont.extraLargeSize, fontColor: .highlightGold)
+            gainedGoldLabel.position = oldPosition
+            addChildSafely(gainedGoldLabel)
+            let moveUp = SKAction.move(by: CGVector(dx: 0, dy: 100), duration: AnimationSettings.HUD.goldGainedTime)
+            let sequence = SKAction.sequence([moveUp, SKAction.removeFromParent()])
+            gainedGoldLabel.run(sequence)
+                
+            
+            animator.animate(animations)
+            currentTotalGold = total
         }
     }
 }
-

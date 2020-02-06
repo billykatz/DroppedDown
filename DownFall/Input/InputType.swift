@@ -16,6 +16,8 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
         } else if case InputType.animationsFinished(let lhsRef) = lhs,
             case InputType.animationsFinished(let rhsRef) = rhs {
             return lhsRef == rhsRef
+        } else if case InputType.collectItem(_, _, _) = lhs, case InputType.collectItem(_, _, _) = rhs {
+            return true
         }
         return lhs == rhs
     }

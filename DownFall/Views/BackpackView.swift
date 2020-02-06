@@ -258,7 +258,7 @@ class BackpackView: SKSpriteNode {
             
             
             // targeting board sprite
-            targetBoard.position = CGPoint.alignHorizontally(targetBoard.frame, relativeTo: itemView.frame, horizontalAcnhor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.more*2, horizontalPadding: 0.0, translatedToBounds: true)
+            targetBoard.position = CGPoint.alignHorizontally(targetBoard.frame, relativeTo: itemView.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.more*2, horizontalPadding: 0.0, translatedToBounds: true)
             itemDetailView.addChildSafely(targetBoard)
             
             // targeting message
@@ -274,7 +274,7 @@ class BackpackView: SKSpriteNode {
             // usage paragraph
             let usageMessageParagraph = ParagraphNode(text: viewModel.usageMessage, paragraphWidth: toastWidth, fontSize: UIFont.largeSize, fontColor: .lightText)
             usageMessageParagraph.position =
-                CGPoint.alignHorizontally(usageMessageParagraph.frame, relativeTo: toastMessageParagraph.frame, horizontalAcnhor: .left, verticalAlign: .bottom, verticalPadding: Style.Padding.normal, horizontalPadding: 0.0, translatedToBounds: true)
+                CGPoint.alignHorizontally(usageMessageParagraph.frame, relativeTo: toastMessageParagraph.frame, horizontalAnchor: .left, verticalAlign: .bottom, verticalPadding: Style.Padding.normal, horizontalPadding: 0.0, translatedToBounds: true)
             
             //targeting and uasage message
             itemDetailView.addOptionalChild(toastMessageParagraph)
@@ -284,7 +284,7 @@ class BackpackView: SKSpriteNode {
             let button = Button(size: CGSize(width: Style.Backpack.ctaButton, height: 100.0), delegate: self, identifier: .backpackConfirm, precedence: .foreground, fontSize: UIFont.extraLargeSize, fontColor: UIColor.black, backgroundColor: .highlightGold)
             
             button.enabled(viewModel.legallyTargeted)
-            button.position = CGPoint.alignHorizontally(button.frame, relativeTo: itemDetailView.frame, horizontalAcnhor: .right, verticalAlign: .top, verticalPadding: 0.0, horizontalPadding: Style.Padding.more, translatedToBounds: false)
+            button.position = CGPoint.alignHorizontally(button.frame, relativeTo: itemDetailView.frame, horizontalAnchor: .right, verticalAlign: .top, verticalPadding: 0.0, horizontalPadding: Style.Padding.more, translatedToBounds: false)
             button.zPosition = Precedence.menu.rawValue
             itemDetailView.addChildSafely(button)
                 
@@ -455,7 +455,7 @@ class BackpackView: SKSpriteNode {
         //toast container
         toastContainer.addOptionalChild(toastMessageParagraph)
         toastContainer.zPosition = Precedence.underground.rawValue
-        toastContainer.position = CGPoint.alignHorizontally(toastContainer.frame, relativeTo: self.background.frame, horizontalAcnhor: .left, verticalAlign: .top, verticalPadding: -toastContainer.frame.height/2, horizontalPadding: Style.Padding.more, translatedToBounds: true)
+        toastContainer.position = CGPoint.alignHorizontally(toastContainer.frame, relativeTo: self.background.frame, horizontalAnchor: .left, verticalAlign: .top, verticalPadding: -toastContainer.frame.height/2, horizontalPadding: Style.Padding.more, translatedToBounds: true)
 
         self.addChildSafely(toastContainer)
         toastMessageContainer = toastContainer

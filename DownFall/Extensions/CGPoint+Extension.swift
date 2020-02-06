@@ -52,8 +52,8 @@ extension CGPoint {
     
     
     /// Convenience to placing a view in side another view with equal vorizontal and vetical padding
-    static func position(_ this: CGRect,
-                         inside that: CGRect,
+    static func position(_ this: CGRect?,
+                         inside that: CGRect?,
                          verticaliy: Verticality,
                          anchor: Anchor,
                          padding: CGFloat = 0.0) -> CGPoint {
@@ -124,7 +124,7 @@ extension CGPoint {
     /// Align horizontally on the left right or center but position on the outside
     static func alignHorizontally(_ this: CGRect?,
                                   relativeTo that: CGRect?,
-                                  horizontalAcnhor: Anchor,
+                                  horizontalAnchor: Anchor,
                                   verticalAlign: Verticality,
                                   verticalPadding : CGFloat = 0.0,
                                   horizontalPadding: CGFloat = 0.0,
@@ -134,7 +134,7 @@ extension CGPoint {
         var x = CGFloat(0.0)
         var y = CGFloat(0.0)
         
-        switch horizontalAcnhor {
+        switch horizontalAnchor {
         case .center:
             x = 0.0
         case .left:

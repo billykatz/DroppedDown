@@ -24,4 +24,14 @@ struct AnimationSettings {
     struct Backpack {
         static let itemDetailMoveRate = Double(0.15)
     }
+    
+    struct Board {
+        static let goldGainSpeedStart = Double(0.15)
+        static let goldGainSpeedEnd = Double(0.65)
+        static let goldWaitTime = Double(0.05)
+    }
+    
+    struct HUD {
+        static let goldGainedTime = Double(1.0)
+    }
 }

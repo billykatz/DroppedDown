@@ -332,7 +332,6 @@ class Renderer: SKSpriteNode {
                          tileSize: tileSize,
                          completion)
     }
-
 }
 
 extension Renderer {
@@ -355,8 +354,13 @@ extension Renderer {
         let shiftDown = transformations[2]
         
         //remove "removed" tiles from sprite storage
+        var removedAnimations: [(SKSpriteNode, SKAction)] = []
         for tileTrans in removed {
-            sprites[tileTrans.end.x][tileTrans.end.y].removeFromParent()
+            if let crumble = sprites[tileTrans.end.x][tileTrans.end.y].crumble() {
+                // set the position way in the background so that new nodes come in over
+                sprites[tileTrans.end.x][tileTrans.end.y].zPosition = Precedence.underground.rawValue
+                removedAnimations.append(crumble)
+            }
         }
         
         
@@ -378,15 +382,39 @@ extension Renderer {
             spriteForeground.addChild(spriteNodes[endRow][endCol])
         }
         
-        //animation "shiftDown" transformation
-        var count = shiftDown.count
-        animate(shiftDown) { [weak self] in
-            guard let strongSelf = self else { return }
-            count -= 1
-            if count == 0 {
-                strongSelf.animationsFinished(for: strongSelf.sprites, endTiles: endTiles)
+        /// map the shift down tile transformation array to [SKSpriteNode, SKAction)] to work Animator world
+        
+        var shiftDownActions: [(SKSpriteNode, SKAction)] = []
+        for trans in shiftDown {
+            
+            let (startRow, startCol) = trans.initial.tuple
+            let (endRow, endCol) = trans.end.tuple
+            let sprite: SKSpriteNode
+            if trans.initial.row >= Int(boardSize) {
+                sprite = spriteNodes[endRow][endCol]
+            } else {
+                sprite = sprites[startRow][startCol]
             }
+            
+            //create the action
+            let endPoint = CGPoint.init(x: tileSize * CGFloat(trans.end.column) + bottomLeft.x,
+                                        y: tileSize * CGFloat(trans.end.row) + bottomLeft.y)
+            let animation = SKAction.move(to: endPoint, duration: AnimationSettings.fallSpeed)
+            let wait = SKAction.wait(forDuration: 0.25)
+            shiftDownActions.append((sprite, SKAction.sequence([wait, animation])))
         }
+        
+        
+        // animate the removal of rocks and rocks falling at the same time
+        // they are quasi-sequenced because the faling rocks wait x seconds before falling
+        // TODO: figure out if there is a better way to sequence animations
+        // For example, it would be nice to say "start this animation at a certain key frame/progress of another animation"
+        removedAnimations.append(contentsOf: shiftDownActions)
+        animator.animate(removedAnimations) {  [weak self] in
+            guard let strongSelf = self else { return }
+            strongSelf.animationsFinished(for: strongSelf.sprites, endTiles: endTiles)
+        }
+        
     }
     
 }

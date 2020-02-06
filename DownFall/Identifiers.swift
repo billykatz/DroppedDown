@@ -23,7 +23,14 @@ struct Identifiers {
     struct Sprite {
         static let redReticle = "redReticle"
         static let greenReticle = "greenReticle"
+        
+        struct Sheet {
+            static let brownRockCrumble = "brownRockCrumble"
+            static let redRockCrumble = "redRockCrumble"
+            static let blueRockCrumble = "blueRockCrumble"
+        }
     }
+
     
     static let mainMenuScene = "MainMenu"
 }

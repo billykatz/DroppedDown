@@ -51,6 +51,21 @@ struct Animator {
         }
     }
     
+    func animate(_ spriteActions: [(SKSpriteNode, SKAction)], completion: (() -> Void)? = nil) {
+        if spriteActions.count == 0 { completion?() }
+        var numActions = spriteActions.count
+        // tell each child to run it's action
+        for (child, action) in spriteActions {
+            child.run(action) {
+                numActions -= 1
+                if numActions == 0 {
+                    completion?()                    
+                }
+            }
+        }
+    }
+
+    
     func animate(_ transformation: [TileTransformation]?,
                  boardSize: CGFloat,
                  bottomLeft: CGPoint,
@@ -61,7 +76,10 @@ struct Animator {
             completion?()
             return
         }
+        
         var childActionDict : [SKNode : SKAction] = [:]
+        
+        // create each animation action
         for transIdx in 0..<transformation.count {
             let trans = transformation[transIdx]
             //calculate a point that is out of bounds of the foreground
@@ -84,6 +102,8 @@ struct Animator {
             }
             
         }
+        
+        // tell each child to run it's action
         for (child, action) in childActionDict {
             child.run(action) {
                 completion?()

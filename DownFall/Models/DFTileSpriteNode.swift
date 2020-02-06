@@ -133,5 +133,25 @@ class DFTileSpriteNode: SKSpriteNode {
         
         self.addChild(finger)
     }
+    
+    func crumble() -> (SKSpriteNode, SKAction)? {
+        var animationFrames: [SKTexture] = []
+        switch self.type {
+        case .brownRock:
+            animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.brownRockCrumble), rows: 1, columns: 7).animationFrames()
+        case .redRock:
+            animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.redRockCrumble), rows: 1, columns: 6).animationFrames()
+        case .blueRock:
+            animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.blueRockCrumble), rows: 1, columns: 7).animationFrames()
+        default:
+            return nil
+        }
+        
+        let animateCrumble = SKAction.animate(with: animationFrames, timePerFrame: 0.08)
+        let removeFromParent = SKAction.removeFromParent()
+        let sequence = SKAction.sequence([animateCrumble, removeFromParent])
+        return (self, sequence)
+    }
+    
 }
 

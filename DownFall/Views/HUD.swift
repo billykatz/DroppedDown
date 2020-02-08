@@ -153,10 +153,10 @@ class HUD: SKSpriteNode {
             }
             
             // show exaclty how much gold was gained as well
-            let gainedGoldLabel = ParagraphNode(text: "\(goldGained)", paragraphWidth: Style.HUD.labelParagraphWidth, fontName: UIFont.pixelFontName, fontSize: UIFont.extraLargeSize, fontColor: .highlightGold)
-            gainedGoldLabel.position = oldPosition
+            let gainedGoldLabel = ParagraphNode(text: "+\(goldGained)", paragraphWidth: Style.HUD.labelParagraphWidth, fontName: UIFont.pixelFontName, fontSize: UIFont.extraLargeSize, fontColor: .highlightGold)
+            gainedGoldLabel.position = oldPosition.translateVertically(40.0)
             addChildSafely(gainedGoldLabel)
-            let moveUp = SKAction.move(by: CGVector(dx: 0, dy: 100), duration: AnimationSettings.HUD.goldGainedTime)
+            let moveUp = SKAction.move(by: CGVector(dx: 0, dy: 50), duration: AnimationSettings.HUD.goldGainedTime)
             let sequence = SKAction.sequence([moveUp, SKAction.removeFromParent()])
             gainedGoldLabel.run(sequence)
                 

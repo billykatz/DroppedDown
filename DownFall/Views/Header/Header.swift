@@ -8,18 +8,18 @@
 
 import SpriteKit
 
-protocol HeaderDelegate: class {
-    func settingsTapped(_ header: Header)
+protocol SettingsDelegate: class {
+    func settingsTapped()
 }
 
 class Header: SKSpriteNode {
     
-    weak var delegate: HeaderDelegate?
+    weak var delegate: SettingsDelegate?
     
     static func build(color: UIColor,
                       size: CGSize,
                       precedence: Precedence,
-                      delegate: HeaderDelegate) -> Header {
+                      delegate: SettingsDelegate) -> Header {
         let header = Header(texture: SKTexture(imageNamed: Identifiers.header), color: color, size: size)
         let setting = SKSpriteNode(imageNamed: Identifiers.settings)
         setting.name = Identifiers.settings
@@ -29,7 +29,6 @@ class Header: SKSpriteNode {
         header.addChild(setting)
         header.isUserInteractionEnabled = true
         
-        header.delegate = delegate
         
         return header
     }
@@ -39,7 +38,7 @@ class Header: SKSpriteNode {
         let position = touch.location(in: self)
         for node in self.nodes(at: position) {
             if node.name == Identifiers.settings {
-                delegate?.settingsTapped(self)
+                delegate?.settingsTapped()
             }
         }
     }

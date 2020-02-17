@@ -16,6 +16,11 @@ import SpriteKit
 
 class BackpackView: SKSpriteNode {
     
+    private struct Constants {
+        static let emptyItemMessage = "No items in backpack."
+        static let restockMessage = "(Restock in the store)"
+    }
+    
     // view model
     private let viewModel: TargetingViewModel
     
@@ -46,6 +51,7 @@ class BackpackView: SKSpriteNode {
     private var itemArea: SKSpriteNode
     private var toastMessageContainer: SKShapeNode?
     private var itemDetailView: SKSpriteNode
+    private var emptyItemArea: SKSpriteNode
     
     // swipe values
     private var touchIsSwipe = false
@@ -115,6 +121,20 @@ class BackpackView: SKSpriteNode {
         // item  areas
         itemArea = SKSpriteNode(color: .clear, size: CGSize(width: CGFloat(viewModel.inventory.count) * Style.Backpack.itemSize.width, height: height/2))
         itemArea.position = CGPoint.position(itemArea.frame, inside: inventoryArea.frame, verticaliy: .bottom, anchor: .left)
+        
+        self.emptyItemArea = SKSpriteNode(color: .clear,
+                                          size: CGSize(width: playableRect.width, height: height))
+        self.emptyItemArea.position = .zero
+        emptyItemArea.isHidden = true
+        
+        let emptyItemLabel = ParagraphNode(text: Constants.emptyItemMessage, paragraphWidth: playableRect.width, fontColor: .black)
+        emptyItemLabel.position = .zero
+        emptyItemLabel.position = emptyItemLabel.position.translateVertically(Style.Padding.more)
+        
+        let restockLabel = ParagraphNode(text: Constants.restockMessage, paragraphWidth: playableRect.width, fontSize: UIFont.largeSize, fontColor: .black)
+        restockLabel.position = CGPoint.alignHorizontally(restockLabel.frame, relativeTo: emptyItemLabel.frame, horizontalAnchor: .center, verticalAlign: .bottom)
+        emptyItemArea.addChild(emptyItemLabel)
+        emptyItemArea.addChild(restockLabel)
 
         // init ourselves
         super.init(texture: nil, color: .clear, size: CGSize(width: playableRect.width, height: height))
@@ -126,6 +146,7 @@ class BackpackView: SKSpriteNode {
         
         // add sprites to the inventory area
         inventoryArea.addChild(itemArea)
+        inventoryArea.addChild(emptyItemArea)
         
         // add children to view container
         viewContainer.addChild(self.background)
@@ -370,6 +391,10 @@ class BackpackView: SKSpriteNode {
             assert(sprites.count <= gridPoints.count, "We hard coded \(rows*columns) items total, this will break if there are more than 10 items")
             sprites[index]?.position = gridPoints[index]
             itemArea.addChildSafely(sprites[index])
+        }
+        
+        if sprites.isEmpty {
+            emptyItemArea.isHidden = false
         }
         
         inventoryArea.addChildSafely(itemArea)

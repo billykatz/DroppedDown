@@ -10,7 +10,7 @@ import GameplayKit
 
 protocol TileStrategy {
     var randomSource: GKLinearCongruentialRandomSource { get }
-    func tiles(for tiles: [[Tile]]) -> [Tile]
+    func tiles(for tiles: [[Tile]]) -> [[Tile]]
     func board(difficulty: Difficulty) -> [[Tile]]
     func goldDropped(from monster: EntityModel) -> Int
     func randomMonster(not: EntityModel.EntityType) -> Tile

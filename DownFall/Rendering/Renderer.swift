@@ -86,29 +86,34 @@ class Renderer: SKSpriteNode {
         
         
         self.backpackView.touchDelegate = self
-        isUserInteractionEnabled = true
+        self.isUserInteractionEnabled = true
 
         foreground.position = playableRect.center
         menuForeground.position = playableRect.center
         
-        // add settings button to board
-        header = Header.build(color: .black,
-                              size: CGSize(width: playableRect.width, height: Style.Header.height),
-                              precedence: precedence,
-                              delegate: self)
-        header.position = CGPoint.position(header.frame, centeredInTopOf: playableRect)
-        header.zPosition = precedence.rawValue
+//        // add settings button to board
+//        header = Header.build(color: .black,
+//                              size: CGSize(width: playableRect.width, height: Style.Header.height),
+//                              precedence: precedence,
+//                              delegate: self)
+//        header.position = CGPoint.position(header.frame, centeredInTopOf: playableRect)
+//        header.zPosition = precedence.rawValue
+        
+        //create safe area
+        let safeArea = SKSpriteNode.init(color: .foregroundBlue, size: CGSize(width: playableRect.width, height: 75.0))
+        safeArea.position = CGPoint.position(safeArea.frame, centeredInTopOf: playableRect)
         
         //create the hud
-        hud = HUD.build(color: UIColor.darkGray, size: CGSize(width: playableRect.width, height: Style.HUD.height))
-        hud.position = CGPoint.alignHorizontally(hud.frame, relativeTo: header.frame, horizontalAnchor: .center, verticalAlign: .bottom, translatedToBounds: true)
+        hud = HUD.build(color: .foregroundBlue, size: CGSize(width: playableRect.width, height: Style.HUD.height), delegate: self)
+        hud.position = CGPoint.alignHorizontally(hud.frame, relativeTo: safeArea.frame, horizontalAnchor: .center, verticalAlign: .bottom, translatedToBounds: true)
+        hud.zPosition = Precedence.foreground.rawValue
         
         //create the helper text view
-        helperTextView = HelperTextView.build(color: UIColor.clayRed, size: CGSize(width: playableRect.width * 0.8, height: 400))
-        helperTextView.position = CGPoint.position(this: helperTextView.frame, centeredInBottomOf: playableRect)
+//        helperTextView = HelperTextView.build(color: UIColor.clayRed, size: CGSize(width: playableRect.width * 0.8, height: 400))
+//        helperTextView.position = CGPoint.position(this: helperTextView.frame, centeredInBottomOf: playableRect)
         
 
-        [spriteForeground, header, hud, self.backpackView].forEach { foreground.addChild($0) }
+        [spriteForeground, safeArea, hud, self.backpackView].forEach { foreground.addChild($0) }
         
         // Register for Dispatch
         Dispatch.shared.register { [weak self] input in
@@ -588,8 +593,8 @@ extension Renderer {
 
 }
 
-extension Renderer: HeaderDelegate {
-    func settingsTapped(_ header: Header) {
+extension Renderer: SettingsDelegate {
+    func settingsTapped() {
         InputQueue.append(Input(.pause))
     }
 }

@@ -24,6 +24,10 @@
 import GameplayKit
 
 struct TutorialTileCreator: TileStrategy {
+    func tiles(for tiles: [[Tile]]) -> [[Tile]] {
+        return []
+    }
+    
     func randomMonster(not: EntityModel.EntityType) -> Tile {
         return Tile(type: .blackRock)
     }

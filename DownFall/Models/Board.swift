@@ -470,8 +470,8 @@ extension Board {
         // Intermediate tiles is the "in-between" board that has shifted down
         // tiles into and replaced the shifted down tiles with empty tiles
         // the tile creator replaces empty tiles with new tiles
-        var newTileTypes = tileCreator.tiles(for: intermediateTiles)
-        guard newTileTypes.count == shiftIndices.reduce(0, +) else { assertionFailure("newTileTypes count must match the number of empty tiles in the board"); return }
+        let createdTiles: [[Tile]] = tileCreator.tiles(for: intermediateTiles)
+//        guard createdTiles.count == shiftIndices.reduce(0, +) else { assertionFailure("newTileTypes count must match the number of empty tiles in the board"); return }
         
         for (col, shifts) in shiftIndices.enumerated() where shifts > 0 {
             for startIdx in 0..<shifts {
@@ -479,9 +479,6 @@ extension Board {
                 let startCol = col
                 let endRow = startRow - shifts
                 let endCol = col
-                
-                //Add the first tile from TileCreator and remove it from the array
-                intermediateTiles[endRow][endCol] = newTileTypes.removeFirst()
                 
                 //append to shift dictionary
                 var trans = TileTransformation(TileCoord(startRow, startCol),
@@ -494,6 +491,8 @@ extension Board {
                 newTiles.append(trans)
             }
         }
+        
+        intermediateTiles = createdTiles
     }
     
     private func calculateShiftIndices(for tiles: inout [[Tile]]) -> ([TileTransformation], [Int]) {

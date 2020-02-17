@@ -9,16 +9,12 @@
 import Foundation
 
 struct LevelConstructor {
-    static let monstersOnScreenDivisor = 2
     
     static func buildLevels(_ difficulty: Difficulty) -> [Level] {
         return LevelType.gameCases.map { levelType in
-            let maxMonstersTotal = LevelConstructor.maxMonstersTotalPer(levelType, difficulty: difficulty)
-            let maxMonstersOnScreen = maxMonstersTotal/LevelConstructor.monstersOnScreenDivisor
             return Level(type: levelType,
-                         monsterRatio: monstersPerLevel(levelType, difficulty: difficulty),
-                         maxMonstersTotal: maxMonstersTotal,
-                         maxMonstersOnScreen: maxMonstersOnScreen,
+                         monsterTypeRatio: monstersPerLevel(levelType, difficulty: difficulty),
+                         monsterCountStart: monsterCountStart(levelType, difficulty: difficulty),
                          maxGems: 1,
                          maxTime: timePer(levelType, difficulty: difficulty),
                          boardSize: boardSize(per: levelType, difficulty: difficulty),
@@ -31,9 +27,8 @@ struct LevelConstructor {
     static func buildTutorialLevels() -> [Level] {
         return (0..<LevelType.tutorialCases.count).map { index in
             Level(type: LevelType.tutorialCases[index],
-                  monsterRatio: [:],
-                  maxMonstersTotal: 0,
-                  maxMonstersOnScreen: 0,
+                  monsterTypeRatio: [:],
+                  monsterCountStart: 0,
                   maxGems: 0,
                   maxTime: 0,
                   boardSize: 4,
@@ -77,19 +72,31 @@ struct LevelConstructor {
         
         switch levelType {
         case .first:
-            var rocks = matchUp([.redRock, .blueRock, .brownRock], range: normalRockRange, subRanges: 3)
-            rocks[.greenRock] = normalRockRange.next(10)
+            let rocks = matchUp([.redRock, .blueRock, .purpleRock], range: normalRockRange, subRanges: 3)
             return rocks
         case .second:
-            var rocks = matchUp([.redRock, .blueRock, .purpleRock], range: normalRockRange, subRanges: 3)
-            rocks[.greenRock] = normalRockRange.next(10)
+            let rocks = matchUp([.redRock, .blueRock, .purpleRock], range: normalRockRange, subRanges: 3)
             return rocks
         case .third:
-            var rocks = matchUp([.redRock, .blueRock, .purpleRock, .brownRock], range: normalRockRange, subRanges: 4)
-            rocks[.greenRock] = normalRockRange.next(10)
+            let rocks = matchUp([.redRock, .blueRock, .purpleRock, .brownRock], range: normalRockRange, subRanges: 4)
             return rocks
         case .boss, .tutorial1, .tutorial2:
             fatalError("Gotta do boss and or not call this for tutorial")
+        }
+    }
+    
+    static func monsterCountStart(_ levelType: LevelType, difficulty: Difficulty) -> Int {
+        let boardWidth = boardSize(per: levelType, difficulty: difficulty)
+        let boardsize = boardWidth * boardWidth
+        switch (levelType, difficulty) {
+        case (.first, _):
+            return boardsize/10
+        case (.second, _):
+            return boardsize/9
+        case (.third, _):
+            return boardsize/8
+        default:
+            preconditionFailure("Chloe is so cure when she is sleepy")
         }
     }
     
@@ -105,7 +112,7 @@ struct LevelConstructor {
                 return new
             })
         }
-
+        
         
         
         let normalRockRange = RangeModel(lower: 0, upper: 100)
@@ -115,7 +122,11 @@ struct LevelConstructor {
             case .easy:
                 return matchUp([.rat, .bat], range: normalRockRange, subRanges: 2)
             case .normal, .hard:
-                return matchUp([.rat, .bat, .alamo], range: normalRockRange, subRanges: 3)
+                let ratRange = RangeModel(lower: 0, upper: 40)
+                let alamoRange = ratRange.next(40)
+                let batRange = alamoRange.next(20)
+                return [.rat: ratRange, .alamo: alamoRange, .bat: batRange]
+//                return matchUp([.rat, .bat, .alamo], range: normalRockRange, subRanges: 3)
             }
         case .second:
             switch difficulty{
@@ -136,39 +147,6 @@ struct LevelConstructor {
         }
     }
     
-    static func maxMonstersTotalPer(_ levelType: LevelType, difficulty: Difficulty) -> Int {
-        switch levelType {
-        case .first:
-            switch difficulty{
-            case .easy:
-                return 6
-            case .normal:
-                return 12
-            case .hard:
-                return 20
-            }
-        case .second:
-            switch difficulty{
-            case .easy:
-                return 8
-            case .normal:
-                return 15
-            case .hard:
-                return 25
-            }
-        case .third:
-            switch difficulty{
-            case .easy:
-                return 10
-            case .normal:
-                return 20
-            case .hard:
-                return 30
-            }
-        case .boss, .tutorial1, .tutorial2:
-            fatalError("Boss level not implemented yet")
-        }
-    }
     
     static func timePer(_ levelType: LevelType, difficulty: Difficulty) -> Int {
         switch levelType {
@@ -207,25 +185,25 @@ struct LevelConstructor {
     static func availableAbilities(per levelType: LevelType, difficulty: Difficulty) -> [AnyAbility] {
         let abilities: [Ability] = [LesserHealingPotion(), Dynamite(), GreaterHealingPotion(), TransmogrificationPotion(), KillMonsterPotion(), RockASwap()]
         
-//        switch levelType {
-//        case .first:
-//            switch difficulty {
-//            case .easy, .normal, .hard:
-//                abilities = [LesserHealingPotion(), Dynamite(), SwordPickAxe()]
-//            }
-//        case .second:
-//            switch difficulty {
-//            case .easy, .normal, .hard:
-//                abilities = [LesserHealingPotion(), Dynamite(), GreaterHealingPotion()]
-//            }
-//        case .third:
-//            switch difficulty {
-//            case .easy, .normal, .hard:
-//                abilities = [LesserHealingPotion(), Dynamite(), GreaterHealingPotion(), ShieldEast()]
-//            }
-//        case .boss, .tutorial1, .tutorial2:
-//            fatalError("Boss level not implemented yet")
-//        }
+        //        switch levelType {
+        //        case .first:
+        //            switch difficulty {
+        //            case .easy, .normal, .hard:
+        //                abilities = [LesserHealingPotion(), Dynamite(), SwordPickAxe()]
+        //            }
+        //        case .second:
+        //            switch difficulty {
+        //            case .easy, .normal, .hard:
+        //                abilities = [LesserHealingPotion(), Dynamite(), GreaterHealingPotion()]
+        //            }
+        //        case .third:
+        //            switch difficulty {
+        //            case .easy, .normal, .hard:
+        //                abilities = [LesserHealingPotion(), Dynamite(), GreaterHealingPotion(), ShieldEast()]
+        //            }
+        //        case .boss, .tutorial1, .tutorial2:
+        //            fatalError("Boss level not implemented yet")
+        //        }
         
         return abilities.map { AnyAbility($0) }
     }

@@ -73,8 +73,8 @@ class MainMenu: SKScene {
 
 
 
-extension MainMenu: HeaderDelegate {
-    func settingsTapped(_ header: Header) {
+extension MainMenu: SettingsDelegate {
+    func settingsTapped() {
         let difficultyIndex = GameScope.shared.difficulty.rawValue - 1
         GameScope.shared.difficulty = Difficulty.allCases[(difficultyIndex + 1) % Difficulty.allCases.count]
         updateDifficultyLabel()

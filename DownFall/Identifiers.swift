@@ -28,6 +28,7 @@ struct Identifiers {
             static let brownRockCrumble = "brownRockCrumble"
             static let redRockCrumble = "redRockCrumble"
             static let blueRockCrumble = "blueRockCrumble"
+            static let purpleRockCrumble = "purpleRockCrumble"
         }
     }
 

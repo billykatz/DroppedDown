@@ -9,11 +9,25 @@
 import SpriteKit
 
 class HUD: SKSpriteNode {
-    static func build(color: UIColor, size: CGSize) -> HUD {
+    static func build(color: UIColor, size: CGSize, delegate: SettingsDelegate?) -> HUD {
         let header = HUD(texture: nil, color: color, size: size)
+        
+        let setting = SKSpriteNode(imageNamed: Identifiers.settings)
+        setting.name = Identifiers.settings
+        setting.position = CGPoint.position(setting.frame,
+                                            centeredOnTheRightOf: header.frame,
+                                            horizontalOffset: Style.Padding.more)
+        setting.zPosition = Precedence.foreground.rawValue
+        
+        header.addChild(setting)
+        
+        header.isUserInteractionEnabled = true
+        header.delegate = delegate
+        
         Dispatch.shared.register {
             header.handle($0)
         }
+        
         return header
     }
     
@@ -27,6 +41,8 @@ class HUD: SKSpriteNode {
     
     var currentTotalGold: Int = 0
     let animator = Animator()
+    
+    var delegate: SettingsDelegate?
     
     //Mark: - Instance Methods
     
@@ -78,7 +94,11 @@ class HUD: SKSpriteNode {
 
     func show(_ data: EntityModel) {
         // Remove all the hearts so that we can redraw
-        removeAllChildren()
+        for child in children {
+            if child.name != Identifiers.settings {
+                child.removeFromParent()
+            }
+        }
         
         // create and display the full and empty hearts
         for health in 0..<data.originalHp {
@@ -165,4 +185,16 @@ class HUD: SKSpriteNode {
             currentTotalGold = total
         }
     }
+    
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = touches.first else { return }
+        let position = touch.location(in: self)
+        for node in self.nodes(at: position) {
+            if node.name == Identifiers.settings {
+                delegate?.settingsTapped()
+            }
+        }
+    }
+
 }

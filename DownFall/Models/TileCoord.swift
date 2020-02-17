@@ -34,6 +34,10 @@ struct TileCoord: Hashable {
         self.y = y
     }
     
+    init(row: Int, column: Int) {
+        self.init(row, column)
+    }
+    
     var rowAbove : TileCoord {
         return TileCoord(self.x+1, self.y)
     }

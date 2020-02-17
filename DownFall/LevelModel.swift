@@ -9,9 +9,8 @@
 
 struct Level {
     let type: LevelType
-    let monsterRatio: [EntityModel.EntityType: RangeModel]
-    let maxMonstersTotal: Int
-    let maxMonstersOnScreen: Int
+    let monsterTypeRatio: [EntityModel.EntityType: RangeModel]
+    let monsterCountStart: Int
     let maxGems: Int
     let maxTime: Int
     let boardSize: Int
@@ -26,5 +25,5 @@ struct Level {
         return tutorialData != nil
     }
         
-    static let zero = Level(type: .first, monsterRatio: [:], maxMonstersTotal: 0, maxMonstersOnScreen: 0, maxGems: 0, maxTime: 0, boardSize: 0, abilities: [], goldMultiplier: 1, rocksRatio: [:], tutorialData: nil)
+    static let zero = Level(type: .first, monsterTypeRatio: [:], monsterCountStart: 0, maxGems: 0, maxTime: 0, boardSize: 0, abilities: [], goldMultiplier: 1, rocksRatio: [:], tutorialData: nil)
 }

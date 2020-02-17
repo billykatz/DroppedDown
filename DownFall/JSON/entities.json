@@ -235,7 +235,7 @@
             "carry": {
                 "items": [{
                     "type": "gold",
-                    "amount": 10
+                    "amount": 30
                 }]
                 
             },
@@ -294,7 +294,7 @@
             "carry": {
                 "items": [{
                     "type": "gold",
-                    "amount": 3
+                    "amount": 20
                 }]
             },
             "abilities": []
@@ -360,7 +360,7 @@
             "carry": {
                 "items": [{
                     "type": "gold",
-                    "amount": 5
+                    "amount": 30
                 }]
             },
             "abilities": []
@@ -375,41 +375,13 @@
                 "damage": 1,
                 "range": {
                     "lower": 1,
-                    "upper": 1
+                    "upper": 3
                 },
                 "attacksPerTurn": 1,
                 "attackSlope": [
                     {
-                        "over": 1,
-                        "up": 1
-                    },
-                    {
-                        "over": 1,
-                        "up": -1
-                    },
-                    {
-                        "over": -1,
-                        "up": 1
-                    },
-                    {
-                        "over": -1,
-                        "up": -1
-                    },
-                    {
-                        "over": 0,
-                        "up": 1
-                    },
-                    {
                         "over": 0,
                         "up": -1
-                    },
-                    {
-                        "over": 1,
-                        "up": 0
-                    },
-                    {
-                        "over": -1,
-                        "up": 0
                     }
                 ]
             },
@@ -442,7 +414,7 @@
             "carry": {
                 "items": [{
                     "type": "gold",
-                    "amount": 7
+                    "amount": 20
                 }]
             },
             "abilities": []

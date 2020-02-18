@@ -58,9 +58,11 @@ class Board: Equatable {
         resetShouldHighlight()
         switch input.type {
         case .rotateCounterClockwise:
-            transformation = rotate(.left)
+            InputQueue.append(Input(.transformation(rotate(.left))))
+            return
         case .rotateClockwise:
-            transformation = rotate(.right)
+            InputQueue.append(Input(.transformation(rotate(.right))))
+            return
         case .touchBegan:
             transformation = Transformation(transformation: nil,
                                             inputType: input.type,
@@ -83,9 +85,9 @@ class Board: Equatable {
         case .reffingFinished(let newTurn):
             transformation = resetAttacks(newTurn: newTurn)
         case .transformation(let trans):
-            if let inputType = trans.inputType,
+            if let inputType = trans.first?.inputType,
                 case .reffingFinished(_) = inputType,
-                let tilesSruct = trans.endTiles {
+                let tilesSruct = trans.first?.endTiles {
                 let input = Input(.newTurn, tilesSruct)
                 InputQueue.append(input)
                 transformation = nil
@@ -94,7 +96,7 @@ class Board: Equatable {
             InputQueue.append(
                 Input(
                     InputType.transformation(
-                        Transformation(transformation: nil, inputType: .itemUseSelected(ability), endTiles: self.tiles)
+                        [Transformation(transformation: nil, inputType: .itemUseSelected(ability), endTiles: self.tiles)]
                     )
                 )
             )
@@ -105,7 +107,7 @@ class Board: Equatable {
             InputQueue.append(
                 Input(
                     InputType.transformation(
-                        trans
+                        [trans]
                     )
                 )
             )
@@ -125,7 +127,7 @@ class Board: Equatable {
         }
         
         guard let trans = transformation else { return }
-        InputQueue.append(Input(.transformation(trans)))
+        InputQueue.append(Input(.transformation([trans])))
     }
     
     func indicateAttackPattern(from coord: TileCoord, inputType: InputType) -> Transformation {
@@ -502,6 +504,8 @@ extension Board {
             var shift = 0
             for row in 0..<tiles.count {
                 switch tiles[row][col].type {
+                case .column:
+                    shift = 0
                 case .empty:
                     shift += 1
                 default:
@@ -553,8 +557,9 @@ extension Board {
         case right
     }
     
-    func rotate(_ direction: RotationalDirection) -> Transformation {
+    func rotate(_ direction: RotationalDirection) -> [Transformation] {
         var transformation: [TileTransformation] = []
+        var allTransformations: [Transformation] = []
         var intermediateTiles: [[Tile]] = []
         let numCols = boardSize - 1
         let inputType: InputType
@@ -591,11 +596,33 @@ extension Board {
             }
             inputType = .rotateClockwise
         }
+        
+        allTransformations.append(Transformation(transformation: [transformation],
+                                                 inputType: inputType,
+                                                 endTiles: intermediateTiles))
+        
+        if typeCount(for: self.tiles, of: .empty).count > 0 {
+            // store tile transforamtions and shift information
+            var newTiles : [TileTransformation] = []
+            var (shiftDown, shiftIndices) = calculateShiftIndices(for: &intermediateTiles)
+            
+            //add new tiles
+            addNewTiles(shiftIndices: shiftIndices,
+                        shiftDown: &shiftDown,
+                        newTiles: &newTiles,
+                        intermediateTiles: &intermediateTiles)
+            
+            // return our new board
+            
+            allTransformations.append(Transformation(transformation: [newTiles, shiftDown],
+                                           inputType: inputType,
+                                           endTiles: intermediateTiles))
+        }
+        
+        
         self.tiles = intermediateTiles
         
-        return Transformation(transformation: [transformation],
-                              inputType: inputType,
-                              endTiles: tiles)
+        return allTransformations
     }
 }
 

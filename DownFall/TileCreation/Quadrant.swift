@@ -43,4 +43,12 @@ enum Quadrant: CaseIterable {
 
         }
     }
+    
+    func randomCoord(for boardSize: Int, notIn tileCoordSet: Set<TileCoord>) -> TileCoord {
+        var tileCoord = randomCoord(for: boardSize)
+        while tileCoordSet.contains(tileCoord) {
+            tileCoord = randomCoord(for: boardSize)
+        }
+        return tileCoord
+    }
 }

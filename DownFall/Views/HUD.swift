@@ -65,14 +65,14 @@ class HUD: SKSpriteNode {
     func handle(_ input: Input) {
         switch input.type {
         case .transformation(let trans):
-            guard let inputType = trans.inputType else { return }
+            guard let inputType = trans.first?.inputType else { return }
             switch inputType {
             case .attack:
-                showAttack(attackInput: input, endTiles: trans.endTiles)
+                showAttack(attackInput: input, endTiles: trans.first!.endTiles)
             case .collectItem(_, let item, let total):
                 incrementCurrencyCounter(item, total: total)
             case .itemUsed:
-                if let tiles = trans.endTiles,
+                if let tiles = trans.first?.endTiles,
                     let playerCoord = getTilePosition(.player(.zero), tiles: tiles),
                     case TileType.player(let data) = tiles[playerCoord].type {
                     show(data)

@@ -21,7 +21,7 @@ struct TargetingState: GameState {
         case .itemUsed:
             return AnyGameState(ComputingState())
         case .transformation(let trans):
-            guard let inputType = trans.inputType else { fatalError() }
+            guard let inputType = trans.first?.inputType else { fatalError() }
             if case InputType.itemUseSelected(_) = inputType {
                 return AnyGameState(TargetingState())
             }
@@ -36,7 +36,7 @@ struct TargetingState: GameState {
         case .itemUseCanceled, .itemCanBeUsed, .itemUseSelected, .itemUsed:
             return true
         case .transformation(let trans):
-            guard let inputType = trans.inputType else { fatalError() }
+            guard let inputType = trans.first?.inputType else { fatalError() }
             if case InputType.itemUseSelected(_) = inputType {
                 return true
             }

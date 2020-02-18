@@ -16,7 +16,6 @@ class TileCreator: TileStrategy {
     let boardSize: Int
     var level: Level?
     var specialRocks = 0
-    var totalMonstersAdded = 0
     var specialGems = 0
     var goldVariance = 2
     let maxMonsterRatio: Double = 0.20
@@ -51,7 +50,7 @@ class TileCreator: TileStrategy {
             return first.upper < second.upper
         }
         guard let upperRange = totalNumber?.upper else { fatalError("We need the max number or else we cannot continue") }
-
+        
         let randomNumber = Int.random(upperRange)
         for (key, value) in level.monsterTypeRatio {
             if value.contains(randomNumber), let data = entities.entity(with: key) {
@@ -74,6 +73,17 @@ class TileCreator: TileStrategy {
         }
     }
     
+    private func randomCoord(notIn set: Set<TileCoord>) -> TileCoord {
+        guard let level = level else { preconditionFailure("We need a level to work") }
+        let upperbound = level.boardSize
+        
+        var tileCoord = TileCoord(row: Int.random(upperbound), column: Int.random(upperbound))
+        while set.contains(tileCoord) {
+            tileCoord = TileCoord(row: Int.random(upperbound), column: Int.random(upperbound))
+        }
+        return tileCoord
+    }
+    
     private func randomRock() -> TileType {
         guard let level = level else { fatalError("You need to init with a level") }
         let totalNumber = level.rocksRatio.values.max { (first, second) -> Bool in
@@ -89,7 +99,7 @@ class TileCreator: TileStrategy {
         
         fatalError("The randomNumber between 0-\(upperRange-1) should find itself in the range of one of the rocks")
     }
-
+    
     func goldDropped(from monster: EntityModel) -> Int {
         if let goldItem = monster.carry.items.first(where: { $0.type == .gold }) {
             let medianAmount = goldItem.amount * (level?.goldMultiplier ?? 1)
@@ -110,7 +120,7 @@ class TileCreator: TileStrategy {
                 validTile = !neighbors.contains {  $0.type == .monster(.zero) || $0.type == .player(.zero) } && !noMoreMonsters
             case .redRock, .blueRock, .brownRock, .purpleRock:
                 validTile = true
-            case .item, .exit, .player, .fireball, .blackRock, .greenRock, .empty:
+            case .item, .exit, .player, .fireball, .blackRock, .greenRock, .empty, .column:
                 validTile = false
             }
         }
@@ -122,9 +132,9 @@ class TileCreator: TileStrategy {
         return [coord.colLeft, coord.colRight, coord.rowAbove, coord.rowBelow]
             .filter {
                 return isWithinBounds($0, within: tiles)
-            }.map {
-                tiles[$0]
-            }
+        }.map {
+            tiles[$0]
+        }
     }
     
     func tiles(for tiles: [[Tile]]) -> [[Tile]] {
@@ -138,15 +148,25 @@ class TileCreator: TileStrategy {
         for row in 0..<newTiles.count {
             for col in 0..<newTiles[row].count {
                 
+                
                 //check the old array for empties
                 if tiles[row][col].type == .empty {
                     // update the new array and check for neighbors in new array as well.
-                    
-                     let newTile = randomTile(neighbors(of: TileCoord(row: row, column: col), in: newTiles), noMoreMonsters: currMonsterCount < maxMonsters)
-                    if newTile.type == .monster(.zero) {
-                        currMonsterCount += 1
+                    // check if there are any columns above me
+                    var columnAboveMe = 0
+                    for rowAbove in row..<newTiles.count {
+                        if newTiles[rowAbove][col].type == .column {
+                            columnAboveMe += 1
+                        }
                     }
-                    newTiles[row][col] = newTile
+                    
+                    if columnAboveMe == 0 {
+                        let newTile = randomTile(neighbors(of: TileCoord(row: row, column: col), in: newTiles), noMoreMonsters: currMonsterCount < maxMonsters)
+                        if newTile.type == .monster(.zero) {
+                            currMonsterCount += 1
+                        }
+                        newTiles[row][col] = newTile
+                    }
                 }
             }
         }
@@ -155,28 +175,26 @@ class TileCreator: TileStrategy {
     }
     
     /**
-    Create a 2d Array of tile types
-    - Parameters:
+     Create a 2d Array of tile types
+     - Parameters:
      - boardSize: The width and height of a board
      - entities: An array of entities loaded from data
      - difficulty: The level of difficuly
- 
-    */
+     
+     */
     
     func board(difficulty: Difficulty) -> [[Tile]] {
+        guard let level = level else { preconditionFailure("Can;t build a build without a level") }
         var newTiles: [Tile] = []
+        
+        //just add a bunchhhhhhh of rocks
         while (newTiles.count < boardSize * boardSize) {
             let nextTile = Tile(type: randomRock())
             
             switch nextTile.type {
             case .blueRock, .purpleRock, .brownRock, .blackRock, .redRock:
                 newTiles.append(nextTile)
-            case .greenRock:
-                if specialRocks < level?.maxSpecialRocks ?? 0 {
-                    specialRocks += 1
-                    newTiles.append(nextTile)
-                }
-            case .exit, .player, .monster, .item, .empty, .fireball:
+            case .exit, .player, .monster, .item, .empty, .fireball, .greenRock, .column:
                 assertionFailure("randomRock should only create rocks")
             }
         }
@@ -191,29 +209,37 @@ class TileCreator: TileStrategy {
             }
         }
         
+        // place the columns
+        let columnCoordinates: Set<TileCoord> = Set(level.columnCoordinates)
+        for coord in level.columnCoordinates {
+            tiles[coord.row][coord.column] = Tile(type: .column)
+        }
+        
+        // place the player in a quadrant
         let playerQuadrant = Quadrant.allCases[Int.random(Quadrant.allCases.count)]
-        let playerPosition = playerQuadrant.randomCoord(for: boardSize)
+        let playerPosition = playerQuadrant.randomCoord(for: boardSize, notIn: columnCoordinates)
         
         
         guard let playerData = playerEntityData else { fatalError("We must get a playerData or else we cannot continue") }
         tiles[playerPosition.x][playerPosition.y] = Tile(type: .player(playerData))
         
-        let upperMonsterbound = Int(Double(tiles.count))
         
-        for _ in 0..<level!.monsterCountStart {
-            let randomRow = Int.random(upperMonsterbound)
-            let randomCol = Int.random(upperMonsterbound)
-            guard playerPosition != TileCoord(randomRow,randomCol),
-                !TileCoord(randomRow, randomCol).isOrthogonallyAdjacent(to: playerPosition) else { continue }
+        // reserve all positions so we don't overwrite any one position multiple times
+        var reservedSet = Set<TileCoord>([playerPosition, playerPosition.colLeft, playerPosition.colRight, playerPosition.rowAbove, playerPosition.rowBelow])
+        reservedSet.formUnion(columnCoordinates)
+        // add monsters
+        for _ in 0..<level.monsterCountStart {
+            let randomTileCoord = randomCoord(notIn: reservedSet)
+            let (randomRow, randomCol) = randomTileCoord.tuple
+            reservedSet.insert(randomTileCoord)
             tiles[randomRow][randomCol] = Tile(type: randomMonster())
-            totalMonstersAdded += 1
         }
         
         //place the exit on the opposite side of the grid
         #warning ("make sure this is set properly for release")
         let exitQuadrant = playerQuadrant.opposite
 //        let exitQuadrant = playerQuadrant
-        let exitPosition = exitQuadrant.randomCoord(for: boardSize)
+        let exitPosition = exitQuadrant.randomCoord(for: boardSize, notIn: reservedSet)
         
         tiles[exitPosition.x][exitPosition.y] = Tile.exit
         

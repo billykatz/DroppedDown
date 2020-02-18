@@ -20,7 +20,8 @@ struct LevelConstructor {
                          boardSize: boardSize(per: levelType, difficulty: difficulty),
                          abilities: availableAbilities(per: levelType, difficulty: difficulty),
                          goldMultiplier: difficulty.goldMultiplier,
-                         rocksRatio: availableRocksPerLevel(levelType, difficulty: difficulty))
+                         rocksRatio: availableRocksPerLevel(levelType, difficulty: difficulty),
+                         columnCoordinates: columns(per: levelType, difficulty: difficulty))
         }
     }
     
@@ -35,6 +36,7 @@ struct LevelConstructor {
                   abilities: [],
                   goldMultiplier: 1,
                   rocksRatio: [:],
+                  columnCoordinates: [],
                   tutorialData: GameScope.shared.tutorials[index])
         }
     }
@@ -84,6 +86,22 @@ struct LevelConstructor {
             fatalError("Gotta do boss and or not call this for tutorial")
         }
     }
+    
+    static func columns(per levelType: LevelType, difficulty: Difficulty) -> [TileCoord] {
+        let boardWidth = boardSize(per: levelType, difficulty: difficulty)
+        let inset = 2
+        if levelType == .third {
+            return [
+                    TileCoord(inset, inset),
+                    TileCoord(inset, boardWidth-inset-1),
+                    TileCoord(boardWidth-inset-1, boardWidth-inset-1),
+                    TileCoord(boardWidth-inset-1, inset)
+                    ]
+        } else {
+            return []
+        }
+    }
+
     
     static func monsterCountStart(_ levelType: LevelType, difficulty: Difficulty) -> Int {
         let boardWidth = boardSize(per: levelType, difficulty: difficulty)

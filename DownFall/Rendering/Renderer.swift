@@ -132,11 +132,12 @@ class Renderer: SKSpriteNode {
         }
     }
     
-    private func renderTransformation(_ trans: Transformation) {
-        if let inputType = trans.inputType {
+    private func renderTransformation(_ transformations: [Transformation]) {
+        
+        if let trans = transformations.first, let inputType = trans.inputType {
             switch inputType {
             case .rotateCounterClockwise, .rotateClockwise:
-                rotate(for: trans)
+                rotate(for: transformations)
             case .touch:
                 //TODO: sometimes remove and replace has a monster for the touch(_, type).  not sure why
                 if let _ = trans.tileTransformation {
@@ -172,7 +173,7 @@ class Renderer: SKSpriteNode {
                 fatalError()
             }
         } else {
-            animationsFinished(for: sprites, endTiles: trans.endTiles)
+            animationsFinished(for: sprites, endTiles: transformations.first?.endTiles)
         }
 
     }
@@ -253,14 +254,14 @@ class Renderer: SKSpriteNode {
         
     }
     
-    private func add(sprites: [[DFTileSpriteNode]], tiles: [[Tile]]?) {
+    private func add(sprites: [[DFTileSpriteNode]], tiles: [[Tile]]) {
         spriteForeground.removeAllChildren()
         for (row, innerSprites) in sprites.enumerated() {
             for (col, sprite) in innerSprites.enumerated() {
-                if tiles?[row][col].shouldHighlight ?? false {
+                if tiles[row][col].shouldHighlight {
                     sprite.indicateSpriteWillBeAttacked()
-                } else if let turns = tiles?[row][col].type.turnsUntilAttack(),
-                    let frequency = tiles?[row][col].type.attackFrequency() {
+                } else if let turns = tiles[row][col].type.turnsUntilAttack(),
+                    let frequency = tiles[row][col].type.attackFrequency() {
                     sprite.showAttackTiming(frequency, turns)
                 }
                 spriteForeground.addChild(sprite)
@@ -307,16 +308,87 @@ class Renderer: SKSpriteNode {
     }
 
     /// Animate each tileTransformation to display rotation
-    private func rotate(for transformation: Transformation?) {
-        guard let transformation = transformation,
-            let trans = transformation.tileTransformation?.first,
-            let endTileStructs = transformation.endTiles else { return }
-        var animationCount = 0
-        animate(trans) { [weak self] in
-            guard let strongSelf = self else { return }
-            animationCount += 1
-            if animationCount == trans.count {
-                strongSelf.animationsFinished(for: strongSelf.sprites, endTiles: endTileStructs)
+    private func rotate(for transformations: [Transformation]) {
+        guard let rotateTrans = transformations.first,
+            let trans = transformations.first?.tileTransformation?.first,
+            let rotateEndTiles = rotateTrans.endTiles else { return }
+        
+        guard transformations.count > 1 else {
+            var animationCount = 0
+            animate(trans) { [weak self] in
+                guard let strongSelf = self else { return }
+                animationCount += 1
+                if animationCount == trans.count {
+                    strongSelf.animationsFinished(for: strongSelf.sprites, endTiles: rotateEndTiles)
+                }
+            }
+            return
+        }
+        
+        if transformations.count > 1,
+            let newTiles = transformations[1].tileTransformation?[0],
+            let shiftDown = transformations[1].tileTransformation?[1],
+            let finalTiles = transformations[1].endTiles
+        {
+            
+            var animationCount = 0
+            animate(trans) { [weak self] in
+                guard let strongSelf = self else { return }
+                animationCount += 1
+                if animationCount == trans.count {
+                    
+                    // finish the rotate transformation
+                    let spriteNodes = strongSelf.createSprites(from: rotateEndTiles)
+                    strongSelf.sprites = spriteNodes
+                    strongSelf.add(sprites: spriteNodes, tiles: rotateEndTiles)
+                    
+                    
+                    // START THE SHIFT DOWN ANIMATION
+                    
+                    //add new tiles "newTiles"
+                    for trans in newTiles {
+                        let (startRow, startCol) = trans.initial.tuple
+                        let (endRow, endCol) = trans.end.tuple
+                        
+                        // get sprite from the target sprites row and col
+                        let sprite = spriteNodes[endRow][endCol]
+                        
+                        // place the tile at the "start" which is above the visible board
+                        // the animation will then move them to the correct place in the foreground
+                        let x = strongSelf.tileSize * strongSelf.boardSize + ( CGFloat(startRow) * strongSelf.tileSize ) + strongSelf.bottomLeft.x
+                        let y = strongSelf.tileSize * CGFloat(startCol) + strongSelf.bottomLeft.y
+                        sprite.position = CGPoint.init(x: y, y: x)
+                        
+                    }
+                    
+                    
+                    /// map the shift down tile transformation array to [SKSpriteNode, SKAction)] to work Animator world
+                    var shiftDownActions: [(SKSpriteNode, SKAction)] = []
+                    for trans in shiftDown {
+
+                        let (startRow, startCol) = trans.initial.tuple
+                        let (endRow, endCol) = trans.end.tuple
+                        let sprite: SKSpriteNode
+                        if trans.initial.row >= Int(strongSelf.boardSize) {
+                            // startRow may be out of bounds because we temprarily place the tile above the board to visually allow it to drop down.  In that case, use the end row to access the actualy sprite from storage
+                            sprite = spriteNodes[endRow][endCol]
+                        } else {
+                            //sprite already exist in the board. so access it by it's start row
+                            sprite = spriteNodes[startRow][startCol]
+                        }
+
+                        //create the action
+                        let endPoint = CGPoint.init(x: strongSelf.tileSize * CGFloat(trans.end.column) + strongSelf.bottomLeft.x,
+                                                    y: strongSelf.tileSize * CGFloat(trans.end.row) + strongSelf.bottomLeft.y)
+                        let animation = SKAction.move(to: endPoint, duration: AnimationSettings.fallSpeed)
+                        shiftDownActions.append((sprite, SKAction.sequence([animation])))
+                    }
+
+                    strongSelf.animator.animate(shiftDownActions) { [weak self] in
+                        guard let strongSelf = self else { return }
+                        strongSelf.animationsFinished(for: spriteNodes, endTiles: finalTiles)
+                    }
+                }
             }
         }
     }
@@ -324,6 +396,7 @@ class Renderer: SKSpriteNode {
     private func animationsFinished(for endBoard: [[DFTileSpriteNode]],
                                     endTiles: [[Tile]]?,
                                     ref: Bool = true) {
+        guard let endTiles = endTiles else { preconditionFailure("why dont we have end tiles at this point") }
         sprites = createSprites(from: endTiles)
         add(sprites: sprites, tiles: endTiles)
         InputQueue.append(Input(.animationsFinished(ref: ref), endTiles))

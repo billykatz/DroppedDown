@@ -19,7 +19,7 @@ class TurnWatcher {
         Dispatch.shared.register { [weak self] (input) in
             switch input.type {
             case .transformation(let transformation):
-                switch transformation.inputType {
+                switch transformation.first!.inputType {
                 case .reffingFinished?:
                     ()
                 case .touchBegan:
@@ -30,11 +30,11 @@ class TurnWatcher {
                     if case TileType.monster = type {
                         self?.newTurn = false
                     }
-                    if transformation.tileTransformation != nil {
+                    if transformation.first?.tileTransformation != nil {
                         self?.newTurn = true
                     }
                 default:
-                    if transformation.tileTransformation != nil {
+                    if transformation.first?.tileTransformation != nil {
                         self?.newTurn = true
                     }
                 }

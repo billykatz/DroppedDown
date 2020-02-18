@@ -33,10 +33,10 @@ class HelperTextView: SKSpriteNode {
         case .gameWin:
             descriptionText = "You won, you are a masterful miner!\n Make sure to leave feedback :)"
         case .transformation(let trans):
-            guard let inputType = trans.inputType else { return }
+            guard let inputType = trans.first?.inputType else { return }
             switch inputType {
             case .attack(_, let attackerPosition, let defenderPosition, _):
-                if let tiles = trans.endTiles {
+                if let tiles = trans.first?.endTiles {
                     if let defenderPosition = defenderPosition {
                         let attacker = tiles[attackerPosition]
                         let defender = tiles[defenderPosition]
@@ -67,10 +67,10 @@ class HelperTextView: SKSpriteNode {
             case .monster(let data):
                 descriptionText = "\(data)"
             case .empty:
-                descriptionText = "How in the hell did you tap on an empty tile?"
+                descriptionText = "How in the hell did you tap on an empty tile? BECAUSE WE ADDED COLUMNS, BOOOM"
             case .item(let item):
                 descriptionText = "That's \(item.textureName), cool!"
-            case .fireball:
+            case .fireball, .column:
                 descriptionText = ""
             }
         case .boardBuilt, .pause:

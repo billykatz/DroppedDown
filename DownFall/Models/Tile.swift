@@ -101,6 +101,8 @@ enum TileType: Equatable, Hashable, CaseIterable {
             return true
         case (.item(let lhsItem), .item(let rhsItem)):
             return lhsItem == rhsItem
+        case (.column, .column):
+            return true
         default:
             return false
         }
@@ -118,6 +120,7 @@ enum TileType: Equatable, Hashable, CaseIterable {
     case exit
     case item(Item)
     case fireball
+    case column
     
     func isARock() -> Bool {
         return TileType.rockCases.contains(self)
@@ -188,6 +191,8 @@ enum TileType: Equatable, Hashable, CaseIterable {
             return TextureName.brownRock.rawValue
         case .redRock:
             return TextureName.redRock.rawValue
+        case .column:
+            return "redColumn"
         }
     }
     

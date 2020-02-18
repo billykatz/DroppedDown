@@ -268,7 +268,7 @@ class Referee {
                 else { return nil }
             return Input(.collectItem(playerPosition.rowBelow, item, playerData.carry.total(in: item.type.currencyType)), tiles)
         }
-        
+
         
         // Game rules are enforced in the following priorities
         // Game Win

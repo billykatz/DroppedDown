@@ -157,16 +157,16 @@ class TargetingViewModel: Targeting {
         Dispatch.shared.register { [weak self] (input) in
             switch input.type {
             case .transformation(let trans):
-                if let inputType = trans.inputType,
+                if let inputType = trans.first?.inputType,
                     case InputType.itemUseSelected(_) = inputType,
-                    let endTiles = trans.endTiles
+                    let endTiles = trans.first?.endTiles
                 {
                     self?.tiles = endTiles
                 }
                 
-                if let inputType = trans.inputType,
+                if let inputType = trans.first?.inputType,
                     case InputType.itemUsed(_) = inputType,
-                    let tiles = trans.endTiles,
+                    let tiles = trans.first?.endTiles,
                     let playerCoord = getTilePosition(.player(.zero), tiles: tiles),
                     case TileType.player(let data) = tiles[playerCoord].type
                 {

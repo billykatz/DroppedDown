@@ -17,7 +17,7 @@ struct WinState: GameState {
         case .playAgain, .selectLevel, .visitStore:
             return true
         case .transformation(let trans):
-            guard let inputType = trans.inputType else { return false }
+            guard let inputType = trans.first?.inputType else { return false }
             switch inputType {
             case .gameWin:
                 return true
@@ -34,7 +34,7 @@ struct WinState: GameState {
         case .playAgain, .selectLevel, .visitStore:
             return AnyGameState(PlayState())
         case .transformation(let trans):
-            switch trans.inputType! {
+            switch trans.first?.inputType! {
             case .gameWin:
                 return AnyGameState(WinState())
             default:

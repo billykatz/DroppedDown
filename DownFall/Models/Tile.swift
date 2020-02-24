@@ -82,7 +82,8 @@ extension Tile: Equatable {
 enum TileType: Equatable, Hashable, CaseIterable {
     
     static var rockCases: [TileType] = [.rock(.blue), .rock(.green), .rock(.red), .rock(.blue), .rock(.brown)]
-    static var allCases: [TileType] = [.player(.zero), .exit, .empty, .monster(.zero), .item(.zero), .fireball, .rock(.red), .pillar(.red)]
+    static var allCases: [TileType] = [.player(.zero), .exit, .empty, .monster(.zero), .item(.zero), .fireball, .rock(.red), .pillar(.red, 3)]
+    static var randomCases = [TileType.monster(.zero), .rock(.red)]
     typealias AllCases = [TileType]
 
     static func == (lhs: TileType, rhs: TileType) -> Bool {
@@ -112,7 +113,7 @@ enum TileType: Equatable, Hashable, CaseIterable {
     case exit
     case item(Item)
     case fireball
-    case pillar(Color)
+    case pillar(Color, Int)
     case rock(Color)
     
     var isARock: Bool {
@@ -137,7 +138,7 @@ enum TileType: Equatable, Hashable, CaseIterable {
     var color: Color? {
         if case TileType.rock(let color) = self {
             return color
-        } else if case TileType.pillar(let color) = self {
+        } else if case TileType.pillar(let color, _) = self {
             return color
         }
         return nil
@@ -189,16 +190,16 @@ enum TileType: Equatable, Hashable, CaseIterable {
             case .green:
                 return "greenRockv2"
             }
-        case .pillar(let color):
+        case let .pillar(color, health):
             switch color {
             case .blue:
-                return "bluePillar3Health"
+                return "bluePillar\(health)Health"
             case .purple:
-                return "purplePillar3Health"
+                return "purplePillar\(health)Health"
             case .brown:
-                return "brownPillar3Health"
+                return "brownPillar\(health)Health"
             case .red:
-                return "redPillar3Health"
+                return "redPillar\(health)Health"
             case .green:
                 preconditionFailure("Shouldnt be here")
             }

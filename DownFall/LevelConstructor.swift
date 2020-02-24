@@ -92,10 +92,10 @@ struct LevelConstructor {
         let inset = 2
         if levelType == .third {
             return [
-                    (TileType.pillar(.red), TileCoord(inset, inset)),
-                    (TileType.pillar(.blue), TileCoord(inset, boardWidth-inset-1)),
-                    (TileType.pillar(.brown), TileCoord(boardWidth-inset-1, boardWidth-inset-1)),
-                    (TileType.pillar(.purple), TileCoord(boardWidth-inset-1, inset))
+                    (TileType.pillar(.red, 3), TileCoord(inset, inset)),
+                    (TileType.pillar(.blue, 3), TileCoord(inset, boardWidth-inset-1)),
+                    (TileType.pillar(.brown, 3), TileCoord(boardWidth-inset-1, boardWidth-inset-1)),
+                    (TileType.pillar(.purple, 3), TileCoord(boardWidth-inset-1, inset))
                     ]
         } else {
             return []
@@ -113,6 +113,7 @@ struct LevelConstructor {
             return boardsize/9
         case (.third, _):
             return boardsize/8
+            
         default:
             preconditionFailure("Chloe is so cure when she is sleepy")
         }
@@ -138,27 +139,41 @@ struct LevelConstructor {
         case .first:
             switch difficulty{
             case .easy:
-                return matchUp([.rat, .bat], range: normalRockRange, subRanges: 2)
+                return matchUp([.rat, .alamo], range: normalRockRange, subRanges: 2)
             case .normal, .hard:
                 let ratRange = RangeModel(lower: 0, upper: 40)
                 let alamoRange = ratRange.next(40)
                 let batRange = alamoRange.next(20)
                 return [.rat: ratRange, .alamo: alamoRange, .bat: batRange]
-//                return matchUp([.rat, .bat, .alamo], range: normalRockRange, subRanges: 3)
             }
         case .second:
             switch difficulty{
             case .easy:
-                return matchUp([.rat, .bat, .dragon], range: normalRockRange, subRanges: 3)
+                let alamoRange = RangeModel(lower: 0, upper: 30)
+                let dragonRange = alamoRange.next(30)
+                let batRange = alamoRange.next(10)
+                return [.alamo: alamoRange, .dragon: dragonRange, .bat: batRange]
             case .normal, .hard:
-                return matchUp([.rat, .bat, .dragon, .alamo], range: normalRockRange, subRanges: 4)
+                
+                let ratRange = RangeModel(lower: 0, upper: 30)
+                let alamoRange = ratRange.next(30)
+                let dragonRange = alamoRange.next(30)
+                let batRange = alamoRange.next(10)
+                return [.rat: ratRange, .alamo: alamoRange, .dragon: dragonRange, .bat: batRange]
             }
         case .third:
             switch difficulty{
             case .easy:
-                return matchUp([.bat, .dragon, .alamo], range: normalRockRange, subRanges: 3)
+                let alamoRange = RangeModel(lower: 0, upper: 30)
+                let dragonRange = alamoRange.next(30)
+                let batRange = alamoRange.next(20)
+                return [.alamo: alamoRange, .dragon: dragonRange, .bat: batRange]
             case .normal, .hard:
-                return matchUp([.rat, .bat, .dragon, .alamo], range: normalRockRange, subRanges: 4)
+                let ratRange = RangeModel(lower: 0, upper: 30)
+                let alamoRange = ratRange.next(30)
+                let dragonRange = alamoRange.next(30)
+                let batRange = alamoRange.next(10)
+                return [.rat: ratRange, .alamo: alamoRange, .dragon: dragonRange, .bat: batRange]
             }
         case .boss, .tutorial1, .tutorial2:
             fatalError("Boss level not implemented yet")

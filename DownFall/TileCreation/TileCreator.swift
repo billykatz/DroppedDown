@@ -32,14 +32,15 @@ class TileCreator: TileStrategy {
     }
     
     private func randomTile(_ given: Int) -> TileType {
-        let index = abs(given) % TileType.allCases.count
-        switch TileType.allCases[index] {
-        case .monster:
+        let weight = 12
+        let index = abs(given) % (TileType.randomCases.count + weight)
+        switch index {
+        case 0...1:
             return randomMonster()
-        case .rock:
+        case 1...Int.max:
             return randomRock()
         default:
-            return TileType.allCases[index]
+            preconditionFailure("Shouldnt be here")
         }
     }
     

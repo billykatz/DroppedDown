@@ -365,10 +365,22 @@ extension Board {
         }
         
         
+        
         // set the tiles to be removed as Empty placeholder
         var intermediateTiles = tiles
         for coord in selectedTiles {
             intermediateTiles[coord.x][coord.y] = Tile.empty
+        }
+        
+        // decrement the health of each pillar
+        for pillarCoord in selectedPillars {
+            if case let .pillar(color, health) = intermediateTiles[pillarCoord.x][pillarCoord.y].type {
+                if health == 1 {
+                    intermediateTiles[pillarCoord.x][pillarCoord.y] = Tile.empty
+                } else {
+                    intermediateTiles[pillarCoord.x][pillarCoord.y] = Tile(type: .pillar(color, health-1))
+                }
+            }
         }
         
         // store tile transforamtions and shift information

@@ -296,18 +296,19 @@ extension Board {
     /// Find all contiguous neighbors of the same color as the tile that was tapped
     /// Return a new board with the selectedTiles updated
     
-    func findNeighbors(_ coord: TileCoord) -> [TileCoord] {
+    func findNeighbors(_ coord: TileCoord) -> ([TileCoord], [TileCoord]) {
         let (x,y) = coord.tuple
         guard
             x >= 0,
             x < boardSize,
             y >= 0,
-            y < boardSize else { return [] }
+            y < boardSize else { return ([], []) }
         
-        if case TileType.monster(_) = tiles[x][y].type { return [] }
+        if case TileType.monster(_) = tiles[x][y].type { return ([],[]) }
         var queue = [TileCoord(x, y)]
         var tileCoordSet = Set(queue)
         var head = 0
+        var pillars: [TileCoord] = []
         
         while head < queue.count {
             let tileRow = queue[head].x
@@ -318,18 +319,25 @@ extension Board {
             for i in tileRow-1...tileRow+1 {
                 for j in tileCol-1...tileCol+1 {
                     //check that it is within bounds, that we havent visited it before, and it's the same type as us
-                    guard valid(neighbor: TileCoord(i,j), for: TileCoord(tileRow, tileCol)),
+                    guard
+                        valid(neighbor: TileCoord(i,j), for: TileCoord(tileRow, tileCol)),
                         !tileCoordSet.contains(TileCoord(i,j)),
-                        tiles[i][j].type == currTile.type,
-                        tiles[i][j].type.isARock()
+                        let myColor = tiles[i][j].type.color, let theirColor = currTile.type.color,
+                        myColor == theirColor
                         else { continue }
                     //valid neighbor within bounds
-                    queue.append(TileCoord(i,j))
-                    tileCoordSet.insert(TileCoord(i,j))
+                    if case .pillar = tiles[tileRow][tileCol].type {
+                        pillars.append(TileCoord(tileRow, tileCol))
+                    } else if case .pillar = tiles[i][j].type {
+                        pillars.append(TileCoord(i,j))
+                    } else {
+                        queue.append(TileCoord(i,j))
+                        tileCoordSet.insert(TileCoord(i,j))
+                    }
                 }
             }
         }
-        return queue
+        return (queue, pillars)
     }
     
     /*
@@ -346,14 +354,16 @@ extension Board {
                           input: Input) -> Transformation {
         // Check that the tile group at row, col has more than 3 tiles
         var selectedTiles: [TileCoord] = [tileCoord]
+        var selectedPillars: [TileCoord] = []
         if !singleTile {
-            selectedTiles = findNeighbors(tileCoord)
+            (selectedTiles, selectedPillars) = findNeighbors(tileCoord)
             if selectedTiles.count < 3 {
                 return Transformation(transformation: nil,
                                       inputType: input.type,
                                       endTiles: tiles)
             }
         }
+        
         
         // set the tiles to be removed as Empty placeholder
         var intermediateTiles = tiles
@@ -504,7 +514,7 @@ extension Board {
             var shift = 0
             for row in 0..<tiles.count {
                 switch tiles[row][col].type {
-                case .column:
+                case .pillar:
                     shift = 0
                 case .empty:
                     shift += 1

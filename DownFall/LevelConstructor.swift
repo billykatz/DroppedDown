@@ -21,7 +21,7 @@ struct LevelConstructor {
                          abilities: availableAbilities(per: levelType, difficulty: difficulty),
                          goldMultiplier: difficulty.goldMultiplier,
                          rocksRatio: availableRocksPerLevel(levelType, difficulty: difficulty),
-                         columnCoordinates: columns(per: levelType, difficulty: difficulty))
+                         pillarCoordinates: pillars(per: levelType, difficulty: difficulty))
         }
     }
     
@@ -36,7 +36,7 @@ struct LevelConstructor {
                   abilities: [],
                   goldMultiplier: 1,
                   rocksRatio: [:],
-                  columnCoordinates: [],
+                  pillarCoordinates: [],
                   tutorialData: GameScope.shared.tutorials[index])
         }
     }
@@ -74,28 +74,28 @@ struct LevelConstructor {
         
         switch levelType {
         case .first:
-            let rocks = matchUp([.redRock, .blueRock, .purpleRock], range: normalRockRange, subRanges: 3)
+            let rocks = matchUp([.rock(.red), .rock(.blue), .rock(.purple)], range: normalRockRange, subRanges: 3)
             return rocks
         case .second:
-            let rocks = matchUp([.redRock, .blueRock, .purpleRock], range: normalRockRange, subRanges: 3)
+            let rocks = matchUp([.rock(.red), .rock(.blue), .rock(.purple)], range: normalRockRange, subRanges: 3)
             return rocks
         case .third:
-            let rocks = matchUp([.redRock, .blueRock, .purpleRock, .brownRock], range: normalRockRange, subRanges: 4)
+            let rocks = matchUp([.rock(.red), .rock(.blue), .rock(.purple), .rock(.brown)], range: normalRockRange, subRanges: 4)
             return rocks
         case .boss, .tutorial1, .tutorial2:
             fatalError("Gotta do boss and or not call this for tutorial")
         }
     }
     
-    static func columns(per levelType: LevelType, difficulty: Difficulty) -> [TileCoord] {
+    static func pillars(per levelType: LevelType, difficulty: Difficulty) -> [(TileType, TileCoord)] {
         let boardWidth = boardSize(per: levelType, difficulty: difficulty)
         let inset = 2
         if levelType == .third {
             return [
-                    TileCoord(inset, inset),
-                    TileCoord(inset, boardWidth-inset-1),
-                    TileCoord(boardWidth-inset-1, boardWidth-inset-1),
-                    TileCoord(boardWidth-inset-1, inset)
+                    (TileType.pillar(.red), TileCoord(inset, inset)),
+                    (TileType.pillar(.blue), TileCoord(inset, boardWidth-inset-1)),
+                    (TileType.pillar(.brown), TileCoord(boardWidth-inset-1, boardWidth-inset-1)),
+                    (TileType.pillar(.purple), TileCoord(boardWidth-inset-1, inset))
                     ]
         } else {
             return []

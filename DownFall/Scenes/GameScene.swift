@@ -118,13 +118,6 @@ class GameScene: SKScene {
 
         //Turn watcher
         TurnWatcher.shared.register()
-        
-        //Debug settings triple tap
-//        let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(tripleTap))
-//        tapRecognizer.numberOfTapsRequired = 3
-//        // this boolean prevents the bug where there is a delay after a user touches the board
-//        tapRecognizer.delaysTouchesEnded = false
-//        view.addGestureRecognizer(tapRecognizer)
     }
     
     public func prepareForReuse() {

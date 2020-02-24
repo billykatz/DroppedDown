@@ -35,11 +35,19 @@ class DFTileSpriteNode: SKSpriteNode {
             minecartSprite.name = "minecart"
             addChild(minecartSprite)
             
+//        case .pillar:
+//            let backgroundColor = SKSpriteNode(color: .lightGray, size: CGSize(width:width, height: height))
+//            super.init(texture: SKTexture(imageNamed: type.textureString()),
+//                       color: .clear,
+//                       size: CGSize(width: width, height: height))
+//            backgroundColor.zPosition = Precedence.background.rawValue
+//            addChild(backgroundColor)
+            
         default:
             
             super.init(texture: SKTexture(imageNamed: type.textureString()),
                        color: .clear,
-                       size: CGSize.init(width: width, height: height))
+                       size: CGSize(width: width, height: height))
         }
     }
     
@@ -118,8 +126,8 @@ class DFTileSpriteNode: SKSpriteNode {
     func showFinger() {
         let finger = SKSpriteNode(imageNamed: "finger")
         finger.position = CGPoint.position(this: finger.frame,
-                                               centeredInBottomOf: self.frame,
-                                               verticalPadding: -Style.Padding.most)
+                                           centeredInBottomOf: self.frame,
+                                           verticalPadding: -Style.Padding.most)
         finger.size = Style.TutorialHighlight.fingerSize
         
         let moveDownVector = CGVector.init(dx: 0.0, dy: -20.0)
@@ -137,13 +145,13 @@ class DFTileSpriteNode: SKSpriteNode {
     func crumble() -> (SKSpriteNode, SKAction)? {
         var animationFrames: [SKTexture] = []
         switch self.type {
-        case .brownRock:
+        case .rock(.brown):
             animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.brownRockCrumble), rows: 1, columns: 4).animationFrames()
-        case .redRock:
+        case .rock(.red):
             animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.redRockCrumble), rows: 1, columns: 4).animationFrames()
-        case .blueRock:
+        case .rock(.blue):
             animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.blueRockCrumble), rows: 1, columns: 4).animationFrames()
-        case .purpleRock:
+        case .rock(.purple):
             animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.purpleRockCrumble), rows: 1, columns: 4).animationFrames()
         default:
             return nil

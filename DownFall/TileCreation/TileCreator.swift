@@ -36,7 +36,7 @@ class TileCreator: TileStrategy {
         switch TileType.allCases[index] {
         case .monster:
             return randomMonster()
-        case .blackRock, .blueRock, .purpleRock, .brownRock, .greenRock, .redRock:
+        case .rock:
             return randomRock()
         default:
             return TileType.allCases[index]
@@ -118,9 +118,9 @@ class TileCreator: TileStrategy {
             switch nextTile.type {
             case .monster:
                 validTile = !neighbors.contains {  $0.type == .monster(.zero) || $0.type == .player(.zero) } && !noMoreMonsters
-            case .redRock, .blueRock, .brownRock, .purpleRock:
+            case .rock(.red), .rock(.purple), .rock(.blue), .rock(.brown):
                 validTile = true
-            case .item, .exit, .player, .fireball, .blackRock, .greenRock, .empty, .column:
+            case .item, .exit, .player, .fireball, .rock(.green), .empty, .pillar:
                 validTile = false
             }
         }
@@ -155,7 +155,7 @@ class TileCreator: TileStrategy {
                     // check if there are any columns above me
                     var columnAboveMe = 0
                     for rowAbove in row..<newTiles.count {
-                        if newTiles[rowAbove][col].type == .column {
+                        if case TileType.pillar = newTiles[rowAbove][col].type {
                             columnAboveMe += 1
                         }
                     }
@@ -192,9 +192,9 @@ class TileCreator: TileStrategy {
             let nextTile = Tile(type: randomRock())
             
             switch nextTile.type {
-            case .blueRock, .purpleRock, .brownRock, .blackRock, .redRock:
+            case .rock:
                 newTiles.append(nextTile)
-            case .exit, .player, .monster, .item, .empty, .fireball, .greenRock, .column:
+            case .exit, .player, .monster, .item, .empty, .fireball, .pillar:
                 assertionFailure("randomRock should only create rocks")
             }
         }
@@ -209,15 +209,15 @@ class TileCreator: TileStrategy {
             }
         }
         
-        // place the columns
-        let columnCoordinates: Set<TileCoord> = Set(level.columnCoordinates)
-        for coord in level.columnCoordinates {
-            tiles[coord.row][coord.column] = Tile(type: .column)
+        // place the pillars
+        let pillarCoordinates: Set<TileCoord> = Set(level.pillarCoordinates.map { $0.1 })
+        for (tiletype, coord) in level.pillarCoordinates {
+            tiles[coord.row][coord.column] = Tile(type: tiletype)
         }
         
         // place the player in a quadrant
         let playerQuadrant = Quadrant.allCases[Int.random(Quadrant.allCases.count)]
-        let playerPosition = playerQuadrant.randomCoord(for: boardSize, notIn: columnCoordinates)
+        let playerPosition = playerQuadrant.randomCoord(for: boardSize, notIn: pillarCoordinates)
         
         
         guard let playerData = playerEntityData else { fatalError("We must get a playerData or else we cannot continue") }
@@ -226,7 +226,7 @@ class TileCreator: TileStrategy {
         
         // reserve all positions so we don't overwrite any one position multiple times
         var reservedSet = Set<TileCoord>([playerPosition, playerPosition.colLeft, playerPosition.colRight, playerPosition.rowAbove, playerPosition.rowBelow])
-        reservedSet.formUnion(columnCoordinates)
+        reservedSet.formUnion(pillarCoordinates)
         // add monsters
         for _ in 0..<level.monsterCountStart {
             let randomTileCoord = randomCoord(notIn: reservedSet)

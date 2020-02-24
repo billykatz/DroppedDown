@@ -26,6 +26,7 @@ class Header: SKSpriteNode {
         setting.position = CGPoint.position(setting.frame, centeredOnTheRightOf: header.frame, horizontalOffset: Style.Padding.more)
         setting.zPosition = precedence.rawValue
         
+        header.delegate = delegate
         header.addChild(setting)
         header.isUserInteractionEnabled = true
         

@@ -23,8 +23,8 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
     }
     
     
-    static var allCases: [InputType] = [.touchBegan(TileCoord(0,0), .blueRock),
-                                        .touch(TileCoord(0,0), .blueRock),
+    static var allCases: [InputType] = [.touchBegan(TileCoord(0,0), .rock(.red)),
+                                        .touch(TileCoord(0,0), .rock(.red)),
                                         .rotateCounterClockwise,
                                         .rotateClockwise,
                                         .attack(attackType: .targets,

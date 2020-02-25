@@ -32,6 +32,7 @@ class TileCreator: TileStrategy {
     }
     
     private func randomTile(_ given: Int) -> TileType {
+        guard level?.spawnsMonsters ?? true else { return randomRock() }
         let weight = 12
         let index = abs(given) % (TileType.randomCases.count + weight)
         switch index {
@@ -236,6 +237,7 @@ class TileCreator: TileStrategy {
             tiles[randomRow][randomCol] = Tile(type: randomMonster())
         }
         
+        guard level.hasExit else { return tiles }
         //place the exit on the opposite side of the grid
         #warning ("make sure this is set properly for release")
         let exitQuadrant = playerQuadrant.opposite

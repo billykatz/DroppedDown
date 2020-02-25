@@ -25,6 +25,14 @@ struct Level {
     var isTutorial: Bool {
         return tutorialData != nil
     }
+    
+    var hasExit: Bool {
+        return type != .boss
+    }
+    
+    var spawnsMonsters: Bool {
+        return type != .boss
+    }
         
     static let zero = Level(type: .first, monsterTypeRatio: [:], monsterCountStart: 0, maxGems: 0, maxTime: 0, boardSize: 0, abilities: [], goldMultiplier: 1, rocksRatio: [:], pillarCoordinates: [], tutorialData: nil)
 }

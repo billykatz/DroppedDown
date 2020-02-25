@@ -14,6 +14,6 @@ enum LevelType: Int, Codable, CaseIterable {
     case tutorial1
     case tutorial2
     
-    static var gameCases: [LevelType] = [.first, .second, .third]
+    static var gameCases: [LevelType] = [.first, .second, .third, .boss]
     static var tutorialCases: [LevelType] = [.tutorial1, .tutorial2]
 }

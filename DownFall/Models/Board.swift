@@ -374,8 +374,10 @@ extension Board {
         for pillarCoord in selectedPillars {
             if case let .pillar(color, health) = intermediateTiles[pillarCoord.x][pillarCoord.y].type {
                 if health == 1 {
+                    // remove the pillar from the board
                     intermediateTiles[pillarCoord.x][pillarCoord.y] = Tile.empty
                 } else {
+                    //decrement the pillar's health
                     intermediateTiles[pillarCoord.x][pillarCoord.y] = Tile(type: .pillar(color, health-1))
                 }
             }

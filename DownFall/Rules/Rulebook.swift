@@ -14,7 +14,7 @@ struct Rulebook {
         case .first, .second, .third:
             return Win()
         case .boss:
-            ()
+            return BossWin()
         case .tutorial1:
             return Tutorial1Win()
         case .tutorial2:

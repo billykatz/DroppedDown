@@ -308,7 +308,7 @@ extension Board {
         var queue = [TileCoord(x, y)]
         var tileCoordSet = Set(queue)
         var head = 0
-        var pillars: [TileCoord] = []
+        var pillars = Set<TileCoord>()
         
         while head < queue.count {
             let tileRow = queue[head].x
@@ -326,10 +326,8 @@ extension Board {
                         myColor == theirColor
                         else { continue }
                     //valid neighbor within bounds
-                    if case .pillar = tiles[tileRow][tileCol].type {
-                        pillars.append(TileCoord(tileRow, tileCol))
-                    } else if case .pillar = tiles[i][j].type {
-                        pillars.append(TileCoord(i,j))
+                    if case .pillar = tiles[i][j].type {
+                        pillars.insert(TileCoord(i,j))
                     } else {
                         queue.append(TileCoord(i,j))
                         tileCoordSet.insert(TileCoord(i,j))
@@ -337,7 +335,7 @@ extension Board {
                 }
             }
         }
-        return (queue, pillars)
+        return (queue, Array(pillars))
     }
     
     /*

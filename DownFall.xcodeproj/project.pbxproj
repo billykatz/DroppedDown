@@ -136,6 +136,7 @@
 		58B39BD723D21C9600915858 /* BackpackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58B39BD623D21C9600915858 /* BackpackView.swift */; };
 		58C1AE4A23D19CEE003B5B5A /* TransmogrificationPotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C1AE4923D19CEE003B5B5A /* TransmogrificationPotion.swift */; };
 		58C1AE4C23D19E03003B5B5A /* KillMonsterPotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C1AE4B23D19E03003B5B5A /* KillMonsterPotion.swift */; };
+		58F034C32408B7CF00BE1863 /* BossController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F034C22408B7CF00BE1863 /* BossController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -281,6 +282,7 @@
 		58B39BD623D21C9600915858 /* BackpackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackpackView.swift; sourceTree = "<group>"; };
 		58C1AE4923D19CEE003B5B5A /* TransmogrificationPotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransmogrificationPotion.swift; sourceTree = "<group>"; };
 		58C1AE4B23D19E03003B5B5A /* KillMonsterPotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KillMonsterPotion.swift; sourceTree = "<group>"; };
+		58F034C22408B7CF00BE1863 /* BossController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BossController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -617,6 +619,7 @@
 				3D10609A233DD05500ECE7E6 /* TurnWatcher.swift */,
 				3D3D31ED23ABEFBB002B87EE /* Level */,
 				3D7D8B2C2252857E0016FE4C /* CombatSimulator.swift */,
+				58F034C12408B7C000BE1863 /* Boss */,
 				3D00A0F823AAC813007E2D8B /* Identifiers.swift */,
 				3DF2925F20A37FF0006671AC /* Info.plist */,
 				3D1060A1234040A000ECE7E6 /* Haptics */,
@@ -694,6 +697,14 @@
 			);
 			name = Targeting;
 			path = ..;
+			sourceTree = "<group>";
+		};
+		58F034C12408B7C000BE1863 /* Boss */ = {
+			isa = PBXGroup;
+			children = (
+				58F034C22408B7CF00BE1863 /* BossController.swift */,
+			);
+			name = Boss;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -848,6 +859,7 @@
 				3D58468C22A632F100EDD845 /* AttackModel.swift in Sources */,
 				3D06390922EEB54E00C4D5E9 /* ReffingState.swift in Sources */,
 				3DC072C123748D100046F224 /* Quadrant.swift in Sources */,
+				58F034C32408B7CF00BE1863 /* BossController.swift in Sources */,
 				3D635E8F22E20CDA0090C99C /* AnimationModel.swift in Sources */,
 				3DE87C94223D691100D750CF /* GameState.swift in Sources */,
 				3D674C9122C9BFDB0003AEB4 /* UIColor+Extensions.swift in Sources */,

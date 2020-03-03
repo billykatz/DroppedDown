@@ -18,13 +18,22 @@ struct Tile: Hashable {
     let type: TileType
     var shouldHighlight: Bool
     var tutorialHighlight: Bool
+    var bossTargetedToEat: Bool
+    var bossTargetToAttack: Bool
+    var bossAttack: Bool
     
     init(type: TileType,
          shouldHighlight: Bool = false,
-         tutorialHighlight: Bool = false) {
+         tutorialHighlight: Bool = false,
+         bossTargetedToEat: Bool = false,
+         bossTargetToAttack: Bool = false,
+         bossAttack: Bool = false) {
         self.type = type
         self.shouldHighlight = shouldHighlight
         self.tutorialHighlight = tutorialHighlight
+        self.bossTargetedToEat = bossTargetedToEat
+        self.bossTargetToAttack = bossTargetToAttack
+        self.bossAttack = bossAttack
     }
     
     static var exit: Tile {
@@ -81,7 +90,7 @@ extension Tile: Equatable {
 
 enum TileType: Equatable, Hashable, CaseIterable {
     
-    static var rockCases: [TileType] = [.rock(.blue), .rock(.green), .rock(.red), .rock(.blue), .rock(.brown)]
+    static var rockCases: [TileType] = [.rock(.blue), .rock(.green), .rock(.red), .rock(.purple), .rock(.brown)]
     static var allCases: [TileType] = [.player(.zero), .exit, .empty, .monster(.zero), .item(.zero), .fireball, .rock(.red), .pillar(.red, 3)]
     static var randomCases = [TileType.monster(.zero), .rock(.red)]
     typealias AllCases = [TileType]

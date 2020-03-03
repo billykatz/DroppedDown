@@ -35,14 +35,6 @@ class DFTileSpriteNode: SKSpriteNode {
             minecartSprite.name = "minecart"
             addChild(minecartSprite)
             
-//        case .pillar:
-//            let backgroundColor = SKSpriteNode(color: .lightGray, size: CGSize(width:width, height: height))
-//            super.init(texture: SKTexture(imageNamed: type.textureString()),
-//                       color: .clear,
-//                       size: CGSize(width: width, height: height))
-//            backgroundColor.zPosition = Precedence.background.rawValue
-//            addChild(backgroundColor)
-            
         default:
             
             super.init(texture: SKTexture(imageNamed: type.textureString()),
@@ -69,6 +61,39 @@ class DFTileSpriteNode: SKSpriteNode {
         self.addChild(indicatorSprite)
         
         let wait = SKAction.wait(forDuration: 2.0)
+        let remove = SKAction.removeFromParent()
+        indicatorSprite.run(SKAction.sequence([wait, remove]))
+    }
+    
+    func indicateSpriteWillBeEaten() {
+        let indicatorSprite = SKSpriteNode(color: .red, size: self.size)
+        indicatorSprite.zPosition = Precedence.background.rawValue
+        
+        self.addChild(indicatorSprite)
+        
+        let wait = SKAction.wait(forDuration: 5.0)
+        let remove = SKAction.removeFromParent()
+        indicatorSprite.run(SKAction.sequence([wait, remove]))
+    }
+    
+    func indicateSpriteWillBeBossAttacked() {
+        let indicatorSprite = SKSpriteNode(color: .clayRed, size: self.size)
+        indicatorSprite.zPosition = Precedence.background.rawValue
+        
+        self.addChild(indicatorSprite)
+        
+        let wait = SKAction.wait(forDuration: 5.0)
+        let remove = SKAction.removeFromParent()
+        indicatorSprite.run(SKAction.sequence([wait, remove]))
+    }
+    
+    func indicateSpriteIsBossAttacked() {
+        let indicatorSprite = SKSpriteNode(color: .foregroundBlue, size: self.size)
+        indicatorSprite.zPosition = Precedence.background.rawValue
+        
+        self.addChild(indicatorSprite)
+        
+        let wait = SKAction.wait(forDuration: 5.0)
         let remove = SKAction.removeFromParent()
         indicatorSprite.run(SKAction.sequence([wait, remove]))
     }

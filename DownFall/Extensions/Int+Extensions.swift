@@ -29,6 +29,18 @@ public extension Int {
         return retVal
     }
     
+    /**
+     Returns a random integer between 0 and n-1 that is not in a set of Ints
+     */
+    static func random(_ n: Int, notInSet set: Set<Int>) -> Int {
+        var retVal = random(n)
+        while set.contains(retVal) {
+            retVal = random(n)
+        }
+        return retVal
+    }
+
+    
     
     /**
      Returns a random integer between 0 and n-1 that is not the given number

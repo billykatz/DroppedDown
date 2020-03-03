@@ -48,7 +48,8 @@ class Board: Equatable {
     private func resetShouldHighlight() {
         for i in 0..<tiles.count {
             for j in 0..<tiles[i].count {
-                tiles[i][j] = Tile(type: tiles[i][j].type, shouldHighlight: false)
+                let tile = tiles[i][j]
+                tiles[i][j] = Tile(type: tiles[i][j].type, shouldHighlight: false, bossTargetedToEat: tile.bossTargetedToEat)
             }
         }
     }
@@ -71,7 +72,7 @@ class Board: Equatable {
             if case TileType.monster = type {
                 transformation = indicateAttackPattern(from: tileCoord, inputType: input.type)
             } else {
-                transformation = removeAndReplace(tileCoord, input: input)
+                transformation = removeAndReplace(from: tiles, tileCoord: tileCoord, input: input)
             }
         case .attack:
             transformation = attack(input)
@@ -111,7 +112,24 @@ class Board: Equatable {
                     )
                 )
             )
-
+        case .bossTargetsWhatToEat(let coords):
+            coords.forEach { coord in
+                tiles[coord.row][coord.column].bossTargetedToEat = true
+            }
+            InputQueue.append(
+                Input(
+                    InputType.transformation(
+                        [Transformation(transformation: nil, inputType: .bossTargetsWhatToEat(coords), endTiles: self.tiles)]
+                    )
+                )
+            )
+        case .bossEatsRocks(let coords):
+            let trans = bossEatsRocks(input, targets: coords)
+            InputQueue.append(Input(.transformation(trans)))
+        case .bossTargetsWhatToAttack(let attackDictionary):
+            transformation = bossAttackTargets(attackDictionary, input: input)
+        case .bossAttacks(let attackDictionary):
+            transformation = bossAttacks(attackDictionary, input: input)
         case .gameLose(_),
              .play,
              .pause,
@@ -128,6 +146,28 @@ class Board: Equatable {
         
         guard let trans = transformation else { return }
         InputQueue.append(Input(.transformation([trans])))
+    }
+    
+    func bossAttacks(_ attacks: [BossController.BossAttack: Set<TileCoord>], input: Input) -> Transformation {
+        for (_, value) in attacks {
+            value.forEach { coord in
+                tiles[coord.row][coord.column].bossAttack = true
+            }
+        }
+        return Transformation(transformation: nil, inputType: input.type, endTiles: tiles)
+    }
+    
+    func bossAttackTargets(_ attacks: [BossController.BossAttack: Set<TileCoord>], input: Input) -> Transformation {
+        for (_, value) in attacks {
+            value.forEach { coord in
+                tiles[coord.row][coord.column].bossTargetToAttack = true
+            }
+        }
+        return Transformation(transformation: nil, inputType: input.type, endTiles: tiles)
+    }
+    
+    func bossEatsRocks(_ input: Input, targets: [TileCoord]) -> [Transformation] {
+        return [removeAndReplace(from: tiles, specificCoord: targets, input: input)]
     }
     
     func indicateAttackPattern(from coord: TileCoord, inputType: InputType) -> Transformation {
@@ -231,7 +271,7 @@ extension Board {
             }
         case .dynamite:
             use(ability)
-            return removeAndReplace(targets.first!, singleTile: true, input: input)
+            return removeAndReplace(from: tiles, tileCoord: targets.first!, singleTile: true, input: input)
         case .rockASwap:
             use(ability)
             let firstTarget = targets.first!
@@ -243,7 +283,7 @@ extension Board {
             return transmogrify(target, input: input)
         case .killMonsterPotion:
             use(ability)
-            return removeAndReplace(targets.first!, singleTile: true, input: input)
+            return removeAndReplace(from: tiles, tileCoord: targets.first!, singleTile: true, input: input)
         default:
             ()
         }
@@ -305,6 +345,7 @@ extension Board {
             y < boardSize else { return ([], []) }
         
         if case TileType.monster(_) = tiles[x][y].type { return ([],[]) }
+        if case TileType.pillar = tiles[x][y].type { return ([],[]) }
         var queue = [TileCoord(x, y)]
         var tileCoordSet = Set(queue)
         var head = 0
@@ -347,7 +388,8 @@ extension Board {
      *  - returns a transformation with the tiles that have been removed, added, and shifted down
      */
     
-    func removeAndReplace(_ tileCoord: TileCoord,
+    func removeAndReplace(from tiles: [[Tile]],
+                          tileCoord: TileCoord,
                           singleTile: Bool = false,
                           input: Input) -> Transformation {
         // Check that the tile group at row, col has more than 3 tiles
@@ -408,6 +450,47 @@ extension Board {
         )
     }
     
+    
+    func removeAndReplace(from tiles: [[Tile]],
+                          specificCoord: [TileCoord],
+                          singleTile: Bool = false,
+                          input: Input) -> Transformation {
+        // Check that the tile group at row, col has more than 3 tiles
+        var selectedTiles: [TileCoord] = specificCoord
+        
+        
+        // set the tiles to be removed as Empty placeholder
+        var intermediateTiles = tiles
+        for coord in selectedTiles {
+            intermediateTiles[coord.x][coord.y] = Tile.empty
+        }
+        
+        // store tile transforamtions and shift information
+        var newTiles : [TileTransformation] = []
+        var (shiftDown, shiftIndices) = calculateShiftIndices(for: &intermediateTiles)
+        
+        //add new tiles
+        addNewTiles(shiftIndices: shiftIndices,
+                    shiftDown: &shiftDown,
+                    newTiles: &newTiles,
+                    intermediateTiles: &intermediateTiles)
+        
+        //create selectedTilesTransformation array
+        let selectedTilesTransformation = selectedTiles.map { TileTransformation($0, $0) }
+        
+        //update our store of tilesftiles
+        self.tiles = intermediateTiles
+        
+        // return our new board
+        return Transformation(transformation: [selectedTilesTransformation,
+                                               newTiles,
+                                               shiftDown],
+                              inputType: input.type,
+                              endTiles: intermediateTiles
+        )
+    }
+
+    
     private func resetAttacks(newTurn: Bool) -> Transformation? {
         func resetAttacks(in tiles: [[Tile]]) -> [[Tile]] {
             var newTiles = tiles
@@ -439,7 +522,7 @@ extension Board {
         let selectedTile = tiles[coord]
         
         //remove and replace the single item tile
-        let transformation = removeAndReplace(coord, singleTile: true, input: input)
+        let transformation = removeAndReplace(from: tiles, tileCoord: coord, singleTile: true, input: input)
         
         //save the item
         guard case let TileType.item(item) = selectedTile.type,
@@ -482,7 +565,7 @@ extension Board {
                                   endTiles: tiles)
         } else {
             //no item! remove and replace
-            return removeAndReplace(coord, singleTile: true, input: input)
+            return removeAndReplace(from: tiles, tileCoord: coord, singleTile: true, input: input)
         }
         
     }

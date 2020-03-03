@@ -45,6 +45,11 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
                                         .itemUseSelected(.zero),
                                         .itemCanBeUsed(false),
                                         .itemUsed(.zero, []),
+                                        .bossTargetsWhatToEat([]),
+                                        .bossEatsRocks([]),
+                                        .bossTargetsWhatToAttack([:]),
+                                        .bossAttacks([:])
+                                                                 
     ]
     
     typealias AllCases = [InputType]
@@ -73,6 +78,10 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
     case itemUseCanceled
     case itemCanBeUsed(Bool)
     case itemUsed(AnyAbility, [TileCoord])
+    case bossTargetsWhatToEat([TileCoord])
+    case bossEatsRocks([TileCoord])
+    case bossTargetsWhatToAttack([BossController.BossAttack: Set<TileCoord>])
+    case bossAttacks([BossController.BossAttack: Set<TileCoord>])
     
     var debugDescription: String {
         switch self {
@@ -124,6 +133,14 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
             return "item can be used: \(used)"
         case .itemUsed(let ability, let targets):
             return "\(ability.textureName) used on targets \(targets)"
+        case .bossTargetsWhatToEat:
+            return "Boss targets what to eat"
+        case .bossEatsRocks:
+            return "Boss eats rocks"
+        case .bossTargetsWhatToAttack:
+            return "Boss targets what to attack"
+        case .bossAttacks:
+            return "Boss attacks"
         }
     }
 }

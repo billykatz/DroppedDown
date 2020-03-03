@@ -20,7 +20,5 @@ struct Rulebook {
         case .tutorial2:
             return Tutorial2Win()
         }
-        
-        fatalError("You must implement the win rule")
     }
 }

@@ -53,7 +53,7 @@ class Renderer: SKSpriteNode {
 
     private lazy var safeArea: SKSpriteNode = {
         //create safe area
-        let safeArea = SKSpriteNode.init(color: .foregroundBlue, size: CGSize(width: playableRect.width, height: 75.0))
+        let safeArea = SKSpriteNode(color: .foregroundBlue, size: CGSize(width: playableRect.width, height: 75.0))
         safeArea.position = CGPoint.position(safeArea.frame, centeredInTopOf: playableRect)
         return safeArea
     }()
@@ -99,7 +99,7 @@ class Renderer: SKSpriteNode {
         foreground.position = playableRect.center
         menuForeground.position = playableRect.center
 
-        [spriteForeground, safeArea, hud, self.backpackView].forEach { foreground.addChild($0) }
+        [spriteForeground, safeArea, hud, backpackView].forEach { foreground.addChild($0) }
         
         // Register for Dispatch
         Dispatch.shared.register { [weak self] input in

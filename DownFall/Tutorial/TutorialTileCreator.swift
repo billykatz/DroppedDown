@@ -29,7 +29,7 @@ struct TutorialTileCreator: TileStrategy {
     }
     
     func randomMonster(not: EntityModel.EntityType) -> Tile {
-        return Tile(type: .blackRock)
+        return Tile.redRock
     }
     
     func goldDropped(from monster: EntityModel) -> Int {

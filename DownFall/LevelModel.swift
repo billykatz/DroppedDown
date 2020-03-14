@@ -18,13 +18,21 @@ struct Level {
     let goldMultiplier: Int
     let rocksRatio: [TileType: RangeModel]
     let maxSpecialRocks = 5
-    let columnCoordinates: [TileCoord]
+    let pillarCoordinates: [(TileType, TileCoord)]
     
     var tutorialData: TutorialData?
     
     var isTutorial: Bool {
         return tutorialData != nil
     }
+    
+    var hasExit: Bool {
+        return type != .boss
+    }
+    
+    var spawnsMonsters: Bool {
+        return type != .boss
+    }
         
-    static let zero = Level(type: .first, monsterTypeRatio: [:], monsterCountStart: 0, maxGems: 0, maxTime: 0, boardSize: 0, abilities: [], goldMultiplier: 1, rocksRatio: [:], columnCoordinates: [], tutorialData: nil)
+    static let zero = Level(type: .first, monsterTypeRatio: [:], monsterCountStart: 0, maxGems: 0, maxTime: 0, boardSize: 0, abilities: [], goldMultiplier: 1, rocksRatio: [:], pillarCoordinates: [], tutorialData: nil)
 }

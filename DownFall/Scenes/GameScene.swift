@@ -35,6 +35,9 @@ class GameScene: SKScene {
     //level
     private var level: Level?
     
+    //boss controller
+    private var bossController: BossController?
+    
     //touch state
     private var touchWasSwipe = false
     private var touchWasCanceled = false
@@ -68,6 +71,11 @@ class GameScene: SKScene {
         
         // create haptic generator
         generator = HapticGenerator()
+        
+        // create boss controller
+        if level.type == .boss {
+            bossController = BossController()
+        }
         
     }
     
@@ -118,13 +126,6 @@ class GameScene: SKScene {
 
         //Turn watcher
         TurnWatcher.shared.register()
-        
-        //Debug settings triple tap
-//        let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(tripleTap))
-//        tapRecognizer.numberOfTapsRequired = 3
-//        // this boolean prevents the bug where there is a delay after a user touches the board
-//        tapRecognizer.delaysTouchesEnded = false
-//        view.addGestureRecognizer(tapRecognizer)
     }
     
     public func prepareForReuse() {
@@ -133,6 +134,7 @@ class GameScene: SKScene {
         foreground = nil
         gameSceneDelegate = nil
         generator = nil
+        bossController = nil
         swipeRecognizerView?.removeFromSuperview()
         InputQueue.reset()
         Dispatch.shared.reset()

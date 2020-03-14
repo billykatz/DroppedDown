@@ -39,7 +39,7 @@ class DFTileSpriteNode: SKSpriteNode {
             
             super.init(texture: SKTexture(imageNamed: type.textureString()),
                        color: .clear,
-                       size: CGSize.init(width: width, height: height))
+                       size: CGSize(width: width, height: height))
         }
     }
     
@@ -61,6 +61,39 @@ class DFTileSpriteNode: SKSpriteNode {
         self.addChild(indicatorSprite)
         
         let wait = SKAction.wait(forDuration: 2.0)
+        let remove = SKAction.removeFromParent()
+        indicatorSprite.run(SKAction.sequence([wait, remove]))
+    }
+    
+    func indicateSpriteWillBeEaten() {
+        let indicatorSprite = SKSpriteNode(color: .red, size: self.size)
+        indicatorSprite.zPosition = Precedence.background.rawValue
+        
+        self.addChild(indicatorSprite)
+        
+        let wait = SKAction.wait(forDuration: 5.0)
+        let remove = SKAction.removeFromParent()
+        indicatorSprite.run(SKAction.sequence([wait, remove]))
+    }
+    
+    func indicateSpriteWillBeBossAttacked() {
+        let indicatorSprite = SKSpriteNode(color: .clayRed, size: self.size)
+        indicatorSprite.zPosition = Precedence.background.rawValue
+        
+        self.addChild(indicatorSprite)
+        
+        let wait = SKAction.wait(forDuration: 5.0)
+        let remove = SKAction.removeFromParent()
+        indicatorSprite.run(SKAction.sequence([wait, remove]))
+    }
+    
+    func indicateSpriteIsBossAttacked() {
+        let indicatorSprite = SKSpriteNode(color: .foregroundBlue, size: self.size)
+        indicatorSprite.zPosition = Precedence.background.rawValue
+        
+        self.addChild(indicatorSprite)
+        
+        let wait = SKAction.wait(forDuration: 5.0)
         let remove = SKAction.removeFromParent()
         indicatorSprite.run(SKAction.sequence([wait, remove]))
     }
@@ -118,8 +151,8 @@ class DFTileSpriteNode: SKSpriteNode {
     func showFinger() {
         let finger = SKSpriteNode(imageNamed: "finger")
         finger.position = CGPoint.position(this: finger.frame,
-                                               centeredInBottomOf: self.frame,
-                                               verticalPadding: -Style.Padding.most)
+                                           centeredInBottomOf: self.frame,
+                                           verticalPadding: -Style.Padding.most)
         finger.size = Style.TutorialHighlight.fingerSize
         
         let moveDownVector = CGVector.init(dx: 0.0, dy: -20.0)
@@ -137,13 +170,13 @@ class DFTileSpriteNode: SKSpriteNode {
     func crumble() -> (SKSpriteNode, SKAction)? {
         var animationFrames: [SKTexture] = []
         switch self.type {
-        case .brownRock:
+        case .rock(.brown):
             animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.brownRockCrumble), rows: 1, columns: 4).animationFrames()
-        case .redRock:
+        case .rock(.red):
             animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.redRockCrumble), rows: 1, columns: 4).animationFrames()
-        case .blueRock:
+        case .rock(.blue):
             animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.blueRockCrumble), rows: 1, columns: 4).animationFrames()
-        case .purpleRock:
+        case .rock(.purple):
             animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.purpleRockCrumble), rows: 1, columns: 4).animationFrames()
         default:
             return nil

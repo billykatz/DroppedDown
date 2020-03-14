@@ -20,7 +20,7 @@ protocol LevelCoordinating: StoreSceneDelegate, GameSceneCoordinatingDelegate, M
     func presentStore(_ playerData: EntityModel)
     func presentNextLevel(_ playerData: EntityModel?)
     func levelSelect(_ updatedPlayerData: EntityModel)
-    func startGame(player playerData: EntityModel, difficulty: Difficulty)
+    func startGame(player playerData: EntityModel, difficulty: Difficulty, level: LevelType)
 }
 
 extension LevelCoordinating where Self: UIViewController {
@@ -99,11 +99,11 @@ extension LevelCoordinating where Self: UIViewController {
     
     func difficultySelected(_ difficulty: Difficulty) {
         levels = LevelConstructor.buildLevels(difficulty)
-        levelIndex = 0
-        
     }
     
-    func startGame(player: EntityModel, difficulty: Difficulty) {
+    func startGame(player: EntityModel, difficulty: Difficulty, level: LevelType) {
+        let index = LevelType.gameCases.firstIndex(of: level) ?? 0
+        levelIndex = index
         difficultySelected(difficulty)
         presentStore(player)
     }

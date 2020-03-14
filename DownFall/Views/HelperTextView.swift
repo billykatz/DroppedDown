@@ -58,7 +58,7 @@ class HelperTextView: SKSpriteNode {
             }
         case .touch(_, let type):
             switch type {
-            case .blackRock, .blueRock, .greenRock, .purpleRock, .brownRock, .redRock:
+            case .rock:
                 descriptionText = "Remove rocks by tapping on groups\n of 3 or more anywhere on the board."
             case .exit:
                 descriptionText = "That's the mine shaft,\n but you cant exit until you find the gem!"
@@ -70,7 +70,7 @@ class HelperTextView: SKSpriteNode {
                 descriptionText = "How in the hell did you tap on an empty tile? BECAUSE WE ADDED COLUMNS, BOOOM"
             case .item(let item):
                 descriptionText = "That's \(item.textureName), cool!"
-            case .fireball, .column:
+            case .fireball, .pillar:
                 descriptionText = ""
             }
         case .boardBuilt, .pause:

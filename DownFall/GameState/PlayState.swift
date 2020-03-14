@@ -14,10 +14,11 @@ struct PlayState: GameState {
     
     func shouldAppend(_ input: Input) -> Bool {
         switch input.type {
-        case .gameWin,. gameLose,. pause,
+        case .gameWin,. gameLose, .pause,
              .attack, .transformation,
              .touch, .monsterDies, .rotateCounterClockwise, .rotateClockwise,
-             .boardBuilt, .touchBegan, .tutorial, .itemUseSelected:
+             .boardBuilt, .touchBegan, .tutorial, .itemUseSelected,
+             .bossTargetsWhatToEat, .bossEatsRocks, .bossTargetsWhatToAttack, .bossAttacks:
             return true
         case .animationsFinished, .play,
              .reffingFinished, .playAgain, .collectItem,
@@ -37,7 +38,7 @@ struct PlayState: GameState {
             return AnyGameState(PauseState())
         case .attack, .touch, .monsterDies,
              .rotateCounterClockwise, .rotateClockwise, .collectItem,
-             .touchBegan:
+             .touchBegan, .bossTargetsWhatToEat, .bossEatsRocks, .bossTargetsWhatToAttack, .bossAttacks:
             return AnyGameState(ComputingState())
         case .boardBuilt:
             return AnyGameState(PlayState())
@@ -49,7 +50,7 @@ struct PlayState: GameState {
             }
         case .itemUseSelected:
             return AnyGameState(TargetingState())
-        case .animationsFinished, .play, .transformation, .reffingFinished, .playAgain,. selectLevel,       .newTurn, .visitStore, .itemUseCanceled, .itemCanBeUsed, .itemUsed:
+        case .animationsFinished, .play, .transformation, .reffingFinished, .playAgain,. selectLevel, .newTurn, .visitStore, .itemUseCanceled, .itemCanBeUsed, .itemUsed:
             return nil
         }
         

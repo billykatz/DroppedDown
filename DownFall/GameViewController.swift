@@ -11,6 +11,7 @@ import SpriteKit
 import GameplayKit
 
 class GameViewController: UIViewController, LevelCoordinating {
+    
 
     internal var gameSceneNode: GameScene?
     internal var tutorialSceneNode: TutorialScene?
@@ -82,11 +83,10 @@ extension GameViewController: MainMenuDelegate {
                             height: self.view.safeAreaLayoutGuide.layoutFrame.height)
     }
     
-    func newGame(_ difficulty: Difficulty, _ playerModel: EntityModel?) {
+    func newGame(_ difficulty: Difficulty, _ playerModel: EntityModel?, level: LevelType) {
         if let view = self.view as! SKView?, let player = playerModel {
-//            setFrame()
             view.presentScene(nil)
-            startGame(player: player, difficulty: difficulty)
+            startGame(player: player, difficulty: difficulty, level: level)
         }
     }
 }

@@ -51,10 +51,20 @@ class Renderer: SKSpriteNode {
         return MenuSpriteNode(.tutorial2Win, playableRect: self.playableRect, precedence: .menu, level: self.level)
     }()
 
+    private lazy var safeArea: SKSpriteNode = {
+        //create safe area
+        let safeArea = SKSpriteNode(color: .foregroundBlue, size: CGSize(width: playableRect.width, height: 75.0))
+        safeArea.position = CGPoint.position(safeArea.frame, centeredInTopOf: playableRect)
+        return safeArea
+    }()
     
-    private var header  = Header()
-    private var hud = HUD()
-    private var helperTextView = HelperTextView()
+    private lazy var hud: HUD = {
+        let hud = HUD.build(color: .foregroundBlue, size: CGSize(width: playableRect.width, height: Style.HUD.height), delegate: self)
+        hud.position = CGPoint.alignHorizontally(hud.frame, relativeTo: safeArea.frame, horizontalAnchor: .center, verticalAlign: .bottom, translatedToBounds: true)
+        hud.zPosition = Precedence.foreground.rawValue
+        return hud
+    }()
+    
     public var backpackView: BackpackView
     
     init(playableRect: CGRect,
@@ -80,40 +90,16 @@ class Renderer: SKSpriteNode {
         foreground = givenForeground
         
         self.backpackView = BackpackView(playableRect: playableRect, viewModel: TargetingViewModel(), levelSize: level.boardSize)
-
         
         super.init(texture: nil, color: .clear, size: CGSize.zero)
-        
         
         self.backpackView.touchDelegate = self
         self.isUserInteractionEnabled = true
 
         foreground.position = playableRect.center
         menuForeground.position = playableRect.center
-        
-//        // add settings button to board
-//        header = Header.build(color: .black,
-//                              size: CGSize(width: playableRect.width, height: Style.Header.height),
-//                              precedence: precedence,
-//                              delegate: self)
-//        header.position = CGPoint.position(header.frame, centeredInTopOf: playableRect)
-//        header.zPosition = precedence.rawValue
-        
-        //create safe area
-        let safeArea = SKSpriteNode.init(color: .foregroundBlue, size: CGSize(width: playableRect.width, height: 75.0))
-        safeArea.position = CGPoint.position(safeArea.frame, centeredInTopOf: playableRect)
-        
-        //create the hud
-        hud = HUD.build(color: .foregroundBlue, size: CGSize(width: playableRect.width, height: Style.HUD.height), delegate: self)
-        hud.position = CGPoint.alignHorizontally(hud.frame, relativeTo: safeArea.frame, horizontalAnchor: .center, verticalAlign: .bottom, translatedToBounds: true)
-        hud.zPosition = Precedence.foreground.rawValue
-        
-        //create the helper text view
-//        helperTextView = HelperTextView.build(color: UIColor.clayRed, size: CGSize(width: playableRect.width * 0.8, height: 400))
-//        helperTextView.position = CGPoint.position(this: helperTextView.frame, centeredInBottomOf: playableRect)
-        
 
-        [spriteForeground, safeArea, hud, self.backpackView].forEach { foreground.addChild($0) }
+        [spriteForeground, safeArea, hud, backpackView].forEach { foreground.addChild($0) }
         
         // Register for Dispatch
         Dispatch.shared.register { [weak self] input in
@@ -153,21 +139,15 @@ class Renderer: SKSpriteNode {
                 animate(trans.tileTransformation?.first) { [weak self] in
                     self?.gameWin(transformation: trans)
                 }
-            case .monsterDies:
-                let sprites = createSprites(from: trans.endTiles)
-                animationsFinished(for: sprites, endTiles: trans.endTiles)
-            case .itemUsed:
+            case .monsterDies, .itemUsed, .newTurn, .bossTargetsWhatToEat, .bossTargetsWhatToAttack, .bossAttacks:
                 let sprites = createSprites(from: trans.endTiles)
                 animationsFinished(for: sprites, endTiles: trans.endTiles)
             case .collectItem:
                 computeNewBoard(for: trans)
-            case .reffingFinished:
+            case .bossEatsRocks:
+                computeNewBoard(for: transformations)
+            case .reffingFinished, .touchBegan, .itemUseSelected:
                 () // Purposely left blank.
-            case .touchBegan, .itemUseSelected:
-                ()
-            case .newTurn:
-                let sprites = createSprites(from: trans.endTiles)
-                animationsFinished(for: sprites, endTiles: trans.endTiles, ref: false)
             default:
                 // Transformation assoc value should ony exist for certain inputs
                 fatalError()
@@ -197,11 +177,7 @@ class Renderer: SKSpriteNode {
         case .newTurn:
             let sprites = createSprites(from: input.endTilesStruct)
             animationsFinished(for: sprites, endTiles: input.endTilesStruct, ref: false)
-        case .touch, .rotateCounterClockwise, .rotateClockwise,
-             .monsterDies, .attack, .gameWin,
-             .animationsFinished, .reffingFinished,
-             .boardBuilt,. collectItem, .selectLevel, .transformation, .touchBegan,
-             .visitStore, .itemUseSelected, .itemUseCanceled, .itemCanBeUsed, .itemUsed:
+        default:
             ()
         }
     }
@@ -263,6 +239,12 @@ class Renderer: SKSpriteNode {
                 } else if let turns = tiles[row][col].type.turnsUntilAttack(),
                     let frequency = tiles[row][col].type.attackFrequency() {
                     sprite.showAttackTiming(frequency, turns)
+                } else if tiles[row][col].bossTargetedToEat {
+                    sprite.indicateSpriteWillBeEaten()
+                } else if tiles[row][col].bossTargetToAttack {
+                    sprite.indicateSpriteWillBeAttacked()
+                } else if tiles[row][col].bossAttack {
+                    sprite.indicateSpriteIsBossAttacked()
                 }
                 spriteForeground.addChild(sprite)
             }
@@ -414,7 +396,22 @@ class Renderer: SKSpriteNode {
 
 extension Renderer {
     
-    private func computeNewBoard(for transformation: Transformation?) {
+    /// Recursive wrapper for chaining animated transformations
+    private func computeNewBoard(for transformations: [Transformation]) {
+        computeNewBoard(for: transformations.first) { [weak self] in
+            guard let self = self else { return }
+            if transformations.count == 1 {
+                self.animationsFinished(for: self.sprites, endTiles: transformations.first?.endTiles)
+            } else {
+                self.computeNewBoard(for: Array(transformations.dropFirst()))
+            }
+        }
+    }
+
+    /// Prepares the animation data to compute a new board.  This is hard coded to work with remove and replace animations
+    /// Use the callback if you'd to do something on completion.  Alsmost certaintly, youll want to call animationsFinished(for:endTiles:) in the completion code path
+    /// Implicitly depends on Animator
+    private func computeNewBoard(for transformation: Transformation?, completion: ( () -> () )? = nil) {
         guard let endTiles = transformation?.endTiles else {
             fatalError("We should always be passing through end tiles")
         }
@@ -422,7 +419,7 @@ extension Renderer {
         guard let transformation = transformation,
             let transformations = transformation.tileTransformation,
             let inputType = transformation.inputType else {
-            animationsFinished(for: sprites, endTiles: endTiles)
+            completion?() ?? animationsFinished(for: sprites, endTiles: endTiles)
             return
         }
         
@@ -510,7 +507,8 @@ extension Renderer {
         removedAnimations.append(contentsOf: shiftDownActions)
         animator.animate(removedAnimations) {  [weak self] in
             guard let strongSelf = self else { return }
-            strongSelf.animationsFinished(for: strongSelf.sprites, endTiles: endTiles)
+            completion?() ?? strongSelf.animationsFinished(for: strongSelf.sprites, endTiles: endTiles)
+
         }
         
     }
@@ -592,10 +590,6 @@ extension Renderer {
                         }
                     }
                 }
-            }
-            
-            if node.name == "setting" {
-                header.touchesEnded(touches, with: event)
             }
         }
     }

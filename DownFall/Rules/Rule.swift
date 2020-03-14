@@ -10,6 +10,17 @@ protocol Rule {
     func apply(_ tiles: [[Tile]]) -> Input?
 }
 
+struct BossWin: Rule {
+    func apply(_ tiles: [[Tile]]) -> Input? {
+        for tile in tiles.reduce([], +) {
+            if case TileType.pillar = tile.type {
+                return nil
+            }
+        }
+        return Input(.gameWin)
+    }
+}
+
 struct Win: Rule {
     func apply(_ tiles: [[Tile]]) -> Input? {
         let playerPosition = getTilePosition(.player(.zero), tiles: tiles)

@@ -12,6 +12,7 @@ import SpriteKit
 
 protocol TargetViewModel {
     var currentTargets: [TileCoord] { get }
+    var attackTargets: [BossController.BossAttack: Set<TileCoord>] { get }
 }
 
 protocol TargetingView {
@@ -64,26 +65,46 @@ class TargetView: TargetingView {
     }
     
     func dataUpdated() {
+        targetingArea.removeAllChildren()
         updateTargetArea()
-        updateReticles()
+        updateTargetReticles()
+        updateAttackReticles()
     }
     
     private func updateTargetArea() {
         
     }
     
-    private func updateReticles() {
-        targetingArea.removeAllChildren()
+    private func updateTargetReticles() {
         
         for target in viewModel?.currentTargets ?? [] {
             let position = translateCoord(target)
-            let identifier: String = Identifiers.Sprite.redReticle
             let reticle = SKSpriteNode(texture: SKTexture(imageNamed: identifier), size: CGSize(width: tileSize, height: tileSize))
             reticle.position = position
             reticle.zPosition = Precedence.menu.rawValue
             targetingArea.addChildSafely(reticle)
         }
+        
     }
+    
+    private let identifier: String = Identifiers.Sprite.redReticle
+    
+    private func updateAttackReticles() {
+        
+        for (_, targets) in viewModel?.attackTargets ?? [:] {
+//            switch attack {
+//            case .bomb:
+            for target in targets {
+                let position = translateCoord(target)
+                let reticle = SKSpriteNode(texture: SKTexture(imageNamed: identifier), size: CGSize(width: tileSize, height: tileSize))
+                reticle.position = position
+                reticle.zPosition = Precedence.menu.rawValue
+                targetingArea.addChildSafely(reticle)
+            }
+//            }
+        }
+    }
+    
 
     
     private func translateCoord(_ coord: TileCoord) -> CGPoint {

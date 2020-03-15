@@ -31,9 +31,17 @@ class BossController: TargetViewModel {
         return _currentTargets
     }
     
-    private let numRocksToEat = 4
+    var attackTargets: [BossController.BossAttack: Set<TileCoord>] {
+        return attackDictionary
+    }
+    
+    private let numRocksToEat = 6
     private var rocksToEat: [TileType] = []
-    private var attackDictionary: [BossAttack: Set<TileCoord>] = [:]
+    private var attackDictionary: [BossAttack: Set<TileCoord>] = [:] {
+        didSet {
+            targetingView.dataUpdated()
+        }
+    }
     
     private var tiles: [[Tile]]?
     private var stateBeforeDizzy = AttackState.rests
@@ -79,8 +87,10 @@ class BossController: TargetViewModel {
     }
     
     private var targetingView: TargetingView
+    private let boardSize: Int
     
     init(foreground: SKNode, playableRect: CGRect, levelSize: Int, boardSize: Int) {
+        self.boardSize = boardSize
         self.targetingView = TargetView(foreground: foreground,
                                         playableRect: playableRect,
                                         levelSize: levelSize,
@@ -100,26 +110,54 @@ class BossController: TargetViewModel {
         }
     }
     
-    enum BossAttack {
-        case column
-        case row
+    enum BossAttack: Hashable {
+        case hair(Int, Bool)
+        case destroy(Int, Bool)
         case spawn
         case bomb
     }
     
     func attack(basedOnRocks rocksEaten: [TileType]) -> [BossAttack] {
         
+        var attackedColumns = Set<Int>()
+        var attackedRows = Set<Int>()
+        
+        var attacksRow: Bool {
+            return Int.random(2) == 0
+        }
+        
+        func rowColumnAttack(_ attack: BossAttack) -> BossAttack {
+            let attacksRowOrColumn = attacksRow
+            let attackIndex: Int
+            if attacksRowOrColumn {
+                attackIndex = Int.random(boardSize, notInSet: attackedRows)
+                attackedRows.insert(attackIndex)
+            } else {
+                attackIndex = Int.random(boardSize, notInSet: attackedColumns)
+                attackedColumns.insert(attackIndex)
+            }
+            
+            switch attack {
+            case .hair:
+                return .hair(attackIndex, attacksRowOrColumn)
+            case .destroy:
+                return .destroy(attackIndex, attacksRowOrColumn)
+            default:
+                return attack
+            }
+        }
+        
         return rocksEaten.map {
             if case TileType.rock(let color) = $0 {
                 switch color {
                 case .blue:
-                    return .column
+                    return rowColumnAttack(.hair(0, false))
                 case .red:
                     return .bomb
                 case .purple:
                     return .spawn
                 case .brown:
-                    return .row
+                    return rowColumnAttack(.destroy(0, false))
                 case .green:
                     preconditionFailure("How did you eat a green rock???")
                 }
@@ -127,46 +165,89 @@ class BossController: TargetViewModel {
                 preconditionFailure("These eaten rocks should only have type rock")
             }
         }
+        
     }
     
     func attacked(tiles: [[Tile]], by attacks: [BossController.BossAttack]) -> [BossController.BossAttack: Set<TileCoord>] {
         //TODO: can be optimized
-        var columnsAttacked = Set<Int>()
+        var columnsAtwtacked = Set<Int>()
         var rowsAttacked = Set<Int>()
         var monstersSpawned = Set<TileCoord>()
         var bombsSpawned = Set<TileCoord>()
+        var hairRowsAttacked = Set<Int>()
+        var hairColumnsAttacked = Set<Int>()
+        var destroyRowsAttacked = Set<Int>()
+        var destroyColumnsAttacked = Set<Int>()
+        
+        var attacksRow: Bool {
+            return Int.random(2) == 0
+        }
+        
+        /// Deteremine which rows and/or columns will be attacked
+        for attack in attacks {
+            switch attack {
+            case let .hair(attackIndex, isARow):
+                if isARow {
+                    hairRowsAttacked.insert(attackIndex)
+                } else {
+                    hairColumnsAttacked.insert(attackIndex)
+                }
+            case let .destroy(attackIndex, isARow):
+                if isARow {
+                    destroyRowsAttacked.insert(attackIndex)
+                } else {
+                    destroyColumnsAttacked.insert(attackIndex)
+                }
+            default: ()
+            }
+        }
+        
+        /// Determine the actual tile coords that will be hair attacked or destroyed
+        var hairAttackColumnCoords = Set<TileCoord>()
+        var hairAttackRowCoords = Set<TileCoord>()
+        var destoryAttackColumnCoords = Set<TileCoord>()
+        var destoryAttackRowCoords = Set<TileCoord>()
+        for row in 0..<tiles.count {
+            for col in 0..<tiles.count {
+                if hairColumnsAttacked.contains(col) {
+                    hairAttackColumnCoords.insert(TileCoord(row, col))
+                }
+                if hairRowsAttacked.contains(row) {
+                    hairAttackRowCoords.insert(TileCoord(row, col))
+                }
+                if destroyColumnsAttacked.contains(col) {
+                    destoryAttackColumnCoords.insert(TileCoord(row, col))
+                }
+                if destroyRowsAttacked.contains(row) {
+                    destoryAttackRowCoords.insert(TileCoord(row, col))
+                }
+            }
+        }
+        
+        let columnRowCoords = hairAttackRowCoords.union(hairAttackColumnCoords).union(destoryAttackRowCoords).union(destoryAttackColumnCoords)
+        
         for attack in attacks {
             switch attack {
             case .bomb:
-                bombsSpawned.insert(randomCoord(notIn: bombsSpawned))
-            case .column:
-                columnsAttacked.insert(Int.random(tiles.count, notInSet: columnsAttacked))
-            case .row:
-                rowsAttacked.insert(Int.random(tiles.count, notInSet: rowsAttacked))
+                bombsSpawned.insert(randomCoord(notIn: bombsSpawned.union(columnRowCoords)))
             case .spawn:
-                monstersSpawned.insert(randomCoord(notIn: monstersSpawned))
+                monstersSpawned.insert(randomCoord(notIn: monstersSpawned.union(columnRowCoords)))
+            default: ()
             }
         }
-        
-        var columnCoords = Set<TileCoord>()
-        var rowCoords = Set<TileCoord>()
-        for row in 0..<tiles.count {
-            for col in 0..<tiles.count {
-                if columnsAttacked.contains(col) {
-                    columnCoords.insert(TileCoord(row, col))
-                }
-                if rowsAttacked.contains(row) {
-                    rowCoords.insert(TileCoord(row, col))
-                }
-            }
-        }
-        
+
         var result: [BossAttack: Set<TileCoord>] = [:]
-        if !columnCoords.isEmpty {
-            result[.column] = columnCoords
+        if !hairAttackColumnCoords.isEmpty {
+            result[.hair(0, false)] = hairAttackColumnCoords
         }
-        if !rowCoords.isEmpty {
-            result[.row] = rowCoords
+        if !hairAttackRowCoords.isEmpty {
+            result[.hair(0, true)] = hairAttackRowCoords
+        }
+        if !destoryAttackColumnCoords.isEmpty {
+            result[.destroy(0, false)] = destoryAttackColumnCoords
+        }
+        if !destoryAttackRowCoords.isEmpty {
+            result[.destroy(0, true)] = destoryAttackRowCoords
         }
         if !bombsSpawned.isEmpty {
             result[.bomb] = bombsSpawned

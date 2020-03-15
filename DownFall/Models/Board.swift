@@ -115,8 +115,6 @@ class Board: Equatable {
         case .bossEatsRocks(let coords):
             let trans = bossEatsRocks(input, targets: coords)
             InputQueue.append(Input(.transformation(trans)))
-        case .bossTargetsWhatToAttack(let attackDictionary):
-            transformation = bossAttackTargets(attackDictionary, input: input)
         case .bossAttacks(let attackDictionary):
             transformation = bossAttacks(attackDictionary, input: input)
         case .gameLose(_),
@@ -129,7 +127,7 @@ class Board: Equatable {
              .newTurn,
              .tutorial,
              .visitStore,
-             .itemUseCanceled, .itemCanBeUsed, .bossTargetsWhatToEat:
+             .itemUseCanceled, .itemCanBeUsed, .bossTargetsWhatToEat, .bossTargetsWhatToAttack:
             transformation = nil
         }
         
@@ -141,15 +139,6 @@ class Board: Equatable {
         for (_, value) in attacks {
             value.forEach { coord in
                 tiles[coord.row][coord.column].bossAttack = true
-            }
-        }
-        return Transformation(transformation: nil, inputType: input.type, endTiles: tiles)
-    }
-    
-    func bossAttackTargets(_ attacks: [BossController.BossAttack: Set<TileCoord>], input: Input) -> Transformation {
-        for (_, value) in attacks {
-            value.forEach { coord in
-                tiles[coord.row][coord.column].bossTargetToAttack = true
             }
         }
         return Transformation(transformation: nil, inputType: input.type, endTiles: tiles)

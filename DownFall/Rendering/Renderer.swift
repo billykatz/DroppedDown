@@ -139,7 +139,7 @@ class Renderer: SKSpriteNode {
                 animate(trans.tileTransformation?.first) { [weak self] in
                     self?.gameWin(transformation: trans)
                 }
-            case .monsterDies, .itemUsed, .newTurn, .bossTargetsWhatToEat, .bossTargetsWhatToAttack, .bossAttacks:
+            case .monsterDies, .itemUsed, .newTurn, .bossTargetsWhatToEat, .bossAttacks:
                 let sprites = createSprites(from: trans.endTiles)
                 animationsFinished(for: sprites, endTiles: trans.endTiles)
             case .collectItem:
@@ -239,8 +239,6 @@ class Renderer: SKSpriteNode {
                 } else if let turns = tiles[row][col].type.turnsUntilAttack(),
                     let frequency = tiles[row][col].type.attackFrequency() {
                     sprite.showAttackTiming(frequency, turns)
-                } else if tiles[row][col].bossTargetToAttack {
-                    sprite.indicateSpriteWillBeAttacked()
                 } else if tiles[row][col].bossAttack {
                     sprite.indicateSpriteIsBossAttacked()
                 }

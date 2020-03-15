@@ -387,8 +387,8 @@
             },
             "animations": {
                 "attack": {
-                    "animationFilename": "",
-                    "numberOfFrames": 0
+                    "animationFilename": "alamoAttack",
+                    "numberOfFrames": 6
                 },
                 "hurt": {
                     "animationFilename": "",
@@ -407,8 +407,8 @@
                     "numberOfFrames": 0
                 },
                 "projectile": {
-                    "animationFilename": "",
-                    "numberOfFrames": 0
+                    "animationFilename": "alamoProjectile",
+                    "numberOfFrames": 9
                 }
             },
             "carry": {

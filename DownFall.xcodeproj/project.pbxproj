@@ -133,6 +133,7 @@
 		589A27D123D90CD900174DE7 /* TargetingState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589A27D023D90CD900174DE7 /* TargetingState.swift */; };
 		589A27D423D90FE000174DE7 /* TargetingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589A27D323D90FE000174DE7 /* TargetingViewModel.swift */; };
 		589A27D623D9210900174DE7 /* TargetingViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589A27D523D9210900174DE7 /* TargetingViewModelTests.swift */; };
+		58A51663241DF3E2009E84E1 /* TargetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58A51662241DF3E2009E84E1 /* TargetView.swift */; };
 		58B39BD723D21C9600915858 /* BackpackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58B39BD623D21C9600915858 /* BackpackView.swift */; };
 		58C1AE4A23D19CEE003B5B5A /* TransmogrificationPotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C1AE4923D19CEE003B5B5A /* TransmogrificationPotion.swift */; };
 		58C1AE4C23D19E03003B5B5A /* KillMonsterPotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C1AE4B23D19E03003B5B5A /* KillMonsterPotion.swift */; };
@@ -279,6 +280,7 @@
 		589A27D023D90CD900174DE7 /* TargetingState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetingState.swift; sourceTree = "<group>"; };
 		589A27D323D90FE000174DE7 /* TargetingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetingViewModel.swift; sourceTree = "<group>"; };
 		589A27D523D9210900174DE7 /* TargetingViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetingViewModelTests.swift; sourceTree = "<group>"; };
+		58A51662241DF3E2009E84E1 /* TargetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetView.swift; sourceTree = "<group>"; };
 		58B39BD623D21C9600915858 /* BackpackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackpackView.swift; sourceTree = "<group>"; };
 		58C1AE4923D19CEE003B5B5A /* TransmogrificationPotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransmogrificationPotion.swift; sourceTree = "<group>"; };
 		58C1AE4B23D19E03003B5B5A /* KillMonsterPotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KillMonsterPotion.swift; sourceTree = "<group>"; };
@@ -703,6 +705,7 @@
 			isa = PBXGroup;
 			children = (
 				58F034C22408B7CF00BE1863 /* BossController.swift */,
+				58A51662241DF3E2009E84E1 /* TargetView.swift */,
 			);
 			name = Boss;
 			sourceTree = "<group>";
@@ -828,6 +831,7 @@
 				3DD72595239DC4FE005933B2 /* MenuType.swift in Sources */,
 				3D4F569422B33B44003695D8 /* Helpers.swift in Sources */,
 				3DF2925420A37FEE006671AC /* GameScene.swift in Sources */,
+				58A51663241DF3E2009E84E1 /* TargetView.swift in Sources */,
 				3D06390B22EEB56100C4D5E9 /* AnimatingState.swift in Sources */,
 				3DEF7FF3237DB8B90070FB3D /* InputType.swift in Sources */,
 				3D5FB09420AE768700ACD716 /* AnimationSettings.swift in Sources */,

@@ -74,7 +74,7 @@ class GameScene: SKScene {
         
         // create boss controller
         if level.type == .boss {
-            bossController = BossController()
+            bossController = BossController(foreground: foreground, playableRect: size.playableRect, levelSize: level.boardSize, boardSize: boardSize)
         }
         
     }
@@ -168,9 +168,15 @@ extension GameScene {
 //MARK: - Rotate
 extension GameScene {
     private func rotateClockwise() {
+        if case BossController.AttackState.targetsWhatToEat? = bossController?.state {
+            return
+        }
         InputQueue.append(Input(.rotateClockwise))
     }
     private func rotateCounterClockwise() {
+        if case BossController.AttackState.targetsWhatToEat? = bossController?.state {
+            return
+        }
         InputQueue.append(Input(.rotateCounterClockwise))
     }
 }

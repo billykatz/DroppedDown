@@ -7,8 +7,10 @@
 //
 
 import Foundation
+import SpriteKit
+import CoreGraphics
 
-class BossController {
+class BossController: TargetViewModel {
     
     enum AttackState {
         case targetsWhatToEat
@@ -18,32 +20,46 @@ class BossController {
         case rests
         case dizzied
     }
+    
+    //view model conformance
+    var _currentTargets: [TileCoord] = [] {
+        didSet {
+            targetingView.dataUpdated()
+        }
+    }
+    var currentTargets: [TileCoord] {
+        return _currentTargets
+    }
+    
     private let numRocksToEat = 4
     private var rocksToEat: [TileType] = []
     private var attackDictionary: [BossAttack: Set<TileCoord>] = [:]
     
     private var tiles: [[Tile]]?
     private var stateBeforeDizzy = AttackState.rests
-    private var state = AttackState.rests {
+    private(set) var state = AttackState.rests {
         didSet {
             guard let tiles = tiles else { return }
             switch state {
             case .targetsWhatToEat:
                 let targets = targetRocksToEat(in: tiles)
                 //create the input
+                _currentTargets = targets
                 InputQueue.append(Input(.bossTargetsWhatToEat(targets)))
             case .eats:
                 var coordsTargetedToEat: [TileCoord] = []
                 
                 for row in 0..<tiles.count {
                     for col in 0..<tiles.count {
-                        let tile = tiles[row][col]
-                        if tile.bossTargetedToEat {
+                        if _currentTargets.contains(TileCoord(row: row, column: col)) {
+                            let tile = tiles[row][col]
                             rocksToEat.append(tile.type)
                             coordsTargetedToEat.append(TileCoord(row: row, column: col))
                         }
                     }
                 }
+                
+                _currentTargets = []
                 InputQueue.append(Input(.bossEatsRocks(coordsTargetedToEat)))
             case .targetsWhatToAttack:
                 let attacks = attack(basedOnRocks: rocksToEat)
@@ -62,7 +78,14 @@ class BossController {
         }
     }
     
-    init() {
+    private var targetingView: TargetingView
+    
+    init(foreground: SKNode, playableRect: CGRect, levelSize: Int, boardSize: Int) {
+        self.targetingView = TargetView(foreground: foreground,
+                                        playableRect: playableRect,
+                                        levelSize: levelSize,
+                                        boardSize: CGFloat(boardSize))
+        targetingView.viewModel = self
         Dispatch.shared.register { [weak self] (input) in
             self?.handle(input)
         }
@@ -98,7 +121,7 @@ class BossController {
                 case .brown:
                     return .row
                 case .green:
-                     preconditionFailure("How did you eat a green rock???")
+                    preconditionFailure("How did you eat a green rock???")
                 }
             } else {
                 preconditionFailure("These eaten rocks should only have type rock")
@@ -154,7 +177,7 @@ class BossController {
         return result
         
     }
-
+    
     
     func targetRocksToEat(in tiles: [[Tile]]) -> [TileCoord] {
         var targets: [TileCoord] = []
@@ -193,7 +216,7 @@ class BossController {
         }
         return tileCoord
     }
-
+    
     
     func advanceState() {
         switch state {
@@ -212,3 +235,4 @@ class BossController {
         }
     }
 }
+

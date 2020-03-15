@@ -18,7 +18,7 @@ struct PlayState: GameState {
              .attack, .transformation,
              .touch, .monsterDies, .rotateCounterClockwise, .rotateClockwise,
              .boardBuilt, .touchBegan, .tutorial, .itemUseSelected,
-             .bossTargetsWhatToEat, .bossEatsRocks, .bossTargetsWhatToAttack, .bossAttacks:
+             .bossEatsRocks, .bossTargetsWhatToAttack, .bossAttacks, .bossTargetsWhatToEat:
             return true
         case .animationsFinished, .play,
              .reffingFinished, .playAgain, .collectItem,
@@ -38,9 +38,9 @@ struct PlayState: GameState {
             return AnyGameState(PauseState())
         case .attack, .touch, .monsterDies,
              .rotateCounterClockwise, .rotateClockwise, .collectItem,
-             .touchBegan, .bossTargetsWhatToEat, .bossEatsRocks, .bossTargetsWhatToAttack, .bossAttacks:
+             .touchBegan, .bossEatsRocks, .bossTargetsWhatToAttack, .bossAttacks:
             return AnyGameState(ComputingState())
-        case .boardBuilt:
+        case .boardBuilt, .bossTargetsWhatToEat:
             return AnyGameState(PlayState())
         case .tutorial(let step):
             if step.showCounterClockwiseRotate || step.showClockwiseRotate {

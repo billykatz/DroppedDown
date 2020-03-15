@@ -66,7 +66,7 @@ class Renderer: SKSpriteNode {
     }()
     
     public var backpackView: BackpackView
-    
+
     init(playableRect: CGRect,
          foreground givenForeground: SKNode,
          boardSize theBoardSize: Int,
@@ -239,8 +239,6 @@ class Renderer: SKSpriteNode {
                 } else if let turns = tiles[row][col].type.turnsUntilAttack(),
                     let frequency = tiles[row][col].type.attackFrequency() {
                     sprite.showAttackTiming(frequency, turns)
-                } else if tiles[row][col].bossTargetedToEat {
-                    sprite.indicateSpriteWillBeEaten()
                 } else if tiles[row][col].bossTargetToAttack {
                     sprite.indicateSpriteWillBeAttacked()
                 } else if tiles[row][col].bossAttack {
@@ -424,18 +422,26 @@ extension Renderer {
         }
         
         let spriteNodes = createSprites(from: endTiles)
-        //TODO: don't hardcode this
+        // TODO: don't hardcode this
         let removed = transformations[0]
         let newTiles = transformations[1]
         let shiftDown = transformations[2]
         
-        //remove "removed" tiles from sprite storage
+        // remove "removed" tiles from sprite storage
         var removedAnimations: [(SKSpriteNode, SKAction)] = []
         for tileTrans in removed {
             if let crumble = sprites[tileTrans.end.x][tileTrans.end.y].crumble() {
                 // set the position way in the background so that new nodes come in over
                 sprites[tileTrans.end.x][tileTrans.end.y].zPosition = Precedence.underground.rawValue
-                removedAnimations.append(crumble)
+                
+                var crumbleAnimations: [SKAction] = [crumble.1]
+                if case InputType.bossEatsRocks? = transformation.inputType {
+                    let targetPosition = CGPoint.alignVertically(sprites[tileTrans.end.x][tileTrans.end.y].frame, relativeTo: self.hud.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: -3 * Style.Padding.most, translatedToBounds: true)
+                    let action = SKAction.move(to: targetPosition, duration: 0.5)
+                    crumbleAnimations.insert(action, at: 0)
+                }
+                let newCrumble = (sprites[tileTrans.end.x][tileTrans.end.y], SKAction.sequence(crumbleAnimations))
+                removedAnimations.append(newCrumble)
             }
         }
         

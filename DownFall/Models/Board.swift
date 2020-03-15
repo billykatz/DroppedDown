@@ -49,7 +49,7 @@ class Board: Equatable {
         for i in 0..<tiles.count {
             for j in 0..<tiles[i].count {
                 let tile = tiles[i][j]
-                tiles[i][j] = Tile(type: tiles[i][j].type, shouldHighlight: false, bossTargetedToEat: tile.bossTargetedToEat)
+                tiles[i][j] = Tile(type: tiles[i][j].type, shouldHighlight: false)
             }
         }
     }
@@ -112,17 +112,6 @@ class Board: Equatable {
                     )
                 )
             )
-        case .bossTargetsWhatToEat(let coords):
-            coords.forEach { coord in
-                tiles[coord.row][coord.column].bossTargetedToEat = true
-            }
-            InputQueue.append(
-                Input(
-                    InputType.transformation(
-                        [Transformation(transformation: nil, inputType: .bossTargetsWhatToEat(coords), endTiles: self.tiles)]
-                    )
-                )
-            )
         case .bossEatsRocks(let coords):
             let trans = bossEatsRocks(input, targets: coords)
             InputQueue.append(Input(.transformation(trans)))
@@ -140,7 +129,7 @@ class Board: Equatable {
              .newTurn,
              .tutorial,
              .visitStore,
-             .itemUseCanceled, .itemCanBeUsed:
+             .itemUseCanceled, .itemCanBeUsed, .bossTargetsWhatToEat:
             transformation = nil
         }
         

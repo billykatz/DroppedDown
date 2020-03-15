@@ -18,20 +18,17 @@ struct Tile: Hashable {
     let type: TileType
     var shouldHighlight: Bool
     var tutorialHighlight: Bool
-    var bossTargetedToEat: Bool
     var bossTargetToAttack: Bool
     var bossAttack: Bool
     
     init(type: TileType,
          shouldHighlight: Bool = false,
          tutorialHighlight: Bool = false,
-         bossTargetedToEat: Bool = false,
          bossTargetToAttack: Bool = false,
          bossAttack: Bool = false) {
         self.type = type
         self.shouldHighlight = shouldHighlight
         self.tutorialHighlight = tutorialHighlight
-        self.bossTargetedToEat = bossTargetedToEat
         self.bossTargetToAttack = bossTargetToAttack
         self.bossAttack = bossAttack
     }

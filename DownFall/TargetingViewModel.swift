@@ -59,16 +59,16 @@ class TargetingViewModel: Targeting {
     
     var ability: AnyAbility? {
         didSet {
+            currentTargets = []
             if let ability = ability {
                 InputQueue.append(Input(InputType.itemUseSelected(ability)))
                 self.viewMode = .itemDetail
+                autoTarget()
             }
             else {
                 InputQueue.append(Input(InputType.itemUseCanceled))
                 self.viewMode = .inventory
             }
-            currentTargets = []
-            autoTarget()
         }
     }
     

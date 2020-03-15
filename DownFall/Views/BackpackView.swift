@@ -106,7 +106,6 @@ class BackpackView: SKSpriteNode {
         self.inventoryArea = SKSpriteNode(texture: nil, color: .clear, size: CGSize(width: playableRect.width, height: height))
         self.inventoryArea.position = CGPoint.position(this: inventoryArea.frame, centeredInBottomOf: viewContainer.frame)
         
-        
         // item detail view
         self.itemDetailView = SKSpriteNode(texture: nil, color: .clayRed, size: self.inventoryArea.size)
         self.itemDetailView.position = CGPoint.position(this: itemDetailView.frame, centeredInBottomOf: viewContainer.frame)
@@ -423,7 +422,7 @@ class BackpackView: SKSpriteNode {
     
     private func translateCoord(_ coord: TileCoord) -> CGPoint {
         
-        //tricky, but the row (x) corresponds to the y axis. and the col (y) corresponds to the x-axis.
+        //tricky, but the row (x) corresponds to the column which start at 0 on the left with the n-1th the farthest right on the board. And the Y coordinate corresponds to the x-axis or the row, that starts at 0 and moves up the screen with the n-1th row at the top of the board.
         let x = CGFloat(coord.column) * tileSize + bottomLeft.x
         let y = CGFloat(coord.row) * tileSize + bottomLeft.y
         

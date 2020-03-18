@@ -106,6 +106,17 @@ class BossController: TargetViewModel {
         case .newTurn:
             tiles = input.endTilesStruct
             advanceState()
+        case .transformation(let trans):
+            if let initialTrans = trans.first, case InputType.touch? = initialTrans.inputType,
+                let removed = initialTrans.tileTransformation?.first?.map({ $0.initial }) {
+                var newTargets: [TileCoord] = []
+                for coord in _currentTargets {
+                    if !removed.contains(coord) {
+                        newTargets.append(coord)
+                    }
+                }
+                _currentTargets = newTargets
+            }
         default: ()
         }
     }
@@ -168,6 +179,24 @@ class BossController: TargetViewModel {
         
     }
     
+    private var pillarCoords: Set<TileCoord> {
+        guard let tiles = tiles else { return Set<TileCoord>() }
+        var temp = Set<TileCoord>()
+        for row in 0..<tiles.count {
+            for col in 0..<tiles.count {
+                if case TileType.pillar = tiles[row][col].type {
+                    temp.insert(TileCoord(row: row, column: col))
+                }
+            }
+        }
+        return temp
+    }
+    
+    private var playerCoord: TileCoord {
+        guard let tiles = tiles, let position = getTilePosition(.player(.zero), tiles: tiles) else { preconditionFailure("Where is the player??") }
+        return position
+    }
+    
     func attacked(tiles: [[Tile]], by attacks: [BossController.BossAttack]) -> [BossController.BossAttack: Set<TileCoord>] {
         //TODO: can be optimized
         var columnsAtwtacked = Set<Int>()
@@ -224,7 +253,7 @@ class BossController: TargetViewModel {
             }
         }
         
-        let columnRowCoords = hairAttackRowCoords.union(hairAttackColumnCoords).union(destoryAttackRowCoords).union(destoryAttackColumnCoords)
+        let columnRowCoords = hairAttackRowCoords.union(hairAttackColumnCoords).union(destoryAttackRowCoords).union(destoryAttackColumnCoords).union(pillarCoords).union([playerCoord])
         
         for attack in attacks {
             switch attack {

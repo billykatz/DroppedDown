@@ -122,7 +122,7 @@ class TileCreator: TileStrategy {
                 validTile = !neighbors.contains {  $0.type == .monster(.zero) || $0.type == .player(.zero) } && !noMoreMonsters
             case .rock(.red), .rock(.purple), .rock(.blue), .rock(.brown):
                 validTile = true
-            case .item, .exit, .player, .fireball, .rock(.green), .empty, .pillar:
+            case .item, .exit, .player, .rock(.green), .empty, .pillar, .dynamite:
                 validTile = false
             }
         }
@@ -196,7 +196,7 @@ class TileCreator: TileStrategy {
             switch nextTile.type {
             case .rock:
                 newTiles.append(nextTile)
-            case .exit, .player, .monster, .item, .empty, .fireball, .pillar:
+            case .exit, .player, .monster, .item, .empty, .pillar, .dynamite:
                 assertionFailure("randomRock should only create rocks")
             }
         }

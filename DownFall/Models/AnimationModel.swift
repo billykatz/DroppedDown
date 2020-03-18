@@ -8,85 +8,34 @@
 
 import SpriteKit
 
-protocol BuildAnimations {
-    var attackAnimation: [SKTexture]? { get }
-    var hurtAnimation: [SKTexture]? { get }
-    var dyingAnimation: [SKTexture]? { get }
-    var idleAnimation: [SKTexture]? { get }
-    var fallAnimation: [SKTexture]? { get }
-    var projectileAnimation: [SKTexture]? { get }
-}
-
-struct AllAnimationsModel: Equatable, Decodable {
-    let attack: AnimationModel
-    let hurt: AnimationModel
-    let dying: AnimationModel
-    let idle: AnimationModel
-    let fall: AnimationModel
-    let projectile: AnimationModel
-    
-    static var zero = AllAnimationsModel(attack: .zero,
-                                         hurt: .zero,
-                                         dying: .zero,
-                                         idle: .zero,
-                                         fall: .zero,
-                                         projectile: .zero)
-    
+enum AnimationType: String, Decodable {
+    case attack
+    case hurt
+    case dying
+    case idle
+    case fall
+    case projectileStart
+    case projectileMid
+    case projectileEnd
 }
 
 struct AnimationModel: Equatable, Decodable {
     let animationFilename: String
     let numberOfFrames: Int
+    let animationType: AnimationType
+    var keyframe: Int?
     
     var texture: SKTexture? {
         if animationFilename.isEmpty { return nil }
         return SKTexture(imageNamed: animationFilename)
     }
     
-    static var zero = AnimationModel(animationFilename: "", numberOfFrames: 0)
+    var animationTextures: [SKTexture]? {
+        guard let texture = self.texture else { return nil }
+        return SpriteSheet(texture: texture,
+                           rows: 1,
+                           columns: numberOfFrames).animationFrames()
+    }
+    
+    static var zero = AnimationModel(animationFilename: "", numberOfFrames: 0, animationType: .attack)
 }
-
-extension AllAnimationsModel: BuildAnimations {
-    var attackAnimation: [SKTexture]? {
-        guard let texture = attack.texture else { return nil }
-        return SpriteSheet(texture: texture,
-                           rows: 1,
-                           columns: attack.numberOfFrames).animationFrames()
-    }
-    
-    var hurtAnimation: [SKTexture]? {
-        guard let texture = hurt.texture else { return nil }
-        return SpriteSheet(texture: texture,
-                           rows: 1,
-                           columns: hurt.numberOfFrames).animationFrames()
-    }
-    
-    var dyingAnimation: [SKTexture]? {
-        guard let texture = dying.texture else { return nil }
-        return SpriteSheet(texture: texture,
-                           rows: 1,
-                           columns: dying.numberOfFrames).animationFrames()
-    }
-    
-    var idleAnimation: [SKTexture]? {
-        guard let texture = idle.texture else { return nil }
-        return SpriteSheet(texture: texture,
-                           rows: 1,
-                           columns: idle.numberOfFrames).animationFrames()
-    }
-    
-    var fallAnimation: [SKTexture]? {
-        guard let texture = fall.texture else { return nil }
-        return SpriteSheet(texture: texture,
-                           rows: 1,
-                           columns: fall.numberOfFrames).animationFrames()
-    }
-    
-    var projectileAnimation: [SKTexture]? {
-        guard let texture = projectile.texture else { return nil }
-        return SpriteSheet(texture: texture,
-                           rows: 1,
-                           columns: projectile.numberOfFrames).animationFrames()
-    }
-}
-

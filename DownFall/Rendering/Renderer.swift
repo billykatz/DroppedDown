@@ -146,6 +146,8 @@ class Renderer: SKSpriteNode {
                 computeNewBoard(for: trans)
             case .bossEatsRocks:
                 computeNewBoard(for: transformations)
+            case .decrementDynamites:
+                computeNewBoard(for: transformations)
             case .reffingFinished, .touchBegan, .itemUseSelected:
                 () // Purposely left blank.
             default:
@@ -239,8 +241,6 @@ class Renderer: SKSpriteNode {
                 } else if let turns = tiles[row][col].type.turnsUntilAttack(),
                     let frequency = tiles[row][col].type.attackFrequency() {
                     sprite.showAttackTiming(frequency, turns)
-                } else if tiles[row][col].bossAttack {
-                    sprite.indicateSpriteIsBossAttacked()
                 }
                 spriteForeground.addChild(sprite)
             }
@@ -428,7 +428,10 @@ extension Renderer {
         // remove "removed" tiles from sprite storage
         var removedAnimations: [(SKSpriteNode, SKAction)] = []
         for tileTrans in removed {
-            if let crumble = sprites[tileTrans.end.x][tileTrans.end.y].crumble() {
+            if InputType.fuzzyEqual(.decrementDynamites(Set<TileCoord>()), inputType) {
+                sprites[tileTrans.end.x][tileTrans.end.y].zPosition = Precedence.underground.rawValue
+                removedAnimations.append((sprites[tileTrans.end.x][tileTrans.end.y], animator.smokeAnimation()))
+            } else if let crumble = sprites[tileTrans.end.x][tileTrans.end.y].crumble() {
                 // set the position way in the background so that new nodes come in over
                 sprites[tileTrans.end.x][tileTrans.end.y].zPosition = Precedence.underground.rawValue
                 

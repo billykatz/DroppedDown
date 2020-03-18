@@ -117,6 +117,9 @@ class Board: Equatable {
             InputQueue.append(Input(.transformation(trans)))
         case .bossAttacks(let attackDictionary):
             transformation = bossAttacks(attackDictionary, input: input)
+        case .decrementDynamites(let dynamiteCoords):
+            let trans = decrementDynamites(input: input, dynamiteCoords: dynamiteCoords)
+            InputQueue.append(Input(.transformation(trans)))
         case .gameLose(_),
              .play,
              .pause,
@@ -135,13 +138,60 @@ class Board: Equatable {
         InputQueue.append(Input(.transformation([trans])))
     }
     
+    private func decrementDynamites(input: Input, dynamiteCoords: Set<TileCoord>) -> [Transformation] {
+
+        var removedRocksAndPillars: [TileCoord] = []
+        for coord in dynamiteCoords {
+            if case let TileType.dynamite(fuse, _) = tiles[coord].type {
+                let newFuse = fuse - 1
+                
+                if newFuse <= 0 {
+                    /// EXPLODE
+                    tiles[coord.row][coord.column] = Tile(type: .empty)
+                    
+                    let affectedNeighbors = coord.allNeighbors
+                    for neighborCoord in affectedNeighbors {
+                        guard isWithinBounds(neighborCoord) else { continue }
+                        switch tiles[neighborCoord].type {
+                        case .dynamite:
+                            tiles[neighborCoord.row][neighborCoord.column] = Tile(type: .dynamite(fuseCount: 0, hasBeenDecremented: false))
+                        case .player(let playerData):
+                            tiles[neighborCoord.row][neighborCoord.column] = Tile(type: .player(playerData.wasAttacked(for: 1, from: neighborCoord.direction(relative: coord) ?? .east)))
+                        case .rock, .pillar:
+                            removedRocksAndPillars.append(neighborCoord)
+                        case .empty, .exit, .monster, .gem, .gold:
+                            () // purposefully left blank
+                        case .item:
+                            ()
+                        }
+                    }
+                } else {
+                    tiles[coord.row][coord.column] = Tile(type: .dynamite(fuseCount:newFuse, hasBeenDecremented: true))
+                }
+            }
+            
+        }
+        let removedAndReplaced = removeAndReplace(from: tiles, specificCoord: removedRocksAndPillars, input: input)
+        
+        return [Transformation(transformation: nil, inputType: input.type, endTiles: tiles), removedAndReplaced]
+    }
+    
     func bossAttacks(_ attacks: [BossController.BossAttack: Set<TileCoord>], input: Input) -> Transformation {
-        for (_, value) in attacks {
-            value.forEach { coord in
-                tiles[coord.row][coord.column].bossAttack = true
+        for (attack, targets) in attacks {
+            switch attack {
+            case .bomb:
+                for coord in targets {
+                    self.tiles[coord.row][coord.column] = Tile(type: .dynamite(fuseCount: 3, hasBeenDecremented: false))
+                }
+            default:
+                ()
+//            case .spawn:
+//            case .destroy(<#T##Int#>, <#T##Bool#>):
+//            case .hair(<#T##Int#>, <#T##Bool#>):
+                
             }
         }
-        return Transformation(transformation: nil, inputType: input.type, endTiles: tiles)
+        return Transformation(transformation: nil, inputType: input.type, endTiles: self.tiles)
     }
     
     func bossEatsRocks(_ input: Input, targets: [TileCoord]) -> [Transformation] {
@@ -434,13 +484,26 @@ extension Board {
                           singleTile: Bool = false,
                           input: Input) -> Transformation {
         // Check that the tile group at row, col has more than 3 tiles
-        var selectedTiles: [TileCoord] = specificCoord
-        
+        let selectedTiles: [TileCoord] = specificCoord
         
         // set the tiles to be removed as Empty placeholder
         var intermediateTiles = tiles
         for coord in selectedTiles {
-            intermediateTiles[coord.x][coord.y] = Tile.empty
+            switch tiles[coord].type {
+            case let .pillar(color, health):
+                if health == 1 {
+                    // remove the pillar from the board
+                    intermediateTiles[coord.x][coord.y] = Tile.empty
+                } else {
+                    //decrement the pillar's health
+                    intermediateTiles[coord.x][coord.y] = Tile(type: .pillar(color, health-1))
+                }
+
+            case .rock:
+                intermediateTiles[coord.x][coord.y] = Tile.empty
+            default:
+                preconditionFailure("We should only use this for rocks and pillars")
+            }
         }
         
         // store tile transforamtions and shift information
@@ -480,6 +543,10 @@ extension Board {
                     
                     if case .player(let data) = tiles[i][j].type {
                         newTiles[i][j] = Tile(type: .player(data.resetAttacks()))
+                    }
+                    
+                    if case let .dynamite(fuseCount, _) = tiles[i][j].type {
+                        newTiles[i][j] = Tile(type: .dynamite(fuseCount: fuseCount, hasBeenDecremented: false))
                     }
                 }
             }

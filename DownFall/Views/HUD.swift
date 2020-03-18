@@ -71,7 +71,7 @@ class HUD: SKSpriteNode {
                 showAttack(attackInput: input, endTiles: trans.first!.endTiles)
             case .collectItem(_, let item, let total):
                 incrementCurrencyCounter(item, total: total)
-            case .itemUsed:
+            case .itemUsed, .decrementDynamites:
                 if let tiles = trans.first?.endTiles,
                     let playerCoord = getTilePosition(.player(.zero), tiles: tiles),
                     case TileType.player(let data) = tiles[playerCoord].type {

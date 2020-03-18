@@ -18,16 +18,13 @@ struct Tile: Hashable {
     let type: TileType
     var shouldHighlight: Bool
     var tutorialHighlight: Bool
-    var bossAttack: Bool
     
     init(type: TileType,
          shouldHighlight: Bool = false,
-         tutorialHighlight: Bool = false,
-         bossAttack: Bool = false) {
+         tutorialHighlight: Bool = false) {
         self.type = type
         self.shouldHighlight = shouldHighlight
         self.tutorialHighlight = tutorialHighlight
-        self.bossAttack = bossAttack
     }
     
     static var exit: Tile {
@@ -85,7 +82,7 @@ extension Tile: Equatable {
 enum TileType: Equatable, Hashable, CaseIterable {
     
     static var rockCases: [TileType] = [.rock(.blue), .rock(.green), .rock(.red), .rock(.purple), .rock(.brown)]
-    static var allCases: [TileType] = [.player(.zero), .exit, .empty, .monster(.zero), .item(.zero), .fireball, .rock(.red), .pillar(.red, 3)]
+    static var allCases: [TileType] = [.player(.zero), .exit, .empty, .monster(.zero), .item(.zero), .rock(.red), .pillar(.red, 3)]
     static var randomCases = [TileType.monster(.zero), .rock(.red)]
     typealias AllCases = [TileType]
 
@@ -105,6 +102,8 @@ enum TileType: Equatable, Hashable, CaseIterable {
             return leftColor == rightColor
         case let (.rock(leftColor), .rock(rightColor)):
             return leftColor == rightColor
+        case let (.dynamite(_, lhsHasBeen), .dynamite(_, rhsHasBeen)):
+            return lhsHasBeen == rhsHasBeen
         default:
             return false
         }
@@ -115,9 +114,9 @@ enum TileType: Equatable, Hashable, CaseIterable {
     case empty
     case exit
     case item(Item)
-    case fireball
     case pillar(Color, Int)
     case rock(Color)
+    case dynamite(fuseCount: Int, hasBeenDecremented: Bool)
     
     var isARock: Bool {
         if case .rock = self {
@@ -225,10 +224,10 @@ enum TileType: Equatable, Hashable, CaseIterable {
             return data.name
         case .item(let item):
             return item.textureName
-        case .fireball:
-            return TextureName.fireball.rawValue
         case .rock, .pillar:
             return self.textureName
+        case .dynamite:
+            return TextureName.dynamite.rawValue
         }
     }
     
@@ -239,7 +238,7 @@ enum TileType: Equatable, Hashable, CaseIterable {
         case exit
         case greenMonster
         case gem1 = "gem2"
-        case fireball
+        case dynamite
     }
 }
 
@@ -262,6 +261,8 @@ extension TileType {
             return "gem"
         case .gold:
             return "gold"
+        case .dynamite:
+            return "dynamite"
         default:
             preconditionFailure("We probably shouldnt be here. Investigate")
         }

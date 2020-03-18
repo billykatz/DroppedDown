@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SpriteKit
 
 protocol ResetsAttacks {
     func resetAttacks() -> EntityModel
@@ -29,7 +30,7 @@ struct EntityModel: Equatable, Decodable {
     
     static let playerCases: [EntityType] = [.easyPlayer, .normalPlayer, .hardPlayer]
     
-    static let zero: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .rat, carry: .zero, animations: .zero, abilities: [])
+    static let zero: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .rat, carry: .zero, animations: [], abilities: [])
     
     let originalHp: Int
     let hp: Int
@@ -37,7 +38,7 @@ struct EntityModel: Equatable, Decodable {
     let attack: AttackModel
     let type: EntityType
     let carry: CarryModel
-    let animations: AllAnimationsModel
+    let animations: [AnimationModel]
     var abilities: [AnyAbility] = []
     
     private enum CodingKeys: String, CodingKey {
@@ -56,7 +57,7 @@ struct EntityModel: Equatable, Decodable {
                         attack: AttackModel? = nil,
                         type: EntityType? = nil,
                         carry: CarryModel? = nil,
-                        animations: AllAnimationsModel? = nil,
+                        animations: [AnimationModel]? = nil,
                         abilities: [AnyAbility]? = nil) -> EntityModel {
         let updatedOriginalHp = originalHp ?? self.originalHp
         let updatedHp = hp ?? self.hp
@@ -88,6 +89,16 @@ struct EntityModel: Equatable, Decodable {
             }
         }
         return attack.attacksPerTurn + bonusAttacks - attack.attacksThisTurn > 0
+    }
+    
+    
+    func animation(of animationType: AnimationType) -> [SKTexture]? {
+        guard let animations = animations.first(where: { $0.animationType == animationType })?.animationTextures else { return nil }
+        return animations
+    }
+    
+    func keyframe(of animationType: AnimationType) -> Int? {
+        return animations.first(where: { $0.animationType == animationType })?.keyframe
     }
     
     /**

@@ -18,6 +18,12 @@ struct Animator {
         return smokeAnimation
     }
     
+    public func explodeAnimation() -> SKAction {
+        let explodeTexture = SpriteSheet(texture: SKTexture(imageNamed: "explodeAnimation"), rows: 1, columns: 4).animationFrames()
+        let explodeAnimation = SKAction.animate(with: explodeTexture, timePerFrame: 0.07)
+        return explodeAnimation
+    }
+    
     func timePerFrame() -> Double {
         return 0.07
     }
@@ -36,25 +42,32 @@ struct Animator {
     func projectileKeyFrame(for entity: EntityModel, index: Int) -> Double {
         switch entity.type {
         case .dragon:
-            if index < 1 {
-                return 0
-            } else if index < 2 {
+            var duration: Double = 0
+            if index >= 0 {
+                if let keyframes = entity.keyframe(of: .attack) {
+                    duration += Double(keyframes)
+                }
+            }
+            if index >= 1 {
                 if let keyframes = entity.keyframe(of: .projectileStart) {
-                    return Double(keyframes)
-                }
-            } else {
-                // 3 + 5
-                if let startKeyframe = entity.keyframe(of: .projectileStart),
-                    let midKeyFrame = entity.keyframe(of: .projectileMid) {
-                    return Double(startKeyframe + midKeyFrame*index)
+                    duration += Double(keyframes)
                 }
             }
-            return 0
+            if index >= 2 {
+                if let midKeyFrame = entity.keyframe(of: .projectileMid) {
+                    duration += Double(midKeyFrame*index)
+                }
+            }
+            return duration
         case .alamo:
-            if index >= 1, let keyframe = entity.keyframe(of: .projectileStart) {
-                return Double(keyframe * index)
+            var duration: Double = 0
+            if index >= 0, let keyframes = entity.keyframe(of: .attack) {
+                duration += Double(keyframes)
             }
-            return 0
+            if index >= 1, let keyframe = entity.keyframe(of: .projectileStart) {
+                duration += Double(keyframe * index)
+            }
+            return duration
         default:
             return 0
         }

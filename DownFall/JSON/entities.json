@@ -184,6 +184,12 @@
             },
             "animations": [
                 {
+                    "animationFilename": "dragonAttack",
+                    "numberOfFrames": 6,
+                    "animationType": "attack",
+                    "keyframe": 6
+                },
+                {
                     "animationFilename": "fireballStart",
                     "numberOfFrames": 6,
                     "animationType": "projectileStart",
@@ -346,7 +352,8 @@
                 {
                     "animationFilename": "alamoAttack",
                     "numberOfFrames": 6,
-                    "animationType": "attack"
+                    "animationType": "attack",
+                    "keyframe": 6
                 },
                 {
                     "animationFilename": "alamoStart",

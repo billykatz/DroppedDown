@@ -429,8 +429,8 @@ extension Renderer {
         var removedAnimations: [(SKSpriteNode, SKAction)] = []
         for tileTrans in removed {
             if InputType.fuzzyEqual(.decrementDynamites(Set<TileCoord>()), inputType) {
-                sprites[tileTrans.end.x][tileTrans.end.y].zPosition = Precedence.underground.rawValue
-                removedAnimations.append((sprites[tileTrans.end.x][tileTrans.end.y], animator.smokeAnimation()))
+                let sequence = SKAction.sequence([animator.explodeAnimation(), animator.smokeAnimation()])
+                removedAnimations.append((sprites[tileTrans.end.x][tileTrans.end.y], sequence))
             } else if let crumble = sprites[tileTrans.end.x][tileTrans.end.y].crumble() {
                 // set the position way in the background so that new nodes come in over
                 sprites[tileTrans.end.x][tileTrans.end.y].zPosition = Precedence.underground.rawValue
@@ -440,6 +440,7 @@ extension Renderer {
                     let targetPosition = CGPoint.alignVertically(sprites[tileTrans.end.x][tileTrans.end.y].frame, relativeTo: self.hud.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: -3 * Style.Padding.most, translatedToBounds: true)
                     let action = SKAction.move(to: targetPosition, duration: 0.5)
                     crumbleAnimations.insert(action, at: 0)
+                    
                 }
                 let newCrumble = (sprites[tileTrans.end.x][tileTrans.end.y], SKAction.sequence(crumbleAnimations))
                 removedAnimations.append(newCrumble)
@@ -483,7 +484,7 @@ extension Renderer {
             let endPoint = CGPoint.init(x: tileSize * CGFloat(trans.end.column) + bottomLeft.x,
                                         y: tileSize * CGFloat(trans.end.row) + bottomLeft.y)
             let animation = SKAction.move(to: endPoint, duration: AnimationSettings.fallSpeed)
-            let wait = SKAction.wait(forDuration: 0.25)
+            let wait = SKAction.wait(forDuration: 0.33)
             shiftDownActions.append((sprite, SKAction.sequence([wait, animation])))
         }
         

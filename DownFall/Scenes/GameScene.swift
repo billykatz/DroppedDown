@@ -74,7 +74,7 @@ class GameScene: SKScene {
         
         // create boss controller
         if level.type == .boss {
-            bossController = BossController()
+            bossController = BossController(foreground: foreground, playableRect: size.playableRect, levelSize: level.boardSize, boardSize: boardSize)
         }
         
     }

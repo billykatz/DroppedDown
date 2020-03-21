@@ -18,6 +18,8 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
             return lhsRef == rhsRef
         } else if case InputType.collectItem(_, _, _) = lhs, case InputType.collectItem(_, _, _) = rhs {
             return true
+        } else if case InputType.decrementDynamites(_) = lhs, case InputType.decrementDynamites(_) = rhs {
+            return true
         }
         return lhs == rhs
     }
@@ -47,8 +49,9 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
                                         .itemUsed(.zero, []),
                                         .bossTargetsWhatToEat([]),
                                         .bossEatsRocks([]),
-                                        .bossTargetsWhatToAttack([:]),
-                                        .bossAttacks([:])
+                                        .bossTargetsWhatToAttack([]),
+                                        .bossAttacks([]),
+                                        .decrementDynamites(Set<TileCoord>())
                                                                  
     ]
     
@@ -80,8 +83,9 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
     case itemUsed(AnyAbility, [TileCoord])
     case bossTargetsWhatToEat([TileCoord])
     case bossEatsRocks([TileCoord])
-    case bossTargetsWhatToAttack([BossController.BossAttack: Set<TileCoord>])
-    case bossAttacks([BossController.BossAttack: Set<TileCoord>])
+    case bossTargetsWhatToAttack([BossController.BossAttack])
+    case bossAttacks([BossController.BossAttack])
+    case decrementDynamites(Set<TileCoord>)
     
     var debugDescription: String {
         switch self {
@@ -141,6 +145,8 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
             return "Boss targets what to attack"
         case .bossAttacks:
             return "Boss attacks"
+        case .decrementDynamites:
+            return "Decrement the dynamite fuses"
         }
     }
 }

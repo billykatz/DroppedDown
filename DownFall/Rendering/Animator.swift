@@ -12,13 +12,75 @@ import SpriteKit
 
 struct Animator {
     
+    public func smokeAnimation() -> SKAction {
+        let smokeTexture = SpriteSheet(texture: SKTexture(imageNamed: "smokeAnimation"), rows: 1, columns: 6).animationFrames()
+        let smokeAnimation = SKAction.animate(with: smokeTexture, timePerFrame: 0.07)
+        return smokeAnimation
+    }
+    
+    public func explodeAnimation() -> SKAction {
+        let explodeTexture = SpriteSheet(texture: SKTexture(imageNamed: "explodeAnimation"), rows: 1, columns: 4).animationFrames()
+        let explodeAnimation = SKAction.animate(with: explodeTexture, timePerFrame: 0.07)
+        return explodeAnimation
+    }
+    
+    func timePerFrame() -> Double {
+        return 0.07
+    }
+    
+    func projectileTimePerFrame(for monsterType: EntityModel.EntityType) -> Double {
+        switch monsterType {
+        case .alamo:
+            return 0.03
+        case .dragon:
+            return 0.1
+        default:
+            return 0.07
+        }
+    }
+    
+    func projectileKeyFrame(for entity: EntityModel, index: Int) -> Double {
+        switch entity.type {
+        case .dragon:
+            var duration: Double = 0
+            if index >= 0 {
+                if let keyframes = entity.keyframe(of: .attack) {
+                    duration += Double(keyframes)
+                }
+            }
+            if index >= 1 {
+                if let keyframes = entity.keyframe(of: .projectileStart) {
+                    duration += Double(keyframes)
+                }
+            }
+            if index >= 2 {
+                if let midKeyFrame = entity.keyframe(of: .projectileMid) {
+                    duration += Double(midKeyFrame*index)
+                }
+            }
+            return duration
+        case .alamo:
+            var duration: Double = 0
+            if index >= 0, let keyframes = entity.keyframe(of: .attack) {
+                duration += Double(keyframes)
+            }
+            if index >= 1, let keyframe = entity.keyframe(of: .projectileStart) {
+                duration += Double(keyframe * index)
+            }
+            return duration
+        default:
+            return 0
+        }
+        
+    }
+    
     func gameWin(transformation: Transformation?,
                  sprites: [[DFTileSpriteNode]],
                  completion: (() -> Void)? = nil) {
         guard let transformation = transformation,
             let playerWinTransformation = transformation.tileTransformation?.first?.first else {
-            completion?()
-            return
+                completion?()
+                return
         }
         
         let exitSprite = sprites[playerWinTransformation.end]
@@ -75,7 +137,7 @@ struct Animator {
             }
         }
     }
-
+    
     
     func animate(_ transformation: [TileTransformation]?,
                  boardSize: CGFloat,
@@ -140,176 +202,36 @@ struct Animator {
          The animation of the defender.
          The sprite/animation of the projectile
          
-         However, there is not always a projectile involved.  For example, a player hitting a rat with their pick axe.
+         However, there is not always a projectile involved.  For example, a player hitting a rat with their pick axe. Or a rat attacking a player
          
          The basic sequence of attacks are:
          - animate the attacker
          - if there are projectiles, animate those
          
-         When we are all said and finished, we should call animations finished to move on
+         When we are all said and finished, we call animations finished to move on
          
          */
         
-        var attackAnimationFrames: [SKTexture]?
-        var projectileAnimationFrames: [SKTexture]?
-        var defenderAnimationFrames: [SKTexture]?
-        
-        // get the attack animation
-        if case let TileType.monster(monsterData) = tiles[attackerPosition].type {
-            attackAnimationFrames = monsterData.animations.attackAnimation
-        } else if case let TileType.player(playerData) = tiles[attackerPosition].type {
-            attackAnimationFrames = playerData.animations.attackAnimation
-        }
-        
-        // get the projectile animation
-        // set a default projectileLength
-        var projectileLength: Double = 0
-        var projectileRetracts = false
-        var isProjectileSequenced = false
-        if case let TileType.monster(monsterData) = tiles[attackerPosition].type {
-            projectileAnimationFrames = monsterData.animations.projectileAnimation
-            switch monsterData.type {
-            case .alamo:
-                projectileLength = 6
-                projectileRetracts = true
-                isProjectileSequenced = true
-            case .dragon:
-                isProjectileSequenced = true
-                projectileLength = Double(projectileAnimationFrames?.count ?? 0)
-            default:
-                // TODO implement different projectile lengths based on the attacker
-                projectileLength = Double(projectileAnimationFrames?.count ?? 0)
-                ()
-            }
-        } else if case let TileType.player(playerData) = tiles[attackerPosition].type {
-            projectileAnimationFrames = playerData.animations.projectileAnimation
-        }
-        
-        // get the defender animation
-        if let defenderPosition = defenderPosition {
-            if case let TileType.monster(monsterData) = tiles[defenderPosition].type {
-                defenderAnimationFrames = monsterData.animations.hurtAnimation
-            } else if case let TileType.player(playerData) = tiles[defenderPosition].type {
-                defenderAnimationFrames = playerData.animations.hurtAnimation
-            }
-        }
-        
-        
         // group up the actions so we can run them sequentially
         var groupedActions: [SKAction] = []
-        let timePerFrame = 0.07
-        let projectileTilePerFrame = 0.03
         
-        // CAREFUL: Synchronizing with main thread
+        // CAREFUL: Synchronizing on main thread
         let dispatchGroup = DispatchGroup()
         
-        
-        // attack
-        if let frames = attackAnimationFrames {
-            let attackAnimation = SKAction.animate(with: frames, timePerFrame: timePerFrame)
-                        
-            dispatchGroup.enter()
-            groupedActions.append(
-                SKAction.run {
-                    sprites[attackerPosition].run(attackAnimation) {
-                        dispatchGroup.leave()
-                    }
-                }
-            )
+        // attacker animation
+        if let attackAnimation = animation(for: .attack, fromPosition: attackerPosition, in: tiles, sprites: sprites, dispatchGroup: dispatchGroup) {
+            groupedActions.append(attackAnimation)
         }
         
         // projectile
-        var projectileGroup: [SKAction] = []
-        
-        /// certain projectiles like Alamo's attack move across a tile and animate while extending across the entire tile.  This can give the illusion of a connected attack.  The first X frames in an attack are is projectile moving across the tile.  The last Y frames are the projectile animating while stretched across the tile.
-        /// This variable `frames` holds the attack as it moves across the tile
-        let frames = Array<SKTexture>(projectileAnimationFrames?[0..<Int(projectileLength)] ?? [])
-        if frames.count > 0 {
-            
-            /// this is a local time per frame variable because projectiles feel better when they move faster
-            let timePerFrame = projectileTilePerFrame
-            
-            /// the TileCoords of the affected tiles
-            let positions = positions(affectedTiles)
-            for (idx, position) in positions.enumerated() {
-                
-                /// the initial projectile animation
-                var projectileAnimations: [SKAction] = [SKAction.animate(with: frames, timePerFrame: timePerFrame)]
-                
-                /// Create a sprite where to run the animations
-                /// This will get added and removed from the foreground node
-                let sprite = SKSpriteNode(color: .clear, size: CGSize(width: 100, height: 100))
-                sprite.position = position
-                sprite.zPosition = Precedence.menu.rawValue
-                
-                /// The following actions are sequenced.
-                var sequencedActions: [SKAction] = []
-                
-                /// For Alamo's attack, the projectile goes out and comes back.
-                /// We need to animate an `idle` animation and a reverse of the original projectile aniamtion to create this effect
-                if projectileRetracts, let totalFrames = projectileAnimationFrames?.count {
-                    /// For each tile besides the last.  Animate an idle animation for the correct amount of time
-                    if idx < positions.count - 1 {
-                        let idleFrames = Array<SKTexture>(projectileAnimationFrames?[Int(projectileLength)..<totalFrames] ?? [])
-                        let idleAnimation = SKAction.animate(with: idleFrames, timePerFrame: timePerFrame)
-                        
-                        /// It is really helpful to have the projectile frames be a multiple of the idle frames
-                        let projectileToIdleRatio = frames.count / idleFrames.count
-                        let outAndBackConstant = 2
-                        let numberOfTilesAfterThis = (positions.count - idx - 1)
-                        
-                        /// The equation for how many times to repeat the idle
-                        let repeatCount = outAndBackConstant * projectileToIdleRatio * numberOfTilesAfterThis
-                        
-                        /// The repeat animation
-                        let repeated = SKAction.repeat(idleAnimation, count: repeatCount)
-                        projectileAnimations.append(repeated)
-                    }
-                    
-                    /// For every tile, we will eventually show the original animation in reverese
-                    let retractAnimation = SKAction.animate(with: frames.reversed(), timePerFrame: timePerFrame)
-                    projectileAnimations.append(retractAnimation)
-                }
-                
-                if isProjectileSequenced {
-                    /// Created a wait action to wait before animating.
-                    /// For example, if a projectile will fly across 3 tiles, then the 2nd and 2rd tile need to wait before displaying the projectile
-                    let waitAction = SKAction.wait(forDuration: Double(idx) * Double(frames.count) * timePerFrame)
-                    sequencedActions.append(waitAction)
-                }
-                
-                /// The action that animates the actual projectile
-                let projectileAction =
-                    SKAction.run {
-                        foreground.addChild(sprite)
-                        sprite.run (SKAction.sequence(projectileAnimations)) {
-                            sprite.removeFromParent()
-                        }
-                }
-                
-                sequencedActions.append(projectileAction)
-                let sequence = SKAction.sequence(sequencedActions)
-                
-                /// All these projectile actions assume the same start time
-                projectileGroup.append(sequence)
-            }
-        }
-        if projectileGroup.count > 0 {
+        if let projectileGroup = projectileAnimations(from: attackerPosition, in: tiles, with: sprites, affectedTilesPosition: positions(affectedTiles), foreground: foreground, dispatchGroup: dispatchGroup),
+            projectileGroup.count > 0 {
             groupedActions.append(SKAction.group(projectileGroup))
         }
         
-        //defender
-        if let defenderPosition = defenderPosition,
-            let frames = defenderAnimationFrames {
-            let defenderAnimation = SKAction.animate(with: frames, timePerFrame: timePerFrame)
-            dispatchGroup.enter()
-            groupedActions.append(
-                SKAction.run {
-                    sprites[defenderPosition].run(defenderAnimation) {
-                        dispatchGroup.leave()
-                    }
-                }
-            )
+        // defender animation
+        if let defend = animation(for: .hurt, fromPosition: defenderPosition, in: tiles, sprites: sprites, dispatchGroup: dispatchGroup) {
+            groupedActions.append(defend)
         }
         
         
@@ -319,5 +241,183 @@ struct Animator {
         }
         
     }
-
+    
+    private func projectileAnimations(from position: TileCoord?, in tiles: [[Tile]], with sprites: [[DFTileSpriteNode]], affectedTilesPosition: [CGPoint], foreground: SKNode, dispatchGroup: DispatchGroup) -> [SKAction]? {
+        
+        guard let entityPosition = position else { return nil }
+        
+        /// get the projectile animations depending on the tile type
+        
+        var projectileStartAnimationFrames: [SKTexture]?
+        var projectileMidAnimationFrames: [SKTexture]?
+        
+        // get the projectile animation
+        var projectileRetracts = false
+        var isProjectileSequenced = false
+        var showSmokeAfter = false
+        var projectileTilePerFrame = 0.03
+        if case let TileType.monster(monsterData) = tiles[entityPosition].type {
+            
+            // set the projectil speed
+            projectileTilePerFrame = projectileTimePerFrame(for: monsterData.type)
+            
+            /// set some variables based on the monster type
+            switch monsterData.type {
+            case .alamo:
+                projectileRetracts = true
+                isProjectileSequenced = true
+            case .dragon:
+                isProjectileSequenced = true
+                showSmokeAfter = true
+            default:
+                ()
+            }
+            
+            // grab the start tile animation
+            if let projectileAnimation = monsterData.animation(of: .projectileStart) {
+                projectileStartAnimationFrames = projectileAnimation
+            }
+            // grab the mid tile animation
+            if let projectileAnimation = monsterData.animation(of: .projectileMid) {
+                projectileMidAnimationFrames = projectileAnimation
+            }
+            
+            // TODO: grab the end tile animation if we create a monster like that
+            
+        }
+        
+        // projectile
+        var projectileGroup: [SKAction] = []
+        
+        /// certain projectiles like Alamo's attack have two distinct phases.  There is the initial movement across the tile.  These frames are `projectileStart`. The next phase could be a few things.  In Alamo's case, the frames for `projectileMid` are repeated. In Dragon's case, every tile after the first only does `projectileMid`.  In the bat's case, there is no `projectileMid
+        
+        
+        /// Every projectile has start frames.  We can safely return in the case that we do not have any projectileStartFrames
+        guard let startFrames = projectileStartAnimationFrames, startFrames.count > 0 else { return nil }
+        let startFramesCount = startFrames.count
+        
+        /// the TileCoords where projectiles should appear
+        for (idx, position) in affectedTilesPosition.enumerated() {
+            
+            /// the initial projectile animation
+            var projectileAnimations: [SKAction] = [SKAction.animate(with: startFrames, timePerFrame: projectileTilePerFrame)]
+            
+            /// Create a sprite where to run the animations
+            /// This will get added and removed from the foreground node
+            let sprite = SKSpriteNode(color: .clear, size: CGSize(width: 100, height: 100))
+            sprite.position = position
+            sprite.zPosition = Precedence.menu.rawValue
+            
+            /// The following actions are sequenced.
+            var sequencedActions: [SKAction] = []
+            
+            /// For Alamo's attack, the projectile goes out and comes back.
+            /// We need to animate an `idle` animation and a reverse of the original projectile aniamtion to create this effect
+            if projectileRetracts, let midFrames = projectileMidAnimationFrames {
+                /// For each tile besides the last.  Animate an idle animation for the correct amount of time
+                if idx < affectedTilesPosition.count - 1 {
+                    let repeatedAnimation = repeatedIdleAnimation(idleFrames: midFrames,
+                                                                  startFrameCount: startFramesCount,
+                                                                  affectedTileCount: affectedTilesPosition.count,
+                                                                  index: idx,
+                                                                  projectileTilePerFrame: projectileTilePerFrame)
+                    projectileAnimations.append(repeatedAnimation)
+                }
+                /// For every tile, we will eventually show the original animation in reverese
+                let retractAnimation = SKAction.animate(with: startFrames.reversed(), timePerFrame: projectileTilePerFrame)
+                projectileAnimations.append(retractAnimation)
+            }
+                /// If the attack does not retract then we want to show the midFrames in all the tiles between 1..<n, where n is the length of the attack. Unless there is an projectileEnd aniamtion.  Then we want to only show the midFrames for the middle tiles, where the idx is in 1..<n-1.
+            else if idx > 0, let midFrames = projectileMidAnimationFrames {
+                let midFrameAnimation = SKAction.animate(with: midFrames, timePerFrame: projectileTilePerFrame)
+                projectileAnimations = [midFrameAnimation]
+            }
+            
+            
+//            if isProjectileSequenced && projectileRetracts {
+//                /// Create a wait action to wait before animating.
+//                /// For example, if a projectile will fly across 3 tiles, then the 2nd and 2rd tile need to wait before displaying the projectile
+//                let waitAction = SKAction.wait(forDuration: Double(idx) * Double(startFramesCount) * projectileTilePerFrame)
+//                sequencedActions.append(waitAction)
+//            }
+            if isProjectileSequenced, case let TileType.monster(monsterData) = tiles[entityPosition].type {
+                let duration = projectileKeyFrame(for: monsterData, index: idx)
+                let waitAction = SKAction.wait(forDuration: duration * projectileTilePerFrame)
+                sequencedActions.append(waitAction)
+            }
+            
+            /// Show smoke as an after effect if needed
+            if showSmokeAfter {
+                projectileAnimations.append(smokeAnimation())
+            }
+            
+            /// The action that animates the actual projectile
+            let projectileAction =
+                SKAction.run {
+                    foreground.addChild(sprite)
+                    sprite.run (SKAction.sequence(projectileAnimations)) {
+                        sprite.removeFromParent()
+                    }
+            }
+            
+            sequencedActions.append(projectileAction)
+            let sequence = SKAction.sequence(sequencedActions)
+            
+            /// All these projectile actions assume the same start time
+            projectileGroup.append(sequence)
+            
+        }
+        
+        return projectileGroup
+    }
+    
+    
+    private func repeatedIdleAnimation(idleFrames: [SKTexture], startFrameCount: Int, affectedTileCount: Int, index: Int, projectileTilePerFrame: Double) -> SKAction {
+        let idleAnimation = SKAction.animate(with: idleFrames, timePerFrame: projectileTilePerFrame)
+        
+        /// It is really helpful to have the projectile frames be a multiple of the idle frames
+        let projectileToIdleRatio = startFrameCount / idleFrames.count
+        let outAndBackConstant = 2
+        let numberOfTilesAfterThis = (affectedTileCount - index - 1)
+        
+        /// The equation for how many times to repeat the idle
+        let repeatCount = outAndBackConstant * projectileToIdleRatio * numberOfTilesAfterThis
+        
+        /// The repeat animation
+        return SKAction.repeat(idleAnimation, count: repeatCount)
+    }
+    
+    private func animation(for animationType: AnimationType,
+                           fromPosition position: TileCoord?,
+                           in tiles: [[Tile]],
+                           sprites: [[DFTileSpriteNode]],
+                           dispatchGroup: DispatchGroup) -> SKAction? {
+        
+        var animationFrames: [SKTexture]?
+        // get the attack animation
+        if let position = position {
+            if case let TileType.monster(monsterData) = tiles[position].type,
+                let attackAnimation = monsterData.animation(of: animationType) {
+                animationFrames = attackAnimation
+            } else if case let TileType.player(playerData) = tiles[position].type,
+                let attackAnimation = playerData.animation(of: animationType) {
+                animationFrames = attackAnimation
+            }
+        }
+        
+        // animate!
+        if let position = position,
+            let frames = animationFrames {
+            let animation = SKAction.animate(with: frames, timePerFrame: self.timePerFrame())
+            
+            dispatchGroup.enter()
+            return
+                SKAction.run {
+                    sprites[position].run(animation) {
+                        dispatchGroup.leave()
+                    }
+            }
+        }
+        return nil
+    }
 }

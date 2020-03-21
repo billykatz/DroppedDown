@@ -18,12 +18,12 @@ struct PlayState: GameState {
              .attack, .transformation,
              .touch, .monsterDies, .rotateCounterClockwise, .rotateClockwise,
              .boardBuilt, .touchBegan, .tutorial, .itemUseSelected,
-             .bossTargetsWhatToEat, .bossEatsRocks, .bossTargetsWhatToAttack, .bossAttacks:
+             .bossEatsRocks, .bossTargetsWhatToAttack, .bossAttacks, .bossTargetsWhatToEat:
             return true
         case .animationsFinished, .play,
              .reffingFinished, .playAgain, .collectItem,
              .selectLevel, .newTurn,
-             .visitStore, .itemUseCanceled, .itemCanBeUsed, .itemUsed:
+             .visitStore, .itemUseCanceled, .itemCanBeUsed, .itemUsed, .decrementDynamites:
             return false
         }
     }
@@ -38,9 +38,9 @@ struct PlayState: GameState {
             return AnyGameState(PauseState())
         case .attack, .touch, .monsterDies,
              .rotateCounterClockwise, .rotateClockwise, .collectItem,
-             .touchBegan, .bossTargetsWhatToEat, .bossEatsRocks, .bossTargetsWhatToAttack, .bossAttacks:
+             .touchBegan, .bossEatsRocks, .bossAttacks:
             return AnyGameState(ComputingState())
-        case .boardBuilt:
+        case .boardBuilt, .bossTargetsWhatToEat, .bossTargetsWhatToAttack:
             return AnyGameState(PlayState())
         case .tutorial(let step):
             if step.showCounterClockwiseRotate || step.showClockwiseRotate {
@@ -50,7 +50,7 @@ struct PlayState: GameState {
             }
         case .itemUseSelected:
             return AnyGameState(TargetingState())
-        case .animationsFinished, .play, .transformation, .reffingFinished, .playAgain,. selectLevel, .newTurn, .visitStore, .itemUseCanceled, .itemCanBeUsed, .itemUsed:
+        case .animationsFinished, .play, .transformation, .reffingFinished, .playAgain,. selectLevel, .newTurn, .visitStore, .itemUseCanceled, .itemCanBeUsed, .itemUsed, .decrementDynamites:
             return nil
         }
         

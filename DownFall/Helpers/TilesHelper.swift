@@ -17,6 +17,19 @@ func getTilePosition(_ type: TileType, tiles: [[Tile]]) -> TileCoord? {
     return nil
 }
 
+func getTilePositions(_ type: TileType, tiles: [[Tile]]) -> Set<TileCoord>? {
+    var coords = Set<TileCoord>()
+    for i in 0..<tiles.count {
+        for j in 0..<tiles[i].count {
+            if tiles[i][j].type == type {
+                coords.insert(TileCoord(i,j))
+            }
+        }
+    }
+    if !coords.isEmpty { return coords }
+    return nil
+}
+
 func tileIndices(of type: TileType, in tiles: [[Tile]]) -> [TileCoord] {
     var tileCoords: [TileCoord] = []
     for (i, _) in tiles.enumerated() {

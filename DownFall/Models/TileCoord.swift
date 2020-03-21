@@ -54,6 +54,26 @@ struct TileCoord: Hashable {
         return TileCoord(self.x, self.y+1)
     }
     
+    var northEast: TileCoord {
+        return TileCoord(x+1, y+1)
+    }
+    
+    var northWest: TileCoord {
+        return TileCoord(x-1, y+1)
+    }
+    
+    var southWest: TileCoord {
+        return TileCoord(x-1, y-1)
+    }
+    
+    var southEast: TileCoord {
+        return TileCoord(x+1, y-1)
+    }
+    
+    var allNeighbors: Set<TileCoord> {
+        return Set<TileCoord>([colLeft, colRight, rowAbove, rowBelow, northEast, northWest, southEast, southWest])
+    }
+    
     func isOrthogonallyAdjacent(to other: TileCoord) -> Bool {
         
         /// x  x  x
@@ -119,7 +139,7 @@ struct TileCoord: Hashable {
         // We might be a diagonally on the same line
         // Therefore our row and col could both be different than the other row and col
         // If the other coords are different, we have to make sure the difference is the same
-        guard  distance(to: to, along: .vertical) == distance(to: to, along: .horizontal) else {
+        guard distance(to: to, along: .vertical) == distance(to: to, along: .horizontal) else {
             return nil
         }
         

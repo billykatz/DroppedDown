@@ -22,7 +22,7 @@ struct ReffingState: GameState {
             return AnyGameState(ComputingState())
         case .reffingFinished(newTurn: false):
             return AnyGameState(PlayState())
-        case .attack, .monsterDies, .collectItem:
+        case .attack, .monsterDies, .collectItem, .decrementDynamites:
             return AnyGameState(ComputingState())
         case .gameWin:
             return AnyGameState(WinState())
@@ -36,7 +36,7 @@ struct ReffingState: GameState {
     func shouldAppend(_ input: Input) -> Bool {
         switch input.type {
         case .reffingFinished, .attack, .monsterDies,
-             .gameWin, .gameLose, .collectItem:
+             .gameWin, .gameLose, .collectItem, .decrementDynamites:
             return true
         default:
             return false

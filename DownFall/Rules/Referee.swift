@@ -88,6 +88,7 @@ class Referee {
         
         let playerPosition = getTilePosition(.player(.zero), tiles: tiles)
         let exitPosition = getTilePosition(.exit, tiles: tiles)
+        let dynamitePositions = getTilePositions(.dynamite(fuseCount: 0, hasBeenDecremented: false), tiles: tiles)
         
         func boardHasMoreMoves() -> Bool {
             guard let playerPosition = playerPosition else { return false }
@@ -268,6 +269,11 @@ class Referee {
                 else { return nil }
             return Input(.collectItem(playerPosition.rowBelow, item, playerData.carry.total(in: item.type.currencyType)), tiles)
         }
+        
+        func decrementDynamiteFuses() -> Input? {
+            guard let dynamitePos = dynamitePositions else { return nil }
+            return Input(.decrementDynamites(dynamitePos))
+        }
 
         
         // Game rules are enforced in the following priorities
@@ -303,6 +309,10 @@ class Referee {
         
         if let monsterAttack = monsterAttacks() {
             return monsterAttack
+        }
+        
+        if let decrementDynamite = decrementDynamiteFuses() {
+            return decrementDynamite
         }
         
         let newTurn = TurnWatcher.shared.getNewTurnAndReset()

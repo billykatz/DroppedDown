@@ -181,8 +181,8 @@
             },
             "animations": {
                 "attack": {
-                    "animationFilename": "dragonAttack",
-                    "numberOfFrames": 21
+                    "animationFilename": "",
+                    "numberOfFrames": 0
                 },
                 "hurt": {
                     "animationFilename": "",
@@ -201,8 +201,8 @@
                     "numberOfFrames": 0
                 },
                 "projectile": {
-                    "animationFilename": "fireball",
-                    "numberOfFrames": 8
+                    "animationFilename": "",
+                    "numberOfFrames": 0
                 }
             },
             "carry": {

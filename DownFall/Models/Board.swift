@@ -49,7 +49,7 @@ class Board: Equatable {
         for i in 0..<tiles.count {
             for j in 0..<tiles[i].count {
                 let tile = tiles[i][j]
-                tiles[i][j] = Tile(type: tiles[i][j].type, shouldHighlight: false, bossTargetedToEat: tile.bossTargetedToEat)
+                tiles[i][j] = Tile(type: tiles[i][j].type, shouldHighlight: false)
             }
         }
     }
@@ -59,10 +59,10 @@ class Board: Equatable {
         resetShouldHighlight()
         switch input.type {
         case .rotateCounterClockwise:
-            InputQueue.append(Input(.transformation(rotate(.left))))
+            InputQueue.append(Input(.transformation(rotate(.counterClockwise))))
             return
         case .rotateClockwise:
-            InputQueue.append(Input(.transformation(rotate(.right))))
+            InputQueue.append(Input(.transformation(rotate(.clockwise))))
             return
         case .touchBegan:
             transformation = Transformation(transformation: nil,
@@ -112,24 +112,14 @@ class Board: Equatable {
                     )
                 )
             )
-        case .bossTargetsWhatToEat(let coords):
-            coords.forEach { coord in
-                tiles[coord.row][coord.column].bossTargetedToEat = true
-            }
-            InputQueue.append(
-                Input(
-                    InputType.transformation(
-                        [Transformation(transformation: nil, inputType: .bossTargetsWhatToEat(coords), endTiles: self.tiles)]
-                    )
-                )
-            )
         case .bossEatsRocks(let coords):
             let trans = bossEatsRocks(input, targets: coords)
             InputQueue.append(Input(.transformation(trans)))
-        case .bossTargetsWhatToAttack(let attackDictionary):
-            transformation = bossAttackTargets(attackDictionary, input: input)
-        case .bossAttacks(let attackDictionary):
-            transformation = bossAttacks(attackDictionary, input: input)
+        case .bossAttacks(let attacks):
+            transformation = bossAttacks(attacks, input: input)
+        case .decrementDynamites(let dynamiteCoords):
+            let trans = decrementDynamites(input: input, dynamiteCoords: dynamiteCoords)
+            InputQueue.append(Input(.transformation(trans)))
         case .gameLose(_),
              .play,
              .pause,
@@ -140,7 +130,7 @@ class Board: Equatable {
              .newTurn,
              .tutorial,
              .visitStore,
-             .itemUseCanceled, .itemCanBeUsed:
+             .itemUseCanceled, .itemCanBeUsed, .bossTargetsWhatToEat, .bossTargetsWhatToAttack:
             transformation = nil
         }
         
@@ -148,22 +138,58 @@ class Board: Equatable {
         InputQueue.append(Input(.transformation([trans])))
     }
     
-    func bossAttacks(_ attacks: [BossController.BossAttack: Set<TileCoord>], input: Input) -> Transformation {
-        for (_, value) in attacks {
-            value.forEach { coord in
-                tiles[coord.row][coord.column].bossAttack = true
+    private func decrementDynamites(input: Input, dynamiteCoords: Set<TileCoord>) -> [Transformation] {
+
+        var removedRocksAndPillars: [TileCoord] = []
+        for coord in dynamiteCoords {
+            if case let TileType.dynamite(fuse, _) = tiles[coord].type {
+                let newFuse = fuse - 1
+                
+                if newFuse <= 0 {
+                    /// EXPLODE
+                    tiles[coord.row][coord.column] = Tile(type: .empty)
+                    
+                    let affectedNeighbors = coord.allNeighbors
+                    for neighborCoord in affectedNeighbors {
+                        guard isWithinBounds(neighborCoord) else { continue }
+                        switch tiles[neighborCoord].type {
+                        case .dynamite:
+                            tiles[neighborCoord.row][neighborCoord.column] = Tile(type: .dynamite(fuseCount: 0, hasBeenDecremented: false))
+                        case .player(let playerData):
+                            tiles[neighborCoord.row][neighborCoord.column] = Tile(type: .player(playerData.wasAttacked(for: 1, from: neighborCoord.direction(relative: coord) ?? .east)))
+                        case .rock, .pillar:
+                            removedRocksAndPillars.append(neighborCoord)
+                        case .empty, .exit, .monster, .gem, .gold:
+                            () // purposefully left blank
+                        case .item:
+                            ()
+                        }
+                    }
+                } else {
+                    tiles[coord.row][coord.column] = Tile(type: .dynamite(fuseCount:newFuse, hasBeenDecremented: true))
+                }
             }
+            
         }
-        return Transformation(transformation: nil, inputType: input.type, endTiles: tiles)
+        let removedAndReplaced = removeAndReplace(from: tiles, specificCoord: removedRocksAndPillars, input: input)
+        
+        return [Transformation(transformation: nil, inputType: input.type, endTiles: tiles), removedAndReplaced]
     }
     
-    func bossAttackTargets(_ attacks: [BossController.BossAttack: Set<TileCoord>], input: Input) -> Transformation {
-        for (_, value) in attacks {
-            value.forEach { coord in
-                tiles[coord.row][coord.column].bossTargetToAttack = true
+    func bossAttacks(_ attacks: [BossController.BossAttack], input: Input) -> Transformation {
+        for attack in attacks {
+            switch attack {
+            case .bomb(let target):
+                self.tiles[target.row][target.column] = Tile(type: .dynamite(fuseCount: 3, hasBeenDecremented: false))
+            default:
+                ()
+//            case .spawn:
+//            case .destroy(<#T##Int#>, <#T##Bool#>):
+//            case .hair(<#T##Int#>, <#T##Bool#>):
+                
             }
         }
-        return Transformation(transformation: nil, inputType: input.type, endTiles: tiles)
+        return Transformation(transformation: nil, inputType: input.type, endTiles: self.tiles)
     }
     
     func bossEatsRocks(_ input: Input, targets: [TileCoord]) -> [Transformation] {
@@ -456,13 +482,26 @@ extension Board {
                           singleTile: Bool = false,
                           input: Input) -> Transformation {
         // Check that the tile group at row, col has more than 3 tiles
-        var selectedTiles: [TileCoord] = specificCoord
-        
+        let selectedTiles: [TileCoord] = specificCoord
         
         // set the tiles to be removed as Empty placeholder
         var intermediateTiles = tiles
         for coord in selectedTiles {
-            intermediateTiles[coord.x][coord.y] = Tile.empty
+            switch tiles[coord].type {
+            case let .pillar(color, health):
+                if health == 1 {
+                    // remove the pillar from the board
+                    intermediateTiles[coord.x][coord.y] = Tile.empty
+                } else {
+                    //decrement the pillar's health
+                    intermediateTiles[coord.x][coord.y] = Tile(type: .pillar(color, health-1))
+                }
+
+            case .rock:
+                intermediateTiles[coord.x][coord.y] = Tile.empty
+            default:
+                preconditionFailure("We should only use this for rocks and pillars")
+            }
         }
         
         // store tile transforamtions and shift information
@@ -502,6 +541,10 @@ extension Board {
                     
                     if case .player(let data) = tiles[i][j].type {
                         newTiles[i][j] = Tile(type: .player(data.resetAttacks()))
+                    }
+                    
+                    if case let .dynamite(fuseCount, _) = tiles[i][j].type {
+                        newTiles[i][j] = Tile(type: .dynamite(fuseCount: fuseCount, hasBeenDecremented: false))
                     }
                 }
             }
@@ -658,8 +701,8 @@ extension Board {
 extension Board {
     
     enum RotationalDirection {
-        case left
-        case right
+        case counterClockwise
+        case clockwise
     }
     
     func rotate(_ direction: RotationalDirection) -> [Transformation] {
@@ -669,7 +712,7 @@ extension Board {
         let numCols = boardSize - 1
         let inputType: InputType
         switch direction {
-        case .left:
+        case .counterClockwise:
             for colIdx in 0..<boardSize {
                 var column : [Tile] = []
                 for rowIdx in 0..<boardSize {
@@ -686,7 +729,7 @@ extension Board {
                 intermediateTiles.append(column)
             }
             inputType = .rotateCounterClockwise
-        case .right:
+        case .clockwise:
             for colIdx in (0..<boardSize).reversed() {
                 var column : [Tile] = []
                 for rowIdx in 0..<boardSize {

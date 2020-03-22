@@ -160,12 +160,12 @@ class GameScene: SKScene {
     private var lastPosition: CGPoint?
     private var swipeDirection: SwipeDirection?
     enum SwipeDirection {
-        case right
-        case left
+        case up
+        case down
         
         init(from vector: CGVector) {
-            if vector.dx > 0 { self = .right }
-            else { self = .left }
+            if vector.dy > 0 { self = .up }
+            else { self = .down }
         }
     }
     
@@ -175,9 +175,9 @@ class GameScene: SKScene {
         
         init(from swipeDirection: SwipeDirection) {
             switch swipeDirection {
-            case .right:
+            case .up:
                 self = .counterClockwise
-            case .left:
+            case .down:
                 self = .clockwise
             }
         }
@@ -199,7 +199,7 @@ class GameScene: SKScene {
         // deteremine the vector of the swipe
         let vector = currentPosition - lastPosition
         // set the swipe for the duration of this swipe gesture
-        if self.swipeDirection == nil && !(view?.isInTop(currentPosition) ?? true) {
+        if self.swipeDirection == nil && (view?.isOnRight(currentPosition) ?? false) {
             let swipeDirection = SwipeDirection(from: vector)
             self.swipeDirection = swipeDirection
             
@@ -219,8 +219,8 @@ class GameScene: SKScene {
             guard let swipeDirection = swipeDirection else { return }
             let distance: CGFloat
             switch swipeDirection {
-            case .left, .right:
-                distance = vector.dx
+            case .up, .down:
+                distance = vector.dy
             }
             self.rotatePreview?.touchesMoved(distance: distance)
         }

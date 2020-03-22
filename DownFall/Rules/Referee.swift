@@ -89,6 +89,7 @@ class Referee {
         let playerPosition = getTilePosition(.player(.zero), tiles: tiles)
         let exitPosition = getTilePosition(.exit, tiles: tiles)
         let dynamitePositions = getTilePositions(.dynamite(fuseCount: 0, hasBeenDecremented: false), tiles: tiles)
+        let emptyPositions = getTilePosition(.empty, tiles: tiles)
         
         func boardHasMoreMoves() -> Bool {
             guard let playerPosition = playerPosition else { return false }
@@ -274,6 +275,31 @@ class Referee {
             guard let dynamitePos = dynamitePositions else { return nil }
             return Input(.decrementDynamites(dynamitePos))
         }
+        
+        func refillEmptyTiles() -> Input? {
+            var needsRefill = false
+            for col in 0..<tiles.count {
+                var pillarIdx = -1
+                var emptyIdx = -1
+                for row in 0..<tiles.count {
+                    switch tiles[row][col].type {
+                    case .pillar:
+                        pillarIdx = row
+                    default:
+                        ()
+                    }
+                    
+                    if case TileType.empty = tiles[row][col].type {
+                        emptyIdx = row
+                    }
+                }
+                if emptyIdx > pillarIdx {
+                    needsRefill = true
+                }
+            }
+            guard needsRefill else { return nil }
+            return Input(.refillEmpty)
+        }
 
         
         // Game rules are enforced in the following priorities
@@ -313,6 +339,10 @@ class Referee {
         
         if let decrementDynamite = decrementDynamiteFuses() {
             return decrementDynamite
+        }
+        
+        if let refill = refillEmptyTiles() {
+            return refill
         }
         
         let newTurn = TurnWatcher.shared.getNewTurnAndReset()

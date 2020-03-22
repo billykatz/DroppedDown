@@ -123,6 +123,10 @@ struct Animator {
         }
         animate(animations)
     }
+    func animate(_ spriteActions: [SpriteAction], completion: (() -> Void)? = nil) {
+        let spriteActionTuple = spriteActions.map { ($0.sprite, $0.action) }
+        self.animate(spriteActionTuple, completion: completion)
+    }
     
     func animate(_ spriteActions: [(SKSpriteNode, SKAction)], completion: (() -> Void)? = nil) {
         if spriteActions.count == 0 { completion?() }

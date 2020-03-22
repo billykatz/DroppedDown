@@ -10,6 +10,11 @@ import CoreGraphics
 import Foundation
 
 extension CGPoint {
+    
+    static func -(_ lhs: CGPoint, _ rhs: CGPoint) -> CGVector {
+        return CGVector(dx: lhs.x - rhs.x, dy: lhs.y - rhs.y)
+    }
+    
     static func gridPositions(rows: CGFloat,
                               columns: CGFloat,
                               itemSize: CGSize,

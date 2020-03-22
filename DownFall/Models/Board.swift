@@ -58,11 +58,11 @@ class Board: Equatable {
         var transformation: Transformation?
         resetShouldHighlight()
         switch input.type {
-        case .rotateCounterClockwise:
-            InputQueue.append(Input(.transformation(rotate(.counterClockwise))))
+        case .rotateCounterClockwise(let preview):
+            InputQueue.append(Input(.transformation(rotate(.counterClockwise, preview: preview))))
             return
-        case .rotateClockwise:
-            InputQueue.append(Input(.transformation(rotate(.clockwise))))
+        case .rotateClockwise(let preview):
+            InputQueue.append(Input(.transformation(rotate(.clockwise, preview: preview))))
             return
         case .touchBegan:
             transformation = Transformation(transformation: nil,
@@ -120,6 +120,40 @@ class Board: Equatable {
         case .decrementDynamites(let dynamiteCoords):
             let trans = decrementDynamites(input: input, dynamiteCoords: dynamiteCoords)
             InputQueue.append(Input(.transformation(trans)))
+        case .rotatePreviewFinish(let spriteAction, let trans):
+            /// if we have a trans, that is because we are actually rotating
+            if let tiles = trans?.endTiles {
+                self.tiles = tiles
+                var allTransformations = [Transformation(transformation: nil, inputType: .rotatePreviewFinish(spriteAction, trans), endTiles: tiles)]
+                
+                if typeCount(for: self.tiles, of: .empty).count > 0 {
+                    // store tile transforamtions and shift information
+                    var newTiles : [TileTransformation] = []
+                    var intermediateTiles = self.tiles
+                    var (shiftDown, shiftIndices) = calculateShiftIndices(for: &intermediateTiles)
+                    
+                    //add new tiles
+                    addNewTiles(shiftIndices: shiftIndices,
+                                shiftDown: &shiftDown,
+                                newTiles: &newTiles,
+                                intermediateTiles: &intermediateTiles)
+                    
+                    // return our new board
+                    
+                    allTransformations.append(Transformation(transformation: [newTiles, shiftDown],
+                                                             inputType: input.type,
+                                                             endTiles: intermediateTiles))
+                }
+                
+                InputQueue.append(Input(.transformation(allTransformations)))
+            }
+                // we are not rotating, use the current tiles we have
+            else {
+                let transformation = Transformation(transformation: nil, inputType: .rotatePreviewFinish(spriteAction, trans), endTiles: self.tiles)
+                InputQueue.append(Input(.transformation([transformation])))
+            }
+        case .refillEmpty:
+            InputQueue.append(Input(.transformation([refillEmpty(inputType: .refillEmpty)])))
         case .gameLose(_),
              .play,
              .pause,
@@ -130,7 +164,8 @@ class Board: Equatable {
              .newTurn,
              .tutorial,
              .visitStore,
-             .itemUseCanceled, .itemCanBeUsed, .bossTargetsWhatToEat, .bossTargetsWhatToAttack:
+             .itemUseCanceled, .itemCanBeUsed, .bossTargetsWhatToEat, .bossTargetsWhatToAttack,
+             .rotatePreview:
             transformation = nil
         }
         
@@ -139,7 +174,7 @@ class Board: Equatable {
     }
     
     private func decrementDynamites(input: Input, dynamiteCoords: Set<TileCoord>) -> [Transformation] {
-
+        
         var removedRocksAndPillars: [TileCoord] = []
         for coord in dynamiteCoords {
             if case let TileType.dynamite(fuse, _) = tiles[coord].type {
@@ -183,9 +218,9 @@ class Board: Equatable {
                 self.tiles[target.row][target.column] = Tile(type: .dynamite(fuseCount: 3, hasBeenDecremented: false))
             default:
                 ()
-//            case .spawn:
-//            case .destroy(<#T##Int#>, <#T##Bool#>):
-//            case .hair(<#T##Int#>, <#T##Bool#>):
+                //            case .spawn:
+                //            case .destroy(<#T##Int#>, <#T##Bool#>):
+                //            case .hair(<#T##Int#>, <#T##Bool#>):
                 
             }
         }
@@ -217,7 +252,7 @@ class Board: Equatable {
                 return nil
             }
         }
-
+        
         var newTiles = tiles
         let affectedTile = attackedTiles(in: tiles, from: coord)
         for coord in affectedTile {
@@ -252,7 +287,7 @@ class Board: Equatable {
                 tiles = newTiles
             }
         }
-
+        
     }
     
     private func swap(_ first: TileCoord, with second: TileCoord, input: Input) -> Transformation {
@@ -496,7 +531,7 @@ extension Board {
                     //decrement the pillar's health
                     intermediateTiles[coord.x][coord.y] = Tile(type: .pillar(color, health-1))
                 }
-
+                
             case .rock:
                 intermediateTiles[coord.x][coord.y] = Tile.empty
             default:
@@ -528,7 +563,7 @@ extension Board {
                               endTiles: intermediateTiles
         )
     }
-
+    
     
     private func resetAttacks(newTurn: Bool) -> Transformation? {
         func resetAttacks(in tiles: [[Tile]]) -> [[Tile]] {
@@ -573,19 +608,19 @@ extension Board {
             let pp = playerPosition,
             case let .player(data) = updatedTiles[pp].type
             else { return Transformation.zero }
-            
+        
         let newCarryModel = data.carry.earn(item.amount, inCurrency: item.type.currencyType)
         let playerData = EntityModel(originalHp: data.originalHp,
                                      hp: data.hp,
                                      name: data.name,
                                      // we have to reset attack here because the player has moved but the turn may not be over
-                                     // Eg: it is possible that there could be two or more monsters
-                                     // under the player and the player should be able to attack
-                                     attack: data.attack.resetAttack(),
-                                     type: data.type,
-                                     carry: newCarryModel,
-                                     animations: data.animations,
-                                     abilities: data.abilities)
+            // Eg: it is possible that there could be two or more monsters
+            // under the player and the player should be able to attack
+            attack: data.attack.resetAttack(),
+            type: data.type,
+            carry: newCarryModel,
+            animations: data.animations,
+            abilities: data.abilities)
         
         updatedTiles[pp.x][pp.y] = Tile(type: .player(playerData))
         
@@ -621,7 +656,7 @@ extension Board {
         // tiles into and replaced the shifted down tiles with empty tiles
         // the tile creator replaces empty tiles with new tiles
         let createdTiles: [[Tile]] = tileCreator.tiles(for: intermediateTiles)
-//        guard createdTiles.count == shiftIndices.reduce(0, +) else { assertionFailure("newTileTypes count must match the number of empty tiles in the board"); return }
+        //        guard createdTiles.count == shiftIndices.reduce(0, +) else { assertionFailure("newTileTypes count must match the number of empty tiles in the board"); return }
         
         for (col, shifts) in shiftIndices.enumerated() where shifts > 0 {
             for startIdx in 0..<shifts {
@@ -705,7 +740,33 @@ extension Board {
         case clockwise
     }
     
-    func rotate(_ direction: RotationalDirection) -> [Transformation] {
+    func refillEmpty(inputType: InputType) -> Transformation {
+        /// Pillars can create voids of .empty tiles, therefore on rotate we may need to create and shift down tiles
+        var intermediateTiles: [[Tile]] = self.tiles
+        
+        if typeCount(for: self.tiles, of: .empty).count > 0 {
+            // store tile transforamtions and shift information
+            var newTiles : [TileTransformation] = []
+            var (shiftDown, shiftIndices) = calculateShiftIndices(for: &intermediateTiles)
+            
+            //add new tiles
+            addNewTiles(shiftIndices: shiftIndices,
+                        shiftDown: &shiftDown,
+                        newTiles: &newTiles,
+                        intermediateTiles: &intermediateTiles)
+            
+            // return our new board
+            if !newTiles.isEmpty {
+                self.tiles = intermediateTiles
+                return Transformation(transformation: [newTiles, shiftDown],
+                                                     inputType: inputType,
+                                                     endTiles: intermediateTiles)
+            }
+        }
+        return Transformation(transformation: nil, inputType: .refillEmpty, endTiles: self.tiles)
+    }
+    
+    func rotate(_ direction: RotationalDirection, preview: Bool) -> [Transformation] {
         var transformation: [TileTransformation] = []
         var allTransformations: [Transformation] = []
         var intermediateTiles: [[Tile]] = []
@@ -728,7 +789,7 @@ extension Board {
                 }
                 intermediateTiles.append(column)
             }
-            inputType = .rotateCounterClockwise
+            inputType = .rotateCounterClockwise(preview: preview)
         case .clockwise:
             for colIdx in (0..<boardSize).reversed() {
                 var column : [Tile] = []
@@ -742,13 +803,15 @@ extension Board {
                 }
                 intermediateTiles.append(column)
             }
-            inputType = .rotateClockwise
+            inputType = .rotateClockwise(preview: preview)
         }
         
         allTransformations.append(Transformation(transformation: [transformation],
                                                  inputType: inputType,
                                                  endTiles: intermediateTiles))
         
+        
+        /// Pillars can create voids of .empty tiles, therefore on rotate we may need to create and shift down tiles
         if typeCount(for: self.tiles, of: .empty).count > 0 {
             // store tile transforamtions and shift information
             var newTiles : [TileTransformation] = []
@@ -763,12 +826,13 @@ extension Board {
             // return our new board
             
             allTransformations.append(Transformation(transformation: [newTiles, shiftDown],
-                                           inputType: inputType,
-                                           endTiles: intermediateTiles))
+                                                     inputType: inputType,
+                                                     endTiles: intermediateTiles))
         }
         
-        
-        self.tiles = intermediateTiles
+        if !preview {
+            self.tiles = intermediateTiles
+        }
         
         return allTransformations
     }

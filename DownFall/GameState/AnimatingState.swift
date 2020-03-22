@@ -14,7 +14,7 @@ struct AnimatingState: GameState {
     
     func shouldAppend(_ input: Input) -> Bool {
         switch input.type {
-        case .animationsFinished:
+        case .animationsFinished, .rotatePreview, .rotatePreviewFinish:
             return true
         default:
             return false
@@ -27,6 +27,10 @@ struct AnimatingState: GameState {
             return AnyGameState(ReffingState())
         case .animationsFinished(ref: false):
             return AnyGameState(PlayState())
+        case .rotatePreview:
+            return AnyGameState(AnimatingState())
+        case .rotatePreviewFinish:
+            return AnyGameState(ComputingState())
         default:
             return nil
         }

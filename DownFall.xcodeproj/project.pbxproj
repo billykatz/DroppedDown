@@ -126,6 +126,9 @@
 		3DF2928320A66BEB006671AC /* Tile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2928220A66BEB006671AC /* Tile.swift */; };
 		3DF2928520A76242006671AC /* Board.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2928420A76242006671AC /* Board.swift */; };
 		5605D6D321CC2DF400C1C5C2 /* DFTileSpriteNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5605D6D221CC2DF400C1C5C2 /* DFTileSpriteNode.swift */; };
+		5819AB71242A5CA600498BB6 /* SpriteAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5819AB70242A5CA600498BB6 /* SpriteAction.swift */; };
+		5819AB73242A668400498BB6 /* SwipeTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5819AB72242A668400498BB6 /* SwipeTypes.swift */; };
+		5843F4542426747100C03612 /* RotatePreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5843F4532426747100C03612 /* RotatePreviewView.swift */; };
 		5865D62E23DBF652007D11FC /* abilities.json in Sources */ = {isa = PBXBuildFile; fileRef = 5865D62D23DBF652007D11FC /* abilities.json */; };
 		586AE77723CF91AA00302347 /* AttackModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 586AE77623CF91AA00302347 /* AttackModelTests.swift */; };
 		5882602123DB809300A77BE8 /* EmptyAbility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5882602023DB809300A77BE8 /* EmptyAbility.swift */; };
@@ -273,6 +276,9 @@
 		3DF2928220A66BEB006671AC /* Tile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tile.swift; sourceTree = "<group>"; };
 		3DF2928420A76242006671AC /* Board.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Board.swift; sourceTree = "<group>"; };
 		5605D6D221CC2DF400C1C5C2 /* DFTileSpriteNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DFTileSpriteNode.swift; sourceTree = "<group>"; };
+		5819AB70242A5CA600498BB6 /* SpriteAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteAction.swift; sourceTree = "<group>"; };
+		5819AB72242A668400498BB6 /* SwipeTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeTypes.swift; sourceTree = "<group>"; };
+		5843F4532426747100C03612 /* RotatePreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RotatePreviewView.swift; sourceTree = "<group>"; };
 		5865D62D23DBF652007D11FC /* abilities.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = abilities.json; sourceTree = "<group>"; };
 		586AE77623CF91AA00302347 /* AttackModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttackModelTests.swift; sourceTree = "<group>"; };
 		5882602023DB809300A77BE8 /* EmptyAbility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyAbility.swift; sourceTree = "<group>"; };
@@ -570,6 +576,7 @@
 				589A27D223D90FD500174DE7 /* Targeting */,
 				3DE87C8F22374C2C00D750CF /* Button.swift */,
 				58B39BD623D21C9600915858 /* BackpackView.swift */,
+				5843F4532426747100C03612 /* RotatePreviewView.swift */,
 				3DD5AA0C2398025400FB63F4 /* Styling.swift */,
 				3DF0A6AF2379C4DC00941305 /* ParagraphNode.swift */,
 				3DC072BA2373AF510046F224 /* SwipeRecognizerView.swift */,
@@ -675,9 +682,11 @@
 			children = (
 				3DA0A37B2300CDEB0041EF34 /* Items */,
 				3D58468722A6322900EDD845 /* RangeModel.swift */,
+				5819AB70242A5CA600498BB6 /* SpriteAction.swift */,
 				3D58468B22A632F100EDD845 /* AttackModel.swift */,
 				3D58468922A6325300EDD845 /* CarryModel.swift */,
 				3DA4E8962290A88C006E90D1 /* EntityModel.swift */,
+				5819AB72242A668400498BB6 /* SwipeTypes.swift */,
 				3D635E8E22E20CDA0090C99C /* AnimationModel.swift */,
 				3D30A42A2217F63500AFA1E1 /* TileCoord.swift */,
 				3DF2928220A66BEB006671AC /* Tile.swift */,
@@ -844,6 +853,7 @@
 				3D3D31EC23ABEFA8002B87EE /* LevelConstructor.swift in Sources */,
 				3D7EF45E21D18DAB00A2D9E8 /* TileTransformation.swift in Sources */,
 				3DB270A722AE065300D9BF8B /* Data+Extensions.swift in Sources */,
+				5819AB73242A668400498BB6 /* SwipeTypes.swift in Sources */,
 				3DF2928520A76242006671AC /* Board.swift in Sources */,
 				3D7D8B37225422440016FE4C /* TilesHelper.swift in Sources */,
 				58C1AE4A23D19CEE003B5B5A /* TransmogrificationPotion.swift in Sources */,
@@ -862,6 +872,7 @@
 				3D30A42B2217F63500AFA1E1 /* TileCoord.swift in Sources */,
 				3D58468C22A632F100EDD845 /* AttackModel.swift in Sources */,
 				3D06390922EEB54E00C4D5E9 /* ReffingState.swift in Sources */,
+				5843F4542426747100C03612 /* RotatePreviewView.swift in Sources */,
 				3DC072C123748D100046F224 /* Quadrant.swift in Sources */,
 				58F034C32408B7CF00BE1863 /* BossController.swift in Sources */,
 				3D635E8F22E20CDA0090C99C /* AnimationModel.swift in Sources */,
@@ -881,6 +892,7 @@
 				3D10609B233DD05500ECE7E6 /* TurnWatcher.swift in Sources */,
 				3D06390122EEB4FB00C4D5E9 /* PauseState.swift in Sources */,
 				3D58468A22A6325300EDD845 /* CarryModel.swift in Sources */,
+				5819AB71242A5CA600498BB6 /* SpriteAction.swift in Sources */,
 				3DF2928320A66BEB006671AC /* Tile.swift in Sources */,
 				3DA4E88B228FC156006E90D1 /* Util.swift in Sources */,
 				3DC072C6237545400046F224 /* Rule.swift in Sources */,

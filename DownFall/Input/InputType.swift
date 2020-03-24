@@ -20,15 +20,15 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
             return true
         } else if case InputType.decrementDynamites(_) = lhs, case InputType.decrementDynamites(_) = rhs {
             return true
-        }
+        } 
         return lhs == rhs
     }
     
     
     static var allCases: [InputType] = [.touchBegan(TileCoord(0,0), .rock(.red)),
                                         .touch(TileCoord(0,0), .rock(.red)),
-                                        .rotateCounterClockwise,
-                                        .rotateClockwise,
+                                        .rotateCounterClockwise(preview: false),
+                                        .rotateClockwise(preview: false),
                                         .attack(attackType: .targets,
                                                 attacker: TileCoord(0,0),
                                                 defender: TileCoord(0,0),
@@ -51,7 +51,10 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
                                         .bossEatsRocks([]),
                                         .bossTargetsWhatToAttack([]),
                                         .bossAttacks([]),
-                                        .decrementDynamites(Set<TileCoord>())
+                                        .decrementDynamites(Set<TileCoord>()),
+                                        .rotatePreview([], .zero),
+                                        .rotatePreviewFinish([], nil),
+                                        .refillEmpty
                                                                  
     ]
     
@@ -59,8 +62,8 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
     
     case touchBegan(_ position: TileCoord, _ tileType: TileType)
     case touch(_ position: TileCoord, _ tileType: TileType)
-    case rotateCounterClockwise
-    case rotateClockwise
+    case rotateCounterClockwise(preview: Bool)
+    case rotateClockwise(preview: Bool)
     case monsterDies(TileCoord)
     case attack(attackType: AttackType, attacker: TileCoord, defender: TileCoord?, affectedTiles: [TileCoord])
     case gameWin
@@ -86,6 +89,9 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
     case bossTargetsWhatToAttack([BossController.BossAttack])
     case bossAttacks([BossController.BossAttack])
     case decrementDynamites(Set<TileCoord>)
+    case rotatePreview([[DFTileSpriteNode]], Transformation)
+    case rotatePreviewFinish([SpriteAction], Transformation?)
+    case refillEmpty
     
     var debugDescription: String {
         switch self {
@@ -147,6 +153,12 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
             return "Boss attacks"
         case .decrementDynamites:
             return "Decrement the dynamite fuses"
+        case .rotatePreview:
+            return "Rotate preview"
+        case .rotatePreviewFinish:
+            return "Rotate finish"
+        case .refillEmpty:
+            return "Refill empty tiles"
         }
     }
 }

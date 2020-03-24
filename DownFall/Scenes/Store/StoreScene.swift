@@ -51,7 +51,7 @@ class StoreScene: SKScene {
         let maxAspectRatio : CGFloat = 19.5/9.0
         let playableWidth = size.height / maxAspectRatio
         
-        background = SKSpriteNode(color: .clayRed,
+        background = SKSpriteNode(texture: SKTexture(imageNamed: "storeBackground"),
                                   size: CGSize(width: playableWidth,
                                                height: size.height))
         
@@ -110,7 +110,7 @@ class StoreScene: SKScene {
             itemSize: Style.Store.Item.size,
             width: playableWidth,
             height: Style.Store.ItemGrid.height,
-            bottomLeft: CGPoint(x: -frame.width/2, y: 0)
+            bottomLeft: CGPoint(x: -frame.width/2, y: -frame.height/2)
         )
         for (index, position) in gridPoints.enumerated() {
             if items.count - 1 >= index {

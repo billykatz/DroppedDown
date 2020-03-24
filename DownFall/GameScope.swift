@@ -40,7 +40,7 @@ struct GameScope {
                     TutorialStep(dialog: "Rotate to collect the gem",
                                  highlightType: [],
                                  showClockwiseRotate: true,
-                                 inputToContinue: InputType.rotateCounterClockwise)
+                                 inputToContinue: InputType.rotateCounterClockwise(preview: false))
         ]
     )
     

@@ -23,7 +23,7 @@ struct PlayState: GameState {
         case .animationsFinished, .play,
              .reffingFinished, .playAgain, .collectItem,
              .selectLevel, .newTurn,
-             .visitStore, .itemUseCanceled, .itemCanBeUsed, .itemUsed, .decrementDynamites:
+             .visitStore, .itemUseCanceled, .itemCanBeUsed, .itemUsed, .decrementDynamites, .rotatePreview, .rotatePreviewFinish, .refillEmpty:
             return false
         }
     }
@@ -50,7 +50,7 @@ struct PlayState: GameState {
             }
         case .itemUseSelected:
             return AnyGameState(TargetingState())
-        case .animationsFinished, .play, .transformation, .reffingFinished, .playAgain,. selectLevel, .newTurn, .visitStore, .itemUseCanceled, .itemCanBeUsed, .itemUsed, .decrementDynamites:
+        case .animationsFinished, .play, .transformation, .reffingFinished, .playAgain,. selectLevel, .newTurn, .visitStore, .itemUseCanceled, .itemCanBeUsed, .itemUsed, .decrementDynamites, .rotatePreview, .rotatePreviewFinish, .refillEmpty:
             return nil
         }
         

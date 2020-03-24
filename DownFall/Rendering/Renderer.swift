@@ -50,7 +50,7 @@ class Renderer: SKSpriteNode {
     private lazy var tutorial2WinSprite: MenuSpriteNode = {
         return MenuSpriteNode(.tutorial2Win, playableRect: self.playableRect, precedence: .menu, level: self.level)
     }()
-
+    
     private lazy var safeArea: SKSpriteNode = {
         //create safe area
         let safeArea = SKSpriteNode(color: .foregroundBlue, size: CGSize(width: playableRect.width, height: 75.0))
@@ -66,12 +66,13 @@ class Renderer: SKSpriteNode {
     }()
     
     public var backpackView: BackpackView
-
+    
     init(playableRect: CGRect,
          foreground givenForeground: SKNode,
          boardSize theBoardSize: Int,
          precedence: Precedence,
-         level: Level) {
+         level: Level,
+         touchDelegate: UIResponder) {
         
         self.precedence = precedence
         self.playableRect = playableRect
@@ -93,12 +94,12 @@ class Renderer: SKSpriteNode {
         
         super.init(texture: nil, color: .clear, size: CGSize.zero)
         
-        self.backpackView.touchDelegate = self
+        self.backpackView.touchDelegate = touchDelegate
         self.isUserInteractionEnabled = true
-
+        
         foreground.position = playableRect.center
         menuForeground.position = playableRect.center
-
+        
         [spriteForeground, safeArea, hud, backpackView].forEach { foreground.addChild($0) }
         
         // Register for Dispatch
@@ -111,7 +112,7 @@ class Renderer: SKSpriteNode {
                     let tiles = input.endTilesStruct else { return }
                 self.sprites = self.createSprites(from: tiles)
                 self.add(sprites: self.sprites, tiles: tiles)
-
+                
             default:
                 self?.renderInput(input)
             }
@@ -123,7 +124,7 @@ class Renderer: SKSpriteNode {
         if let trans = transformations.first, let inputType = trans.inputType {
             switch inputType {
             case .rotateCounterClockwise, .rotateClockwise:
-                rotate(for: transformations)
+                rotatePreview(for: transformations)
             case .touch:
                 //TODO: sometimes remove and replace has a monster for the touch(_, type).  not sure why
                 if let _ = trans.tileTransformation {
@@ -148,6 +149,21 @@ class Renderer: SKSpriteNode {
                 computeNewBoard(for: transformations)
             case .decrementDynamites:
                 computeNewBoard(for: transformations)
+            case .refillEmpty:
+                refillEmptyTiles(with: trans)
+            case .rotatePreviewFinish(let spriteActions, let trans):
+                if let trans = trans {
+                    animator.animate(spriteActions) { [weak self] in
+                        guard let self = self else { return }
+                        self.animationsFinished(for: self.sprites, endTiles: trans.endTiles, ref: true)
+                    }
+                } else {
+                    animator.animate(spriteActions) { [weak self] in
+                        guard let self = self else { return }
+                        self.animationsFinished(for: self.sprites, endTiles: nil, ref: false)
+                    }
+                }
+                
             case .reffingFinished, .touchBegan, .itemUseSelected:
                 () // Purposely left blank.
             default:
@@ -157,7 +173,7 @@ class Renderer: SKSpriteNode {
         } else {
             animationsFinished(for: sprites, endTiles: transformations.first?.endTiles)
         }
-
+        
     }
     
     private func renderInput(_ input: Input) {
@@ -246,7 +262,7 @@ class Renderer: SKSpriteNode {
             }
         }
     }
-
+    
     
     private func positionsInForeground(at coords: [TileCoord]) -> [CGPoint] {
         var x : CGFloat = 0
@@ -284,12 +300,78 @@ class Renderer: SKSpriteNode {
         }
         return sprites
     }
-
+    
+    /// Attach the sprites to the input so that another object can rotate the board for us
+    private func rotatePreview(for transformations: [Transformation]) {
+        guard let rotateTrans = transformations.first else {
+            preconditionFailure("We should have a transformation")
+        }
+        InputQueue.append(Input(.rotatePreview(sprites, rotateTrans)))
+    }
+    
+    private func refillEmptyTiles(with transformation: Transformation, completion: (() -> ())? = nil) {
+        guard let newTiles = transformation.tileTransformation?[0],
+            let shiftDown = transformation.tileTransformation?[1],
+            let finalTiles = transformation.endTiles else {
+                preconditionFailure("All these conditions must be met to refill empty tiles")
+        }
+        
+        
+        // START THE SHIFT DOWN ANIMATION
+        
+        //add new tiles "newTiles"
+        for trans in newTiles {
+            let (startRow, startCol) = trans.initial.tuple
+            let (endRow, endCol) = trans.end.tuple
+            
+            // get sprite from the target sprites row and col
+            let sprite = sprites[endRow][endCol]
+            
+            // place the tile at the "start" which is above the visible board
+            // the animation will then move them to the correct place in the foreground
+            let x = tileSize * boardSize + ( CGFloat(startRow) * tileSize ) + bottomLeft.x
+            let y = tileSize * CGFloat(startCol) + bottomLeft.y
+            sprite.position = CGPoint.init(x: y, y: x)
+            
+        }
+        
+        
+        /// map the shift down tile transformation array to [SKSpriteNode, SKAction)] to work Animator world
+        var shiftDownActions: [SpriteAction] = []
+        for trans in shiftDown {
+            
+            let (startRow, startCol) = trans.initial.tuple
+            let (endRow, endCol) = trans.end.tuple
+            let sprite: SKSpriteNode
+            if trans.initial.row >= Int(boardSize) {
+                // startRow may be out of bounds because we temprarily place the tile above the board to visually allow it to drop down.  In that case, use the end row to access the actualy sprite from storage
+                sprite = sprites[endRow][endCol]
+            } else {
+                //sprite already exist in the board. so access it by it's start row
+                sprite = sprites[startRow][startCol]
+            }
+            
+            //create the action
+            let endPoint = CGPoint.init(x: tileSize * CGFloat(trans.end.column) + bottomLeft.x,
+                                        y: tileSize * CGFloat(trans.end.row) + bottomLeft.y)
+            let animation = SKAction.move(to: endPoint, duration: AnimationSettings.fallSpeed)
+            shiftDownActions.append(SpriteAction(sprite: sprite,action: SKAction.sequence([animation])))
+        }
+        
+        animator.animate(shiftDownActions) { [weak self] in
+            guard let self = self else { return }
+            completion?() ?? self.animationsFinished(for: self.sprites, endTiles: finalTiles)
+        }
+    }
+    
     /// Animate each tileTransformation to display rotation
     private func rotate(for transformations: [Transformation]) {
         guard let rotateTrans = transformations.first,
             let trans = transformations.first?.tileTransformation?.first,
-            let rotateEndTiles = rotateTrans.endTiles else { return }
+            let rotateEndTiles = rotateTrans.endTiles else {
+                preconditionFailure("All conditions must be met to rotate")
+                return
+        }
         
         guard transformations.count > 1 else {
             var animationCount = 0
@@ -303,81 +385,24 @@ class Renderer: SKSpriteNode {
             return
         }
         
-        if transformations.count > 1,
-            let newTiles = transformations[1].tileTransformation?[0],
-            let shiftDown = transformations[1].tileTransformation?[1],
-            let finalTiles = transformations[1].endTiles
-        {
-            
-            var animationCount = 0
-            animate(trans) { [weak self] in
-                guard let strongSelf = self else { return }
-                animationCount += 1
-                if animationCount == trans.count {
-                    
-                    // finish the rotate transformation
-                    let spriteNodes = strongSelf.createSprites(from: rotateEndTiles)
-                    strongSelf.sprites = spriteNodes
-                    strongSelf.add(sprites: spriteNodes, tiles: rotateEndTiles)
-                    
-                    
-                    // START THE SHIFT DOWN ANIMATION
-                    
-                    //add new tiles "newTiles"
-                    for trans in newTiles {
-                        let (startRow, startCol) = trans.initial.tuple
-                        let (endRow, endCol) = trans.end.tuple
-                        
-                        // get sprite from the target sprites row and col
-                        let sprite = spriteNodes[endRow][endCol]
-                        
-                        // place the tile at the "start" which is above the visible board
-                        // the animation will then move them to the correct place in the foreground
-                        let x = strongSelf.tileSize * strongSelf.boardSize + ( CGFloat(startRow) * strongSelf.tileSize ) + strongSelf.bottomLeft.x
-                        let y = strongSelf.tileSize * CGFloat(startCol) + strongSelf.bottomLeft.y
-                        sprite.position = CGPoint.init(x: y, y: x)
-                        
-                    }
-                    
-                    
-                    /// map the shift down tile transformation array to [SKSpriteNode, SKAction)] to work Animator world
-                    var shiftDownActions: [(SKSpriteNode, SKAction)] = []
-                    for trans in shiftDown {
-
-                        let (startRow, startCol) = trans.initial.tuple
-                        let (endRow, endCol) = trans.end.tuple
-                        let sprite: SKSpriteNode
-                        if trans.initial.row >= Int(strongSelf.boardSize) {
-                            // startRow may be out of bounds because we temprarily place the tile above the board to visually allow it to drop down.  In that case, use the end row to access the actualy sprite from storage
-                            sprite = spriteNodes[endRow][endCol]
-                        } else {
-                            //sprite already exist in the board. so access it by it's start row
-                            sprite = spriteNodes[startRow][startCol]
-                        }
-
-                        //create the action
-                        let endPoint = CGPoint.init(x: strongSelf.tileSize * CGFloat(trans.end.column) + strongSelf.bottomLeft.x,
-                                                    y: strongSelf.tileSize * CGFloat(trans.end.row) + strongSelf.bottomLeft.y)
-                        let animation = SKAction.move(to: endPoint, duration: AnimationSettings.fallSpeed)
-                        shiftDownActions.append((sprite, SKAction.sequence([animation])))
-                    }
-
-                    strongSelf.animator.animate(shiftDownActions) { [weak self] in
-                        guard let strongSelf = self else { return }
-                        strongSelf.animationsFinished(for: spriteNodes, endTiles: finalTiles)
-                    }
-                }
-            }
-        }
+        refillEmptyTiles(with: transformations[1])
     }
     
     private func animationsFinished(for endBoard: [[DFTileSpriteNode]],
                                     endTiles: [[Tile]]?,
                                     ref: Bool = true) {
-        guard let endTiles = endTiles else { preconditionFailure("why dont we have end tiles at this point") }
-        sprites = createSprites(from: endTiles)
-        add(sprites: sprites, tiles: endTiles)
-        InputQueue.append(Input(.animationsFinished(ref: ref), endTiles))
+        
+        /// endTiles is optional but almost always has a value
+        /// However, with rotate previews, we don't have to create and add sprites like we normally do because some rotate previews return to the original state.  So in the case where there are no end tiles, act like nothing ever happened.
+        if let endTiles = endTiles {
+            sprites = createSprites(from: endTiles)
+            add(sprites: sprites, tiles: endTiles)
+            InputQueue.append(Input(.animationsFinished(ref: ref), endTiles))
+        } else {
+            InputQueue.append(Input(.animationsFinished(ref: false), endTiles))
+        }
+        
+        
     }
     
     private func animate(_ transformation: [TileTransformation]?, _ completion: (() -> Void)?) {
@@ -403,9 +428,9 @@ extension Renderer {
             }
         }
     }
-
+    
     /// Prepares the animation data to compute a new board.  This is hard coded to work with remove and replace animations
-    /// Use the callback if you'd to do something on completion.  Alsmost certaintly, youll want to call animationsFinished(for:endTiles:) in the completion code path
+    /// Use the callback if you'd to do something on completion.  Youll want to call animationsFinished(for:endTiles:) in addition to whatever else you want to do.
     /// Implicitly depends on Animator
     private func computeNewBoard(for transformation: Transformation?, completion: ( () -> () )? = nil) {
         guard let endTiles = transformation?.endTiles else {
@@ -415,8 +440,8 @@ extension Renderer {
         guard let transformation = transformation,
             let transformations = transformation.tileTransformation,
             let inputType = transformation.inputType else {
-            completion?() ?? animationsFinished(for: sprites, endTiles: endTiles)
-            return
+                completion?() ?? animationsFinished(for: sprites, endTiles: endTiles)
+                return
         }
         
         let spriteNodes = createSprites(from: endTiles)
@@ -516,7 +541,7 @@ extension Renderer {
         animator.animate(removedAnimations) {  [weak self] in
             guard let strongSelf = self else { return }
             completion?() ?? strongSelf.animationsFinished(for: strongSelf.sprites, endTiles: endTiles)
-
+            
         }
         
     }
@@ -551,7 +576,7 @@ extension Renderer {
         guard let touch = touches.first else { return }
         let positionInScene = touch.location(in: self.foreground)
         let nodes = foreground.nodes(at: positionInScene)
-
+        
         for node in nodes {
             if node is DFTileSpriteNode {
                 for index in 0..<sprites.reduce([],+).count {
@@ -594,7 +619,7 @@ extension Renderer {
                                                  sprites[row][col].type))
                                 )
                             }
-    
+                            
                         }
                     }
                 }
@@ -606,7 +631,7 @@ extension Renderer {
 extension Renderer {
     private func gameWin(transformation: Transformation?) {
         animator.gameWin(transformation: transformation, sprites: sprites) { [weak self] in
-    
+            
             guard let strongSelf = self else { return }
             strongSelf.menuForeground.removeAllChildren()
             let gameWinMenu: SKSpriteNode
@@ -665,7 +690,7 @@ extension Renderer {
         if output == "" { output = "\n-----\nThere are no differences" }
         print(output)
     }
-
+    
 }
 
 extension Renderer: SettingsDelegate {

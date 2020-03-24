@@ -75,7 +75,9 @@ class TutorialScene: SKScene {
                                  foreground: foreground,
                                  boardSize: level.boardSize,
                                  precedence: Precedence.foreground,
-                                 level: level)
+                                 level: level,
+                                 touchDelegate: self
+        )
         
         
         // SwipeRecognizerView
@@ -161,19 +163,24 @@ extension TutorialScene {
 extension TutorialScene {
     private func rotateRight() {
         if allowedToRotate(clockwise: true) {
-            InputQueue.append(Input(.rotateClockwise))
+            InputQueue.append(Input(.rotateClockwise(preview: false)))
         }
     }
     private func rotateLeft() {
         if allowedToRotate(clockwise: false) {
-            InputQueue.append(Input(.rotateCounterClockwise))
+            InputQueue.append(Input(.rotateCounterClockwise(preview: false)))
         }
     }
     
     func allowedToRotate(clockwise: Bool) -> Bool {
         guard let data = level?.tutorialData else { return false }
-        let rotateDirectionInput : InputType = clockwise ? .rotateClockwise : .rotateCounterClockwise
-        return  rotateDirectionInput == data.currentStep.inputToContinue
+//        let rotateDirectionInput : InputType = clockwise ? .rotateClockwise : .rotateCounterClockwise
+        
+        if case InputType.rotateClockwise(_) = data.currentStep.inputToContinue {
+            return true
+        }
+        
+        return false
     }
 }
 

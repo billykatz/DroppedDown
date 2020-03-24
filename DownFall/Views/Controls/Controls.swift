@@ -41,19 +41,19 @@ class Controls: SKSpriteNode {
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard let touch = touches.first else { return }
-        let positionInScene = touch.location(in: self)
-        let nodes = self.nodes(at: positionInScene)
-        
-        
-        for node in nodes {
-            if node.name == Constants.rotateLeft {
-                InputQueue.append(Input(.rotateCounterClockwise))
-            }
-            if node.name == Constants.rotateRight {
-                InputQueue.append(Input(.rotateClockwise))
-            }
-        }
+//        guard let touch = touches.first else { return }
+//        let positionInScene = touch.location(in: self)
+//        let nodes = self.nodes(at: positionInScene)
+//        
+//        
+//        for node in nodes {
+//            if node.name == Constants.rotateLeft {
+//                InputQueue.append(Input(.rotateCounterClockwise))
+//            }
+//            if node.name == Constants.rotateRight {
+//                InputQueue.append(Input(.rotateClockwise))
+//            }
+//        }
         
     }
     

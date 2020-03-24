@@ -11,6 +11,10 @@ import UIKit
 
 class GameScene: SKScene {
     
+    struct Constants {
+        static let swipeDistanceThreshold = CGFloat(25.0)
+    }
+    
     // only strong reference to the Board
     private var board: Board!
     
@@ -41,6 +45,11 @@ class GameScene: SKScene {
     //touch state
     private var touchWasSwipe = false
     private var touchWasCanceled = false
+    private var lastPosition: CGPoint?
+    private var swipeDirection: SwipeDirection?
+    
+    // rotate preview
+    private var rotatePreview: RotatePreviewView?
     
     required init?(coder aDecoder: NSCoder) { super.init(coder: aDecoder) }
     
@@ -80,20 +89,19 @@ class GameScene: SKScene {
     }
     
     override func didMove(to view: SKView) {
+        
+        // preview view
+        self.rotatePreview = RotatePreviewView()
     
         // create the renderer
         self.renderer = Renderer(playableRect: size.playableRect,
                                  foreground: foreground,
                                  boardSize: boardSize,
                                  precedence: Precedence.foreground,
-                                 level: level!)
+                                 level: level!,
+                                 touchDelegate: self
+        )
         
-        
-        // SwipeRecognizerView
-        swipeRecognizerView = SwipeRecognizerView(frame: view.frame.subtractBottom(0.20),
-                                                        target: self,
-                                                        swiped: #selector(swiped))
-        view.addSubview(swipeRecognizerView!)
         
         // Register for inputs we care about
         Dispatch.shared.register { [weak self] input in
@@ -135,6 +143,7 @@ class GameScene: SKScene {
         gameSceneDelegate = nil
         generator = nil
         bossController = nil
+        rotatePreview = nil
         swipeRecognizerView?.removeFromSuperview()
         InputQueue.reset()
         Dispatch.shared.reset()
@@ -142,75 +151,7 @@ class GameScene: SKScene {
     }
 }
 
-//MARK: Swiping logic
-extension GameScene {
-    @objc func swiped(_ gestureRecognizer: UISwipeGestureRecognizer) {
-        guard let inTop = self.view?.isInTop(gestureRecognizer),
-            let onRight = self.view?.isOnRight(gestureRecognizer)
-            else { return }
-        
-        touchWasSwipe = true
-        switch gestureRecognizer.direction {
-        case .down:
-            onRight ? rotateClockwise() : rotateCounterClockwise()
-        case .up:
-            !onRight ? rotateClockwise() : rotateCounterClockwise()
-        case .left:
-            !inTop ? rotateClockwise() : rotateCounterClockwise()
-        case .right:
-            inTop ? rotateClockwise() : rotateCounterClockwise()
-        default:
-            fatalError("There should only be four directions in our swipe gesture recognizer")
-        }
-    }
-}
-
-//MARK: - Rotate
-extension GameScene {
-    private func rotateClockwise() {
-        InputQueue.append(Input(.rotateClockwise))
-    }
-    private func rotateCounterClockwise() {
-        InputQueue.append(Input(.rotateCounterClockwise))
-    }
-}
-
-// MARK: - Debug
-
-extension GameScene {
-    
-    @objc private func tripleTap(_ sender: UITapGestureRecognizer) {
-        if sender.numberOfTapsRequired == 3 {
-            let touchLocation = sender.location(in: view)
-            let newTouch = convertPoint(fromView: touchLocation)
-            
-            if self.nodes(at: newTouch).contains(where: { node in
-                (node as? SKSpriteNode)?.name == "setting"
-            }) {
-                guard let playerIndex = tileIndices(of: .player(.zero), in: self.board.tiles).first else { return }
-                
-                self.foreground.removeAllChildren()
-                if case let TileType.player(data) = self.board.tiles[playerIndex].type {
-                    self.removeFromParent()
-                    self.gameSceneDelegate?.reset(self, playerData: data)
-                }
-            }
-        }
-    }
-}
-
-// MARK: - Update
-
-extension GameScene {
-    /// We try to digest the top of the queue every frame
-    override func update(_ currentTime: TimeInterval) {
-        guard let input = InputQueue.pop() else { return }
-        Dispatch.shared.send(input)
-    }
-}
-
-// MARK: - Touch Relay
-
+//MARK: Touch and Swiping logic
 extension GameScene {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         touchWasSwipe = false
@@ -224,13 +165,105 @@ extension GameScene {
         }
     }
     
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = touches.first else { return }
+        let currentPosition = touch.location(in: self.foreground)
+        
+        // set the lastPosition once until we have detected a swipe
+        if lastPosition == nil {
+            lastPosition = currentPosition
+        }
+        guard let lastPosition = lastPosition, (abs(currentPosition.x - lastPosition.x) > Constants.swipeDistanceThreshold || abs(currentPosition.y - lastPosition.y) > Constants.swipeDistanceThreshold || touchWasSwipe) else {
+            return
+        }
+        touchWasSwipe = true
+        
+        // deteremine the vector of the swipe
+        let vector = currentPosition - lastPosition
+        // set the swipe for the duration of this swipe gesture
+        let touchIsOnRight = (view?.isOnRight(currentPosition) ?? false)
+        let touchIsInBottom = (view?.isInBottom(currentPosition) ?? false)
+        if self.swipeDirection == nil {
+            let swipeDirection = SwipeDirection(from: vector)
+            
+            /// you can only start certain kinds of swipes in the correct area of the screen
+            /// Up and down must originate on the right side of the screen
+            /// Left and right must originate on the bottom half of the screen
+            switch swipeDirection {
+            case .up, .down:
+                if !touchIsOnRight {
+                    return
+                }
+            case .left, .right:
+                if !touchIsInBottom {
+                    return
+                }
+            }
+            
+            /// finally set the swipeDirection
+            self.swipeDirection = swipeDirection
+            
+            /// deteremine which clock rotation to apply
+            let rotateDir = RotateDirection(from: swipeDirection)
+            
+            /// call functions that send rotate input
+            switch rotateDir {
+            case .clockwise:
+                rotateClockwise(preview: true)
+            case .counterClockwise:
+                rotateCounterClockwise(preview: true)
+            }
+        }
+        
+        /// update the preview view
+        if touchWasSwipe {
+            guard let swipeDirection = swipeDirection else { return }
+            let distance: CGFloat
+            switch swipeDirection {
+            case .up, .down:
+                distance = vector.dy
+            case .left, .right:
+                distance = vector.dx
+            }
+            self.rotatePreview?.touchesMoved(distance: distance)
+        }
+        
+        // set the last position for the next update
+        self.lastPosition = currentPosition
+    }
+    
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        self.lastPosition = nil
+        self.swipeDirection = nil
         if !touchWasSwipe {
             guard !touchWasCanceled else {
                 touchWasCanceled = false
                 return
             }
             self.renderer?.touchesEnded(touches, with: event)
+        } else {
+            self.rotatePreview?.touchesEnded()
         }
+        self.touchWasSwipe = false
+    }
+}
+
+//MARK: - Rotate
+extension GameScene {
+    private func rotateClockwise(preview: Bool) {
+        InputQueue.append(Input(.rotateClockwise(preview: preview)))
+    }
+    private func rotateCounterClockwise(preview: Bool) {
+        InputQueue.append(Input(.rotateCounterClockwise(preview: preview)))
+    }
+}
+
+// MARK: - Update
+
+extension GameScene {
+    /// We try to digest the top of the queue every frame
+    override func update(_ currentTime: TimeInterval) {
+        guard let input = InputQueue.pop() else { return }
+        Dispatch.shared.send(input)
     }
 }

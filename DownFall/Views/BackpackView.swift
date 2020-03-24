@@ -25,7 +25,7 @@ class BackpackView: SKSpriteNode {
     private let viewModel: TargetingViewModel
     
     // touch delegate
-    weak var touchDelegate: Renderer?
+    weak var touchDelegate: UIResponder?
     
     // constants
     private let targetingAreaName = "targetingArea"
@@ -499,7 +499,10 @@ extension BackpackView {
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
         let position = touch.location(in: self)
-        guard background.contains(position) else { return }
+        guard background.contains(position) else {            
+            touchDelegate?.touchesMoved(touches, with: event)
+            return
+        }
         
         // we might not have moved far enough from our original position to consider this a swipe
         // however you may start to swipe and then end up back or close to our original position.
@@ -548,6 +551,7 @@ extension BackpackView {
         let position = touch.location(in: self)
         initialPosition = position
     }
+    
 }
 
 extension BackpackView: ButtonDelegate {

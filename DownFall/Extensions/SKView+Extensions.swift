@@ -19,9 +19,9 @@ extension SKView {
         return location.x > (frame.width)/2
     }
     
-    func isInTop(_ point: CGPoint?) -> Bool {
+    func isInBottom(_ point: CGPoint?) -> Bool {
         guard let point = point else { return false }
-        return point.y > (frame.height)/2
+        return point.y < (frame.height)/2
     }
     
     func isOnRight(_ point: CGPoint?) -> Bool {

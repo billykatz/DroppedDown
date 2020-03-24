@@ -25,7 +25,7 @@ class BackpackView: SKSpriteNode {
     private let viewModel: TargetingViewModel
     
     // touch delegate
-    weak var touchDelegate: SKScene?
+    weak var touchDelegate: UIResponder?
     
     // constants
     private let targetingAreaName = "targetingArea"

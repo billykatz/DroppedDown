@@ -7,13 +7,6 @@
 //
 
 import Foundation
-import SpriteKit
-
-struct SpriteAction:Equatable, Hashable {
-    let sprite: SKSpriteNode
-    let action: SKAction
-}
-
 
 indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringConvertible{
     static func fuzzyEqual(_ lhs: InputType, _ rhs: InputType) -> Bool {

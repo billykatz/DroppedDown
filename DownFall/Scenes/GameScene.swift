@@ -11,6 +11,10 @@ import UIKit
 
 class GameScene: SKScene {
     
+    struct Constants {
+        static let swipeDistanceThreshold = CGFloat(25.0)
+    }
+    
     // only strong reference to the Board
     private var board: Board!
     
@@ -41,6 +45,8 @@ class GameScene: SKScene {
     //touch state
     private var touchWasSwipe = false
     private var touchWasCanceled = false
+    private var lastPosition: CGPoint?
+    private var swipeDirection: SwipeDirection?
     
     // rotate preview
     private var rotatePreview: RotatePreviewView?
@@ -143,8 +149,10 @@ class GameScene: SKScene {
         Dispatch.shared.reset()
         print("deiniting")
     }
-    
-    
+}
+
+//MARK: Touch and Swiping logic
+extension GameScene {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         touchWasSwipe = false
         self.renderer?.touchesBegan(touches, with: event)
@@ -157,41 +165,15 @@ class GameScene: SKScene {
         }
     }
     
-    private var lastPosition: CGPoint?
-    private var swipeDirection: SwipeDirection?
-    enum SwipeDirection {
-        case up
-        case down
-        
-        init(from vector: CGVector) {
-            if vector.dy > 0 { self = .up }
-            else { self = .down }
-        }
-    }
-    
-    enum RotateDirection {
-        case counterClockwise
-        case clockwise
-        
-        init(from swipeDirection: SwipeDirection) {
-            switch swipeDirection {
-            case .up:
-                self = .counterClockwise
-            case .down:
-                self = .clockwise
-            }
-        }
-    }
-    
-    
-    
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
         let currentPosition = touch.location(in: self.foreground)
+        
+        // set the lastPosition once until we have detected a swipe
         if lastPosition == nil {
             lastPosition = currentPosition
         }
-        guard let lastPosition = lastPosition, (abs(currentPosition.x - lastPosition.x) > 25.0 || abs(currentPosition.y - lastPosition.y) > 25.0 || touchWasSwipe) else {
+        guard let lastPosition = lastPosition, (abs(currentPosition.x - lastPosition.x) > Constants.swipeDistanceThreshold || abs(currentPosition.y - lastPosition.y) > Constants.swipeDistanceThreshold || touchWasSwipe) else {
             return
         }
         touchWasSwipe = true
@@ -199,12 +181,32 @@ class GameScene: SKScene {
         // deteremine the vector of the swipe
         let vector = currentPosition - lastPosition
         // set the swipe for the duration of this swipe gesture
-        if self.swipeDirection == nil && (view?.isOnRight(currentPosition) ?? false) {
+        let touchIsOnRight = (view?.isOnRight(currentPosition) ?? false)
+        let touchIsInBottom = (view?.isInBottom(currentPosition) ?? false)
+        if self.swipeDirection == nil {
             let swipeDirection = SwipeDirection(from: vector)
+            
+            /// you can only start certain kinds of swipes in the correct area of the screen
+            /// Up and down must originate on the right side of the screen
+            /// Left and right must originate on the bottom half of the screen
+            switch swipeDirection {
+            case .up, .down:
+                if !touchIsOnRight {
+                    return
+                }
+            case .left, .right:
+                if !touchIsInBottom {
+                    return
+                }
+            }
+            
+            /// finally set the swipeDirection
             self.swipeDirection = swipeDirection
             
+            /// deteremine which clock rotation to apply
             let rotateDir = RotateDirection(from: swipeDirection)
             
+            /// call functions that send rotate input
             switch rotateDir {
             case .clockwise:
                 rotateClockwise(preview: true)
@@ -213,7 +215,6 @@ class GameScene: SKScene {
             }
         }
         
-        
         /// update the preview view
         if touchWasSwipe {
             guard let swipeDirection = swipeDirection else { return }
@@ -221,6 +222,8 @@ class GameScene: SKScene {
             switch swipeDirection {
             case .up, .down:
                 distance = vector.dy
+            case .left, .right:
+                distance = vector.dx
             }
             self.rotatePreview?.touchesMoved(distance: distance)
         }
@@ -245,30 +248,6 @@ class GameScene: SKScene {
     }
 }
 
-//MARK: Swiping logic
-extension GameScene {
-    
-//    @objc func swiped(_ gestureRecognizer: UISwipeGestureRecognizer) {
-//        guard let inTop = self.view?.isInTop(gestureRecognizer),
-//            let onRight = self.view?.isOnRight(gestureRecognizer)
-//            else { return }
-//
-//        touchWasSwipe = true
-//        switch gestureRecognizer.direction {
-//        case .down:
-//            onRight ? rotateClockwise() : rotateCounterClockwise()
-//        case .up:
-//            !onRight ? rotateClockwise() : rotateCounterClockwise()
-//        case .left:
-//            !inTop ? rotateClockwise() : rotateCounterClockwise()
-//        case .right:
-//            inTop ? rotateClockwise() : rotateCounterClockwise()
-//        default:
-//            fatalError("There should only be four directions in our swipe gesture recognizer")
-//        }
-//    }
-}
-
 //MARK: - Rotate
 extension GameScene {
     private func rotateClockwise(preview: Bool) {
@@ -287,10 +266,4 @@ extension GameScene {
         guard let input = InputQueue.pop() else { return }
         Dispatch.shared.send(input)
     }
-}
-
-// MARK: - Touch Relay
-
-extension GameScene {
-
 }

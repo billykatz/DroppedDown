@@ -49,7 +49,7 @@ class Board: Equatable {
         for i in 0..<tiles.count {
             for j in 0..<tiles[i].count {
                 let tile = tiles[i][j]
-                tiles[i][j] = Tile(type: tiles[i][j].type, shouldHighlight: false)
+                tiles[i][j] = Tile(type: tile.type, shouldHighlight: false)
             }
         }
     }
@@ -120,38 +120,9 @@ class Board: Equatable {
         case .decrementDynamites(let dynamiteCoords):
             let trans = decrementDynamites(input: input, dynamiteCoords: dynamiteCoords)
             InputQueue.append(Input(.transformation(trans)))
-        case .rotatePreviewFinish(let spriteAction, let trans):
-            /// if we have a trans, that is because we are actually rotating
-            if let tiles = trans?.endTiles {
-                self.tiles = tiles
-                var allTransformations = [Transformation(transformation: nil, inputType: .rotatePreviewFinish(spriteAction, trans), endTiles: tiles)]
-                
-                if typeCount(for: self.tiles, of: .empty).count > 0 {
-                    // store tile transforamtions and shift information
-                    var newTiles : [TileTransformation] = []
-                    var intermediateTiles = self.tiles
-                    var (shiftDown, shiftIndices) = calculateShiftIndices(for: &intermediateTiles)
-                    
-                    //add new tiles
-                    addNewTiles(shiftIndices: shiftIndices,
-                                shiftDown: &shiftDown,
-                                newTiles: &newTiles,
-                                intermediateTiles: &intermediateTiles)
-                    
-                    // return our new board
-                    
-                    allTransformations.append(Transformation(transformation: [newTiles, shiftDown],
-                                                             inputType: input.type,
-                                                             endTiles: intermediateTiles))
-                }
-                
-                InputQueue.append(Input(.transformation(allTransformations)))
-            }
-                // we are not rotating, use the current tiles we have
-            else {
-                let transformation = Transformation(transformation: nil, inputType: .rotatePreviewFinish(spriteAction, trans), endTiles: self.tiles)
-                InputQueue.append(Input(.transformation([transformation])))
-            }
+        case .rotatePreviewFinish:
+            let transformation = rotatePreviewFinish(input: input)
+            InputQueue.append(Input(.transformation(transformation)))
         case .refillEmpty:
             InputQueue.append(Input(.transformation([refillEmpty(inputType: .refillEmpty)])))
         case .gameLose(_),
@@ -171,6 +142,40 @@ class Board: Equatable {
         
         guard let trans = transformation else { return }
         InputQueue.append(Input(.transformation([trans])))
+    }
+    
+    private func rotatePreviewFinish(input: Input) -> [Transformation] {
+        
+        // if we do not have a trans, then we are not rotating, creating an empty Transformation
+        guard case InputType.rotatePreviewFinish(let spriteAction, let trans) = input.type,
+            let tiles = trans?.endTiles else {
+                let transformation = Transformation(transformation: nil, inputType: input.type, endTiles: self.tiles)
+                return [transformation]
+        }
+        /// if we have a trans, that is because we are actually rotating
+        self.tiles = tiles
+        var allTransformations = [Transformation(transformation: nil, inputType: .rotatePreviewFinish(spriteAction, trans), endTiles: tiles)]
+        
+        if typeCount(for: self.tiles, of: .empty).count > 0 {
+            // store tile transforamtions and shift information
+            var newTiles : [TileTransformation] = []
+            var intermediateTiles = self.tiles
+            var (shiftDown, shiftIndices) = calculateShiftIndices(for: &intermediateTiles)
+            
+            //add new tiles
+            addNewTiles(shiftIndices: shiftIndices,
+                        shiftDown: &shiftDown,
+                        newTiles: &newTiles,
+                        intermediateTiles: &intermediateTiles)
+            
+            // return our new board
+            
+            allTransformations.append(Transformation(transformation: [newTiles, shiftDown],
+                                                     inputType: input.type,
+                                                     endTiles: intermediateTiles))
+        }
+        
+        return allTransformations
     }
     
     private func decrementDynamites(input: Input, dynamiteCoords: Set<TileCoord>) -> [Transformation] {
@@ -218,10 +223,6 @@ class Board: Equatable {
                 self.tiles[target.row][target.column] = Tile(type: .dynamite(fuseCount: 3, hasBeenDecremented: false))
             default:
                 ()
-                //            case .spawn:
-                //            case .destroy(<#T##Int#>, <#T##Bool#>):
-                //            case .hair(<#T##Int#>, <#T##Bool#>):
-                
             }
         }
         return Transformation(transformation: nil, inputType: input.type, endTiles: self.tiles)
@@ -656,7 +657,6 @@ extension Board {
         // tiles into and replaced the shifted down tiles with empty tiles
         // the tile creator replaces empty tiles with new tiles
         let createdTiles: [[Tile]] = tileCreator.tiles(for: intermediateTiles)
-        //        guard createdTiles.count == shiftIndices.reduce(0, +) else { assertionFailure("newTileTypes count must match the number of empty tiles in the board"); return }
         
         for (col, shifts) in shiftIndices.enumerated() where shifts > 0 {
             for startIdx in 0..<shifts {
@@ -759,8 +759,8 @@ extension Board {
             if !newTiles.isEmpty {
                 self.tiles = intermediateTiles
                 return Transformation(transformation: [newTiles, shiftDown],
-                                                     inputType: inputType,
-                                                     endTiles: intermediateTiles)
+                                      inputType: inputType,
+                                      endTiles: intermediateTiles)
             }
         }
         return Transformation(transformation: nil, inputType: .refillEmpty, endTiles: self.tiles)
@@ -830,6 +830,7 @@ extension Board {
                                                      endTiles: intermediateTiles))
         }
         
+        /// We support previewing the rotate transformation.  In that case, dont update our tiles to the rotated tiles just yet.  Wait for rotatePreviewFinish to do that.
         if !preview {
             self.tiles = intermediateTiles
         }

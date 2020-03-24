@@ -10,15 +10,15 @@ import SpriteKit
 
 class RotatePreviewView {
     
-    var sprites: [[DFTileSpriteNode]] = []
-    var originalPosition: [[CGPoint]] = []
-    var finalPosition: [[CGPoint]] = []
-    var tileTransformation: [TileTransformation] = []
-    var originalInput: Transformation?
-    var totalDistance = CGFloat(300.0)
-    var distancedMoved = CGFloat(0.0)
-    var rotateInputType: InputType?
-    var ratio: CGFloat = 0
+    private var sprites: [[DFTileSpriteNode]] = []
+    private var originalPosition: [[CGPoint]] = []
+    private var finalPosition: [[CGPoint]] = []
+    private var tileTransformation: [TileTransformation] = []
+    private var originalInput: Transformation?
+    private var distancedMoved = CGFloat(0.0)
+    private var rotateInputType: InputType?
+    private var distanceTraveledRatio: CGFloat = 0
+    private let returnToStartRatio = CGFloat(0.6)
     
     init() {
         Dispatch.shared.register { [weak self] (input) in
@@ -35,8 +35,7 @@ class RotatePreviewView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func preview(sprites: [[DFTileSpriteNode]], rotateTransformation: Transformation) {
-        print("### rotate type \(rotateTransformation.inputType)")
+    private func preview(sprites: [[DFTileSpriteNode]], rotateTransformation: Transformation) {
         self.sprites = sprites
         self.originalInput = rotateTransformation
         self.tileTransformation = rotateTransformation.tileTransformation?.first ?? []
@@ -49,20 +48,25 @@ class RotatePreviewView {
                 originalPosition[spriteRow].append(sprites[spriteRow][spriteCol].position)
             }
         }
-        print(rotateTransformation.inputType!)
-        print("We are here now")
+        for tilePosition in self.tileTransformation {
+            finalPosition[tilePosition.initial.row][tilePosition.initial.column] = originalPosition[tilePosition.end.row][tilePosition.end.column]
+        }
     }
     
-    func touchesMoved(distance: CGFloat) {
+    public func touchesMoved(distance: CGFloat) {
         guard !sprites.isEmpty, !tileTransformation.isEmpty, !originalPosition.isEmpty,
             let inputType = self.rotateInputType else { return }
+        
+        // determine the total distance we must moved
+        let totalDistance: CGFloat
         if case InputType.rotateClockwise = inputType {
-            totalDistance = CGFloat(-300.0)
+            totalDistance = -300.0
         } else {
-            totalDistance = CGFloat(300.0)
+            totalDistance = 300.0
         }
+        
         distancedMoved += distance
-        self.ratio = max(min(distancedMoved/totalDistance, 1.0), 0.0)
+        self.distanceTraveledRatio = max(min(distancedMoved/totalDistance, 1.0), 0.0)
         for spriteRow in 0..<sprites.count {
             for spriteCol in 0..<sprites.count {
                 let transformation = tileTransformation.first { (tileTrans) -> Bool in
@@ -74,10 +78,9 @@ class RotatePreviewView {
                 let sprite = sprites[spriteRow][spriteCol]
                 let originalSpritePosition = originalPosition[tileTrans.initial.row][tileTrans.initial.column]
                 let rotatedSpritePosition = originalPosition[tileTrans.end.row][tileTrans.end.column]
-                self.finalPosition[spriteRow][spriteCol] = rotatedSpritePosition
                 
                 let vector = rotatedSpritePosition - originalSpritePosition
-                let newSpritePosition = CGPoint(x: originalSpritePosition.x + vector.dx * ratio, y: originalSpritePosition.y + vector.dy * ratio)
+                let newSpritePosition = CGPoint(x: originalSpritePosition.x + vector.dx * distanceTraveledRatio, y: originalSpritePosition.y + vector.dy * distanceTraveledRatio)
                 
                 /// set the new position
                 sprite.position = newSpritePosition
@@ -88,56 +91,30 @@ class RotatePreviewView {
         }
     }
     
-    private let returnToStartRatio = CGFloat(0.6)
-    
-    func touchesEnded() {
-        guard !sprites.isEmpty, !originalPosition.isEmpty else {
+    public func touchesEnded() {
+        defer {
             rotateInputType = nil
             distancedMoved = 0
             sprites = []
             originalPosition = []
             finalPosition = []
             tileTransformation = []
-            totalDistance = 0.0
-            ratio = 0
+            distanceTraveledRatio = 0
             originalInput = nil
-            return
-            
         }
+        
+        
+        guard !sprites.isEmpty, !originalPosition.isEmpty else { return }
         var spriteActions: [SpriteAction] = []
-        let returnToStart = ratio < returnToStartRatio
+        let returnToStart = distanceTraveledRatio < returnToStartRatio
         for row in 0..<sprites.count {
             for col in 0..<sprites.count {
                 let position = returnToStart ? originalPosition[row][col] : finalPosition[row][col]
-                spriteActions.append(SpriteAction(sprite: sprites[row][col], action: SKAction.move(to: position, duration: 0.07)))
+                spriteActions.append(SpriteAction(sprite: sprites[row][col], action: SKAction.move(to: position, duration: AnimationSettings.RotatePreview.finishRotateSpeed)))
             }
         }
         
-        /*
-         var sprites: [[DFTileSpriteNode]] = []
-         var originalPosition: [[CGPoint]] = []
-         var finalPosition: [[CGPoint]] = []
-         var tileTransformation: [TileTransformation] = []
-         var originalInput: Transformation?
-         var totalDistance = CGFloat(300.0)
-         var distancedMoved = CGFloat(0.0)
-         var rotateInputType: InputType?
-         var ratio: CGFloat = 0
-
-         */
-        
-        rotateInputType = nil
-        distancedMoved = 0
-        sprites = []
-        originalPosition = []
-        finalPosition = []
-        tileTransformation = []
-        totalDistance = 0.0
-        ratio = 0
-        
         InputQueue.append(Input(.rotatePreviewFinish(spriteActions, returnToStart ? nil : originalInput)))
-        
-        originalInput = nil
     }
     
 }

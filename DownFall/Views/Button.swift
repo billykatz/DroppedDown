@@ -116,7 +116,8 @@ class Button: SKShapeNode {
          fontSize: CGFloat,
          fontColor: UIColor,
          backgroundColor: UIColor = .clayRed,
-         showSelection: Bool = true) {
+         showSelection: Bool = true,
+         addTextLabel: Bool = true) {
         
         //Set properties
         self.delegate = delegate
@@ -150,20 +151,22 @@ class Button: SKShapeNode {
         isUserInteractionEnabled = true
         zPosition = precedence.rawValue
         
+        if addTextLabel {
+            //Create Label
+            let label = Label(text: identifier.title,
+                              width: self.frame.width,
+                              delegate: self,
+                              precedence: precedence,
+                              identifier: identifier,
+                              fontSize: fontSize,
+                              fontColor: fontColor)
+            label.position = self.frame.center
+            label.zPosition = Precedence.menu.rawValue
+            
+            // Add Label
+            buttonView?.addChild(label)
+        }
         
-        //Create Label
-        let label = Label(text: identifier.title,
-                          width: self.frame.width,
-                          delegate: self,
-                          precedence: precedence,
-                          identifier: identifier,
-                          fontSize: fontSize,
-                          fontColor: fontColor)
-        label.position = self.frame.center
-        label.zPosition = Precedence.menu.rawValue
-        
-        // Add Label
-        buttonView?.addChild(label)
         self.addChildSafely(buttonView)
         
         //add touch expanding view

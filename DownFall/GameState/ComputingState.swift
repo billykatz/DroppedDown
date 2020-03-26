@@ -23,6 +23,8 @@ struct ComputingState: GameState {
             else {
                 return AnyGameState(AnimatingState())
             }
+        case .tileDetail:
+            return AnyGameState(PauseState())
         case .newTurn:
             return AnyGameState(PlayState())
         default:
@@ -32,7 +34,7 @@ struct ComputingState: GameState {
     
     func shouldAppend(_ input: Input) -> Bool {
         switch input.type {
-        case .transformation, .newTurn:
+        case .transformation, .newTurn, .tileDetail:
             return true
         default:
             return false

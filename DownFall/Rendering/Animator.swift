@@ -91,7 +91,7 @@ struct Animator {
         let minecart = SKSpriteNode(imageNamed: "minecart")
         minecart.size = exitSprite.size.scale(by: Style.DFTileSpriteNode.Exit.minecartSizeCoefficient)
         minecart.zPosition = Precedence.foreground.rawValue
-        minecart.position = CGPoint.position(minecart.frame, inside: exitSprite.frame, verticaliy: .center, anchor: .center)
+        minecart.position = CGPoint.position(minecart.frame, inside: exitSprite.frame, verticalAnchor: .center, horizontalAnchor: .center)
         
         let playerWin = SKSpriteNode(imageNamed: "playerWin")
         playerWin.size = exitSprite.size.scale(by: Style.DFTileSpriteNode.Exit.minecartSizeCoefficient)
@@ -238,6 +238,10 @@ struct Animator {
             groupedActions.append(defend)
         }
         
+        if let unwindAttackAnimaton = animation(for: .attack, fromPosition: attackerPosition, in: tiles, sprites: sprites, dispatchGroup: dispatchGroup)?.reversed() {
+            groupedActions.append(unwindAttackAnimaton)
+        }
+        
         
         foreground.run(SKAction.sequence(groupedActions))
         dispatchGroup.notify(queue: .main) {
@@ -308,7 +312,7 @@ struct Animator {
             
             /// Create a sprite where to run the animations
             /// This will get added and removed from the foreground node
-            let sprite = SKSpriteNode(color: .clear, size: CGSize(width: 100, height: 100))
+            let sprite = SKSpriteNode(color: .clear, size: sprites[0][0].size)
             sprite.position = position
             sprite.zPosition = Precedence.menu.rawValue
             
@@ -337,13 +341,8 @@ struct Animator {
                 projectileAnimations = [midFrameAnimation]
             }
             
-            
-//            if isProjectileSequenced && projectileRetracts {
-//                /// Create a wait action to wait before animating.
-//                /// For example, if a projectile will fly across 3 tiles, then the 2nd and 2rd tile need to wait before displaying the projectile
-//                let waitAction = SKAction.wait(forDuration: Double(idx) * Double(startFramesCount) * projectileTilePerFrame)
-//                sequencedActions.append(waitAction)
-//            }
+    
+            /// sequence the projectile
             if isProjectileSequenced, case let TileType.monster(monsterData) = tiles[entityPosition].type {
                 let duration = projectileKeyFrame(for: monsterData, index: idx)
                 let waitAction = SKAction.wait(forDuration: duration * projectileTilePerFrame)

@@ -18,7 +18,7 @@ class TileCreator: TileStrategy {
     var specialRocks = 0
     var specialGems = 0
     var goldVariance = 2
-    let maxMonsterRatio: Double = 0.20
+    let maxMonsterRatio: Double = 0.15
     
     required init(_ entities: EntitiesModel,
                   difficulty: Difficulty,
@@ -144,7 +144,7 @@ class TileCreator: TileStrategy {
         // copy the given array to keep track of where we need tiles
         var newTiles: [[Tile]] = tiles
         
-        let maxMonsters = Int(Double(tiles.count) * maxMonsterRatio)
+        let maxMonsters = Int(Double(tiles.count * tiles.count) * maxMonsterRatio)
         var currMonsterCount = typeCount(for: tiles, of: .monster(.zero)).count
         
         for row in 0..<newTiles.count {
@@ -155,15 +155,15 @@ class TileCreator: TileStrategy {
                 if tiles[row][col].type == .empty {
                     // update the new array and check for neighbors in new array as well.
                     // check if there are any columns above me
-                    var columnAboveMe = 0
+                    var pillarAboveMe = 0
                     for rowAbove in row..<newTiles.count {
                         if case TileType.pillar = newTiles[rowAbove][col].type {
-                            columnAboveMe += 1
+                            pillarAboveMe += 1
                         }
                     }
                     
-                    if columnAboveMe == 0 {
-                        let newTile = randomTile(neighbors(of: TileCoord(row: row, column: col), in: newTiles), noMoreMonsters: currMonsterCount < maxMonsters)
+                    if pillarAboveMe == 0 {
+                        let newTile = randomTile(neighbors(of: TileCoord(row: row, column: col), in: newTiles), noMoreMonsters: currMonsterCount >= maxMonsters)
                         if newTile.type == .monster(.zero) {
                             currMonsterCount += 1
                         }

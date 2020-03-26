@@ -54,7 +54,9 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
                                         .decrementDynamites(Set<TileCoord>()),
                                         .rotatePreview([], .zero),
                                         .rotatePreviewFinish([], nil),
-                                        .refillEmpty
+                                        .refillEmpty,
+                                        .tileDetail(.exit, []),
+                                        .boardBuilt
                                                                  
     ]
     
@@ -92,6 +94,7 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
     case rotatePreview([[DFTileSpriteNode]], Transformation)
     case rotatePreviewFinish([SpriteAction], Transformation?)
     case refillEmpty
+    case tileDetail(TileType, [TileCoord])
     
     var debugDescription: String {
         switch self {
@@ -159,6 +162,8 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
             return "Rotate finish"
         case .refillEmpty:
             return "Refill empty tiles"
+        case .tileDetail:
+            return "Tile detail"
         }
     }
 }

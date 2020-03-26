@@ -30,3 +30,14 @@ extension SKNode {
         child?.position = childPosition ?? .zero
     }
 }
+
+extension SKNode {
+    func removeAllChildren(exceptChildWithName name: String) {
+        for child in children {
+            if child.name != name {
+                child.removeFromParent()
+            }
+        }
+    }
+}
+

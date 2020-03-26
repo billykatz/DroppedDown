@@ -21,6 +21,9 @@ class Renderer: SKSpriteNode {
     // Used to determine what special UI consdierations to make for what level we are on
     private let level: Level
     
+    // View for TileDetail
+    private var tileDetailView: TileDetailView?
+    
     private var spriteForeground = SKNode()
     private var menuForeground = SKNode()
     
@@ -90,9 +93,14 @@ class Renderer: SKSpriteNode {
         
         foreground = givenForeground
         
+        // backpack view
         self.backpackView = BackpackView(playableRect: playableRect, viewModel: TargetingViewModel(), levelSize: level.boardSize)
         
+        
         super.init(texture: nil, color: .clear, size: CGSize.zero)
+        
+        // tile detail view
+        self.tileDetailView = TileDetailView(foreground: foreground, playableRect: playableRect, animator: Animator(), alignedTo: hud.frame, levelSize: level.boardSize)
         
         self.backpackView.touchDelegate = touchDelegate
         self.isUserInteractionEnabled = true
@@ -252,9 +260,7 @@ class Renderer: SKSpriteNode {
         spriteForeground.removeAllChildren()
         for (row, innerSprites) in sprites.enumerated() {
             for (col, sprite) in innerSprites.enumerated() {
-                if tiles[row][col].shouldHighlight {
-                    sprite.indicateSpriteWillBeAttacked()
-                } else if let turns = tiles[row][col].type.turnsUntilAttack(),
+                if let turns = tiles[row][col].type.turnsUntilAttack(),
                     let frequency = tiles[row][col].type.attackFrequency() {
                     sprite.showAttackTiming(frequency, turns)
                 }
@@ -370,7 +376,6 @@ class Renderer: SKSpriteNode {
             let trans = transformations.first?.tileTransformation?.first,
             let rotateEndTiles = rotateTrans.endTiles else {
                 preconditionFailure("All conditions must be met to rotate")
-                return
         }
         
         guard transformations.count > 1 else {
@@ -576,6 +581,8 @@ extension Renderer {
         guard let touch = touches.first else { return }
         let positionInScene = touch.location(in: self.foreground)
         let nodes = foreground.nodes(at: positionInScene)
+        
+        self.tileDetailView?.touchesEnded(touches, with: event)
         
         for node in nodes {
             if node is DFTileSpriteNode {

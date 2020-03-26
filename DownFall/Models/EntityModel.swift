@@ -14,7 +14,7 @@ protocol ResetsAttacks {
 }
 
 struct EntityModel: Equatable, Decodable {
-        
+    
     enum EntityType: String, Decodable, CaseIterable {
         case bat
         case rat
@@ -26,6 +26,23 @@ struct EntityModel: Equatable, Decodable {
         case easyPlayer
         case normalPlayer
         case hardPlayer
+        
+        var humanReadable: String {
+            switch self {
+            case .bat:
+                return "Bat"
+            case .rat:
+                return "Rat"
+            case .dragon:
+                return "Dragon"
+            case .alamo:
+                return "Alamo"
+            case .player, .easyPlayer, .hardPlayer, .normalPlayer:
+                return "You"
+            default:
+                return self.rawValue
+            }
+        }
     }
     
     static let playerCases: [EntityType] = [.easyPlayer, .normalPlayer, .hardPlayer]
@@ -120,7 +137,7 @@ struct EntityModel: Equatable, Decodable {
         }
         
         return self.update(abilities: newAbilities)
-
+        
     }
     
     func remove(_ ability: Ability) -> EntityModel {
@@ -179,7 +196,7 @@ struct EntityModel: Equatable, Decodable {
         }
         return update(abilities: newAbilities)
     }
-
+    
 }
 
 extension EntityModel: ResetsAttacks {
@@ -220,7 +237,6 @@ struct EntitiesModel: Equatable, Decodable {
         return entity(with: .hardPlayer)
     }
 }
-
 
 extension EntityModel: CustomDebugStringConvertible {
     var debugDescription: String {

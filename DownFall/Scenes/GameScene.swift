@@ -245,6 +245,8 @@ extension GameScene {
             self.rotatePreview?.touchesEnded()
         }
         self.touchWasSwipe = false
+        
+        self.renderer?.touchesEnded(touches, with: event)
     }
 }
 

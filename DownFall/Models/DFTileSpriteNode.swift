@@ -26,14 +26,15 @@ class DFTileSpriteNode: SKSpriteNode {
                        color: .clear,
                        size: size)
             
-            let trackSprite = SKSpriteNode(texture: tracks, size: size)
-            trackSprite.zPosition = Precedence.background.rawValue
-            addChild(trackSprite)
             let minecartSprite = SKSpriteNode(texture: minecart, size: minecartSize)
-            minecartSprite.zPosition = Precedence.foreground.rawValue
+            //            minecartSprite.zPosition = Precedence.foreground.rawValue
             minecartSprite.position = CGPoint.position(this: minecartSprite.frame, centeredInBottomOf: self.frame, verticalPadding: Style.Padding.less)
             minecartSprite.name = "minecart"
             addChild(minecartSprite)
+            
+            let trackSprite = SKSpriteNode(texture: tracks, size: size)
+            trackSprite.zPosition = Precedence.background.rawValue
+            addChild(trackSprite)
             
         default:
             

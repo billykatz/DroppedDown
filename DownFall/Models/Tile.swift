@@ -16,14 +16,11 @@ enum Color {
 
 struct Tile: Hashable {
     let type: TileType
-    var shouldHighlight: Bool
     var tutorialHighlight: Bool
     
     init(type: TileType,
-         shouldHighlight: Bool = false,
          tutorialHighlight: Bool = false) {
         self.type = type
-        self.shouldHighlight = shouldHighlight
         self.tutorialHighlight = tutorialHighlight
     }
     
@@ -75,7 +72,7 @@ struct Tile: Hashable {
 
 extension Tile: Equatable {
     static func ==(lhs: Tile, rhs: Tile) -> Bool {
-        return lhs.type == rhs.type && lhs.shouldHighlight == rhs.shouldHighlight
+        return lhs.type == rhs.type
     }
 }
 
@@ -249,14 +246,14 @@ extension TileType {
             return "rock"
         case .pillar:
             return "pillar"
-        case .player:
-            return "player"
+        case .player(let data):
+            return data.type.humanReadable
         case .exit:
             return "mineshaft"
         case .item:
             return "item"
-        case .monster:
-            return "monster"
+        case .monster(let data):
+            return data.type.humanReadable
         case .gem:
             return "gem"
         case .gold:

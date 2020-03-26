@@ -499,8 +499,7 @@ extension BackpackView {
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
         let position = touch.location(in: self)
-        guard background.contains(position) else {            
-            touchDelegate?.touchesMoved(touches, with: event)
+        guard background.contains(position) else {
             return
         }
         
@@ -521,7 +520,6 @@ extension BackpackView {
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        touchDelegate?.touchesEnded(touches, with: event)
         guard let touch = touches.first else { return }
         let position = touch.location(in: self)
         
@@ -546,7 +544,7 @@ extension BackpackView {
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        touchDelegate?.touchesBegan(touches, with: event)
+//        touchDelegate?.touchesBegan(touches, with: event)
         guard let touch = touches.first else { return }
         let position = touch.location(in: self)
         initialPosition = position

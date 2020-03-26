@@ -240,7 +240,6 @@ extension GameScene {
                 touchWasCanceled = false
                 return
             }
-            self.renderer?.touchesEnded(touches, with: event)
         } else {
             self.rotatePreview?.touchesEnded()
         }

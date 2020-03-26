@@ -84,13 +84,18 @@ class TileDetailView: SKNode {
         contentView.addChild(targetingArea)
         self.foreground.addChild(contentView)
         
+        
         super.init()
+        
+        // default interaction is false
+        isUserInteractionEnabled = false
         
         Dispatch.shared.register { [weak self] input in
             switch input.type {
             case .tileDetail(let tileType, let attacks):
                 self?.tileType = tileType
                 self?.tileAttacks = attacks
+                self?.isUserInteractionEnabled = true
             default:
                 break
             }
@@ -201,6 +206,7 @@ extension TileDetailView {
             tileType = nil
             tileAttacks = []
             InputQueue.append(Input(.play))
+            isUserInteractionEnabled = false
         }
     }
 }

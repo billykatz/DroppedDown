@@ -38,7 +38,7 @@ struct EntityModel: Equatable, Decodable {
             case .alamo:
                 return "Alamo"
             case .player, .easyPlayer, .hardPlayer, .normalPlayer:
-                return "You"
+                return "Player"
             default:
                 return self.rawValue
             }
@@ -48,6 +48,7 @@ struct EntityModel: Equatable, Decodable {
     static let playerCases: [EntityType] = [.easyPlayer, .normalPlayer, .hardPlayer]
     
     static let zero: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .rat, carry: .zero, animations: [], abilities: [])
+    static let playerZero: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .player, carry: .zero, animations: [], abilities: [])
     
     let originalHp: Int
     let hp: Int

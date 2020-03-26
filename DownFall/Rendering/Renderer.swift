@@ -582,7 +582,11 @@ extension Renderer {
         let positionInScene = touch.location(in: self.foreground)
         let nodes = foreground.nodes(at: positionInScene)
         
-        self.tileDetailView?.touchesEnded(touches, with: event)
+        if self.tileDetailView?.isUserInteractionEnabled ?? false {
+            self.tileDetailView?.touchesEnded(touches, with: event)
+        } else {
+            self.backpackView.touchesEnded(touches, with: event)
+        }
         
         for node in nodes {
             if node is DFTileSpriteNode {

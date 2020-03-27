@@ -62,7 +62,7 @@ class Renderer: SKSpriteNode {
     }()
     
     private lazy var hud: HUD = {
-        let hud = HUD.build(color: .foregroundBlue, size: CGSize(width: playableRect.width, height: Style.HUD.height), delegate: self)
+        let hud = HUD.build(color: .foregroundBlue, size: CGSize(width: playableRect.width, height: Style.HUD.height), delegate: self, threatLevelController: level.threatLevelController)
         hud.position = CGPoint.alignHorizontally(hud.frame, relativeTo: safeArea.frame, horizontalAnchor: .center, verticalAlign: .bottom, translatedToBounds: true)
         hud.zPosition = Precedence.foreground.rawValue
         return hud

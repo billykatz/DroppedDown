@@ -20,5 +20,18 @@ struct CombatSimulator {
         
         return (newAttacker, newDefender)
     }
+    
+    static func simulate(attacker: EntityModel,
+                         defender: EntityModel,
+                         attacked from: Direction,
+                         threatLevel: ThreatLevel) -> (EntityModel, EntityModel) {
+        let newAttacker = attacker.didAttack()
+        
+        //create new defender model reflecting new state
+        let newDefender = defender.wasAttacked(for: attacker.attack.damage * threatLevel.color.goldDamageMultiplier, from: from)
+        
+        return (newAttacker, newDefender)
+    }
+
 }
 

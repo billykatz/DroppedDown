@@ -238,7 +238,7 @@ struct Animator {
             groupedActions.append(defend)
         }
         
-        if let unwindAttackAnimaton = animation(for: .attack, fromPosition: attackerPosition, in: tiles, sprites: sprites, dispatchGroup: dispatchGroup)?.reversed() {
+        if let unwindAttackAnimaton = animation(for: .attack, fromPosition: attackerPosition, in: tiles, sprites: sprites, dispatchGroup: dispatchGroup) {
             groupedActions.append(unwindAttackAnimaton)
         }
         
@@ -394,7 +394,8 @@ struct Animator {
                            fromPosition position: TileCoord?,
                            in tiles: [[Tile]],
                            sprites: [[DFTileSpriteNode]],
-                           dispatchGroup: DispatchGroup) -> SKAction? {
+                           dispatchGroup: DispatchGroup,
+                           reverse: Bool = false) -> SKAction? {
         
         var animationFrames: [SKTexture]?
         // get the attack animation
@@ -410,7 +411,8 @@ struct Animator {
         
         // animate!
         if let position = position,
-            let frames = animationFrames {
+            var frames = animationFrames {
+            if reverse { frames.reverse() }
             let animation = SKAction.animate(with: frames, timePerFrame: self.timePerFrame())
             
             dispatchGroup.enter()

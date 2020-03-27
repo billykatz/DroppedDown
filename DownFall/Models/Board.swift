@@ -12,14 +12,15 @@ class Board: Equatable {
     }
     
     private(set) var tiles: [[Tile]]
+    private let level: Level
+    var tileCreator: TileStrategy
     
     private var playerPosition : TileCoord? {
         return getTileStructPosition(.player(.zero))
     }
-    var boardSize: Int { return tiles.count }
-    var tileCreator: TileStrategy
     
-    private let level: Level
+    var boardSize: Int { return tiles.count }
+    
     
     subscript(index: TileCoord) -> TileType? {
         guard isWithinBounds(index) else { return nil }
@@ -603,7 +604,7 @@ extension Board {
     private func monsterDied(at coord: TileCoord, input: Input) -> Transformation {
         if case let .monster(monsterData) = tiles[coord].type {
             let gold = tileCreator.goldDropped(from: monsterData)
-            let item = Item.init(type: .gold, amount: gold)
+            let item = Item.init(type: .gold, amount: gold * level.threatLevelController.threatLevel.color.goldDamageMultiplier)
             let itemTile = TileType.item(item)
             tiles[coord.x][coord.y] = Tile(type: itemTile)
             return Transformation(transformation: nil,
@@ -892,7 +893,8 @@ extension Board {
             
             let (newAttackerData, newDefenderData) = CombatSimulator.simulate(attacker: attacker,
                                                                               defender: defender,
-                                                                              attacked: relativeAttackDirection)
+                                                                              attacked: relativeAttackDirection,
+                                                                              threatLevel: level.threatLevelController.threatLevel)
             
             tiles[attackerPosition.x][attackerPosition.y] = Tile(type: TileType.monster(newAttackerData))
             tiles[defenderPosition.x][defenderPosition.y] = Tile(type: TileType.player(newDefenderData))

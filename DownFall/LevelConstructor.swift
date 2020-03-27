@@ -21,7 +21,8 @@ struct LevelConstructor {
                          abilities: availableAbilities(per: levelType, difficulty: difficulty),
                          goldMultiplier: difficulty.goldMultiplier,
                          rocksRatio: availableRocksPerLevel(levelType, difficulty: difficulty),
-                         pillarCoordinates: pillars(per: levelType, difficulty: difficulty))
+                         pillarCoordinates: pillars(per: levelType, difficulty: difficulty),
+                         threatLevelController: ThreatLevelController())
         }
     }
     
@@ -37,6 +38,7 @@ struct LevelConstructor {
                   goldMultiplier: 1,
                   rocksRatio: [:],
                   pillarCoordinates: [],
+                  threatLevelController: ThreatLevelController(),
                   tutorialData: GameScope.shared.tutorials[index])
         }
     }
@@ -130,11 +132,11 @@ struct LevelConstructor {
         let boardsize = boardWidth * boardWidth
         switch (levelType, difficulty) {
         case (.first, _):
-            return boardsize/20
+            return boardsize/15
         case (.second, _):
-            return boardsize/20
+            return boardsize/15
         case (.third, _):
-            return boardsize/20
+            return boardsize/12
         case (.boss, _):
             return 0
             

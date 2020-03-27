@@ -55,6 +55,6 @@ struct LesserHealingPotion: Ability {
     }
     var heal: Int? { return 1 }
     var targets: Int? { return 1 }
-    var targetTypes: [TileType]? { return [TileType.player(.zero)] }
+    var targetTypes: [TileType]? { return [TileType.player(.playerZero)] }
 }
 

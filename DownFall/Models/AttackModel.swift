@@ -8,6 +8,7 @@
 
 import Foundation
 
+
 struct AttackSlope: Equatable, Decodable {
     let over: Int
     let up: Int
@@ -19,6 +20,21 @@ struct AttackSlope: Equatable, Decodable {
             AttackSlope(over: 0, up: -1),
             AttackSlope(over: 1, up: 0)
         ]
+    }
+    
+    var humanReadable: String {
+        if abs(over) == abs(up) {
+            return "diagonally"
+        } else if over > 0, up == 0 {
+            return "right"
+        } else if over < 0, up == 0 {
+            return "left"
+        } else if up > 0, over == 0 {
+            return "up"
+        } else if up < 0, over == 0 {
+            return "down"
+        }
+        return "over \(over) and up \(up)"
     }
 }
 
@@ -48,6 +64,58 @@ struct AttackModel: Equatable, Decodable {
         case damage
         case attacksPerTurn
         case attackSlope
+    }
+    
+    func numberDescription(for number: Int) -> String {
+        let numberDescriptor: String
+        switch number {
+        case 1:
+            numberDescriptor = "st"
+        case 2:
+            numberDescriptor = "nd"
+        case 3:
+            numberDescriptor = "rd"
+        default:
+            numberDescriptor = "th"
+            
+        }
+        return numberDescriptor
+    }
+    
+    public func humanReadable() -> String {
+        var string = ""
+        let numberDescriptor = numberDescription(for: range.lower)
+        let upperNumberDescriptor = numberDescription(for: range.upper)
+        
+        /// direction string
+        let directionString: String
+        let directions = attackSlope.map { $0.humanReadable }.removingDuplicates()
+        if directions.count == 1 {
+            directionString = "attacks \(directions.first!)."
+        } else if directions.count == 2 {
+            directionString = "attacks \(directions[0]) and \(directions[1])."
+        } else {
+            let directionsWithCommas = directions.dropLast().joined(separator: ", ")
+            let lastDirection = "and \(directions.last ?? "")"
+            directionString = "attacks \(directionsWithCommas)\(lastDirection)."
+        }
+        string.append("\u{2022} \(directionString)")
+        
+        /// range string
+        let attackString: String
+        if range.lower == range.upper {
+            attackString = "attacks the \(range.lower)\(numberDescriptor) tile."
+        } else if range.lower == range.upper - 1  {
+            attackString = "attacks the \(range.lower)\(numberDescriptor) and \(range.upper)\(upperNumberDescriptor) tile."
+        }
+        else {
+            attackString = "attacks the \(range.lower)\(numberDescriptor) through the \(range.upper)\(upperNumberDescriptor) tiles."
+        }
+        string.append("\n\u{2022} \(attackString)")
+        string.append("\n\u{2022} deals \(damage) damage.")
+        
+        return string
+        
     }
 
     static let zero = AttackModel(type: .targets,

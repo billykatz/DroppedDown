@@ -45,18 +45,9 @@ class Board: Equatable {
             tileCol < boardSize
     }
     
-    private func resetShouldHighlight() {
-        for i in 0..<tiles.count {
-            for j in 0..<tiles[i].count {
-                let tile = tiles[i][j]
-                tiles[i][j] = Tile(type: tile.type, shouldHighlight: false)
-            }
-        }
-    }
     
     func handle(input: Input) {
         var transformation: Transformation?
-        resetShouldHighlight()
         switch input.type {
         case .rotateCounterClockwise(let preview):
             InputQueue.append(Input(.transformation(rotate(.counterClockwise, preview: preview))))
@@ -69,8 +60,10 @@ class Board: Equatable {
                                             inputType: input.type,
                                             endTiles: tiles)
         case .touch(let tileCoord, let type):
-            if case TileType.monster = type {
-                transformation = indicateAttackPattern(from: tileCoord, inputType: input.type)
+            if case TileType.monster(let data) = type {
+                let attacks = calculateAttacks(for: data, from: tileCoord)
+                InputQueue.append(Input(.tileDetail(type, attacks)))
+                return
             } else {
                 transformation = removeAndReplace(from: tiles, tileCoord: tileCoord, input: input)
             }
@@ -136,7 +129,7 @@ class Board: Equatable {
              .tutorial,
              .visitStore,
              .itemUseCanceled, .itemCanBeUsed, .bossTargetsWhatToEat, .bossTargetsWhatToAttack,
-             .rotatePreview:
+             .rotatePreview, .tileDetail:
             transformation = nil
         }
         
@@ -232,40 +225,14 @@ class Board: Equatable {
         return [removeAndReplace(from: tiles, specificCoord: targets, input: input)]
     }
     
-    func indicateAttackPattern(from coord: TileCoord, inputType: InputType) -> Transformation {
-        func attackedTiles(in tiles: [[Tile]], from position: TileCoord) -> [TileCoord] {
-            guard isWithinBounds(position) else { return [] }
-            let attacker = tiles[position]
-            if case TileType.player(let player) = attacker.type  {
-                return calculateAttacks(for: player, from: position)
-            } else if case TileType.monster(let monster) = attacker.type {
-                return calculateAttacks(for: monster, from: position)
+    func calculateAttacks(for entity: EntityModel, from position: TileCoord) -> [TileCoord] {
+        return entity.attack.targets(from: position).compactMap { target in
+            if isWithinBounds(target) {
+                return target
             }
-            return []
+            return nil
         }
-        
-        
-        func calculateAttacks(for entity: EntityModel, from position: TileCoord) -> [TileCoord] {
-            return entity.attack.targets(from: position).compactMap { target in
-                if isWithinBounds(target) {
-                    return target
-                }
-                return nil
-            }
-        }
-        
-        var newTiles = tiles
-        let affectedTile = attackedTiles(in: tiles, from: coord)
-        for coord in affectedTile {
-            newTiles[coord.x][coord.y].shouldHighlight = true
-        }
-        tiles = newTiles
-        
-        return Transformation(transformation: .none,
-                              inputType: inputType,
-                              endTiles: tiles)
     }
-    
     
     // MARK: - Helpers
     private func getTileStructPosition(_ type: TileType) -> TileCoord? {

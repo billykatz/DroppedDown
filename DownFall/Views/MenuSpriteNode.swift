@@ -13,9 +13,9 @@ class MenuSpriteNode: SKSpriteNode {
     //TODO: Generally, we need to capture all the constants and move them to our Style struct.
     
     init(_ menuType: MenuType, playableRect: CGRect, precedence: Precedence, level: Level) {
+        
         let menuSizeWidth = playableRect.size.width * menuType.widthCoefficient
         let menuSizeHeight = playableRect.size.height * menuType.heightCoefficient
-        
         
         
         super.init(texture: nil,

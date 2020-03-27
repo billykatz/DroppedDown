@@ -193,7 +193,7 @@ class StoreScene: SKScene {
                                  fontSize: UIFont.smallSize,
                                  fontColor: .white,
                                  backgroundColor: .darkGray)
-        closeButton.position = CGPoint.position(closeButton.frame, inside: popupNode.frame, verticaliy: .top, anchor: .right)
+        closeButton.position = CGPoint.position(closeButton.frame, inside: popupNode.frame, verticalAnchor: .top, horizontalAnchor: .right)
         popupNode.addChild(closeButton)
         popupNode.name = Constants.popup
         return popupNode

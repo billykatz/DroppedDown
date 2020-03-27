@@ -75,8 +75,7 @@ class TutorialScene: SKScene {
                                  foreground: foreground,
                                  boardSize: level.boardSize,
                                  precedence: Precedence.foreground,
-                                 level: level,
-                                 touchDelegate: self
+                                 level: level
         )
         
         

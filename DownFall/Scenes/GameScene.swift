@@ -98,8 +98,7 @@ class GameScene: SKScene {
                                  foreground: foreground,
                                  boardSize: boardSize,
                                  precedence: Precedence.foreground,
-                                 level: level!,
-                                 touchDelegate: self
+                                 level: level!
         )
         
         
@@ -233,6 +232,11 @@ extension GameScene {
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        defer {
+            self.renderer?.touchesEnded(touches, with: event)
+        }
+        
+        
         self.lastPosition = nil
         self.swipeDirection = nil
         if !touchWasSwipe {
@@ -240,7 +244,6 @@ extension GameScene {
                 touchWasCanceled = false
                 return
             }
-            self.renderer?.touchesEnded(touches, with: event)
         } else {
             self.rotatePreview?.touchesEnded()
         }

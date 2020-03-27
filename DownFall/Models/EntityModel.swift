@@ -14,7 +14,7 @@ protocol ResetsAttacks {
 }
 
 struct EntityModel: Equatable, Decodable {
-        
+    
     enum EntityType: String, Decodable, CaseIterable {
         case bat
         case rat
@@ -26,11 +26,29 @@ struct EntityModel: Equatable, Decodable {
         case easyPlayer
         case normalPlayer
         case hardPlayer
+        
+        var humanReadable: String {
+            switch self {
+            case .bat:
+                return "Bat"
+            case .rat:
+                return "Rat"
+            case .dragon:
+                return "Dragon"
+            case .alamo:
+                return "Alamo"
+            case .player, .easyPlayer, .hardPlayer, .normalPlayer:
+                return "Player"
+            default:
+                return self.rawValue
+            }
+        }
     }
     
     static let playerCases: [EntityType] = [.easyPlayer, .normalPlayer, .hardPlayer]
     
     static let zero: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .rat, carry: .zero, animations: [], abilities: [])
+    static let playerZero: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .player, carry: .zero, animations: [], abilities: [])
     
     let originalHp: Int
     let hp: Int
@@ -120,7 +138,7 @@ struct EntityModel: Equatable, Decodable {
         }
         
         return self.update(abilities: newAbilities)
-
+        
     }
     
     func remove(_ ability: Ability) -> EntityModel {
@@ -179,7 +197,7 @@ struct EntityModel: Equatable, Decodable {
         }
         return update(abilities: newAbilities)
     }
-
+    
 }
 
 extension EntityModel: ResetsAttacks {
@@ -220,7 +238,6 @@ struct EntitiesModel: Equatable, Decodable {
         return entity(with: .hardPlayer)
     }
 }
-
 
 extension EntityModel: CustomDebugStringConvertible {
     var debugDescription: String {

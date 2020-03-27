@@ -130,11 +130,11 @@ struct LevelConstructor {
         let boardsize = boardWidth * boardWidth
         switch (levelType, difficulty) {
         case (.first, _):
-            return boardsize/10
+            return boardsize/20
         case (.second, _):
-            return boardsize/9
+            return boardsize/20
         case (.third, _):
-            return boardsize/8
+            return boardsize/20
         case (.boss, _):
             return 0
             

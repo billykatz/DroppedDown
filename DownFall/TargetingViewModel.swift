@@ -167,7 +167,7 @@ class TargetingViewModel: Targeting {
                 if let inputType = trans.first?.inputType,
                     case InputType.itemUsed(_) = inputType,
                     let tiles = trans.first?.endTiles,
-                    let playerCoord = getTilePosition(.player(.zero), tiles: tiles),
+                    let playerCoord = getTilePosition(.player(.playerZero), tiles: tiles),
                     case TileType.player(let data) = tiles[playerCoord].type
                 {
                     self?.inventory = data.abilities

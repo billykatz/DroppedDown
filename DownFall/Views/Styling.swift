@@ -13,6 +13,11 @@ struct Style {
     static let buttonToBottomPadding: CGFloat = 16.0
     static let paragraphPadding: CGFloat = 8.0
     
+    struct DetailView {
+        static let spriteSize = CGSize(width: 200.0, height: 200.0)
+        static let closeButtonSize = CGSize(width: 75.0, height: 75.0)
+    }
+    
     struct Backpack {
         static let heightCoefficient = CGFloat(0.20)
         static let backpackViewSizeCoefficient = CGFloat(0.75)

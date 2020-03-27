@@ -24,9 +24,6 @@ class BackpackView: SKSpriteNode {
     // view model
     private let viewModel: TargetingViewModel
     
-    // touch delegate
-    weak var touchDelegate: UIResponder?
-    
     // constants
     private let targetingAreaName = "targetingArea"
     
@@ -119,7 +116,7 @@ class BackpackView: SKSpriteNode {
         
         // item  areas
         itemArea = SKSpriteNode(color: .clear, size: CGSize(width: CGFloat(viewModel.inventory.count) * Style.Backpack.itemSize.width, height: height/2))
-        itemArea.position = CGPoint.position(itemArea.frame, inside: inventoryArea.frame, verticaliy: .bottom, anchor: .left)
+        itemArea.position = CGPoint.position(itemArea.frame, inside: inventoryArea.frame, verticalAnchor: .bottom, horizontalAnchor: .left)
         
         self.emptyItemArea = SKSpriteNode(color: .clear,
                                           size: CGSize(width: playableRect.width, height: height))
@@ -233,7 +230,7 @@ class BackpackView: SKSpriteNode {
         if let number = ability?.count, number > 1 {
             let numberXLabel = ParagraphNode(text: "\(number)x", paragraphWidth: size.width, fontColor: .darkText)
             numberXLabel.zPosition = Precedence.menu.rawValue
-            numberXLabel.position = CGPoint.position(numberXLabel.frame, inside: sprite?.frame ?? .zero, verticaliy: .bottom, anchor: .right)
+            numberXLabel.position = CGPoint.position(numberXLabel.frame, inside: sprite?.frame ?? .zero, verticalAnchor: .bottom, horizontalAnchor: .right)
             
             let backgroundColor = SKSpriteNode(color: .lightGray, size: numberXLabel.size)
             backgroundColor.position = .zero
@@ -273,7 +270,7 @@ class BackpackView: SKSpriteNode {
             
             
             // add the cancel button
-            cancelButton.position = CGPoint.position(cancelButton.frame, inside: itemDetailView.frame, verticaliy: .bottom, anchor: .right, padding: Style.Padding.most*2)
+            cancelButton.position = CGPoint.position(cancelButton.frame, inside: itemDetailView.frame, verticalAnchor: .bottom, horizontalAnchor: .right, padding: Style.Padding.most*2)
             itemDetailView.addChildSafely(cancelButton)
             
             
@@ -351,7 +348,7 @@ class BackpackView: SKSpriteNode {
         
         //recalculate the frame based on number of available abilities
         let newItemArea = SKSpriteNode(color: .clear, size: CGSize(width: CGFloat(viewModel.inventory.count) * Style.Backpack.itemSize.width, height: height/2))
-        newItemArea.position = CGPoint.position(newItemArea.frame, inside: inventoryArea.frame, verticaliy: .center, anchor: .center)
+        newItemArea.position = CGPoint.position(newItemArea.frame, inside: inventoryArea.frame, verticalAnchor: .center, horizontalAnchor: .center)
         
         itemArea = newItemArea
         
@@ -499,8 +496,7 @@ extension BackpackView {
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
         let position = touch.location(in: self)
-        guard background.contains(position) else {            
-            touchDelegate?.touchesMoved(touches, with: event)
+        guard background.contains(position) else {
             return
         }
         
@@ -521,7 +517,6 @@ extension BackpackView {
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        touchDelegate?.touchesEnded(touches, with: event)
         guard let touch = touches.first else { return }
         let position = touch.location(in: self)
         
@@ -546,7 +541,6 @@ extension BackpackView {
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        touchDelegate?.touchesBegan(touches, with: event)
         guard let touch = touches.first else { return }
         let position = touch.location(in: self)
         initialPosition = position

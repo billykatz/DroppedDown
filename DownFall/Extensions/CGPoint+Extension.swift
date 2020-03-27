@@ -59,11 +59,11 @@ extension CGPoint {
     /// Convenience to placing a view in side another view with equal vorizontal and vetical padding
     static func position(_ this: CGRect?,
                          inside that: CGRect?,
-                         verticaliy: Verticality,
-                         anchor: Anchor,
+                         verticalAnchor: Verticality,
+                         horizontalAnchor: Anchor,
                          padding: CGFloat = 0.0) -> CGPoint {
         
-        return CGPoint.position(this, inside: that, verticalAlign: verticaliy, horizontalAnchor: anchor, xOffset: padding, yOffset: padding)
+        return CGPoint.position(this, inside: that, verticalAlign: verticalAnchor, horizontalAnchor: horizontalAnchor, xOffset: padding, yOffset: padding)
     }
     
     /// Position a view insde relative to another view.
@@ -74,10 +74,11 @@ extension CGPoint {
                          verticalAlign: Verticality,
                          horizontalAnchor: Anchor,
                          xOffset: CGFloat = 0.0,
-                         yOffset: CGFloat = 0.0) -> CGPoint {
+                         yOffset: CGFloat = 0.0,
+                         translatedToBounds: Bool = false) -> CGPoint {
         guard let this = this, let that = that else { return .zero }
         
-        let y: CGFloat
+        var y: CGFloat
         switch verticalAlign {
         case .top:
             y = that.height/2 - this.height/2 - yOffset
@@ -87,7 +88,7 @@ extension CGPoint {
             y = -that.height/2 + this.height/2 + yOffset
         }
         
-        let x: CGFloat
+        var x: CGFloat
         switch horizontalAnchor {
         case .left:
             x = -that.width/2 + this.width/2 + xOffset
@@ -95,6 +96,11 @@ extension CGPoint {
             x = 0.0
         case .right:
             x = that.width/2 - this.width/2 - xOffset
+        }
+        
+        if translatedToBounds {
+            x = that.center.x + x
+            y = that.center.y + y
         }
         
         return CGPoint(x: x, y: y)

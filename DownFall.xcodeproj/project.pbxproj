@@ -129,6 +129,7 @@
 		5819AB71242A5CA600498BB6 /* SpriteAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5819AB70242A5CA600498BB6 /* SpriteAction.swift */; };
 		5819AB73242A668400498BB6 /* SwipeTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5819AB72242A668400498BB6 /* SwipeTypes.swift */; };
 		58383643242D7A6E004CA026 /* Array+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58383642242D7A6E004CA026 /* Array+Extensions.swift */; };
+		5838364B242D7E21004CA026 /* ThreatLevelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5838364A242D7E21004CA026 /* ThreatLevelController.swift */; };
 		5843F4542426747100C03612 /* RotatePreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5843F4532426747100C03612 /* RotatePreviewView.swift */; };
 		5865D62E23DBF652007D11FC /* abilities.json in Sources */ = {isa = PBXBuildFile; fileRef = 5865D62D23DBF652007D11FC /* abilities.json */; };
 		5867A591242B0CD1005BFD10 /* TileDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5867A590242B0CD1005BFD10 /* TileDetailView.swift */; };
@@ -281,6 +282,7 @@
 		5819AB70242A5CA600498BB6 /* SpriteAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteAction.swift; sourceTree = "<group>"; };
 		5819AB72242A668400498BB6 /* SwipeTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeTypes.swift; sourceTree = "<group>"; };
 		58383642242D7A6E004CA026 /* Array+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Extensions.swift"; sourceTree = "<group>"; };
+		5838364A242D7E21004CA026 /* ThreatLevelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreatLevelController.swift; sourceTree = "<group>"; };
 		5843F4532426747100C03612 /* RotatePreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RotatePreviewView.swift; sourceTree = "<group>"; };
 		5865D62D23DBF652007D11FC /* abilities.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = abilities.json; sourceTree = "<group>"; };
 		5867A590242B0CD1005BFD10 /* TileDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileDetailView.swift; sourceTree = "<group>"; };
@@ -361,6 +363,7 @@
 		3D10609D2340400500ECE7E6 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				3D00A0F823AAC813007E2D8B /* Identifiers.swift */,
 				3D5FB09320AE768700ACD716 /* AnimationSettings.swift */,
 			);
 			path = Settings;
@@ -626,16 +629,16 @@
 		3DF2924C20A37FEE006671AC /* DownFall */ = {
 			isa = PBXGroup;
 			children = (
+				58383649242D7E11004CA026 /* Threat */,
 				3DF0A6B12379CC0500941305 /* Fonts */,
 				3DC072C22375451D0046F224 /* Rules */,
 				3DF2924D20A37FEE006671AC /* AppDelegate.swift */,
-				3DF2925520A37FEE006671AC /* GameViewController.swift */,
+				58383645242D7D10004CA026 /* ViewController */,
 				3D6279CE23AD55010048EB76 /* Game Scope */,
-				3D10609A233DD05500ECE7E6 /* TurnWatcher.swift */,
+				58383644242D7D04004CA026 /* TurnWatcher */,
 				3D3D31ED23ABEFBB002B87EE /* Level */,
-				3D7D8B2C2252857E0016FE4C /* CombatSimulator.swift */,
+				58383646242D7D1E004CA026 /* Combat */,
 				58F034C12408B7C000BE1863 /* Boss */,
-				3D00A0F823AAC813007E2D8B /* Identifiers.swift */,
 				3DF2925F20A37FF0006671AC /* Info.plist */,
 				3D1060A1234040A000ECE7E6 /* Haptics */,
 				3D1060A2234040AA00ECE7E6 /* Sprite Sheet */,
@@ -705,6 +708,38 @@
 				3D68BF9522FF3D9000FC9B10 /* AbilityModel.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		58383644242D7D04004CA026 /* TurnWatcher */ = {
+			isa = PBXGroup;
+			children = (
+				3D10609A233DD05500ECE7E6 /* TurnWatcher.swift */,
+			);
+			name = TurnWatcher;
+			sourceTree = "<group>";
+		};
+		58383645242D7D10004CA026 /* ViewController */ = {
+			isa = PBXGroup;
+			children = (
+				3DF2925520A37FEE006671AC /* GameViewController.swift */,
+			);
+			name = ViewController;
+			sourceTree = "<group>";
+		};
+		58383646242D7D1E004CA026 /* Combat */ = {
+			isa = PBXGroup;
+			children = (
+				3D7D8B2C2252857E0016FE4C /* CombatSimulator.swift */,
+			);
+			name = Combat;
+			sourceTree = "<group>";
+		};
+		58383649242D7E11004CA026 /* Threat */ = {
+			isa = PBXGroup;
+			children = (
+				5838364A242D7E21004CA026 /* ThreatLevelController.swift */,
+			);
+			name = Threat;
 			sourceTree = "<group>";
 		};
 		589A27D223D90FD500174DE7 /* Targeting */ = {
@@ -888,6 +923,7 @@
 				589A27D423D90FE000174DE7 /* TargetingViewModel.swift in Sources */,
 				3D58468822A6322900EDD845 /* RangeModel.swift in Sources */,
 				3D00A0F923AAC813007E2D8B /* Identifiers.swift in Sources */,
+				5838364B242D7E21004CA026 /* ThreatLevelController.swift in Sources */,
 				3DA0A37A22FFAECE0041EF34 /* UIFont+Extensions.swift in Sources */,
 				3DE87C9022374C2C00D750CF /* Button.swift in Sources */,
 				3D14C82123A83D93003E211D /* LevelCoordinator.swift in Sources */,

@@ -9,7 +9,12 @@
 import SpriteKit
 
 class HUD: SKSpriteNode {
-    static func build(color: UIColor, size: CGSize, delegate: SettingsDelegate?) -> HUD {
+    
+    struct Constants {
+        static let threatIndicator = "threatIndicator"
+    }
+    
+    static func build(color: UIColor, size: CGSize, delegate: SettingsDelegate?, threatLevelController: ThreatLevelController) -> HUD {
         let header = HUD(texture: nil, color: color, size: size)
         
         let setting = SKSpriteNode(imageNamed: Identifiers.settings)
@@ -23,6 +28,8 @@ class HUD: SKSpriteNode {
         
         header.isUserInteractionEnabled = true
         header.delegate = delegate
+        
+        header.threatLevelController = threatLevelController
         
         Dispatch.shared.register {
             header.handle($0)
@@ -43,6 +50,48 @@ class HUD: SKSpriteNode {
     let animator = Animator()
     
     var delegate: SettingsDelegate?
+    var threatLevelController: ThreatLevelController?
+    
+    private var threatIndicator: SKSpriteNode? {
+        
+        guard let threatLevel = self.threatLevelController?.threatLevel else { return nil }
+        let totalWidth = CGFloat(500.0)
+        let totalHeight = CGFloat(50)
+        let totalBox = SKShapeNode(rect: CGRect(x: -totalWidth/3, y: -totalHeight - Style.Padding.most, width: totalWidth, height: totalHeight))
+        totalBox.fillColor = .clear
+        totalBox.strokeColor = .black
+        totalBox.lineWidth = 5.0
+        
+        let ratio: CGFloat
+        if threatLevel.color == .red {
+            ratio = 1.0
+        } else {
+            ratio = CGFloat(threatLevel.unitsAccrued - threatLevel.color.numberOfUnits.lowerBound) / CGFloat(threatLevel.color.numberOfUnits.upperBound)
+        }
+        let width = CGFloat(totalWidth) * CGFloat(ratio)
+        let colorIndicator = SKShapeNode(rect: CGRect(x: totalBox.frame.origin.x+5, y: totalBox.frame.origin.y+6, width: width, height: totalHeight-6))
+        colorIndicator.fillColor = threatLevel.color.uicolor
+        
+        let textIndicator: ParagraphNode
+        switch threatLevel.color {
+        case .yellow:
+            textIndicator = ParagraphNode(text: "1x Gold/Damage", paragraphWidth: totalWidth, fontSize: UIFont.mediumSize, fontColor: .black)
+        case .orange:
+            textIndicator = ParagraphNode(text: "2x Gold/Damage", paragraphWidth: totalWidth, fontSize: UIFont.mediumSize, fontColor: .black)
+        case .red:
+            textIndicator = ParagraphNode(text: "3x Gold/Damage", paragraphWidth: totalWidth, fontSize: UIFont.mediumSize, fontColor: .black)
+        }
+        textIndicator.position = totalBox.frame.center
+        
+        let emptySprite = SKSpriteNode(color: .clear, size: self.size)
+        emptySprite.position = .zero
+        emptySprite.addChild(totalBox)
+        emptySprite.addChild(colorIndicator)
+        emptySprite.addChildSafely(textIndicator)
+        emptySprite.name = Constants.threatIndicator
+        
+        return emptySprite
+    }
     
     //Mark: - Instance Methods
     
@@ -87,18 +136,27 @@ class HUD: SKSpriteNode {
                 let playerPosition = getTilePosition(.player(.zero), tiles: tiles),
                 case let TileType.player(data) = tiles[playerPosition].type else { return }
             show(data)
+            updateThreatIndicator()
+        case .newTurn:
+            updateThreatIndicator()
         default:
             ()
         }
     }
-
-    func show(_ data: EntityModel) {
-        // Remove all the hearts so that we can redraw
+    
+    func updateThreatIndicator() {
         for child in children {
-            if child.name != Identifiers.settings {
+            if child.name == Constants.threatIndicator {
                 child.removeFromParent()
             }
         }
+        
+        addChildSafely(threatIndicator)
+    }
+    
+    func show(_ data: EntityModel) {
+        // Remove all the hearts so that we can redraw
+        self.removeAllChildren(exclude: [Identifiers.settings, Constants.threatIndicator])
         
         // create and display the full and empty hearts
         for health in 0..<data.originalHp {
@@ -123,20 +181,6 @@ class HUD: SKSpriteNode {
         let coinNode = SKSpriteNode(texture: SKTexture(imageNamed: Identifiers.gold), size: Style.HUD.heartSize)
         coinNode.position = CGPoint.alignVertically(coinNode.frame, relativeTo: goldLabel.frame, horizontalAnchor: .right, verticalAlign: .center, translatedToBounds: true)
         self.addChild(coinNode)
-        
-        // the label with the player's amount of gems
-        let gemSpriteLabel = ParagraphNode(text: "\(data.carry.total(in: .gem))", paragraphWidth: Style.HUD.labelParagraphWidth, fontName: UIFont.pixelFontName, fontSize: UIFont.extraLargeSize, fontColor: .lightText)
-        gemSpriteLabel.position = CGPoint.alignVertically(gemSpriteLabel.frame, relativeTo: coinNode.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding:  Style.HUD.coinLabelPadding, translatedToBounds: true)
-        gemSpriteLabel.name = Identifiers.gemSpriteLabel
-        self.addChild(gemSpriteLabel)
-        
-        // The sprite of the gem
-        let gemSprite = SKSpriteNode(texture: SKTexture(imageNamed: Identifiers.gem), size: Style.HUD.gemSize)
-        gemSprite.position = CGPoint.alignVertically(gemSprite.frame, relativeTo: gemSpriteLabel.frame, horizontalAnchor: .right, verticalAlign: .center, translatedToBounds: true)
-        self.addChild(gemSprite)
-        
-        
-        
     }
     
     func incrementCurrencyCounter(_ item: Item, total: Int) {
@@ -179,7 +223,7 @@ class HUD: SKSpriteNode {
             let moveUp = SKAction.move(by: CGVector(dx: 0, dy: 50), duration: AnimationSettings.HUD.goldGainedTime)
             let sequence = SKAction.sequence([moveUp, SKAction.removeFromParent()])
             gainedGoldLabel.run(sequence)
-                
+            
             
             animator.animate(animations)
             currentTotalGold = total
@@ -196,5 +240,5 @@ class HUD: SKSpriteNode {
             }
         }
     }
-
+    
 }

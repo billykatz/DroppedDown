@@ -2,8 +2,8 @@
     "entities": [
         { "name": "player2",
             "type": "player",
-            "originalHp": 7,
-            "hp": 7,
+            "originalHp": 8,
+            "hp": 8,
             "attack": {
                 "type": "targets",
                 "frequency" : 1,
@@ -205,7 +205,7 @@
             "carry": {
                 "items": [{
                     "type": "gold",
-                    "amount": 30
+                    "amount": 10
                 }]
                 
             },
@@ -261,7 +261,7 @@
             "carry": {
                 "items": [{
                     "type": "gold",
-                    "amount": 20
+                    "amount": 7
                 }]
             },
             "abilities": []
@@ -323,7 +323,7 @@
             "carry": {
                 "items": [{
                     "type": "gold",
-                    "amount": 30
+                    "amount": 15
                 }]
             },
             "abilities": []
@@ -370,7 +370,7 @@
             "carry": {
                 "items": [{
                     "type": "gold",
-                    "amount": 20
+                    "amount": 10
                 }]
             },
             "abilities": []

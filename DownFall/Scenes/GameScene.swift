@@ -60,6 +60,7 @@ class GameScene: SKScene {
                            updatedEntity: EntityModel? = nil,
                            level: Level) {
         // init our level
+        level.threatLevelController.reset()
         self.level = level
         Referee.injectLevel(level)
         

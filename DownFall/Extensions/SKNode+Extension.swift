@@ -39,5 +39,13 @@ extension SKNode {
             }
         }
     }
+    
+    func removeAllChildren(exclude names: [String]) {
+        for child in children {
+            if !names.contains(child.name ?? "") {
+                child.removeFromParent()
+            }
+        }
+    }
 }
 

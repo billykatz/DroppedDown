@@ -57,7 +57,6 @@ extension GameViewController {
             mainMenuScene.playerModel = updatedPlayerData
 
             if let view = self.view as! SKView? {
-//                setFrame()
                 view.presentScene(mainMenuScene)
                 view.ignoresSiblingOrder = true
             }

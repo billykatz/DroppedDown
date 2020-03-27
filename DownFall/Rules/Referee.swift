@@ -112,13 +112,40 @@ class Referee {
             return TileCoord(initialRow + (i * slopedDirection.up), initialCol + (i * slopedDirection.over))
         }
         
-        func calculateAttacks(for entity: EntityModel, from position: TileCoord) -> [TileCoord] {
-            return entity.attack.targets(from: position).compactMap { target in
+        func calculateAttacks(for entity: EntityModel, from position: TileCoord) -> ([TileCoord], [TileCoord]) {
+            
+            /// remove attacks that are out of bounds
+            let attackedTiles = entity.attack.targets(from: position).compactMap { target -> TileCoord? in
                 if isWithinBounds(target) {
                     return target
                 }
                 return nil
             }
+            
+            /// determine if there are any pillars that are attacks
+            var pillarCoords = Set<TileCoord>()
+            for tileCoord in attackedTiles {
+                if tiles[tileCoord].type.isAPillar {
+                    pillarCoords.insert(tileCoord)
+                }
+            }
+            
+            /// deteremine if the pillar stops attacks and remove those tile coord.
+            var attackedTilesWithPillarsBlocking: [TileCoord] = []
+            for tileCoord in attackedTiles {
+                var blockedByPillar = false
+                for pillar in pillarCoords {
+                    if tileCoord.existsOnLineAfter(b: pillar, onLineFrom: position) {
+                        blockedByPillar = true
+                    }
+                }
+                if !blockedByPillar {
+                    attackedTilesWithPillarsBlocking.append(tileCoord)
+                }
+            }
+            
+            /// return attack tiles considering pillars blocking attacks and the original attacks tile coords
+            return (attackedTilesWithPillarsBlocking, attackedTiles)
         }
         
         func calculatePossibleAttacks(for entity: EntityModel, from position: TileCoord) -> [TileCoord] {
@@ -145,14 +172,14 @@ class Referee {
         }
         
         
-        func attackedTiles(from position: TileCoord) -> [TileCoord] {
+        func attackedTiles(from position: TileCoord) -> ([TileCoord], [TileCoord]) {
             let attacker = tiles[position]
             if case TileType.player(let player) = attacker.type  {
                 return calculateAttacks(for: player, from: position)
             } else if case TileType.monster(let monster) = attacker.type {
                 return calculateAttacks(for: monster, from: position)
             }
-            return []
+            return ([], [])
         }
         
         
@@ -183,7 +210,7 @@ class Referee {
             guard let playerPosition = playerPosition,
                 case TileType.player(let playerData) = tiles[playerPosition].type,
                 playerData.canAttack else { return nil }
-            let attackedTileArray = attackedTiles(from: playerPosition)
+            let (_, attackedTileArray) = attackedTiles(from: playerPosition)
             for attackedTile in attackedTileArray {
                 if case TileType.monster(let data) = tiles[attackedTile].type, data.hp > 0 {
                     return Input(.attack(attackType: playerData.attack.type,
@@ -218,13 +245,27 @@ class Referee {
                     
                     guard shouldAttack else { continue }
                     
-                    let attackedTileArray = attackedTiles(from: potentialMonsterPosition)
-                    for attackedTile in attackedTileArray {
+                    
+                    let (nonBlockedAttackedTiles, allAttackedTileArray) = attackedTiles(from: potentialMonsterPosition)
+
+                    for attackedTile in nonBlockedAttackedTiles {
                         if case TileType.player = tiles[attackedTile].type {
                             return Input(.attack(attackType: monsterData.attack.type,
                                                  attacker: potentialMonsterPosition,
                                                  defender: attackedTile,
-                                                 affectedTiles: attackedTileArray))
+                                                 affectedTiles: nonBlockedAttackedTiles))
+                        } else if case TileType.pillar = tiles[attackedTile].type,
+                            allAttackedTileArray.contains(where: { (coord) -> Bool in
+                                if case TileType.player = tiles[coord].type {
+                                    return true
+                                }
+                                return false
+                            })
+                            {
+                            return Input(.attack(attackType: monsterData.attack.type,
+                                                 attacker: potentialMonsterPosition,
+                                                 defender: attackedTile,
+                                                 affectedTiles: nonBlockedAttackedTiles))
                         }
                     }
                     
@@ -235,7 +276,7 @@ class Referee {
                         return Input(.attack(attackType: monsterData.attack.type,
                                              attacker: potentialMonsterPosition,
                                              defender: nil,
-                                             affectedTiles: attackedTileArray))
+                                             affectedTiles: nonBlockedAttackedTiles))
                     }
                     
                 }
@@ -276,25 +317,46 @@ class Referee {
             return Input(.decrementDynamites(dynamitePos))
         }
         
+        /// We need to refill if ever there is an empty tile with a non-empty and non-pillar tile above it
+        /// Edge cases: If there is a chain of 2 or more empty tiles witha pillar directly on top of them, we do not need to refill
+        /// Edge cases: If there is an empty tile beneath in the same column as a pillar, but the pillar is not directly above the empty tile.  we _do_ need to refill
         func refillEmptyTiles() -> Input? {
             var needsRefill = false
             for col in 0..<tiles.count {
                 var pillarIdx = -1
-                var emptyIdx = -1
+                var prevEmptyIdx = -1
                 for row in 0..<tiles.count {
+                    var currEmptyIdx = -1
                     switch tiles[row][col].type {
                     case .pillar:
+                        // save the most revent pillar idx
                         pillarIdx = row
+                    case .empty:
+                        // save the current empty idx
+                        currEmptyIdx = row
                     default:
-                        ()
+                        /// if the row above a empty tile is not empty and not a pillar, then we need to shit down tiles
+                        if prevEmptyIdx >= 0 {
+                            needsRefill = true
+                        }
                     }
                     
-                    if case TileType.empty = tiles[row][col].type {
-                        emptyIdx = row
+                    /// if the previous tile was empty and the current tile is a pillar, we do not need to shift down.  Reset the indexes so we can properly determine more shift down cases up the column.
+                    if prevEmptyIdx >= 0 && // empty has been set
+                        pillarIdx >= 0 && // pillar has been set
+                        prevEmptyIdx == pillarIdx - 1 {
+                        /// the string of empties has met a pillar
+                        /// reset everything and continue going up the row
+                        
+                        prevEmptyIdx = -1
+                        pillarIdx = -1
                     }
-                }
-                if emptyIdx > pillarIdx {
-                    needsRefill = true
+                    
+                    /// We need to remember the previous empty tile and the current tile to recognize adjacent empty tiles.
+                    /// Save the current empty tile index for the next loop
+                    if currEmptyIdx >= 0 {
+                        prevEmptyIdx = currEmptyIdx
+                    }
                 }
             }
             guard needsRefill else { return nil }
@@ -333,6 +395,10 @@ class Referee {
             return collectItem
         }
         
+        if let refill = refillEmptyTiles() {
+            return refill
+        }
+        
         if let monsterAttack = monsterAttacks() {
             return monsterAttack
         }
@@ -341,9 +407,6 @@ class Referee {
             return decrementDynamite
         }
         
-        if let refill = refillEmptyTiles() {
-            return refill
-        }
         
         let newTurn = TurnWatcher.shared.getNewTurnAndReset()
         return Input(.reffingFinished(newTurn: newTurn), tiles, nil)

@@ -128,6 +128,20 @@ class TileDetailView: SKNode {
         return attackDesc
     }
     
+    private func pillarDescription(tileType: TileType, nextTo: CGRect) -> ParagraphNode? {
+        guard case TileType.pillar(_ , let health) = tileType  else { return nil }
+        let text =
+        """
+        \u{2022} \(health) health
+        \u{2022} blocks attacks
+        """
+        let pillarDesc = ParagraphNode(text: text, paragraphWidth: detailViewTemplate.frame.width - Style.DetailView.spriteSize.width, fontSize: UIFont.mediumSize)
+        pillarDesc.position = CGPoint.alignHorizontally(pillarDesc.frame, relativeTo: nextTo, horizontalAnchor: .left, verticalAlign: .bottom, verticalPadding: Style.Padding.more, translatedToBounds: true)
+        pillarDesc.zPosition = Precedence.menu.rawValue
+        return pillarDesc
+        
+    }
+    
     
     func updateTileDetailView() {
         guard let tileType = tileType else {
@@ -152,6 +166,8 @@ class TileDetailView: SKNode {
         /// add the attack description
         if let attackDesc = attackDescription(tileType: tileType, nextTo: title.frame) {
             detailViewTemplate.addChild(attackDesc)
+        } else if let pillarDesc = pillarDescription(tileType: tileType, nextTo: title.frame) {
+            detailViewTemplate.addChild(pillarDesc)
         }
         
         // add the border

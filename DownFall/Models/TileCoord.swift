@@ -170,6 +170,33 @@ struct TileCoord: Hashable {
         return coordinates
     }
     
+    /// Returns true if self ( c ) exists on the line from points a and to b. With a magnitude larger than ab and in the same direction as the vector ab
+    /// ---a---b---c
+    /// return true
+    /// a------c
+    ///  \
+    ///   \
+    ///    b
+    /// return false
+    /// a----c----b return false
+    /// c---a----b return false
+    /// cross productduct = (c.y - a.y) * (b.x - a.x) - (c.x - a.x) * (b.y - a.y)
+    func existsOnLineAfter(b: TileCoord, onLineFrom a: TileCoord) -> Bool {
+        let crossProduct = (self.y-a.y) * (b.x-a.x) - (self.x-a.x) * (b.y - a.y)
+
+        guard crossProduct == 0 else { return false }
+        
+        let dotProduct = (self.x - a.x) * (b.x - a.x) + (self.y - a.y) * (b.y - a.y)
+        
+        guard dotProduct > 0 else { return false }
+        
+        let lengthAB = (b.x-a.x)*(b.x-a.x) + (b.y-a.y)*(b.y-a.y)
+        
+        guard dotProduct > lengthAB else { return false }
+        
+        return true
+    }
+    
     static func random(_ size: Int) -> TileCoord {
         return TileCoord(Int.random(size), Int.random(size))
     }

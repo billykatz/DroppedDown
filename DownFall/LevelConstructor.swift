@@ -195,9 +195,9 @@ struct LevelConstructor {
                 let batRange = alamoRange.next(20)
                 return [.alamo: alamoRange, .dragon: dragonRange, .bat: batRange]
             case .normal, .hard:
-                let ratRange = RangeModel(lower: 0, upper: 30)
-                let alamoRange = ratRange.next(30)
-                let dragonRange = alamoRange.next(30)
+                let ratRange = RangeModel(lower: 0, upper: 20)
+                let alamoRange = ratRange.next(20)
+                let dragonRange = alamoRange.next(20)
                 let batRange = alamoRange.next(10)
                 return [.rat: ratRange, .alamo: alamoRange, .dragon: dragonRange, .bat: batRange]
             }

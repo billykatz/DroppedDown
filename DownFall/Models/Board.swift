@@ -65,6 +65,9 @@ class Board: Equatable {
                 let attacks = calculateAttacks(for: data, from: tileCoord)
                 InputQueue.append(Input(.tileDetail(type, attacks)))
                 return
+            } else if case TileType.pillar = type {
+                InputQueue.append(Input(.tileDetail(type, [])))
+                return
             } else {
                 transformation = removeAndReplace(from: tiles, tileCoord: tileCoord, input: input)
             }
@@ -724,12 +727,10 @@ extension Board {
                         intermediateTiles: &intermediateTiles)
             
             // return our new board
-            if !newTiles.isEmpty {
-                self.tiles = intermediateTiles
-                return Transformation(transformation: [newTiles, shiftDown],
-                                      inputType: inputType,
-                                      endTiles: intermediateTiles)
-            }
+            self.tiles = intermediateTiles
+            return Transformation(transformation: [newTiles, shiftDown],
+                                  inputType: inputType,
+                                  endTiles: intermediateTiles)
         }
         return Transformation(transformation: nil, inputType: .refillEmpty, endTiles: self.tiles)
     }
@@ -904,10 +905,23 @@ extension Board {
             tiles[attackerPosition.x][attackerPosition.y] = Tile(type: TileType.player(playerModel.didAttack()))
             
         } else if case let .monster(monsterModel) = tiles[attackerPosition].type,
+            let defenderPosition = defenderPostion,
+            case .pillar (let color, let health) = tiles[defenderPosition].type {
+            //just note that the monster attacked
+            // and the pillar takes one damage
+            tiles[attackerPosition.x][attackerPosition.y] = Tile(type: TileType.monster(monsterModel.didAttack()))
+            if health == 1 {
+                tiles[defenderPosition.x][defenderPosition.y] = Tile.empty
+            } else {
+                tiles[defenderPosition.x][defenderPosition.y] = Tile(type: .pillar(color, health - 1))
+                
+            }
+        } else if case let .monster(monsterModel) = tiles[attackerPosition].type,
             defenderPostion == nil {
             //just note that the monster attacked
             tiles[attackerPosition.x][attackerPosition.y] = Tile(type: TileType.monster(monsterModel.didAttack()))
         }
+
         
         
         return Transformation(inputType: input.type,

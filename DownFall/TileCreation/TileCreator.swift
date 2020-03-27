@@ -154,7 +154,7 @@ class TileCreator: TileStrategy {
                 //check the old array for empties
                 if tiles[row][col].type == .empty {
                     // update the new array and check for neighbors in new array as well.
-                    // check if there are any columns above me
+                    // check if there are any pillars above me
                     var pillarAboveMe = 0
                     for rowAbove in row..<newTiles.count {
                         if case TileType.pillar = newTiles[rowAbove][col].type {

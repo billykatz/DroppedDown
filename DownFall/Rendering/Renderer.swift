@@ -314,12 +314,16 @@ class Renderer: SKSpriteNode {
     }
     
     private func refillEmptyTiles(with transformation: Transformation, completion: (() -> ())? = nil) {
-        guard let newTiles = transformation.tileTransformation?[0],
-            let shiftDown = transformation.tileTransformation?[1],
+        guard let shiftDown = transformation.tileTransformation?[1],
             let finalTiles = transformation.endTiles else {
                 preconditionFailure("All these conditions must be met to refill empty tiles")
         }
         
+        /// It is possible to create shift down without new tiles. Consider the scenario where there is one column with two pillars with at least one tile separating them. A player could destory the lower pillar and expect the tiles above it to fall down.
+        /// [pillar]        [pillar]
+        /// [rock]      ->  [empty]
+        /// [pillar]        [rock]
+        let newTiles = transformation.tileTransformation?.first ?? []
         
         // START THE SHIFT DOWN ANIMATION
         

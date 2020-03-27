@@ -12,6 +12,16 @@ enum Color {
     case purple
     case red
     case green
+    
+    var humanReadable: String{
+        switch self {
+        case .blue: return "Blue"
+        case .brown: return "Brown"
+        case .purple: return "Purple"
+        case .red: return "Red"
+        case .green: return "Green"
+        }
+    }
 }
 
 struct Tile: Hashable {
@@ -82,7 +92,7 @@ enum TileType: Equatable, Hashable, CaseIterable {
     static var allCases: [TileType] = [.player(.zero), .exit, .empty, .monster(.zero), .item(.zero), .rock(.red), .pillar(.red, 3)]
     static var randomCases = [TileType.monster(.zero), .rock(.red)]
     typealias AllCases = [TileType]
-
+    
     static func == (lhs: TileType, rhs: TileType) -> Bool {
         switch (lhs, rhs) {
         case (.player, .player):
@@ -122,7 +132,7 @@ enum TileType: Equatable, Hashable, CaseIterable {
         return false
     }
     
-
+    
     var isAPillar: Bool {
         if case .pillar = self {
             return true
@@ -156,13 +166,13 @@ enum TileType: Equatable, Hashable, CaseIterable {
             return data.attack.turnsUntilNextAttack()
         }
         return nil
-
+        
     }
     
     func attackFrequency() -> Int? {
         if case let .monster(data) = self {
             return data.attack.frequency
-       }
+        }
         return nil
     }
     
@@ -202,7 +212,7 @@ enum TileType: Equatable, Hashable, CaseIterable {
             case .green:
                 preconditionFailure("Shouldnt be here")
             }
-
+            
         default:
             return ""
         }
@@ -244,8 +254,8 @@ extension TileType {
         switch self {
         case .rock:
             return "rock"
-        case .pillar:
-            return "pillar"
+        case .pillar(let color, _):
+            return "\(color.humanReadable) pillar"
         case .player(let data):
             return data.type.humanReadable
         case .exit:

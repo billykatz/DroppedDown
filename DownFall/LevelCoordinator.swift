@@ -68,7 +68,7 @@ extension LevelCoordinating where Self: UIViewController {
                     #endif
                 }
             }
-        case .first, .second, .third, .boss:
+        case .first, .second, .third, .fourth, .fifth, .sixth, .seventh, .boss:
             gameSceneNode?.prepareForReuse()
             if let scene = GKScene(fileNamed: "GameScene")?.rootNode as? GameScene,
                 let entities = entities,

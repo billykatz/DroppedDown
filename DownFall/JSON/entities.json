@@ -374,6 +374,46 @@
                 }]
             },
             "abilities": []
+        },
+        { "name": "sally",
+            "type": "sally",
+            "originalHp": 1,
+            "hp": 1,
+            "attack": {
+                "type": "charges",
+                "frequency" : 3,
+                "damage": 1,
+                "range": {
+                    "lower": 1,
+                    "upper": 4
+                },
+                "attacksPerTurn": 1,
+                "attackSlope": [
+                    {
+                        "over": 1,
+                        "up": 0
+                    },
+                    {
+                        "over": -1,
+                        "up": 0
+                    }
+                ]
+            },
+            "animations": [
+                {
+                    "animationFilename": "sallyAttack",
+                    "numberOfFrames": 9,
+                    "animationType": "attack",
+                    "keyframe": 9
+                }
+            ],
+            "carry": {
+                "items": [{
+                    "type": "gold",
+                    "amount": 13
+                }]
+            },
+            "abilities": []
         }
     ]
 }

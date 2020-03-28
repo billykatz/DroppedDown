@@ -649,7 +649,7 @@ extension Renderer {
             strongSelf.menuForeground.removeAllChildren()
             let gameWinMenu: SKSpriteNode
             switch strongSelf.level.type {
-            case .first, .second, .third, .boss:
+            case .first, .second, .third, .fourth, .fifth, .sixth, .seventh, .boss:
                 //TODO: program the boss win sprite
                 gameWinMenu = strongSelf.gameWinSpriteNode
             case .tutorial1:

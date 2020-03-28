@@ -45,11 +45,11 @@ struct LevelConstructor {
     
     static func boardSize(per levelType: LevelType, difficulty: Difficulty) -> Int {
         switch levelType {
-        case .first:
+        case .first, .second:
             return 8
-        case .second:
+        case .third, .fourth:
             return 9
-        case .third, .boss:
+        case .fifth, .sixth, .seventh, .boss:
             return 10
         case .tutorial1, .tutorial2:
             fatalError()
@@ -73,13 +73,10 @@ struct LevelConstructor {
         }
         
         switch levelType {
-        case .first:
+        case .first, .second:
             let rocks = matchUp([.rock(.red), .rock(.blue), .rock(.purple)], range: normalRockRange, subRanges: 3)
             return rocks
-        case .second:
-            let rocks = matchUp([.rock(.red), .rock(.blue), .rock(.purple)], range: normalRockRange, subRanges: 3)
-            return rocks
-        case .third, .boss:
+        case .third, .fourth, .fifth, .sixth, .seventh, .boss:
             let rocks = matchUp([.rock(.red), .rock(.blue), .rock(.purple), .rock(.brown)], range: normalRockRange, subRanges: 4)
             return rocks
         case .tutorial1, .tutorial2:
@@ -90,14 +87,47 @@ struct LevelConstructor {
     static func pillars(per levelType: LevelType, difficulty: Difficulty) -> [(TileType, TileCoord)] {
         let boardWidth = boardSize(per: levelType, difficulty: difficulty)
         let inset = 2
-        if levelType == .third {
+        switch levelType {
+        case .first:
+            return []
+        case .second:
             return [
-                (TileType.pillar(.red, 3), TileCoord(inset, inset)),
-                (TileType.pillar(.blue, 3), TileCoord(inset, boardWidth-inset-1)),
-                (TileType.pillar(.brown, 3), TileCoord(boardWidth-inset-1, boardWidth-inset-1)),
-                (TileType.pillar(.purple, 3), TileCoord(boardWidth-inset-1, inset))
+                (TileType.pillar(.red, 3), TileCoord(boardWidth/2, boardWidth/2)),
+                (TileType.pillar(.blue, 3), TileCoord(boardWidth/2 - 1, boardWidth/2 - 1)),
             ]
-        } else if levelType == .boss {
+        case .third:
+            return [
+                (TileType.pillar(.purple, 3), TileCoord(inset, inset)),
+                (TileType.pillar(.brown, 3), TileCoord(boardWidth-inset-1, boardWidth-inset-1))
+            ]
+        case .fourth:
+            let inset = 4
+            return [
+                (TileType.pillar(.blue, 3), TileCoord(inset, boardWidth-inset-2)),
+                (TileType.pillar(.blue, 3), TileCoord(inset, boardWidth-inset-1)),
+                (TileType.pillar(.blue, 3), TileCoord(inset, boardWidth-inset))
+            ]
+
+        case .fifth:
+            let localInset = 3
+            return [
+                (TileType.pillar(.purple, 3), TileCoord(boardWidth-localInset-1, localInset)),
+                (TileType.pillar(.brown, 3), TileCoord(boardWidth-localInset-1, boardWidth-localInset-1)),
+                (TileType.pillar(.blue, 3), TileCoord(localInset, boardWidth-localInset-1)),
+                (TileType.pillar(.red, 3), TileCoord(localInset, localInset))
+            ]
+        case .sixth:
+                return [
+                    (TileType.pillar(.blue, 3), TileCoord(0, 0)),
+                    (TileType.pillar(.blue, 3), TileCoord(0, 1)),
+                    (TileType.pillar(.blue, 3), TileCoord(1, 0)),
+                    (TileType.pillar(.purple, 3), TileCoord(boardWidth-1, boardWidth-2)),
+                    (TileType.pillar(.purple, 3), TileCoord(boardWidth-1, boardWidth-1)),
+                    (TileType.pillar(.purple, 3), TileCoord(boardWidth-2, boardWidth-1))
+                ]
+        case .tutorial1, .tutorial2:
+            return []
+        case .seventh, .boss:
             var pillarCoords: [TileCoord] = []
             let beforeHalf = boardWidth/2 - 1
             let afterHalf = boardWidth/2
@@ -121,8 +151,6 @@ struct LevelConstructor {
             }
             
             return result
-        } else {
-            return []
         }
     }
     
@@ -135,7 +163,7 @@ struct LevelConstructor {
             return boardsize/15
         case (.second, _):
             return boardsize/15
-        case (.third, _):
+        case (.third, _), (.fourth, _), (.fifth, _), (.sixth, _), (.seventh, _):
             return boardsize/12
         case (.boss, _):
             return 0
@@ -201,8 +229,31 @@ struct LevelConstructor {
                 let batRange = alamoRange.next(10)
                 return [.rat: ratRange, .alamo: alamoRange, .dragon: dragonRange, .bat: batRange]
             }
+        case .fourth, .fifth:
+            switch difficulty {
+            case .easy, .normal, .hard:
+                let alamoRange = RangeModel(lower: 0, upper: 20)
+                let dragonRange = alamoRange.next(20)
+                let batRange = dragonRange.next(10)
+                let sallyRange = batRange.next(10)
+                return [.sally: sallyRange, .alamo: alamoRange, .dragon: dragonRange, .bat: batRange]
+            }
+        case .sixth, .seventh:
+            switch difficulty {
+            case .easy, .normal, .hard:
+                let alamoRange = RangeModel(lower: 0, upper: 20)
+                let dragonRange = alamoRange.next(20)
+                let batRange = dragonRange.next(20)
+                let sallyRange = batRange.next(20)
+                return [.sally: sallyRange, .alamo: alamoRange, .dragon: dragonRange, .bat: batRange]
+            }
+            
         case .boss:
-            return [:]
+            let ratRange = RangeModel(lower: 0, upper: 20)
+            let alamoRange = ratRange.next(20)
+            let dragonRange = alamoRange.next(20)
+            let batRange = alamoRange.next(20)
+            return [.rat: ratRange, .alamo: alamoRange, .dragon: dragonRange, .bat: batRange]
         case .tutorial1, .tutorial2:
             fatalError("Boss level not implemented yet")
         }
@@ -240,6 +291,8 @@ struct LevelConstructor {
             }
         case .tutorial1, .tutorial2:
             fatalError("Boss level not implemented yet")
+        default:
+            return 0
         }
     }
     

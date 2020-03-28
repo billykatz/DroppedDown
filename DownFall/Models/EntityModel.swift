@@ -26,17 +26,20 @@ struct EntityModel: Equatable, Decodable {
         case easyPlayer
         case normalPlayer
         case hardPlayer
+        case sally
         
         var humanReadable: String {
             switch self {
             case .bat:
-                return "Bat"
+                return "Guano the Bat"
             case .rat:
-                return "Rat"
+                return "Matt the Rat"
             case .dragon:
                 return "Dragon"
             case .alamo:
-                return "Alamo"
+                return "Alamo the Tree"
+            case .sally:
+                return "Sally the Salamander"
             case .player, .easyPlayer, .hardPlayer, .normalPlayer:
                 return "Player"
             default:

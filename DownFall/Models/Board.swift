@@ -217,7 +217,28 @@ class Board: Equatable {
         for attack in attacks {
             switch attack {
             case .bomb(let target):
-                self.tiles[target.row][target.column] = Tile(type: .dynamite(fuseCount: 3, hasBeenDecremented: false))
+                if case TileType.player(let data) = tiles[target.row][target.column].type {
+                    /// deal 3 damage to the player
+                    tiles[target.row][target.column] = Tile(type: .player(data.wasAttacked(for: 3, from: .south)))
+                } else if case TileType.pillar(let color, let health) = tiles[target.row][target.column].type {
+                    /// reconstruct pillars if we rotate into them
+                    tiles[target.row][target.column] = Tile(type: .pillar(color, min(3, health + 1)))
+                } else {
+                    self.tiles[target.row][target.column] = Tile(type: .dynamite(fuseCount: 3, hasBeenDecremented: false))
+                }
+            case .spawn(let target):
+                if case TileType.player(let data) = tiles[target.row][target.column].type {
+                    /// deal 3 damage to the player
+                    tiles[target.row][target.column] = Tile(type: .player(data.wasAttacked(for: 3, from: .south)))
+                } else if case TileType.pillar(let color, let health) = tiles[target.row][target.column].type {
+                    /// reconstruct pillars if we rotate into them
+                    tiles[target.row][target.column] = Tile(type: .pillar(color, min(3, health + 1)))
+                }
+                else {
+                    self.tiles[target.row][target.column] = Tile(type: tileCreator.randomMonster())
+                }
+            case .destroy(let destroyedRocks):
+                return removeAndReplace(from: tiles, specificCoord: Array(destroyedRocks), input: input)
             default:
                 ()
             }

@@ -45,7 +45,7 @@ class TileCreator: TileStrategy {
         }
     }
     
-    private func randomMonster() -> TileType {
+    func randomMonster() -> TileType {
         
         guard let level = level else { fatalError("You need to init with a level") }
         let totalNumber = level.monsterTypeRatio.values.max { (first, second) -> Bool in

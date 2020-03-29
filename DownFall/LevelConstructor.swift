@@ -13,8 +13,9 @@ struct LevelConstructor {
     static func buildLevels(_ difficulty: Difficulty) -> [Level] {
         return LevelType.gameCases.map { levelType in
             return Level(type: levelType,
-                         monsterTypeRatio: monstersPerLevel(levelType, difficulty: difficulty),
+                         monsterTypeRatio: monsterTypes(per: levelType, difficulty: difficulty),
                          monsterCountStart: monsterCountStart(levelType, difficulty: difficulty),
+                         maxMonsterOnBoardRatio: maxMonsterOnBoardRatio(per: levelType, difficulty: difficulty),
                          maxGems: 1,
                          maxTime: timePer(levelType, difficulty: difficulty),
                          boardSize: boardSize(per: levelType, difficulty: difficulty),
@@ -22,7 +23,7 @@ struct LevelConstructor {
                          goldMultiplier: difficulty.goldMultiplier,
                          rocksRatio: availableRocksPerLevel(levelType, difficulty: difficulty),
                          pillarCoordinates: pillars(per: levelType, difficulty: difficulty),
-                         threatLevelController: ThreatLevelController())
+                         threatLevelController: buildThreatLevelController(per: levelType, difficulty: difficulty))
         }
     }
     
@@ -31,6 +32,7 @@ struct LevelConstructor {
             Level(type: LevelType.tutorialCases[index],
                   monsterTypeRatio: [:],
                   monsterCountStart: 0,
+                  maxMonsterOnBoardRatio: 0.0,
                   maxGems: 0,
                   maxTime: 0,
                   boardSize: 4,
@@ -56,6 +58,37 @@ struct LevelConstructor {
         }
     }
     
+    static func buildThreatLevelController(per levelType: LevelType, difficulty: Difficulty) -> ThreatLevelController {
+        switch levelType {
+        case .first, .second:
+            return ThreatLevelController(yellowRange: 0..<75, orangeRange: 75..<150, redRange: 150..<Int.max)
+        case .third, .fourth:
+            return ThreatLevelController(yellowRange: 0..<65, orangeRange: 65..<130, redRange: 130..<Int.max)
+        case .fifth, .sixth, .seventh:
+            return ThreatLevelController(yellowRange: 0..<55, orangeRange: 55..<110, redRange: 110..<Int.max)
+        case .tutorial1, .tutorial2, .boss:
+            fatalError()
+        }
+    }
+    
+    
+    static func maxMonsterOnBoardRatio(per levelType: LevelType, difficulty: Difficulty) -> Double {
+        switch levelType {
+        case .first:
+            return 0.05
+        case .second, .third:
+            return 0.08
+        case .fourth:
+            return 0.10
+        case .fifth, .sixth, .boss:
+            return 0.12
+        case .seventh:
+            return  0.15
+        case .tutorial1, .tutorial2:
+            fatalError()
+        }
+    }
+    
     
     static func availableRocksPerLevel(_ levelType: LevelType, difficulty: Difficulty) -> [TileType: RangeModel] {
         let normalRockRange = RangeModel(lower: 0, upper: 90)
@@ -73,18 +106,28 @@ struct LevelConstructor {
         }
         
         switch levelType {
-        case .first, .second:
+        case .first, .second, .third:
             let rocks = matchUp([.rock(.red), .rock(.blue), .rock(.purple)], range: normalRockRange, subRanges: 3)
             return rocks
-        case .third, .fourth, .fifth, .sixth, .seventh, .boss:
+        case .fourth, .fifth, .sixth, .seventh, .boss:
             let rocks = matchUp([.rock(.red), .rock(.blue), .rock(.purple), .rock(.brown)], range: normalRockRange, subRanges: 4)
             return rocks
         case .tutorial1, .tutorial2:
-            fatalError("Gotta do boss and or not call this for tutorial")
+            fatalError("Do not call this for tutorial")
         }
     }
     
     static func pillars(per levelType: LevelType, difficulty: Difficulty) -> [(TileType, TileCoord)] {
+        
+        func randomPillar(notIn set: Set<Color>) -> TileType {
+            var color = Color.allCases.randomElement()!
+            while set.contains(color) {
+                color = Color.allCases.randomElement()!
+            }
+            return TileType.pillar(color, 3)
+        }
+        
+        
         let boardWidth = boardSize(per: levelType, difficulty: difficulty)
         let inset = 2
         switch levelType {
@@ -92,38 +135,41 @@ struct LevelConstructor {
             return []
         case .second:
             return [
-                (TileType.pillar(.red, 3), TileCoord(boardWidth/2, boardWidth/2)),
-                (TileType.pillar(.blue, 3), TileCoord(boardWidth/2 - 1, boardWidth/2 - 1)),
+                (randomPillar(notIn: Set<Color>([.purple, .brown, .green])), TileCoord(boardWidth/2, boardWidth/2)),
+                (randomPillar(notIn: Set<Color>([.purple, .brown, .green])), TileCoord(boardWidth/2 - 1, boardWidth/2 - 1)),
             ]
         case .third:
             return [
-                (TileType.pillar(.purple, 3), TileCoord(inset, inset)),
-                (TileType.pillar(.brown, 3), TileCoord(boardWidth-inset-1, boardWidth-inset-1))
+                (randomPillar(notIn: Set<Color>([.brown, .green])), TileCoord(inset, inset)),
+                (randomPillar(notIn: Set<Color>([.brown, .green])), TileCoord(boardWidth-inset-1, boardWidth-inset-1))
             ]
         case .fourth:
             let inset = 4
+            let randoPillar = randomPillar(notIn: Set<Color>([.brown, .green]))
             return [
-                (TileType.pillar(.blue, 3), TileCoord(inset, boardWidth-inset-2)),
-                (TileType.pillar(.blue, 3), TileCoord(inset, boardWidth-inset-1)),
-                (TileType.pillar(.blue, 3), TileCoord(inset, boardWidth-inset))
+                (randoPillar, TileCoord(inset, boardWidth-inset-2)),
+                (randoPillar, TileCoord(inset, boardWidth-inset-1)),
+                (randoPillar, TileCoord(inset, boardWidth-inset))
             ]
 
         case .fifth:
             let localInset = 3
             return [
-                (TileType.pillar(.purple, 3), TileCoord(boardWidth-localInset-1, localInset)),
-                (TileType.pillar(.brown, 3), TileCoord(boardWidth-localInset-1, boardWidth-localInset-1)),
-                (TileType.pillar(.blue, 3), TileCoord(localInset, boardWidth-localInset-1)),
-                (TileType.pillar(.red, 3), TileCoord(localInset, localInset))
+                (randomPillar(notIn: Set<Color>([.green])), TileCoord(boardWidth-localInset-1, localInset)),
+                (randomPillar(notIn: Set<Color>([.green])), TileCoord(boardWidth-localInset-1, boardWidth-localInset-1)),
+                (randomPillar(notIn: Set<Color>([.green])), TileCoord(localInset, boardWidth-localInset-1)),
+                (randomPillar(notIn: Set<Color>([.green])), TileCoord(localInset, localInset))
             ]
         case .sixth:
+            let randomPillar1 = randomPillar(notIn: Set<Color>([.green]))
+            let randomPillar2 = randomPillar(notIn: Set<Color>([.green]))
                 return [
-                    (TileType.pillar(.blue, 3), TileCoord(0, 0)),
-                    (TileType.pillar(.blue, 3), TileCoord(0, 1)),
-                    (TileType.pillar(.blue, 3), TileCoord(1, 0)),
-                    (TileType.pillar(.purple, 3), TileCoord(boardWidth-1, boardWidth-2)),
-                    (TileType.pillar(.purple, 3), TileCoord(boardWidth-1, boardWidth-1)),
-                    (TileType.pillar(.purple, 3), TileCoord(boardWidth-2, boardWidth-1))
+                    (randomPillar1, TileCoord(0, 0)),
+                    (randomPillar1, TileCoord(0, 1)),
+                    (randomPillar1, TileCoord(1, 0)),
+                    (randomPillar2, TileCoord(boardWidth-1, boardWidth-2)),
+                    (randomPillar2, TileCoord(boardWidth-1, boardWidth-1)),
+                    (randomPillar2, TileCoord(boardWidth-2, boardWidth-1))
                 ]
         case .tutorial1, .tutorial2:
             return []
@@ -156,16 +202,16 @@ struct LevelConstructor {
     
     
     static func monsterCountStart(_ levelType: LevelType, difficulty: Difficulty) -> Int {
-        let boardWidth = boardSize(per: levelType, difficulty: difficulty)
-        let boardsize = boardWidth * boardWidth
-        switch (levelType, difficulty) {
-        case (.first, _):
-            return boardsize/15
-        case (.second, _):
-            return boardsize/15
-        case (.third, _), (.fourth, _), (.fifth, _), (.sixth, _), (.seventh, _):
-            return boardsize/12
-        case (.boss, _):
+        switch levelType {
+        case .first:
+            return 2
+        case .second:
+            return 3
+        case .third, .fourth:
+            return 6
+        case .fifth, .sixth, .seventh:
+            return 8
+        case .boss:
             return 0
             
         default:
@@ -173,7 +219,7 @@ struct LevelConstructor {
         }
     }
     
-    static func monstersPerLevel(_ levelType: LevelType, difficulty: Difficulty) -> [EntityModel.EntityType: RangeModel] {
+    static func monsterTypes(per levelType: LevelType, difficulty: Difficulty) -> [EntityModel.EntityType: RangeModel] {
         func matchUp(_ types: [EntityModel.EntityType], range: RangeModel, subRanges: Int) -> [EntityModel.EntityType: RangeModel] {
             guard types.count == subRanges else { fatalError("The number of types nust match the number of subranges") }
             let dividedMonsterRanges = range.divivdedIntoSubRanges(subRanges)
@@ -186,68 +232,30 @@ struct LevelConstructor {
             })
         }
         
-        
-        
-        let normalRockRange = RangeModel(lower: 0, upper: 100)
         switch levelType {
-        case .first:
-            switch difficulty{
-            case .easy:
-                return matchUp([.rat, .alamo], range: normalRockRange, subRanges: 2)
-            case .normal, .hard:
-                let ratRange = RangeModel(lower: 0, upper: 40)
-                let alamoRange = ratRange.next(40)
-                let batRange = alamoRange.next(20)
-                return [.rat: ratRange, .alamo: alamoRange, .bat: batRange]
-            }
-        case .second:
-            switch difficulty{
-            case .easy:
-                let alamoRange = RangeModel(lower: 0, upper: 30)
-                let dragonRange = alamoRange.next(30)
-                let batRange = alamoRange.next(10)
-                return [.alamo: alamoRange, .dragon: dragonRange, .bat: batRange]
-            case .normal, .hard:
-                
-                let ratRange = RangeModel(lower: 0, upper: 30)
-                let alamoRange = ratRange.next(30)
-                let dragonRange = alamoRange.next(30)
-                let batRange = alamoRange.next(10)
-                return [.rat: ratRange, .alamo: alamoRange, .dragon: dragonRange, .bat: batRange]
-            }
+        case .first, .second:
+            let ratRange = RangeModel(lower: 0, upper: 40)
+            let alamoRange = ratRange.next(40)
+            let batRange = alamoRange.next(20)
+            return [.rat: ratRange, .alamo: alamoRange, .bat: batRange]
         case .third:
-            switch difficulty{
-            case .easy:
-                let alamoRange = RangeModel(lower: 0, upper: 30)
-                let dragonRange = alamoRange.next(30)
-                let batRange = alamoRange.next(20)
-                return [.alamo: alamoRange, .dragon: dragonRange, .bat: batRange]
-            case .normal, .hard:
-                let ratRange = RangeModel(lower: 0, upper: 20)
-                let alamoRange = ratRange.next(20)
-                let dragonRange = alamoRange.next(20)
-                let batRange = alamoRange.next(10)
-                return [.rat: ratRange, .alamo: alamoRange, .dragon: dragonRange, .bat: batRange]
-            }
+            let ratRange = RangeModel(lower: 0, upper: 20)
+            let alamoRange = ratRange.next(20)
+            let dragonRange = alamoRange.next(20)
+            let batRange = alamoRange.next(10)
+            return [.rat: ratRange, .alamo: alamoRange, .dragon: dragonRange, .bat: batRange]
         case .fourth, .fifth:
-            switch difficulty {
-            case .easy, .normal, .hard:
-                let alamoRange = RangeModel(lower: 0, upper: 20)
-                let dragonRange = alamoRange.next(20)
-                let batRange = dragonRange.next(10)
-                let sallyRange = batRange.next(10)
-                return [.sally: sallyRange, .alamo: alamoRange, .dragon: dragonRange, .bat: batRange]
-            }
+            let alamoRange = RangeModel(lower: 0, upper: 20)
+            let dragonRange = alamoRange.next(20)
+            let batRange = dragonRange.next(10)
+            let sallyRange = batRange.next(10)
+            return [.sally: sallyRange, .alamo: alamoRange, .dragon: dragonRange, .bat: batRange]
         case .sixth, .seventh:
-            switch difficulty {
-            case .easy, .normal, .hard:
-                let alamoRange = RangeModel(lower: 0, upper: 20)
-                let dragonRange = alamoRange.next(20)
-                let batRange = dragonRange.next(20)
-                let sallyRange = batRange.next(20)
-                return [.sally: sallyRange, .alamo: alamoRange, .dragon: dragonRange, .bat: batRange]
-            }
-            
+            let alamoRange = RangeModel(lower: 0, upper: 20)
+            let dragonRange = alamoRange.next(20)
+            let batRange = dragonRange.next(10)
+            let sallyRange = batRange.next(20)
+            return [.sally: sallyRange, .alamo: alamoRange, .dragon: dragonRange, .bat: batRange]
         case .boss:
             let ratRange = RangeModel(lower: 0, upper: 20)
             let alamoRange = ratRange.next(20)

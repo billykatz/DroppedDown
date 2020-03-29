@@ -65,8 +65,10 @@ class HUD: SKSpriteNode {
         let ratio: CGFloat
         if threatLevel.color == .red {
             ratio = 1.0
+        } else if threatLevel.color == .orange {
+            ratio = CGFloat(threatLevel.unitsAccrued - threatLevel.orangeRange.lowerBound) / CGFloat(threatLevel.orangeRange.upperBound)
         } else {
-            ratio = CGFloat(threatLevel.unitsAccrued - threatLevel.color.numberOfUnits.lowerBound) / CGFloat(threatLevel.color.numberOfUnits.upperBound)
+            ratio = CGFloat(threatLevel.unitsAccrued - threatLevel.yellowRange.lowerBound) / CGFloat(threatLevel.yellowRange.upperBound)
         }
         let width = CGFloat(totalWidth) * CGFloat(ratio)
         let colorIndicator = SKShapeNode(rect: CGRect(x: totalBox.frame.origin.x+5, y: totalBox.frame.origin.y+6, width: width, height: totalHeight-6))

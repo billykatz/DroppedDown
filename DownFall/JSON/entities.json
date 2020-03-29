@@ -205,7 +205,7 @@
             "carry": {
                 "items": [{
                     "type": "gold",
-                    "amount": 10
+                    "amount": 15
                 }]
                 
             },
@@ -261,7 +261,7 @@
             "carry": {
                 "items": [{
                     "type": "gold",
-                    "amount": 7
+                    "amount": 15
                 }]
             },
             "abilities": []
@@ -370,7 +370,7 @@
             "carry": {
                 "items": [{
                     "type": "gold",
-                    "amount": 10
+                    "amount": 15
                 }]
             },
             "abilities": []
@@ -385,7 +385,7 @@
                 "damage": 1,
                 "range": {
                     "lower": 1,
-                    "upper": 4
+                    "upper": 3
                 },
                 "attacksPerTurn": 1,
                 "attackSlope": [
@@ -426,7 +426,7 @@
             "carry": {
                 "items": [{
                     "type": "gold",
-                    "amount": 13
+                    "amount": 15
                 }]
             },
             "abilities": []

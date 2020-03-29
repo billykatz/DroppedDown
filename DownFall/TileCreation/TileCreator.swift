@@ -144,7 +144,7 @@ class TileCreator: TileStrategy {
         // copy the given array to keep track of where we need tiles
         var newTiles: [[Tile]] = tiles
         
-        let maxMonsters = Int(Double(tiles.count * tiles.count) * maxMonsterRatio)
+        let maxMonsters = Int(Double(tiles.count * tiles.count) * (level?.maxMonsterOnBoardRatio ?? maxMonsterRatio))
         var currMonsterCount = typeCount(for: tiles, of: .monster(.zero)).count
         
         for row in 0..<newTiles.count {

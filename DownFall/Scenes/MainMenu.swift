@@ -62,7 +62,7 @@ class MainMenu: SKScene {
         addChild(levelButton)
         
         
-        levelTypeIndex = 3
+        levelTypeIndex = 0
         
         //TODO: reinstate tutorial
         //        let tutorialButton = Button(size: Style.RunMenu.buttonSize,

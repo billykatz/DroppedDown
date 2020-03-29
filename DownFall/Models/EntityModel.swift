@@ -146,7 +146,13 @@ struct EntityModel: Equatable, Decodable {
     
     func remove(_ ability: Ability) -> EntityModel {
         var newAbilities = abilities
-        newAbilities.removeAll(where: { $0.type == ability.type })
+        if var newAbility = abilities.first(where: { $0.type == ability.type }) {
+            newAbility.count -= 1
+            newAbilities.removeAll(where: { $0.type == ability.type })
+            if newAbility.count > 0 {
+                newAbilities.append(newAbility)
+            }
+        }
         return self.update(abilities: newAbilities)
     }
     

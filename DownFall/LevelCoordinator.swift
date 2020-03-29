@@ -35,7 +35,6 @@ extension LevelCoordinating where Self: UIViewController {
             view.presentScene(nil)
             let storeScene = StoreScene(size: self.view!.frame.size,
                                         playerData: playerData,
-                                        inventory: StoreInventory(),
                                         level: currentLevel)
             storeScene.storeSceneDelegate = self
             view.presentScene(storeScene)
@@ -147,7 +146,6 @@ extension LevelCoordinating where Self: UIViewController {
             
             let storeScene = StoreScene(size: self.view!.frame.size,
                                         playerData: playerData,
-                                        inventory: StoreInventory(),
                                         level: levels[levelIndex])
             storeScene.storeSceneDelegate = self
             view.presentScene(storeScene)

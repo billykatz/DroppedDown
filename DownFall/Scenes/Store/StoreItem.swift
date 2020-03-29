@@ -33,7 +33,7 @@ class StoreItem: SKSpriteNode {
     
     init(ability: Ability,
          size: CGSize,
-         color: UIColor = UIColor.storeItemBackground,
+         color: UIColor = UIColor.storeItemBackgroundNotSelected,
          delegate: StoreItemDelegate,
          identifier: ButtonIdentifier,
          precedence: Precedence,
@@ -64,13 +64,6 @@ class StoreItem: SKSpriteNode {
         }
         
         addChildSafely(abilitySprite)
-        
-        boxShapeNode = SKShapeNode(rect: frame.applying(CGAffineTransform(scaleX: 1.4 , y: 1.7)))
-        boxShapeNode?.strokeColor = .white
-        boxShapeNode?.position = CGPoint(x: 0, y: -15)
-        boxShapeNode?.lineWidth = 1.5
-        addChild(boxShapeNode!)
-        
         
         let currencyTexture = SKTexture(imageNamed: ability.currency.rawValue)
         let currencySprite = SKSpriteNode(texture: currencyTexture)
@@ -103,31 +96,7 @@ class StoreItem: SKSpriteNode {
     }
     
     private func toggleSelection() {
-        let selectionHighlight: SKShapeNode = {
-            let strokeColor: UIColor = isPurchased ? .highlightGreen : .highlightGold
-            let highlight = SKShapeNode(path: CGPath(rect: boxShapeNode!.frame, transform: nil), centered: true)
-            highlight.strokeColor = strokeColor
-            highlight.fillColor = .clear
-            highlight.name = highlightString
-            highlight.lineWidth = 2.5
-            highlight.zPosition = 2
-            highlight.position = boxShapeNode!.position
-            return highlight
-        }()
-        
-        func select() {
-            addChild(selectionHighlight)
-        }
-        
-        func deselect() {
-            for child in children {
-                if child.name == highlightString {
-                    child.removeFromParent()
-                }
-            }
-        }
-        
-        isSelected ? select() : deselect()
+        self.color = isSelected ? .foregroundBlue : .storeItemBackgroundNotSelected
     }
     
     private func togglePurchaseIndicator() {

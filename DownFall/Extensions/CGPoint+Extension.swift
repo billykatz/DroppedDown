@@ -25,7 +25,7 @@ extension CGPoint {
         let inset: CGFloat = 15.0
         let bottomPadding: CGFloat = 30.0
         let columnPadding = max(0, (width - (columns * itemSize.width) - (2 * inset)) / (columns-1) )
-        let rowPadding = min(30.0, (height - (rows * itemSize.height)) / (rows - 1))
+        let rowPadding = min(45.0, (height - (rows * itemSize.height)) / (rows - 1))
         
         var points: [CGPoint] = []
         for row in 0..<Int(rows) {

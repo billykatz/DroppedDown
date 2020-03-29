@@ -9,71 +9,6 @@
 import Foundation
 import SpriteKit
 
-enum ButtonIdentifier: String {
-    case resume
-    case playAgain
-    case selectLevel
-    case leaveStore
-    case storeItem
-    case rotate
-    case wallet
-    case infoPopup
-    case visitStore
-    case newGame
-    case back
-    case startTutorial
-    case purchase
-    case sell
-    case close
-    case backpack
-    case backpackSelect
-    case backpackCancel
-    case backpackConfirm
-    case mainMenu
-    case cycleLevel
-    
-    var title: String {
-        switch self {
-        case .resume:
-            return "Resume"
-        case .playAgain:
-            return "Play Again?"
-        case .selectLevel:
-            return "Level Select"
-        case .leaveStore:
-            return "Leave Store"
-        case .rotate:
-            return "Got it! 👍"
-        case .visitStore:
-            return "Visit Store"
-        case .newGame:
-            return "New Game"
-        case .back:
-            return "Back"
-        case .startTutorial:
-            return "Start Tutorial"
-        case .purchase:
-            return "Purchase"
-        case .sell:
-            return "Sell"
-        case .close:
-            return "Close"
-        case .backpackSelect:
-            return "Select"
-        case .backpackCancel:
-            return "Cancel"
-        case .backpackConfirm:
-            return "Confirm"
-        case .mainMenu:
-            return "Main Menu"
-        case .cycleLevel:
-            return "Level start"
-        case .wallet, .infoPopup, .storeItem, .backpack:
-            return ""
-        }
-    }
-}
-
 protocol ButtonDelegate: class {
     func buttonTapped(_ button: Button)
 }
@@ -81,7 +16,7 @@ protocol ButtonDelegate: class {
 class Button: SKShapeNode {
     
     static let small = CGSize(width: 75, height: 30)
-    static let medium = CGSize(width: 100, height: 50)
+    static let medium = CGSize(width: 110, height: 50)
     static let large = CGSize(width: 150, height: 75)
     
     weak var delegate: ButtonDelegate?
@@ -117,7 +52,8 @@ class Button: SKShapeNode {
          fontColor: UIColor,
          backgroundColor: UIColor = .clayRed,
          showSelection: Bool = true,
-         addTextLabel: Bool = true) {
+         addTextLabel: Bool = true,
+         disable: Bool = false) {
         
         //Set properties
         self.delegate = delegate
@@ -172,7 +108,8 @@ class Button: SKShapeNode {
         //add touch expanding view
         addChild(touchTargetExpandingView)
 
-
+        //enable/disable
+        self.isDisabled = disable
         
         self.color = .clear
         

@@ -405,6 +405,22 @@
                     "numberOfFrames": 9,
                     "animationType": "attack",
                     "keyframe": 9
+                },
+                {
+                    "animationFilename": "sallyProjectileStart",
+                    "numberOfFrames": 6,
+                    "animationType": "projectileStart",
+                    "keyframe": 6
+                },
+                {
+                    "animationFilename": "sallyProjectileEnd",
+                    "numberOfFrames": 3,
+                    "animationType": "projectileEnd"
+                },
+                {
+                    "animationFilename": "sallyProjectileMid",
+                    "numberOfFrames": 1,
+                    "animationType": "projectileMid"
                 }
             ],
             "carry": {

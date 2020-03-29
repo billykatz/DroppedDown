@@ -197,6 +197,23 @@ struct TileCoord: Hashable {
         return true
     }
     
+    
+    func existsOnLineBetween(b: TileCoord, onLineFrom a: TileCoord) -> Bool {
+        let crossProduct = (self.y-a.y) * (b.x-a.x) - (self.x-a.x) * (b.y - a.y)
+
+        guard crossProduct == 0 else { return false }
+        
+        let dotProduct = (self.x - a.x) * (b.x - a.x) + (self.y - a.y) * (b.y - a.y)
+        
+        guard dotProduct > 0 else { return false }
+        
+        let lengthAB = (b.x-a.x)*(b.x-a.x) + (b.y-a.y)*(b.y-a.y)
+        
+        guard dotProduct <= lengthAB else { return false }
+        
+        return true
+    }
+    
     static func random(_ size: Int) -> TileCoord {
         return TileCoord(Int.random(size), Int.random(size))
     }

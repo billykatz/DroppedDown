@@ -16,7 +16,7 @@ class GameViewController: UIViewController, LevelCoordinating {
     internal var gameSceneNode: GameScene?
     internal var tutorialSceneNode: TutorialScene?
     internal var entities: EntitiesModel?
-    internal var levelIndex: Int = 0
+    internal var levelIndex: Int = 1
     internal var levels: [Level]?
     
     override func viewDidLoad() {

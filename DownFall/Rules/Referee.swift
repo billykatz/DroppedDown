@@ -130,6 +130,13 @@ class Referee {
                 }
             }
             
+            let playerCoord = attackedTiles.first { coord in
+                if case TileType.player = tiles[coord].type {
+                    return true
+                }
+                return false
+            }
+            
             /// deteremine if the pillar stops attacks and remove those tile coord.
             var attackedTilesWithPillarsBlocking: [TileCoord] = []
             for tileCoord in attackedTiles {
@@ -139,6 +146,14 @@ class Referee {
                         blockedByPillar = true
                     }
                 }
+                
+                /// TODO: we need to fix this ugly logic
+                if entity.type == .sally, let playerCoord = playerCoord {
+                    if !tileCoord.existsOnLineBetween(b: playerCoord, onLineFrom: position) {
+                        blockedByPillar = true
+                    }
+                }
+                
                 if !blockedByPillar {
                     attackedTilesWithPillarsBlocking.append(tileCoord)
                 }

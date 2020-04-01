@@ -218,12 +218,12 @@ class BackpackView: SKSpriteNode {
         if let abilityFrames = ability?.spriteSheet?.animationFrames(), let first = abilityFrames.first  {
             sprite = SKSpriteNode(texture: first, color: .clear, size: size)
             sprite?.run(SKAction.repeatForever(SKAction.animate(with: abilityFrames, timePerFrame: AnimationSettings.Store.itemFrameRate)))
-            sprite?.name = ability?.type.rawValue
+            sprite?.name = ability?.type.humanReadable
             
         } else if let abilitySprite = ability?.sprite {
             sprite = abilitySprite
             sprite?.size = size
-            sprite?.name = ability?.type.rawValue
+            sprite?.name = ability?.type.humanReadable
         }
         
         // add on the 1...Nx to display that you own multiple copies
@@ -523,7 +523,7 @@ extension BackpackView {
         guard !touchIsSwipe else {
             touchIsSwipe = false
             return
-        }
+        }   
         
         for node in self.nodes(at: position) {
             if node.name == targetingAreaName && viewModel.ability != nil && !background.contains(position) {
@@ -532,7 +532,7 @@ extension BackpackView {
             }
             else if let abilityType = node.name, viewModel.viewMode == .inventory  {
                 for ability in viewModel.inventory {
-                    if ability.type.rawValue == abilityType {
+                    if ability.type.humanReadable == abilityType {
                         viewModel.didSelect(ability)
                     }
                 }

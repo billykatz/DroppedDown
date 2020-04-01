@@ -136,8 +136,7 @@ class Renderer: SKSpriteNode {
                 if let _ = trans.tileTransformation {
                     computeNewBoard(for: trans)
                 } else {
-                    animationsFinished(for: sprites,
-                                       endTiles: trans.endTiles,
+                    animationsFinished(endTiles: trans.endTiles,
                                        ref: false)
                 }
             case .attack:
@@ -146,9 +145,14 @@ class Renderer: SKSpriteNode {
                 animate(trans.tileTransformation?.first) { [weak self] in
                     self?.gameWin(transformation: trans)
                 }
-            case .monsterDies, .itemUsed, .newTurn, .bossTargetsWhatToEat, .bossAttacks:
-                let sprites = createSprites(from: trans.endTiles)
-                animationsFinished(for: sprites, endTiles: trans.endTiles)
+            case .monsterDies, .newTurn, .bossTargetsWhatToEat, .bossAttacks:
+                animationsFinished(endTiles: trans.endTiles)
+            case .itemUsed(let ability, _):
+                if ability.type == .massMineRock {
+                    computeNewBoard(for: transformations)
+                } else {
+                    animationsFinished(endTiles: trans.endTiles)
+                }
             case .collectItem:
                 computeNewBoard(for: trans)
             case .bossEatsRocks:
@@ -157,16 +161,18 @@ class Renderer: SKSpriteNode {
                 computeNewBoard(for: transformations)
             case .refillEmpty:
                 refillEmptyTiles(with: trans)
+            case .shuffleBoard:
+                computeNewBoard(for: trans)
             case .rotatePreviewFinish(let spriteActions, let trans):
                 if let trans = trans {
                     animator.animate(spriteActions) { [weak self] in
                         guard let self = self else { return }
-                        self.animationsFinished(for: self.sprites, endTiles: trans.endTiles, ref: true)
+                        self.animationsFinished(endTiles: trans.endTiles, ref: true)
                     }
                 } else {
                     animator.animate(spriteActions) { [weak self] in
                         guard let self = self else { return }
-                        self.animationsFinished(for: self.sprites, endTiles: nil, ref: false)
+                        self.animationsFinished(endTiles: nil, ref: false)
                     }
                 }
                 
@@ -177,7 +183,7 @@ class Renderer: SKSpriteNode {
                 fatalError()
             }
         } else {
-            animationsFinished(for: sprites, endTiles: transformations.first?.endTiles)
+            animationsFinished(endTiles: transformations.first?.endTiles)
         }
         
     }
@@ -199,8 +205,7 @@ class Renderer: SKSpriteNode {
         case .tutorial(let step):
             renderTutorial(step)
         case .newTurn:
-            let sprites = createSprites(from: input.endTilesStruct)
-            animationsFinished(for: sprites, endTiles: input.endTilesStruct, ref: false)
+            animationsFinished(endTiles: input.endTilesStruct, ref: false)
         default:
             ()
         }
@@ -239,7 +244,7 @@ class Renderer: SKSpriteNode {
     
     private func animateAttack(attackInput: InputType, endTiles: [[Tile]]?) {
         guard let tiles = endTiles else {
-            animationsFinished(for: sprites, endTiles: endTiles)
+            animationsFinished(endTiles: endTiles)
             return
         }
         
@@ -249,7 +254,7 @@ class Renderer: SKSpriteNode {
                          sprites: sprites,
                          positions: positionsInForeground) { [weak self] in
                             guard let strongSelf = self else { return }
-                            strongSelf.animationsFinished(for: strongSelf.sprites, endTiles: tiles)
+                            strongSelf.animationsFinished(endTiles: tiles)
         }
         
     }
@@ -368,7 +373,7 @@ class Renderer: SKSpriteNode {
         
         animator.animate(shiftDownActions) { [weak self] in
             guard let self = self else { return }
-            completion?() ?? self.animationsFinished(for: self.sprites, endTiles: finalTiles)
+            completion?() ?? self.animationsFinished(endTiles: finalTiles)
         }
     }
     
@@ -386,7 +391,7 @@ class Renderer: SKSpriteNode {
                 guard let strongSelf = self else { return }
                 animationCount += 1
                 if animationCount == trans.count {
-                    strongSelf.animationsFinished(for: strongSelf.sprites, endTiles: rotateEndTiles)
+                    strongSelf.animationsFinished(endTiles: rotateEndTiles)
                 }
             }
             return
@@ -395,8 +400,7 @@ class Renderer: SKSpriteNode {
         refillEmptyTiles(with: transformations[1])
     }
     
-    private func animationsFinished(for endBoard: [[DFTileSpriteNode]],
-                                    endTiles: [[Tile]]?,
+    private func animationsFinished(endTiles: [[Tile]]?,
                                     ref: Bool = true) {
         
         /// endTiles is optional but almost always has a value
@@ -429,7 +433,7 @@ extension Renderer {
         computeNewBoard(for: transformations.first) { [weak self] in
             guard let self = self else { return }
             if transformations.count == 1 {
-                self.animationsFinished(for: self.sprites, endTiles: transformations.first?.endTiles)
+                self.animationsFinished(endTiles: transformations.first?.endTiles)
             } else {
                 self.computeNewBoard(for: Array(transformations.dropFirst()))
             }
@@ -447,7 +451,7 @@ extension Renderer {
         guard let transformation = transformation,
             let transformations = transformation.tileTransformation,
             let inputType = transformation.inputType else {
-                completion?() ?? animationsFinished(for: sprites, endTiles: endTiles)
+                completion?() ?? animationsFinished(endTiles: endTiles)
                 return
         }
         
@@ -547,7 +551,7 @@ extension Renderer {
         removedAnimations.append(contentsOf: shiftDownActions)
         animator.animate(removedAnimations) {  [weak self] in
             guard let strongSelf = self else { return }
-            completion?() ?? strongSelf.animationsFinished(for: strongSelf.sprites, endTiles: endTiles)
+            completion?() ?? strongSelf.animationsFinished(endTiles: endTiles)
             
         }
         

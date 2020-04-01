@@ -1,14 +1,14 @@
 //
-//  Dynamite.swift
+//  MassMineAbility.swift
 //  DownFall
 //
-//  Created by William Katz on 12/19/19.
-//  Copyright © 2019 William Katz LLC. All rights reserved.
+//  Created by Katz, Billy on 3/30/20.
+//  Copyright © 2020 William Katz LLC. All rights reserved.
 //
 
 import Foundation
 
-struct Dynamite: Ability {
+struct MassMinePickaxe: Ability {
     
     var count: Int
     
@@ -17,45 +17,46 @@ struct Dynamite: Ability {
     }
     
     func animatedColumns() -> Int? {
-        return nil
+        return 3
     }
     
     var affectsCombat: Bool {
-        return false
+        false
     }
+    
+    var type: AbilityType { return .massMineRock }
     
     var textureName: String {
-        return "dynamite"
+        return "explodeAnimation"
     }
     
-    var cost: Int { return 125 }
+    var cost: Int { return 349 }
     
-    var currency: Currency { return .gold }
-    
-    var type: AbilityType { return .dynamite }
+    var currency: Currency {
+        return .gold
+    }
     
     var description: String {
-        return "Destroys one of any kind of rock."
+        return "Destory all rocks of one color"
     }
     
     var flavorText: String {
-        return "Boom boom boom boom, I want you to go boom."
+        return "Boom a color of the rainbow"
     }
     
     var extraAttacksGranted: Int? {
         return nil
     }
     
-    func blocksDamage(from: Direction) -> Int? {
-        return nil
+    var usage: Usage {
+        .once
     }
     
-    var usage: Usage {
-        return .once
+    func blocksDamage(from: Direction) -> Int? {
+        return nil
     }
     
     var heal: Int? { return nil }
     var targets: Int? { return 1 }
     var targetTypes: [TileType]? { return TileType.rockCases }
 }
-

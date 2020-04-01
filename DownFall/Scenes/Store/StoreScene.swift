@@ -98,6 +98,13 @@ class StoreScene: SKScene {
         inventoryButton.position = CGPoint.alignHorizontally(inventoryButton.frame, relativeTo: goldWallet.frame, horizontalAnchor: .left, verticalAlign: .top, verticalPadding: Style.Padding.normal, translatedToBounds: true)
         addChild(inventoryButton)
         
+        
+        if level.type == .first {
+            let firstOneFree = ParagraphNode(text: "\"Welcome!, first one is on the house\"", paragraphWidth: self.frame.width*0.7, fontSize: UIFont.smallSize)
+            firstOneFree.position = CGPoint.zero.translateVertically(-40.0)
+            addChild(firstOneFree)
+        }
+        
     }
     
     private func createStoreItems(from level: Level) -> [StoreItem] {
@@ -370,7 +377,7 @@ class StoreScene: SKScene {
             border.position = .zero
             inventoryView.addChild(border)
             
-            let playerInventoryNames = playerData.abilities.map { ($0.type.rawValue, $0.count) }
+            let playerInventoryNames = playerData.abilities.map { ($0.type.humanReadable, $0.count) }
             var string = ""
             for (name, count) in playerInventoryNames {
                 string += "\(name) \(count > 1 ? "x\(count)" : "" )"
@@ -416,10 +423,23 @@ extension StoreScene: ButtonDelegate {
             storeSceneDelegate?.leave(self, updatedPlayerData: playerData)
         case .purchase:
             if let storeItem = selectedItem { buy(storeItem) }
-        case .sell:
-            if let storeItem = selectedItem {
-                sell(storeItem)
+            
+            if level.type == .first {
+                for item in items {
+                    item.isPurchased = true
+                }
             }
+        case .sell:
+            if level.type == .first {
+                for item in items {
+                    sell(item)
+                }
+            } else {
+                if let storeItem = selectedItem {
+                    sell(storeItem)
+                }
+            }
+            
         case .close:
             selectedItem = nil
         case .seeInventory:

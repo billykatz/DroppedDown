@@ -112,7 +112,7 @@ struct AttackModel: Equatable, Decodable {
             attackString = "attacks the \(range.lower)\(numberDescriptor) through the \(range.upper)\(upperNumberDescriptor) tiles."
         }
         string.append("\n\u{2022} \(attackString)")
-        string.append("\n\u{2022} deals \(damage) damage.")
+        string.append("\n\u{2022} deals \(damage) base damage.")
         
         return string
         

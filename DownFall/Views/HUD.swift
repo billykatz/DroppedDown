@@ -12,6 +12,7 @@ class HUD: SKSpriteNode {
     
     struct Constants {
         static let threatIndicator = "threatIndicator"
+        static let shuffleBoardButton = "shuffleBoardButton"
     }
     
     static func build(color: UIColor, size: CGSize, delegate: SettingsDelegate?, threatLevelController: ThreatLevelController) -> HUD {
@@ -30,6 +31,18 @@ class HUD: SKSpriteNode {
         header.delegate = delegate
         
         header.threatLevelController = threatLevelController
+        
+        let button = Button(size: Button.inGameLarge,
+                            delegate: header,
+                            identifier: .shuffleBoard,
+                            precedence: .background,
+                            fontSize: UIFont.mediumSize,
+                            fontColor: .white)
+        button.position = CGPoint.alignHorizontally(button.frame, relativeTo: header.frame, horizontalAnchor: .left, verticalAlign: .bottom, verticalPadding: Style.Padding.most)
+        button.zPosition = Precedence.foreground.rawValue
+        button.name = Constants.shuffleBoardButton
+        
+        header.addChild(button)
         
         Dispatch.shared.register {
             header.handle($0)
@@ -122,7 +135,7 @@ class HUD: SKSpriteNode {
                 showAttack(attackInput: input, endTiles: trans.first!.endTiles)
             case .collectItem(_, let item, let total):
                 incrementCurrencyCounter(item, total: total)
-            case .itemUsed, .decrementDynamites:
+            case .itemUsed, .decrementDynamites, .shuffleBoard:
                 if let tiles = trans.first?.endTiles,
                     let playerCoord = getTilePosition(.player(.zero), tiles: tiles),
                     case TileType.player(let data) = tiles[playerCoord].type {
@@ -132,8 +145,6 @@ class HUD: SKSpriteNode {
                 ()
             }
         case .boardBuilt:
-            //TODO: check this logic out thoroughly.
-            // Update 12/28: not sure why I wrote this/
             guard let tiles = input.endTilesStruct,
                 let playerPosition = getTilePosition(.player(.zero), tiles: tiles),
                 case let TileType.player(data) = tiles[playerPosition].type else { return }
@@ -158,7 +169,7 @@ class HUD: SKSpriteNode {
     
     func show(_ data: EntityModel) {
         // Remove all the hearts so that we can redraw
-        self.removeAllChildren(exclude: [Identifiers.settings, Constants.threatIndicator])
+        self.removeAllChildren(exclude: [Identifiers.settings, Constants.threatIndicator, Constants.shuffleBoardButton])
         
         // create and display the full and empty hearts
         for health in 0..<data.originalHp {
@@ -239,8 +250,21 @@ class HUD: SKSpriteNode {
         for node in self.nodes(at: position) {
             if node.name == Identifiers.settings {
                 delegate?.settingsTapped()
+            } else if node.name == Constants.threatIndicator {
+                print("threatIndicator touched")
             }
         }
     }
     
+}
+
+extension HUD: ButtonDelegate {
+    func buttonTapped(_ button: Button) {
+        switch button.identifier {
+        case .shuffleBoard:
+            InputQueue.append(Input(.shuffleBoard))
+        default:
+            ()
+        }
+    }
 }

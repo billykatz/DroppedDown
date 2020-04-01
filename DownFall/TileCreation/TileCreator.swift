@@ -176,6 +176,35 @@ class TileCreator: TileStrategy {
         return newTiles
     }
     
+    func shuffle(tiles: [[Tile]]) -> [[Tile]] {
+        var newTiles = tiles
+        var reservedCoords = Set<TileCoord>()
+        var currentMonsterCount = 0
+        for row in 0..<tiles.count {
+            for col in 0..<tiles.count {
+                switch tiles[row][col].type {
+                case .monster:
+                    currentMonsterCount += 1
+                    newTiles[row][col] = Tile(type: randomRock())
+                case .rock:
+                    newTiles[row][col] = Tile(type: randomRock())
+                case .player(let data):
+                    reservedCoords.insert(TileCoord(row: row, column: col))
+                    newTiles[row][col] = Tile(type: .player(data.wasAttacked(for: 2, from: .south)))
+                default:
+                    reservedCoords.insert(TileCoord(row: row, column: col))
+                }
+            }
+        }
+        
+        let newMonsterCount = max(1, currentMonsterCount-3)
+        for _ in 0..<newMonsterCount {
+            let coord = randomCoord(notIn: reservedCoords)
+            newTiles[coord.row][coord.column] = Tile(type: randomMonster())
+        }
+        return newTiles
+    }
+    
     /**
      Create a 2d Array of tile types
      - Parameters:

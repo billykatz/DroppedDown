@@ -15,6 +15,7 @@ protocol TileStrategy {
     func goldDropped(from monster: EntityModel) -> Int
     func randomMonster() -> TileType
     func randomMonster(not: EntityModel.EntityType) -> Tile
+    func shuffle(tiles: [[Tile]]) -> [[Tile]]
     var entities: EntitiesModel { get }
     var difficulty: Difficulty { get }
     var updatedEntity: EntityModel? { get }

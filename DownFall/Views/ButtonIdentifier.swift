@@ -29,6 +29,7 @@ enum ButtonIdentifier: String {
     case mainMenu
     case cycleLevel
     case seeInventory
+    case shuffleBoard
     
     var title: String {
         switch self {
@@ -68,6 +69,8 @@ enum ButtonIdentifier: String {
             return "Level start"
         case .seeInventory:
             return "Inventory"
+        case .shuffleBoard:
+            return "Pay 2 \u{2665}: Shuffle board"
         case .wallet, .infoPopup, .storeItem, .backpack:
             return ""
         }

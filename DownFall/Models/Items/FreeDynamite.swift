@@ -1,14 +1,14 @@
 //
-//  Dynamite.swift
+//  FreeDynamite.swift
 //  DownFall
 //
-//  Created by William Katz on 12/19/19.
-//  Copyright © 2019 William Katz LLC. All rights reserved.
+//  Created by Katz, Billy on 3/29/20.
+//  Copyright © 2020 William Katz LLC. All rights reserved.
 //
 
 import Foundation
 
-struct Dynamite: Ability {
+struct FreeDynamite: Ability {
     
     var count: Int
     
@@ -28,7 +28,7 @@ struct Dynamite: Ability {
         return "dynamite"
     }
     
-    var cost: Int { return 125 }
+    var cost: Int { return 0 }
     
     var currency: Currency { return .gold }
     

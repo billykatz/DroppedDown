@@ -372,6 +372,12 @@ class Referee {
                     if currEmptyIdx >= 0 {
                         prevEmptyIdx = currEmptyIdx
                     }
+                    
+                    
+                    /// edge case where the top most tile is empty
+                    if currEmptyIdx == tiles.count - 1 {
+                        needsRefill = true
+                    }
                 }
             }
             guard needsRefill else { return nil }
@@ -391,8 +397,6 @@ class Referee {
         
         if let input = winRule.apply(tiles) {
             return input
-        } else if !boardHasMoreMoves() {
-            return Input(.gameLose("The board has no more moves"))
         } else if playerIsDead() {
             return Input(.gameLose("You ran out of health"))
         }

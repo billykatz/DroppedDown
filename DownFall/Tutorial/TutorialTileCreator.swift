@@ -24,6 +24,10 @@
 import GameplayKit
 
 struct TutorialTileCreator: TileStrategy {
+    func shuffle(tiles: [[Tile]]) -> [[Tile]] {
+        return []
+    }
+    
     func randomMonster() -> TileType {
         return .monster(.zero)
     }

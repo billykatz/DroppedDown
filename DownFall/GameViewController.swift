@@ -68,7 +68,6 @@ extension GameViewController {
 extension GameViewController: MainMenuDelegate {
     func didSelectStartTutorial(_ playerModel: EntityModel?) {
         if let view = self.view as! SKView? {
-//            view.frame = self.view.safeAreaLayoutGuide.layoutFrame
             view.presentScene(nil)
             levels = LevelConstructor.buildTutorialLevels()
             presentNextLevel(playerModel)

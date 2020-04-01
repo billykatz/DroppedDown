@@ -76,7 +76,7 @@ class TileDetailView: SKNode {
         let detailView = SKSpriteNode(color: .clayRed, size: CGSize(width: maxWidth, height: maxHeight))
         
         detailView.position = CGPoint.alignHorizontally(detailView.frame, relativeTo: alignedToHUDFrame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.most, translatedToBounds: true)
-                
+        detailView.zPosition = Precedence.aboveMenu.rawValue
         self.detailViewTemplate = detailView
 
         /// Add nodes to the foreground
@@ -85,6 +85,9 @@ class TileDetailView: SKNode {
         
         
         super.init()
+        
+        // set out own z position
+        self.zPosition = Precedence.aboveMenu.rawValue
         
         // default interaction is false
         isUserInteractionEnabled = false
@@ -133,7 +136,9 @@ class TileDetailView: SKNode {
         let text =
         """
         \u{2022} \(health) health
-        \u{2022} blocks attacks
+        \u{2022} blocks attacks from monsters
+        \u{2022} takes damage from mining rocks next to it
+        \u{2022} collapses when it reaches 0 health
         """
         let pillarDesc = ParagraphNode(text: text, paragraphWidth: detailViewTemplate.frame.width - Style.DetailView.spriteSize.width, fontSize: UIFont.mediumSize)
         pillarDesc.position = CGPoint.alignHorizontally(pillarDesc.frame, relativeTo: nextTo, horizontalAnchor: .left, verticalAlign: .bottom, verticalPadding: Style.Padding.more, translatedToBounds: true)
@@ -178,6 +183,8 @@ class TileDetailView: SKNode {
         border.position = .zero
         border.name = Constants.borderName
         contentView.addChild(border)
+        
+        contentView.zPosition = Precedence.aboveMenu.rawValue
         
         /// Add it to the view
         contentView.addChild(detailViewTemplate)

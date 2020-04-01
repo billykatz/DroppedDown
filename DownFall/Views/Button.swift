@@ -19,6 +19,8 @@ class Button: SKShapeNode {
     static let medium = CGSize(width: 110, height: 50)
     static let large = CGSize(width: 150, height: 75)
     
+    static let inGameLarge = CGSize(width: 200, height: 160)
+    
     weak var delegate: ButtonDelegate?
     
     var identifier: ButtonIdentifier

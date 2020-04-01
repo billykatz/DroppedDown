@@ -1,14 +1,14 @@
 //
-//  TransmogrificationPotion.swift
+//  FreeKillMonsterPotion.swift
 //  DownFall
 //
-//  Created by Katz, Billy on 1/16/20.
+//  Created by Katz, Billy on 3/29/20.
 //  Copyright © 2020 William Katz LLC. All rights reserved.
 //
 
 import Foundation
 
-struct TransmogrificationPotion: Ability {
+struct FreeKillMonsterPotion: Ability {
     
     var count: Int
     
@@ -17,31 +17,33 @@ struct TransmogrificationPotion: Ability {
     }
     
     func animatedColumns() -> Int? {
-        return 6
+        return 7
     }
     
     var affectsCombat: Bool {
         false
     }
     
-    var type: AbilityType { return .transmogrificationPotion }
+    var type: AbilityType { return .killMonsterPotion }
     
     var textureName: String {
-        return "transmogrificationPotionSpriteSheet"
+        return "killMonsterPotionSpriteSheet"
     }
     
-    var cost: Int { return 99 }
+    var cost: Int {
+        return 0
+    }
     
     var currency: Currency {
         return .gold
     }
     
     var description: String {
-        return "Transform any monster into another random monster."
+        return "Kill any monster.  That monster does not drop any gold."
     }
     
     var flavorText: String {
-        return "Archmaester Killian stumbled upon this in search for a potion to cure this father-in-law of idiocy."
+        return "The patent is held by the Dryad Queen Cecila, known far and wide for her thriftiness."
     }
     
     var extraAttacksGranted: Int? {
@@ -60,5 +62,3 @@ struct TransmogrificationPotion: Ability {
     var targets: Int? { return 1 }
     var targetTypes: [TileType]? { return [TileType.monster(.zero)] }
 }
-
-

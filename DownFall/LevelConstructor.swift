@@ -151,7 +151,7 @@ struct LevelConstructor {
                 (randoPillar, TileCoord(inset, boardWidth-inset-1)),
                 (randoPillar, TileCoord(inset, boardWidth-inset))
             ]
-
+            
         case .fifth:
             let localInset = 3
             return [
@@ -163,14 +163,14 @@ struct LevelConstructor {
         case .sixth:
             let randomPillar1 = randomPillar(notIn: Set<Color>([.green]))
             let randomPillar2 = randomPillar(notIn: Set<Color>([.green]))
-                return [
-                    (randomPillar1, TileCoord(0, 0)),
-                    (randomPillar1, TileCoord(0, 1)),
-                    (randomPillar1, TileCoord(1, 0)),
-                    (randomPillar2, TileCoord(boardWidth-1, boardWidth-2)),
-                    (randomPillar2, TileCoord(boardWidth-1, boardWidth-1)),
-                    (randomPillar2, TileCoord(boardWidth-2, boardWidth-1))
-                ]
+            return [
+                (randomPillar1, TileCoord(0, 0)),
+                (randomPillar1, TileCoord(0, 1)),
+                (randomPillar1, TileCoord(1, 0)),
+                (randomPillar2, TileCoord(boardWidth-1, boardWidth-2)),
+                (randomPillar2, TileCoord(boardWidth-1, boardWidth-1)),
+                (randomPillar2, TileCoord(boardWidth-2, boardWidth-1))
+            ]
         case .tutorial1, .tutorial2:
             return []
         case .seventh, .boss:
@@ -305,27 +305,38 @@ struct LevelConstructor {
     }
     
     static func availableAbilities(per levelType: LevelType, difficulty: Difficulty) -> [AnyAbility] {
-        let abilities: [Ability] = [LesserHealingPotion(),LesserHealingPotion(), GreaterHealingPotion(), TransmogrificationPotion(), KillMonsterPotion(), RockASwap()]
         
-        //        switch levelType {
-        //        case .first:
-        //            switch difficulty {
-        //            case .easy, .normal, .hard:
-        //                abilities = [LesserHealingPotion(), Dynamite(), SwordPickAxe()]
-        //            }
-        //        case .second:
-        //            switch difficulty {
-        //            case .easy, .normal, .hard:
-        //                abilities = [LesserHealingPotion(), Dynamite(), GreaterHealingPotion()]
-        //            }
-        //        case .third:
-        //            switch difficulty {
-        //            case .easy, .normal, .hard:
-        //                abilities = [LesserHealingPotion(), Dynamite(), GreaterHealingPotion(), ShieldEast()]
-        //            }
-        //        case .boss, .tutorial1, .tutorial2:
-        //            fatalError("Boss level not implemented yet")
-        //        }
+        func droppingRandom(numberOfElements: Int, from array: [Ability]) -> [Ability] {
+            if numberOfElements >= array.count { return [] }
+            if numberOfElements == 0 { return array }
+            var new = array
+            var removed = 0
+            while removed < numberOfElements {
+                let randomNumber = Int.random(new.count)
+                removed += 1
+                new.remove(at: randomNumber)
+            }
+            return new
+        }
+
+        
+        var abilities: [Ability]
+        
+        switch levelType {
+        case .first:
+            abilities = [FreeLesserHealingPotion(), FreeKillMonsterPotion(), FreeDynamite()]
+        case .second, .third:
+            let temp: [Ability] = [LesserHealingPotion(), TransmogrificationPotion(), KillMonsterPotion(), Dynamite(), GreaterHealingPotion()]
+            abilities = droppingRandom(numberOfElements: 2, from: temp)
+        case .fourth:
+            let temp: [Ability] = [GreatestHealingPotion(), RockASwap(), TransmogrificationPotion(), KillMonsterGroupPotion(),  KillMonsterPotion(), Dynamite(), GreaterHealingPotion(), MassMinePickaxe()]
+                      abilities = droppingRandom(numberOfElements: 2, from: temp)
+        case .fifth, .sixth, .seventh:
+        let temp: [Ability] = [GreatestHealingPotion(), RockASwap(),MassMinePickaxe(), TransmogrificationPotion(), KillMonsterGroupPotion(),  KillMonsterPotion(), Dynamite(), GreaterHealingPotion()]
+                  abilities = droppingRandom(numberOfElements: 2, from: temp)
+        case .boss, .tutorial1, .tutorial2:
+            fatalError("Boss level not implemented yet")
+        }
         
         return abilities.map { AnyAbility($0) }
     }

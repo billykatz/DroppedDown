@@ -122,6 +122,8 @@ class Board: Equatable {
             InputQueue.append(Input(.transformation(transformation)))
         case .refillEmpty:
             InputQueue.append(Input(.transformation([refillEmpty(inputType: .refillEmpty)])))
+        case .shuffleBoard:
+            InputQueue.append(Input(.transformation([shuffleBoard(inputType: .shuffleBoard)])))
         case .gameLose(_),
              .play,
              .pause,
@@ -304,12 +306,24 @@ class Board: Equatable {
     }
 }
 
+//MARK: shuffle board
+
+extension Board {
+    func shuffleBoard(inputType: InputType) -> Transformation {
+        let newTiles = tileCreator.shuffle(tiles: self.tiles)
+        self.tiles = newTiles
+        return Transformation(transformation: nil, inputType: inputType, endTiles: newTiles)
+    }
+}
+
+
+
 //MARK: - use ability
 
 extension Board {
     private func use(_ ability: AnyAbility, on targets: [TileCoord], input: Input) -> Transformation {
         switch ability.type {
-        case .greaterHealingPotion, .lesserHealingPotion:
+        case .greaterHealingPotion, .lesserHealingPotion, .greatestHealingPotion:
             if let playerCoord = self.tiles(of: .player(.zero)).first {
                 if case TileType.player(let data) = tiles[playerCoord].type, let heal = ability.heal {
                     let newData = data.heal(for: heal).use(ability)
@@ -338,6 +352,18 @@ extension Board {
         case .killMonsterPotion:
             use(ability)
             return removeAndReplace(from: tiles, tileCoord: targets.first!, singleTile: true, input: input)
+        case .tapAwayMonster:
+            let monsters = removeAndReplace(from: tiles, tileCoord: targets.first!, singleTile: false, input: input, killMonsters: true)
+            if monsters.tileTransformation != nil {
+                
+                // TODO: Check a different way to see if this is legal. we are doing the same calculation twice because we need to call `use` before removeAndReplace()
+                use(ability)
+                return removeAndReplace(from: tiles, tileCoord: targets.first!, singleTile: false, input: input, killMonsters: true)
+            }
+        case .massMineRock:
+            guard let target = targets.first, case TileType.rock(let color) = tiles[target.row][target.column].type else { return .zero }
+            use(ability)
+            return massMine(tiles: tiles, color: color, input: input)
         default:
             ()
         }
@@ -390,7 +416,7 @@ extension Board {
     /// Find all contiguous neighbors of the same color as the tile that was tapped
     /// Return a new board with the selectedTiles updated
     
-    func findNeighbors(_ coord: TileCoord) -> ([TileCoord], [TileCoord]) {
+    func findNeighbors(_ coord: TileCoord, killMonsters: Bool = false) -> ([TileCoord], [TileCoord]) {
         let (x,y) = coord.tuple
         guard
             x >= 0,
@@ -398,7 +424,7 @@ extension Board {
             y >= 0,
             y < boardSize else { return ([], []) }
         
-        if case TileType.monster(_) = tiles[x][y].type { return ([],[]) }
+        if case TileType.monster(_) = tiles[x][y].type, !killMonsters { return ([],[]) }
         if case TileType.pillar = tiles[x][y].type { return ([],[]) }
         var queue = [TileCoord(x, y)]
         var tileCoordSet = Set(queue)
@@ -414,23 +440,78 @@ extension Board {
             for i in tileRow-1...tileRow+1 {
                 for j in tileCol-1...tileCol+1 {
                     //check that it is within bounds, that we havent visited it before, and it's the same type as us
-                    guard
-                        valid(neighbor: TileCoord(i,j), for: TileCoord(tileRow, tileCol)),
-                        !tileCoordSet.contains(TileCoord(i,j)),
-                        let myColor = tiles[i][j].type.color, let theirColor = currTile.type.color,
-                        myColor == theirColor
-                        else { continue }
-                    //valid neighbor within bounds
-                    if case .pillar = tiles[i][j].type {
-                        pillars.insert(TileCoord(i,j))
+                    if killMonsters {
+                        guard
+                            valid(neighbor: TileCoord(i,j), for: TileCoord(tileRow, tileCol)),
+                            !tileCoordSet.contains(TileCoord(i,j)) else { continue }
+                        if case .monster = tiles[i][j].type {
+                            queue.append(TileCoord(i,j))
+                            tileCoordSet.insert(TileCoord(row: i, column: j))
+                        }
                     } else {
-                        queue.append(TileCoord(i,j))
-                        tileCoordSet.insert(TileCoord(i,j))
+                        guard
+                            valid(neighbor: TileCoord(i,j), for: TileCoord(tileRow, tileCol)),
+                            !tileCoordSet.contains(TileCoord(i,j)),
+                            let myColor = tiles[i][j].type.color,
+                            let theirColor = currTile.type.color,
+                            myColor == theirColor else { continue }
+                        //valid neighbor within bounds
+                        if case .pillar = tiles[i][j].type {
+                            pillars.insert(TileCoord(i,j))
+                        } else {
+                            queue.append(TileCoord(i,j))
+                            tileCoordSet.insert(TileCoord(i,j))
+                        }
                     }
                 }
             }
         }
         return (queue, Array(pillars))
+    }
+    
+    func massMine(tiles: [[Tile]], color: Color, input: Input) -> Transformation {
+        var selectedCoords: [TileCoord] = []
+        for row in 0..<tiles.count {
+            for col in 0..<tiles.count {
+                if case TileType.rock(let tileColor) = tiles[row][col].type,
+                    tileColor == color {
+                    selectedCoords.append(TileCoord(row: row, column: col))
+                }
+            }
+        }
+        
+        return mine(selectedCoords: selectedCoords, from: tiles, input: input)
+    }
+    
+    func mine(selectedCoords: [TileCoord], from tiles: [[Tile]], input: Input) -> Transformation {
+        
+        var intermediateTiles = tiles
+        for coord in selectedCoords {
+            intermediateTiles[coord.x][coord.y] = Tile.empty
+        }
+        
+        // store tile transforamtions and shift information
+        var newTiles : [TileTransformation] = []
+        var (shiftDown, shiftIndices) = calculateShiftIndices(for: &intermediateTiles)
+        
+        //add new tiles
+        addNewTiles(shiftIndices: shiftIndices,
+                    shiftDown: &shiftDown,
+                    newTiles: &newTiles,
+                    intermediateTiles: &intermediateTiles)
+        
+        //create selectedTilesTransformation array
+        let selectedTilesTransformation = selectedCoords.map { TileTransformation($0, $0) }
+        
+        //update our store of tilesftiles
+        self.tiles = intermediateTiles
+        
+        // return our new board
+        return Transformation(transformation: [selectedTilesTransformation,
+                                               newTiles,
+                                               shiftDown],
+                              inputType: input.type,
+                              endTiles: intermediateTiles)
     }
     
     /*
@@ -445,12 +526,13 @@ extension Board {
     func removeAndReplace(from tiles: [[Tile]],
                           tileCoord: TileCoord,
                           singleTile: Bool = false,
-                          input: Input) -> Transformation {
+                          input: Input,
+                          killMonsters: Bool = false) -> Transformation {
         // Check that the tile group at row, col has more than 3 tiles
         var selectedTiles: [TileCoord] = [tileCoord]
         var selectedPillars: [TileCoord] = []
         if !singleTile {
-            (selectedTiles, selectedPillars) = findNeighbors(tileCoord)
+            (selectedTiles, selectedPillars) = findNeighbors(tileCoord, killMonsters: killMonsters)
             if selectedTiles.count < 3 {
                 return Transformation(transformation: nil,
                                       inputType: input.type,
@@ -731,7 +813,6 @@ extension Board {
         case counterClockwise
         case clockwise
     }
-    
     func refillEmpty(inputType: InputType) -> Transformation {
         /// Pillars can create voids of .empty tiles, therefore on rotate we may need to create and shift down tiles
         var intermediateTiles: [[Tile]] = self.tiles
@@ -942,7 +1023,7 @@ extension Board {
             //just note that the monster attacked
             tiles[attackerPosition.x][attackerPosition.y] = Tile(type: TileType.monster(monsterModel.didAttack()))
         }
-
+        
         
         
         return Transformation(inputType: input.type,

@@ -182,29 +182,14 @@ extension GameScene {
         let vector = currentPosition - lastPosition
         // set the swipe for the duration of this swipe gesture
         let touchIsOnRight = (view?.isOnRight(currentPosition) ?? false)
-        let touchIsInBottom = (view?.isInBottom(currentPosition) ?? false)
         if self.swipeDirection == nil {
             let swipeDirection = SwipeDirection(from: vector)
-            
-            /// you can only start certain kinds of swipes in the correct area of the screen
-            /// Up and down must originate on the right side of the screen
-            /// Left and right must originate on the bottom half of the screen
-            switch swipeDirection {
-            case .up, .down:
-                if !touchIsOnRight {
-                    return
-                }
-            case .left, .right:
-                if !touchIsInBottom {
-                    return
-                }
-            }
             
             /// finally set the swipeDirection
             self.swipeDirection = swipeDirection
             
             /// deteremine which clock rotation to apply
-            let rotateDir = RotateDirection(from: swipeDirection)
+            let rotateDir = RotateDirection(from: swipeDirection, isOnRight: touchIsOnRight)
             
             /// call functions that send rotate input
             switch rotateDir {
@@ -218,13 +203,12 @@ extension GameScene {
         /// update the preview view
         if touchWasSwipe {
             guard let swipeDirection = swipeDirection else { return }
-            let distance: CGFloat
+            var distance: CGFloat
             switch swipeDirection {
             case .up, .down:
                 distance = vector.dy
-            case .left, .right:
-                distance = vector.dx
             }
+            distance *= (touchIsOnRight ? 1 : -1)
             self.rotatePreview?.touchesMoved(distance: distance)
         }
         

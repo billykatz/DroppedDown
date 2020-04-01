@@ -11,18 +11,10 @@ import CoreGraphics
 enum SwipeDirection {
     case up
     case down
-    case left
-    case right
     
     init(from vector: CGVector) {
-        if abs(vector.dx) > abs(vector.dy) {
-            if vector.dx > 0 { self = .right }
-            else { self = .left }
-        }
-        else {
-            if vector.dy > 0 { self = .up }
-            else { self = .down }
-        }
+        if vector.dy > 0 { self = .up }
+        else { self = .down }
     }
 }
 
@@ -30,12 +22,12 @@ enum RotateDirection {
     case counterClockwise
     case clockwise
     
-    init(from swipeDirection: SwipeDirection) {
+    init(from swipeDirection: SwipeDirection, isOnRight: Bool) {
         switch swipeDirection {
-        case .up, .right:
-            self = .counterClockwise
-        case .down, .left:
-            self = .clockwise
+        case .up:
+            self = isOnRight ? .counterClockwise : .clockwise
+        case .down:
+            self = isOnRight ? .clockwise : .counterClockwise
         }
     }
 }

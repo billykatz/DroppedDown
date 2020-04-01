@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "3DF2924920A37FEE006671AC"
-               BuildableName = "DownFall.app"
+               BuildableName = "Shift Shaft.app"
                BlueprintName = "DownFall"
                ReferencedContainer = "container:DownFall.xcodeproj">
             </BuildableReference>
@@ -56,7 +56,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "3DF2924920A37FEE006671AC"
-            BuildableName = "DownFall.app"
+            BuildableName = "Shift Shaft.app"
             BlueprintName = "DownFall"
             ReferencedContainer = "container:DownFall.xcodeproj">
          </BuildableReference>
@@ -73,7 +73,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "3DF2924920A37FEE006671AC"
-            BuildableName = "DownFall.app"
+            BuildableName = "Shift Shaft.app"
             BlueprintName = "DownFall"
             ReferencedContainer = "container:DownFall.xcodeproj">
          </BuildableReference>

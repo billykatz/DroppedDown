@@ -106,10 +106,10 @@ struct LevelConstructor {
         }
         
         switch levelType {
-        case .first, .second, .third:
+        case .first, .second, .third, .fourth:
             let rocks = matchUp([.rock(.red), .rock(.blue), .rock(.purple)], range: normalRockRange, subRanges: 3)
             return rocks
-        case .fourth, .fifth, .sixth, .seventh, .boss:
+        case .fifth, .sixth, .seventh, .boss:
             let rocks = matchUp([.rock(.red), .rock(.blue), .rock(.purple), .rock(.brown)], range: normalRockRange, subRanges: 4)
             return rocks
         case .tutorial1, .tutorial2:
@@ -153,14 +153,6 @@ struct LevelConstructor {
             ]
             
         case .fifth:
-            let localInset = 3
-            return [
-                (randomPillar(notIn: Set<Color>([.green])), TileCoord(boardWidth-localInset-1, localInset)),
-                (randomPillar(notIn: Set<Color>([.green])), TileCoord(boardWidth-localInset-1, boardWidth-localInset-1)),
-                (randomPillar(notIn: Set<Color>([.green])), TileCoord(localInset, boardWidth-localInset-1)),
-                (randomPillar(notIn: Set<Color>([.green])), TileCoord(localInset, localInset))
-            ]
-        case .sixth:
             let randomPillar1 = randomPillar(notIn: Set<Color>([.green]))
             let randomPillar2 = randomPillar(notIn: Set<Color>([.green]))
             return [
@@ -171,9 +163,30 @@ struct LevelConstructor {
                 (randomPillar2, TileCoord(boardWidth-1, boardWidth-1)),
                 (randomPillar2, TileCoord(boardWidth-2, boardWidth-1))
             ]
+        case .sixth:
+            let localInset = 3
+            return [
+                (randomPillar(notIn: Set<Color>([.green])), TileCoord(boardWidth-localInset-1, localInset)),
+                (randomPillar(notIn: Set<Color>([.green])), TileCoord(boardWidth-localInset-1, boardWidth-localInset-1)),
+                (randomPillar(notIn: Set<Color>([.green])), TileCoord(localInset, boardWidth-localInset-1)),
+                (randomPillar(notIn: Set<Color>([.green])), TileCoord(localInset, localInset))
+            ]
+        case .seventh:
+            let localInset = 2
+            let otherInset = 4
+            return [
+                (randomPillar(notIn: Set<Color>([.green])), TileCoord(boardWidth-localInset-1, localInset)),
+                (randomPillar(notIn: Set<Color>([.green])), TileCoord(boardWidth-localInset-1, boardWidth-localInset-1)),
+                (randomPillar(notIn: Set<Color>([.green])), TileCoord(localInset, boardWidth-localInset-1)),
+                (randomPillar(notIn: Set<Color>([.green])), TileCoord(localInset, localInset)),
+                (randomPillar(notIn: Set<Color>([.green])), TileCoord(boardWidth-otherInset-1, otherInset)),
+                (randomPillar(notIn: Set<Color>([.green])), TileCoord(boardWidth-otherInset-1, boardWidth-otherInset-1)),
+                (randomPillar(notIn: Set<Color>([.green])), TileCoord(otherInset, boardWidth-otherInset-1)),
+                (randomPillar(notIn: Set<Color>([.green])), TileCoord(otherInset, otherInset))
+            ]
         case .tutorial1, .tutorial2:
             return []
-        case .seventh, .boss:
+        case .boss:
             var pillarCoords: [TileCoord] = []
             let beforeHalf = boardWidth/2 - 1
             let afterHalf = boardWidth/2

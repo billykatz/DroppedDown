@@ -30,7 +30,7 @@ struct MassMinePickaxe: Ability {
         return "explodeAnimation"
     }
     
-    var cost: Int { return 349 }
+    var cost: Int { return 299 }
     
     var currency: Currency {
         return .gold

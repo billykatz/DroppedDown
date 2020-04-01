@@ -31,7 +31,7 @@ struct KillMonsterGroupPotion: Ability {
         return "killMonsterPotionSpriteSheet"
     }
     
-    var cost: Int { return 399 }
+    var cost: Int { return 299 }
     
     var currency: Currency {
         return .gold

@@ -100,9 +100,8 @@ class StoreScene: SKScene {
         
         
         if level.type == .first {
-            let firstOneFree = ParagraphNode(text: "\"Welcome!, first one is on the house\"", paragraphWidth: self.frame.width*0.7, fontSize: UIFont.smallSize)
-            firstOneFree.position = CGPoint.zero.translateVertically(-40.0)
-            addChild(firstOneFree)
+            let infoPopup = informationPopup(with: "\"Welcome, first one is on the house!\"")
+            show(infoPopup)
         }
         
     }
@@ -127,7 +126,7 @@ class StoreScene: SKScene {
             itemSize: Style.Store.Item.size,
             width: playableWidth,
             height: Style.Store.ItemGrid.height,
-            bottomLeft: CGPoint(x: -frame.width/2, y: 0)
+            bottomLeft: CGPoint(x: -frame.width/2, y: 0 - Style.Store.InfoPopup.height/2)
         )
         for (index, position) in gridPoints.enumerated() {
             if items.count - 1 >= index {
@@ -168,6 +167,7 @@ class StoreScene: SKScene {
         let purchased = selectedItem?.isPurchased ?? false
         
         let canAfford = playerData.canAfford(selectedItem?.ability.cost ?? 0, inCurrency: .gold)
+        
         
         let purchaseButton = Button(size: Style.Store.CTAButton.size,
                                     delegate: self,
@@ -396,8 +396,7 @@ class StoreScene: SKScene {
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
-        let positionInScene = touch.location(in: self)
-        if !inventoryView.contains(positionInScene) {
+        if !inventoryHidden {
             inventoryHidden = true
         }
         
@@ -443,7 +442,7 @@ extension StoreScene: ButtonDelegate {
         case .close:
             selectedItem = nil
         case .seeInventory:
-            inventoryHidden = false
+            inventoryHidden = !inventoryHidden
         default:
             fatalError("You must add a case for added buttons here")
         }

@@ -79,9 +79,11 @@ class MenuSpriteNode: SKSpriteNode {
             
             let text = level.type == .seventh ?
             """
-            You beat the seventh and final level. You are a boss!
+            You are a BOSS!
 
-            Thanks for playing and look out for the next update.
+            🎊 🎊 🎊 🎊 🎊
+
+            You beat the seventh and final level.
             """
                 :
             """

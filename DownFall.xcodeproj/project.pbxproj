@@ -27,7 +27,6 @@
 		3D30A4292216899E00AFA1E1 /* BoardMocker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D30A4232216892A00AFA1E1 /* BoardMocker.swift */; };
 		3D30A42B2217F63500AFA1E1 /* TileCoord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D30A42A2217F63500AFA1E1 /* TileCoord.swift */; };
 		3D3D31EC23ABEFA8002B87EE /* LevelConstructor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D3D31EB23ABEFA8002B87EE /* LevelConstructor.swift */; };
-		3D4A470D23B3CEFC000165FB /* RandomTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4A470C23B3CEFC000165FB /* RandomTests.swift */; };
 		3D4A470F23B3D33B000165FB /* LevelType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4A470E23B3D33B000165FB /* LevelType.swift */; };
 		3D4A471123B3D34F000165FB /* LevelModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4A471023B3D34F000165FB /* LevelModel.swift */; };
 		3D4A471323B3DCB7000165FB /* RangeModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4A471223B3DCB7000165FB /* RangeModelTests.swift */; };
@@ -72,7 +71,6 @@
 		3DA0A37A22FFAECE0041EF34 /* UIFont+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DA0A37922FFAECE0041EF34 /* UIFont+Extensions.swift */; };
 		3DA0A37D2300CDFC0041EF34 /* DoubleAttack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DA0A37C2300CDFC0041EF34 /* DoubleAttack.swift */; };
 		3DA0A37F2300CE3B0041EF34 /* ShieldEast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DA0A37E2300CE3B0041EF34 /* ShieldEast.swift */; };
-		3DA0A3812303D46F0041EF34 /* StoreInventory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DA0A3802303D46F0041EF34 /* StoreInventory.swift */; };
 		3DA0A384230455B90041EF34 /* CGPoint+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DA0A383230455B90041EF34 /* CGPoint+Extension.swift */; };
 		3DA0A386230457580041EF34 /* SKLabelNode+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DA0A385230457580041EF34 /* SKLabelNode+Extension.swift */; };
 		3DA4E883228E5D2F006E90D1 /* SKSpriteNode+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DA4E882228E5D2F006E90D1 /* SKSpriteNode+Extensions.swift */; };
@@ -126,11 +124,18 @@
 		3DF2928320A66BEB006671AC /* Tile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2928220A66BEB006671AC /* Tile.swift */; };
 		3DF2928520A76242006671AC /* Board.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2928420A76242006671AC /* Board.swift */; };
 		5605D6D321CC2DF400C1C5C2 /* DFTileSpriteNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5605D6D221CC2DF400C1C5C2 /* DFTileSpriteNode.swift */; };
+		5819582D2432790700965108 /* MassMineAbility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5819582C2432790700965108 /* MassMineAbility.swift */; };
 		5819AB71242A5CA600498BB6 /* SpriteAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5819AB70242A5CA600498BB6 /* SpriteAction.swift */; };
 		5819AB73242A668400498BB6 /* SwipeTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5819AB72242A668400498BB6 /* SwipeTypes.swift */; };
+		582635DD243168B500A944B6 /* ButtonIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 582635DC243168B500A944B6 /* ButtonIdentifier.swift */; };
 		58383643242D7A6E004CA026 /* Array+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58383642242D7A6E004CA026 /* Array+Extensions.swift */; };
 		5838364B242D7E21004CA026 /* ThreatLevelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5838364A242D7E21004CA026 /* ThreatLevelController.swift */; };
 		5843F4542426747100C03612 /* RotatePreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5843F4532426747100C03612 /* RotatePreviewView.swift */; };
+		585EF8052431855800E87FCB /* KillMonsterGroupPotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585EF8042431855800E87FCB /* KillMonsterGroupPotion.swift */; };
+		585EF80724318B5800E87FCB /* GreatestHealingPotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585EF80624318B5800E87FCB /* GreatestHealingPotion.swift */; };
+		585EF8092431ACEF00E87FCB /* FreeLesserHealingPotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585EF8082431ACEF00E87FCB /* FreeLesserHealingPotion.swift */; };
+		585EF80B2431AD2400E87FCB /* FreeKillMonsterPotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585EF80A2431AD2400E87FCB /* FreeKillMonsterPotion.swift */; };
+		585EF80D2431AD3800E87FCB /* FreeDynamite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585EF80C2431AD3800E87FCB /* FreeDynamite.swift */; };
 		5865D62E23DBF652007D11FC /* abilities.json in Sources */ = {isa = PBXBuildFile; fileRef = 5865D62D23DBF652007D11FC /* abilities.json */; };
 		5867A591242B0CD1005BFD10 /* TileDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5867A590242B0CD1005BFD10 /* TileDetailView.swift */; };
 		586AE77723CF91AA00302347 /* AttackModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 586AE77623CF91AA00302347 /* AttackModelTests.swift */; };
@@ -140,6 +145,7 @@
 		589A27D423D90FE000174DE7 /* TargetingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589A27D323D90FE000174DE7 /* TargetingViewModel.swift */; };
 		589A27D623D9210900174DE7 /* TargetingViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589A27D523D9210900174DE7 /* TargetingViewModelTests.swift */; };
 		58A51663241DF3E2009E84E1 /* TargetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58A51662241DF3E2009E84E1 /* TargetView.swift */; };
+		58AD4883243581FC00F90A87 /* RandomTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4A470C23B3CEFC000165FB /* RandomTests.swift */; };
 		58B39BD723D21C9600915858 /* BackpackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58B39BD623D21C9600915858 /* BackpackView.swift */; };
 		58C1AE4A23D19CEE003B5B5A /* TransmogrificationPotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C1AE4923D19CEE003B5B5A /* TransmogrificationPotion.swift */; };
 		58C1AE4C23D19E03003B5B5A /* KillMonsterPotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C1AE4B23D19E03003B5B5A /* KillMonsterPotion.swift */; };
@@ -222,7 +228,6 @@
 		3DA0A37922FFAECE0041EF34 /* UIFont+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIFont+Extensions.swift"; sourceTree = "<group>"; };
 		3DA0A37C2300CDFC0041EF34 /* DoubleAttack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoubleAttack.swift; sourceTree = "<group>"; };
 		3DA0A37E2300CE3B0041EF34 /* ShieldEast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShieldEast.swift; sourceTree = "<group>"; };
-		3DA0A3802303D46F0041EF34 /* StoreInventory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreInventory.swift; sourceTree = "<group>"; };
 		3DA0A383230455B90041EF34 /* CGPoint+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGPoint+Extension.swift"; sourceTree = "<group>"; };
 		3DA0A385230457580041EF34 /* SKLabelNode+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SKLabelNode+Extension.swift"; sourceTree = "<group>"; };
 		3DA4E882228E5D2F006E90D1 /* SKSpriteNode+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SKSpriteNode+Extensions.swift"; sourceTree = "<group>"; };
@@ -266,7 +271,7 @@
 		3DEF7FF2237DB8B90070FB3D /* InputType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputType.swift; sourceTree = "<group>"; };
 		3DF0A6AF2379C4DC00941305 /* ParagraphNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParagraphNode.swift; sourceTree = "<group>"; };
 		3DF0A6B22379CC4600941305 /* pixel-font.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "pixel-font.ttf"; sourceTree = "<group>"; };
-		3DF2924A20A37FEE006671AC /* DownFall.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DownFall.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3DF2924A20A37FEE006671AC /* Shift Shaft.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Shift Shaft.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3DF2924D20A37FEE006671AC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		3DF2925320A37FEE006671AC /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
 		3DF2925520A37FEE006671AC /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
@@ -279,11 +284,18 @@
 		3DF2928220A66BEB006671AC /* Tile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tile.swift; sourceTree = "<group>"; };
 		3DF2928420A76242006671AC /* Board.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Board.swift; sourceTree = "<group>"; };
 		5605D6D221CC2DF400C1C5C2 /* DFTileSpriteNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DFTileSpriteNode.swift; sourceTree = "<group>"; };
+		5819582C2432790700965108 /* MassMineAbility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MassMineAbility.swift; sourceTree = "<group>"; };
 		5819AB70242A5CA600498BB6 /* SpriteAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteAction.swift; sourceTree = "<group>"; };
 		5819AB72242A668400498BB6 /* SwipeTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeTypes.swift; sourceTree = "<group>"; };
+		582635DC243168B500A944B6 /* ButtonIdentifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonIdentifier.swift; sourceTree = "<group>"; };
 		58383642242D7A6E004CA026 /* Array+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Extensions.swift"; sourceTree = "<group>"; };
 		5838364A242D7E21004CA026 /* ThreatLevelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreatLevelController.swift; sourceTree = "<group>"; };
 		5843F4532426747100C03612 /* RotatePreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RotatePreviewView.swift; sourceTree = "<group>"; };
+		585EF8042431855800E87FCB /* KillMonsterGroupPotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KillMonsterGroupPotion.swift; sourceTree = "<group>"; };
+		585EF80624318B5800E87FCB /* GreatestHealingPotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GreatestHealingPotion.swift; sourceTree = "<group>"; };
+		585EF8082431ACEF00E87FCB /* FreeLesserHealingPotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeLesserHealingPotion.swift; sourceTree = "<group>"; };
+		585EF80A2431AD2400E87FCB /* FreeKillMonsterPotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeKillMonsterPotion.swift; sourceTree = "<group>"; };
+		585EF80C2431AD3800E87FCB /* FreeDynamite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeDynamite.swift; sourceTree = "<group>"; };
 		5865D62D23DBF652007D11FC /* abilities.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = abilities.json; sourceTree = "<group>"; };
 		5867A590242B0CD1005BFD10 /* TileDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileDetailView.swift; sourceTree = "<group>"; };
 		586AE77623CF91AA00302347 /* AttackModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttackModelTests.swift; sourceTree = "<group>"; };
@@ -501,11 +513,17 @@
 				3D6279CC23AD39950048EB76 /* SwordPickAxe.swift */,
 				3D6279C423ACA3DF0048EB76 /* RockASwap.swift */,
 				3D6279C623ACA8350048EB76 /* Dynamite.swift */,
+				585EF80C2431AD3800E87FCB /* FreeDynamite.swift */,
 				3DA0A37E2300CE3B0041EF34 /* ShieldEast.swift */,
 				3D6279CA23ACA90E0048EB76 /* GreaterHealingPoition.swift */,
+				585EF80624318B5800E87FCB /* GreatestHealingPotion.swift */,
+				585EF8082431ACEF00E87FCB /* FreeLesserHealingPotion.swift */,
 				3D6279C823ACA8A00048EB76 /* LesserHealingPotion.swift */,
 				58C1AE4923D19CEE003B5B5A /* TransmogrificationPotion.swift */,
 				58C1AE4B23D19E03003B5B5A /* KillMonsterPotion.swift */,
+				585EF80A2431AD2400E87FCB /* FreeKillMonsterPotion.swift */,
+				585EF8042431855800E87FCB /* KillMonsterGroupPotion.swift */,
+				5819582C2432790700965108 /* MassMineAbility.swift */,
 			);
 			path = Items;
 			sourceTree = "<group>";
@@ -515,7 +533,6 @@
 			children = (
 				3D06390E22F1DB8300C4D5E9 /* StoreScene.swift */,
 				3DA0A37722FFA6250041EF34 /* StoreItem.swift */,
-				3DA0A3802303D46F0041EF34 /* StoreInventory.swift */,
 			);
 			path = Store;
 			sourceTree = "<group>";
@@ -582,7 +599,7 @@
 			isa = PBXGroup;
 			children = (
 				589A27D223D90FD500174DE7 /* Targeting */,
-				3DE87C8F22374C2C00D750CF /* Button.swift */,
+				582635DB243168A700A944B6 /* Buttons */,
 				58B39BD623D21C9600915858 /* BackpackView.swift */,
 				5843F4532426747100C03612 /* RotatePreviewView.swift */,
 				5867A590242B0CD1005BFD10 /* TileDetailView.swift */,
@@ -620,7 +637,7 @@
 		3DF2924B20A37FEE006671AC /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				3DF2924A20A37FEE006671AC /* DownFall.app */,
+				3DF2924A20A37FEE006671AC /* Shift Shaft.app */,
 				3DF2926420A37FF0006671AC /* DownFallTests.xctest */,
 			);
 			name = Products;
@@ -710,6 +727,15 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
+		582635DB243168A700A944B6 /* Buttons */ = {
+			isa = PBXGroup;
+			children = (
+				3DE87C8F22374C2C00D750CF /* Button.swift */,
+				582635DC243168B500A944B6 /* ButtonIdentifier.swift */,
+			);
+			name = Buttons;
+			sourceTree = "<group>";
+		};
 		58383644242D7D04004CA026 /* TurnWatcher */ = {
 			isa = PBXGroup;
 			children = (
@@ -777,7 +803,7 @@
 			);
 			name = DownFall;
 			productName = DownFall;
-			productReference = 3DF2924A20A37FEE006671AC /* DownFall.app */;
+			productReference = 3DF2924A20A37FEE006671AC /* Shift Shaft.app */;
 			productType = "com.apple.product-type.application";
 		};
 		3DF2926320A37FF0006671AC /* DownFallTests */ = {
@@ -897,6 +923,7 @@
 				5819AB73242A668400498BB6 /* SwipeTypes.swift in Sources */,
 				3DF2928520A76242006671AC /* Board.swift in Sources */,
 				3D7D8B37225422440016FE4C /* TilesHelper.swift in Sources */,
+				582635DD243168B500A944B6 /* ButtonIdentifier.swift in Sources */,
 				58C1AE4A23D19CEE003B5B5A /* TransmogrificationPotion.swift in Sources */,
 				3DAFBD3721B8E6E7009B116A /* InputQueue.swift in Sources */,
 				3DC072BB2373AF510046F224 /* SwipeRecognizerView.swift in Sources */,
@@ -911,6 +938,7 @@
 				3DA0087D21E6D1960017D8DA /* TileCreator.swift in Sources */,
 				3D06390522EEB52300C4D5E9 /* LoseState.swift in Sources */,
 				3D30A42B2217F63500AFA1E1 /* TileCoord.swift in Sources */,
+				585EF80724318B5800E87FCB /* GreatestHealingPotion.swift in Sources */,
 				3D58468C22A632F100EDD845 /* AttackModel.swift in Sources */,
 				3D06390922EEB54E00C4D5E9 /* ReffingState.swift in Sources */,
 				5843F4542426747100C03612 /* RotatePreviewView.swift in Sources */,
@@ -918,6 +946,7 @@
 				58F034C32408B7CF00BE1863 /* BossController.swift in Sources */,
 				3D635E8F22E20CDA0090C99C /* AnimationModel.swift in Sources */,
 				3DE87C94223D691100D750CF /* GameState.swift in Sources */,
+				585EF80D2431AD3800E87FCB /* FreeDynamite.swift in Sources */,
 				3D674C9122C9BFDB0003AEB4 /* UIColor+Extensions.swift in Sources */,
 				3DA4E883228E5D2F006E90D1 /* SKSpriteNode+Extensions.swift in Sources */,
 				589A27D423D90FE000174DE7 /* TargetingViewModel.swift in Sources */,
@@ -931,18 +960,20 @@
 				3DA0A37F2300CE3B0041EF34 /* ShieldEast.swift in Sources */,
 				3D106098232E9A0200ECE7E6 /* Animator.swift in Sources */,
 				3DF2924E20A37FEE006671AC /* AppDelegate.swift in Sources */,
+				585EF8092431ACEF00E87FCB /* FreeLesserHealingPotion.swift in Sources */,
 				3D10609B233DD05500ECE7E6 /* TurnWatcher.swift in Sources */,
 				3D06390122EEB4FB00C4D5E9 /* PauseState.swift in Sources */,
+				585EF80B2431AD2400E87FCB /* FreeKillMonsterPotion.swift in Sources */,
 				3D58468A22A6325300EDD845 /* CarryModel.swift in Sources */,
 				5819AB71242A5CA600498BB6 /* SpriteAction.swift in Sources */,
 				3DF2928320A66BEB006671AC /* Tile.swift in Sources */,
 				3DA4E88B228FC156006E90D1 /* Util.swift in Sources */,
 				3DC072C6237545400046F224 /* Rule.swift in Sources */,
 				3D6279D423AD56870048EB76 /* TutorialSelectionScene.swift in Sources */,
+				5819582D2432790700965108 /* MassMineAbility.swift in Sources */,
 				3DE87C8E2235D05300D750CF /* MenuSpriteNode.swift in Sources */,
 				3D6AACE1222C997800C77B24 /* Header.swift in Sources */,
 				3DC072C42375452D0046F224 /* Rulebook.swift in Sources */,
-				3DA0A3812303D46F0041EF34 /* StoreInventory.swift in Sources */,
 				3D06390322EEB50C00C4D5E9 /* PlayState.swift in Sources */,
 				3DD36ECB21E5B86100AC4873 /* TileStrategy.swift in Sources */,
 				3DA0A37822FFA6250041EF34 /* StoreItem.swift in Sources */,
@@ -952,6 +983,7 @@
 				3DD7258F239DC151005933B2 /* GameSceneDelegate.swift in Sources */,
 				3D90AAD321D8869200C7428A /* Referee.swift in Sources */,
 				3DA0A37D2300CDFC0041EF34 /* DoubleAttack.swift in Sources */,
+				585EF8052431855800E87FCB /* KillMonsterGroupPotion.swift in Sources */,
 				3DC072B72373AA710046F224 /* TutorialScene.swift in Sources */,
 				3D6279C523ACA3DF0048EB76 /* RockASwap.swift in Sources */,
 				3DC072BD23747F6B0046F224 /* CGSize+Extension.swift in Sources */,
@@ -992,7 +1024,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3D4A470D23B3CEFC000165FB /* RandomTests.swift in Sources */,
 				3DD72597239DD056005933B2 /* TutorialModelTests.swift in Sources */,
 				3DE87C92223D555A00D750CF /* InputQueueTests.swift in Sources */,
 				3D508DEA23B3EDA10067F53A /* AttackModel+Extensions.swift in Sources */,
@@ -1007,6 +1038,7 @@
 				3D90AAD021D8854300C7428A /* RefereeTests.swift in Sources */,
 				3D508DED23B3EE7C0067F53A /* CarryModelTests.swift in Sources */,
 				586AE77723CF91AA00302347 /* AttackModelTests.swift in Sources */,
+				58AD4883243581FC00F90A87 /* RandomTests.swift in Sources */,
 				3DE87C96224068FA00D750CF /* GameStateTests.swift in Sources */,
 				3DCB38AB232DCE88001D148F /* TileCoordTests.swift in Sources */,
 			);
@@ -1161,7 +1193,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = G6N5X5RF9Q;
 				INFOPLIST_FILE = DownFall/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1170,7 +1202,7 @@
 				);
 				MARKETING_VERSION = 1.3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.williamKatz.DroppedDown;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Shift Shaft";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -1181,8 +1213,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 2B7P5KV3Q9;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = G6N5X5RF9Q;
 				INFOPLIST_FILE = DownFall/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1190,7 +1222,7 @@
 				);
 				MARKETING_VERSION = 1.3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.williamKatz.DroppedDown;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Shift Shaft";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -1201,6 +1233,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = G6N5X5RF9Q;
 				INFOPLIST_FILE = DownFallTests/Info.plist;
@@ -1213,7 +1246,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DownFall.app/DownFall";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Shift Shaft.app/Shift Shaft";
 			};
 			name = Debug;
 		};
@@ -1222,6 +1255,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = G6N5X5RF9Q;
 				INFOPLIST_FILE = DownFallTests/Info.plist;
@@ -1234,7 +1268,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DownFall.app/DownFall";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Shift Shaft.app/Shift Shaft";
 			};
 			name = Release;
 		};

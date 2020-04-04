@@ -26,17 +26,20 @@ struct EntityModel: Equatable, Decodable {
         case easyPlayer
         case normalPlayer
         case hardPlayer
+        case sally
         
         var humanReadable: String {
             switch self {
             case .bat:
-                return "Bat"
+                return "Guano the Bat"
             case .rat:
-                return "Rat"
+                return "Matt the Rat"
             case .dragon:
                 return "Dragon"
             case .alamo:
-                return "Alamo"
+                return "Alamo the Tree"
+            case .sally:
+                return "Sally the Salamander"
             case .player, .easyPlayer, .hardPlayer, .normalPlayer:
                 return "Player"
             default:
@@ -143,7 +146,13 @@ struct EntityModel: Equatable, Decodable {
     
     func remove(_ ability: Ability) -> EntityModel {
         var newAbilities = abilities
-        newAbilities.removeAll(where: { $0.type == ability.type })
+        if var newAbility = abilities.first(where: { $0.type == ability.type }) {
+            newAbility.count -= 1
+            newAbilities.removeAll(where: { $0.type == ability.type })
+            if newAbility.count > 0 {
+                newAbilities.append(newAbility)
+            }
+        }
         return self.update(abilities: newAbilities)
     }
     

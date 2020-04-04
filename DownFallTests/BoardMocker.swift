@@ -7,7 +7,7 @@
 //
 
 import Foundation
-@testable import DownFall
+@testable import Shift_Shaft
 
 extension Int: Sequence {
     public func makeIterator() -> CountableRange<Int>.Iterator {
@@ -183,7 +183,7 @@ func lose(_ board: Board) -> Builder {
         var newTiles = board.tiles
         for i in board.boardSize {
             for j in board.boardSize {
-                newTiles[i][j] = (i + j) % 2 == 0  ? Tile(type: .blackRock) : Tile(type: .greenRock)
+                newTiles[i][j] = (i + j) % 2 == 0  ? Tile.purpleRock : Tile.greenRock
             }
         }
         return Board(tiles: newTiles)

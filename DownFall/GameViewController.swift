@@ -16,7 +16,7 @@ class GameViewController: UIViewController, LevelCoordinating {
     internal var gameSceneNode: GameScene?
     internal var tutorialSceneNode: TutorialScene?
     internal var entities: EntitiesModel?
-    internal var levelIndex: Int = 0
+    internal var levelIndex: Int = 1
     internal var levels: [Level]?
     
     override func viewDidLoad() {
@@ -68,7 +68,6 @@ extension GameViewController {
 extension GameViewController: MainMenuDelegate {
     func didSelectStartTutorial(_ playerModel: EntityModel?) {
         if let view = self.view as! SKView? {
-//            view.frame = self.view.safeAreaLayoutGuide.layoutFrame
             view.presentScene(nil)
             levels = LevelConstructor.buildTutorialLevels()
             presentNextLevel(playerModel)

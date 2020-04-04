@@ -205,7 +205,7 @@
             "carry": {
                 "items": [{
                     "type": "gold",
-                    "amount": 10
+                    "amount": 15
                 }]
                 
             },
@@ -261,7 +261,7 @@
             "carry": {
                 "items": [{
                     "type": "gold",
-                    "amount": 7
+                    "amount": 15
                 }]
             },
             "abilities": []
@@ -370,7 +370,63 @@
             "carry": {
                 "items": [{
                     "type": "gold",
-                    "amount": 10
+                    "amount": 15
+                }]
+            },
+            "abilities": []
+        },
+        { "name": "sally",
+            "type": "sally",
+            "originalHp": 1,
+            "hp": 1,
+            "attack": {
+                "type": "charges",
+                "frequency" : 3,
+                "damage": 1,
+                "range": {
+                    "lower": 1,
+                    "upper": 3
+                },
+                "attacksPerTurn": 1,
+                "attackSlope": [
+                    {
+                        "over": 1,
+                        "up": 0
+                    },
+                    {
+                        "over": -1,
+                        "up": 0
+                    }
+                ]
+            },
+            "animations": [
+                {
+                    "animationFilename": "sallyAttack",
+                    "numberOfFrames": 9,
+                    "animationType": "attack",
+                    "keyframe": 9
+                },
+                {
+                    "animationFilename": "sallyProjectileStart",
+                    "numberOfFrames": 6,
+                    "animationType": "projectileStart",
+                    "keyframe": 6
+                },
+                {
+                    "animationFilename": "sallyProjectileEnd",
+                    "numberOfFrames": 3,
+                    "animationType": "projectileEnd"
+                },
+                {
+                    "animationFilename": "sallyProjectileMid",
+                    "numberOfFrames": 1,
+                    "animationType": "projectileMid"
+                }
+            ],
+            "carry": {
+                "items": [{
+                    "type": "gold",
+                    "amount": 15
                 }]
             },
             "abilities": []

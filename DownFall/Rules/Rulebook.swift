@@ -11,7 +11,7 @@ import Foundation
 struct Rulebook {
     static var winRule: Rule {
         switch Referee.level.type {
-        case .first, .second, .third:
+        case .first, .second, .third, .fourth, .fifth, .sixth, .seventh:
             return Win()
         case .boss:
             return BossWin()

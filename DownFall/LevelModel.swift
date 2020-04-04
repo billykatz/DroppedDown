@@ -11,6 +11,7 @@ struct Level {
     let type: LevelType
     let monsterTypeRatio: [EntityModel.EntityType: RangeModel]
     let monsterCountStart: Int
+    let maxMonsterOnBoardRatio: Double
     let maxGems: Int
     let maxTime: Int
     let boardSize: Int
@@ -35,5 +36,5 @@ struct Level {
         return type != .boss
     }
         
-    static let zero = Level(type: .first, monsterTypeRatio: [:], monsterCountStart: 0, maxGems: 0, maxTime: 0, boardSize: 0, abilities: [], goldMultiplier: 1, rocksRatio: [:], pillarCoordinates: [], threatLevelController:  ThreatLevelController(), tutorialData: nil)
+    static let zero = Level(type: .first, monsterTypeRatio: [:], monsterCountStart: 0, maxMonsterOnBoardRatio: 0.0, maxGems: 0, maxTime: 0, boardSize: 0, abilities: [], goldMultiplier: 1, rocksRatio: [:], pillarCoordinates: [], threatLevelController:  ThreatLevelController(), tutorialData: nil)
 }

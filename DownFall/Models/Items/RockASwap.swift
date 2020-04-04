@@ -26,7 +26,7 @@ struct RockASwap: Ability {
         return "rockaswap"
     }
     
-    var cost: Int { return 99 }
+    var cost: Int { return 199 }
     
     var currency: Currency { return .gold }
     

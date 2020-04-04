@@ -6,7 +6,7 @@
 //  Copyright © 2019 William Katz LLC. All rights reserved.
 //
 
-@testable import DownFall
+@testable import Shift_Shaft
 
 import XCTest
 
@@ -18,7 +18,7 @@ extension EntityModel {
                              attack: AttackModel = AttackModel.pickaxe,
                              type: EntityModel.EntityType = .player,
                              carry: CarryModel = .zero,
-                             animations: AllAnimationsModel = .zero,
+                             animations: [AnimationModel] = [],
                              abilities: [AnyAbility] = []) -> EntityModel {
         return EntityModel(originalHp: originalHp,
                            hp: hp,
@@ -36,7 +36,7 @@ extension EntityModel {
                               attack: AttackModel = AttackModel.swipe,
                               type: EntityModel.EntityType = .rat,
                               carry: CarryModel = .zero,
-                              animations: AllAnimationsModel = .zero,
+                              animations: [AnimationModel] = [],
                               abilities: [AnyAbility] = []) -> EntityModel {
         return EntityModel(originalHp: originalHp,
                            hp: hp,

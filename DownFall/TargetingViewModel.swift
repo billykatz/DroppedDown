@@ -89,7 +89,7 @@ class TargetingViewModel: Targeting {
     }
     
     var nameMessage: String? {
-        return ability?.type.rawValue
+        return ability?.type.humanReadable
     }
     
     var usageMessage: String {
@@ -107,7 +107,11 @@ class TargetingViewModel: Targeting {
         let typesOfTargetString = typesOfTargets.reduce([]) { (result, tileType) -> [String] in
             var newResult = result
             if !result.contains(tileType.humanReadable) {
-                newResult.append(tileType.humanReadable)
+                if case .monster = tileType {
+                    newResult.append("monster")
+                } else {
+                    newResult.append(tileType.humanReadable)
+                }
             }
             return newResult
         }

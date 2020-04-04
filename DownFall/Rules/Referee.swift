@@ -130,6 +130,13 @@ class Referee {
                 }
             }
             
+            let playerCoord = attackedTiles.first { coord in
+                if case TileType.player = tiles[coord].type {
+                    return true
+                }
+                return false
+            }
+            
             /// deteremine if the pillar stops attacks and remove those tile coord.
             var attackedTilesWithPillarsBlocking: [TileCoord] = []
             for tileCoord in attackedTiles {
@@ -139,6 +146,14 @@ class Referee {
                         blockedByPillar = true
                     }
                 }
+                
+                /// TODO: we need to fix this ugly logic
+                if entity.type == .sally, let playerCoord = playerCoord {
+                    if !tileCoord.existsOnLineBetween(b: playerCoord, onLineFrom: position) {
+                        blockedByPillar = true
+                    }
+                }
+                
                 if !blockedByPillar {
                     attackedTilesWithPillarsBlocking.append(tileCoord)
                 }
@@ -357,6 +372,12 @@ class Referee {
                     if currEmptyIdx >= 0 {
                         prevEmptyIdx = currEmptyIdx
                     }
+                    
+                    
+                    /// edge case where the top most tile is empty
+                    if currEmptyIdx == tiles.count - 1 {
+                        needsRefill = true
+                    }
                 }
             }
             guard needsRefill else { return nil }
@@ -376,8 +397,6 @@ class Referee {
         
         if let input = winRule.apply(tiles) {
             return input
-        } else if !boardHasMoreMoves() {
-            return Input(.gameLose("The board has no more moves"))
         } else if playerIsDead() {
             return Input(.gameLose("You ran out of health"))
         }

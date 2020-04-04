@@ -77,11 +77,13 @@ class MenuSpriteNode: SKSpriteNode {
 
         } else if menuType == .gameWin {
             
-            let text = level.type == .third ?
+            let text = level.type == .seventh ?
             """
-            You beat the third level!!
+            You are a BOSS!
 
-            This is also the last designed level.  You can keep playing the level as much as you'd like.
+            🎊 🎊 🎊 🎊 🎊
+
+            You beat the seventh and final level.
             """
                 :
             """
@@ -122,6 +124,23 @@ class MenuSpriteNode: SKSpriteNode {
                                 backgroundColor: .eggshellWhite)
             mainMenuButton.position = CGPoint.position(this: mainMenuButton.frame, centeredInBottomOf: self.frame, verticalPadding: Style.Padding.most*2 + buttonSize.height)
             addChild(mainMenuButton)
+
+        } else if menuType == .gameLose {
+            let text =
+                """
+                    You ran of of health.
+                            😞
+
+                    Thanks for playing!!
+                """
+            let paragraphNode = ParagraphNode.labelNode(text: text, paragraphWidth: menuSizeWidth * 0.95,
+                fontSize: UIFont.largeSize)
+
+            paragraphNode.position = CGPoint.position(paragraphNode.frame, inside: self.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most)
+            paragraphNode.zPosition = precedence.rawValue
+            
+            addChild(paragraphNode)
+            
 
         }
         

@@ -125,16 +125,37 @@ extension Ability {
     }
 }
 
-enum AbilityType: String, Decodable {
-    case doubleAttack = "Double Attack"
-    case sheildEast = "Side Shield East"
-    case rockASwap = "Rock a Swap"
-    case dynamite = "Dynamite"
-    case lesserHealingPotion = "Lesser Healing Potion"
-    case greaterHealingPotion = "Greater Healing Potion"
-    case swordPickAxe = "Sword Pick Axe"
-    case transmogrificationPotion = "Transmogrification Potion"
-    case killMonsterPotion = "Kill Monster Potion"
+enum AbilityType: Equatable {
+    
+    case doubleAttack
+    case sheildEast
+    case rockASwap
+    case dynamite
+    case lesserHealingPotion
+    case greaterHealingPotion
+    case greatestHealingPotion
+    case swordPickAxe
+    case transmogrificationPotion
+    case killMonsterPotion
+    case tapAwayMonster
+    case massMineRock
+    
+    var humanReadable: String {
+        switch self {
+        case .doubleAttack: return "Double Attack"
+        case .sheildEast: return "Side Shield East"
+        case .rockASwap: return "Rock a Swap"
+        case .dynamite: return "Dynamite"
+        case .lesserHealingPotion: return "Lesser Healing Potion"
+        case .greaterHealingPotion: return "Greater Healing Potion"
+        case .greatestHealingPotion: return "Greatest Healing Potion"
+        case .swordPickAxe: return "Sword Pick Axe"
+        case .transmogrificationPotion: return "Transmogrification Potion"
+        case .killMonsterPotion: return "Kill Monster Potion"
+        case .tapAwayMonster: return "Destory Monster Group"
+        case .massMineRock: return "Mass Mine"
+        }
+    }
 }
 
 enum Usage {

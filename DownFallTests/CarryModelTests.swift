@@ -7,7 +7,7 @@
 //
 
 import XCTest
-@testable import DownFall
+@testable import Shift_Shaft
 
 class CarryModelTests: XCTestCase {
     func testTotal() {

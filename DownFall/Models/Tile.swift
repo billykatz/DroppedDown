@@ -6,7 +6,7 @@
 //  Copyright © 2018 William Katz LLC. All rights reserved.
 //
 
-enum Color {
+enum Color: CaseIterable {
     case blue
     case brown
     case purple

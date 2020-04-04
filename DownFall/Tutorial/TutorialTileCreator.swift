@@ -24,6 +24,14 @@
 import GameplayKit
 
 struct TutorialTileCreator: TileStrategy {
+    func shuffle(tiles: [[Tile]]) -> [[Tile]] {
+        return []
+    }
+    
+    func randomMonster() -> TileType {
+        return .monster(.zero)
+    }
+    
     func tiles(for tiles: [[Tile]]) -> [[Tile]] {
         return []
     }
@@ -57,7 +65,7 @@ struct TutorialTileCreator: TileStrategy {
         
         var tiles: [[Tile]] = []
         switch level?.type {
-        case .first, .second, .third, .boss, .none:
+        case .first, .second, .third, .fourth, .fifth, .sixth, .seventh, .boss, .none:
             fatalError("You cant create a tutorial board with one of these diffculties")
         case .tutorial1:
             tiles = [

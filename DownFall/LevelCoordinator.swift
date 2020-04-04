@@ -35,7 +35,6 @@ extension LevelCoordinating where Self: UIViewController {
             view.presentScene(nil)
             let storeScene = StoreScene(size: self.view!.frame.size,
                                         playerData: playerData,
-                                        inventory: StoreInventory(),
                                         level: currentLevel)
             storeScene.storeSceneDelegate = self
             view.presentScene(storeScene)
@@ -68,7 +67,7 @@ extension LevelCoordinating where Self: UIViewController {
                     #endif
                 }
             }
-        case .first, .second, .third, .boss:
+        case .first, .second, .third, .fourth, .fifth, .sixth, .seventh, .boss:
             gameSceneNode?.prepareForReuse()
             if let scene = GKScene(fileNamed: "GameScene")?.rootNode as? GameScene,
                 let entities = entities,
@@ -145,16 +144,16 @@ extension LevelCoordinating where Self: UIViewController {
             gameSceneNode?.removeFromParent()
             
             
+            // Increment the level index before we visit the store
+            // there might/is be a better place to do this
+            levelIndex = min(levels.count - 1, levelIndex + 1)
+            
+            
             let storeScene = StoreScene(size: self.view!.frame.size,
                                         playerData: playerData,
-                                        inventory: StoreInventory(),
                                         level: levels[levelIndex])
             storeScene.storeSceneDelegate = self
             view.presentScene(storeScene)
-            
-            // Increment the level index after we visit the store
-            // there might/is be a better place to do this
-            levelIndex = min(levels.count - 1, levelIndex + 1)
         }
     }
 }

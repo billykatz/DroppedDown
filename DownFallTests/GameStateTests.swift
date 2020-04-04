@@ -7,7 +7,7 @@
 //
 
 import XCTest
-@testable import DownFall
+@testable import Shift_Shaft
 
 
 /// The purpose of these tests is to verfiy our state machine
@@ -54,8 +54,10 @@ class GameStateTests: XCTestCase {
                  .monsterDies, .pause, .play, .touch, .rotateClockwise,
                  .rotateCounterClockwise, .transformation, .reffingFinished,
                  .boardBuilt, .collectItem,. newTurn, .touchBegan, .tutorial,
-                 .itemUseSelected, .itemUseCanceled, .itemCanBeUsed, .itemUsed:
+                 .itemUseSelected, .itemUseCanceled, .itemCanBeUsed, .itemUsed,
+                 .bossTargetsWhatToEat(_), .bossEatsRocks(_), .bossTargetsWhatToAttack(_), .bossAttacks(_), .decrementDynamites(_), .rotatePreview(_, _), .rotatePreviewFinish(_, _), .refillEmpty, .tileDetail(_, _) , .shuffleBoard:
                 XCTAssertNil(gameState.transitionState(given: Input(input)))
+                
             }
         }
     }
@@ -65,12 +67,16 @@ class GameStateTests: XCTestCase {
             switch input {
             case .animationsFinished:
                 XCTAssertEqual(AnyGameState(ReffingState()), gameState.transitionState(given: Input(input)))
+            case .rotatePreview:
+                XCTAssertEqual(AnyGameState(AnimatingState()), gameState.transitionState(given: Input(input)))
+            case .rotatePreviewFinish:
+            XCTAssertEqual(AnyGameState(ComputingState()), gameState.transitionState(given: Input(input)))
             case .playAgain, .gameLose, .gameWin, .boardBuilt,
                  .monsterDies, .pause, .play, .touch, .rotateClockwise,
                  .rotateCounterClockwise, .attack, .transformation, .reffingFinished,
                  .collectItem, .selectLevel, .newTurn, .touchBegan, .tutorial,
                  .visitStore, .itemUseSelected, .itemUseCanceled, .itemCanBeUsed,
-                 .itemUsed:
+                 .itemUsed, .bossTargetsWhatToEat(_), .bossEatsRocks(_), .bossTargetsWhatToAttack(_), .bossAttacks(_), .decrementDynamites(_), .refillEmpty, .tileDetail(_, _) , .shuffleBoard:
                 XCTAssertNil(gameState.transitionState(given: Input(input)), "\(gameState.state) should not transition to \(input)")
             }
         }
@@ -80,14 +86,15 @@ class GameStateTests: XCTestCase {
     func testPausedStateTransition(_ gameState: AnyGameState) {
         for input in InputType.allCases {
             switch input {
-            case .play, .selectLevel:
+            case .play, .selectLevel, .playAgain:
                 XCTAssertEqual(AnyGameState(PlayState()),
                                gameState.transitionState(given: Input(input)))
-            case .playAgain, .gameLose, .gameWin, .boardBuilt,
+            case .gameLose, .gameWin, .boardBuilt,
                  .monsterDies, .animationsFinished, .touch, .rotateClockwise,
                  .rotateCounterClockwise, .attack, .pause, .transformation,
                  .reffingFinished, .collectItem, .newTurn, .touchBegan, .tutorial,
-                 .visitStore, .itemUseSelected, .itemUseCanceled, .itemCanBeUsed, .itemUsed:
+                 .visitStore, .itemUseSelected, .itemUseCanceled, .itemCanBeUsed, .itemUsed,
+                 .bossTargetsWhatToEat(_), .bossEatsRocks(_), .bossTargetsWhatToAttack(_), .bossAttacks(_), .decrementDynamites(_), .rotatePreview(_, _), .rotatePreviewFinish(_, _), .refillEmpty, .shuffleBoard, .tileDetail:
                 XCTAssertNil(gameState.transitionState(given: Input(input)))
             }
         }
@@ -103,13 +110,14 @@ class GameStateTests: XCTestCase {
                 XCTAssertEqual(AnyGameState(LoseState()),
                                gameState.transitionState(given: Input(input)))
             case .touch, .monsterDies, .touchBegan,
-                 .attack, .rotateCounterClockwise, .rotateClockwise, .collectItem:
+                 .attack, .rotateCounterClockwise, .rotateClockwise, .collectItem, .bossEatsRocks, .bossAttacks:
                 XCTAssertEqual(AnyGameState(ComputingState()),
                                gameState.transitionState(given: Input(input)))
             case .pause:
                 XCTAssertEqual(AnyGameState(PauseState()),
                                gameState.transitionState(given: Input(input)))
-            case .boardBuilt, .tutorial:
+            case .boardBuilt, .tutorial,
+                 .bossTargetsWhatToEat, .bossTargetsWhatToAttack:
                 XCTAssertEqual(AnyGameState(PlayState()),
                                gameState.transitionState(given: Input(input)))
             case .itemUseSelected:
@@ -117,7 +125,8 @@ class GameStateTests: XCTestCase {
                                gameState.transitionState(given: Input(input)))
             case .play, .playAgain, .animationsFinished,
                  .transformation, .reffingFinished, .selectLevel,
-                 .newTurn, .visitStore, .itemUseCanceled, .itemCanBeUsed, .itemUsed:
+                 .newTurn, .visitStore, .itemUseCanceled, .itemCanBeUsed, .itemUsed,
+                .decrementDynamites(_), .rotatePreview(_, _), .rotatePreviewFinish(_, _), .refillEmpty, .tileDetail(_, _) , .shuffleBoard:
                 XCTAssertNil(gameState.transitionState(given: Input(input)), "\(gameState.state) should not transition to \(input)")
             }
         }
@@ -126,14 +135,21 @@ class GameStateTests: XCTestCase {
     func testComputingStateTransition(_ gameState: AnyGameState) {
         for input in InputType.allCases {
             switch input {
-            case .transformation, .newTurn:
+            case .transformation:
                 XCTAssertEqual(AnyGameState(AnimatingState()),
+                               gameState.transitionState(given: Input(input)))
+            case .newTurn:
+                XCTAssertEqual(AnyGameState(PlayState()),
+                gameState.transitionState(given: Input(input)))
+            case .tileDetail:
+                XCTAssertEqual(AnyGameState(PauseState()),
                                gameState.transitionState(given: Input(input)))
             case .playAgain, .gameLose, .gameWin, .attack, .boardBuilt,
                  .monsterDies, .animationsFinished, .touch, .rotateClockwise,
                  .rotateCounterClockwise, .pause, .play, .reffingFinished,
                  .collectItem, .selectLevel,. touchBegan, .tutorial,
-                 .visitStore, .itemUseSelected, .itemUseCanceled, .itemCanBeUsed, .itemUsed:
+                 .visitStore, .itemUseSelected, .itemUseCanceled, .itemCanBeUsed, .itemUsed,
+                 .bossTargetsWhatToEat(_), .bossEatsRocks(_), .bossTargetsWhatToAttack(_), .bossAttacks(_), .decrementDynamites(_), .rotatePreviewFinish(_, _), .refillEmpty, .shuffleBoard, .rotatePreview:
                 XCTAssertNil(gameState.transitionState(given: Input(input)))
             }
         }
@@ -148,7 +164,7 @@ class GameStateTests: XCTestCase {
             case .reffingFinished(false):
                 XCTAssertEqual(AnyGameState(PlayState()),
                                gameState.transitionState(given: Input(input)))
-            case .attack, .monsterDies, .collectItem:
+            case .attack, .monsterDies, .collectItem, .decrementDynamites, .refillEmpty:
                 XCTAssertEqual(AnyGameState(ComputingState()),
                                gameState.transitionState(given: Input(input)))
             case .gameWin:
@@ -158,7 +174,8 @@ class GameStateTests: XCTestCase {
                 XCTAssertEqual(AnyGameState(LoseState()),
                                gameState.transitionState(given: Input(input)))
             case .touch, .rotateCounterClockwise, .rotateClockwise, .play, .pause, .animationsFinished, .playAgain, .transformation, .boardBuilt, .selectLevel, .newTurn, .touchBegan, .tutorial,
-                 .visitStore, .itemUseSelected, .itemUseCanceled, .itemCanBeUsed, .itemUsed:
+                 .visitStore, .itemUseSelected, .itemUseCanceled, .itemCanBeUsed, .itemUsed,
+                 .bossTargetsWhatToEat(_), .bossEatsRocks(_), .bossTargetsWhatToAttack(_), .bossAttacks(_), .rotatePreview(_, _), .rotatePreviewFinish(_, _), .tileDetail(_, _) , .shuffleBoard:
                 XCTAssertNil(gameState.transitionState(given: Input(input)))
             }
         }
@@ -177,7 +194,8 @@ class GameStateTests: XCTestCase {
                 XCTAssertEqual(AnyGameState(ComputingState()),
                 gameState.transitionState(given: Input(input)))
             case .touch, .rotateCounterClockwise, .rotateClockwise, .play, .pause, .animationsFinished, .playAgain, .transformation, .boardBuilt, .selectLevel, .newTurn, .touchBegan, .tutorial,
-                 .visitStore, .itemUseSelected, .reffingFinished, .attack, .monsterDies, .collectItem, .gameWin, .gameLose:
+                 .visitStore, .itemUseSelected, .reffingFinished, .attack, .monsterDies, .collectItem, .gameWin, .gameLose,
+                 .bossTargetsWhatToEat(_), .bossEatsRocks(_), .bossTargetsWhatToAttack(_), .bossAttacks(_), .decrementDynamites(_), .rotatePreview(_, _), .rotatePreviewFinish(_, _), .refillEmpty, .tileDetail(_, _) , .shuffleBoard:
                 XCTAssertNil(gameState.transitionState(given: Input(input)))
             }
         }
@@ -222,7 +240,8 @@ class GameStateTests: XCTestCase {
             switch input {
             case .attack, .monsterDies, .gameLose, .touchBegan,
                  .gameWin, .pause, .rotateCounterClockwise,
-                 .rotateClockwise, .touch, .tutorial, .itemUseSelected:
+                 .rotateClockwise, .touch, .tutorial, .itemUseSelected,
+                 .bossAttacks, .bossEatsRocks, .bossTargetsWhatToAttack, .bossTargetsWhatToEat,. boardBuilt:
                 XCTAssertTrue(gameState.shouldAppend(Input(input)), "\(gameState.state) ought to append \(input)")
             default:
                 XCTAssertFalse(gameState.shouldAppend(Input(input)),  "\(gameState.state) ought not to append \(input)")
@@ -234,7 +253,7 @@ class GameStateTests: XCTestCase {
     func testComputingStateShouldAppend(_ gameState: AnyGameState) {
         for input in InputType.allCases {
             switch input {
-            case .transformation:
+            case .transformation, .tileDetail:
                 XCTAssertTrue(gameState.shouldAppend(Input(input)), "\(gameState.state) ought to append \(input)")
             default:
                 XCTAssertFalse(gameState.shouldAppend(Input(input)),  "\(gameState.state) ought not to append \(input)")
@@ -245,7 +264,7 @@ class GameStateTests: XCTestCase {
     func testAnimatingStateShouldAppend(_ gameState: AnyGameState) {
         for input in InputType.allCases {
             switch input {
-            case .animationsFinished:
+            case .animationsFinished, .rotatePreviewFinish, .rotatePreview:
                 XCTAssertTrue(gameState.shouldAppend(Input(input)),  "\(gameState.state) ought to append \(input)")
             default:
                 XCTAssertFalse(gameState.shouldAppend(Input(input)),  "\(gameState.state) ought not to append \(input)")
@@ -256,7 +275,7 @@ class GameStateTests: XCTestCase {
     func testPauseStateShouldAppend(_ gameState: AnyGameState) {
         for input in InputType.allCases {
             switch input {
-            case .play:
+            case .play, .playAgain:
                 XCTAssertTrue(gameState.shouldAppend(Input(input)),  "\(gameState.state) ought to append \(input)")
             default:
                 XCTAssertFalse(gameState.shouldAppend(Input(input)),  "\(gameState.state) ought not to append \(input)")
@@ -267,7 +286,7 @@ class GameStateTests: XCTestCase {
     func testReffingStateShouldAppend(_ gameState: AnyGameState) {
         for input in InputType.allCases {
             switch input {
-            case .reffingFinished, .attack, .monsterDies, .gameWin, .gameLose, .collectItem:
+            case .reffingFinished, .attack, .monsterDies, .gameWin, .gameLose, .collectItem, .decrementDynamites, .refillEmpty:
                 XCTAssertTrue(gameState.shouldAppend(Input(input)), "\(gameState.state) ought to append \(input)")
             default:
                 XCTAssertFalse(gameState.shouldAppend(Input(input)),  "\(gameState.state) ought not to append \(input)")

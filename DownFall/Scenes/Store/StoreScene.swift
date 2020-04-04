@@ -45,13 +45,12 @@ class StoreScene: SKScene {
     
     init(size: CGSize,
          playerData: EntityModel,
-         inventory: StoreSceneInventory,
          level: Level) {
         //playable rect
         let maxAspectRatio : CGFloat = 19.5/9.0
         let playableWidth = size.height / maxAspectRatio
         
-        background = SKSpriteNode(texture: SKTexture(imageNamed: "storeBackground"),
+        background = SKSpriteNode(color: .clayRed,
                                   size: CGSize(width: playableWidth,
                                                height: size.height))
         
@@ -85,9 +84,26 @@ class StoreScene: SKScene {
         addChild(background)
         
         let goldWallet = walletView(.gold, order: 0)
-        let gemWallet = walletView(.gem, order: 1)
         addChild(goldWallet)
-        addChild(gemWallet)
+        
+        
+        let inventoryButton = Button(size: Button.medium,
+                                     delegate: self,
+                                     identifier: .seeInventory,
+                                     precedence: .foreground,
+                                     fontSize:  UIFont.smallSize,
+                                     fontColor: .black,
+                                     backgroundColor: .foregroundBlue)
+        
+        inventoryButton.position = CGPoint.alignHorizontally(inventoryButton.frame, relativeTo: goldWallet.frame, horizontalAnchor: .left, verticalAlign: .top, verticalPadding: Style.Padding.normal, translatedToBounds: true)
+        addChild(inventoryButton)
+        
+        
+        if level.type == .first {
+            let infoPopup = informationPopup(with: "\"Welcome, first one is on the house!\"")
+            show(infoPopup)
+        }
+        
     }
     
     private func createStoreItems(from level: Level) -> [StoreItem] {
@@ -110,7 +126,7 @@ class StoreScene: SKScene {
             itemSize: Style.Store.Item.size,
             width: playableWidth,
             height: Style.Store.ItemGrid.height,
-            bottomLeft: CGPoint(x: -frame.width/2, y: -frame.height/2)
+            bottomLeft: CGPoint(x: -frame.width/2, y: 0 - Style.Store.InfoPopup.height/2)
         )
         for (index, position) in gridPoints.enumerated() {
             if items.count - 1 >= index {
@@ -134,21 +150,24 @@ class StoreScene: SKScene {
             """
             \(playerData.carry.total(in: currency))
             """,
-                                width: self.frame.width,
-                                delegate: nil, precedence: .foreground,
-                                identifier: .wallet,
-                                fontSize: UIFont.largeSize,
-                                fontColor: .white)
+            width: self.frame.width,
+            delegate: nil, precedence: .foreground,
+            identifier: .wallet,
+            fontSize: UIFont.largeSize,
+            fontColor: .white)
         
         walletView.addChild(currencySprite)
         walletView.addChild(amountLabel)
         walletView.name = currencyWalletName(currency)
         return walletView
-
+        
     }
     
     private var transactionButton: Button {
         let purchased = selectedItem?.isPurchased ?? false
+        
+        let canAfford = playerData.canAfford(selectedItem?.ability.cost ?? 0, inCurrency: .gold)
+        
         
         let purchaseButton = Button(size: Style.Store.CTAButton.size,
                                     delegate: self,
@@ -156,7 +175,9 @@ class StoreScene: SKScene {
                                     precedence: .foreground,
                                     fontSize: UIFont.mediumSize,
                                     fontColor: .white,
-                                    backgroundColor: !purchased ? .green : .blue)
+                                    backgroundColor: !purchased ? (canAfford ? .storeSceneGreen : .lightGray) : .black,
+                                    showSelection: purchased || canAfford,
+                                    disable: !purchased && !canAfford)
         purchaseButton.position = CGPoint.positionThis(purchaseButton.frame,
                                                        inBottomOf: frame,
                                                        anchored: .right,
@@ -172,7 +193,7 @@ class StoreScene: SKScene {
     
     
     private func informationPopup(with text: String) -> SKSpriteNode {
-        let popupNode = SKSpriteNode(color: .storeItemBackground,
+        let popupNode = SKSpriteNode(color: .storeItemBackgroundNotSelected,
                                      size: CGSize(width: self.frame.width - Style.Store.InfoPopup.sidePadding, height: Style.Store.InfoPopup.height))
         
         popupNode.position = CGPoint.position(popupNode.frame, centeredInTopOf: frame, verticalOffset: Style.Store.InfoPopup.topPadding)
@@ -284,7 +305,7 @@ class StoreScene: SKScene {
     }
     
     private func reloadWalletView(_ currency: Currency) {
-        let newWalletView = walletView(currency, order: CGFloat(Currency.allCases.firstIndex(of: currency) ?? 0))
+        let newWalletView = walletView(currency, order: 0)
         
         for child in children {
             if child.name == currencyWalletName(currency) {
@@ -327,10 +348,65 @@ class StoreScene: SKScene {
         show(button)
         button.run(slideIn)
     }
+    
+    private var inventoryHidden: Bool = true {
+        didSet {
+            showInventory()
+        }
+    }
+    private lazy var inventoryView: SKSpriteNode = {
+        let width = frame.width*0.7
+        let inventoryView = SKSpriteNode(color: .foregroundBlue, size: CGSize(width: width, height: frame.width*0.8))
+        inventoryView.position = .zero
+        inventoryView.zPosition = 1000
+        
+        return inventoryView
+        
+    }()
+    
+    private func showInventory() {
+        if inventoryHidden {
+            inventoryView.removeAllChildren()
+            inventoryView.removeFromParent()
+        } else if inventoryView.parent == nil {
+            
+            let border = SKShapeNode(rect: inventoryView.frame)
+            border.strokeColor = UIColor.darkGray
+            border.lineWidth = Style.Menu.borderWidth
+            border.zPosition = Precedence.menu.rawValue + 100
+            border.position = .zero
+            inventoryView.addChild(border)
+            
+            let playerInventoryNames = playerData.abilities.map { ($0.type.humanReadable, $0.count) }
+            var string = ""
+            for (name, count) in playerInventoryNames {
+                string += "\(name) \(count > 1 ? "x\(count)" : "" )"
+                string += "\n"
+            }
+            if string.isEmpty {
+                string = "None"
+            }
+            
+            let paragraph = ParagraphNode(text: string, paragraphWidth: frame.width*0.7, fontSize: UIFont.smallSize, fontColor: .black)
+            inventoryView.addChild(paragraph)
+            
+            addChild(inventoryView)
+        }
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = touches.first else { return }
+        if !inventoryHidden {
+            inventoryHidden = true
+        }
+        
+        
+    }
 }
 
 extension StoreScene: StoreItemDelegate {
     func storeItemTapped(_ storeItem: StoreItem, ability: Ability) {
+        inventoryHidden = true
         selectedItem = storeItem
     }
     
@@ -346,12 +422,27 @@ extension StoreScene: ButtonDelegate {
             storeSceneDelegate?.leave(self, updatedPlayerData: playerData)
         case .purchase:
             if let storeItem = selectedItem { buy(storeItem) }
-        case .sell:
-            if let storeItem = selectedItem {
-                sell(storeItem)
+            
+            if level.type == .first {
+                for item in items {
+                    item.isPurchased = true
+                }
             }
+        case .sell:
+            if level.type == .first {
+                for item in items {
+                    sell(item)
+                }
+            } else {
+                if let storeItem = selectedItem {
+                    sell(storeItem)
+                }
+            }
+            
         case .close:
             selectedItem = nil
+        case .seeInventory:
+            inventoryHidden = !inventoryHidden
         default:
             fatalError("You must add a case for added buttons here")
         }

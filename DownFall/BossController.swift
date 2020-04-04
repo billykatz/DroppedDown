@@ -12,10 +12,20 @@ import CoreGraphics
 
 class BossController: TargetViewModel {
     
+    enum BossAttack: Hashable {
+        case hair(Set<TileCoord>)
+        case destroy(Set<TileCoord>)
+        case spawn(TileCoord)
+        case bomb(TileCoord)
+    }
+    
     enum AttackState {
         case targetsWhatToEat
+        case targetWhatToEatRest
         case eats
+        case eatsRest
         case targetsWhatToAttack
+        case targetWhatToAttackRest
         case attacks
         case rests
         case dizzied
@@ -106,49 +116,49 @@ class BossController: TargetViewModel {
             tiles = input.endTilesStruct
             advanceState()
         case .transformation(let trans):
-            if let initialTrans = trans.first, case InputType.touch? = initialTrans.inputType,
-                let removed = initialTrans.tileTransformation?.first?.map({ $0.initial }) {
-                let removedColumns = removed.map { $0.column }
-                var newTargets: [TileCoord] = []
-                for coord in _currentTargets {
-                    if !removed.contains(coord) {
-                        var newCoord: TileCoord?
-                        for column in removedColumns {
-                            if coord.column == column {
-                                newCoord = TileCoord(row: (newCoord ?? coord).row - 1, column: coord.column)
-                            }
-                        }
-                        
-                        newTargets.append(newCoord ?? coord)
-                    }
-                }
-                _currentTargets = newTargets
-            }
-            if let initialTrans = trans.first,
-                let tileTrans = initialTrans.tileTransformation?.first {
-                switch initialTrans.inputType {
-                case .rotateClockwise, .rotateCounterClockwise:
-                    var newTargets: [TileCoord] = []
-                    for tileTransformation in tileTrans {
-                        if _currentTargets.contains(tileTransformation.initial) {
-                            newTargets.append(tileTransformation.end)
-                        }
-                    }
-                    
-                    _currentTargets = newTargets
-                default:
-                    () // purposefully left blank
-                }
-            }
+            trackRocksThatHaveMoved(trans: trans)
         default: ()
         }
     }
     
-    enum BossAttack: Hashable {
-        case hair(Set<TileCoord>)
-        case destroy(Set<TileCoord>)
-        case spawn(TileCoord)
-        case bomb(TileCoord)
+    func trackRocksThatHaveMoved(trans: [Transformation]) {
+        if let initialTrans = trans.first, case InputType.touch? = initialTrans.inputType,
+            let removed = initialTrans.tileTransformation?.first?.map({ $0.initial }),
+            let shiftedDown = initialTrans.tileTransformation?[2] {
+            var newTargets: [TileCoord] = []
+            for coord in _currentTargets {
+                var coordWasModified = false
+                /// ignore any coords that were removed
+                guard !removed.contains(coord) else {
+                    continue
+                }
+                
+                /// grab the shift tile transformation to keep track of the rock the Boss wants to eat
+                for shiftDownTrans in shiftedDown {
+                    if shiftDownTrans.initial == coord {
+                        coordWasModified = true
+                        newTargets.append(shiftDownTrans.end)
+                    }
+                }
+                if !coordWasModified {
+                    newTargets.append(coord)
+                }
+            }
+            _currentTargets = newTargets
+        }
+        if let initialTrans = trans.first,
+            case InputType.rotatePreviewFinish(_, let tileTrans)? = initialTrans.inputType {
+            if tileTrans != nil {
+                var newTargets: [TileCoord] = []
+                for tileTransformation in tileTrans?.tileTransformation?.first ?? [] {
+                    if _currentTargets.contains(tileTransformation.initial) {
+                        newTargets.append(tileTransformation.end)
+                    }
+                }
+                _currentTargets = newTargets
+            }
+            
+        }
     }
     
     func attack(basedOnRocks rocksEaten: [TileType]) -> [BossAttack] {
@@ -196,7 +206,7 @@ class BossController: TargetViewModel {
         }
         
         var doNotAttackCoords = pillarCoords.union([playerCoord])
-    
+        
         return rocksEaten.map {
             if case TileType.rock(let color) = $0 {
                 switch color {
@@ -286,10 +296,16 @@ class BossController: TargetViewModel {
     func advanceState() {
         switch state {
         case .targetsWhatToEat:
+            state = .targetWhatToEatRest
+        case .targetWhatToEatRest:
             state = .eats
         case .eats:
+            state = .eatsRest
+        case .eatsRest:
             state = .targetsWhatToAttack
         case .targetsWhatToAttack:
+            state = .targetWhatToAttackRest
+        case .targetWhatToAttackRest:
             state = .attacks
         case .attacks:
             state = .rests

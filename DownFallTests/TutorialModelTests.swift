@@ -7,7 +7,7 @@
 //
 
 import XCTest
-@testable import DownFall
+@testable import Shift_Shaft
 
 class TutorialModelTests: XCTestCase {
     
@@ -24,7 +24,7 @@ class TutorialModelTests: XCTestCase {
                                     inputToContinue: InputType.tutorial(.zero))
     
     static let fourth = TutorialStep(dialog: "Fourth",
-                                     highlightType: [.blackRock],
+                                     highlightType: [TileType.rock(.blue)],
                                      inputToContinue: InputType.tutorial(.zero))
     static let fifth = TutorialStep(dialog: "Fifth",
                                     highlightType: [.gold],

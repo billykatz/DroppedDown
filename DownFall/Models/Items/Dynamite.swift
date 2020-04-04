@@ -28,7 +28,7 @@ struct Dynamite: Ability {
         return "dynamite"
     }
     
-    var cost: Int { return 58 }
+    var cost: Int { return 125 }
     
     var currency: Currency { return .gold }
     

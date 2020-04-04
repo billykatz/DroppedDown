@@ -28,7 +28,7 @@ struct LesserHealingPotion: Ability {
         return "lesserHealingPotionSpriteSheet"
     }
     
-    var cost: Int { return 35 }
+    var cost: Int { return 125 }
     
     var currency: Currency { return .gold }
     

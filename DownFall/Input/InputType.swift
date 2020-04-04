@@ -95,6 +95,7 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
     case rotatePreviewFinish([SpriteAction], Transformation?)
     case refillEmpty
     case tileDetail(TileType, [TileCoord])
+    case shuffleBoard
     
     var debugDescription: String {
         switch self {
@@ -164,6 +165,8 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
             return "Refill empty tiles"
         case .tileDetail:
             return "Tile detail"
+        case .shuffleBoard:
+            return "Shuffle board"
         }
     }
 }

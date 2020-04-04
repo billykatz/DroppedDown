@@ -15,40 +15,30 @@ import UIKit
 struct ThreatLevel {
     
     let unitsAccrued: Int
-    let color: ThreatColor
+    let yellowRange: Range<Int>
+    let orangeRange: Range<Int>
+    let redRange: Range<Int>
+    var color: ThreatColor {
+        if yellowRange.contains(unitsAccrued) {
+            return .yellow
+        } else if orangeRange.contains(unitsAccrued) {
+            return .orange
+        } else {
+            return .red
+        }
+    }
     
-    init(unitsAccrued: Int) {
+    init(unitsAccrued: Int, yellowRange: Range<Int>, orangeRange: Range<Int>, redRange: Range<Int>) {
         self.unitsAccrued = unitsAccrued
-        self.color = ThreatColor(unitsAccrued: unitsAccrued)
+        self.yellowRange = yellowRange
+        self.orangeRange = orangeRange
+        self.redRange = redRange
     }
     
     enum ThreatColor: CaseIterable {
         case yellow
         case orange
         case red
-        
-        init(unitsAccrued: Int) {
-            guard unitsAccrued >= 0 else { preconditionFailure("You get nothing, good day sir") }
-            for color in ThreatColor.allCases {
-                if color.numberOfUnits.contains(unitsAccrued) {
-                    self = color
-                    return
-                }
-            }
-            
-            preconditionFailure("I said good day")
-        }
-        
-        var numberOfUnits: Range<Int> {
-            switch self {
-            case .yellow:
-                return 0..<50
-            case .orange:
-                return 50..<100
-            case .red:
-                return 100..<Int.max
-            }
-        }
         
         var goldDamageMultiplier: Int {
             switch self {
@@ -74,7 +64,7 @@ struct ThreatLevel {
     }
     
     func threatLevel(plus units: Int) -> ThreatLevel {
-        return ThreatLevel(unitsAccrued: unitsAccrued + units)
+        return ThreatLevel(unitsAccrued: unitsAccrued + units, yellowRange: self.yellowRange, orangeRange: self.orangeRange, redRange: self.redRange)
     }
     
     
@@ -95,8 +85,8 @@ class ThreatLevelController {
     
     var threatLevel: ThreatLevel
     
-    init() {
-        self.threatLevel = ThreatLevel(unitsAccrued: 1)
+    init(yellowRange: Range<Int> = 0..<50, orangeRange: Range<Int> = 50..<100, redRange: Range<Int> = 100..<Int.max) {
+        self.threatLevel = ThreatLevel(unitsAccrued: 1, yellowRange: yellowRange, orangeRange: orangeRange, redRange: redRange)
         
         Dispatch.shared.register { [weak self] input in
             self?.handle(input)
@@ -104,7 +94,7 @@ class ThreatLevelController {
     }
     
     func reset() {
-        threatLevel = ThreatLevel(unitsAccrued: 1)
+        threatLevel = ThreatLevel(unitsAccrued: 1, yellowRange: threatLevel.yellowRange, orangeRange: threatLevel.orangeRange, redRange: threatLevel.redRange)
         
         Dispatch.shared.register { [weak self] input in
             self?.handle(input)

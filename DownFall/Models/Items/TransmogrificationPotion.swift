@@ -30,9 +30,7 @@ struct TransmogrificationPotion: Ability {
         return "transmogrificationPotionSpriteSheet"
     }
     
-    var cost: Int {
-        return 75
-    }
+    var cost: Int { return 79 }
     
     var currency: Currency {
         return .gold

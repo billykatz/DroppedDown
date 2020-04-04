@@ -7,7 +7,7 @@
 //
 
 import XCTest
-@testable import DownFall
+@testable import Shift_Shaft
 
 class TargetingViewModelTests: XCTestCase {
     
@@ -32,7 +32,7 @@ class TargetingViewModelTests: XCTestCase {
                                    endTiles: tiles)
         
         self.playerCoord = typeCount(for: tiles, of: .player(.zero)).first
-        Dispatch.shared.send(Input(InputType.transformation(trans)))
+        Dispatch.shared.send(Input(InputType.transformation([trans])))
     }
     
     func testDidTargetSingle() {

@@ -7,7 +7,7 @@
 //
 
 import Foundation
-@testable import DownFall
+@testable import Shift_Shaft
 
 extension AttackModel {
     static var pickaxe = AttackModel(type: .targets,
@@ -47,7 +47,7 @@ extension TileType {
                                             attack: .zero,
                                             type: .rat,
                                             carry: .zero,
-                                            animations: .zero,
+                                            animations: [],
                                             abilities: [])
         )
     }
@@ -82,7 +82,7 @@ extension TileType {
                                                                 attackSlope: AttackSlope.sideways),
                               type: EntityModel.EntityType = .rat,
                               carry: CarryModel = .zero,
-                              animations: AllAnimationsModel = .zero,
+                              animations: [AnimationModel] = [],
                               abilities: [AnyAbility] = []) -> TileType {
         return TileType.monster(EntityModel(originalHp: originalHp,
                                             hp: hp,
@@ -100,7 +100,7 @@ extension TileType {
                              attack: AttackModel = AttackModel.pickaxe,
                              type: EntityModel.EntityType = .player,
                              carry: CarryModel = .zero,
-                             animations: AllAnimationsModel = .zero,
+                             animations: [AnimationModel] = [],
                              abilities: [AnyAbility] = []) -> TileType {
         return TileType.player(EntityModel(originalHp: originalHp,
                                            hp: hp,

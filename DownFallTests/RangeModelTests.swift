@@ -9,7 +9,7 @@
 import Foundation
 
 import XCTest
-@testable import DownFall
+@testable import Shift_Shaft
 
 class RangeModelTests: XCTestCase {
 

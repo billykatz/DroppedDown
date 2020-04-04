@@ -7,7 +7,7 @@
 //
 
 import Foundation
-@testable import DownFall
+@testable import Shift_Shaft
  
 
 func toTileStructs(tileTypes: [[TileType]]) -> [[Tile]] {
@@ -27,6 +27,6 @@ func toTileStructs(tileTypes: [[TileType]]) -> [[Tile]] {
 
 extension Level {
     static var test: Level {
-        return Level(type: .first, monsterRatio: LevelConstructor.monstersPerLevel(.first, difficulty: .easy), maxMonstersTotal: 10, maxMonstersOnScreen: 5, maxGems: 1, maxTime: 30, boardSize: 4, abilities: [], goldMultiplier: 2, rocksRatio: LevelConstructor.availableRocksPerLevel(.first, difficulty: .easy), tutorialData: nil)
+        return Level(type: .first, monsterTypeRatio: LevelConstructor.monsterTypes(per: .first, difficulty: .easy), monsterCountStart: 2, maxMonsterOnBoardRatio: 0.07, maxGems: 1, maxTime: Int(30.0), boardSize: 4, abilities: [], goldMultiplier: 2, rocksRatio: LevelConstructor.availableRocksPerLevel(.first, difficulty: .easy), pillarCoordinates: [], threatLevelController: ThreatLevelController(), tutorialData: nil)
     }
 }

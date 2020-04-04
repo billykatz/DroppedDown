@@ -6,7 +6,7 @@
 //  Copyright © 2019 William Katz LLC. All rights reserved.
 //
 
-@testable import DownFall
+@testable import Shift_Shaft
 
 extension AttackSlope {
     static var south: AttackSlope {

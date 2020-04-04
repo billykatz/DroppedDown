@@ -27,7 +27,6 @@
 		3D30A4292216899E00AFA1E1 /* BoardMocker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D30A4232216892A00AFA1E1 /* BoardMocker.swift */; };
 		3D30A42B2217F63500AFA1E1 /* TileCoord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D30A42A2217F63500AFA1E1 /* TileCoord.swift */; };
 		3D3D31EC23ABEFA8002B87EE /* LevelConstructor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D3D31EB23ABEFA8002B87EE /* LevelConstructor.swift */; };
-		3D4A470D23B3CEFC000165FB /* RandomTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4A470C23B3CEFC000165FB /* RandomTests.swift */; };
 		3D4A470F23B3D33B000165FB /* LevelType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4A470E23B3D33B000165FB /* LevelType.swift */; };
 		3D4A471123B3D34F000165FB /* LevelModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4A471023B3D34F000165FB /* LevelModel.swift */; };
 		3D4A471323B3DCB7000165FB /* RangeModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4A471223B3DCB7000165FB /* RangeModelTests.swift */; };
@@ -146,6 +145,7 @@
 		589A27D423D90FE000174DE7 /* TargetingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589A27D323D90FE000174DE7 /* TargetingViewModel.swift */; };
 		589A27D623D9210900174DE7 /* TargetingViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589A27D523D9210900174DE7 /* TargetingViewModelTests.swift */; };
 		58A51663241DF3E2009E84E1 /* TargetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58A51662241DF3E2009E84E1 /* TargetView.swift */; };
+		58AD4883243581FC00F90A87 /* RandomTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4A470C23B3CEFC000165FB /* RandomTests.swift */; };
 		58B39BD723D21C9600915858 /* BackpackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58B39BD623D21C9600915858 /* BackpackView.swift */; };
 		58C1AE4A23D19CEE003B5B5A /* TransmogrificationPotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C1AE4923D19CEE003B5B5A /* TransmogrificationPotion.swift */; };
 		58C1AE4C23D19E03003B5B5A /* KillMonsterPotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C1AE4B23D19E03003B5B5A /* KillMonsterPotion.swift */; };
@@ -1024,7 +1024,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3D4A470D23B3CEFC000165FB /* RandomTests.swift in Sources */,
 				3DD72597239DD056005933B2 /* TutorialModelTests.swift in Sources */,
 				3DE87C92223D555A00D750CF /* InputQueueTests.swift in Sources */,
 				3D508DEA23B3EDA10067F53A /* AttackModel+Extensions.swift in Sources */,
@@ -1039,6 +1038,7 @@
 				3D90AAD021D8854300C7428A /* RefereeTests.swift in Sources */,
 				3D508DED23B3EE7C0067F53A /* CarryModelTests.swift in Sources */,
 				586AE77723CF91AA00302347 /* AttackModelTests.swift in Sources */,
+				58AD4883243581FC00F90A87 /* RandomTests.swift in Sources */,
 				3DE87C96224068FA00D750CF /* GameStateTests.swift in Sources */,
 				3DCB38AB232DCE88001D148F /* TileCoordTests.swift in Sources */,
 			);
@@ -1193,7 +1193,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = G6N5X5RF9Q;
 				INFOPLIST_FILE = DownFall/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1213,7 +1213,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = G6N5X5RF9Q;
 				INFOPLIST_FILE = DownFall/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1233,6 +1233,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = G6N5X5RF9Q;
 				INFOPLIST_FILE = DownFallTests/Info.plist;
@@ -1245,7 +1246,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DownFall.app/DownFall";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Shift Shaft.app/Shift Shaft";
 			};
 			name = Debug;
 		};
@@ -1254,6 +1255,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = G6N5X5RF9Q;
 				INFOPLIST_FILE = DownFallTests/Info.plist;
@@ -1266,7 +1268,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DownFall.app/DownFall";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Shift Shaft.app/Shift Shaft";
 			};
 			name = Release;
 		};

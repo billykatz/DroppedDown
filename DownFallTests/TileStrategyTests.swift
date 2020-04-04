@@ -8,7 +8,7 @@
 
 import XCTest
 import GameplayKit
-@testable import DownFall
+@testable import Shift_Shaft
 
 class TileStrategyTests: XCTestCase {
     
@@ -24,38 +24,27 @@ class TileStrategyTests: XCTestCase {
         emptyButOnePlayer = empty >>> player
         testBoardSize = board.boardSize
     }
-        
-    func testTileStrategyCreatesTheCorrectAmountOfTiles() {
-        let allBlack = all(Tile(type: .blackRock), board)
-        
-        for i in testBoardSize+1 { // 0,1,2,3
-            let compose =  allBlack >>> xRows(i, .empty, board)
-            let composedBoard = compose(board)
-            let newTiles = TileCreator(entities(),
-                                       difficulty: .normal,
-                                       level: .test)
-                .tiles(for: composedBoard.tiles)
-            XCTAssertEqual(newTiles.count, i*testBoardSize, "TileGod adds \(i) tiles if there are \(i) empty")
-        }
-        
-    }
-    
-    func testTileStrategyAddsCorrectNumberExtraExit() {
-        let exit = xTiles(1, .exit, board)
-        let emptyButOne = empty >>> exit
-        
-        var newTiles = TileCreator(entities(),
-                                   difficulty: .normal,
-                                   level: .test)
-            .tiles(for: emptyButOne(board).tiles)
-        XCTAssertFalse(newTiles.contains(.exit), "Tile God should not suggest adding another exit")
-        
-        newTiles = TileCreator(entities(),
-                               difficulty: .normal,
-                               level: .test)
-            .tiles(for: empty(board).tiles)
-        XCTAssertEqual(newTiles.filter { $0 == .exit }.count, 1, "Tile God suggest adding only 1 exit")
-    }
+  
+    /// This test is no longer relevant right now.  The board starts with a exit, so thre is never a need for the tile creator to create one
+//    func testTileStrategyAddsCorrectNumberExtraExit() {
+//        let exit = xTiles(1, .exit, board)
+//        let emptyButOne = empty >>> exit
+//
+//        var newTiles = TileCreator(entities(),
+//                                   difficulty: .normal,
+//                                   level: .test)
+//            .tiles(for: emptyButOne(board).tiles)
+//
+//        var exitCount = typeCount(for: newTiles, of: .exit).count
+//        XCTAssertEqual(exitCount, 1, "Tile God should not suggest adding another exit")
+//
+//        newTiles = TileCreator(entities(),
+//                               difficulty: .normal,
+//                               level: .test)
+//            .tiles(for: empty(board).tiles)
+//        exitCount = typeCount(for: newTiles, of: .exit).count
+//        XCTAssertEqual(exitCount, 1, "Tile God suggest adding only 1 exit")
+//    }
     
     
     func testTileStrategyAddsCorrectNumberOfMonstersForDifferentDifficulties() {
@@ -64,7 +53,7 @@ class TileStrategyTests: XCTestCase {
                 let newTiles = TileCreator(entities(),
                                            difficulty: difficulty,
                                            level: .test)
-                    .tiles(for: emptyButOnePlayer(board).tiles)
+                    .tiles(for: emptyButOnePlayer(board).tiles).reduce([], +)
                 let monsterCount = newTiles.filter { $0 == Tile(type: .monster(.zero)) }.count
                 let maxExpectedMonsters = 10
                 XCTAssertTrue(monsterCount <= maxExpectedMonsters, "Difficulty \(difficulty) - Tile God added \(monsterCount), we expected at most \(maxExpectedMonsters)")

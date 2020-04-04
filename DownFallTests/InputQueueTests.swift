@@ -7,7 +7,8 @@
 //
 
 import XCTest
-@testable import DownFall
+
+@testable import Shift_Shaft
 
 /// These tests are to verify the rules we enforced for
 /// deciding when and where certain Input are queued

@@ -7,14 +7,14 @@
 //
 
 import XCTest
-@testable import DownFall
+@testable import Shift_Shaft
 
 /* Example board
                                 (0,0)   (0,1)   (0,2)
  let tiles: [[MockTile]] = [[.player2, .exit, .blueRock],
  
                                 (1,0)       (1,1)       (1,2)
-                            [.greenRock, .blueRock, .blackRock],
+                            [.greenRock, .blueRock, .purpleRock],
  
                                 (2,0)       (2,1)       (2,2)
                             [.blueRock, .greenRock, .blueRock]]
@@ -23,11 +23,11 @@ import XCTest
  */
 
 struct MockBoardHelper {
-    private static func row(of type: Tile = Tile(type: .greenRock), by size: Int = 5) -> [Tile] {
+    private static func row(of type: Tile = Tile.greenRock, by size: Int = 5) -> [Tile] {
         return Array(repeating: type, count: size)
     }
     
-    static func createBoard(_ type: Tile = Tile(type: .greenRock), size: Int = 5) -> Board {
+    static func createBoard(_ type: Tile = Tile.greenRock, size: Int = 5) -> Board {
         let tc = TileCreator(entities(),
                              difficulty: .normal,
                              level: .test)
@@ -36,7 +36,7 @@ struct MockBoardHelper {
                      level: .test)
     }
     
-    static func createBoardWithRowOfSameColor(_ type: Tile = Tile(type: .greenRock), size: Int = 5, rowIdx: Int = 0) -> Board {
+    static func createBoardWithRowOfSameColor(_ type: Tile = Tile.greenRock, size: Int = 5, rowIdx: Int = 0) -> Board {
         let board = createBoard(.exit, size: size)
         var tiles = board.tiles
         for col in 0..<size {
@@ -54,9 +54,9 @@ class BoardTests: XCTestCase {
     override func setUp() {
         super.setUp()
         // Put setup code here. This method is called before the invocation of each test method in the class.
-        self.tiles = toTileStructs(tileTypes: [[TileType.player(.zero), .exit, .blueRock],
+        self.tiles = [[Tile(type: .player(.zero)), .exit, .blueRock],
                   [.blueRock, .blueRock, .blueRock],
-                  [.blueRock, .blueRock, .blueRock]])
+                  [.blueRock, .blueRock, .blueRock]]
         self.board = Board(tileCreator: TileCreator(entities(),
                                                     difficulty: .normal,
                                                     level: .test),
@@ -175,72 +175,79 @@ class BoardTests: XCTestCase {
 
     func testFindNeighbors () {
         let expectedNeighbors: [TileCoord] = [(0,2), (1,2), (2,2), (1,1), (1,0), (2,0), (2,1)].map { TileCoord($0.0, $0.1) }
-        let actualNeighbors = board.findNeighbors(TileCoord(1, 1))
+        let actualNeighbors = board.findNeighbors(TileCoord(1, 1)).0
         XCTAssertEqual(Set(actualNeighbors), Set(expectedNeighbors), "Neighbors found do not match")
         
     }
     
     func testFindNoNeighbots() {
-        let tiles: [[TileType]] = [[TileType.player(.zero), .exit, .blueRock],
-                                   [.blackRock, .greenRock, .blackRock],
-                                   [.blueRock, .blackRock, .blueRock]]
+        let tiles: [[Tile]] = [[Tile(type: .player(.zero)), .exit, .blueRock],
+                                   [.purpleRock, .greenRock, .purpleRock],
+                                   [.blueRock, .purpleRock, .blueRock]]
         
-        let board = Board(tiles: toTileStructs(tileTypes: tiles))
-        let actualFoundNeighbors = board.findNeighbors(TileCoord(1,1))
+        let board = Board(tiles: tiles)
+        let actualFoundNeighbors = board.findNeighbors(TileCoord(1,1)).0
         XCTAssertEqual(actualFoundNeighbors.count, 1, "No neighbors found, inital and after board should be equal")
     }
     
     func testInvalidInputFindNeighbors() {
-        let actualFoundNeighbors = board.findNeighbors(TileCoord(-1,-1))
+        let actualFoundNeighbors = board.findNeighbors(TileCoord(-1,-1)).0
         XCTAssertTrue(actualFoundNeighbors.isEmpty, "Invalid input, inital and after board should be equal")
     }
     
     func testRotateLeft() {
         
-        let tiles: [[TileType]] = [[TileType.player(.zero), .exit, .blueRock],
-                                   [.greenRock, .blueRock, .blackRock],
+        let tiles: [[Tile]] = [[Tile(type: .player(.zero)), .exit, .blueRock],
+                                   [.greenRock, .blueRock, .purpleRock],
                                    [.blueRock, .greenRock, .blueRock]]
         
-        let rotatedTiles: [[TileType]] = [[.blueRock, .greenRock, TileType.player(.zero)],
+        let rotatedTiles: [[Tile]] = [[.blueRock, .greenRock, Tile(type: .player(.zero))],
                                           [.greenRock, .blueRock, .exit],
-                                          [.blueRock, .blackRock, .blueRock]]
+                                          [.blueRock, .purpleRock, .blueRock]]
         
-        let initalBoard = Board(tiles: toTileStructs(tileTypes: tiles))
+        let initalBoard = Board(tiles: tiles)
         
-        let acutalRotatedBoard = initalBoard.rotate(.left).endTiles
-        XCTAssertEqual(acutalRotatedBoard, toTileStructs(tileTypes: rotatedTiles), "Inital board should match expected result board after 90 degree rotate left")
+        let acutalRotatedBoard = initalBoard.rotate(.counterClockwise, preview: true).first!.endTiles
+        XCTAssertEqual(acutalRotatedBoard, rotatedTiles, "Inital board should match expected result board after 90 degree rotate left")
         
         
     }
     
     func testRotateRight() {
-        let tiles: [[TileType]] = [[TileType.player(.zero), .exit, .blueRock],
-                                   [.greenRock, .blueRock, .blackRock],
+        let tiles: [[Tile]] = [[Tile(type: .player(.zero)), .exit, .blueRock],
+                                   [.greenRock, .blueRock, .purpleRock],
                                    [.blueRock, .greenRock, .blueRock]]
         
-        let rotatedTiles: [[TileType]] = [[.blueRock, .blackRock, .blueRock],
+        let rotatedTiles: [[Tile]] = [[.blueRock, .purpleRock, .blueRock],
                                           [.exit, .blueRock, .greenRock],
-                                          [TileType.player(.zero), .greenRock, .blueRock]]
+                                          [Tile(type: .player(.zero)), .greenRock, .blueRock]]
         
-        let initalBoard = Board(tiles: toTileStructs(tileTypes: tiles))
+        let initalBoard = Board(tiles: tiles)
         
-        let acutalRotatedBoard = initalBoard.rotate(.right).endTiles
-        XCTAssertEqual(acutalRotatedBoard, toTileStructs(tileTypes: rotatedTiles), "Inital board should match expected result board after 90 degree rotate right")
+        let acutalRotatedBoard = initalBoard.rotate(.clockwise, preview: false).first!.endTiles
+        XCTAssertEqual(acutalRotatedBoard, rotatedTiles, "Inital board should match expected result board after 90 degree rotate right")
     }
     
     func testTapPlayerDoesNotResultTransformation() {
-        let playerTapppedTransformation = board.removeAndReplace(TileCoord(0,0),
-                                                                 input: Input(.touch(TileCoord(0,0),
-                                                                                     TileType.player(.zero))))
-        let expectedTrans = Transformation(transformation: nil, inputType: .touch(TileCoord(0,0),
-        TileType.player(.zero)), endTiles: board.tiles)
+        
+        let playerTapppedTransformation = board.removeAndReplace(from: board.tiles,
+                                                                 tileCoord: TileCoord(row: 0, column: 0),
+                                                                 singleTile: false,
+                                                                 input: Input(.touch(TileCoord(0,0), .player(.zero))))
+        
+        let expectedTrans = Transformation(transformation: nil,
+                                           inputType: .touch(TileCoord(0,0),
+                                                             .player(.zero)),
+                                           endTiles: board.tiles)
         XCTAssertEqual(expectedTrans, playerTapppedTransformation, "Tapping player should not result in a board transformation")
     }
     
     func testTapExitDoesNotResultTransformation() {
-        let exitTappedTransformation = board.removeAndReplace(TileCoord(0,1),
-                                                              input: Input(.touch(TileCoord(0,1),
-                                                                                  TileType.exit)))
+        let exitTappedTransformation = board.removeAndReplace(from: board.tiles,
+        tileCoord: TileCoord(0,1),
+        singleTile: false,
+        input: Input(.touch(TileCoord(0,1), .exit)))
+
         let expectedTrans = Transformation(transformation: nil,
                                            inputType: .touch(TileCoord(0,1),
                                            TileType.exit),
@@ -251,7 +258,7 @@ class BoardTests: XCTestCase {
     //TODO: tap monster does not result in transformation
     
     func testBoardComputesValidPlayerAttackVariableDamage() {
-        let player1 = TileType.player(.zero)
+        let player1 = Tile(type: .player(.zero))
         let player2 = TileType.createPlayer(originalHp: 5,
                                             hp: 5,
                                             attack: AttackModel(type: .targets,
@@ -263,120 +270,120 @@ class BoardTests: XCTestCase {
                                                                 attacksPerTurn: 1,
                                                                 attackSlope: [AttackSlope.south]))
 
-        var givenTiles: [[TileType]] = [[.blueRock, .exit, .blueRock],
-                                        [.strongMonster, .blueRock, .blueRock],
+        var givenTiles: [[Tile]] = [[.blueRock, .exit, .blueRock],
+                                    [Tile(type: .strongMonster), .blueRock, .blueRock],
                                         [player1, .blueRock, .blueRock]]
-        var expectedTiles: [[TileType]] = [[.blueRock, .exit, .blueRock],
-                                           [.normalMonster, .blueRock, .blueRock],
+        var expectedTiles: [[Tile]] = [[.blueRock, .exit, .blueRock],
+                                           [Tile(type: .normalMonster), .blueRock, .blueRock],
                                            [player1, .blueRock, .blueRock]]
-        var actualBoard = Board(tiles: toTileStructs(tileTypes: givenTiles)).attack(Input(.attack(attackType: .targets,
+        var actualBoard = Board(tiles: givenTiles).attack(Input(.attack(attackType: .targets,
                                                                         attacker: TileCoord(2, 0),
                                                                         defender: TileCoord(1, 0),
                                                                         affectedTiles: [TileCoord(1, 0)]))).endTiles
-        XCTAssertEqual(toTileStructs(tileTypes: expectedTiles), actualBoard, "Board removes HP from tiles beneath the player equal to the palyer attack damage.")
+        XCTAssertEqual(expectedTiles, actualBoard, "Board removes HP from tiles beneath the player equal to the palyer attack damage.")
 
         givenTiles = [[.blueRock, .exit, .blueRock],
-                      [.healthyMonster, .blueRock, .blueRock],
-                      [player2, .blueRock, .blueRock]]
+                      [Tile(type: .healthyMonster), .blueRock, .blueRock],
+                      [Tile(type: player2), .blueRock, .blueRock]]
 
         expectedTiles = [[.blueRock, .exit, .blueRock],
-                         [.normalMonster, .blueRock, .blueRock],
-                         [player2, .blueRock, .blueRock]]
+                         [Tile(type: .normalMonster), .blueRock, .blueRock],
+                         [Tile(type: player2), .blueRock, .blueRock]]
 
-        actualBoard = Board(tiles: toTileStructs(tileTypes: givenTiles))
+        actualBoard = Board(tiles: givenTiles)
             .attack(Input(.attack(attackType: .targets,
                                                                     attacker: TileCoord(2, 0),
                                                                     defender: TileCoord(1, 0),
                                                                     affectedTiles: [TileCoord(1, 0)]))).endTiles
-        XCTAssertEqual(toTileStructs(tileTypes: expectedTiles), actualBoard, "Board removes HP from tiles beneath the palyer equal to the palyer attack damage.")
+        XCTAssertEqual(expectedTiles, actualBoard, "Board removes HP from tiles beneath the palyer equal to the palyer attack damage.")
 
 
         givenTiles = [[.blueRock, .exit, .blueRock],
-                      [.normalMonster, .blueRock, .blueRock],
-                      [player2, .blueRock, .blueRock]]
+                      [Tile(type: .normalMonster), .blueRock, .blueRock],
+                      [Tile(type: player2), .blueRock, .blueRock]]
 
         expectedTiles = [[.blueRock, .exit, .blueRock],
-                         [.deadRat, .blueRock, .blueRock],
-                         [player2, .blueRock, .blueRock]]
+                         [Tile(type: .deadRat), .blueRock, .blueRock],
+                         [Tile(type: player2), .blueRock, .blueRock]]
 
-        actualBoard = Board(tiles: toTileStructs(tileTypes: givenTiles)).attack(Input(.attack(attackType: .targets,
+        actualBoard = Board(tiles: givenTiles).attack(Input(.attack(attackType: .targets,
                                                                     attacker: TileCoord(2, 0),
                                                                     defender: TileCoord(1, 0),
                                                                     affectedTiles: [TileCoord(1, 0)]))).endTiles
-        XCTAssertEqual(toTileStructs(tileTypes: expectedTiles), actualBoard, "Board subtracts HP from tile's hp located beneath the player equal to the player attack damage.")
+        XCTAssertEqual(expectedTiles, actualBoard, "Board subtracts HP from tile's hp located beneath the player equal to the player attack damage.")
 
 
         givenTiles = [[.blueRock, .exit, .blueRock],
-                      [.strongMonster, .blueRock, .blueRock],
-                      [.strongPlayer, .blueRock, .blueRock]]
+                      [Tile(type: .strongMonster), .blueRock, .blueRock],
+                      [Tile(type: .strongPlayer), .blueRock, .blueRock]]
 
         expectedTiles = [[.blueRock, .exit, .blueRock],
-                         [.deadRat, .blueRock, .blueRock],
-                         [.strongPlayer, .blueRock, .blueRock]]
+                         [Tile(type: .deadRat), .blueRock, .blueRock],
+                         [Tile(type: .strongPlayer), .blueRock, .blueRock]]
 
-        actualBoard = Board(tiles: toTileStructs(tileTypes: givenTiles)).attack(Input(.attack(attackType: .targets,
+        actualBoard = Board(tiles: givenTiles).attack(Input(.attack(attackType: .targets,
                                                                     attacker: TileCoord(2, 0),
                                                                     defender: TileCoord(1, 0),
                                                                     affectedTiles: [TileCoord(1, 0)]))).endTiles
-        XCTAssertEqual(toTileStructs(tileTypes: expectedTiles), actualBoard, "Board subtracts HP from tile's hp located beneath the player equal to the player attack damage.")
+        XCTAssertEqual(expectedTiles, actualBoard, "Board subtracts HP from tile's hp located beneath the player equal to the player attack damage.")
     }
     
     func testBoardValidMonsters() {
-        let givenTiles = [[TileType.normalPlayer, .normalMonster, .blueRock],
+        let givenTiles = [[Tile(type: .normalPlayer), Tile(type: .normalMonster), .blueRock],
                           [.blueRock, .exit, .blueRock],
                           [.blueRock, .blueRock, .blueRock]]
         
-        let expectedTiles: [[TileType]] = [[.deadPlayer, .monsterThatHasAttacked, .blueRock],
+        let expectedTiles: [[Tile]] = [[Tile(type: .deadPlayer), Tile(type: .monsterThatHasAttacked), .blueRock],
                                            [.blueRock, .exit, .blueRock],
                                            [.blueRock, .blueRock, .blueRock]]
-        let actualBoard = Board(tiles: toTileStructs(tileTypes: givenTiles)).attack(Input(.attack(attackType: .targets,
+        let actualBoard = Board(tiles: givenTiles).attack(Input(.attack(attackType: .targets,
                                                                         attacker: TileCoord(0, 1),
                                                                         defender: TileCoord(0, 0),
                                                                         affectedTiles: [TileCoord(0, 0)]))).endTiles
-        XCTAssertEqual(toTileStructs(tileTypes: expectedTiles), actualBoard, "Board applies Monster's attack damage to Player's hp.")
+        XCTAssertEqual(expectedTiles, actualBoard, "Board applies Monster's attack damage to Player's hp.")
         
     }
     
     func testBoardDeterminesHowManyTilesAreEmpty() {
-        var tiles: [[TileType]] = [[TileType.player(.zero), .exit, .blueRock],
-                                   [.blackRock, .empty, .blackRock],
+        var tiles: [[Tile]] = [[Tile(type: .player(.zero)), .exit, .blueRock],
+                                   [.purpleRock, .empty, .purpleRock],
                                    [.blueRock, .empty, .blueRock]]
         
-        var board = Board.init(tiles: toTileStructs(tileTypes: tiles))
+        var board = Board.init(tiles: tiles)
         XCTAssertEqual(board.tiles(of: .empty).count, 2, "Board can deteremine how many empty tiles it has")
 
         tiles = [[.empty, .empty, .empty],
                  [.empty, .empty, .empty],
                  [.empty, .empty, .empty]]
-        board = Board.init(tiles: toTileStructs(tileTypes: tiles))
+        board = Board.init(tiles: tiles)
         XCTAssertEqual(board.tiles(of: .empty).count, 9, "Board can deteremine how many empty tiles it has")
         
-        tiles = [[.blackRock, .blackRock, .blackRock],
-                 [.blackRock, .blackRock, .blackRock],
-                 [.blackRock, .blackRock, .blackRock]]
-        board = Board.init(tiles: toTileStructs(tileTypes: tiles))
+        tiles = [[.purpleRock, .purpleRock, .purpleRock],
+                 [.purpleRock, .purpleRock, .purpleRock],
+                 [.purpleRock, .purpleRock, .purpleRock]]
+        board = Board.init(tiles: tiles)
         XCTAssertEqual(board.tiles(of: .empty).count, 0, "Board can deteremine how many empty tiles it has")
 
     }
     
     func testBoardKnowsHowManyExitsThereAre() {
-        var tiles: [[TileType]] = [[TileType.player(.zero), .exit, .blueRock],
-                                   [.blackRock, .empty, .blackRock],
+        var tiles: [[Tile]] = [[Tile(type: .player(.zero)), .exit, .blueRock],
+                                   [.purpleRock, .empty, .purpleRock],
                                    [.blueRock, .empty, .blueRock]]
         
-        var board = Board.init(tiles: toTileStructs(tileTypes: tiles))
+        var board = Board.init(tiles: tiles)
         XCTAssertEqual(board.tiles(of: .exit).count, 1, "Board can deteremine how many exit tiles it has")
         
         tiles = [[.empty, .exit, .empty],
                  [.empty, .exit, .empty],
                  [.empty, .exit, .empty]]
-        board = Board.init(tiles: toTileStructs(tileTypes: tiles))
+        board = Board.init(tiles: tiles)
         XCTAssertEqual(board.tiles(of: .exit).count, 3, "Board can deteremine how many exit tiles it has")
         
         tiles = [[.exit, .exit, .exit],
                  [.exit, .exit, .exit],
                  [.exit, .exit, .exit]]
-        board = Board.init(tiles: toTileStructs(tileTypes: tiles))
+        board = Board.init(tiles: tiles)
         XCTAssertEqual(board.tiles(of: .exit).count, 9, "Board can deteremine how many exit tiles it has")
         
     }
@@ -408,8 +415,9 @@ class BoardTests: XCTestCase {
         }
         
         let actualTransformation: [TileTransformation] =
-            board.removeAndReplace(TileCoord(0,0),
-                                   input: Input.init(.touch(TileCoord(0,0), .greenRock)))
+            board.removeAndReplace(from: board.tiles,
+                                   tileCoord: TileCoord(0,0),
+                                   input: Input(.touch(TileCoord(0,0), .rock(.green))))
                 .tileTransformation![2]
         
         XCTAssertEqual(expectedTransformation.count, actualTransformation.count, "Shift down transformations should be the same")
@@ -420,7 +428,7 @@ class BoardTests: XCTestCase {
     
     func testRemoveFirstRow() {
         let size = 3
-        let board = MockBoardHelper.createBoardWithRowOfSameColor(Tile(type: .blueRock), size: size, rowIdx: 0)
+        let board = MockBoardHelper.createBoardWithRowOfSameColor(.blueRock, size: size, rowIdx: 0)
         
         var expectedTransformation: [TileTransformation] = []
         for colIdx in 0..<size{
@@ -440,8 +448,9 @@ class BoardTests: XCTestCase {
 
         
         
-        let transformation = board.removeAndReplace(TileCoord(0,0),
-                                                          input: Input(.touch(TileCoord(0,0), .blackRock)))
+        let transformation = board.removeAndReplace(from: board.tiles,
+                                                    tileCoord: TileCoord(0,0),
+                                                    input: Input(.touch(TileCoord(0,0), .rock(.purple))))
             
         let actualTransformation = transformation.tileTransformation![2]
         
@@ -451,14 +460,14 @@ class BoardTests: XCTestCase {
     }
     
     func testBoardRemoveAndReplaceSingleTile() {
-        let board = MockBoardHelper.createBoard(Tile(type: .greenRock), size: 3)
+        let board = MockBoardHelper.createBoard(Tile.greenRock, size: 3)
         
         let expectedTransformation = [TileTransformation.init(TileCoord(1, 1), TileCoord(0, 1)),
                                       TileTransformation.init(TileCoord(2, 1), TileCoord(1, 1)),
                                       TileTransformation.init(TileCoord(3, 1), TileCoord(2, 1))]
         
         
-        let actualTransformation = board.removeAndReplace(TileCoord(0, 1), singleTile: true, input: Input(.touch(TileCoord(0,1), .greenRock))).tileTransformation![2]
+        let actualTransformation = board.removeAndReplace(from: board.tiles, tileCoord: TileCoord(0, 1), singleTile: true, input: Input(.touch(TileCoord(0,1), .rock(.green)))).tileTransformation![2]
 
         XCTAssertEqual(expectedTransformation.count, actualTransformation.count, "Shift down transformations should be the same")
         arrayEquality(actualTransformation, expectedTransformation)
@@ -466,7 +475,7 @@ class BoardTests: XCTestCase {
     }
     
     func testvalidCardinalNeighbors() {
-        let board = MockBoardHelper.createBoard(Tile(type: .greenRock), size: 3)
+        let board = MockBoardHelper.createBoard(Tile.greenRock, size: 3)
         
         // Test 1,1 has 4 neighbors
         var expectedNeighborsSet : Set<TileCoord> = [TileCoord(0, 1), TileCoord(1, 0), TileCoord(2, 1), TileCoord(1, 2)]

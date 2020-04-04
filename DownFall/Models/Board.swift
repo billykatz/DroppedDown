@@ -210,7 +210,7 @@ class Board: Equatable {
             }
             
         }
-        let removedAndReplaced = removeAndReplace(from: tiles, specificCoord: removedRocksAndPillars, input: input)
+        let removedAndReplaced = removeAndReplaces(from: tiles, specificCoord: removedRocksAndPillars, input: input)
         
         return [Transformation(transformation: nil, inputType: input.type, endTiles: tiles), removedAndReplaced]
     }
@@ -240,7 +240,7 @@ class Board: Equatable {
                     self.tiles[target.row][target.column] = Tile(type: tileCreator.randomMonster())
                 }
             case .destroy(let destroyedRocks):
-                return removeAndReplace(from: tiles, specificCoord: Array(destroyedRocks), input: input)
+                return removeAndReplaces(from: tiles, specificCoord: Array(destroyedRocks), input: input)
             default:
                 ()
             }
@@ -249,7 +249,7 @@ class Board: Equatable {
     }
     
     func bossEatsRocks(_ input: Input, targets: [TileCoord]) -> [Transformation] {
-        return [removeAndReplace(from: tiles, specificCoord: targets, input: input)]
+        return [removeAndReplaces(from: tiles, specificCoord: targets, input: input)]
     }
     
     func calculateAttacks(for entity: EntityModel, from position: TileCoord) -> [TileCoord] {
@@ -587,7 +587,7 @@ extension Board {
     }
     
     
-    func removeAndReplace(from tiles: [[Tile]],
+    func removeAndReplaces(from tiles: [[Tile]],
                           specificCoord: [TileCoord],
                           singleTile: Bool = false,
                           input: Input) -> Transformation {

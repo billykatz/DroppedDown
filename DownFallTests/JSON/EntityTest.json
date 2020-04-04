@@ -2,8 +2,8 @@
     "entities": [
         { "name": "player2",
             "type": "player",
-            "originalHp": 5,
-            "hp": 5,
+            "originalHp": 8,
+            "hp": 8,
             "attack": {
                 "type": "targets",
                 "frequency" : 1,
@@ -20,37 +20,34 @@
                     }
                 ]
             },
-            "animations": {
-                "attack": {
-                    "animationFilename": "playerAttack",
-                    "numberOfFrames": 10
-                },
-                "hurt": {
-                    "animationFilename": "playerDamaged",
-                    "numberOfFrames": 9
-                },
-                "dying": {
-                    "animationFilename": "",
-                    "numberOfFrames": 0
-                },
-                "idle": {
-                    "animationFilename": "",
-                    "numberOfFrames": 0
-                },
-                "fall":{
-                    "animationFilename": "playerFall",
-                    "numberOfFrames": 9
-                },
-                "projectile": {
-                    "animationFilename": "",
-                    "numberOfFrames": 0
-                }
-            },
+            "animations":
+                [
+                    {
+                        "animationFilename": "playerAttack",
+                        "numberOfFrames": 10,
+                        "animationType": "attack"
+                    },
+                    {
+                        "animationFilename": "playerDamaged",
+                        "numberOfFrames": 9,
+                        "animationType": "hurt"
+                    },
+                    {
+                        "animationFilename": "playerFall",
+                        "numberOfFrames": 9,
+                        "animationType": "fall"
+                    }
+                ],
             "carry": {
                 "items": [
                     {
                         "type": "gold",
-                        "amount": 15
+                        "amount": 50
+                        
+                    },
+                    {
+                        "type": "gem",
+                        "amount": 0
                         
                     }
                 ]
@@ -77,34 +74,37 @@
                     }
                 ]
             },
-            "animations": {
-                "attack": {
-                    "animationFilename": "playerAttack",
-                    "numberOfFrames": 10
-                },
-                "hurt": {
-                    "animationFilename": "playerDamaged",
-                    "numberOfFrames": 9
-                },
-                "dying": {
-                    "animationFilename": "",
-                    "numberOfFrames": 0
-                },
-                "idle": {
-                    "animationFilename": "",
-                    "numberOfFrames": 0
-                },
-                "fall":{
-                    "animationFilename": "playerFall",
-                    "numberOfFrames": 9
-                },
-                "projectile": {
-                    "animationFilename": "",
-                    "numberOfFrames": 0
-                }
-            },
+            "animations":
+                [
+                    {
+                        "animationFilename": "playerAttack",
+                        "numberOfFrames": 10,
+                        "animationType": "attack"
+                    },
+                    {
+                        "animationFilename": "playerDamaged",
+                        "numberOfFrames": 9,
+                        "animationType": "hurt"
+                    },
+                    {
+                        "animationFilename": "playerFall",
+                        "numberOfFrames": 9,
+                        "animationType": "fall"
+                    }
+                ],
             "carry": {
-                "items": []
+                "items": [
+                {
+                    "type": "gold",
+                    "amount": 15
+                    
+                },
+                {
+                    "type": "gem",
+                    "amount": 0
+                    
+                }
+                ]
             },
             "abilities": []
         },
@@ -128,34 +128,37 @@
                     }
                 ]
             },
-            "animations": {
-                "attack": {
-                    "animationFilename": "playerAttack",
-                    "numberOfFrames": 10
-                },
-                "hurt": {
-                    "animationFilename": "playerDamaged",
-                    "numberOfFrames": 9
-                },
-                "dying": {
-                    "animationFilename": "",
-                    "numberOfFrames": 0
-                },
-                "idle": {
-                    "animationFilename": "",
-                    "numberOfFrames": 0
-                },
-                "fall":{
-                    "animationFilename": "playerFall",
-                    "numberOfFrames": 9
-                },
-                "projectile": {
-                    "animationFilename": "",
-                    "numberOfFrames": 0
-                }
-            },
+            "animations":
+                [
+                    {
+                        "animationFilename": "playerAttack",
+                        "numberOfFrames": 10,
+                        "animationType": "attack"
+                    },
+                    {
+                        "animationFilename": "playerDamaged",
+                        "numberOfFrames": 9,
+                        "animationType": "hurt"
+                    },
+                    {
+                        "animationFilename": "playerFall",
+                        "numberOfFrames": 9,
+                        "animationType": "fall"
+                    }
+                ],
             "carry": {
-                "items": []
+                "items": [
+                {
+                    "type": "gold",
+                    "amount": 15
+                    
+                },
+                {
+                    "type": "gem",
+                    "amount": 0
+                    
+                }
+                ]
             },
             "abilities": []
         },
@@ -164,12 +167,12 @@
             "originalHp": 1,
             "hp": 1,
             "attack": {
-                "type": "targets",
-                "frequency" : 1,
+                "type": "charges",
+                "frequency" : 3,
                 "damage": 1,
                 "range": {
                     "lower": 1,
-                    "upper": 10
+                    "upper": 5
                 },
                 "attacksPerTurn": 1,
                 "attackSlope": [
@@ -179,36 +182,30 @@
                     }
                 ]
             },
-            "animations": {
-                "attack": {
-                    "animationFilename": "",
-                    "numberOfFrames": 0
+            "animations": [
+                {
+                    "animationFilename": "dragonAttack",
+                    "numberOfFrames": 6,
+                    "animationType": "attack",
+                    "keyframe": 6
                 },
-                "hurt": {
-                    "animationFilename": "",
-                    "numberOfFrames": 0
+                {
+                    "animationFilename": "fireballStart",
+                    "numberOfFrames": 6,
+                    "animationType": "projectileStart",
+                    "keyframe": 4
                 },
-                "dying": {
-                    "animationFilename": "",
-                    "numberOfFrames": 0
-                },
-                "idle": {
-                    "animationFilename": "",
-                    "numberOfFrames": 0
-                },
-                "fall":{
-                    "animationFilename": "",
-                    "numberOfFrames": 0
-                },
-                "projectile": {
-                    "animationFilename": "",
-                    "numberOfFrames": 0
+                {
+                    "animationFilename": "fireballMid",
+                    "numberOfFrames": 5,
+                    "animationType": "projectileMid",
+                    "keyframe": 2
                 }
-            },
+            ],
             "carry": {
                 "items": [{
                     "type": "gold",
-                    "amount": 10
+                    "amount": 15
                 }]
                 
             },
@@ -219,8 +216,8 @@
             "originalHp": 1,
             "hp": 1,
             "attack": {
-                "type": "targets",
-                "frequency" : 1,
+                "type": "charges",
+                "frequency" : 3,
                 "damage": 1,
                 "range": {
                     "lower": 1,
@@ -238,36 +235,33 @@
                     }
                 ]
             },
-            "animations": {
-                "attack": {
-                    "animationFilename": "ratAttack",
-                    "numberOfFrames": 7
-                },
-                "hurt": {
-                    "animationFilename": "ratHurt",
-                    "numberOfFrames": 5
-                },
-                "dying": {
-                    "animationFilename": "ratDying",
-                    "numberOfFrames": 5
-                },
-                "idle": {
-                    "animationFilename": "ratIdle",
-                    "numberOfFrames": 5
-                },
-                "fall":{
-                    "animationFilename": "",
-                    "numberOfFrames": 0
-                },
-                "projectile": {
-                    "animationFilename": "",
-                    "numberOfFrames": 0
-                }
-            },
+            "animations":
+                [
+                    {
+                        "animationFilename": "ratAttack",
+                        "numberOfFrames": 7,
+                        "animationType": "attack"
+                    },
+                    {
+                        "animationFilename": "ratHurt",
+                        "numberOfFrames": 5,
+                        "animationType": "hurt"
+                    },
+                    {
+                        "animationFilename": "ratDying",
+                        "numberOfFrames": 5,
+                        "animationType": "dying"
+                    },
+                    {
+                        "animationFilename": "ratIdle",
+                        "numberOfFrames": 5,
+                        "animationType": "idle"
+                    }
+                ],
             "carry": {
                 "items": [{
                     "type": "gold",
-                    "amount": 3
+                    "amount": 15
                 }]
             },
             "abilities": []
@@ -282,10 +276,9 @@
                 "damage": 1,
                 "range": {
                     "lower": 1,
-                    "upper": 3
+                    "upper": 2
                 },
                 "attacksPerTurn": 1,
-                "charge" : 1,
                 "attackSlope": [
                     {
                         "over": 1,
@@ -305,36 +298,32 @@
                     }
                 ]
             },
-            "animations": {
-                "attack": {
+            "animations": [
+                {
                     "animationFilename": "batAttack",
-                    "numberOfFrames": 16
+                    "numberOfFrames": 16,
+                    "animationType": "attack"
                 },
-                "hurt": {
+                {
                     "animationFilename": "batHurt",
-                    "numberOfFrames": 6
+                    "numberOfFrames": 6,
+                    "animationType": "hurt"
                 },
-                "dying": {
-                    "animationFilename": "",
-                    "numberOfFrames": 0
-                },
-                "idle": {
+                {
                     "animationFilename": "batIdle",
-                    "numberOfFrames": 5
+                    "numberOfFrames": 5,
+                    "animationType": "idle"
                 },
-                "fall":{
-                    "animationFilename": "",
-                    "numberOfFrames": 0
-                },
-                "projectile": {
+                {
                     "animationFilename": "batProjectile",
-                    "numberOfFrames": 4
+                    "numberOfFrames": 4,
+                    "animationType": "projectileStart"
                 }
-            },
+            ],
             "carry": {
                 "items": [{
                     "type": "gold",
-                    "amount": 5
+                    "amount": 15
                 }]
             },
             "abilities": []
@@ -348,36 +337,58 @@
                 "frequency" : 3,
                 "damage": 1,
                 "range": {
-                    "lower": 2,
-                    "upper": 2
+                    "lower": 1,
+                    "upper": 5
                 },
                 "attacksPerTurn": 1,
-                "charges": 1,
                 "attackSlope": [
                     {
-                        "over": 1,
-                        "up": 1
-                    },
-                    {
-                        "over": 1,
-                        "up": -1
-                    },
-                    {
-                        "over": -1,
-                        "up": 1
-                    },
-                    {
-                        "over": -1,
-                        "up": -1
-                    },
-                    {
-                        "over": 0,
-                        "up": 1
-                    },
-                    {
                         "over": 0,
                         "up": -1
-                    },
+                    }
+                ]
+            },
+            "animations": [
+                {
+                    "animationFilename": "alamoAttack",
+                    "numberOfFrames": 6,
+                    "animationType": "attack",
+                    "keyframe": 6
+                },
+                {
+                    "animationFilename": "alamoStart",
+                    "numberOfFrames": 6,
+                    "animationType": "projectileStart",
+                    "keyframe": 6
+                },
+                {
+                    "animationFilename": "alamoMid",
+                    "numberOfFrames": 3,
+                    "animationType": "projectileMid"
+                }
+            ],
+            "carry": {
+                "items": [{
+                    "type": "gold",
+                    "amount": 15
+                }]
+            },
+            "abilities": []
+        },
+        { "name": "sally",
+            "type": "sally",
+            "originalHp": 1,
+            "hp": 1,
+            "attack": {
+                "type": "charges",
+                "frequency" : 3,
+                "damage": 1,
+                "range": {
+                    "lower": 1,
+                    "upper": 3
+                },
+                "attacksPerTurn": 1,
+                "attackSlope": [
                     {
                         "over": 1,
                         "up": 0
@@ -388,36 +399,34 @@
                     }
                 ]
             },
-            "animations": {
-                "attack": {
-                    "animationFilename": "",
-                    "numberOfFrames": 0
+            "animations": [
+                {
+                    "animationFilename": "sallyAttack",
+                    "numberOfFrames": 9,
+                    "animationType": "attack",
+                    "keyframe": 9
                 },
-                "hurt": {
-                    "animationFilename": "",
-                    "numberOfFrames": 0
+                {
+                    "animationFilename": "sallyProjectileStart",
+                    "numberOfFrames": 6,
+                    "animationType": "projectileStart",
+                    "keyframe": 6
                 },
-                "dying": {
-                    "animationFilename": "",
-                    "numberOfFrames": 0
+                {
+                    "animationFilename": "sallyProjectileEnd",
+                    "numberOfFrames": 3,
+                    "animationType": "projectileEnd"
                 },
-                "idle": {
-                    "animationFilename": "",
-                    "numberOfFrames": 0
-                },
-                "fall":{
-                    "animationFilename": "",
-                    "numberOfFrames": 0
-                },
-                "projectile": {
-                    "animationFilename": "",
-                    "numberOfFrames": 0
+                {
+                    "animationFilename": "sallyProjectileMid",
+                    "numberOfFrames": 1,
+                    "animationType": "projectileMid"
                 }
-            },
+            ],
             "carry": {
                 "items": [{
                     "type": "gold",
-                    "amount": 7
+                    "amount": 15
                 }]
             },
             "abilities": []

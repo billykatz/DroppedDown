@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import GameplayKit
 @testable import Shift_Shaft
 
 extension Int: Sequence {
@@ -31,7 +32,7 @@ extension Board {
     convenience init(tiles: [[Tile]]) {
         let tileCreator = TileCreator(entities(),
                                       difficulty: .normal,
-                                      level: Level.zero)
+                                      level: Level.zero, randomSource: GKLinearCongruentialRandomSource())
         self.init(tileCreator: tileCreator, tiles: tiles, level: Level.zero)
     }
 }

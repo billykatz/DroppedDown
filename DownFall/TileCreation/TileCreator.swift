@@ -9,7 +9,7 @@
 import GameplayKit
 
 class TileCreator: TileStrategy {
-    var randomSource = GKLinearCongruentialRandomSource()
+    let randomSource: GKLinearCongruentialRandomSource
     let entities: EntitiesModel
     let difficulty: Difficulty
     var updatedEntity: EntityModel?
@@ -23,11 +23,13 @@ class TileCreator: TileStrategy {
     required init(_ entities: EntitiesModel,
                   difficulty: Difficulty,
                   updatedEntity: EntityModel? = nil,
-                  level: Level?) {
+                  level: Level?,
+                  randomSource: GKLinearCongruentialRandomSource) {
         self.entities = entities
         self.difficulty = difficulty
         self.updatedEntity = updatedEntity
         self.level = level
+        self.randomSource = randomSource
         self.boardSize = level?.boardSize ?? 0
     }
     

@@ -8,6 +8,7 @@
 
 import SpriteKit
 import UIKit
+import GameplayKit
 
 class TutorialScene: SKScene {
     var gameSceneDelegate: GameSceneCoordinatingDelegate?
@@ -58,7 +59,8 @@ class TutorialScene: SKScene {
         let tileCreator = TutorialTileCreator(entities,
                                               difficulty: difficulty,
                                               updatedEntity: updatedEntity,
-                                              level: level)
+                                              level: level,
+                                              randomSource: GKLinearCongruentialRandomSource())
         
         //board
         board = Board.build(tileCreator: tileCreator, difficulty: difficulty, level: level)

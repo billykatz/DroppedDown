@@ -24,6 +24,7 @@
 import GameplayKit
 
 struct TutorialTileCreator: TileStrategy {
+    
     func shuffle(tiles: [[Tile]]) -> [[Tile]] {
         return []
     }
@@ -50,7 +51,7 @@ struct TutorialTileCreator: TileStrategy {
     var level: Level?
     var randomSource: GKLinearCongruentialRandomSource = GKLinearCongruentialRandomSource()
     
-    init(_ entities: EntitiesModel, difficulty: Difficulty, updatedEntity: EntityModel?, level: Level?) {
+    init(_ entities: EntitiesModel, difficulty: Difficulty, updatedEntity: EntityModel?, level: Level?, randomSource: GKLinearCongruentialRandomSource) {
         self.entities = entities
         self.difficulty = difficulty
         self.updatedEntity = updatedEntity

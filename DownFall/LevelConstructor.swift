@@ -7,10 +7,11 @@
 //
 
 import Foundation
+import GameplayKit
 
 struct LevelConstructor {
     
-    static func buildLevels(_ difficulty: Difficulty) -> [Level] {
+    static func buildLevels(_ difficulty: Difficulty, randomSource: GKLinearCongruentialRandomSource) -> [Level] {
         return LevelType.gameCases.map { levelType in
             return Level(type: levelType,
                          monsterTypeRatio: monsterTypes(per: levelType, difficulty: difficulty),

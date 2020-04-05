@@ -7,6 +7,7 @@
 //
 
 import XCTest
+import GameplayKit
 @testable import Shift_Shaft
 
 /* Example board
@@ -30,7 +31,7 @@ struct MockBoardHelper {
     static func createBoard(_ type: Tile = Tile.greenRock, size: Int = 5) -> Board {
         let tc = TileCreator(entities(),
                              difficulty: .normal,
-                             level: .test)
+                             level: .test, randomSource: GKLinearCongruentialRandomSource())
         return Board(tileCreator: tc,
                      tiles: Array(repeating: row(of: type, by: size),  count: size),
                      level: .test)
@@ -59,7 +60,7 @@ class BoardTests: XCTestCase {
                   [.blueRock, .blueRock, .blueRock]]
         self.board = Board(tileCreator: TileCreator(entities(),
                                                     difficulty: .normal,
-                                                    level: .test),
+                                                    level: .test, randomSource: GKLinearCongruentialRandomSource()),
                            tiles: tiles,
                            level: .test)
     }

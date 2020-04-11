@@ -124,6 +124,8 @@ class Board: Equatable {
             InputQueue.append(Input(.transformation([refillEmpty(inputType: .refillEmpty)])))
         case .shuffleBoard:
             InputQueue.append(Input(.transformation([shuffleBoard(inputType: .shuffleBoard)])))
+        case .unlockExit:
+            InputQueue.append(Input(.transformation([unlockExit(inputType: input.type)])))
         case .gameLose(_),
              .play,
              .pause,
@@ -141,6 +143,16 @@ class Board: Equatable {
         
         guard let trans = transformation else { return }
         InputQueue.append(Input(.transformation([trans])))
+    }
+    
+    private func unlockExit(inputType: InputType) -> Transformation {
+        var newTiles = tiles
+        
+        if let exitCoord = typeCount(for: tiles, of: .exit(blocked: true)).first {
+            newTiles[exitCoord.row][exitCoord.column] = Tile(type: .exit(blocked: false))
+        }
+        
+        return Transformation(transformation: nil, inputType: inputType, endTiles: newTiles)
     }
     
     private func rotatePreviewFinish(input: Input) -> [Transformation] {

@@ -1,6 +1,6 @@
 {
     "entities": [
-        { "name": "player2",
+        { "name": "player3",
             "type": "player",
             "originalHp": 8,
             "hp": 8,
@@ -54,7 +54,7 @@
             },
             "abilities": []
         },
-        { "name": "player2",
+        { "name": "player3",
             "type": "player",
             "originalHp": 2,
             "hp": 2,
@@ -108,7 +108,7 @@
             },
             "abilities": []
         },
-        { "name": "player2",
+        { "name": "player3",
             "type": "player",
             "originalHp": 1,
             "hp": 1,

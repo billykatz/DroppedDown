@@ -62,10 +62,17 @@ class Renderer: SKSpriteNode {
     }()
     
     private lazy var hud: HUD = {
-        let hud = HUD.build(color: .foregroundBlue, size: CGSize(width: playableRect.width, height: Style.HUD.height), delegate: self, threatLevelController: level.threatLevelController)
+        let hud = HUD.build(color: .foregroundBlue, size: CGSize(width: playableRect.width, height: Style.HUD.height), delegate: self, level: level)
         hud.position = CGPoint.alignHorizontally(hud.frame, relativeTo: safeArea.frame, horizontalAnchor: .center, verticalAlign: .bottom, translatedToBounds: true)
         hud.zPosition = Precedence.foreground.rawValue
         return hud
+    }()
+    
+    private lazy var levelGoalView: LevelGoalView = {
+        let levelGoalView = LevelGoalView.init(viewModel: LevelGoalTracker(level: level), playableRect: playableRect)
+        levelGoalView.position = CGPoint.alignHorizontally(levelGoalView.frame, relativeTo: hud.frame, horizontalAnchor: .center, verticalAlign: .bottom, translatedToBounds: true)
+        levelGoalView.zPosition = Precedence.foreground.rawValue
+        return levelGoalView
     }()
     
     public var backpackView: BackpackView
@@ -106,7 +113,7 @@ class Renderer: SKSpriteNode {
         foreground.position = playableRect.center
         menuForeground.position = playableRect.center
         
-        [spriteForeground, safeArea, hud, backpackView].forEach { foreground.addChild($0) }
+        [spriteForeground, safeArea, hud, levelGoalView, backpackView].forEach { foreground.addChild($0) }
         
         // Register for Dispatch
         Dispatch.shared.register { [weak self] input in
@@ -145,7 +152,7 @@ class Renderer: SKSpriteNode {
                 animate(trans.tileTransformation?.first) { [weak self] in
                     self?.gameWin(transformation: trans)
                 }
-            case .monsterDies, .newTurn, .bossTargetsWhatToEat, .bossAttacks:
+            case .monsterDies, .newTurn, .bossTargetsWhatToEat, .bossAttacks, .unlockExit:
                 animationsFinished(endTiles: trans.endTiles)
             case .itemUsed(let ability, _):
                 if ability.type == .massMineRock {
@@ -297,7 +304,7 @@ class Renderer: SKSpriteNode {
             sprites.append([])
             for col in 0..<Int(boardSize) {
                 x = CGFloat(col) * tileSize + bottomLeft.x
-                let isPlayer = tiles[row][col].type == TileType.player(.zero)
+                let isPlayer = false //tiles[row][col].type == TileType.player(.zero)
                 let height: CGFloat = isPlayer ? 160 : tileSize
                 let width: CGFloat = isPlayer ? 80 : tileSize
                 let sprite = DFTileSpriteNode(type: tiles[row][col].type,

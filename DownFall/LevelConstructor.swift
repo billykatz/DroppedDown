@@ -24,8 +24,13 @@ struct LevelConstructor {
                          goldMultiplier: difficulty.goldMultiplier,
                          rocksRatio: availableRocksPerLevel(levelType, difficulty: difficulty),
                          pillarCoordinates: pillars(per: levelType, difficulty: difficulty),
-                         threatLevelController: buildThreatLevelController(per: levelType, difficulty: difficulty))
+                         threatLevelController: buildThreatLevelController(per: levelType, difficulty: difficulty),
+                         goals: levelGoal(per: levelType, difficulty: difficulty))
         }
+    }
+    
+    static func levelGoal(per: LevelType, difficulty: Difficulty) -> [LevelGoal] {
+        return [LevelGoal(typeAmounts: [.rock(.purple): 50], type: .unlockExit)]
     }
     
     static func buildTutorialLevels() -> [Level] {
@@ -42,6 +47,7 @@ struct LevelConstructor {
                   rocksRatio: [:],
                   pillarCoordinates: [],
                   threatLevelController: ThreatLevelController(),
+                  goals: [LevelGoal(typeAmounts: [:], type: .unlockExit)],
                   tutorialData: GameScope.shared.tutorials[index])
         }
     }

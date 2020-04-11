@@ -13,9 +13,10 @@ class HUD: SKSpriteNode {
     struct Constants {
         static let threatIndicator = "threatIndicator"
         static let shuffleBoardButton = "shuffleBoardButton"
+        static let levelGoalIndicator = "levelGoalIndicator"
     }
     
-    static func build(color: UIColor, size: CGSize, delegate: SettingsDelegate?, threatLevelController: ThreatLevelController) -> HUD {
+    static func build(color: UIColor, size: CGSize, delegate: SettingsDelegate?, level: Level) -> HUD {
         let header = HUD(texture: nil, color: color, size: size)
         
         let setting = SKSpriteNode(imageNamed: Identifiers.settings)
@@ -30,7 +31,7 @@ class HUD: SKSpriteNode {
         header.isUserInteractionEnabled = true
         header.delegate = delegate
         
-        header.threatLevelController = threatLevelController
+        header.level = level
         
         let button = Button(size: Button.inGameLarge,
                             delegate: header,
@@ -63,11 +64,14 @@ class HUD: SKSpriteNode {
     let animator = Animator()
     
     var delegate: SettingsDelegate?
-    var threatLevelController: ThreatLevelController?
+    var level: Level?
+    lazy var threatLevelController: ThreatLevelController = {
+        return self.level?.threatLevelController ?? ThreatLevelController()
+    }()
     
     private var threatIndicator: SKSpriteNode? {
         
-        guard let threatLevel = self.threatLevelController?.threatLevel else { return nil }
+        let threatLevel = threatLevelController.threatLevel
         let totalWidth = CGFloat(500.0)
         let totalHeight = CGFloat(50)
         let totalBox = SKShapeNode(rect: CGRect(x: -totalWidth/3, y: -totalHeight - Style.Padding.most, width: totalWidth, height: totalHeight))
@@ -169,7 +173,7 @@ class HUD: SKSpriteNode {
     
     func show(_ data: EntityModel) {
         // Remove all the hearts so that we can redraw
-        self.removeAllChildren(exclude: [Identifiers.settings, Constants.threatIndicator, Constants.shuffleBoardButton])
+        self.removeAllChildren(exclude: [Identifiers.settings, Constants.threatIndicator, Constants.shuffleBoardButton, Constants.levelGoalIndicator])
         
         // create and display the full and empty hearts
         for health in 0..<data.originalHp {

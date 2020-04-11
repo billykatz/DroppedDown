@@ -124,6 +124,7 @@
 		3DF2928320A66BEB006671AC /* Tile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2928220A66BEB006671AC /* Tile.swift */; };
 		3DF2928520A76242006671AC /* Board.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2928420A76242006671AC /* Board.swift */; };
 		5605D6D321CC2DF400C1C5C2 /* DFTileSpriteNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5605D6D221CC2DF400C1C5C2 /* DFTileSpriteNode.swift */; };
+		58153460243993F400483481 /* LevelGoalTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5815345F243993F400483481 /* LevelGoalTracker.swift */; };
 		5819582D2432790700965108 /* MassMineAbility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5819582C2432790700965108 /* MassMineAbility.swift */; };
 		5819AB71242A5CA600498BB6 /* SpriteAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5819AB70242A5CA600498BB6 /* SpriteAction.swift */; };
 		5819AB73242A668400498BB6 /* SwipeTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5819AB72242A668400498BB6 /* SwipeTypes.swift */; };
@@ -146,6 +147,7 @@
 		589A27D623D9210900174DE7 /* TargetingViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589A27D523D9210900174DE7 /* TargetingViewModelTests.swift */; };
 		58A51663241DF3E2009E84E1 /* TargetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58A51662241DF3E2009E84E1 /* TargetView.swift */; };
 		58AD4883243581FC00F90A87 /* RandomTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4A470C23B3CEFC000165FB /* RandomTests.swift */; };
+		58AD9282243C283300B5B1EC /* LevelGoalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58AD9281243C283300B5B1EC /* LevelGoalView.swift */; };
 		58B39BD723D21C9600915858 /* BackpackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58B39BD623D21C9600915858 /* BackpackView.swift */; };
 		58C1AE4A23D19CEE003B5B5A /* TransmogrificationPotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C1AE4923D19CEE003B5B5A /* TransmogrificationPotion.swift */; };
 		58C1AE4C23D19E03003B5B5A /* KillMonsterPotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C1AE4B23D19E03003B5B5A /* KillMonsterPotion.swift */; };
@@ -284,6 +286,7 @@
 		3DF2928220A66BEB006671AC /* Tile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tile.swift; sourceTree = "<group>"; };
 		3DF2928420A76242006671AC /* Board.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Board.swift; sourceTree = "<group>"; };
 		5605D6D221CC2DF400C1C5C2 /* DFTileSpriteNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DFTileSpriteNode.swift; sourceTree = "<group>"; };
+		5815345F243993F400483481 /* LevelGoalTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelGoalTracker.swift; sourceTree = "<group>"; };
 		5819582C2432790700965108 /* MassMineAbility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MassMineAbility.swift; sourceTree = "<group>"; };
 		5819AB70242A5CA600498BB6 /* SpriteAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteAction.swift; sourceTree = "<group>"; };
 		5819AB72242A668400498BB6 /* SwipeTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeTypes.swift; sourceTree = "<group>"; };
@@ -305,6 +308,7 @@
 		589A27D323D90FE000174DE7 /* TargetingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetingViewModel.swift; sourceTree = "<group>"; };
 		589A27D523D9210900174DE7 /* TargetingViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetingViewModelTests.swift; sourceTree = "<group>"; };
 		58A51662241DF3E2009E84E1 /* TargetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetView.swift; sourceTree = "<group>"; };
+		58AD9281243C283300B5B1EC /* LevelGoalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelGoalView.swift; sourceTree = "<group>"; };
 		58B39BD623D21C9600915858 /* BackpackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackpackView.swift; sourceTree = "<group>"; };
 		58C1AE4923D19CEE003B5B5A /* TransmogrificationPotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransmogrificationPotion.swift; sourceTree = "<group>"; };
 		58C1AE4B23D19E03003B5B5A /* KillMonsterPotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KillMonsterPotion.swift; sourceTree = "<group>"; };
@@ -608,6 +612,7 @@
 				3DC072BA2373AF510046F224 /* SwipeRecognizerView.swift */,
 				3DA4E88C228FC7FC006E90D1 /* Label.swift */,
 				3D7D8B322253E5BC0016FE4C /* HUD.swift */,
+				58AD9280243C282100B5B1EC /* LevelGoalTracker */,
 				3D7D8B342253F9850016FE4C /* HelperTextView.swift */,
 				3D6AACDF222C996900C77B24 /* Header */,
 				3D6AACE2222CD22100C77B24 /* Controls */,
@@ -777,6 +782,15 @@
 			path = ..;
 			sourceTree = "<group>";
 		};
+		58AD9280243C282100B5B1EC /* LevelGoalTracker */ = {
+			isa = PBXGroup;
+			children = (
+				5815345F243993F400483481 /* LevelGoalTracker.swift */,
+				58AD9281243C283300B5B1EC /* LevelGoalView.swift */,
+			);
+			name = LevelGoalTracker;
+			sourceTree = "<group>";
+		};
 		58F034C12408B7C000BE1863 /* Boss */ = {
 			isa = PBXGroup;
 			children = (
@@ -912,6 +926,7 @@
 				3DEF7FF3237DB8B90070FB3D /* InputType.swift in Sources */,
 				3D5FB09420AE768700ACD716 /* AnimationSettings.swift in Sources */,
 				3D6279C923ACA8A00048EB76 /* LesserHealingPotion.swift in Sources */,
+				58AD9282243C283300B5B1EC /* LevelGoalView.swift in Sources */,
 				3D68BF9622FF3D9000FC9B10 /* AbilityModel.swift in Sources */,
 				3DF2925620A37FEE006671AC /* GameViewController.swift in Sources */,
 				3D7EF45C21D18D9000A2D9E8 /* Transformation.swift in Sources */,
@@ -922,6 +937,7 @@
 				3DB270A722AE065300D9BF8B /* Data+Extensions.swift in Sources */,
 				5819AB73242A668400498BB6 /* SwipeTypes.swift in Sources */,
 				3DF2928520A76242006671AC /* Board.swift in Sources */,
+				58153460243993F400483481 /* LevelGoalTracker.swift in Sources */,
 				3D7D8B37225422440016FE4C /* TilesHelper.swift in Sources */,
 				582635DD243168B500A944B6 /* ButtonIdentifier.swift in Sources */,
 				58C1AE4A23D19CEE003B5B5A /* TransmogrificationPotion.swift in Sources */,

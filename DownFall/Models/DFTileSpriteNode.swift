@@ -14,27 +14,33 @@ class DFTileSpriteNode: SKSpriteNode {
     init(type: TileType, height: CGFloat, width: CGFloat) {
         self.type = type
         switch type {
-        case .exit:
-            let mineshaft = SKTexture(imageNamed: "mineshaft")
-            let tracks = SKTexture(imageNamed: "tracks")
-            let minecart = SKTexture(imageNamed: "minecart")
-            
-            let size = CGSize(width: width, height: height)
-            let minecartSize = CGSize(width: width*Style.DFTileSpriteNode.Exit.minecartSizeCoefficient,
-                                      height: height*Style.DFTileSpriteNode.Exit.minecartSizeCoefficient)
-            super.init(texture: mineshaft,
-                       color: .clear,
-                       size: size)
-            
-            let minecartSprite = SKSpriteNode(texture: minecart, size: minecartSize)
-            minecartSprite.zPosition = Precedence.foreground.rawValue
-            minecartSprite.position = CGPoint.position(this: minecartSprite.frame, centeredInBottomOf: self.frame, verticalPadding: Style.Padding.less)
-            minecartSprite.name = "minecart"
-            addChild(minecartSprite)
-            
-            let trackSprite = SKSpriteNode(texture: tracks, size: size)
-            trackSprite.zPosition = Precedence.background.rawValue
-            addChild(trackSprite)
+        case .exit(let blocked):
+            if blocked {
+                super.init(texture: SKTexture(imageNamed: type.textureString()),
+                           color: .clear,
+                           size: CGSize(width: width, height: height))
+            } else {
+                let mineshaft = SKTexture(imageNamed: "mineshaft")
+                let tracks = SKTexture(imageNamed: "tracks")
+                let minecart = SKTexture(imageNamed: "minecart")
+                
+                let size = CGSize(width: width, height: height)
+                let minecartSize = CGSize(width: width*Style.DFTileSpriteNode.Exit.minecartSizeCoefficient,
+                                          height: height*Style.DFTileSpriteNode.Exit.minecartSizeCoefficient)
+                super.init(texture: mineshaft,
+                           color: .clear,
+                           size: size)
+                
+                let minecartSprite = SKSpriteNode(texture: minecart, size: minecartSize)
+                minecartSprite.zPosition = Precedence.foreground.rawValue
+                minecartSprite.position = CGPoint.position(this: minecartSprite.frame, centeredInBottomOf: self.frame, verticalPadding: Style.Padding.less)
+                minecartSprite.name = "minecart"
+                addChild(minecartSprite)
+                
+                let trackSprite = SKSpriteNode(texture: tracks, size: size)
+                trackSprite.zPosition = Precedence.background.rawValue
+                addChild(trackSprite)
+            }
             
         default:
             
@@ -47,7 +53,7 @@ class DFTileSpriteNode: SKSpriteNode {
     required init?(coder aDecoder: NSCoder) { fatalError("DFTileSpriteNode init?(coder:) is not implemented") }
     
     func removeMinecart() {
-        guard self.type == .exit else { return }
+        guard case TileType.exit = self.type else { return }
         for child in children {
             if child.name == "minecart" {
                 child.removeFromParent()

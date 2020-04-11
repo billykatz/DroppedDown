@@ -55,7 +55,7 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
                                         .rotatePreview([], .zero),
                                         .rotatePreviewFinish([], nil),
                                         .refillEmpty,
-                                        .tileDetail(.exit, []),
+                                        .tileDetail(.exit(blocked: false), []),
                                         .boardBuilt
                                                                  
     ]
@@ -96,6 +96,7 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
     case refillEmpty
     case tileDetail(TileType, [TileCoord])
     case shuffleBoard
+    case unlockExit
     
     var debugDescription: String {
         switch self {
@@ -167,6 +168,8 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
             return "Tile detail"
         case .shuffleBoard:
             return "Shuffle board"
+        case .unlockExit:
+            return "Unlock Exit"
         }
     }
 }

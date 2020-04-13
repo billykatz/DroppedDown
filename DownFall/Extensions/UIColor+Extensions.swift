@@ -35,4 +35,12 @@ extension UIColor {
     static let foregroundBlue = UIColor(rgb: 0x6885ac)
     static let eggshellWhite = UIColor(rgb: 0xc7c6c2)
     static let storeSceneGreen = UIColor(rgb: 0x3b6518)
+    static let lightBarPurple = UIColor(rgb: 0x603c8d)
+    static let darkBarPurple = UIColor(rgb: 0x322049)
+    static let lightBarRed = UIColor(rgb: 0xae4510)
+    static let darkBarRed = UIColor(rgb: 0x803608)
+    static let lightBarBlue = UIColor(rgb: 0x8fb7ea)
+    static let darkBarBlue = UIColor(rgb: 0x4b4f7c)
+    static let backgroundGray = UIColor(rgb: 0x262626)
+    
 }

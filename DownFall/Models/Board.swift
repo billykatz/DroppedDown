@@ -152,6 +152,8 @@ class Board: Equatable {
             newTiles[exitCoord.row][exitCoord.column] = Tile(type: .exit(blocked: false))
         }
         
+        self.tiles = newTiles
+        
         return Transformation(transformation: nil, inputType: inputType, endTiles: newTiles)
     }
     

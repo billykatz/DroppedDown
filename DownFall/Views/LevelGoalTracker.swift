@@ -12,22 +12,24 @@ struct GoalTracking {
     let initial: Int
     let target: Int
     let levelGoalType: LevelGoalType
+    let index: Int
     
     func update(with units: Int) -> GoalTracking {
-        return GoalTracking(initial: min(target, initial+units), target: target, levelGoalType: levelGoalType)
+        return GoalTracking(initial: min(target, initial+units), target: target, levelGoalType: levelGoalType, index: index)
     }
 }
 
 protocol LevelGoalTrackingOutputs {
-    var goalUpdated: ((TileType, GoalTracking) -> ())? { get set }
+    var goalUpdated: (([TileType: GoalTracking]) -> ())? { get set }
     var goalProgress: [TileType: GoalTracking] { get }
+    var exitLocked: Bool { get }
 }
 
 protocol LevelGoalTracking: LevelGoalTrackingOutputs {}
 
 class LevelGoalTracker: LevelGoalTracking {
     
-    public var goalUpdated: ((TileType, GoalTracking) -> ())? = nil
+    public var goalUpdated: (([TileType: GoalTracking]) -> ())? = nil
     public var goalProgress: [TileType: GoalTracking] = [:]
     
     private let level: Level
@@ -35,9 +37,11 @@ class LevelGoalTracker: LevelGoalTracking {
     init(level: Level) {
         self.level = level
         var goalProgress: [TileType: GoalTracking] = [:]
+        var count = 0
         for goal in level.goals {
             for (key, value) in goal.typeAmounts {
-                goalProgress[key] = GoalTracking(initial: 0, target: value, levelGoalType: goal.type)
+                goalProgress[key] = GoalTracking(initial: 0, target: value, levelGoalType: goal.type, index: count)
+                count += 1
             }
         }
         self.goalProgress = goalProgress
@@ -54,19 +58,23 @@ class LevelGoalTracker: LevelGoalTracking {
             return
         case .newTurn:
             unlockExit()
+        case .boardBuilt:
+            goalUpdated?(goalProgress)
         default:
             return
         }
     }
     
-    private func unlockExit() {
-        var finished = false
-        for (_, goal) in goalProgress {
-            if goal.levelGoalType == .unlockExit {
-                finished = goal.initial == goal.target
-            }
+    var exitLocked: Bool {
+        return !goalProgress.allSatisfy { (arg0) -> Bool in
+            let (_, goal) = arg0
+            return goal.initial == goal.target
         }
-        if finished {
+
+    }
+    
+    private func unlockExit() {
+        if !exitLocked {
             InputQueue.append(Input(.unlockExit))
         }
     }
@@ -84,7 +92,6 @@ class LevelGoalTracker: LevelGoalTracking {
     private func advanceGoal(for type: TileType, units: Int) {
         let newGoalTracker = goalProgress[type]?.update(with: units)
         goalProgress[type] = newGoalTracker
-        guard let updatedGoalTracker = newGoalTracker else { return }
-        goalUpdated?(type, updatedGoalTracker)
+        goalUpdated?(goalProgress)
     }
 }

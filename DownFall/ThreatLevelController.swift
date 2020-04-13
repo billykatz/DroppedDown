@@ -45,9 +45,9 @@ struct ThreatLevel {
             case .yellow:
                 return 1
             case .orange:
-                return 2
+                return 1
             case .red:
-                return 3
+                return 1
             }
         }
         

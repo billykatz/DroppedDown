@@ -13,6 +13,11 @@ struct Style {
     static let buttonToBottomPadding: CGFloat = 16.0
     static let paragraphPadding: CGFloat = 8.0
     
+    struct FillableBar {
+        static let cornerRadius: CGFloat = 2.0
+        static let lineWidth: CGFloat = 2.5
+    }
+    
     struct DetailView {
         static let spriteSize = CGSize(width: 200.0, height: 200.0)
         static let closeButtonSize = CGSize(width: 75.0, height: 75.0)
@@ -119,11 +124,14 @@ struct Style {
     }
     
     struct HUD {
-        static let height: CGFloat = 200.0
+        static let height: CGFloat = 250.0
         static let heartSize = CGSize(width: 100.0, height: 100.0)
         static let gemSize = CGSize(width: 75.0, height: 75.0)
         static let labelParagraphWidth = CGFloat(200.0)
         static let coinLabelPadding = CGFloat (50.0)
         static let gemSpritePadding = CGFloat(16.0)
+        static let healthBarWidthRatio = CGFloat(0.50)
+        static let healthBarHeight = CGFloat(50.0)
+        static let lanternSize = CGSize(width: 150.0, height: 150.0)
     }
 }

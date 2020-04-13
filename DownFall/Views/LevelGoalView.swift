@@ -12,22 +12,18 @@ class LevelGoalView: SKSpriteNode {
     
     struct Constants {
         static let goalViewName = "goalView"
-        static let heightConstant = CGFloat(0.15)
-        static let widthConstant = CGFloat(0.85)
     }
     
     let contentView: SKSpriteNode
     var viewModel: LevelGoalTracker?
     
-    init(viewModel: LevelGoalTracker, playableRect: CGRect) {
+    init(viewModel: LevelGoalTracker, size: CGSize) {
         self.viewModel = viewModel
-        self.contentView = SKSpriteNode(color: .clear, size: CGSize(width: playableRect.width*Constants.widthConstant, height: playableRect.height*Constants.heightConstant))
+        self.contentView = SKSpriteNode(color: .clear, size: size)
         
-        super.init(texture: nil, color: .clear, size: .zero)
+        super.init(texture: nil, color: .clear, size: size)
         
         addChild(contentView)
-        
-        createGoalView()
         
         bindToViewModel()
     }
@@ -36,8 +32,39 @@ class LevelGoalView: SKSpriteNode {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func goalView() -> SKSpriteNode{
+        let exit = TileType.exit(blocked: viewModel?.exitLocked ?? true)
+        let sprite = SKSpriteNode(texture: SKTexture(imageNamed: exit.textureString()), color: .clear, size: CGSize(width: 100.0, height: 100.0))
+        sprite.zPosition = 150
+        return sprite
+    }
+    
+    func createFillableCircle(_ updatedGoals: [TileType: GoalTracking]) {
+        for (type, goalTrack) in updatedGoals {
+            let radius = 50 + ((goalTrack.index+1) * 50)
+            let (lightFill, darkFill) = type.fillBarColor
+            let viewModel = FillableCircleViewModel(radius: CGFloat(radius),
+                                                    total: goalTrack.target,
+                                                    progress: goalTrack.initial,
+                                                    fillColor: lightFill,
+                                                    darkFillColor: darkFill,
+                                                    text: "",
+                                                    backgroundColor: .backgroundGray)
+            let fillableCircle = FillableCircleBar(size: size,
+                                                   viewModel: viewModel)
+            if goalTrack.index == 0 {
+                fillableCircle.zPosition = 100
+            } else if goalTrack.index == 1 {
+                fillableCircle.zPosition = 0
+            } else if goalTrack.index == 2 {
+                fillableCircle.zPosition = -100
+            }
+            contentView.addChild(fillableCircle)
+        }
+    }
+    
     func createGoalView() {
-        let view = SKSpriteNode(color: .clayRed, size: contentView.size)
+        let view = SKSpriteNode(color: .foregroundBlue, size: contentView.size)
         view.name = Constants.goalViewName
         
         guard let goalTracker = viewModel?.goalProgress[.rock(.purple)] else { return }
@@ -59,8 +86,9 @@ class LevelGoalView: SKSpriteNode {
         viewModel?.goalUpdated = updateGoal
     }
     
-    func updateGoal(type: TileType, goalTrack: GoalTracking) {
+    func updateGoal(_ updatedGoals: [TileType: GoalTracking]) {
         contentView.removeAllChildren()
-        createGoalView()
+        contentView.addChildSafely(goalView())
+        createFillableCircle(updatedGoals)
     }
 }

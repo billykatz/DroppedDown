@@ -30,7 +30,7 @@ struct LevelConstructor {
     }
     
     static func levelGoal(per: LevelType, difficulty: Difficulty) -> [LevelGoal] {
-        return [LevelGoal(typeAmounts: [.rock(.purple): 50], type: .unlockExit)]
+        return [LevelGoal(typeAmounts: [.rock(.purple): 33, .rock(.blue): 33, .rock(.red): 33], type: .unlockExit)]
     }
     
     static func buildTutorialLevels() -> [Level] {

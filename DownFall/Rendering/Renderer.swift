@@ -56,21 +56,36 @@ class Renderer: SKSpriteNode {
     
     private lazy var safeArea: SKSpriteNode = {
         //create safe area
-        let safeArea = SKSpriteNode(color: .foregroundBlue, size: CGSize(width: playableRect.width, height: 75.0))
+        let safeArea = SKSpriteNode(color: .clear, size: CGSize(width: playableRect.width, height: 75.0))
         safeArea.position = CGPoint.position(safeArea.frame, centeredInTopOf: playableRect)
         return safeArea
     }()
     
     private lazy var hud: HUD = {
-        let hud = HUD.build(color: .foregroundBlue, size: CGSize(width: playableRect.width, height: Style.HUD.height), delegate: self, level: level)
-        hud.position = CGPoint.alignHorizontally(hud.frame, relativeTo: safeArea.frame, horizontalAnchor: .center, verticalAlign: .bottom, translatedToBounds: true)
+        let hud = HUD.build(color: .foregroundBlue,
+                            size: CGSize(width: playableRect.width/2,
+                                         height: Style.HUD.height),
+                            delegate: self, level: level)
+        hud.position = CGPoint.alignHorizontally(hud.frame,
+                                                 relativeTo: safeArea.frame,
+                                                 horizontalAnchor: .right,
+                                                 verticalAlign: .bottom,
+                                                 translatedToBounds: true)
         hud.zPosition = Precedence.foreground.rawValue
         return hud
     }()
     
     private lazy var levelGoalView: LevelGoalView = {
-        let levelGoalView = LevelGoalView.init(viewModel: LevelGoalTracker(level: level), playableRect: playableRect)
-        levelGoalView.position = CGPoint.alignHorizontally(levelGoalView.frame, relativeTo: hud.frame, horizontalAnchor: .center, verticalAlign: .bottom, translatedToBounds: true)
+        let levelGoalView = LevelGoalView(viewModel: LevelGoalTracker(level: level),
+                                          size: CGSize(width: playableRect.width/2,
+                                                       height: Style.HUD.height))
+        levelGoalView.position = CGPoint.alignHorizontally(levelGoalView.frame,
+                                                           relativeTo: safeArea.frame,
+                                                           horizontalAnchor: .left,
+                                                           verticalAlign: .bottom,
+                                                           verticalPadding: Style.Padding.more,
+                                                           horizontalPadding: -Style.Padding.more,
+                                                           translatedToBounds: true)
         levelGoalView.zPosition = Precedence.foreground.rawValue
         return levelGoalView
     }()
@@ -100,7 +115,9 @@ class Renderer: SKSpriteNode {
         foreground = givenForeground
         
         // backpack view
-        self.backpackView = BackpackView(playableRect: playableRect, viewModel: TargetingViewModel(), levelSize: level.boardSize)
+        self.backpackView = BackpackView(playableRect: playableRect,
+                                         viewModel: TargetingViewModel(),
+                                         levelSize: level.boardSize)
         
         
         super.init(texture: nil, color: .clear, size: CGSize.zero)
@@ -304,7 +321,7 @@ class Renderer: SKSpriteNode {
             sprites.append([])
             for col in 0..<Int(boardSize) {
                 x = CGFloat(col) * tileSize + bottomLeft.x
-                let isPlayer = false //tiles[row][col].type == TileType.player(.zero)
+                let isPlayer = tiles[row][col].type == TileType.player(.zero)
                 let height: CGFloat = isPlayer ? 160 : tileSize
                 let width: CGFloat = isPlayer ? 80 : tileSize
                 let sprite = DFTileSpriteNode(type: tiles[row][col].type,

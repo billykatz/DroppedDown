@@ -73,7 +73,7 @@ class Board: Equatable {
             }
         case .attack:
             transformation = attack(input)
-        case .monsterDies(let tileCoord):
+        case .monsterDies(let tileCoord, _):
             //only remove a single tile when a monster dies
             transformation = monsterDied(at: tileCoord, input: input)
         case .gameWin:
@@ -727,8 +727,9 @@ extension Board {
             let item = Item.init(type: .gold, amount: gold * level.threatLevelController.threatLevel.color.goldDamageMultiplier)
             let itemTile = TileType.item(item)
             tiles[coord.x][coord.y] = Tile(type: itemTile)
+            //TODO: dont recreate the input
             return Transformation(transformation: nil,
-                                  inputType: .monsterDies(coord),
+                                  inputType: .monsterDies(coord, monsterData.type),
                                   endTiles: tiles)
         } else {
             //no item! remove and replace

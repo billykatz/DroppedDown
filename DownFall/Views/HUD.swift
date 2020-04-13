@@ -17,7 +17,7 @@ class HUD: SKSpriteNode {
     }
     
     static func build(color: UIColor, size: CGSize, delegate: SettingsDelegate?, level: Level) -> HUD {
-        let header = HUD(texture: nil, color: color, size: size)
+        let header = HUD(texture: nil, color: .clear, size: size)
         
         let setting = SKSpriteNode(texture: SKTexture(imageNamed: Identifiers.settings), color: .clear , size: Style.HUD.lanternSize)
         

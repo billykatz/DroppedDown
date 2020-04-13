@@ -304,7 +304,7 @@ class Referee {
                 for (j, _) in row.enumerated() {
                     if case TileType.monster(let data) = tiles[TileCoord(i,j)].type {
                         if data.hp <= 0 {
-                            return Input(.monsterDies(TileCoord(i,j)))
+                            return Input(.monsterDies(TileCoord(i,j), data.type))
                         }
                     }
                 }

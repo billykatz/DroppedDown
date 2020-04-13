@@ -42,5 +42,6 @@ extension UIColor {
     static let lightBarBlue = UIColor(rgb: 0x8fb7ea)
     static let darkBarBlue = UIColor(rgb: 0x4b4f7c)
     static let backgroundGray = UIColor(rgb: 0x262626)
-    
+    static let darkBarMonster = UIColor(rgb: 0x930505)
+    static let lightBarMonster = UIColor(rgb: 0xe11a1a)
 }

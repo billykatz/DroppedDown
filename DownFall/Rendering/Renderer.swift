@@ -63,7 +63,7 @@ class Renderer: SKSpriteNode {
     
     private lazy var hud: HUD = {
         let hud = HUD.build(color: .foregroundBlue,
-                            size: CGSize(width: playableRect.width/2,
+                            size: CGSize(width: playableRect.width/4,
                                          height: Style.HUD.height),
                             delegate: self, level: level)
         hud.position = CGPoint.alignHorizontally(hud.frame,
@@ -77,13 +77,13 @@ class Renderer: SKSpriteNode {
     
     private lazy var levelGoalView: LevelGoalView = {
         let levelGoalView = LevelGoalView(viewModel: LevelGoalTracker(level: level),
-                                          size: CGSize(width: playableRect.width/2,
+                                          size: CGSize(width: 3*playableRect.width/4,
                                                        height: Style.HUD.height))
         levelGoalView.position = CGPoint.alignHorizontally(levelGoalView.frame,
                                                            relativeTo: safeArea.frame,
                                                            horizontalAnchor: .left,
                                                            verticalAlign: .bottom,
-                                                           verticalPadding: Style.Padding.more,
+                                                           verticalPadding: Style.Padding.more*6,
                                                            horizontalPadding: -Style.Padding.more,
                                                            translatedToBounds: true)
         levelGoalView.zPosition = Precedence.foreground.rawValue
@@ -123,7 +123,7 @@ class Renderer: SKSpriteNode {
         super.init(texture: nil, color: .clear, size: CGSize.zero)
         
         // tile detail view
-        self.tileDetailView = TileDetailView(foreground: foreground, playableRect: playableRect, animator: Animator(), alignedTo: hud.frame, levelSize: level.boardSize)
+        self.tileDetailView = TileDetailView(foreground: foreground, playableRect: playableRect, alignedTo: hud.frame, levelSize: level.boardSize)
         
         self.isUserInteractionEnabled = true
         
@@ -654,7 +654,7 @@ extension Renderer {
                                 // where on the board
                                 // and when in the tutorial
                             else if InputType.fuzzyEqual(data.currentStep.inputToContinue,
-                                                         .monsterDies(.zero)) {
+                                                         .monsterDies(.zero, .rat)) {
                                 InputQueue.append(
                                     Input(.touch(TileCoord(row, col),
                                                  sprites[row][col].type))

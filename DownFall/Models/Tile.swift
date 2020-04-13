@@ -258,6 +258,8 @@ enum TileType: Equatable, Hashable, CaseIterable {
             return (.lightBarRed, .darkBarRed)
         case .rock(.purple):
             return (.lightBarPurple, .darkBarPurple)
+        case .monster:
+            return (.lightBarMonster, .darkBarMonster)
         default:
             return (.clear, .clear)
         }

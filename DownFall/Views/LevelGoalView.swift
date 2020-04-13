@@ -12,14 +12,17 @@ class LevelGoalView: SKSpriteNode {
     
     struct Constants {
         static let goalViewName = "goalView"
+        static let radius = CGFloat(50)
     }
     
     let contentView: SKSpriteNode
-    var viewModel: LevelGoalTracker?
+    let fillableCircleCenter: CGPoint
+    let viewModel: LevelGoalTracker
     
     init(viewModel: LevelGoalTracker, size: CGSize) {
         self.viewModel = viewModel
         self.contentView = SKSpriteNode(color: .clear, size: size)
+        fillableCircleCenter = CGPoint(x: contentView.frame.minX + (CGFloat(self.viewModel.numberOfExitGoals+2) * Constants.radius), y: 0.0)
         
         super.init(texture: nil, color: .clear, size: size)
         
@@ -33,15 +36,16 @@ class LevelGoalView: SKSpriteNode {
     }
     
     func goalView() -> SKSpriteNode{
-        let exit = TileType.exit(blocked: viewModel?.exitLocked ?? true)
+        let exit = TileType.exit(blocked: viewModel.exitLocked)
         let sprite = SKSpriteNode(texture: SKTexture(imageNamed: exit.textureString()), color: .clear, size: CGSize(width: 100.0, height: 100.0))
         sprite.zPosition = 150
+        sprite.position = fillableCircleCenter
         return sprite
     }
     
     func createFillableCircle(_ updatedGoals: [TileType: GoalTracking]) {
         for (type, goalTrack) in updatedGoals {
-            let radius = 50 + ((goalTrack.index+1) * 50)
+            let radius = Constants.radius + (CGFloat(goalTrack.index+1) * Constants.radius)
             let (lightFill, darkFill) = type.fillBarColor
             let viewModel = FillableCircleViewModel(radius: CGFloat(radius),
                                                     total: goalTrack.target,
@@ -59,31 +63,14 @@ class LevelGoalView: SKSpriteNode {
             } else if goalTrack.index == 2 {
                 fillableCircle.zPosition = -100
             }
+            fillableCircle.position = fillableCircleCenter
+            
             contentView.addChild(fillableCircle)
         }
     }
     
-    func createGoalView() {
-        let view = SKSpriteNode(color: .foregroundBlue, size: contentView.size)
-        view.name = Constants.goalViewName
-        
-        guard let goalTracker = viewModel?.goalProgress[.rock(.purple)] else { return }
-        let text = "\(goalTracker.levelGoalType.rawValue)"
-        let goalLabel = ParagraphNode(text: text, paragraphWidth: contentView.size.width)
-        
-        let goalProgressText = "\(goalTracker.initial) / \(goalTracker.target)"
-        let goalProgressLabel = ParagraphNode(text: goalProgressText, paragraphWidth: contentView.size.width)
-        
-        goalProgressLabel.position = CGPoint.alignHorizontally(goalProgressLabel.frame, relativeTo: goalLabel.frame, horizontalAnchor: .center, verticalAlign: .bottom)
-        
-        view.addChild(goalLabel)
-        view.addChild(goalProgressLabel)
-        
-        contentView.addChild(view)
-    }
-    
     func bindToViewModel() {
-        viewModel?.goalUpdated = updateGoal
+        viewModel.goalUpdated = updateGoal
     }
     
     func updateGoal(_ updatedGoals: [TileType: GoalTracking]) {

@@ -23,6 +23,7 @@ protocol LevelGoalTrackingOutputs {
     var goalUpdated: (([TileType: GoalTracking]) -> ())? { get set }
     var goalProgress: [TileType: GoalTracking] { get }
     var exitLocked: Bool { get }
+    var numberOfExitGoals: Int { get }
 }
 
 protocol LevelGoalTracking: LevelGoalTrackingOutputs {}
@@ -73,6 +74,14 @@ class LevelGoalTracker: LevelGoalTracking {
 
     }
     
+    var numberOfExitGoals: Int {
+        let exitGoals = goalProgress.filter { (entry) -> Bool in
+            let (_, value) = entry
+            return value.levelGoalType == LevelGoalType.unlockExit
+        }
+        return exitGoals.count
+    }
+    
     private func unlockExit() {
         if !exitLocked {
             InputQueue.append(Input(.unlockExit))
@@ -81,11 +90,17 @@ class LevelGoalTracker: LevelGoalTracking {
     
     /// Determines if the transformation advances the level goal
     private func trackLevelGoal(with trans: [Transformation]) {
-        if let first = trans.first,
-            case InputType.touch(_, let type)? = first.inputType,
-            let firstRemovedCount = first.tileTransformation?.first?.count,
-            firstRemovedCount > 0 {
-            advanceGoal(for: type, units: firstRemovedCount)
+        if let inputType = trans.first?.inputType {
+            switch inputType {
+            case InputType.touch(_, let type):
+                if let count = trans.first?.tileTransformation?.first?.count {
+                    advanceGoal(for: type, units: count)
+                }
+            case .monsterDies(_, let type):
+                advanceGoal(for: .monster(EntityModel.zeroedEntity(type: type)), units: 1)
+            default:
+                ()
+            }
         }
     }
     

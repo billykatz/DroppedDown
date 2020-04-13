@@ -23,7 +23,6 @@ class TileDetailView: SKNode {
     private let foreground: SKNode
     private let contentView: SKSpriteNode
     private let targetingArea: SKSpriteNode
-    private let animator: Animator
     private let tileSize: CGFloat
     private let bottomLeft: CGPoint
     private let detailViewTemplate: SKSpriteNode
@@ -42,9 +41,8 @@ class TileDetailView: SKNode {
         }
     }
     
-    init(foreground: SKNode, playableRect: CGRect, animator: Animator = Animator(), alignedTo: CGRect, levelSize: Int) {
+    init(foreground: SKNode, playableRect: CGRect, alignedTo: CGRect, levelSize: Int) {
         self.foreground = foreground
-        self.animator = animator
         contentView = SKSpriteNode(color: .clear, size: playableRect.size)
         contentView.position = .zero
         alignedToHUDFrame = alignedTo
@@ -68,14 +66,12 @@ class TileDetailView: SKNode {
         
         
         /// Detail view
-        // top of targeting area
-        let topOfTargetingArea = bottomLeft.y + (floatLevelSize * tileSize)
 
         let maxWidth = self.contentView.frame.width * Constants.widthCoefficient
-        let maxHeight = alignedToHUDFrame.minY - topOfTargetingArea
+        let maxHeight = Constants.maxHeight// bottomLeft.y - playableRect.minY - tileSize/2 - Style.Padding.more
         let detailView = SKSpriteNode(color: .clayRed, size: CGSize(width: maxWidth, height: maxHeight))
         
-        detailView.position = CGPoint.alignHorizontally(detailView.frame, relativeTo: alignedToHUDFrame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.most, translatedToBounds: true)
+        detailView.position = CGPoint.position(detailView.frame, inside: playableRect, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: Style.Padding.most*8)
         detailView.zPosition = Precedence.aboveMenu.rawValue
         self.detailViewTemplate = detailView
 

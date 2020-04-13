@@ -27,7 +27,7 @@ class FillableCircleBar: SKSpriteNode {
     let contentView: SKSpriteNode
     
     struct Constants {
-        static let lineWidth = CGFloat(25.0)
+        static let lineWidth = CGFloat(30.0)
         static let overlapLineWidth = lineWidth*1.5
         static let halfLineWidth = lineWidth / 2
     }
@@ -70,7 +70,7 @@ class FillableCircleBar: SKSpriteNode {
     }()
     
     private var innerCircleRadius: CGFloat {
-        return viewModel.radius - 20.0
+        return viewModel.radius - Constants.lineWidth
     }
 
     private lazy var outline: SKShapeNode = {
@@ -158,7 +158,7 @@ class FillableCircleBar: SKSpriteNode {
         path.move(to: startPoint)
         
         /// determine the end point that is an extra 1/4 arc length away
-        let endArcLength = arcLength + (circumference / 4)
+        let endArcLength = arcLength + (1.05 * circumference / 4)
         let endRadians = endArcLength / adjustRadius + adjustment
         let endX = adjustRadius * cos(endRadians)
         let endY = adjustRadius * sin(endRadians)

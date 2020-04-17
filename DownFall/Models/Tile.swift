@@ -88,7 +88,7 @@ extension Tile: Equatable {
     }
 }
 
-enum TileType: Equatable, Hashable, CaseIterable {
+enum TileType: Hashable, CaseIterable {
     
     static var rockCases: [TileType] = [.rock(.blue), .rock(.green), .rock(.red), .rock(.purple), .rock(.brown)]
     static var allCases: [TileType] = [.player(.zero), .exit(blocked: false), .empty, .monster(.zero), .item(.zero), .rock(.red), .pillar(.red, 3)]
@@ -260,6 +260,8 @@ enum TileType: Equatable, Hashable, CaseIterable {
             return (.lightBarPurple, .darkBarPurple)
         case .monster:
             return (.lightBarMonster, .darkBarMonster)
+        case .gem:
+            return (.lightBarGem, .darkBarGem)
         default:
             return (.clear, .clear)
         }

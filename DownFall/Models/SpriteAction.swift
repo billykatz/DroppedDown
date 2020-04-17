@@ -8,7 +8,7 @@
 
 import SpriteKit
 
-struct SpriteAction: Equatable, Hashable {
+struct SpriteAction: Hashable {
     let sprite: SKSpriteNode
     let action: SKAction
 }

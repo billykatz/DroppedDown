@@ -11,22 +11,30 @@ import SpriteKit
 class LevelGoalView: SKSpriteNode {
     
     struct Constants {
-        static let goalViewName = "goalView"
+        static let keyView = "keyView"
         static let radius = CGFloat(50)
     }
     
     let contentView: SKSpriteNode
     let fillableCircleCenter: CGPoint
+    let keyView: SKSpriteNode
     let viewModel: LevelGoalTracker
+    var updatedGoals: [GoalTracking]?
     
     init(viewModel: LevelGoalTracker, size: CGSize) {
         self.viewModel = viewModel
         self.contentView = SKSpriteNode(color: .clear, size: size)
-        fillableCircleCenter = CGPoint(x: contentView.frame.minX + (CGFloat(self.viewModel.numberOfExitGoals+2) * Constants.radius), y: 0.0)
+        fillableCircleCenter = .zero//CGPoint(x: contentView.frame.minX + (CGFloat(self.viewModel.numberOfExitGoals+2) * Constants.radius), y: 0.0)
         
+        keyView = SKSpriteNode(color: .clear, size: CGSize(width: 3*size.width/4, height: size.height))
+        keyView.name = Constants.keyView
+                
         super.init(texture: nil, color: .clear, size: size)
         
+        addChild(keyView)
         addChild(contentView)
+        
+        isUserInteractionEnabled = true
         
         bindToViewModel()
     }
@@ -43,8 +51,9 @@ class LevelGoalView: SKSpriteNode {
         return sprite
     }
     
-    func createFillableCircle(_ updatedGoals: [TileType: GoalTracking]) {
-        for (type, goalTrack) in updatedGoals {
+    func createFillableCircle(_ updatedGoals: [GoalTracking]) {
+        for goalTrack in updatedGoals {
+            let type = goalTrack.tileType
             let radius = Constants.radius + (CGFloat(goalTrack.index+1) * Constants.radius)
             let (lightFill, darkFill) = type.fillBarColor
             let viewModel = FillableCircleViewModel(radius: CGFloat(radius),
@@ -68,14 +77,27 @@ class LevelGoalView: SKSpriteNode {
             contentView.addChild(fillableCircle)
         }
     }
-    
+
     func bindToViewModel() {
         viewModel.goalUpdated = updateGoal
     }
     
-    func updateGoal(_ updatedGoals: [TileType: GoalTracking]) {
-        contentView.removeAllChildren()
+    func updateGoal(_ updatedGoals: [GoalTracking]) {
+        contentView.removeAllChildren(exclude: [Constants.keyView])
         contentView.addChildSafely(goalView())
         createFillableCircle(updatedGoals)
+        self.updatedGoals = updatedGoals
+    }
+}
+
+
+extension LevelGoalView {
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = touches.first, let updatedGoals = updatedGoals else { return }
+        let position = touch.location(in: self)
+        if self.contentView.contains(position) {
+            InputQueue.append(Input(.levelGoalDetail(updatedGoals)))
+        }
+        
     }
 }

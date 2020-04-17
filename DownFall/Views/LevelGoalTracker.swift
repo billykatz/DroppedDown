@@ -8,20 +8,88 @@
 
 import Foundation
 
-struct GoalTracking {
+struct GoalTracking: Hashable {
+    let tileType: TileType
     let initial: Int
     let target: Int
     let levelGoalType: LevelGoalType
     let index: Int
+    let minimumAmount: Int
+    let grouped: Bool
+    let reward: LevelGoalReward
     
     func update(with units: Int) -> GoalTracking {
-        return GoalTracking(initial: min(target, initial+units), target: target, levelGoalType: levelGoalType, index: index)
+        var updatedInitial = initial
+        if units >= minimumAmount {
+            if grouped {
+                updatedInitial = min(target, initial+1)
+            } else {
+                updatedInitial = min(target, initial+units)
+            }
+        }
+        return GoalTracking(tileType: tileType, initial: updatedInitial, target: target, levelGoalType: levelGoalType, index: index, minimumAmount: minimumAmount, grouped: grouped, reward: reward)
+    }
+    
+    func textureName() -> String {
+        var goalKeyTextureName: String {
+            switch tileType {
+            case .rock:
+                return tileType.textureName
+            case .monster:
+                return "skullAndCrossbones"
+            case .gem:
+                return "gem2"
+            default:
+                return ""
+            }
+        }
+        
+        return goalKeyTextureName
+    }
+
+    func description() -> String {
+        var goalKeyDescription: String {
+            switch tileType {
+            case .rock:
+                if grouped {
+                    return "Mine \(target) groups of \(minimumAmount) or more."
+                } else {
+                    return "Mine \(target) rocks."
+                }
+            case .monster:
+                return "Destory \(target) monsters."
+            case .gem:
+                return "Collect \(target) gems."
+            default:
+                return ""
+            }
+        }
+        
+        return goalKeyDescription
+    }
+    
+    var rewardTextureName: String {
+        switch reward {
+        case .gem:
+            return "gem2"
+        }
+    }
+    
+    var rewardAmount: Int? {
+        if case .gem(let amount) = reward {
+            return amount
+        }
+        return nil
+    }
+    
+    var progressDescription: String {
+        return "\(initial) / \(target)"
     }
 }
 
 protocol LevelGoalTrackingOutputs {
-    var goalUpdated: (([TileType: GoalTracking]) -> ())? { get set }
-    var goalProgress: [TileType: GoalTracking] { get }
+    var goalUpdated: (([GoalTracking]) -> ())? { get set }
+    var goalProgress: [GoalTracking] { get }
     var exitLocked: Bool { get }
     var numberOfExitGoals: Int { get }
 }
@@ -30,20 +98,18 @@ protocol LevelGoalTracking: LevelGoalTrackingOutputs {}
 
 class LevelGoalTracker: LevelGoalTracking {
     
-    public var goalUpdated: (([TileType: GoalTracking]) -> ())? = nil
-    public var goalProgress: [TileType: GoalTracking] = [:]
+    public var goalUpdated: (([GoalTracking]) -> ())? = nil
+    public var goalProgress: [GoalTracking] = []
     
     private let level: Level
     
     init(level: Level) {
         self.level = level
-        var goalProgress: [TileType: GoalTracking] = [:]
+        var goalProgress: [GoalTracking] = []
         var count = 0
         for goal in level.goals {
-            for (key, value) in goal.typeAmounts {
-                goalProgress[key] = GoalTracking(initial: 0, target: value, levelGoalType: goal.type, index: count)
-                count += 1
-            }
+            goalProgress.append(GoalTracking(tileType: goal.tileType, initial: 0, target: goal.targetAmount, levelGoalType: goal.type, index: count, minimumAmount: goal.minimumGroupSize, grouped: goal.grouped, reward: goal.reward))
+            count += 1
         }
         self.goalProgress = goalProgress
         
@@ -67,17 +133,20 @@ class LevelGoalTracker: LevelGoalTracking {
     }
     
     var exitLocked: Bool {
-        return !goalProgress.allSatisfy { (arg0) -> Bool in
-            let (_, goal) = arg0
-            return goal.initial == goal.target
-        }
+        numberOfExitGoalsUnlocked < level.numberOfGoalsNeedToUnlockExit
+    }
+    
+    var numberOfExitGoalsUnlocked: Int {
+        return goalProgress.filter { (goal) -> Bool in
+            return goal.levelGoalType == LevelGoalType.unlockExit
+                && goal.initial == goal.target
+        }.count
 
     }
     
     var numberOfExitGoals: Int {
-        let exitGoals = goalProgress.filter { (entry) -> Bool in
-            let (_, value) = entry
-            return value.levelGoalType == LevelGoalType.unlockExit
+        let exitGoals = goalProgress.filter { (goal) -> Bool in
+            return goal.levelGoalType == LevelGoalType.unlockExit
         }
         return exitGoals.count
     }
@@ -105,8 +174,18 @@ class LevelGoalTracker: LevelGoalTracking {
     }
     
     private func advanceGoal(for type: TileType, units: Int) {
-        let newGoalTracker = goalProgress[type]?.update(with: units)
-        goalProgress[type] = newGoalTracker
-        goalUpdated?(goalProgress)
+        var newGoalProgess: [GoalTracking] = []
+        for goal in goalProgress {
+            if goal.tileType == type {
+                let newGoalTracker = goal.update(with: units)
+                newGoalProgess.append(newGoalTracker)
+            } else {
+                newGoalProgess.append(goal)
+            }
+        }
+        if newGoalProgess != goalProgress {
+            goalProgress = newGoalProgess
+            goalUpdated?(goalProgress)
+        }
     }
 }

@@ -8,7 +8,7 @@
 
 import Foundation
 
-indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringConvertible{
+indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
     static func fuzzyEqual(_ lhs: InputType, _ rhs: InputType) -> Bool {
         if case InputType.touch(let lhsCoord, _) = lhs,
             case InputType.touch(let rhsCoord, _) = rhs {
@@ -97,6 +97,7 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
     case tileDetail(TileType, [TileCoord])
     case shuffleBoard
     case unlockExit
+    case levelGoalDetail([GoalTracking])
     
     var debugDescription: String {
         switch self {
@@ -170,6 +171,8 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
             return "Shuffle board"
         case .unlockExit:
             return "Unlock Exit"
+        case .levelGoalDetail:
+            return "Level Goal Detail"
         }
     }
 }

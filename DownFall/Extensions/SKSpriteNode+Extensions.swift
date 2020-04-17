@@ -16,5 +16,20 @@ extension SKSpriteNode {
         self.init(texture: texture, color: color, size: size)
         self.zPosition = precedence.rawValue
     }
+    
+    func addIndicator(of amount: Int) {
+        let scale = CGFloat(0.4)
+        let amountParagraph = ParagraphNode(text: "\(amount)", paragraphWidth: self.size.width * scale, fontSize: UIFont.smallSize, fontColor: .white)
+        
+        let amountBackground = SKShapeNode(rectOf: self.size.applying(CGAffineTransform(scaleX: scale, y: scale)))
+        amountBackground.color = .black
+        amountBackground.zPosition = Precedence.menu.rawValue
+        
+        amountBackground.addChild(amountParagraph)
+        
+        amountBackground.position = CGPoint.position(amountBackground.frame, inside: self.frame, verticalAlign: .bottom, horizontalAnchor: .right)
+        
+        addChild(amountBackground)
+    }
 }
 

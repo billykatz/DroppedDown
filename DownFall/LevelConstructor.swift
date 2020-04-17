@@ -25,12 +25,21 @@ struct LevelConstructor {
                          rocksRatio: availableRocksPerLevel(levelType, difficulty: difficulty),
                          pillarCoordinates: pillars(per: levelType, difficulty: difficulty),
                          threatLevelController: buildThreatLevelController(per: levelType, difficulty: difficulty),
-                         goals: levelGoal(per: levelType, difficulty: difficulty))
+                         goals: levelGoal(per: levelType, difficulty: difficulty), numberOfGoalsNeedToUnlockExit: numberOfGoalsNeedToUnlockExit(per: levelType, difficulty: difficulty))
         }
     }
     
+    static func numberOfGoalsNeedToUnlockExit(per: LevelType, difficulty: Difficulty) -> Int {
+    
+        return 2
+    }
+
+    
     static func levelGoal(per: LevelType, difficulty: Difficulty) -> [LevelGoal] {
-        return [LevelGoal(typeAmounts: [.rock(.purple): 33, .rock(.blue): 33, .monster(.zeroedEntity(type: .rat)): 5], type: .unlockExit)]
+        let rockGoal = LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .rock(.purple), targetAmount: 10, minimumGroupSize: 5, grouped: true)
+        let gemGoal = LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .gem, targetAmount: 3, minimumGroupSize: 1, grouped: false)
+        let monsterGoal = LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .monster(.zeroedEntity(type: .rat)), targetAmount: 5, minimumGroupSize: 1, grouped: false)
+        return [rockGoal, gemGoal, monsterGoal]
     }
     
     static func buildTutorialLevels() -> [Level] {
@@ -47,7 +56,8 @@ struct LevelConstructor {
                   rocksRatio: [:],
                   pillarCoordinates: [],
                   threatLevelController: ThreatLevelController(),
-                  goals: [LevelGoal(typeAmounts: [:], type: .unlockExit)],
+                  goals: [LevelGoal(type: .unlockExit, reward: .gem(0), tileType: .empty, targetAmount: 0, minimumGroupSize: 0, grouped: false)],
+                  numberOfGoalsNeedToUnlockExit: 0,
                   tutorialData: GameScope.shared.tutorials[index])
         }
     }

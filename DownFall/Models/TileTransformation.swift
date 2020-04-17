@@ -6,7 +6,7 @@
 //  Copyright © 2018 William Katz LLC. All rights reserved.
 //
 
-struct TileTransformation: Equatable, Hashable {
+struct TileTransformation: Hashable {
     let initial : TileCoord
     let end : TileCoord
     

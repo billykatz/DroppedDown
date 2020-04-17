@@ -18,7 +18,7 @@ struct PlayState: GameState {
              .attack, .transformation,
              .touch, .monsterDies, .rotateCounterClockwise, .rotateClockwise,
              .boardBuilt, .touchBegan, .tutorial, .itemUseSelected,
-             .bossEatsRocks, .bossTargetsWhatToAttack, .bossAttacks, .bossTargetsWhatToEat, .shuffleBoard, .unlockExit:
+             .bossEatsRocks, .bossTargetsWhatToAttack, .bossAttacks, .bossTargetsWhatToEat, .shuffleBoard, .unlockExit, .levelGoalDetail:
             return true
         case .animationsFinished, .play,
              .reffingFinished, .playAgain, .collectItem,
@@ -34,7 +34,7 @@ struct PlayState: GameState {
             return AnyGameState(WinState())
         case .gameLose:
             return AnyGameState(LoseState())
-        case .pause:
+        case .pause, .levelGoalDetail:
             return AnyGameState(PauseState())
         case .attack, .touch, .monsterDies,
              .rotateCounterClockwise, .rotateClockwise, .collectItem,

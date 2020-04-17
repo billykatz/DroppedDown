@@ -12,7 +12,12 @@ struct PauseState: GameState {
     func enter(_ input: Input) {}
     
     func shouldAppend(_ input: Input) -> Bool {
-        return input.type == .play || input.type == .selectLevel || input.type == .playAgain
+        switch input.type {
+        case .play, .selectLevel, .playAgain:
+            return true
+        default:
+            return false
+        }
     }
     
     func transitionState(given input: Input) -> AnyGameState? {

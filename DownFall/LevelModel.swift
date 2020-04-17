@@ -6,14 +6,21 @@
 //  Copyright © 2019 William Katz LLC. All rights reserved.
 //
 
-enum LevelGoalType: String {
+enum LevelGoalType: Hashable {
     case unlockExit
 }
 
-struct LevelGoal: Equatable, Hashable {
-    let typeAmounts: [TileType: Int]
+enum LevelGoalReward: Hashable {
+    case gem(Int)
+}
+
+struct LevelGoal: Hashable {
     let type: LevelGoalType
-    
+    let reward: LevelGoalReward
+    let tileType: TileType
+    let targetAmount: Int
+    let minimumGroupSize: Int
+    let grouped: Bool
 }
 
 struct Level {
@@ -31,6 +38,7 @@ struct Level {
     let pillarCoordinates: [(TileType, TileCoord)]
     let threatLevelController:  ThreatLevelController
     let goals: [LevelGoal]
+    let numberOfGoalsNeedToUnlockExit: Int
     
     var tutorialData: TutorialData?
     
@@ -46,5 +54,5 @@ struct Level {
         return type != .boss
     }
         
-    static let zero = Level(type: .first, monsterTypeRatio: [:], monsterCountStart: 0, maxMonsterOnBoardRatio: 0.0, maxGems: 0, maxTime: 0, boardSize: 0, abilities: [], goldMultiplier: 1, rocksRatio: [:], pillarCoordinates: [], threatLevelController:  ThreatLevelController(), goals: [LevelGoal(typeAmounts: [:], type: .unlockExit)], tutorialData: nil)
+    static let zero = Level(type: .first, monsterTypeRatio: [:], monsterCountStart: 0, maxMonsterOnBoardRatio: 0.0, maxGems: 0, maxTime: 0, boardSize: 0, abilities: [], goldMultiplier: 1, rocksRatio: [:], pillarCoordinates: [], threatLevelController:  ThreatLevelController(), goals: [LevelGoal(type: .unlockExit, reward: .gem(0), tileType: .empty, targetAmount: 0, minimumGroupSize: 0, grouped: false)], numberOfGoalsNeedToUnlockExit: 0, tutorialData: nil)
 }

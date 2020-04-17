@@ -13,6 +13,11 @@ struct Style {
     static let buttonToBottomPadding: CGFloat = 16.0
     static let paragraphPadding: CGFloat = 8.0
     
+    struct LevelGoalKey {
+        static let keyTextureSize = CGSize(width: 50, height: 50)
+        static let keyCircleRadius = CGFloat(15)
+    }
+    
     struct FillableBar {
         static let cornerRadius: CGFloat = 2.0
         static let lineWidth: CGFloat = 2.5

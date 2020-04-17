@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct RangeModel: Decodable, Equatable, Hashable {
+struct RangeModel: Decodable, Hashable {
     let lower: Int
     let upper: Int
     

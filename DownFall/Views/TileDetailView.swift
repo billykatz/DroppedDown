@@ -41,6 +41,14 @@ class TileDetailView: SKNode {
         }
     }
     
+    private var levelGoals: [GoalTracking]? {
+        didSet {
+            updateLevelGoals()
+        }
+    }
+    
+    private var levelReward: LevelGoalReward?
+    
     init(foreground: SKNode, playableRect: CGRect, alignedTo: CGRect, levelSize: Int) {
         self.foreground = foreground
         contentView = SKSpriteNode(color: .clear, size: playableRect.size)
@@ -66,7 +74,7 @@ class TileDetailView: SKNode {
         
         
         /// Detail view
-
+        
         let maxWidth = self.contentView.frame.width * Constants.widthCoefficient
         let maxHeight = Constants.maxHeight// bottomLeft.y - playableRect.minY - tileSize/2 - Style.Padding.more
         let detailView = SKSpriteNode(color: .clayRed, size: CGSize(width: maxWidth, height: maxHeight))
@@ -74,7 +82,7 @@ class TileDetailView: SKNode {
         detailView.position = CGPoint.position(detailView.frame, inside: playableRect, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: Style.Padding.most*8)
         detailView.zPosition = Precedence.aboveMenu.rawValue
         self.detailViewTemplate = detailView
-
+        
         /// Add nodes to the foreground
         contentView.addChild(targetingArea)
         self.foreground.addChild(contentView)
@@ -93,6 +101,10 @@ class TileDetailView: SKNode {
             case .tileDetail(let tileType, let attacks):
                 self?.tileType = tileType
                 self?.tileAttacks = attacks
+                self?.isUserInteractionEnabled = true
+            case .levelGoalDetail(let updatedGoals):
+                /// WARNING: the order of these calls matter
+                self?.levelGoals = updatedGoals
                 self?.isUserInteractionEnabled = true
             default:
                 break
@@ -172,13 +184,7 @@ class TileDetailView: SKNode {
         }
         
         // add the border
-        let border = SKShapeNode(rect: detailViewTemplate.frame)
-        border.strokeColor = UIColor.darkGray
-        border.lineWidth = Style.Menu.borderWidth
-        border.zPosition = Precedence.menu.rawValue + 100
-        border.position = .zero
-        border.name = Constants.borderName
-        contentView.addChild(border)
+        addBorder()
         
         contentView.zPosition = Precedence.aboveMenu.rawValue
         
@@ -186,13 +192,106 @@ class TileDetailView: SKNode {
         contentView.addChild(detailViewTemplate)
     }
     
+    func updateLevelGoals() {
+        guard let updatedGoals = levelGoals else {
+            detailViewTemplate.removeAllChildren()
+            detailViewTemplate.removeFromParent()
+            for child in contentView.children {
+                if child.name == Constants.borderName {
+                    child.removeFromParent()
+                }
+            }
+            return
+        }
+        
+        let subTitleNode = ParagraphNode(text: "Complete 2 of 3 to unlock the exit", paragraphWidth: contentView.frame.width, fontSize: UIFont.largeSize)
+        
+        subTitleNode.position = CGPoint.position(subTitleNode.frame, inside: detailViewTemplate.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most)
+        
+        detailViewTemplate.addChild(subTitleNode)
+        
+        let textHeight = subTitleNode.frame.height + Style.Padding.more
+        
+        for (count, goal) in updatedGoals.enumerated() {
+            let type = goal.tileType
+            let sprite = SKSpriteNode(texture: SKTexture(imageNamed: goal.textureName()), size: Style.LevelGoalKey.keyTextureSize)
+            let circleNode = SKShapeNode(circleOfRadius: Style.LevelGoalKey.keyCircleRadius)
+            circleNode.color = type.fillBarColor.1
+            let colonNode = ParagraphNode(text: ":", paragraphWidth: 10.0)
+            
+            circleNode.position = CGPoint.position(circleNode.frame,
+                                                   inside: detailViewTemplate.frame,
+                                                   verticalAlign: .top,
+                                                   horizontalAnchor: .left,
+                                                   xOffset: Style.Padding.most*3,
+                                                   yOffset: (CGFloat(count)*Style.LevelGoalKey.keyTextureSize.height) + textHeight + Style.Padding.more*2)
+            colonNode.position = CGPoint.alignVertically(colonNode.frame, relativeTo: circleNode.frame, horizontalAnchor: .right, verticalAlign: .center, verticalPadding: Style.Padding.more, horizontalPadding: Style.Padding.more, translatedToBounds: true)
+            sprite.position = CGPoint.alignVertically(sprite.frame, relativeTo: circleNode.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: 2*Style.Padding.most, translatedToBounds: true)
+            
+            
+            detailViewTemplate.addChild(sprite)
+            detailViewTemplate.addChild(colonNode)
+            detailViewTemplate.addChild(circleNode)
+            
+            let descriptionLabel = ParagraphNode(text: "\(goal.description())", paragraphWidth: detailViewTemplate.frame.maxX - sprite.frame.maxX, fontSize: UIFont.mediumSize)
+            
+            descriptionLabel.position = CGPoint.alignVertically(descriptionLabel.frame, relativeTo: sprite.frame, horizontalAnchor: .right, verticalAlign: .center, verticalPadding: Style.Padding.less, horizontalPadding: Style.Padding.most,  translatedToBounds: true)
+            
+            detailViewTemplate.addChild(descriptionLabel)
+            
+            // reward view
+            
+            let size = CGSize(width: 60, height: 60)
+            let rewardView = SKSpriteNode(color: .clear, size: size)
+            
+            let gemSprite = SKSpriteNode(texture: SKTexture(imageNamed: goal.rewardTextureName), size: size)
+            gemSprite.position = CGPoint.position(gemSprite.frame, inside: rewardView.frame, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: Style.Padding.normal)
+            
+            if let amount = goal.rewardAmount {
+                gemSprite.addIndicator(of: amount)
+            }
+            
+            rewardView.addChild(gemSprite)
+            
+            rewardView.position = CGPoint.alignVertically(rewardView.frame, relativeTo: descriptionLabel.frame, horizontalAnchor: .right, verticalAlign: .center, translatedToBounds: true)
+            let xPosition = CGPoint.position(rewardView.frame, inside: detailViewTemplate.frame, verticalAlign: .center, horizontalAnchor: .right, xOffset: Style.Padding.more)
+            rewardView.position = CGPoint(x: xPosition.x, y: rewardView.position.y)
+            
+            detailViewTemplate.addChild(rewardView)
+            
+            
+            let progressLabel = ParagraphNode(text: goal.progressDescription, paragraphWidth: detailViewTemplate.frame.maxX - sprite.frame.maxX, fontSize: UIFont.mediumSize)
+            progressLabel.position = CGPoint.alignVertically(progressLabel.frame, relativeTo: rewardView.frame, horizontalAnchor: .left, verticalAlign: .center, horizontalPadding: Style.Padding.more, translatedToBounds: true)
+            
+            detailViewTemplate.addChild(progressLabel)
+        
+        }
+        
+        
+        contentView.zPosition = Precedence.aboveMenu.rawValue
+        contentView.addChild(detailViewTemplate)
+        
+        addBorder()
+    }
+    
+    
+    func addBorder() {
+        // add the border
+        let border = SKShapeNode(rect: detailViewTemplate.frame)
+        border.strokeColor = UIColor.darkGray
+        border.lineWidth = Style.Menu.borderWidth
+        border.zPosition = Precedence.menu.rawValue + 100
+        border.position = .zero
+        border.name = Constants.borderName
+        contentView.addChild(border)
+    }
     
     private func updateTargetReticles() {
         guard !tileAttacks.isEmpty else {
             targetingArea.removeAllChildren()
             return
         }
-
+        
         for target in tileAttacks {
             let position = translateCoord(target)
             let reticle = SKSpriteNode(texture: SKTexture(imageNamed: "redReticle"),
@@ -202,7 +301,7 @@ class TileDetailView: SKNode {
             targetingArea.addChildSafely(reticle)
         }
     }
-
+    
     
     
     private func translateCoord(_ coord: TileCoord) -> CGPoint {
@@ -213,7 +312,7 @@ class TileDetailView: SKNode {
         
         return CGPoint(x: x, y: y)
     }
-
+    
 }
 
 extension TileDetailView {
@@ -223,6 +322,7 @@ extension TileDetailView {
             // then dismiss the view
             tileType = nil
             tileAttacks = []
+            levelGoals = nil
             InputQueue.append(Input(.play))
             isUserInteractionEnabled = false
         }

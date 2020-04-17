@@ -29,9 +29,9 @@ struct Identifiers {
             static let redRockCrumble = "redRockCrumble"
             static let blueRockCrumble = "blueRockCrumble"
             static let purpleRockCrumble = "purpleRockCrumble"
+        
         }
     }
-
     
     static let mainMenuScene = "MainMenu"
 }

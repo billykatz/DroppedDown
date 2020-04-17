@@ -37,7 +37,7 @@ struct Tile: Hashable {
     }
     
     static var exit: Tile {
-        return Tile(type: .exit(blocked: true))
+        return Tile(type: .exit(blocked: false))
     }
     
     static var empty: Tile {
@@ -248,23 +248,6 @@ enum TileType: Hashable, CaseIterable {
         case greenMonster
         case gem1 = "gem2"
         case dynamite
-    }
-    
-    var fillBarColor: (UIColor, UIColor) {
-        switch self {
-        case .rock(.blue):
-            return (.lightBarBlue, .darkBarBlue)
-        case .rock(.red):
-            return (.lightBarRed, .darkBarRed)
-        case .rock(.purple):
-            return (.lightBarPurple, .darkBarPurple)
-        case .monster:
-            return (.lightBarMonster, .darkBarMonster)
-        case .gem:
-            return (.lightBarGem, .darkBarGem)
-        default:
-            return (.clear, .clear)
-        }
     }
 }
 

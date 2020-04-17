@@ -209,7 +209,7 @@ class RefereeTests: XCTestCase {
                      [.blueRock, Tile(type: .deadRat), .exit, .greenRock],
                      [.greenRock, Tile(type: .normalPlayer), .blueRock, .purpleRock],
                      [.blueRock, .purpleRock, .greenRock, .greenRock]]
-        var expected = Input(.monsterDies(TileCoord(1, 1)))
+        var expected = Input(.monsterDies(TileCoord(1, 1), EntityModel.EntityType.rat))
         var actual = Referee.enforceRules(tiles)
         
         XCTAssertEqual(expected, actual, "Monster dies when hp reaches 0")
@@ -218,7 +218,7 @@ class RefereeTests: XCTestCase {
                  [.blueRock, Tile(type: .deadRat), .exit, .greenRock],
                  [.greenRock, Tile(type: .normalPlayer), .blueRock, .purpleRock],
                  [.blueRock, .purpleRock, Tile(type: .deadRat), .greenRock]]
-        expected = Input(.monsterDies(TileCoord(1, 1)))
+        expected = Input(.monsterDies(TileCoord(1, 1), EntityModel.EntityType.rat))
         actual = Referee.enforceRules(tiles)
         
         XCTAssertEqual(expected, actual, "Only one monster can die at a time")

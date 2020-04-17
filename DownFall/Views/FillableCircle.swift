@@ -10,6 +10,7 @@ import SpriteKit
 
 protocol FillableCircleViewModelable {
     var radius: CGFloat { get }
+    var darkFillColor: UIColor { get }
 }
 
 struct FillableCircleViewModel: FillableCircleViewModelable & FillableBarViewModelable {
@@ -32,6 +33,24 @@ class FillableCircleBar: SKSpriteNode {
         static let halfLineWidth = lineWidth / 2
     }
     
+    /// Calculates the inner radius
+    private var innerCircleRadius: CGFloat {
+        return viewModel.radius - Constants.lineWidth
+    }
+    
+    
+    init(size: CGSize, viewModel: FillableCircleViewModel) {
+        contentView = SKSpriteNode.init(texture: nil, color: .clear, size: size)
+        self.viewModel = viewModel
+        super.init(texture: nil, color: .clear, size: size)
+        
+        addChild(contentView)
+        
+        createView()
+    }
+
+    
+    /// The CGPath that describes the shape that overlaps the bottom left quadrant of the circle
     private lazy var bottomLeftPath: CGPath = {
         let path = CGMutablePath()
         path.move(to: CGPoint(x: -viewModel.radius + Constants.halfLineWidth, y: 0.0))
@@ -41,6 +60,7 @@ class FillableCircleBar: SKSpriteNode {
         return path
     }()
     
+    /// The CGPath that describes the shape that overlaps the bottom right quadrant of the circle
     private lazy var bottomRightPath: CGPath = {
         let path = CGMutablePath()
         path.move(to: CGPoint(x: 0.0, y: -viewModel.radius + Constants.halfLineWidth))
@@ -50,6 +70,8 @@ class FillableCircleBar: SKSpriteNode {
         return path
     }()
     
+    
+    /// The CGPath that describes the shape that overlaps the top right quadrant of the circle
     private lazy var topRightPath: CGPath = {
         let path = CGMutablePath()
         path.move(to: CGPoint(x: viewModel.radius - Constants.halfLineWidth, y: 0.0))
@@ -59,6 +81,7 @@ class FillableCircleBar: SKSpriteNode {
         return path
     }()
     
+    /// The CGPath that describes the shape that overlaps the top left quadrant of the circle
     private lazy var topLeftPath: CGPath = {
         let path = CGMutablePath()
         let adjustedStartPoint = CGPoint(x: -10, y: viewModel.radius - Constants.halfLineWidth)
@@ -69,10 +92,7 @@ class FillableCircleBar: SKSpriteNode {
         return path
     }()
     
-    private var innerCircleRadius: CGFloat {
-        return viewModel.radius - Constants.lineWidth
-    }
-
+    /// This is the shape that gets revealed and shows progress
     private lazy var outline: SKShapeNode = {
         let outline = SKShapeNode(circleOfRadius: viewModel.radius)
         outline.color = viewModel.fillColor
@@ -84,6 +104,7 @@ class FillableCircleBar: SKSpriteNode {
         return outline
     }()
     
+    /// This is the semi-circle shape on the left half of the sprite.  It "crops" the path shape that reveals the outline
     private lazy var overLayOutline: SKShapeNode = {
         let path = CGMutablePath()
         path.addArc(center: .zero, radius: viewModel.radius, startAngle: .pi/2, endAngle: .pi * 3/2, clockwise: false)
@@ -99,31 +120,9 @@ class FillableCircleBar: SKSpriteNode {
         return shape
     }()
     
-    private lazy var overlappingShape: SKShapeNode = {
-        var path = CGMutablePath()
-        let overlapRadius = viewModel.radius
-        path.move(to: CGPoint(x: 0.0, y: viewModel.radius))
-        let endPoint = CGPoint(x: -viewModel.radius, y: 0.0)
-        let controlPoint = CGPoint(x: -overlapRadius, y: overlapRadius)
-//        let controlPoint2 = CGPoint(x: -overlapRadius, y: -overlapRadius)
-        path.addQuadCurve(to: endPoint, control: controlPoint)
-        let overlap = SKShapeNode(path: path)
-        overlap.lineWidth = 40.0
-        overlap.color = .clayRed
-        return overlap
-    }()
-    
-    init(size: CGSize, viewModel: FillableCircleViewModel) {
-        contentView = SKSpriteNode.init(texture: nil, color: .clear, size: size)
-        self.viewModel = viewModel
-        super.init(texture: nil, color: .clear, size: size)
-        
-        addChild(contentView)
-        
-        createView()
-    }
-    
-    func createOverlap(progress: CGFloat) -> CGPath {
+    /// Create the shape the will cover fill bar.
+    /// When the progress enters a new quarter of the circle, we remove the overlapping shape and add this shape instead.  This shape moves along the path of the circle and reveals the underlying progress bar.
+    private func createOverlap(progress: CGFloat) -> CGPath {
         let path = CGMutablePath()
         
         // the line width actually makes it the center of the line is at a radius of 90
@@ -148,11 +147,7 @@ class FillableCircleBar: SKSpriteNode {
         
         
         /// add a pretty circle
-        let circle = SKShapeNode(circleOfRadius: Constants.halfLineWidth * 1.5)
-        circle.position = startPoint
-        circle.color = viewModel.darkFillColor
-        circle.zPosition = Precedence.menu.rawValue
-        addChildSafely(circle)
+        addCircle(radius: Constants.halfLineWidth * 1.5, position: startPoint)
         
         /// move us to the start point before calculating the end point
         path.move(to: startPoint)
@@ -183,7 +178,24 @@ class FillableCircleBar: SKSpriteNode {
         return path
     }
     
-    func createOverlap() {
+    private func addCircle(radius: CGFloat, position: CGPoint, addCheckmark: Bool = false) {
+        /// add a pretty circle
+        let circle = SKShapeNode(circleOfRadius: radius)
+        circle.position = position
+        circle.color = viewModel.darkFillColor
+        circle.zPosition = Precedence.menu.rawValue
+        
+        if addCheckmark {
+            let checkmark = SKSpriteNode(texture: SKTexture(imageNamed: "checkMark"), color: .clear, size: CGSize(width: Constants.lineWidth, height: Constants.lineWidth))
+            checkmark.zPosition = 1
+            circle.addChildSafely(checkmark)
+        }
+        
+        addChildSafely(circle)
+        return
+    }
+    
+    private func createOverlap() {
         let progress = CGFloat(viewModel.progress) / CGFloat(viewModel.total)
         var paths: [CGPath]
         if progress < 0.25 {
@@ -197,38 +209,28 @@ class FillableCircleBar: SKSpriteNode {
             addChildSafely(overLayOutline)
         } else {
             /// add a pretty circle
-            let circle = SKShapeNode(circleOfRadius: Constants.halfLineWidth * 1.5)
-            circle.position = CGPoint(x: 0.0, y: viewModel.radius - Constants.halfLineWidth)
-            circle.color = viewModel.darkFillColor
-            circle.zPosition = Precedence.menu.rawValue
-            
-            let checkmark = SKSpriteNode(texture: SKTexture(imageNamed: "checkMark"), color: .clear, size: CGSize(width: Constants.lineWidth, height: Constants.lineWidth))
-            checkmark.zPosition = 1
-            circle.addChildSafely(checkmark)
-            
-            addChildSafely(circle)
+            addCircle(radius: Constants.halfLineWidth * 1.5,
+                      position: CGPoint(x: 0.0, y: viewModel.radius - Constants.halfLineWidth),
+                      addCheckmark: true)
             return
         }
         
-        let croppedPath = createOverlap(progress: progress)
+        /// Append the shape that overlaps the curent progress
+        paths.append(createOverlap(progress: progress))
         
-        var shapes = paths.map { path -> SKNode in
+        /// Create the shape nodes
+        let shapes = paths.map { path -> SKNode in
             let shape = SKShapeNode(path: path)
             shape.color = viewModel.backgroundColor ?? .clayRed
             shape.lineWidth = Constants.overlapLineWidth
             return shape
         }
-    
         
-        let shape = SKShapeNode(path: croppedPath)
-        shape.color = viewModel.backgroundColor ?? . clayRed
-        shape.lineWidth = Constants.overlapLineWidth
-        shapes.append(shape)
-        
+        /// add each shape to the content view
         shapes.forEach { contentView.addChildSafely($0) }
     }
     
-    func createView() {
+    private func createView() {
         contentView.addChildSafely(outline)
         createOverlap()
     }

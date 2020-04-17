@@ -6,11 +6,11 @@
 //  Copyright © 2020 William Katz LLC. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
 struct GoalTracking: Hashable {
     let tileType: TileType
-    let initial: Int
+    let current: Int
     let target: Int
     let levelGoalType: LevelGoalType
     let index: Int
@@ -19,15 +19,15 @@ struct GoalTracking: Hashable {
     let reward: LevelGoalReward
     
     func update(with units: Int) -> GoalTracking {
-        var updatedInitial = initial
+        var updatedInitial = current
         if units >= minimumAmount {
             if grouped {
-                updatedInitial = min(target, initial+1)
+                updatedInitial = min(target, current+1)
             } else {
-                updatedInitial = min(target, initial+units)
+                updatedInitial = min(target, current+units)
             }
         }
-        return GoalTracking(tileType: tileType, initial: updatedInitial, target: target, levelGoalType: levelGoalType, index: index, minimumAmount: minimumAmount, grouped: grouped, reward: reward)
+        return GoalTracking(tileType: tileType, current: updatedInitial, target: target, levelGoalType: levelGoalType, index: index, minimumAmount: minimumAmount, grouped: grouped, reward: reward)
     }
     
     func textureName() -> String {
@@ -83,8 +83,26 @@ struct GoalTracking: Hashable {
     }
     
     var progressDescription: String {
-        return "\(initial) / \(target)"
+        return "\(current) / \(target)"
     }
+    
+    var fillBarColor: (UIColor, UIColor) {
+        switch self.tileType {
+        case .rock(.blue):
+            return (.lightBarBlue, .darkBarBlue)
+        case .rock(.red):
+            return (.lightBarRed, .darkBarRed)
+        case .rock(.purple):
+            return (.lightBarPurple, .darkBarPurple)
+        case .monster:
+            return (.lightBarMonster, .darkBarMonster)
+        case .gem:
+            return (.lightBarGem, .darkBarGem)
+        default:
+            return (.clear, .clear)
+        }
+    }
+
 }
 
 protocol LevelGoalTrackingOutputs {
@@ -103,12 +121,34 @@ class LevelGoalTracker: LevelGoalTracking {
     
     private let level: Level
     
+    /// Outuputs flase if the player has not reach the number of goals needed to unlock the exit
+    var exitLocked: Bool {
+        numberOfExitGoalsUnlocked < level.numberOfGoalsNeedToUnlockExit
+    }
+    
+    /// Return the number of exit goals that the player has completed
+    var numberOfExitGoalsUnlocked: Int {
+        return goalProgress.filter { (goal) -> Bool in
+            return goal.levelGoalType == LevelGoalType.unlockExit
+                && goal.current == goal.target
+        }.count
+
+    }
+    
+    /// Returns the number of unlockExit goals there are on this level
+    var numberOfExitGoals: Int {
+        let exitGoals = goalProgress.filter { (goal) -> Bool in
+            return goal.levelGoalType == LevelGoalType.unlockExit
+        }
+        return exitGoals.count
+    }
+    
     init(level: Level) {
         self.level = level
         var goalProgress: [GoalTracking] = []
         var count = 0
         for goal in level.goals {
-            goalProgress.append(GoalTracking(tileType: goal.tileType, initial: 0, target: goal.targetAmount, levelGoalType: goal.type, index: count, minimumAmount: goal.minimumGroupSize, grouped: goal.grouped, reward: goal.reward))
+            goalProgress.append(GoalTracking(tileType: goal.tileType, current: 0, target: goal.targetAmount, levelGoalType: goal.type, index: count, minimumAmount: goal.minimumGroupSize, grouped: goal.grouped, reward: goal.reward))
             count += 1
         }
         self.goalProgress = goalProgress
@@ -130,25 +170,6 @@ class LevelGoalTracker: LevelGoalTracking {
         default:
             return
         }
-    }
-    
-    var exitLocked: Bool {
-        numberOfExitGoalsUnlocked < level.numberOfGoalsNeedToUnlockExit
-    }
-    
-    var numberOfExitGoalsUnlocked: Int {
-        return goalProgress.filter { (goal) -> Bool in
-            return goal.levelGoalType == LevelGoalType.unlockExit
-                && goal.initial == goal.target
-        }.count
-
-    }
-    
-    var numberOfExitGoals: Int {
-        let exitGoals = goalProgress.filter { (goal) -> Bool in
-            return goal.levelGoalType == LevelGoalType.unlockExit
-        }
-        return exitGoals.count
     }
     
     private func unlockExit() {

@@ -24,7 +24,7 @@ class LevelGoalView: SKSpriteNode {
     init(viewModel: LevelGoalTracker, size: CGSize) {
         self.viewModel = viewModel
         self.contentView = SKSpriteNode(color: .clear, size: size)
-        fillableCircleCenter = .zero//CGPoint(x: contentView.frame.minX + (CGFloat(self.viewModel.numberOfExitGoals+2) * Constants.radius), y: 0.0)
+        fillableCircleCenter = .zero
         
         keyView = SKSpriteNode(color: .clear, size: CGSize(width: 3*size.width/4, height: size.height))
         keyView.name = Constants.keyView
@@ -43,7 +43,7 @@ class LevelGoalView: SKSpriteNode {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func goalView() -> SKSpriteNode{
+    private func goalView() -> SKSpriteNode{
         let exit = TileType.exit(blocked: viewModel.exitLocked)
         let sprite = SKSpriteNode(texture: SKTexture(imageNamed: exit.textureString()), color: .clear, size: CGSize(width: 100.0, height: 100.0))
         sprite.zPosition = 150
@@ -51,14 +51,13 @@ class LevelGoalView: SKSpriteNode {
         return sprite
     }
     
-    func createFillableCircle(_ updatedGoals: [GoalTracking]) {
+    private func createFillableCircle(_ updatedGoals: [GoalTracking]) {
         for goalTrack in updatedGoals {
-            let type = goalTrack.tileType
             let radius = Constants.radius + (CGFloat(goalTrack.index+1) * Constants.radius)
-            let (lightFill, darkFill) = type.fillBarColor
+            let (lightFill, darkFill) = goalTrack.fillBarColor
             let viewModel = FillableCircleViewModel(radius: CGFloat(radius),
                                                     total: goalTrack.target,
-                                                    progress: goalTrack.initial,
+                                                    progress: goalTrack.current,
                                                     fillColor: lightFill,
                                                     darkFillColor: darkFill,
                                                     text: "",
@@ -78,11 +77,11 @@ class LevelGoalView: SKSpriteNode {
         }
     }
 
-    func bindToViewModel() {
+    private func bindToViewModel() {
         viewModel.goalUpdated = updateGoal
     }
     
-    func updateGoal(_ updatedGoals: [GoalTracking]) {
+    private func updateGoal(_ updatedGoals: [GoalTracking]) {
         contentView.removeAllChildren(exclude: [Constants.keyView])
         contentView.addChildSafely(goalView())
         createFillableCircle(updatedGoals)

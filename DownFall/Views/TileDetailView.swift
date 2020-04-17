@@ -103,7 +103,6 @@ class TileDetailView: SKNode {
                 self?.tileAttacks = attacks
                 self?.isUserInteractionEnabled = true
             case .levelGoalDetail(let updatedGoals):
-                /// WARNING: the order of these calls matter
                 self?.levelGoals = updatedGoals
                 self?.isUserInteractionEnabled = true
             default:
@@ -213,10 +212,9 @@ class TileDetailView: SKNode {
         let textHeight = subTitleNode.frame.height + Style.Padding.more
         
         for (count, goal) in updatedGoals.enumerated() {
-            let type = goal.tileType
             let sprite = SKSpriteNode(texture: SKTexture(imageNamed: goal.textureName()), size: Style.LevelGoalKey.keyTextureSize)
             let circleNode = SKShapeNode(circleOfRadius: Style.LevelGoalKey.keyCircleRadius)
-            circleNode.color = type.fillBarColor.1
+            circleNode.color = goal.fillBarColor.1
             let colonNode = ParagraphNode(text: ":", paragraphWidth: 10.0)
             
             circleNode.position = CGPoint.position(circleNode.frame,

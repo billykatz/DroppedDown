@@ -247,11 +247,11 @@ class BoardTests: XCTestCase {
         let exitTappedTransformation = board.removeAndReplace(from: board.tiles,
         tileCoord: TileCoord(0,1),
         singleTile: false,
-        input: Input(.touch(TileCoord(0,1), .exit)))
+        input: Input(.touch(TileCoord(0,1), .exit(blocked: false))))
 
         let expectedTrans = Transformation(transformation: nil,
                                            inputType: .touch(TileCoord(0,1),
-                                           TileType.exit),
+                                           TileType.exit(blocked: false)),
                                            endTiles: board.tiles)
         XCTAssertEqual(expectedTrans, exitTappedTransformation, "Tapping exit should not result in a board transformation")
     }
@@ -373,19 +373,19 @@ class BoardTests: XCTestCase {
                                    [.blueRock, .empty, .blueRock]]
         
         var board = Board.init(tiles: tiles)
-        XCTAssertEqual(board.tiles(of: .exit).count, 1, "Board can deteremine how many exit tiles it has")
+        XCTAssertEqual(board.tiles(of: .exit(blocked: false)).count, 1, "Board can deteremine how many exit tiles it has")
         
         tiles = [[.empty, .exit, .empty],
                  [.empty, .exit, .empty],
                  [.empty, .exit, .empty]]
         board = Board.init(tiles: tiles)
-        XCTAssertEqual(board.tiles(of: .exit).count, 3, "Board can deteremine how many exit tiles it has")
+        XCTAssertEqual(board.tiles(of: .exit(blocked: false)).count, 3, "Board can deteremine how many exit tiles it has")
         
         tiles = [[.exit, .exit, .exit],
                  [.exit, .exit, .exit],
                  [.exit, .exit, .exit]]
         board = Board.init(tiles: tiles)
-        XCTAssertEqual(board.tiles(of: .exit).count, 9, "Board can deteremine how many exit tiles it has")
+        XCTAssertEqual(board.tiles(of: .exit(blocked: false)).count, 9, "Board can deteremine how many exit tiles it has")
         
     }
     

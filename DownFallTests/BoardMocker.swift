@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import GameplayKit
 @testable import Shift_Shaft
 
 extension Int: Sequence {
@@ -31,7 +32,7 @@ extension Board {
     convenience init(tiles: [[Tile]]) {
         let tileCreator = TileCreator(entities(),
                                       difficulty: .normal,
-                                      level: Level.zero)
+                                      level: Level.zero, randomSource: GKLinearCongruentialRandomSource())
         self.init(tileCreator: tileCreator, tiles: tiles, level: Level.zero)
     }
 }
@@ -131,7 +132,7 @@ func win(_ board: Board) -> Builder {
     return { board in
         guard board.boardSize > 1 else { return board } //cant win if there is only 1 row
         let playerPosition = typeCount(for: board.tiles, of: .player(.zero)).first
-        let exitPosition = typeCount(for: board.tiles, of: .exit).first
+        let exitPosition = typeCount(for: board.tiles, of: .exit(blocked: false)).first
         var newTiles = board.tiles
         
         if let pp = playerPosition, let ep = exitPosition {

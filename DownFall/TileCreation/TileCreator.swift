@@ -9,7 +9,7 @@
 import GameplayKit
 
 class TileCreator: TileStrategy {
-    var randomSource = GKLinearCongruentialRandomSource()
+    let randomSource: GKLinearCongruentialRandomSource
     let entities: EntitiesModel
     let difficulty: Difficulty
     var updatedEntity: EntityModel?
@@ -23,22 +23,34 @@ class TileCreator: TileStrategy {
     required init(_ entities: EntitiesModel,
                   difficulty: Difficulty,
                   updatedEntity: EntityModel? = nil,
-                  level: Level?) {
+                  level: Level?,
+                  randomSource: GKLinearCongruentialRandomSource) {
         self.entities = entities
         self.difficulty = difficulty
         self.updatedEntity = updatedEntity
         self.level = level
+        self.randomSource = randomSource
         self.boardSize = level?.boardSize ?? 0
     }
     
     private func randomTile(_ given: Int) -> TileType {
         guard level?.spawnsMonsters ?? true else { return randomRock() }
-        let weight = 12
+        let weight = 97
         let index = abs(given) % (TileType.randomCases.count + weight)
+        
+         
+        /// 9% of the time we will try to create a monster
+        /// 1% of a time we will spawn a gem
+        /// 90% of the time we will create a rock.
+        /// This should probably vary based on the level
+        /// This is worth to think about more
+        
         switch index {
-        case 0...1:
+        case 0..<9:
             return randomMonster()
-        case 1...Int.max:
+        case 9..<10:
+            return TileType.gem
+        case 10...Int.max:
             return randomRock()
         default:
             preconditionFailure("Shouldnt be here")
@@ -111,6 +123,7 @@ class TileCreator: TileStrategy {
     }
     
     private func randomTile(_ neighbors: [Tile], noMoreMonsters: Bool = false) -> Tile {
+        guard let level = level else { preconditionFailure("We need a level to create tiles") }
         var nextTile = Tile(type: randomTile(randomSource.nextInt()))
         
         var validTile = false
@@ -122,7 +135,12 @@ class TileCreator: TileStrategy {
                 validTile = !neighbors.contains {  $0.type == .monster(.zero) || $0.type == .player(.zero) } && !noMoreMonsters
             case .rock(.red), .rock(.purple), .rock(.blue), .rock(.brown):
                 validTile = true
-            case .item, .exit, .player, .rock(.green), .empty, .pillar, .dynamite:
+            case .item:
+                if specialGems < level.maxSpawnGems {
+                    specialGems += 1
+                    validTile = true
+                }
+            case .exit, .player, .rock(.green), .empty, .pillar, .dynamite:
                 validTile = false
             }
         }
@@ -272,8 +290,12 @@ class TileCreator: TileStrategy {
         let exitQuadrant = playerQuadrant.opposite
 //        let exitQuadrant = playerQuadrant
         let exitPosition = exitQuadrant.randomCoord(for: boardSize, notIn: reservedSet)
+        reservedSet.insert(exitPosition)
         
-        tiles[exitPosition.x][exitPosition.y] = Tile.exit
+        let randomGemPosition = playerQuadrant.adjacent[Int.random(randomSource.nextInt() % 2)].randomCoord(for:boardSize, notIn: reservedSet)
+        tiles[randomGemPosition.x][randomGemPosition.y] = Tile(type: .gem)
+        
+        tiles[exitPosition.x][exitPosition.y] = Tile(type: .exit(blocked: true))
         
         return tiles
     }

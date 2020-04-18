@@ -16,6 +16,7 @@ protocol LevelCoordinating: StoreSceneDelegate, GameSceneCoordinatingDelegate, M
     var entities: EntitiesModel? { get set }
     var levels: [Level]? { get set }
     var levelIndex: Int { get set }
+    var randomSource: GKLinearCongruentialRandomSource? { get }
     
     func presentStore(_ playerData: EntityModel)
     func presentNextLevel(_ playerData: EntityModel?)
@@ -79,7 +80,8 @@ extension LevelCoordinating where Self: UIViewController {
                                           entities: entities,
                                           difficulty: GameScope.shared.difficulty,
                                           updatedEntity: playerData,
-                                          level: level)
+                                          level: level,
+                                          randomSource: randomSource)
                 
                 if let view = self.view as! SKView? {
                     view.presentScene(gameSceneNode)
@@ -96,14 +98,10 @@ extension LevelCoordinating where Self: UIViewController {
         }
     }
     
-    func difficultySelected(_ difficulty: Difficulty) {
-        levels = LevelConstructor.buildLevels(difficulty)
-    }
-    
     func startGame(player: EntityModel, difficulty: Difficulty, level: LevelType) {
         let index = LevelType.gameCases.firstIndex(of: level) ?? 0
         levelIndex = index
-        difficultySelected(difficulty)
+        levels = LevelConstructor.buildLevels(difficulty, randomSource: randomSource ?? GKLinearCongruentialRandomSource())
         presentStore(player)
     }
     

@@ -53,6 +53,10 @@ struct EntityModel: Equatable, Decodable {
     static let zero: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .rat, carry: .zero, animations: [], abilities: [])
     static let playerZero: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .player, carry: .zero, animations: [], abilities: [])
     
+    static func zeroedEntity(type: EntityType) -> EntityModel {
+        return EntityModel(originalHp: 0, hp: 0, name: "", attack: .zero, type: type, carry: .zero, animations: [])
+    }
+    
     let originalHp: Int
     let hp: Int
     let name: String
@@ -205,6 +209,10 @@ struct EntityModel: Equatable, Decodable {
             newAbilities.removeFirst(where: { $0 == AnyAbility(ability) })
         }
         return update(abilities: newAbilities)
+    }
+    
+    func updateCarry(carry: CarryModel) -> EntityModel {
+        return self.update(carry: carry)
     }
     
 }

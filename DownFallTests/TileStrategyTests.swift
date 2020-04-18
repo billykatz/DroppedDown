@@ -52,7 +52,7 @@ class TileStrategyTests: XCTestCase {
             [Difficulty.easy, .normal, .hard].forEach { difficulty in
                 let newTiles = TileCreator(entities(),
                                            difficulty: difficulty,
-                                           level: .test)
+                                           level: .test, randomSource: GKLinearCongruentialRandomSource())
                     .tiles(for: emptyButOnePlayer(board).tiles).reduce([], +)
                 let monsterCount = newTiles.filter { $0 == Tile(type: .monster(.zero)) }.count
                 let maxExpectedMonsters = 10

@@ -55,7 +55,7 @@ class GameStateTests: XCTestCase {
                  .rotateCounterClockwise, .transformation, .reffingFinished,
                  .boardBuilt, .collectItem,. newTurn, .touchBegan, .tutorial,
                  .itemUseSelected, .itemUseCanceled, .itemCanBeUsed, .itemUsed,
-                 .bossTargetsWhatToEat(_), .bossEatsRocks(_), .bossTargetsWhatToAttack(_), .bossAttacks(_), .decrementDynamites(_), .rotatePreview(_, _), .rotatePreviewFinish(_, _), .refillEmpty, .tileDetail(_, _) , .shuffleBoard:
+                 .bossTargetsWhatToEat(_), .bossEatsRocks(_), .bossTargetsWhatToAttack(_), .bossAttacks(_), .decrementDynamites(_), .rotatePreview(_, _), .rotatePreviewFinish(_, _), .refillEmpty, .tileDetail(_, _) , .shuffleBoard, .levelGoalDetail, .unlockExit, .playerAwarded:
                 XCTAssertNil(gameState.transitionState(given: Input(input)))
                 
             }
@@ -76,7 +76,7 @@ class GameStateTests: XCTestCase {
                  .rotateCounterClockwise, .attack, .transformation, .reffingFinished,
                  .collectItem, .selectLevel, .newTurn, .touchBegan, .tutorial,
                  .visitStore, .itemUseSelected, .itemUseCanceled, .itemCanBeUsed,
-                 .itemUsed, .bossTargetsWhatToEat(_), .bossEatsRocks(_), .bossTargetsWhatToAttack(_), .bossAttacks(_), .decrementDynamites(_), .refillEmpty, .tileDetail(_, _) , .shuffleBoard:
+                 .itemUsed, .bossTargetsWhatToEat(_), .bossEatsRocks(_), .bossTargetsWhatToAttack(_), .bossAttacks(_), .decrementDynamites(_), .refillEmpty, .tileDetail(_, _) , .shuffleBoard, .levelGoalDetail, .unlockExit, .playerAwarded:
                 XCTAssertNil(gameState.transitionState(given: Input(input)), "\(gameState.state) should not transition to \(input)")
             }
         }
@@ -94,7 +94,7 @@ class GameStateTests: XCTestCase {
                  .rotateCounterClockwise, .attack, .pause, .transformation,
                  .reffingFinished, .collectItem, .newTurn, .touchBegan, .tutorial,
                  .visitStore, .itemUseSelected, .itemUseCanceled, .itemCanBeUsed, .itemUsed,
-                 .bossTargetsWhatToEat(_), .bossEatsRocks(_), .bossTargetsWhatToAttack(_), .bossAttacks(_), .decrementDynamites(_), .rotatePreview(_, _), .rotatePreviewFinish(_, _), .refillEmpty, .shuffleBoard, .tileDetail:
+                 .bossTargetsWhatToEat(_), .bossEatsRocks(_), .bossTargetsWhatToAttack(_), .bossAttacks(_), .decrementDynamites(_), .rotatePreview(_, _), .rotatePreviewFinish(_, _), .refillEmpty, .shuffleBoard, .tileDetail, .levelGoalDetail, .unlockExit, .playerAwarded:
                 XCTAssertNil(gameState.transitionState(given: Input(input)))
             }
         }
@@ -110,10 +110,10 @@ class GameStateTests: XCTestCase {
                 XCTAssertEqual(AnyGameState(LoseState()),
                                gameState.transitionState(given: Input(input)))
             case .touch, .monsterDies, .touchBegan,
-                 .attack, .rotateCounterClockwise, .rotateClockwise, .collectItem, .bossEatsRocks, .bossAttacks:
+                 .attack, .rotateCounterClockwise, .rotateClockwise, .collectItem, .bossEatsRocks, .bossAttacks, .unlockExit, .playerAwarded:
                 XCTAssertEqual(AnyGameState(ComputingState()),
                                gameState.transitionState(given: Input(input)))
-            case .pause:
+            case .pause, .levelGoalDetail:
                 XCTAssertEqual(AnyGameState(PauseState()),
                                gameState.transitionState(given: Input(input)))
             case .boardBuilt, .tutorial,
@@ -149,7 +149,8 @@ class GameStateTests: XCTestCase {
                  .rotateCounterClockwise, .pause, .play, .reffingFinished,
                  .collectItem, .selectLevel,. touchBegan, .tutorial,
                  .visitStore, .itemUseSelected, .itemUseCanceled, .itemCanBeUsed, .itemUsed,
-                 .bossTargetsWhatToEat(_), .bossEatsRocks(_), .bossTargetsWhatToAttack(_), .bossAttacks(_), .decrementDynamites(_), .rotatePreviewFinish(_, _), .refillEmpty, .shuffleBoard, .rotatePreview:
+                 .bossTargetsWhatToEat(_), .bossEatsRocks(_), .bossTargetsWhatToAttack(_), .bossAttacks(_), .decrementDynamites(_), .rotatePreviewFinish(_, _), .refillEmpty, .shuffleBoard, .rotatePreview, .levelGoalDetail, .unlockExit,
+                 .playerAwarded:
                 XCTAssertNil(gameState.transitionState(given: Input(input)))
             }
         }
@@ -175,7 +176,8 @@ class GameStateTests: XCTestCase {
                                gameState.transitionState(given: Input(input)))
             case .touch, .rotateCounterClockwise, .rotateClockwise, .play, .pause, .animationsFinished, .playAgain, .transformation, .boardBuilt, .selectLevel, .newTurn, .touchBegan, .tutorial,
                  .visitStore, .itemUseSelected, .itemUseCanceled, .itemCanBeUsed, .itemUsed,
-                 .bossTargetsWhatToEat(_), .bossEatsRocks(_), .bossTargetsWhatToAttack(_), .bossAttacks(_), .rotatePreview(_, _), .rotatePreviewFinish(_, _), .tileDetail(_, _) , .shuffleBoard:
+                 .bossTargetsWhatToEat(_), .bossEatsRocks(_), .bossTargetsWhatToAttack(_), .bossAttacks(_), .rotatePreview(_, _), .rotatePreviewFinish(_, _), .tileDetail(_, _) , .shuffleBoard, .levelGoalDetail, .unlockExit,
+                 .playerAwarded:
                 XCTAssertNil(gameState.transitionState(given: Input(input)))
             }
         }
@@ -195,7 +197,7 @@ class GameStateTests: XCTestCase {
                 gameState.transitionState(given: Input(input)))
             case .touch, .rotateCounterClockwise, .rotateClockwise, .play, .pause, .animationsFinished, .playAgain, .transformation, .boardBuilt, .selectLevel, .newTurn, .touchBegan, .tutorial,
                  .visitStore, .itemUseSelected, .reffingFinished, .attack, .monsterDies, .collectItem, .gameWin, .gameLose,
-                 .bossTargetsWhatToEat(_), .bossEatsRocks(_), .bossTargetsWhatToAttack(_), .bossAttacks(_), .decrementDynamites(_), .rotatePreview(_, _), .rotatePreviewFinish(_, _), .refillEmpty, .tileDetail(_, _) , .shuffleBoard:
+                 .bossTargetsWhatToEat(_), .bossEatsRocks(_), .bossTargetsWhatToAttack(_), .bossAttacks(_), .decrementDynamites(_), .rotatePreview(_, _), .rotatePreviewFinish(_, _), .refillEmpty, .tileDetail(_, _) , .shuffleBoard, .levelGoalDetail, .unlockExit, .playerAwarded:
                 XCTAssertNil(gameState.transitionState(given: Input(input)))
             }
         }
@@ -241,7 +243,7 @@ class GameStateTests: XCTestCase {
             case .attack, .monsterDies, .gameLose, .touchBegan,
                  .gameWin, .pause, .rotateCounterClockwise,
                  .rotateClockwise, .touch, .tutorial, .itemUseSelected,
-                 .bossAttacks, .bossEatsRocks, .bossTargetsWhatToAttack, .bossTargetsWhatToEat,. boardBuilt:
+                 .bossAttacks, .bossEatsRocks, .bossTargetsWhatToAttack, .bossTargetsWhatToEat,. boardBuilt, .playerAwarded, .unlockExit,. levelGoalDetail:
                 XCTAssertTrue(gameState.shouldAppend(Input(input)), "\(gameState.state) ought to append \(input)")
             default:
                 XCTAssertFalse(gameState.shouldAppend(Input(input)),  "\(gameState.state) ought not to append \(input)")

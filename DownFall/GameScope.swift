@@ -62,7 +62,7 @@ struct GameScope {
                     TutorialStep(dialog: "All enemies are weak when attacked from above.  Mine some rocks and kill that rat!",
                                  highlightType: [],
                                  tapToContinue: false,
-                                 inputToContinue: InputType.monsterDies(.zero))
+                                 inputToContinue: InputType.monsterDies(.zero, .wizard))
         ]
     )
 }

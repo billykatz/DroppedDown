@@ -11,7 +11,7 @@ import SpriteKit
 import GameplayKit
 
 class GameViewController: UIViewController, LevelCoordinating {
-    
+    var randomSource: GKLinearCongruentialRandomSource?
 
     internal var gameSceneNode: GameScene?
     internal var tutorialSceneNode: TutorialScene?
@@ -25,6 +25,9 @@ class GameViewController: UIViewController, LevelCoordinating {
             guard let entityData = try Data.data(from: "entities") else { fatalError("Crashing here is okay because we failed to parse our entity json file") }
             entities = try JSONDecoder().decode(EntitiesModel.self, from: entityData)
             levelSelect(entities!.entities[0])
+            
+            //TODO: add the actual seed to this source
+            randomSource = GKLinearCongruentialRandomSource()
         }
         catch(let error) {
             fatalError("Crashing due to \(error) while trying to parse json entity file")

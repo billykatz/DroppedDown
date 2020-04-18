@@ -8,7 +8,7 @@
 
 import Foundation
 
-indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringConvertible{
+indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
     static func fuzzyEqual(_ lhs: InputType, _ rhs: InputType) -> Bool {
         if case InputType.touch(let lhsCoord, _) = lhs,
             case InputType.touch(let rhsCoord, _) = rhs {
@@ -33,7 +33,7 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
                                                 attacker: TileCoord(0,0),
                                                 defender: TileCoord(0,0),
                                                 affectedTiles: []),
-                                        .monsterDies(TileCoord(0,0)),
+                                        .monsterDies(TileCoord(0,0), .wizard),
                                         .gameWin,
                                         .gameLose(""),
                                         .play,
@@ -55,8 +55,11 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
                                         .rotatePreview([], .zero),
                                         .rotatePreviewFinish([], nil),
                                         .refillEmpty,
-                                        .tileDetail(.exit, []),
-                                        .boardBuilt
+                                        .tileDetail(.exit(blocked: false), []),
+                                        .boardBuilt,
+                                        .playerAwarded([]),
+                                        .unlockExit,
+                                        .levelGoalDetail([])
                                                                  
     ]
     
@@ -66,7 +69,7 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
     case touch(_ position: TileCoord, _ tileType: TileType)
     case rotateCounterClockwise(preview: Bool)
     case rotateClockwise(preview: Bool)
-    case monsterDies(TileCoord)
+    case monsterDies(TileCoord, EntityModel.EntityType)
     case attack(attackType: AttackType, attacker: TileCoord, defender: TileCoord?, affectedTiles: [TileCoord])
     case gameWin
     case gameLose(String)
@@ -96,6 +99,10 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
     case refillEmpty
     case tileDetail(TileType, [TileCoord])
     case shuffleBoard
+    case unlockExit
+    case levelGoalDetail([GoalTracking])
+    case playerAwarded([LevelGoalReward]
+    )
     
     var debugDescription: String {
         switch self {
@@ -167,6 +174,13 @@ indirect enum InputType : Equatable, Hashable, CaseIterable, CustomDebugStringCo
             return "Tile detail"
         case .shuffleBoard:
             return "Shuffle board"
+        case .unlockExit:
+            return "Unlock Exit"
+        case .levelGoalDetail:
+            return "Level Goal Detail"
+        case .playerAwarded:
+            return "Player is awarded something"
+            
         }
     }
 }

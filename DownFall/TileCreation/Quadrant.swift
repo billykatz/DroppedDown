@@ -25,6 +25,19 @@ enum Quadrant: CaseIterable {
         }
     }
     
+    var adjacent: [Quadrant] {
+        switch self {
+        case .northEast:
+            return [.northWest, .southEast]
+        case .northWest:
+            return [.northEast, .southWest]
+        case .southWest:
+            return [.northWest, .southEast]
+        case .southEast:
+            return [.southWest, .northEast]
+        }
+    }
+    
     func randomCoord(for boardSize: Int) -> TileCoord {
         switch self {
         case .northEast:

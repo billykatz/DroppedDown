@@ -26,7 +26,8 @@ extension UIColor {
     }
     
     static let clayRed: UIColor = UIColor(rgb: 0x9c461f)
-    static let storeItemBackgroundNotSelected: UIColor = UIColor(rgb: 0x8fa9af)
+    static let darkClayRed = UIColor(rgb: 0x743110)
+    static let storeItemBackgroundNotSelected = UIColor(rgb: 0x8fa9af)
     static let storeDarkGray = UIColor(rgb: 0x404040)
     static let storeBlack = UIColor(rgb: 0x171717)
     static let highlightGold = UIColor(rgb: 0xfcd833)
@@ -35,4 +36,17 @@ extension UIColor {
     static let foregroundBlue = UIColor(rgb: 0x6885ac)
     static let eggshellWhite = UIColor(rgb: 0xc7c6c2)
     static let storeSceneGreen = UIColor(rgb: 0x3b6518)
+    
+    /// Fillable Bar Colors
+    static let lightBarPurple = UIColor(rgb: 0x603c8d)
+    static let darkBarPurple = UIColor(rgb: 0x322049)
+    static let lightBarRed = UIColor(rgb: 0xae4510)
+    static let darkBarRed = UIColor(rgb: 0x803608)
+    static let lightBarBlue = UIColor(rgb: 0x8fb7ea)
+    static let darkBarBlue = UIColor(rgb: 0x4b4f7c)
+    static let backgroundGray = UIColor(rgb: 0x262626)
+    static let darkBarMonster = UIColor(rgb: 0x930505)
+    static let lightBarMonster = UIColor(rgb: 0xe11a1a)
+    static let darkBarGem = UIColor(rgb: 0x65b596)
+    static let lightBarGem = UIColor(rgb: 0x9edfc6)
 }

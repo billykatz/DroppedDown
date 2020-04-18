@@ -118,8 +118,13 @@ struct Animator {
         let animations: [(SKSpriteNode, SKAction)] = goldSprites.map { sprite in
             let wait = SKAction.wait(forDuration: Double(index) * AnimationSettings.Board.goldWaitTime)
             let moveAction = SKAction.move(to: endPosition, duration: AnimationSettings.Board.goldGainSpeedEnd)
+            let scaleAction = SKAction.scale(to: Style.Board.goldGainSizeEnd, duration: AnimationSettings.Board.goldGainSpeedEnd)
+            
+            let moveAndScale = SKAction.group([moveAction, scaleAction])
+            
             index += 1
-            return (sprite, SKAction.sequence([wait,moveAction, SKAction.removeFromParent()]))
+            
+            return (sprite, SKAction.sequence([wait, moveAndScale, SKAction.removeFromParent()]))
         }
         animate(animations)
     }

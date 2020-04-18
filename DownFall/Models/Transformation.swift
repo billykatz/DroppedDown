@@ -7,7 +7,7 @@
 //
 
 
-struct Transformation: Equatable, Hashable {
+struct Transformation: Hashable {
     var tileTransformation: [[TileTransformation]]?
     var inputType: InputType? = nil
     var endTiles: [[Tile]]?

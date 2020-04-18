@@ -56,16 +56,38 @@ class Renderer: SKSpriteNode {
     
     private lazy var safeArea: SKSpriteNode = {
         //create safe area
-        let safeArea = SKSpriteNode(color: .foregroundBlue, size: CGSize(width: playableRect.width, height: 75.0))
+        let safeArea = SKSpriteNode(color: .clear, size: CGSize(width: playableRect.width, height: 75.0))
         safeArea.position = CGPoint.position(safeArea.frame, centeredInTopOf: playableRect)
         return safeArea
     }()
     
     private lazy var hud: HUD = {
-        let hud = HUD.build(color: .foregroundBlue, size: CGSize(width: playableRect.width, height: Style.HUD.height), delegate: self, threatLevelController: level.threatLevelController)
-        hud.position = CGPoint.alignHorizontally(hud.frame, relativeTo: safeArea.frame, horizontalAnchor: .center, verticalAlign: .bottom, translatedToBounds: true)
+        let hud = HUD.build(color: .foregroundBlue,
+                            size: CGSize(width: playableRect.width/2,
+                                         height: Style.HUD.height),
+                            delegate: self, level: level)
+        hud.position = CGPoint.alignHorizontally(hud.frame,
+                                                 relativeTo: safeArea.frame,
+                                                 horizontalAnchor: .right,
+                                                 verticalAlign: .bottom,
+                                                 translatedToBounds: true)
         hud.zPosition = Precedence.foreground.rawValue
         return hud
+    }()
+    
+    private lazy var levelGoalView: LevelGoalView = {
+        let levelGoalView = LevelGoalView(viewModel: LevelGoalTracker(level: level),
+                                          size: CGSize(width: playableRect.width/2,
+                                                       height: Style.HUD.height))
+        levelGoalView.position = CGPoint.alignHorizontally(levelGoalView.frame,
+                                                           relativeTo: safeArea.frame,
+                                                           horizontalAnchor: .left,
+                                                           verticalAlign: .bottom,
+                                                           verticalPadding: Style.Padding.more*6,
+                                                           horizontalPadding: -Style.Padding.more,
+                                                           translatedToBounds: true)
+        levelGoalView.zPosition = Precedence.foreground.rawValue
+        return levelGoalView
     }()
     
     public var backpackView: BackpackView
@@ -93,20 +115,22 @@ class Renderer: SKSpriteNode {
         foreground = givenForeground
         
         // backpack view
-        self.backpackView = BackpackView(playableRect: playableRect, viewModel: TargetingViewModel(), levelSize: level.boardSize)
+        self.backpackView = BackpackView(playableRect: playableRect,
+                                         viewModel: TargetingViewModel(),
+                                         levelSize: level.boardSize)
         
         
         super.init(texture: nil, color: .clear, size: CGSize.zero)
         
         // tile detail view
-        self.tileDetailView = TileDetailView(foreground: foreground, playableRect: playableRect, animator: Animator(), alignedTo: hud.frame, levelSize: level.boardSize)
+        self.tileDetailView = TileDetailView(foreground: foreground, playableRect: playableRect, alignedTo: hud.frame, levelSize: level.boardSize)
         
         self.isUserInteractionEnabled = true
         
         foreground.position = playableRect.center
         menuForeground.position = playableRect.center
         
-        [spriteForeground, safeArea, hud, backpackView].forEach { foreground.addChild($0) }
+        [spriteForeground, safeArea, hud, levelGoalView, backpackView].forEach { foreground.addChild($0) }
         
         // Register for Dispatch
         Dispatch.shared.register { [weak self] input in
@@ -145,7 +169,7 @@ class Renderer: SKSpriteNode {
                 animate(trans.tileTransformation?.first) { [weak self] in
                     self?.gameWin(transformation: trans)
                 }
-            case .monsterDies, .newTurn, .bossTargetsWhatToEat, .bossAttacks:
+            case .monsterDies, .newTurn, .bossTargetsWhatToEat, .bossAttacks, .unlockExit, .playerAwarded:
                 animationsFinished(endTiles: trans.endTiles)
             case .itemUsed(let ability, _):
                 if ability.type == .massMineRock {
@@ -524,20 +548,22 @@ extension Renderer {
             shiftDownActions.append((sprite, SKAction.sequence([wait, animation])))
         }
         
-        if case let InputType.collectItem(coord, _, amount) = inputType {
+        if case let InputType.collectItem(coord, item, amount) = inputType {
             // add a bunch of gold sprites to the board
             if let startPoint = positionsInForeground(at: [coord]).first {
-                var goldSprites: [SKSpriteNode] = []
-                for _ in 0..<amount {
-                    let goldSprite = SKSpriteNode(texture: SKTexture(imageNamed: Identifiers.gold),
+                var addedSprites: [SKSpriteNode] = []
+                for _ in 0..<item.amount {
+                    let identifier: String = item.type == .gold ? Identifiers.gold : Identifiers.gem
+                    let sprite = SKSpriteNode(texture: SKTexture(imageNamed: identifier),
                                                   color: .clear,
                                                   size: Style.Board.goldGainSize)
-                    goldSprite.position = startPoint
-                    spriteForeground.addChild(goldSprite)
-                    goldSprites.append(goldSprite)
+                    sprite.position = startPoint
+                    sprite.zPosition = Precedence.menu.rawValue
+                    spriteForeground.addChild(sprite)
+                    addedSprites.append(sprite)
                 }
-                let endPosition = CGPoint.alignHorizontally(goldSprites.first?.frame, relativeTo: self.hud.frame, horizontalAnchor: .left, verticalAlign: .top, translatedToBounds: true)
-                animator.animateGold(goldSprites: goldSprites, gained: amount, from: startPoint, to: endPosition)
+                let endPosition = CGPoint.alignHorizontally(addedSprites.first?.frame, relativeTo: self.hud.frame, horizontalAnchor: .left, verticalAlign: .top, translatedToBounds: true)
+                animator.animateGold(goldSprites: addedSprites, gained: amount, from: startPoint, to: endPosition)
             }
             
             
@@ -630,7 +656,7 @@ extension Renderer {
                                 // where on the board
                                 // and when in the tutorial
                             else if InputType.fuzzyEqual(data.currentStep.inputToContinue,
-                                                         .monsterDies(.zero)) {
+                                                         .monsterDies(.zero, .rat)) {
                                 InputQueue.append(
                                     Input(.touch(TileCoord(row, col),
                                                  sprites[row][col].type))

@@ -6,7 +6,7 @@
 //  Copyright © 2019 William Katz LLC. All rights reserved.
 //
 
-struct Item: Decodable, Equatable, Hashable {
+struct Item: Decodable, Hashable {
     enum ItemType: String, Decodable {
         case gold
         case gem

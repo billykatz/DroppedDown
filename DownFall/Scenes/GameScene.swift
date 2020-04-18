@@ -8,6 +8,7 @@
 
 import SpriteKit
 import UIKit
+import GameplayKit
 
 class GameScene: SKScene {
     
@@ -58,7 +59,8 @@ class GameScene: SKScene {
                            entities: EntitiesModel,
                            difficulty: Difficulty = .normal,
                            updatedEntity: EntityModel? = nil,
-                           level: Level) {
+                           level: Level,
+                           randomSource: GKLinearCongruentialRandomSource?) {
         // init our level
         level.threatLevelController.reset()
         self.level = level
@@ -73,7 +75,8 @@ class GameScene: SKScene {
         let tileCreator = TileCreator(entities,
                                       difficulty: difficulty,
                                       updatedEntity: updatedEntity,
-                                      level: level)
+                                      level: level,
+                                      randomSource: randomSource ?? GKLinearCongruentialRandomSource())
         
         //board
         board = Board.build(tileCreator: tileCreator, difficulty: difficulty, level: level)

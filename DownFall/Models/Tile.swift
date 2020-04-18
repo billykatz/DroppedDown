@@ -6,6 +6,8 @@
 //  Copyright © 2018 William Katz LLC. All rights reserved.
 //
 
+import UIKit
+
 enum Color: CaseIterable {
     case blue
     case brown
@@ -35,7 +37,7 @@ struct Tile: Hashable {
     }
     
     static var exit: Tile {
-        return Tile(type: .exit)
+        return Tile(type: .exit(blocked: false))
     }
     
     static var empty: Tile {
@@ -86,11 +88,11 @@ extension Tile: Equatable {
     }
 }
 
-enum TileType: Equatable, Hashable, CaseIterable {
+enum TileType: Hashable, CaseIterable {
     
     static var rockCases: [TileType] = [.rock(.blue), .rock(.green), .rock(.red), .rock(.purple), .rock(.brown)]
-    static var allCases: [TileType] = [.player(.zero), .exit, .empty, .monster(.zero), .item(.zero), .rock(.red), .pillar(.red, 3)]
-    static var randomCases = [TileType.monster(.zero), .rock(.red)]
+    static var allCases: [TileType] = [.player(.zero), .exit(blocked: false), .empty, .monster(.zero), .item(.zero), .rock(.red), .pillar(.red, 3)]
+    static var randomCases = [TileType.monster(.zero), .rock(.red), .item(Item.gem)]
     typealias AllCases = [TileType]
     
     static func == (lhs: TileType, rhs: TileType) -> Bool {
@@ -119,7 +121,7 @@ enum TileType: Equatable, Hashable, CaseIterable {
     case player(EntityModel)
     case monster(EntityModel)
     case empty
-    case exit
+    case exit(blocked: Bool)
     case item(Item)
     case pillar(Color, Int)
     case rock(Color)
@@ -225,8 +227,8 @@ enum TileType: Equatable, Hashable, CaseIterable {
             return TextureName.player.rawValue
         case .empty:
             return TextureName.empty.rawValue
-        case .exit:
-            return TextureName.exit.rawValue
+        case .exit(let blocked):
+            return blocked ? "blockedExit" : "mineshaft"
         case .monster(let data):
             return data.name
         case .item(let item):

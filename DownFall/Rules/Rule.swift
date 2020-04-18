@@ -27,7 +27,8 @@ struct Win: Rule {
         guard
             let pp = playerPosition,
             isWithinBounds(pp.rowBelow, within: tiles),
-            case Tile.exit = tiles[pp.rowBelow] else { return nil }
+            case TileType.exit(let blocked) = tiles[pp.rowBelow].type,
+            !blocked else { return nil }
         return Input(.gameWin)
     }
 }

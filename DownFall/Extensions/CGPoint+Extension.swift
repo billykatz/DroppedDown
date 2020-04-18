@@ -196,7 +196,7 @@ extension CGPoint {
         
         switch verticalAlign {
         case .center:
-            y = 0.0
+            y = 0.0 + verticalPadding
         case .bottom:
             y = -that.height/2 + this.height/2 + verticalPadding
         case .top:

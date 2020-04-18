@@ -10,7 +10,7 @@ import Foundation
 
 
 struct Identifiers {
-    static let settings = "setting"
+    static let settings = "lanternOn"
     static let header = "header"
     static let fullHeart = "fullHeart"
     static let emptyHeart = "emptyHeart"
@@ -29,9 +29,9 @@ struct Identifiers {
             static let redRockCrumble = "redRockCrumble"
             static let blueRockCrumble = "blueRockCrumble"
             static let purpleRockCrumble = "purpleRockCrumble"
+        
         }
     }
-
     
     static let mainMenuScene = "MainMenu"
 }

@@ -87,7 +87,7 @@ class Referee {
         
         
         let playerPosition = getTilePosition(.player(.zero), tiles: tiles)
-        let exitPosition = getTilePosition(.exit, tiles: tiles)
+        let exitPosition = getTilePosition(.exit(blocked: false), tiles: tiles)
         let dynamitePositions = getTilePositions(.dynamite(fuseCount: 0, hasBeenDecremented: false), tiles: tiles)
         let emptyPositions = getTilePosition(.empty, tiles: tiles)
         
@@ -304,7 +304,7 @@ class Referee {
                 for (j, _) in row.enumerated() {
                     if case TileType.monster(let data) = tiles[TileCoord(i,j)].type {
                         if data.hp <= 0 {
-                            return Input(.monsterDies(TileCoord(i,j)))
+                            return Input(.monsterDies(TileCoord(i,j), data.type))
                         }
                     }
                 }

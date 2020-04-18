@@ -45,7 +45,7 @@ class BackpackView: SKSpriteNode {
     private var targetingArea: SKSpriteNode
     
     // views with content
-    private var itemArea: SKSpriteNode
+    public var itemArea: SKSpriteNode
     private var toastMessageContainer: SKShapeNode?
     private var itemDetailView: SKSpriteNode
     private var emptyItemArea: SKSpriteNode

@@ -27,6 +27,6 @@ func toTileStructs(tileTypes: [[TileType]]) -> [[Tile]] {
 
 extension Level {
     static var test: Level {
-        return Level(type: .first, monsterTypeRatio: LevelConstructor.monsterTypes(per: .first, difficulty: .easy), monsterCountStart: 2, maxMonsterOnBoardRatio: 0.07, maxGems: 1, maxTime: Int(30.0), boardSize: 4, abilities: [], goldMultiplier: 2, rocksRatio: LevelConstructor.availableRocksPerLevel(.first, difficulty: .easy), pillarCoordinates: [], threatLevelController: ThreatLevelController(), goals: [], numberOfGoalsNeedToUnlockExit: 0, tutorialData: nil)
+        return Level(type: .first, monsterTypeRatio: LevelConstructor.monsterTypes(per: .first, difficulty: .easy), monsterCountStart: 2, maxMonsterOnBoardRatio: 0.07, maxGems: 1, maxTime: Int(30.0), boardSize: 4, abilities: [], goldMultiplier: 2, rocksRatio: LevelConstructor.availableRocksPerLevel(.first, difficulty: .easy), pillarCoordinates: [], threatLevelController: ThreatLevelController(), goals: [], numberOfGoalsNeedToUnlockExit: 0, maxSpawnGems: 0, tutorialData: nil)
     }
 }

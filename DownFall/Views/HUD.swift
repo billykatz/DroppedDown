@@ -35,17 +35,17 @@ class HUD: SKSpriteNode {
         
         header.level = level
         
-        let button = Button(size: Button.inGameLarge,
-                            delegate: header,
-                            identifier: .shuffleBoard,
-                            precedence: .background,
-                            fontSize: UIFont.mediumSize,
-                            fontColor: .white)
-        button.position = CGPoint.alignHorizontally(button.frame, relativeTo: header.frame, horizontalAnchor: .right, verticalAlign: .bottom, verticalPadding: Style.Padding.most)
-        button.zPosition = Precedence.foreground.rawValue
-        button.name = Constants.shuffleBoardButton
-        
-        header.addChild(button)
+//        let button = Button(size: Button.inGameLarge,
+//                            delegate: header,
+//                            identifier: .shuffleBoard,
+//                            precedence: .background,
+//                            fontSize: UIFont.mediumSize,
+//                            fontColor: .white)
+//        button.position = CGPoint.alignHorizontally(button.frame, relativeTo: header.frame, horizontalAnchor: .right, verticalAlign: .bottom, verticalPadding: Style.Padding.most)
+//        button.zPosition = Precedence.foreground.rawValue
+//        button.name = Constants.shuffleBoardButton
+//
+//        header.addChild(button)
         
         Dispatch.shared.register {
             header.handle($0)
@@ -63,6 +63,7 @@ class HUD: SKSpriteNode {
     }
     
     var currentTotalGold: Int = 0
+    var currentTotalGem: Int = 0
     let animator = Animator()
     
     var delegate: SettingsDelegate?
@@ -102,7 +103,7 @@ class HUD: SKSpriteNode {
                 showAttack(attackInput: input, endTiles: trans.first!.endTiles)
             case .collectItem(_, let item, let total):
                 incrementCurrencyCounter(item, total: total)
-            case .itemUsed, .decrementDynamites, .shuffleBoard:
+            case .itemUsed, .decrementDynamites, .shuffleBoard, .playerAwarded:
                 if let tiles = trans.first?.endTiles,
                     let playerCoord = getTilePosition(.player(.zero), tiles: tiles),
                     case TileType.player(let data) = tiles[playerCoord].type {
@@ -153,10 +154,10 @@ class HUD: SKSpriteNode {
                                              backgroundColor: .clayRed,
                                              text: "")
         let healthBar = FillableBar(size: CGSize(width: self.size.width * Style.HUD.healthBarWidthRatio, height: Style.HUD.healthBarHeight), viewModel: viewModel)
-        healthBar.position = CGPoint.position(healthBar.frame, inside: frame, verticalAlign: .bottom, horizontalAnchor: .left, xOffset: heartNode.frame.width, yOffset: heartNode.frame.height/2 - Style.HUD.healthBarHeight/2)
+        healthBar.position = CGPoint.position(healthBar.frame, inside: frame, verticalAlign: .bottom, horizontalAnchor: .left, xOffset: heartNode.frame.width + Style.Padding.normal, yOffset: heartNode.frame.height/2 - Style.HUD.healthBarHeight/2)
         
         let healthText = ParagraphNode(text: "\(data.hp)/\(data.originalHp)", paragraphWidth: Style.HUD.heartSize.width*2, fontName: UIFont.pixelFontName, fontSize: UIFont.extraLargeSize, fontColor: .lightText)
-        healthText.position = CGPoint.position(healthText.frame, inside: self.frame, verticalAlign: .bottom, horizontalAnchor: .right, yOffset: heartNode.frame.height/2 - healthText.frame.height/2)
+        healthText.position = CGPoint.position(healthText.frame, inside: self.frame, verticalAlign: .bottom, horizontalAnchor: .right, yOffset: heartNode.frame.height/2 - healthText.frame.height/2 + Style.Padding.normal)
         
         self.addChildSafely(heartNode)
         self.addChildSafely(healthBar)
@@ -169,25 +170,39 @@ class HUD: SKSpriteNode {
         
         // the label with the palyer's amount of gold
         let goldLabel = ParagraphNode(text: "\(data.carry.total(in: .gold))", paragraphWidth: Style.HUD.labelParagraphWidth, fontName: UIFont.pixelFontName, fontSize: UIFont.extraLargeSize, fontColor: .lightText)
-        goldLabel.position = CGPoint.alignVertically(goldLabel.frame, relativeTo: coinNode.frame, horizontalAnchor: .right, verticalAlign: .center, translatedToBounds: true)
+        goldLabel.position = CGPoint.alignVertically(goldLabel.frame, relativeTo: coinNode.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: Style.Padding.more, translatedToBounds: true)
         goldLabel.name = Identifiers.goldSpriteLabel
         self.addChild(goldLabel)
         
+        // the sprite of the coin
+        let gemNode = SKSpriteNode(texture: SKTexture(imageNamed: Identifiers.gem), size: Style.HUD.heartSize)
+        gemNode.position = CGPoint.alignHorizontally(gemNode.frame, relativeTo: coinNode.frame, horizontalAnchor: .center, verticalAlign: .top, translatedToBounds: true)
+        self.addChild(gemNode)
+        
+        // the label with the palyer's amount of gold
+        let gemLabel = ParagraphNode(text: "\(data.carry.total(in: .gem))", paragraphWidth: Style.HUD.labelParagraphWidth, fontName: UIFont.pixelFontName, fontSize: UIFont.extraLargeSize, fontColor: .lightText)
+        gemLabel.position = CGPoint.alignVertically(gemLabel.frame, relativeTo: gemNode.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: Style.Padding.more, translatedToBounds: true)
+        gemLabel.name = Identifiers.gemSpriteLabel
+        self.addChild(gemLabel)
+        
         // save this data for later
         currentTotalGold = data.carry.total(in: .gold)
+        currentTotalGem = data.carry.total(in: .gem)
     }
     
     func incrementCurrencyCounter(_ item: Item, total: Int) {
         let currencyLabelIdentifier = item.type == .gold ? Identifiers.goldSpriteLabel : Identifiers.gemSpriteLabel
+        
+        let localCurrenTotal = item.type == .gold ? currentTotalGold : currentTotalGem
         
         if let currencyLabel = self.childNode(withName: currencyLabelIdentifier) as? ParagraphNode {
             let oldPosition = currencyLabel.position
             currencyLabel.removeFromParent()
             
             var animations: [(SKSpriteNode, SKAction)] = []
-            let goldGained = total-currentTotalGold
+            let goldGained = total-localCurrenTotal
             for gain in 1..<goldGained+1 {
-                let newCurrencyLabel = ParagraphNode(text: "\(currentTotalGold + gain)", paragraphWidth: Style.HUD.labelParagraphWidth, fontName: UIFont.pixelFontName, fontSize: UIFont.extraLargeSize, fontColor: .lightText)
+                let newCurrencyLabel = ParagraphNode(text: "\(localCurrenTotal + gain)", paragraphWidth: Style.HUD.labelParagraphWidth, fontName: UIFont.pixelFontName, fontSize: UIFont.extraLargeSize, fontColor: .lightText)
                 newCurrencyLabel.position = oldPosition
                 newCurrencyLabel.name = currencyLabelIdentifier
                 newCurrencyLabel.isHidden = true
@@ -220,7 +235,12 @@ class HUD: SKSpriteNode {
             
             
             animator.animate(animations)
-            currentTotalGold = total
+            
+            if item.type == .gold {
+                currentTotalGold = total
+            } else {
+                currentTotalGem = total
+            }
         }
     }
     

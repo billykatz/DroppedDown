@@ -12,6 +12,19 @@ enum LevelGoalType: Hashable {
 
 enum LevelGoalReward: Hashable {
     case gem(Int)
+    
+    var currency: Currency{
+        switch self {
+        case .gem:
+            return .gem
+        }
+    }
+    
+    var amount: Int {
+        switch self {
+        case .gem(let amt): return amt
+        }
+    }
 }
 
 struct LevelGoal: Hashable {
@@ -39,6 +52,7 @@ struct Level {
     let threatLevelController:  ThreatLevelController
     let goals: [LevelGoal]
     let numberOfGoalsNeedToUnlockExit: Int
+    let maxSpawnGems: Int
     
     var tutorialData: TutorialData?
     
@@ -54,5 +68,5 @@ struct Level {
         return type != .boss
     }
         
-    static let zero = Level(type: .first, monsterTypeRatio: [:], monsterCountStart: 0, maxMonsterOnBoardRatio: 0.0, maxGems: 0, maxTime: 0, boardSize: 0, abilities: [], goldMultiplier: 1, rocksRatio: [:], pillarCoordinates: [], threatLevelController:  ThreatLevelController(), goals: [LevelGoal(type: .unlockExit, reward: .gem(0), tileType: .empty, targetAmount: 0, minimumGroupSize: 0, grouped: false)], numberOfGoalsNeedToUnlockExit: 0, tutorialData: nil)
+    static let zero = Level(type: .first, monsterTypeRatio: [:], monsterCountStart: 0, maxMonsterOnBoardRatio: 0.0, maxGems: 0, maxTime: 0, boardSize: 0, abilities: [], goldMultiplier: 1, rocksRatio: [:], pillarCoordinates: [], threatLevelController:  ThreatLevelController(), goals: [LevelGoal(type: .unlockExit, reward: .gem(0), tileType: .empty, targetAmount: 0, minimumGroupSize: 0, grouped: false)], numberOfGoalsNeedToUnlockExit: 0, maxSpawnGems: 0, tutorialData: nil)
 }

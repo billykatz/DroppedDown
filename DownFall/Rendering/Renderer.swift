@@ -169,7 +169,7 @@ class Renderer: SKSpriteNode {
                 animate(trans.tileTransformation?.first) { [weak self] in
                     self?.gameWin(transformation: trans)
                 }
-            case .monsterDies, .newTurn, .bossTargetsWhatToEat, .bossAttacks, .unlockExit:
+            case .monsterDies, .newTurn, .bossTargetsWhatToEat, .bossAttacks, .unlockExit, .playerAwarded:
                 animationsFinished(endTiles: trans.endTiles)
             case .itemUsed(let ability, _):
                 if ability.type == .massMineRock {
@@ -548,20 +548,22 @@ extension Renderer {
             shiftDownActions.append((sprite, SKAction.sequence([wait, animation])))
         }
         
-        if case let InputType.collectItem(coord, _, amount) = inputType {
+        if case let InputType.collectItem(coord, item, amount) = inputType {
             // add a bunch of gold sprites to the board
             if let startPoint = positionsInForeground(at: [coord]).first {
-                var goldSprites: [SKSpriteNode] = []
-                for _ in 0..<amount {
-                    let goldSprite = SKSpriteNode(texture: SKTexture(imageNamed: Identifiers.gold),
+                var addedSprites: [SKSpriteNode] = []
+                for _ in 0..<item.amount {
+                    let identifier: String = item.type == .gold ? Identifiers.gold : Identifiers.gem
+                    let sprite = SKSpriteNode(texture: SKTexture(imageNamed: identifier),
                                                   color: .clear,
                                                   size: Style.Board.goldGainSize)
-                    goldSprite.position = startPoint
-                    spriteForeground.addChild(goldSprite)
-                    goldSprites.append(goldSprite)
+                    sprite.position = startPoint
+                    sprite.zPosition = Precedence.menu.rawValue
+                    spriteForeground.addChild(sprite)
+                    addedSprites.append(sprite)
                 }
-                let endPosition = CGPoint.alignHorizontally(goldSprites.first?.frame, relativeTo: self.hud.frame, horizontalAnchor: .left, verticalAlign: .top, translatedToBounds: true)
-                animator.animateGold(goldSprites: goldSprites, gained: amount, from: startPoint, to: endPosition)
+                let endPosition = CGPoint.alignHorizontally(addedSprites.first?.frame, relativeTo: self.hud.frame, horizontalAnchor: .left, verticalAlign: .top, translatedToBounds: true)
+                animator.animateGold(goldSprites: addedSprites, gained: amount, from: startPoint, to: endPosition)
             }
             
             

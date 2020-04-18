@@ -126,6 +126,9 @@ class Board: Equatable {
             InputQueue.append(Input(.transformation([shuffleBoard(inputType: .shuffleBoard)])))
         case .unlockExit:
             InputQueue.append(Input(.transformation([unlockExit(inputType: input.type)])))
+        case .playerAwarded(let rewards):
+            let trans = playerAccepts(rewards: rewards, inputType: input.type)
+            InputQueue.append(Input(.transformation([trans])))
         case .gameLose(_),
              .play,
              .pause,
@@ -143,6 +146,33 @@ class Board: Equatable {
         
         guard let trans = transformation else { return }
         InputQueue.append(Input(.transformation([trans])))
+    }
+    
+    private func playerAccepts(rewards: [LevelGoalReward], inputType: InputType) -> Transformation {
+
+        // grab mutable copy of tiles
+        var newTiles = tiles
+        
+        if let playerCoord = self.tiles(of: .player(.zero)).first,
+            case TileType.player(let data) = tiles[playerCoord].type {
+            
+            // grab a mutable copy of the current carry
+            var newCarry: CarryModel = data.carry
+            
+            // iterate over rewards
+            for reward in rewards {
+                newCarry = newCarry.earn(reward.amount, inCurrency: reward.currency)
+            }
+            
+            // update the player model with the new carry
+            newTiles[playerCoord.row][playerCoord.column] = Tile(type: .player(data.updateCarry(carry: newCarry)))
+            
+            // update the source of truth for tiles
+            tiles = newTiles
+            
+        }
+        // wrap it up in a transformation
+        return Transformation(transformation: nil, inputType: inputType, endTiles: newTiles)
     }
     
     private func unlockExit(inputType: InputType) -> Transformation {
@@ -296,7 +326,6 @@ class Board: Equatable {
                 tiles = newTiles
             }
         }
-        
     }
     
     private func swap(_ first: TileCoord, with second: TileCoord, input: Input) -> Transformation {
@@ -724,7 +753,7 @@ extension Board {
     private func monsterDied(at coord: TileCoord, input: Input) -> Transformation {
         if case let .monster(monsterData) = tiles[coord].type {
             let gold = tileCreator.goldDropped(from: monsterData)
-            let item = Item.init(type: .gold, amount: gold * level.threatLevelController.threatLevel.color.goldDamageMultiplier)
+            let item = Item(type: .gold, amount: gold * level.threatLevelController.threatLevel.color.goldDamageMultiplier)
             let itemTile = TileType.item(item)
             tiles[coord.x][coord.y] = Tile(type: itemTile)
             //TODO: dont recreate the input

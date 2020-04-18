@@ -92,7 +92,7 @@ enum TileType: Hashable, CaseIterable {
     
     static var rockCases: [TileType] = [.rock(.blue), .rock(.green), .rock(.red), .rock(.purple), .rock(.brown)]
     static var allCases: [TileType] = [.player(.zero), .exit(blocked: false), .empty, .monster(.zero), .item(.zero), .rock(.red), .pillar(.red, 3)]
-    static var randomCases = [TileType.monster(.zero), .rock(.red)]
+    static var randomCases = [TileType.monster(.zero), .rock(.red), .item(Item.gem)]
     typealias AllCases = [TileType]
     
     static func == (lhs: TileType, rhs: TileType) -> Bool {

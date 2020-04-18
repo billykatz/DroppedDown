@@ -52,8 +52,8 @@ class LevelGoalView: SKSpriteNode {
     }
     
     private func createFillableCircle(_ updatedGoals: [GoalTracking]) {
-        for goalTrack in updatedGoals {
-            let radius = Constants.radius + (CGFloat(goalTrack.index+1) * Constants.radius)
+        for (index, goalTrack) in updatedGoals.enumerated() {
+            let radius = Constants.radius + (CGFloat(index+1) * Constants.radius)
             let (lightFill, darkFill) = goalTrack.fillBarColor
             let viewModel = FillableCircleViewModel(radius: CGFloat(radius),
                                                     total: goalTrack.target,
@@ -64,11 +64,11 @@ class LevelGoalView: SKSpriteNode {
                                                     backgroundColor: .backgroundGray)
             let fillableCircle = FillableCircleBar(size: size,
                                                    viewModel: viewModel)
-            if goalTrack.index == 0 {
+            if index == 0 {
                 fillableCircle.zPosition = 100
-            } else if goalTrack.index == 1 {
+            } else if index == 1 {
                 fillableCircle.zPosition = 0
-            } else if goalTrack.index == 2 {
+            } else if index == 2 {
                 fillableCircle.zPosition = -100
             }
             fillableCircle.position = fillableCircleCenter

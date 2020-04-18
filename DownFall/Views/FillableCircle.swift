@@ -125,7 +125,7 @@ class FillableCircleBar: SKSpriteNode {
     private func createOverlap(progress: CGFloat) -> CGPath {
         let path = CGMutablePath()
         
-        // the line width actually makes it the center of the line is at a radius of 90
+        // the line width actually makes it the center of the line is at a radius minus half the line width
         let adjustRadius = viewModel.radius - Constants.halfLineWidth
         
         /// we start at the top of the unit circle

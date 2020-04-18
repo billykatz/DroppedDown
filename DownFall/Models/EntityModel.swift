@@ -211,6 +211,10 @@ struct EntityModel: Equatable, Decodable {
         return update(abilities: newAbilities)
     }
     
+    func updateCarry(carry: CarryModel) -> EntityModel {
+        return self.update(carry: carry)
+    }
+    
 }
 
 extension EntityModel: ResetsAttacks {

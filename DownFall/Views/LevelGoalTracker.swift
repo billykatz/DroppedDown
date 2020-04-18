@@ -13,10 +13,10 @@ struct GoalTracking: Hashable {
     let current: Int
     let target: Int
     let levelGoalType: LevelGoalType
-    let index: Int
     let minimumAmount: Int
     let grouped: Bool
     let reward: LevelGoalReward
+    let hasBeenRewarded: Bool
     
     func update(with units: Int) -> GoalTracking {
         var updatedInitial = current
@@ -27,7 +27,11 @@ struct GoalTracking: Hashable {
                 updatedInitial = min(target, current+units)
             }
         }
-        return GoalTracking(tileType: tileType, current: updatedInitial, target: target, levelGoalType: levelGoalType, index: index, minimumAmount: minimumAmount, grouped: grouped, reward: reward)
+        return GoalTracking(tileType: tileType, current: updatedInitial, target: target, levelGoalType: levelGoalType, minimumAmount: minimumAmount, grouped: grouped, reward: reward, hasBeenRewarded: hasBeenRewarded)
+    }
+    
+    func isAwarded() -> GoalTracking {
+        return GoalTracking(tileType: tileType, current: current, target: target, levelGoalType: levelGoalType, minimumAmount: minimumAmount, grouped: grouped, reward: reward, hasBeenRewarded: true)
     }
     
     func textureName() -> String {
@@ -102,6 +106,10 @@ struct GoalTracking: Hashable {
             return (.clear, .clear)
         }
     }
+    
+    var isCompleted: Bool {
+        return current == target
+    }
 
 }
 
@@ -120,6 +128,9 @@ class LevelGoalTracker: LevelGoalTracking {
     public var goalProgress: [GoalTracking] = []
     
     private let level: Level
+    
+    // state to make sure we dont keep trying to unlock the door
+    var exitHasBeenUnlocked = false
     
     /// Outuputs flase if the player has not reach the number of goals needed to unlock the exit
     var exitLocked: Bool {
@@ -148,7 +159,7 @@ class LevelGoalTracker: LevelGoalTracking {
         var goalProgress: [GoalTracking] = []
         var count = 0
         for goal in level.goals {
-            goalProgress.append(GoalTracking(tileType: goal.tileType, current: 0, target: goal.targetAmount, levelGoalType: goal.type, index: count, minimumAmount: goal.minimumGroupSize, grouped: goal.grouped, reward: goal.reward))
+            goalProgress.append(GoalTracking(tileType: goal.tileType, current: 0, target: goal.targetAmount, levelGoalType: goal.type, minimumAmount: goal.minimumGroupSize, grouped: goal.grouped, reward: goal.reward, hasBeenRewarded: false))
             count += 1
         }
         self.goalProgress = goalProgress
@@ -164,7 +175,8 @@ class LevelGoalTracker: LevelGoalTracking {
             trackLevelGoal(with: trans)
             return
         case .newTurn:
-            unlockExit()
+            checkForCompletedGoals()
+            
         case .boardBuilt:
             goalUpdated?(goalProgress)
         default:
@@ -172,8 +184,19 @@ class LevelGoalTracker: LevelGoalTracking {
         }
     }
     
-    private func unlockExit() {
-        if !exitLocked {
+    private func checkForCompletedGoals() {
+        for (idx, goal) in goalProgress.enumerated() {
+            if goal.isCompleted && !goal.hasBeenRewarded {
+                goalProgress[idx] = goal.isAwarded()
+                // return because we can only hand tphese out one at a time
+                InputQueue.append(Input(.playerAwarded([goal.reward])))
+                return
+            }
+        }
+        
+        // unlock the goal last so we dont exit the baord before getting rewards
+        if !exitHasBeenUnlocked && !exitLocked {
+            exitHasBeenUnlocked = true
             InputQueue.append(Input(.unlockExit))
         }
     }
@@ -188,6 +211,8 @@ class LevelGoalTracker: LevelGoalTracking {
                 }
             case .monsterDies(_, let type):
                 advanceGoal(for: .monster(EntityModel.zeroedEntity(type: type)), units: 1)
+            case .collectItem(_, let item, _):
+                advanceGoal(for: TileType.item(item), units: item.amount)
             default:
                 ()
             }

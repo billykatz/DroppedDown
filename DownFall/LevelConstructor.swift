@@ -25,9 +25,17 @@ struct LevelConstructor {
                          rocksRatio: availableRocksPerLevel(levelType, difficulty: difficulty),
                          pillarCoordinates: pillars(per: levelType, difficulty: difficulty),
                          threatLevelController: buildThreatLevelController(per: levelType, difficulty: difficulty),
-                         goals: levelGoal(per: levelType, difficulty: difficulty), numberOfGoalsNeedToUnlockExit: numberOfGoalsNeedToUnlockExit(per: levelType, difficulty: difficulty))
+                         goals: levelGoal(per: levelType, difficulty: difficulty),
+                         numberOfGoalsNeedToUnlockExit: numberOfGoalsNeedToUnlockExit(per: levelType, difficulty: difficulty),
+                         maxSpawnGems: 3)
         }
     }
+    
+    static func maxSpawnGems(per: LevelType, difficulty: Difficulty) -> Int {
+        return 3
+    }
+
+
     
     static func numberOfGoalsNeedToUnlockExit(per: LevelType, difficulty: Difficulty) -> Int {
     
@@ -57,7 +65,7 @@ struct LevelConstructor {
                   pillarCoordinates: [],
                   threatLevelController: ThreatLevelController(),
                   goals: [LevelGoal(type: .unlockExit, reward: .gem(0), tileType: .empty, targetAmount: 0, minimumGroupSize: 0, grouped: false)],
-                  numberOfGoalsNeedToUnlockExit: 0,
+                  numberOfGoalsNeedToUnlockExit: 0, maxSpawnGems: 0,
                   tutorialData: GameScope.shared.tutorials[index])
         }
     }

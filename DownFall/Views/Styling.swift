@@ -75,7 +75,8 @@ struct Style {
     }
     
     struct Board {
-        static let goldGainSize = CGSize(width: 50, height: 50)
+        static let goldGainSize = CGSize(width: 100, height: 100)
+        static let goldGainSizeEnd = CGSize(width: 50, height: 50)
     }
     
         
@@ -129,7 +130,7 @@ struct Style {
     }
     
     struct HUD {
-        static let height: CGFloat = 250.0
+        static let height: CGFloat = 300.0
         static let heartSize = CGSize(width: 100.0, height: 100.0)
         static let gemSize = CGSize(width: 75.0, height: 75.0)
         static let labelParagraphWidth = CGFloat(200.0)

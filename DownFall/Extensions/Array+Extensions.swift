@@ -9,6 +9,16 @@
 import Foundation
 
 extension Array where Element: Hashable {
+    
+    /// Returns the object at th index or nil
+    /// Useful for when you are not sure the size of the array
+    func optionalElement(at index: Int) -> Element? {
+        if index < self.count {
+            return self[index]
+        }
+        return nil
+    }
+    
     func removingDuplicates() -> [Element] {
         var addedDict = [Element: Bool]()
 

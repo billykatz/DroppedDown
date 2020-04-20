@@ -48,8 +48,50 @@ class TargetingViewModel: Targeting {
     
     public var updateCallback: (() -> Void)?
     public var inventoryUpdated: (() -> Void)?
+    public var runeSlotsUpdated: ((Int, [AnyAbility]) -> Void)?
     public var targetsUpdated: (() -> Void)?
     public var viewModeChanged: (() -> Void)?
+    
+    init() {
+        Dispatch.shared.register { [weak self] (input) in
+            switch input.type {
+            case .transformation(let trans):
+                if let inputType = trans.first?.inputType,
+                    case InputType.itemUseSelected(_) = inputType,
+                    let endTiles = trans.first?.endTiles
+                {
+                    self?.tiles = endTiles
+                }
+                
+                if let inputType = trans.first?.inputType,
+                    case InputType.itemUsed(_) = inputType,
+                    let tiles = trans.first?.endTiles,
+                    let playerCoord = getTilePosition(.player(.playerZero), tiles: tiles),
+                    case TileType.player(let data) = tiles[playerCoord].type
+                {
+                    self?.inventory = data.abilities
+                }
+                
+            case .boardBuilt:
+                guard let self = self,
+                    let tiles = input.endTilesStruct else { return }
+                
+                if let playerData = playerData(in: tiles) {
+                    let runeSlots = playerData.runeSlots ?? 0
+                    self.runeSlotsUpdated?(runeSlots, playerData.abilities)
+                    self.runeSlots = runeSlots
+                    self.inventory = playerData.abilities
+                }
+            case .itemUseCanceled:
+                ()
+            default:
+                ()
+            }
+        }
+    }
+    
+    var runeSlots: Int = 0
+
     
     var inventory: [AnyAbility] = [] {
         didSet {
@@ -156,42 +198,7 @@ class TargetingViewModel: Targeting {
             updateCallback?()
         }
     }
-    
-    init() {
-        Dispatch.shared.register { [weak self] (input) in
-            switch input.type {
-            case .transformation(let trans):
-                if let inputType = trans.first?.inputType,
-                    case InputType.itemUseSelected(_) = inputType,
-                    let endTiles = trans.first?.endTiles
-                {
-                    self?.tiles = endTiles
-                }
-                
-                if let inputType = trans.first?.inputType,
-                    case InputType.itemUsed(_) = inputType,
-                    let tiles = trans.first?.endTiles,
-                    let playerCoord = getTilePosition(.player(.playerZero), tiles: tiles),
-                    case TileType.player(let data) = tiles[playerCoord].type
-                {
-                    self?.inventory = data.abilities
-                }
-                
-            case .boardBuilt:
-                guard let self = self,
-                    let tiles = input.endTilesStruct else { return }
-                
-                if let playerData = playerData(in: tiles) {
-                    self.inventory = playerData.abilities
-                }
-            case .itemUseCanceled:
-                ()
-            default:
-                ()
-            }
-        }
-    }
-    
+
     private func isTargetLegal(_ coord: TileCoord) -> Bool {
         guard let tiles = tiles else { return false }
         if typesOfTargets.contains(tiles[coord].type) {

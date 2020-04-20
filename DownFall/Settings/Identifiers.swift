@@ -20,6 +20,10 @@ struct Identifiers {
     static let gemSpriteLabel = "gemSpriteLabel"
     static let goldSpriteLabel = "goldSpriteLabel"
     
+    static let emptyPickaxeHandle = "handle"
+    static let runePickaxeHandle = "runeHandle"
+    static let backgroundPickaxeHandle = "fullHandle"
+    
     struct Sprite {
         static let redReticle = "redReticle"
         static let greenReticle = "greenReticle"

@@ -142,6 +142,9 @@
 		585EF80B2431AD2400E87FCB /* FreeKillMonsterPotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585EF80A2431AD2400E87FCB /* FreeKillMonsterPotion.swift */; };
 		585EF80D2431AD3800E87FCB /* FreeDynamite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585EF80C2431AD3800E87FCB /* FreeDynamite.swift */; };
 		5865D62E23DBF652007D11FC /* abilities.json in Sources */ = {isa = PBXBuildFile; fileRef = 5865D62D23DBF652007D11FC /* abilities.json */; };
+		5866B3D8244CFEE800DF36E0 /* FreeRainEmbers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5866B3D7244CFEE800DF36E0 /* FreeRainEmbers.swift */; };
+		5866B3DA244D2A4600DF36E0 /* GoalTracking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5866B3D9244D2A4600DF36E0 /* GoalTracking.swift */; };
+		5866B3DC244D2D2300DF36E0 /* RuneViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5866B3DB244D2D2300DF36E0 /* RuneViewModel.swift */; };
 		5867A591242B0CD1005BFD10 /* TileDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5867A590242B0CD1005BFD10 /* TileDetailView.swift */; };
 		586AE77723CF91AA00302347 /* AttackModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 586AE77623CF91AA00302347 /* AttackModelTests.swift */; };
 		5882602123DB809300A77BE8 /* EmptyAbility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5882602023DB809300A77BE8 /* EmptyAbility.swift */; };
@@ -308,6 +311,9 @@
 		585EF80A2431AD2400E87FCB /* FreeKillMonsterPotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeKillMonsterPotion.swift; sourceTree = "<group>"; };
 		585EF80C2431AD3800E87FCB /* FreeDynamite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeDynamite.swift; sourceTree = "<group>"; };
 		5865D62D23DBF652007D11FC /* abilities.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = abilities.json; sourceTree = "<group>"; };
+		5866B3D7244CFEE800DF36E0 /* FreeRainEmbers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeRainEmbers.swift; sourceTree = "<group>"; };
+		5866B3D9244D2A4600DF36E0 /* GoalTracking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalTracking.swift; sourceTree = "<group>"; };
+		5866B3DB244D2D2300DF36E0 /* RuneViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneViewModel.swift; sourceTree = "<group>"; };
 		5867A590242B0CD1005BFD10 /* TileDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileDetailView.swift; sourceTree = "<group>"; };
 		586AE77623CF91AA00302347 /* AttackModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttackModelTests.swift; sourceTree = "<group>"; };
 		5882602023DB809300A77BE8 /* EmptyAbility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyAbility.swift; sourceTree = "<group>"; };
@@ -526,6 +532,7 @@
 				3D6279C423ACA3DF0048EB76 /* RockASwap.swift */,
 				3D6279C623ACA8350048EB76 /* Dynamite.swift */,
 				585EF80C2431AD3800E87FCB /* FreeDynamite.swift */,
+				5866B3D7244CFEE800DF36E0 /* FreeRainEmbers.swift */,
 				3DA0A37E2300CE3B0041EF34 /* ShieldEast.swift */,
 				3D6279CA23ACA90E0048EB76 /* GreaterHealingPoition.swift */,
 				585EF80624318B5800E87FCB /* GreatestHealingPotion.swift */,
@@ -611,9 +618,8 @@
 		3DE87C8C2235D03300D750CF /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				589A27D223D90FD500174DE7 /* Targeting */,
+				589A27D223D90FD500174DE7 /* Backpack */,
 				582635DB243168A700A944B6 /* Buttons */,
-				58B39BD623D21C9600915858 /* BackpackView.swift */,
 				5843F4532426747100C03612 /* RotatePreviewView.swift */,
 				5867A590242B0CD1005BFD10 /* TileDetailView.swift */,
 				3DD5AA0C2398025400FB63F4 /* Styling.swift */,
@@ -785,12 +791,14 @@
 			name = Threat;
 			sourceTree = "<group>";
 		};
-		589A27D223D90FD500174DE7 /* Targeting */ = {
+		589A27D223D90FD500174DE7 /* Backpack */ = {
 			isa = PBXGroup;
 			children = (
 				589A27D323D90FE000174DE7 /* TargetingViewModel.swift */,
+				5866B3DB244D2D2300DF36E0 /* RuneViewModel.swift */,
+				58B39BD623D21C9600915858 /* BackpackView.swift */,
 			);
-			name = Targeting;
+			name = Backpack;
 			path = ..;
 			sourceTree = "<group>";
 		};
@@ -798,6 +806,7 @@
 			isa = PBXGroup;
 			children = (
 				5815345F243993F400483481 /* LevelGoalTracker.swift */,
+				5866B3D9244D2A4600DF36E0 /* GoalTracking.swift */,
 				58AD9281243C283300B5B1EC /* LevelGoalView.swift */,
 			);
 			name = LevelGoalTracker;
@@ -931,6 +940,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3DD72595239DC4FE005933B2 /* MenuType.swift in Sources */,
+				5866B3D8244CFEE800DF36E0 /* FreeRainEmbers.swift in Sources */,
 				3D4F569422B33B44003695D8 /* Helpers.swift in Sources */,
 				3DF2925420A37FEE006671AC /* GameScene.swift in Sources */,
 				58A51663241DF3E2009E84E1 /* TargetView.swift in Sources */,
@@ -951,6 +961,7 @@
 				3DF2928520A76242006671AC /* Board.swift in Sources */,
 				58153460243993F400483481 /* LevelGoalTracker.swift in Sources */,
 				3D7D8B37225422440016FE4C /* TilesHelper.swift in Sources */,
+				5866B3DA244D2A4600DF36E0 /* GoalTracking.swift in Sources */,
 				582635DD243168B500A944B6 /* ButtonIdentifier.swift in Sources */,
 				58C1AE4A23D19CEE003B5B5A /* TransmogrificationPotion.swift in Sources */,
 				3DAFBD3721B8E6E7009B116A /* InputQueue.swift in Sources */,
@@ -1020,6 +1031,7 @@
 				3D9C506021FE206000A2210D /* Renderer.swift in Sources */,
 				3DA4E88F228FC860006E90D1 /* SKNode+Extension.swift in Sources */,
 				3DF0A6B02379C4DC00941305 /* ParagraphNode.swift in Sources */,
+				5866B3DC244D2D2300DF36E0 /* RuneViewModel.swift in Sources */,
 				3DC9CA1321D1DDD4004D05D5 /* Difficulty.swift in Sources */,
 				3D06390D22EEB57300C4D5E9 /* WinState.swift in Sources */,
 				3D4F569222B2D087003695D8 /* SpriteSheet.swift in Sources */,

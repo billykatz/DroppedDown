@@ -9,90 +9,90 @@
 import Foundation
 import SpriteKit
 
-struct AnyAbility: Hashable {
-    var _ability: Ability
-    init(_ ability: Ability) {
-        _ability = ability
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(_ability.textureName.hashValue)
-    }
-    
-    //TODO: make hack better
-    static let zero: AnyAbility = AnyAbility(Empty())
-}
-
-extension AnyAbility: Ability {
-    
-    var count : Int {
-        set {
-            _ability.count = newValue
-        }
-        get {
-            return _ability.count
-        }
-    }
-    
-    func animatedColumns() -> Int? {
-        return _ability.animatedColumns()
-    }
-    
-    func blocksDamage(from: Direction) -> Int? {
-        return _ability.blocksDamage(from: from)
-    }
-    
-    var description: String {
-        return _ability.description
-    }
-    
-    var flavorText: String {
-        return _ability.flavorText
-    }
-    
-    var textureName: String {
-         return _ability.textureName
-    }
-    
-    var cost: Int {
-        return _ability.cost
-    }
-    
-    var currency: Currency {
-        return _ability.currency
-    }
-    
-    var affectsCombat: Bool {
-        return _ability.affectsCombat
-    }
-    
-    var type: AbilityType {
-        return _ability.type
-    }
-    
-    var extraAttacksGranted: Int? {
-        return _ability.extraAttacksGranted
-    }
-    
-    var usage: Usage {
-        return _ability.usage
-    }
-    
-    var heal: Int? {
-        return _ability.heal
-    }
-    
-    
-    var targets: Int? { return _ability.targets }
-    var targetTypes: [TileType]? { _ability.targetTypes }
-}
-
-extension AnyAbility: Equatable {
-    static func == (lhs: AnyAbility, rhs: AnyAbility) -> Bool {
-        return lhs.type == rhs.type
-    }
-}
-
+//struct AnyAbility: Hashable {
+//    var _ability: Ability
+//    init(_ ability: Ability) {
+//        _ability = ability
+//    }
+//    
+//    func hash(into hasher: inout Hasher) {
+//        hasher.combine(_ability.textureName.hashValue)
+//    }
+//    
+//    //TODO: make hack better
+//    static let zero: AnyAbility = AnyAbility(Empty())
+//}
+//
+//extension AnyAbility: Ability {
+//    
+//    var count : Int {
+//        set {
+//            _ability.count = newValue
+//        }
+//        get {
+//            return _ability.count
+//        }
+//    }
+//    
+//    func animatedColumns() -> Int? {
+//        return _ability.animatedColumns()
+//    }
+//    
+//    func blocksDamage(from: Direction) -> Int? {
+//        return _ability.blocksDamage(from: from)
+//    }
+//    
+//    var description: String {
+//        return _ability.description
+//    }
+//    
+//    var flavorText: String {
+//        return _ability.flavorText
+//    }
+//    
+//    var textureName: String {
+//         return _ability.textureName
+//    }
+//    
+//    var cost: Int {
+//        return _ability.cost
+//    }
+//    
+//    var currency: Currency {
+//        return _ability.currency
+//    }
+//    
+//    var affectsCombat: Bool {
+//        return _ability.affectsCombat
+//    }
+//    
+//    var type: AbilityType {
+//        return _ability.type
+//    }
+//    
+//    var extraAttacksGranted: Int? {
+//        return _ability.extraAttacksGranted
+//    }
+//    
+//    var usage: Usage {
+//        return _ability.usage
+//    }
+//    
+//    var heal: Int? {
+//        return _ability.heal
+//    }
+//    
+//    
+//    var targets: Int? { return _ability.targets }
+//    var targetTypes: [TileType]? { _ability.targetTypes }
+//}
+//
+//extension AnyAbility: Equatable {
+//    static func == (lhs: AnyAbility, rhs: AnyAbility) -> Bool {
+//        return lhs.type == rhs.type
+//    }
+//}
+//
 
 protocol Ability {
     var affectsCombat: Bool { get }
@@ -109,6 +109,8 @@ protocol Ability {
     var targetTypes: [TileType]? { get }
     var heal: Int? { get }
     var count: Int { get set }
+    var cooldown: Int { get }
+    var rechargeType: TileType { get }
     
     func blocksDamage(from: Direction) -> Int?
     func animatedColumns() -> Int?
@@ -139,6 +141,7 @@ enum AbilityType: Equatable {
     case killMonsterPotion
     case tapAwayMonster
     case massMineRock
+    case rainEmbers
     
     var humanReadable: String {
         switch self {
@@ -154,6 +157,7 @@ enum AbilityType: Equatable {
         case .killMonsterPotion: return "Kill Monster Potion"
         case .tapAwayMonster: return "Destory Monster Group"
         case .massMineRock: return "Mass Mine"
+        case .rainEmbers: return "Rain Embers"
         }
     }
 }

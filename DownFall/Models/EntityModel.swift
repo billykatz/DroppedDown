@@ -13,6 +13,10 @@ protocol ResetsAttacks {
     func resetAttacks() -> EntityModel
 }
 
+struct Pickaxe: Equatable, Codable {
+    var runeSlots: Int
+}
+
 struct EntityModel: Equatable, Decodable {
     
     enum EntityType: String, Decodable, CaseIterable {
@@ -51,7 +55,7 @@ struct EntityModel: Equatable, Decodable {
     static let playerCases: [EntityType] = [.easyPlayer, .normalPlayer, .hardPlayer]
     
     static let zero: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .rat, carry: .zero, animations: [], abilities: [])
-    static let playerZero: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .player, carry: .zero, animations: [], abilities: [])
+    static let playerZero: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .player, carry: .zero, animations: [], abilities: [], pickaxe: Pickaxe(runeSlots: 0))
     
     static func zeroedEntity(type: EntityType) -> EntityModel {
         return EntityModel(originalHp: 0, hp: 0, name: "", attack: .zero, type: type, carry: .zero, animations: [])
@@ -65,6 +69,7 @@ struct EntityModel: Equatable, Decodable {
     let carry: CarryModel
     let animations: [AnimationModel]
     var abilities: [AnyAbility] = []
+    var pickaxe: Pickaxe?
     
     private enum CodingKeys: String, CodingKey {
         case originalHp
@@ -74,6 +79,7 @@ struct EntityModel: Equatable, Decodable {
         case type
         case carry
         case animations
+        case pickaxe
     }
     
     private func update(originalHp: Int? = nil,
@@ -83,7 +89,8 @@ struct EntityModel: Equatable, Decodable {
                         type: EntityType? = nil,
                         carry: CarryModel? = nil,
                         animations: [AnimationModel]? = nil,
-                        abilities: [AnyAbility]? = nil) -> EntityModel {
+                        abilities: [AnyAbility]? = nil,
+                        pickaxe: Pickaxe? = nil) -> EntityModel {
         let updatedOriginalHp = originalHp ?? self.originalHp
         let updatedHp = hp ?? self.hp
         let updatedName = name ?? self.name
@@ -92,6 +99,7 @@ struct EntityModel: Equatable, Decodable {
         let updatedCarry = carry ?? self.carry
         let updatedAnimations = animations ?? self.animations
         let updatedAbilities = abilities ?? self.abilities
+        let pickaxe = pickaxe ?? self.pickaxe
         
         return EntityModel(originalHp: updatedOriginalHp,
                            hp: updatedHp,
@@ -100,10 +108,16 @@ struct EntityModel: Equatable, Decodable {
                            type: updatedType,
                            carry: updatedCarry,
                            animations: updatedAnimations,
-                           abilities: updatedAbilities)
+                           abilities: updatedAbilities,
+                           pickaxe: pickaxe)
         
         
         
+    }
+    
+    var runeSlots: Int? {
+        guard let runeSlots = pickaxe?.runeSlots else { return nil }
+        return runeSlots
     }
     
     var canAttack: Bool {

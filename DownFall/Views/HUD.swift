@@ -152,7 +152,8 @@ class HUD: SKSpriteNode {
                                              progress: data.hp,
                                              fillColor: .red,
                                              backgroundColor: .clayRed,
-                                             text: "")
+                                             text: "",
+                                             horiztonal: true)
         let healthBar = FillableBar(size: CGSize(width: self.size.width * Style.HUD.healthBarWidthRatio, height: Style.HUD.healthBarHeight), viewModel: viewModel)
         healthBar.position = CGPoint.position(healthBar.frame, inside: frame, verticalAlign: .bottom, horizontalAnchor: .left, xOffset: heartNode.frame.width + Style.Padding.normal, yOffset: heartNode.frame.height/2 - Style.HUD.healthBarHeight/2)
         

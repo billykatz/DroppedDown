@@ -54,4 +54,7 @@ extension UIColor {
     static let goldOutlineDull = UIColor(rgb: 0x9E8B2C)
     static let goldOutlineBright = UIColor(rgb: 0xFDD300)
     static let runeBackgroundColor = UIColor(rgb: 0x522B28)
+    
+    /// Rune Deteail color
+    static let runeDetailColor = UIColor(rgb: 0x572d29)
 }

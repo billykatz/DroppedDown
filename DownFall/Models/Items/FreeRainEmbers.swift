@@ -10,6 +10,10 @@ import Foundation
 
 struct FreeRainEmbers: Ability {
     
+    var cooldown: Int { return 20 }
+    
+    var rechargeType: [TileType] { return [TileType.rock(.red)] }
+    
     var count: Int
     
     init(count: Int = 0) {

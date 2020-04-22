@@ -14,6 +14,7 @@ protocol FillableCircleViewModelable {
 }
 
 struct FillableCircleViewModel: FillableCircleViewModelable & FillableBarViewModelable {
+    var horiztonal: Bool
     var radius: CGFloat
     var total: Int
     var progress: Int

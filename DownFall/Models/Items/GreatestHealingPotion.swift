@@ -10,6 +10,10 @@ import Foundation
 
 struct GreatestHealingPotion: Ability {
     
+    var cooldown: Int { return 0 }
+    
+    var rechargeType: [TileType] { return [] }
+    
     var count: Int
     
     init(count: Int = 0) {

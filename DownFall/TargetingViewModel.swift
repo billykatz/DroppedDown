@@ -24,10 +24,8 @@ protocol TargetingOutputs {
     var currentTargets: [Target] { get }
     var legallyTargeted: Bool { get }
     var viewMode:  ViewMode { get }
-    
-    //available abilities to the player
+    var progress: Int { get }
     var inventory: [AnyAbility] { get }
-    
 }
 
 protocol TargetingInputs {
@@ -39,7 +37,7 @@ protocol TargetingInputs {
     func didUse(_ ability: AnyAbility?)
     
     /// Use this to select an ability
-    func didSelect(_ ability: AnyAbility?)
+    func didSelect(_ ability: AnyAbility?, progress: Int)
 }
 
 protocol Targeting: TargetingOutputs, TargetingInputs {}
@@ -47,10 +45,11 @@ protocol Targeting: TargetingOutputs, TargetingInputs {}
 class TargetingViewModel: Targeting {
     
     public var updateCallback: (() -> Void)?
-    public var inventoryUpdated: (() -> Void)?
     public var runeSlotsUpdated: ((Int, [AnyAbility]) -> Void)?
     public var targetsUpdated: (() -> Void)?
     public var viewModeChanged: (() -> Void)?
+    
+    var inventory: [AnyAbility] = []
     
     init() {
         Dispatch.shared.register { [weak self] (input) in
@@ -66,10 +65,12 @@ class TargetingViewModel: Targeting {
                 if let inputType = trans.first?.inputType,
                     case InputType.itemUsed(_) = inputType,
                     let tiles = trans.first?.endTiles,
-                    let playerCoord = getTilePosition(.player(.playerZero), tiles: tiles),
-                    case TileType.player(let data) = tiles[playerCoord].type
+                    let playerData = playerData(in: tiles)
                 {
-                    self?.inventory = data.abilities
+                    let runeSlots = playerData.runeSlots ?? 0
+                    self?.runeSlots = runeSlots
+                    self?.inventory = playerData.abilities
+                    self?.runeSlotsUpdated?(runeSlots, playerData.abilities)
                 }
                 
             case .boardBuilt:
@@ -78,9 +79,9 @@ class TargetingViewModel: Targeting {
                 
                 if let playerData = playerData(in: tiles) {
                     let runeSlots = playerData.runeSlots ?? 0
-                    self.runeSlotsUpdated?(runeSlots, playerData.abilities)
                     self.runeSlots = runeSlots
                     self.inventory = playerData.abilities
+                    self.runeSlotsUpdated?(runeSlots, playerData.abilities)
                 }
             case .itemUseCanceled:
                 ()
@@ -91,14 +92,8 @@ class TargetingViewModel: Targeting {
     }
     
     var runeSlots: Int = 0
+    var progress: Int = 0
 
-    
-    var inventory: [AnyAbility] = [] {
-        didSet {
-            inventoryUpdated?()
-        }
-    }
-    
     var ability: AnyAbility? {
         didSet {
             currentTargets = []
@@ -244,7 +239,8 @@ class TargetingViewModel: Targeting {
         
     }
     
-    func didSelect(_ ability: AnyAbility?) {
+    func didSelect(_ ability: AnyAbility?, progress: Int) {
+        self.progress = progress
         self.ability = ability
     }
     

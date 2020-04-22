@@ -9,6 +9,9 @@
 import Foundation
 
 struct FreeKillMonsterPotion: Ability {
+    var cooldown: Int { return 0 }
+    
+    var rechargeType: [TileType] { return [] }
     
     var count: Int
     

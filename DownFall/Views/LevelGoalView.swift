@@ -55,7 +55,8 @@ class LevelGoalView: SKSpriteNode {
         for (index, goalTrack) in updatedGoals.enumerated() {
             let radius = Constants.radius + (CGFloat(index+1) * Constants.radius)
             let (lightFill, darkFill) = goalTrack.fillBarColor
-            let viewModel = FillableCircleViewModel(radius: CGFloat(radius),
+            let viewModel = FillableCircleViewModel(horiztonal: true,
+                                                    radius: CGFloat(radius),
                                                     total: goalTrack.target,
                                                     progress: goalTrack.current,
                                                     fillColor: lightFill,

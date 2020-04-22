@@ -14,6 +14,7 @@ protocol FillableBarViewModelable {
     var fillColor: UIColor { get }
     var text: String? { get }
     var backgroundColor: UIColor? { get }
+    var horiztonal: Bool { get }
 }
 
 struct FillableBarViewModel: FillableBarViewModelable {
@@ -23,6 +24,7 @@ struct FillableBarViewModel: FillableBarViewModelable {
     var fillColor: UIColor
     var backgroundColor: UIColor?
     var text: String?
+    var horiztonal: Bool
 }
 
 class FillableBar: SKSpriteNode {
@@ -47,26 +49,51 @@ class FillableBar: SKSpriteNode {
 
     
     private lazy var fill: SKShapeNode = {
-        // Subtract the line widths from the actual fill size height
-        let height = contentView.frame.height - 2*Style.FillableBar.lineWidth
         
-        // Determine how long the filled portion of the bar should be
-        let widthRatio: CGFloat = CGFloat(viewModel.progress) / CGFloat(viewModel.total)
-        let width = barOutline.frame.width * widthRatio - 3*Style.FillableBar.lineWidth
-        
-        let size = CGSize(width: width,
-                          height: height)
-        // create the shape
-        var fill = SKShapeNode(rect: CGRect(origin: contentView.frame.origin, size: size), cornerRadius: Style.FillableBar.cornerRadius)
-        
-        // add the color
-        fill.color = viewModel.fillColor
-        
-        // set the position
-        fill.position = CGPoint(x: Style.FillableBar.lineWidth,
-                                y: Style.FillableBar.lineWidth)
-        
-        return fill
+        if self.viewModel.horiztonal {
+            // Subtract the line widths from the actual fill size height
+            let height = contentView.frame.height - 2*Style.FillableBar.lineWidth
+            
+            // Determine how long the filled portion of the bar should be
+            let widthRatio: CGFloat = CGFloat(viewModel.progress) / CGFloat(viewModel.total)
+            let width = barOutline.frame.width * widthRatio - 3*Style.FillableBar.lineWidth
+            
+            let size = CGSize(width: width,
+                              height: height)
+            // create the shape
+            var fill = SKShapeNode(rect: CGRect(origin: contentView.frame.origin, size: size), cornerRadius: Style.FillableBar.cornerRadius)
+            
+            // add the color
+            fill.color = viewModel.fillColor
+            
+            // set the position
+            fill.position = CGPoint(x: Style.FillableBar.lineWidth,
+                                    y: Style.FillableBar.lineWidth)
+            
+            return fill
+        } else {
+            // Subtract the line widths from the actual fill size height
+            let width = contentView.frame.width - 2*Style.FillableBar.lineWidth
+            
+            // Determine how long the filled portion of the bar should be
+            let heightRatio: CGFloat = CGFloat(viewModel.progress) / CGFloat(viewModel.total)
+            let height = barOutline.frame.height * heightRatio - 3*Style.FillableBar.lineWidth
+            
+            let size = CGSize(width: width,
+                              height: height)
+            // create the shape
+            var fill = SKShapeNode(rect: CGRect(origin: contentView.frame.origin, size: size),
+                                   cornerRadius: Style.FillableBar.cornerRadius)
+            
+            // add the color
+            fill.color = viewModel.fillColor
+            
+            // set the position
+            fill.position = CGPoint(x: Style.FillableBar.lineWidth,
+                                    y: Style.FillableBar.lineWidth)
+            
+            return fill
+        }
     }()
     
     private lazy var text: ParagraphNode = {

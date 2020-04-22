@@ -158,6 +158,7 @@
 		58B39BD723D21C9600915858 /* BackpackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58B39BD623D21C9600915858 /* BackpackView.swift */; };
 		58C1AE4A23D19CEE003B5B5A /* TransmogrificationPotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C1AE4923D19CEE003B5B5A /* TransmogrificationPotion.swift */; };
 		58C1AE4C23D19E03003B5B5A /* KillMonsterPotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C1AE4B23D19E03003B5B5A /* KillMonsterPotion.swift */; };
+		58EC7DAC244F49DA00624AC2 /* RuneDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58EC7DAB244F49DA00624AC2 /* RuneDetailView.swift */; };
 		58F034C32408B7CF00BE1863 /* BossController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F034C22408B7CF00BE1863 /* BossController.swift */; };
 /* End PBXBuildFile section */
 
@@ -326,6 +327,7 @@
 		58B39BD623D21C9600915858 /* BackpackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackpackView.swift; sourceTree = "<group>"; };
 		58C1AE4923D19CEE003B5B5A /* TransmogrificationPotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransmogrificationPotion.swift; sourceTree = "<group>"; };
 		58C1AE4B23D19E03003B5B5A /* KillMonsterPotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KillMonsterPotion.swift; sourceTree = "<group>"; };
+		58EC7DAB244F49DA00624AC2 /* RuneDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneDetailView.swift; sourceTree = "<group>"; };
 		58F034C22408B7CF00BE1863 /* BossController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BossController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -797,6 +799,7 @@
 				589A27D323D90FE000174DE7 /* TargetingViewModel.swift */,
 				5866B3DB244D2D2300DF36E0 /* RuneViewModel.swift */,
 				58B39BD623D21C9600915858 /* BackpackView.swift */,
+				58EC7DAB244F49DA00624AC2 /* RuneDetailView.swift */,
 			);
 			name = Backpack;
 			path = ..;
@@ -1003,6 +1006,7 @@
 				585EF8092431ACEF00E87FCB /* FreeLesserHealingPotion.swift in Sources */,
 				3D10609B233DD05500ECE7E6 /* TurnWatcher.swift in Sources */,
 				3D06390122EEB4FB00C4D5E9 /* PauseState.swift in Sources */,
+				58EC7DAC244F49DA00624AC2 /* RuneDetailView.swift in Sources */,
 				585EF80B2431AD2400E87FCB /* FreeKillMonsterPotion.swift in Sources */,
 				3D58468A22A6325300EDD845 /* CarryModel.swift in Sources */,
 				5819AB71242A5CA600498BB6 /* SpriteAction.swift in Sources */,

@@ -93,8 +93,6 @@ class BackpackView: SKSpriteNode {
         // "bind" to to the view model
         self.viewModel.updateCallback = { [weak self] in self?.updated() }
         self.viewModel.runeSlotsUpdated = runeSlotsUpdated
-        self.viewModel.targetsUpdated = { [weak self] in self?.updateShowDetailView() }
-        self.viewModel.viewModeChanged = { [weak self] in self?.updateViewMode() }
         
         // add children to view container
         viewContainer.addChild(self.background)
@@ -128,115 +126,29 @@ class BackpackView: SKSpriteNode {
     // TODO: should this be updated?
     private let maxRuneSlots = 4
     private func runeSlotsUpdated(_ runes: Int, _ abilities: [AnyAbility]) {
+        /// TODO: we only ever want to do this once!!!
+        /// Add an update method to the RuneContainer so if you get a rune mid-level or whatever, it will updated accordinly
+        let viewModel = RuneContainerViewModel(abilities: abilities, numberOfRuneSlots: runes)
+        let runeContainer = RuneContainerView(viewModel: viewModel, mode: .inventory, size: CGSize(width: playableRect.width, height: 300.0))
         
-        defer {
-            viewContainer.addChildSafely(runeInventoryContainer)
-        }
+        runeContainer.position = CGPoint.position(runeContainer.frame, inside: playableRect, verticalAnchor: .bottom, horizontalAnchor: .center, padding: Style.Padding.most*3)
         
-        /// Pickaxe Handle
-        let identifier = Identifiers.backgroundPickaxeHandle
+        viewModel.runeUseWasCanceled = runeUseWasCanceled
+        viewModel.runeWasUsed = self.viewModel.didUse
+        viewModel.runeWasTapped = runeWasTapped
         
-        /// the pixaxe sprite is 1:1.5 width:height ratio
-        let width = playableRect.width
-        let height = CGFloat(48)/CGFloat(128) * width
-        let pickaxeHandlePiece = SKSpriteNode(texture: SKTexture(imageNamed: identifier),
-                                              size: CGSize(width: width, height: height))
-        pickaxeHandlePiece.position = .zero
-        
-        
-        
-        runeInventoryContainer = SKSpriteNode(texture: nil, color: .clear, size: CGSize(width: width, height: height))
-        let position = CGPoint.position(pickaxeHandlePiece.frame,
-                                                            inside: playableRect,
-                                                            verticalAlign: .bottom,
-                                                            horizontalAnchor: .left,
-                                                            yOffset: Style.Padding.most*2)
-        runeInventoryContainer?.position = position
-        
-        runeInventoryContainer?.addChild(pickaxeHandlePiece)
-        
-        /// Rune Slots!
-        for index in 0..<maxRuneSlots {
-            guard index < runes else { return }
-            
-            let ability = abilities.optionalElement(at: index)
-            let viewModel = RuneSlotViewModel(rune: ability)
-            let rune = RuneSlot(viewModel: viewModel, size: .oneFifty)
-            
-            let runeY = CGFloat(0.0)
-            let runeX = playableRect.minX + playableRect.width/CGFloat(8) + (playableRect.width/4.0 * CGFloat(index))
-            
-            rune.position = CGPoint(x: runeX, y: runeY)
-            rune.zPosition = Precedence.menu.rawValue
-            runeInventoryContainer?.addChild(rune)
-            
-            viewModel.runeWasTapped = self.runeWasTapped
-        }
+        addChild(runeContainer)
     }
     
-    func runeWasTapped(ability: AnyAbility?, progress: Int) {
+    func runeUseWasCanceled() {
+        viewModel.didSelect(nil)
+    }
+    
+    func runeWasTapped(ability: AnyAbility?) {
         print("$ Rune was tapped")
-        viewModel.didSelect(ability, progress: progress)
+        viewModel.didSelect(ability)
     }
     
-    private func updateViewMode() {
-        switch viewModel.viewMode {
-        case .inventory:
-            itemDetailContainer?.removeAllChildren()
-            itemDetailContainer = nil
-            
-            runeSlotsUpdated(viewModel.runeSlots, viewModel.inventory)
-            ()
-        case .itemDetail:
-            runeInventoryContainer?.removeAllChildren()
-            runeInventoryContainer = nil
-            
-            createItemDetail(viewModel.ability)
-        }
-    }
-    
-    
-    private var itemDetailContainer: SKSpriteNode?
-    private func createItemDetail(_ ability: AnyAbility?) {
-        guard let ability = ability else { return }
-        
-        /// Pickaxe Handle
-        let identifier = Identifiers.backgroundPickaxeHandle
-        
-        /// the pixaxe sprite is 1:1.5 width:height ratio
-        let width = playableRect.width
-        let height = CGFloat(48)/CGFloat(128) * width
-        let pickaxeHandlePiece = SKSpriteNode(texture: SKTexture(imageNamed: identifier),
-                                              size: CGSize(width: width, height: height))
-        pickaxeHandlePiece.xScale = -1.0
-        pickaxeHandlePiece.position = .zero
-        
-        /// init the container
-        itemDetailContainer = SKSpriteNode(texture: nil, color: .clear, size: CGSize(width: width, height: height))
-        itemDetailContainer?.position = CGPoint.position(itemDetailContainer?.frame,
-                                                         inside: playableRect,
-                                                         verticalAlign: .bottom,
-                                                         horizontalAnchor: .left,
-                                                         yOffset: Style.Padding.most*2)
-        
-        itemDetailContainer?.addChild(pickaxeHandlePiece)
-        
-        
-        /// create the rune view
-        let viewModel = RuneDetailViewModel(rune: ability, progress: self.viewModel.progress)
-        
-        /// route the cancel action to our view model
-        viewModel.cancel = { [weak self] in
-            self?.viewModel.didSelect(nil, progress: 0)
-        }
-        
-        let runeDetail = RuneDetailView(viewModel: viewModel, size: CGSize(width: width, height: height))
-        
-        itemDetailContainer?.addChild(runeDetail)
-        
-        
-        viewContainer.addChildSafely(itemDetailContainer)
-    }
     
     /// grab the sprite or sprite sheet from an ability
     private func getSprite(of ability: AnyAbility?, detailView: Bool = false) -> SKSpriteNode? {
@@ -268,12 +180,6 @@ class BackpackView: SKSpriteNode {
         }
         
         return sprite
-        
-    }
-    
-    /// show the item detail view with ability information
-    private func updateShowDetailView() {
-        guard let selectedRune = viewModel.ability else { return }
         
     }
     
@@ -337,16 +243,6 @@ extension BackpackView {
                 let tileCoord = translatePoint(position)
                 viewModel.didTarget(tileCoord)
             }
-        }
-    }
-}
-
-extension BackpackView: ButtonDelegate {
-    func buttonTapped(_ button: Button) {
-        if button.identifier == ButtonIdentifier.backpackConfirm {
-            viewModel.didUse(viewModel.ability)
-        } else  if button.identifier == ButtonIdentifier.backpackCancel {
-            viewModel.didSelect(nil, progress: 0)
         }
     }
 }

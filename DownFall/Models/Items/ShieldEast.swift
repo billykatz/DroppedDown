@@ -6,9 +6,17 @@
 //  Copyright © 2019 William Katz LLC. All rights reserved.
 //
 
+import UIKit
 import SpriteKit
 
 struct ShieldEast: Ability {
+    var rechargeMinimum: Int {
+        return 1
+    }
+    
+    var progressColor: UIColor {
+        return UIColor.darkBarBlue
+    }
     
     var cooldown: Int { return 0 }
     

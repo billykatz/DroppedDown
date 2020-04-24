@@ -6,7 +6,16 @@
 //  Copyright © 2019 William Katz LLC. All rights reserved.
 //
 
+import UIKit
+
 struct RockASwap: Ability {
+    var rechargeMinimum: Int {
+        return 1
+    }
+    
+    var progressColor: UIColor {
+        return UIColor.darkBarPurple
+    }
     
     var cooldown: Int { return 0 }
     

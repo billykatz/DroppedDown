@@ -8,6 +8,7 @@
 
 import Foundation
 import SpriteKit
+import UIKit
 
 struct AnyAbility: Hashable {
     var _ability: Ability
@@ -30,6 +31,14 @@ extension AnyAbility: Ability {
     
     var rechargeType: [TileType] {
         return _ability.rechargeType
+    }
+    
+    var rechargeMinimum: Int {
+        return _ability.rechargeMinimum
+    }
+    
+    var progressColor: UIColor {
+        return _ability.progressColor
     }
     
     
@@ -119,6 +128,8 @@ protocol Ability {
     var count: Int { get set }
     var cooldown: Int { get }
     var rechargeType: [TileType] { get }
+    var rechargeMinimum: Int { get }
+    var progressColor: UIColor { get }
     
     func blocksDamage(from: Direction) -> Int?
     func animatedColumns() -> Int?

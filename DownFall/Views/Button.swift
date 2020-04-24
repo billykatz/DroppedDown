@@ -13,6 +13,12 @@ protocol ButtonDelegate: class {
     func buttonTapped(_ button: Button)
 }
 
+enum ButtonShape {
+    case rectangle
+    case circle
+}
+
+
 class Button: SKShapeNode {
     
     static let small = CGSize(width: 75, height: 30)
@@ -24,7 +30,7 @@ class Button: SKShapeNode {
     weak var delegate: ButtonDelegate?
     
     var identifier: ButtonIdentifier
-    let originalBackground: UIColor
+    var originalBackground: UIColor = .clear
     var showSelection = false
     
     var dropShadow: SKShapeNode?
@@ -45,6 +51,76 @@ class Button: SKShapeNode {
     var buttonView: SKShapeNode?
     
     private var isDisabled: Bool = false
+    
+    init(size: CGSize,
+         delegate: ButtonDelegate,
+         identifier: ButtonIdentifier,
+         image: SKSpriteNode,
+         precedence: Precedence,
+         shape: ButtonShape,
+         showSelection: Bool = true,
+         disable: Bool = false) {
+        
+        self.delegate = delegate
+        self.identifier = identifier
+        self.showSelection = showSelection
+        
+        // Call super
+        super.init()
+        
+        let rectangle = CGRect(x: -size.width/2, y: -size.height/2, width: size.width, height: size.height)
+        let shadowRect = CGRect(x: -size.width/2, y: -size.height/2 - dropShadowOffset, width: size.width, height: size.height)
+        let cornerRadius = CGFloat(5.0)
+        let shadowShape: SKShapeNode
+        switch shape {
+        case .rectangle:
+            self.path = CGPath(roundedRect: rectangle, cornerWidth: cornerRadius, cornerHeight: cornerRadius, transform: nil)
+            let shadowPath = CGPath(roundedRect: shadowRect, cornerWidth: cornerRadius, cornerHeight: cornerRadius, transform: nil)
+            shadowShape = SKShapeNode(path: shadowPath)
+            
+            let buttonPath = CGPath(roundedRect: rectangle, cornerWidth: cornerRadius, cornerHeight: cornerRadius, transform: nil)
+            self.buttonView = SKShapeNode(path: buttonPath)
+        case .circle:
+            self.path = CGPath(ellipseIn: rectangle, transform: nil)
+            let shadowPath = CGPath(ellipseIn: shadowRect, transform: nil)
+            shadowShape = SKShapeNode(path: shadowPath)
+            
+            let buttonPath = CGPath(ellipseIn: rectangle, transform: nil)
+            self.buttonView = SKShapeNode(path: buttonPath)
+            
+        }
+        
+        // add the image
+        image.zPosition = 0
+        addChildSafely(image)
+        
+        addChildSafely(buttonView)
+        
+        /// add the drop shadow and keep a reference to it
+        shadowShape.color = .storeBlack
+        shadowShape.zPosition = -1
+        self.dropShadow = shadowShape
+        addChild(shadowShape)
+        
+        // set the name to the identifier
+        name = identifier.rawValue
+        isUserInteractionEnabled = true
+        zPosition = 1000
+        
+        
+        //add touch expanding view
+        addChild(touchTargetExpandingView)
+        
+        //enable/disable
+        self.isDisabled = disable
+        
+        // set points for moving the button slightly
+        unpressedPosition = self.frame.center
+        depressedPosition = self.frame.center.translateVertically(-dropShadowOffset)
+        
+        self.color = .lightBarBlue
+        
+    }
     
     init(size: CGSize,
          delegate: ButtonDelegate,
@@ -109,7 +185,7 @@ class Button: SKShapeNode {
         
         //add touch expanding view
         addChild(touchTargetExpandingView)
-
+        
         //enable/disable
         self.isDisabled = disable
         
@@ -119,6 +195,10 @@ class Button: SKShapeNode {
         
         unpressedPosition = self.frame.center
         depressedPosition = self.frame.center.translateVertically(-dropShadowOffset)
+    }
+    
+    func commonInit() {
+        
     }
     
     
@@ -142,7 +222,7 @@ extension Button {
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-
+        
     }
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {

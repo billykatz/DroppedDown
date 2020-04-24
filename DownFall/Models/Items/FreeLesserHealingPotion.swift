@@ -6,7 +6,16 @@
 //  Copyright © 2020 William Katz LLC. All rights reserved.
 //
 
+import UIKit
+
 struct FreeLesserHealingPotion: Ability {
+    var rechargeMinimum: Int {
+        return 1
+    }
+    
+    var progressColor: UIColor {
+        return UIColor.darkBarRed
+    }
     
     var cooldown: Int { return 0 }
     

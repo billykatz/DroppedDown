@@ -7,8 +7,18 @@
 //
 
 import Foundation
+import UIKit
 
 struct FreeKillMonsterPotion: Ability {
+    var rechargeMinimum: Int {
+        return 1
+    }
+    
+    
+    var progressColor: UIColor {
+        return UIColor.darkBarRed
+    }
+    
     var cooldown: Int { return 0 }
     
     var rechargeType: [TileType] { return [] }

@@ -23,8 +23,6 @@ protocol TargetingOutputs {
     var usageMessage: String { get }
     var currentTargets: [Target] { get }
     var legallyTargeted: Bool { get }
-    var viewMode:  ViewMode { get }
-    var progress: Int { get }
     var inventory: [AnyAbility] { get }
 }
 
@@ -37,7 +35,7 @@ protocol TargetingInputs {
     func didUse(_ ability: AnyAbility?)
     
     /// Use this to select an ability
-    func didSelect(_ ability: AnyAbility?, progress: Int)
+    func didSelect(_ ability: AnyAbility?)
 }
 
 protocol Targeting: TargetingOutputs, TargetingInputs {}
@@ -47,7 +45,6 @@ class TargetingViewModel: Targeting {
     public var updateCallback: (() -> Void)?
     public var runeSlotsUpdated: ((Int, [AnyAbility]) -> Void)?
     public var targetsUpdated: (() -> Void)?
-    public var viewModeChanged: (() -> Void)?
     
     var inventory: [AnyAbility] = []
     
@@ -92,27 +89,16 @@ class TargetingViewModel: Targeting {
     }
     
     var runeSlots: Int = 0
-    var progress: Int = 0
 
     var ability: AnyAbility? {
         didSet {
             currentTargets = []
             if let ability = ability {
                 InputQueue.append(Input(InputType.itemUseSelected(ability)))
-                self.viewMode = .itemDetail
                 autoTarget()
             }
             else {
                 InputQueue.append(Input(InputType.itemUseCanceled))
-                self.viewMode = .inventory
-            }
-        }
-    }
-    
-    var viewMode = ViewMode.inventory {
-        didSet {
-            if viewMode != oldValue {
-                viewModeChanged?()
             }
         }
     }
@@ -239,8 +225,7 @@ class TargetingViewModel: Targeting {
         
     }
     
-    func didSelect(_ ability: AnyAbility?, progress: Int) {
-        self.progress = progress
+    func didSelect(_ ability: AnyAbility?) {
         self.ability = ability
     }
     

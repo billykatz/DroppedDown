@@ -222,11 +222,11 @@ extension GameScene {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         defer {
             self.renderer?.touchesEnded(touches, with: event)
+            self.lastPosition = nil
+            self.swipeDirection = nil
+            self.touchWasSwipe = false
         }
         
-        
-        self.lastPosition = nil
-        self.swipeDirection = nil
         if !touchWasSwipe {
             guard !touchWasCanceled else {
                 touchWasCanceled = false
@@ -235,7 +235,6 @@ extension GameScene {
         } else {
             self.rotatePreview?.touchesEnded()
         }
-        self.touchWasSwipe = false
     }
 }
 

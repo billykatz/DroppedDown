@@ -19,7 +19,7 @@ extension SKSpriteNode {
     
     func addIndicator(of amount: Int) {
         let scale = CGFloat(0.4)
-        let amountParagraph = ParagraphNode(text: "\(amount)", paragraphWidth: self.size.width * scale, fontSize: UIFont.smallSize, fontColor: .white)
+        let amountParagraph = ParagraphNode(text: "\(amount)", paragraphWidth: self.size.width * scale, fontSize: UIFont.extraSmallSize, fontColor: .white)
         
         let amountBackground = SKShapeNode(rectOf: self.size.applying(CGAffineTransform(scaleX: scale, y: scale)))
         amountBackground.color = .black

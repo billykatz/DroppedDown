@@ -7,8 +7,20 @@
 //
 
 import Foundation
+import UIKit
 
 struct SwordPickAxe: Ability {
+    var rechargeMinimum: Int {
+        return 1
+    }
+    
+    var progressColor: UIColor {
+        return UIColor.darkBarRed
+    }
+    
+    var cooldown: Int { return 0 }
+    
+    var rechargeType: [TileType] { return [] }
     
     var count: Int
     

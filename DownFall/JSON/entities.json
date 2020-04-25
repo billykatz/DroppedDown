@@ -52,7 +52,10 @@
                     }
                 ]
             },
-            "abilities": []
+            "abilities": [],
+            "pickaxe": {
+                "runeSlots" : 1
+            }
         },
         { "name": "player3",
             "type": "player",
@@ -106,7 +109,10 @@
                 }
                 ]
             },
-            "abilities": []
+            "abilities": [],
+            "pickaxe": {
+                "runeSlots" : 1
+            }
         },
         { "name": "player3",
             "type": "player",
@@ -160,7 +166,10 @@
                 }
                 ]
             },
-            "abilities": []
+            "abilities": [],
+            "pickaxe": {
+                "runeSlots" : 1
+            }
         },
         { "name": "dragon",
             "type": "dragon",

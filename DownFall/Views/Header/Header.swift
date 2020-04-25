@@ -20,7 +20,7 @@ class Header: SKSpriteNode {
                       size: CGSize,
                       precedence: Precedence,
                       delegate: SettingsDelegate) -> Header {
-        let header = Header(texture: SKTexture(imageNamed: Identifiers.header), color: color, size: size)
+        let header = Header(texture: nil, color: color, size: size)
         let setting = SKSpriteNode(imageNamed: Identifiers.settings)
         setting.name = Identifiers.settings
         setting.position = CGPoint.position(setting.frame, centeredOnTheRightOf: header.frame, horizontalOffset: Style.Padding.more)

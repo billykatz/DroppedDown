@@ -8,6 +8,7 @@
 
 import Foundation
 import SpriteKit
+import UIKit
 
 struct AnyAbility: Hashable {
     var _ability: Ability
@@ -24,6 +25,22 @@ struct AnyAbility: Hashable {
 }
 
 extension AnyAbility: Ability {
+    var cooldown: Int {
+        return _ability.cooldown
+    }
+    
+    var rechargeType: [TileType] {
+        return _ability.rechargeType
+    }
+    
+    var rechargeMinimum: Int {
+        return _ability.rechargeMinimum
+    }
+    
+    var progressColor: UIColor {
+        return _ability.progressColor
+    }
+    
     
     var count : Int {
         set {
@@ -109,6 +126,10 @@ protocol Ability {
     var targetTypes: [TileType]? { get }
     var heal: Int? { get }
     var count: Int { get set }
+    var cooldown: Int { get }
+    var rechargeType: [TileType] { get }
+    var rechargeMinimum: Int { get }
+    var progressColor: UIColor { get }
     
     func blocksDamage(from: Direction) -> Int?
     func animatedColumns() -> Int?
@@ -139,6 +160,7 @@ enum AbilityType: Equatable {
     case killMonsterPotion
     case tapAwayMonster
     case massMineRock
+    case rainEmbers
     
     var humanReadable: String {
         switch self {
@@ -154,6 +176,7 @@ enum AbilityType: Equatable {
         case .killMonsterPotion: return "Kill Monster Potion"
         case .tapAwayMonster: return "Destory Monster Group"
         case .massMineRock: return "Mass Mine"
+        case .rainEmbers: return "Rain Embers"
         }
     }
 }

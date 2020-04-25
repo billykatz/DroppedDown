@@ -49,4 +49,12 @@ extension UIColor {
     static let lightBarMonster = UIColor(rgb: 0xe11a1a)
     static let darkBarGem = UIColor(rgb: 0x65b596)
     static let lightBarGem = UIColor(rgb: 0x9edfc6)
+
+    /// Rune colors
+    static let goldOutlineDull = UIColor(rgb: 0x9E8B2C)
+    static let goldOutlineBright = UIColor(rgb: 0xFDD300)
+    static let runeBackgroundColor = UIColor(rgb: 0x522B28)
+    
+    /// Rune Deteail color
+    static let runeDetailColor = UIColor(rgb: 0x572d29)
 }

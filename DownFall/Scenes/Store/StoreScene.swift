@@ -91,7 +91,7 @@ class StoreScene: SKScene {
                                      delegate: self,
                                      identifier: .seeInventory,
                                      precedence: .foreground,
-                                     fontSize:  UIFont.smallSize,
+                                     fontSize:  UIFont.extraSmallSize,
                                      fontColor: .black,
                                      backgroundColor: .foregroundBlue)
         
@@ -114,7 +114,7 @@ class StoreScene: SKScene {
                                    delegate: self,
                                    identifier: .storeItem,
                                    precedence: .foreground,
-                                   fontSize: UIFont.smallSize))
+                                   fontSize: UIFont.extraSmallSize))
         }
         return items
     }
@@ -211,7 +211,7 @@ class StoreScene: SKScene {
                                  delegate: self,
                                  identifier: .close,
                                  precedence: .foreground,
-                                 fontSize: UIFont.smallSize,
+                                 fontSize: UIFont.extraSmallSize,
                                  fontColor: .white,
                                  backgroundColor: .darkGray)
         closeButton.position = CGPoint.position(closeButton.frame, inside: popupNode.frame, verticalAnchor: .top, horizontalAnchor: .right)
@@ -387,7 +387,7 @@ class StoreScene: SKScene {
                 string = "None"
             }
             
-            let paragraph = ParagraphNode(text: string, paragraphWidth: frame.width*0.7, fontSize: UIFont.smallSize, fontColor: .black)
+            let paragraph = ParagraphNode(text: string, paragraphWidth: frame.width*0.7, fontSize: UIFont.extraSmallSize, fontColor: .black)
             inventoryView.addChild(paragraph)
             
             addChild(inventoryView)

@@ -292,7 +292,7 @@ class TileCreator: TileStrategy {
         let exitPosition = exitQuadrant.randomCoord(for: boardSize, notIn: reservedSet)
         reservedSet.insert(exitPosition)
         
-        let randomGemPosition = playerQuadrant.adjacent[Int.random(randomSource.nextInt() % 2)].randomCoord(for:boardSize, notIn: reservedSet)
+        let randomGemPosition = playerQuadrant.adjacent[Int.random(abs(randomSource.nextInt() % 2))].randomCoord(for:boardSize, notIn: reservedSet)
         tiles[randomGemPosition.x][randomGemPosition.y] = Tile(type: .gem)
         
         tiles[exitPosition.x][exitPosition.y] = Tile(type: .exit(blocked: true))

@@ -8,22 +8,38 @@
 
 import SpriteKit
 
-class RuneContainerViewModel {
-    var runeWasTapped: ((AnyAbility) -> ())?
-    var runeWasUsed: ((AnyAbility) -> ())?
-    var runeUseWasCanceled: (() -> ())?
+protocol RuneContainerViewModelable {
+    var runeWasTapped: ((AnyAbility) -> ())? { get }
+    var runeWasUsed: ((AnyAbility) -> ())? { get }
+    var runeUseWasCanceled: (() -> ())? { get }
+    
+    var abilities: [AnyAbility] { get }
+    var numberOfRuneSlots: Int { get }
+}
+
+struct RuneContainerViewModel: RuneContainerViewModelable {
+    let runeWasTapped: ((AnyAbility) -> ())?
+    let runeWasUsed: ((AnyAbility) -> ())?
+    let runeUseWasCanceled: (() -> ())?
     
     let abilities: [AnyAbility]
     let numberOfRuneSlots: Int
     
-    init(abilities: [AnyAbility], numberOfRuneSlots: Int) {
+    init(abilities: [AnyAbility],
+         numberOfRuneSlots: Int,
+         runeWasTapped: ((AnyAbility) -> ())?,
+         runeWasUsed: ((AnyAbility) -> ())?,
+         runeUseWasCanceled: (() -> ())?) {
         self.abilities = abilities
         self.numberOfRuneSlots = numberOfRuneSlots
+        self.runeWasTapped = runeWasTapped
+        self.runeWasUsed = runeWasUsed
+        self.runeUseWasCanceled = runeUseWasCanceled
     }
 }
 
 class RuneContainerView: SKSpriteNode {
-    let viewModel: RuneContainerViewModel
+    let viewModel: RuneContainerViewModelable
     let mode: ViewMode
     
     struct Constants {
@@ -31,10 +47,11 @@ class RuneContainerView: SKSpriteNode {
         static let runeDetailViewName = "runeDetailView"
     }
     
-    init(viewModel: RuneContainerViewModel, mode: ViewMode, size: CGSize) {
+    init(viewModel: RuneContainerViewModelable, mode: ViewMode, size: CGSize) {
         self.viewModel = viewModel
         self.mode = mode
         super.init(texture: nil, color: .clear, size: size)
+        isUserInteractionEnabled = true
         
         setupView()
     }

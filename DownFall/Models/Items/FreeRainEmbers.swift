@@ -11,14 +11,14 @@ import UIKit
 
 struct FreeRainEmbers: Ability {
     var rechargeMinimum: Int {
-        return 4
+        return 1
     }
     
     var progressColor: UIColor {
         return UIColor.darkBarRed
     }
     
-    var cooldown: Int { return 5 }
+    var cooldown: Int { return 25 }
     
     var rechargeType: [TileType] { return [TileType.rock(.red)] }
     

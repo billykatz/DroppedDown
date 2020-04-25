@@ -56,8 +56,8 @@ class Button: SKShapeNode {
          delegate: ButtonDelegate,
          identifier: ButtonIdentifier,
          image: SKSpriteNode,
-         precedence: Precedence,
          shape: ButtonShape,
+         precedence: Precedence = Precedence.aboveMenu,
          showSelection: Bool = true,
          disable: Bool = false) {
         
@@ -102,15 +102,6 @@ class Button: SKShapeNode {
         self.dropShadow = shadowShape
         addChild(shadowShape)
         
-        // set the name to the identifier
-        name = identifier.rawValue
-        isUserInteractionEnabled = true
-        zPosition = 1000
-        
-        
-        //add touch expanding view
-        addChild(touchTargetExpandingView)
-        
         //enable/disable
         self.isDisabled = disable
         
@@ -120,12 +111,14 @@ class Button: SKShapeNode {
         
         self.color = .lightBarBlue
         
+        commonInit(precedence: precedence)
+        
     }
     
     init(size: CGSize,
          delegate: ButtonDelegate,
          identifier: ButtonIdentifier,
-         precedence: Precedence,
+         precedence: Precedence = .aboveMenu,
          fontSize: CGFloat = UIFont.largeSize,
          fontColor: UIColor = UIColor.eggshellWhite,
          backgroundColor: UIColor = .clayRed,
@@ -160,11 +153,6 @@ class Button: SKShapeNode {
         shadowShape.zPosition = -1
         addChild(shadowShape)
         
-        // set the name to the identifier
-        name = identifier.rawValue
-        isUserInteractionEnabled = true
-        zPosition = precedence.rawValue
-        
         if addTextLabel {
             //Create Label
             let label = Label(text: identifier.title,
@@ -183,9 +171,6 @@ class Button: SKShapeNode {
         
         self.addChildSafely(buttonView)
         
-        //add touch expanding view
-        addChild(touchTargetExpandingView)
-        
         //enable/disable
         self.isDisabled = disable
         
@@ -195,10 +180,18 @@ class Button: SKShapeNode {
         
         unpressedPosition = self.frame.center
         depressedPosition = self.frame.center.translateVertically(-dropShadowOffset)
+        
+        commonInit(precedence: precedence)
     }
     
-    func commonInit() {
+    func commonInit(precedence: Precedence) {
+        //add touch expanding view
+        addChild(touchTargetExpandingView)
         
+        // set the name to the identifier
+        name = identifier.rawValue
+        isUserInteractionEnabled = true
+        zPosition = precedence.rawValue
     }
     
     

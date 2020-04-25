@@ -40,55 +40,59 @@ protocol TargetingInputs {
 
 protocol Targeting: TargetingOutputs, TargetingInputs {}
 
+
 class TargetingViewModel: Targeting {
     
     public var updateCallback: (() -> Void)?
     public var runeSlotsUpdated: ((Int, [AnyAbility]) -> Void)?
     public var targetsUpdated: (() -> Void)?
     
+    private var runeSlots: Int = 0
     var inventory: [AnyAbility] = []
     
     init() {
         Dispatch.shared.register { [weak self] (input) in
-            switch input.type {
-            case .transformation(let trans):
-                if let inputType = trans.first?.inputType,
-                    case InputType.itemUseSelected(_) = inputType,
-                    let endTiles = trans.first?.endTiles
-                {
-                    self?.tiles = endTiles
-                }
-                
-                if let inputType = trans.first?.inputType,
-                    case InputType.itemUsed(_) = inputType,
-                    let tiles = trans.first?.endTiles,
-                    let playerData = playerData(in: tiles)
-                {
-                    let runeSlots = playerData.runeSlots ?? 0
-                    self?.runeSlots = runeSlots
-                    self?.inventory = playerData.abilities
-                    self?.runeSlotsUpdated?(runeSlots, playerData.abilities)
-                }
-                
-            case .boardBuilt:
-                guard let self = self,
-                    let tiles = input.endTilesStruct else { return }
-                
-                if let playerData = playerData(in: tiles) {
-                    let runeSlots = playerData.runeSlots ?? 0
-                    self.runeSlots = runeSlots
-                    self.inventory = playerData.abilities
-                    self.runeSlotsUpdated?(runeSlots, playerData.abilities)
-                }
-            case .itemUseCanceled:
-                ()
-            default:
-                ()
-            }
+            self?.handle(input)
         }
     }
     
-    var runeSlots: Int = 0
+    func handle(_ input: Input) {
+        switch input.type {
+        case .transformation(let trans):
+            if let inputType = trans.first?.inputType,
+                case InputType.itemUseSelected(_) = inputType,
+                let endTiles = trans.first?.endTiles
+            {
+                tiles = endTiles
+            }
+            
+            if let inputType = trans.first?.inputType,
+                case InputType.itemUsed(_) = inputType,
+                let tiles = trans.first?.endTiles,
+                let playerData = playerData(in: tiles)
+            {
+                let runeSlots = playerData.runeSlots ?? 0
+                self.runeSlots = runeSlots
+                inventory = playerData.abilities
+                runeSlotsUpdated?(runeSlots, playerData.abilities)
+            }
+            
+        case .boardBuilt:
+            guard let tiles = input.endTilesStruct else { return }
+            
+            if let playerData = playerData(in: tiles) {
+                let runeSlots = playerData.runeSlots ?? 0
+                self.runeSlots = runeSlots
+                inventory = playerData.abilities
+                runeSlotsUpdated?(runeSlots, playerData.abilities)
+            }
+        case .itemUseCanceled:
+            ()
+        default:
+            ()
+        }
+
+    }
 
     var ability: AnyAbility? {
         didSet {

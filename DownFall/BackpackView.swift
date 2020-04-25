@@ -16,8 +16,7 @@ import SpriteKit
 class BackpackView: SKSpriteNode {
     
     private struct Constants {
-        static let emptyItemMessage = "No items in backpack."
-        static let restockMessage = "(Restock in the store)"
+        static let tag = String(describing: BackpackView.self)
     }
     
     // view model
@@ -47,11 +46,6 @@ class BackpackView: SKSpriteNode {
     
     // pick axe
     var pickaxeHandleView: SKSpriteNode?
-    
-    private lazy var targetBoard: SKSpriteNode = {
-        let targetBoard = SKSpriteNode(texture: SKTexture(imageNamed: "targetBoard"), color: .clear, size: Style.Backpack.targetBoardSize)
-        return targetBoard
-    }()
     
     init(playableRect: CGRect, viewModel: TargetingViewModel, levelSize: Int) {
         self.playableRect = playableRect
@@ -118,7 +112,6 @@ class BackpackView: SKSpriteNode {
      */
     func updated() {
         updateReticles()
-        updateCancelButton(with: viewModel.ability)
         updateTargetArea()
     }
     
@@ -128,59 +121,28 @@ class BackpackView: SKSpriteNode {
     private func runeSlotsUpdated(_ runes: Int, _ abilities: [AnyAbility]) {
         /// TODO: we only ever want to do this once!!!
         /// Add an update method to the RuneContainer so if you get a rune mid-level or whatever, it will updated accordinly
-        let viewModel = RuneContainerViewModel(abilities: abilities, numberOfRuneSlots: runes)
-        let runeContainer = RuneContainerView(viewModel: viewModel, mode: .inventory, size: CGSize(width: playableRect.width, height: 300.0))
+        let viewModel = RuneContainerViewModel(abilities: abilities,
+                                               numberOfRuneSlots: runes,
+                                               runeWasTapped: runeWasTapped,
+                                               runeWasUsed: self.viewModel.didUse,
+                                               runeUseWasCanceled: runeUseWasCanceled)
+        let runeContainer = RuneContainerView(viewModel: viewModel,
+                                              mode: .inventory,
+                                              size: CGSize(width: playableRect.width, height: Style.Backpack.runeInventorySize))
         
         runeContainer.position = CGPoint.position(runeContainer.frame, inside: playableRect, verticalAnchor: .bottom, horizontalAnchor: .center, padding: Style.Padding.most*3)
+
         
-        viewModel.runeUseWasCanceled = runeUseWasCanceled
-        viewModel.runeWasUsed = self.viewModel.didUse
-        viewModel.runeWasTapped = runeWasTapped
-        
+        runeInventoryContainer = runeContainer
         addChild(runeContainer)
     }
     
-    func runeUseWasCanceled() {
+    private func runeUseWasCanceled() {
         viewModel.didSelect(nil)
     }
     
-    func runeWasTapped(ability: AnyAbility?) {
-        print("$ Rune was tapped")
+    private func runeWasTapped(ability: AnyAbility?) {
         viewModel.didSelect(ability)
-    }
-    
-    
-    /// grab the sprite or sprite sheet from an ability
-    private func getSprite(of ability: AnyAbility?, detailView: Bool = false) -> SKSpriteNode? {
-        var sprite: SKSpriteNode?
-        let size = detailView ? Style.Backpack.itemDetailSize : Style.Backpack.itemSize
-        if let abilityFrames = ability?.spriteSheet?.animationFrames(), let first = abilityFrames.first  {
-            sprite = SKSpriteNode(texture: first, color: .clear, size: size)
-            sprite?.run(SKAction.repeatForever(SKAction.animate(with: abilityFrames, timePerFrame: AnimationSettings.Store.itemFrameRate)))
-            sprite?.name = ability?.type.humanReadable
-            
-        } else if let abilitySprite = ability?.sprite {
-            sprite = abilitySprite
-            sprite?.size = size
-            sprite?.name = ability?.type.humanReadable
-        }
-        
-        // add on the 1...Nx to display that you own multiple copies
-        if let number = ability?.count, number > 1 {
-            let numberXLabel = ParagraphNode(text: "\(number)x", paragraphWidth: size.width, fontColor: .darkText)
-            numberXLabel.zPosition = Precedence.menu.rawValue
-            numberXLabel.position = CGPoint.position(numberXLabel.frame, inside: sprite?.frame ?? .zero, verticalAnchor: .bottom, horizontalAnchor: .right)
-            
-            let backgroundColor = SKSpriteNode(color: .lightGray, size: numberXLabel.size)
-            backgroundColor.position = .zero
-            
-            numberXLabel.addChildSafely(backgroundColor)
-            sprite?.addChildSafely(numberXLabel)
-            
-        }
-        
-        return sprite
-        
     }
     
     private func updateTargetArea() {
@@ -226,9 +188,6 @@ class BackpackView: SKSpriteNode {
         x = min(Int(boardSize-1), x)
         
         return TileCoord(y, x)
-    }
-    
-    private func updateCancelButton(with ability: AnyAbility?) {
     }
 }
 

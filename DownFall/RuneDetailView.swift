@@ -8,14 +8,29 @@
 
 import SpriteKit
 
-struct RuneDetailViewModel {
+protocol RuneDetailViewModelable {
+    var ability: AnyAbility? { get }
+    var progress: CGFloat { get }
+    var confirmed: ((AnyAbility) -> ())? { get set }
+    var canceled: (() -> ())? { get set }
+    var isCharged: Bool { get }
+    var chargeDescription: String? { get }
+    
+}
+
+struct RuneDetailViewModel: RuneDetailViewModelable {
     var ability: AnyAbility?
     var progress: CGFloat
+    var confirmed: ((AnyAbility) -> ())?
+    var canceled: (() -> ())?
+    
+    /// returns true is we have completed the charging of a rune
     var isCharged: Bool {
         guard let rune = ability else { return false }
         return progress >= CGFloat(rune.cooldown)
     }
     
+    /// returns a string to display to players that describes how to recahrge the rune
     var chargeDescription: String? {
         guard let rune = ability else { return nil }
         var strings: [String] = []
@@ -36,18 +51,16 @@ struct RuneDetailViewModel {
         
         return strings.joined(separator: ". ")
     }
-    var confirmed: ((AnyAbility) -> ())?
-    var canceled: (() -> ())?
 }
 
 class RuneDetailView: SKSpriteNode, ButtonDelegate {
-    let viewModel: RuneDetailViewModel
+    let viewModel: RuneDetailViewModelable
     
     struct Constants {
         static let detailBackgroundScale = CGFloat(0.6)
     }
-     
-    init(viewModel: RuneDetailViewModel, size: CGSize) {
+    
+    init(viewModel: RuneDetailViewModelable, size: CGSize) {
         self.viewModel = viewModel
         super.init(texture: nil, color: .clear, size: size)
         
@@ -65,12 +78,14 @@ class RuneDetailView: SKSpriteNode, ButtonDelegate {
     }
     
     func setupRuneView() {
-        let runeSlotView = RuneSlotView(viewModel: RuneSlotViewModel(rune: viewModel.ability,
-                                                                 registerForUpdates: false,
-                                                                 progress: Int(viewModel.progress)),
-                                    size: .oneFifty)
+        let viewModel = RuneSlotViewModel(rune: self.viewModel.ability,
+                                          registerForUpdates: false,
+                                          progress: Int(self.viewModel.progress))
+        let runeSlotView = RuneSlotView(viewModel: viewModel,
+                                        size: .oneFifty)
         runeSlotView.position = CGPoint.position(runeSlotView.frame, inside: frame, verticalAlign: .center, horizontalAnchor: .left)
         runeSlotView.zPosition = Precedence.foreground.rawValue
+        viewModel.runeWasTapped = { [weak self] (_,_) in self?.viewModel.canceled?() }
         addChild(runeSlotView)
         
     }
@@ -134,13 +149,13 @@ class RuneDetailView: SKSpriteNode, ButtonDelegate {
         if viewModel.ability != nil {
             
             let confirmSprite = SKSpriteNode(texture: SKTexture(imageNamed: "buttonAffirmitive"), size: .oneHundred)
-            let confirmButton = Button(size: .oneHundred, delegate: self, identifier: .backpackConfirm, image: confirmSprite, precedence: .foreground, shape: .circle, showSelection: true, disable: !viewModel.isCharged)
+            let confirmButton = Button(size: .oneHundred, delegate: self, identifier: .backpackConfirm, image: confirmSprite, shape: .circle, showSelection: true, disable: !viewModel.isCharged)
             confirmButton.position = CGPoint.position(confirmButton.frame, inside: self.frame, verticalAlign: .center, horizontalAnchor: .right, xOffset: Style.Padding.more)
             addChild(confirmButton)
         }
         
         let cancelSprite = SKSpriteNode(texture: SKTexture(imageNamed: "buttonNegative"), size: .oneHundred)
-        let cancelButton = Button(size: .oneHundred, delegate: self, identifier: .backpackCancel, image: cancelSprite, precedence: .foreground, shape: .circle, showSelection: true)
+        let cancelButton = Button(size: .oneHundred, delegate: self, identifier: .backpackCancel, image: cancelSprite, shape: .circle, showSelection: true)
         cancelButton.position = CGPoint.alignHorizontally(cancelButton.frame, relativeTo: frame, horizontalAnchor: .right, verticalAlign: .top, verticalPadding: Style.Padding.more, horizontalPadding: Style.Padding.more)
         
         addChild(cancelButton)

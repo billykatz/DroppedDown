@@ -738,7 +738,8 @@ extension Board {
             type: data.type,
             carry: newCarryModel,
             animations: data.animations,
-            abilities: data.abilities)
+            abilities: data.abilities,
+            pickaxe: data.pickaxe)
         
         updatedTiles[pp.x][pp.y] = Tile(type: .player(playerData))
         

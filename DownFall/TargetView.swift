@@ -66,13 +66,8 @@ class TargetView: TargetingView {
     
     func dataUpdated() {
         targetingArea.removeAllChildren()
-        updateTargetArea()
         updateTargetReticles()
         updateAttackReticles()
-    }
-    
-    private func updateTargetArea() {
-        
     }
     
     private func updateTargetReticles() {
@@ -138,7 +133,4 @@ class TargetView: TargetingView {
         
         return TileCoord(y, x)
     }
-    
-    
-    
 }

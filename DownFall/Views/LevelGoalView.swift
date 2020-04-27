@@ -43,14 +43,6 @@ class LevelGoalView: SKSpriteNode {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func goalView() -> SKSpriteNode{
-        let exit = TileType.exit(blocked: viewModel.exitLocked)
-        let sprite = SKSpriteNode(texture: SKTexture(imageNamed: exit.textureString()), color: .clear, size: CGSize(width: 100.0, height: 100.0))
-        sprite.zPosition = 150
-        sprite.position = fillableCircleCenter
-        return sprite
-    }
-    
     private func createFillableCircle(_ updatedGoals: [GoalTracking]) {
         for (index, goalTrack) in updatedGoals.enumerated() {
             let radius = Constants.radius + (CGFloat(index+1) * Constants.radius)

@@ -9,8 +9,6 @@
 protocol LevelGoalTrackingOutputs {
     var goalUpdated: (([GoalTracking]) -> ())? { get set }
     var goalProgress: [GoalTracking] { get }
-    var exitLocked: Bool { get }
-    var numberOfExitGoals: Int { get }
 }
 
 protocol LevelGoalTracking: LevelGoalTrackingOutputs {}
@@ -21,31 +19,6 @@ class LevelGoalTracker: LevelGoalTracking {
     public var goalProgress: [GoalTracking] = []
     
     private let level: Level
-    
-    // state to make sure we dont keep trying to unlock the door
-    var exitHasBeenUnlocked = false
-    
-    /// Outuputs flase if the player has not reach the number of goals needed to unlock the exit
-    var exitLocked: Bool {
-        numberOfExitGoalsUnlocked < level.numberOfGoalsNeedToUnlockExit
-    }
-    
-    /// Return the number of exit goals that the player has completed
-    var numberOfExitGoalsUnlocked: Int {
-        return goalProgress.filter { (goal) -> Bool in
-            return goal.levelGoalType == LevelGoalType.unlockExit
-                && goal.current == goal.target
-        }.count
-
-    }
-    
-    /// Returns the number of unlockExit goals there are on this level
-    var numberOfExitGoals: Int {
-        let exitGoals = goalProgress.filter { (goal) -> Bool in
-            return goal.levelGoalType == LevelGoalType.unlockExit
-        }
-        return exitGoals.count
-    }
     
     init(level: Level) {
         self.level = level
@@ -78,19 +51,16 @@ class LevelGoalTracker: LevelGoalTracking {
     }
     
     private func checkForCompletedGoals() {
-        for (idx, goal) in goalProgress.enumerated() {
+        var awardedGoals: [LevelGoalReward] = []
+        for (idx, goal) in goalProgress.enumerated(){
             if goal.isCompleted && !goal.hasBeenRewarded {
                 goalProgress[idx] = goal.isAwarded()
-                // return because we can only hand tphese out one at a time
-                InputQueue.append(Input(.playerAwarded([goal.reward])))
-                return
+                // return because we can only hand these out one at a time
+                awardedGoals.append(goal.reward)
             }
         }
-        
-        // unlock the goal last so we dont exit the baord before getting rewards
-        if !exitHasBeenUnlocked && !exitLocked {
-            exitHasBeenUnlocked = true
-            InputQueue.append(Input(.unlockExit))
+        if !awardedGoals.isEmpty {
+            InputQueue.append(Input(.playerAwarded(awardedGoals)))
         }
     }
     

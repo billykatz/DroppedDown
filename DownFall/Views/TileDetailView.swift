@@ -203,9 +203,9 @@ class TileDetailView: SKNode {
             return
         }
         
-        let subTitleNode = ParagraphNode(text: "Complete 2 of 3 to unlock the exit", paragraphWidth: contentView.frame.width, fontSize: UIFont.largeSize)
+        let subTitleNode = ParagraphNode(text: "Optional objectives.\nComplete for bonuses", paragraphWidth: detailViewTemplate.frame.width, fontSize: UIFont.largeSize)
         
-        subTitleNode.position = CGPoint.position(subTitleNode.frame, inside: detailViewTemplate.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most)
+        subTitleNode.position = CGPoint.position(subTitleNode.frame, inside: detailViewTemplate.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.less)
         
         detailViewTemplate.addChild(subTitleNode)
         

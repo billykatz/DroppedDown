@@ -71,10 +71,10 @@ class TargetingViewModel: Targeting {
                 let tiles = trans.first?.endTiles,
                 let playerData = playerData(in: tiles)
             {
-                let runeSlots = playerData.runeSlots ?? 0
-                self.runeSlots = runeSlots
-                inventory = playerData.abilities
-                runeSlotsUpdated?(runeSlots, playerData.abilities)
+//                let runeSlots = playerData.runeSlots ?? 0
+//                self.runeSlots = runeSlots
+//                inventory = playerData.abilities
+//                runeSlotsUpdated?(runeSlots, playerData.abilities)
             }
             
         case .boardBuilt:

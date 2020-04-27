@@ -407,6 +407,14 @@ extension Board {
             guard let target = targets.first, case TileType.rock(let color) = tiles[target.row][target.column].type else { return .zero }
             use(ability)
             return massMine(tiles: tiles, color: color, input: input)
+        case .rainEmbers:
+            guard let firstTarget = targets.first, targets.count > 1 else {
+                return .zero
+            }
+            //TODO: we have to rethink how we keep track of rune's progress.  Right now it is not part of the entity's model which mean we will lose the progress between levels-- I think that would feel bag
+//            use(ability)
+            let secondTarget = targets[1]
+            return removeAndReplaces(from: tiles, specificCoord: [firstTarget, secondTarget], input: input)
         default:
             ()
         }
@@ -652,8 +660,10 @@ extension Board {
                 
             case .rock:
                 intermediateTiles[coord.x][coord.y] = Tile.empty
+            case .monster:
+                intermediateTiles[coord.x][coord.y] = Tile.empty
             default:
-                preconditionFailure("We should only use this for rocks and pillars")
+                preconditionFailure("We should only use this for rocks, pillars and monsters")
             }
         }
         
@@ -752,19 +762,20 @@ extension Board {
     
     
     private func monsterDied(at coord: TileCoord, input: Input) -> Transformation {
-        if case let .monster(monsterData) = tiles[coord].type {
-            let gold = tileCreator.goldDropped(from: monsterData)
-            let item = Item(type: .gold, amount: gold * level.threatLevelController.threatLevel.color.goldDamageMultiplier)
-            let itemTile = TileType.item(item)
-            tiles[coord.x][coord.y] = Tile(type: itemTile)
-            //TODO: dont recreate the input
-            return Transformation(transformation: nil,
-                                  inputType: .monsterDies(coord, monsterData.type),
-                                  endTiles: tiles)
-        } else {
+        //TODO: remove the code that makes a monster drop gold.
+//        if case let .monster(monsterData) = tiles[coord].type {
+//            let gold = tileCreator.goldDropped(from: monsterData)
+//            let item = Item(type: .gold, amount: gold * level.threatLevelController.threatLevel.color.goldDamageMultiplier)
+//            let itemTile = TileType.item(item)
+//            tiles[coord.x][coord.y] = Tile(type: itemTile)
+//            //TODO: dont recreate the input
+//            return Transformation(transformation: nil,
+//                                  inputType: .monsterDies(coord, monsterData.type),
+//                                  endTiles: tiles)
+//        } else {
             //no item! remove and replace
             return removeAndReplace(from: tiles, tileCoord: coord, singleTile: true, input: input)
-        }
+//        }
         
     }
     

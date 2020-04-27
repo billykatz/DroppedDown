@@ -131,7 +131,7 @@ class BackpackView: SKSpriteNode {
                                               size: CGSize(width: playableRect.width, height: Style.Backpack.runeInventorySize))
         
         runeContainer.position = CGPoint.position(runeContainer.frame, inside: playableRect, verticalAnchor: .bottom, horizontalAnchor: .center, padding: Style.Padding.most*3)
-
+        runeContainer.zPosition = Precedence.aboveMenu.rawValue
         
         runeInventoryContainer = runeContainer
         addChild(runeContainer)

@@ -77,6 +77,10 @@ class RuneSlotViewModel: RuneSlotViewModelOutputs, RuneSlotViewModelInputs {
         case .transformation(let trans):
             trackRuneProgress(with: trans)
             return
+        case .itemUsed(let rune, _):
+            if rune.type == self.rune?.type {
+                current = 0
+            }
         default:
             return
         }

@@ -142,7 +142,7 @@ class Renderer: SKSpriteNode {
                     let tiles = input.endTilesStruct else { return }
                 self.sprites = self.createSprites(from: tiles)
                 self.add(sprites: self.sprites, tiles: tiles)
-                
+
             default:
                 self?.renderInput(input)
             }
@@ -169,14 +169,12 @@ class Renderer: SKSpriteNode {
                 animate(trans.tileTransformation?.first) { [weak self] in
                     self?.gameWin(transformation: trans)
                 }
-            case .monsterDies, .newTurn, .bossTargetsWhatToEat, .bossAttacks, .unlockExit, .playerAwarded:
+            case .monsterDies:
+                computeNewBoard(for: trans)
+            case .newTurn, .bossTargetsWhatToEat, .bossAttacks, .unlockExit, .playerAwarded:
                 animationsFinished(endTiles: trans.endTiles)
-            case .itemUsed(let ability, _):
-                if ability.type == .massMineRock {
-                    computeNewBoard(for: transformations)
-                } else {
-                    animationsFinished(endTiles: trans.endTiles)
-                }
+            case .itemUsed(let ability, let targets):
+                animateRuneUsed(input: inputType, transformations: transformations, rune: ability, targets: targets)
             case .collectItem:
                 computeNewBoard(for: trans)
             case .bossEatsRocks:
@@ -264,6 +262,18 @@ class Renderer: SKSpriteNode {
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func animateRuneUsed(input: InputType, transformations: [Transformation], rune: AnyAbility, targets: [TileCoord]) {
+        switch rune.type {
+        case .massMineRock:
+            computeNewBoard(for: transformations)
+        case .rainEmbers:
+            computeNewBoard(for: transformations)
+        default:
+            animationsFinished(endTiles: transformations.first?.endTiles)
+        }
+        
     }
     
     private func animateAttack(attackInput: InputType, endTiles: [[Tile]]?) {
@@ -555,8 +565,8 @@ extension Renderer {
                 for _ in 0..<item.amount {
                     let identifier: String = item.type == .gold ? Identifiers.gold : Identifiers.gem
                     let sprite = SKSpriteNode(texture: SKTexture(imageNamed: identifier),
-                                                  color: .clear,
-                                                  size: Style.Board.goldGainSize)
+                                              color: .clear,
+                                              size: Style.Board.goldGainSize)
                     sprite.position = startPoint
                     sprite.zPosition = Precedence.menu.rawValue
                     spriteForeground.addChild(sprite)

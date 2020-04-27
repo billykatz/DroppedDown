@@ -76,7 +76,6 @@ class LevelGoalView: SKSpriteNode {
     
     private func updateGoal(_ updatedGoals: [GoalTracking]) {
         contentView.removeAllChildren(exclude: [Constants.keyView])
-        contentView.addChildSafely(goalView())
         createFillableCircle(updatedGoals)
         self.updatedGoals = updatedGoals
     }

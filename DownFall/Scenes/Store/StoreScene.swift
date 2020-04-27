@@ -20,7 +20,6 @@ protocol StoreSceneInventory {
 class StoreScene: SKScene {
     
     struct Constants {
-        static let goldWallet = "goldWallet"
         static let gemWallet = "gemWallet"
         static let popup  = "popup"
     }
@@ -83,8 +82,8 @@ class StoreScene: SKScene {
         anchorPoint = CGPoint(x: 0.5, y: 0.5)
         addChild(background)
         
-        let goldWallet = walletView(.gold, order: 0)
-        addChild(goldWallet)
+        let gemWallet = walletView(.gem, order: 0)
+        addChild(gemWallet)
         
         
         let inventoryButton = Button(size: Button.medium,
@@ -95,7 +94,7 @@ class StoreScene: SKScene {
                                      fontColor: .black,
                                      backgroundColor: .foregroundBlue)
         
-        inventoryButton.position = CGPoint.alignHorizontally(inventoryButton.frame, relativeTo: goldWallet.frame, horizontalAnchor: .left, verticalAlign: .top, verticalPadding: Style.Padding.normal, translatedToBounds: true)
+        inventoryButton.position = CGPoint.alignHorizontally(inventoryButton.frame, relativeTo: gemWallet.frame, horizontalAnchor: .left, verticalAlign: .top, verticalPadding: Style.Padding.normal, translatedToBounds: true)
         addChild(inventoryButton)
         
         
@@ -166,7 +165,7 @@ class StoreScene: SKScene {
     private var transactionButton: Button {
         let purchased = selectedItem?.isPurchased ?? false
         
-        let canAfford = playerData.canAfford(selectedItem?.ability.cost ?? 0, inCurrency: .gold)
+        let canAfford = playerData.canAfford(selectedItem?.ability.cost ?? 0, inCurrency: .gem)
         
         
         let purchaseButton = Button(size: Style.Store.CTAButton.size,
@@ -301,7 +300,7 @@ class StoreScene: SKScene {
     }
     
     func currencyWalletName(_ currency: Currency) -> String {
-        return (currency == Currency.gold) ? Constants.goldWallet : Constants.gemWallet
+        return Constants.gemWallet
     }
     
     private func reloadWalletView(_ currency: Currency) {

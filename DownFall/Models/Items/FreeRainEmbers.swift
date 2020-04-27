@@ -42,7 +42,7 @@ struct FreeRainEmbers: Ability {
     
     var cost: Int { return 0 }
     
-    var currency: Currency { return .gold }
+    var currency: Currency { return .gem }
     
     var type: AbilityType { return .rainEmbers }
     

@@ -27,6 +27,17 @@ enum LevelGoalReward: Hashable {
     }
 }
 
+enum StoreOfferType {
+    case fullHeal
+}
+
+typealias StoreLevelTier = Int
+
+struct StoreOffer {
+    let type: StoreOfferType
+    let tier: StoreLevelTier
+}
+
 struct LevelGoal: Hashable {
     let type: LevelGoalType
     let reward: LevelGoalReward
@@ -53,6 +64,7 @@ struct Level {
     let goals: [LevelGoal]
     let numberOfGoalsNeedToUnlockExit: Int
     let maxSpawnGems: Int
+    let storeOffering: [StoreOffer]
     
     var tutorialData: TutorialData?
     
@@ -68,5 +80,5 @@ struct Level {
         return type != .boss
     }
         
-    static let zero = Level(type: .first, monsterTypeRatio: [:], monsterCountStart: 0, maxMonsterOnBoardRatio: 0.0, maxGems: 0, maxTime: 0, boardSize: 0, abilities: [], goldMultiplier: 1, rocksRatio: [:], pillarCoordinates: [], threatLevelController:  ThreatLevelController(), goals: [LevelGoal(type: .unlockExit, reward: .gem(0), tileType: .empty, targetAmount: 0, minimumGroupSize: 0, grouped: false)], numberOfGoalsNeedToUnlockExit: 0, maxSpawnGems: 0, tutorialData: nil)
+    static let zero = Level(type: .first, monsterTypeRatio: [:], monsterCountStart: 0, maxMonsterOnBoardRatio: 0.0, maxGems: 0, maxTime: 0, boardSize: 0, abilities: [], goldMultiplier: 1, rocksRatio: [:], pillarCoordinates: [], threatLevelController:  ThreatLevelController(), goals: [LevelGoal(type: .unlockExit, reward: .gem(0), tileType: .empty, targetAmount: 0, minimumGroupSize: 0, grouped: false)], numberOfGoalsNeedToUnlockExit: 0, maxSpawnGems: 0, storeOffering: [], tutorialData: nil)
 }

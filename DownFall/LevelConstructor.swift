@@ -27,9 +27,15 @@ struct LevelConstructor {
                          threatLevelController: buildThreatLevelController(per: levelType, difficulty: difficulty),
                          goals: levelGoal(per: levelType, difficulty: difficulty),
                          numberOfGoalsNeedToUnlockExit: numberOfGoalsNeedToUnlockExit(per: levelType, difficulty: difficulty),
-                         maxSpawnGems: 3)
+                         maxSpawnGems: 3,
+                         storeOffering: storeOffer(per: levelType, difficulty: difficulty))
         }
     }
+    
+    static func storeOffer(per: LevelType, difficulty: Difficulty) -> [StoreOffer] {
+        return [StoreOffer(type: .fullHeal, tier: 1)]
+    }
+
     
     static func maxSpawnGems(per: LevelType, difficulty: Difficulty) -> Int {
         return 3
@@ -65,7 +71,7 @@ struct LevelConstructor {
                   pillarCoordinates: [],
                   threatLevelController: ThreatLevelController(),
                   goals: [LevelGoal(type: .unlockExit, reward: .gem(0), tileType: .empty, targetAmount: 0, minimumGroupSize: 0, grouped: false)],
-                  numberOfGoalsNeedToUnlockExit: 0, maxSpawnGems: 0,
+                  numberOfGoalsNeedToUnlockExit: 0, maxSpawnGems: 0, storeOffering: [],
                   tutorialData: GameScope.shared.tutorials[index])
         }
     }

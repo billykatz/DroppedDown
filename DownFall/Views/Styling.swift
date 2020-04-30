@@ -47,7 +47,7 @@ struct Style {
         }
         
         struct Item {
-            static let size: CGSize = CGSize(width: 75.0, height: 75.0)
+            static let size: CGSize = CGSize(width: 400.0, height: 400.0)
         }
         
         struct ItemGrid {

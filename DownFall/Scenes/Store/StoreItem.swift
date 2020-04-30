@@ -11,13 +11,13 @@ import SpriteKit
 let highlightString = "highlight"
 
 protocol StoreItemDelegate: class {
-    func storeItemTapped(_ storeItem: StoreItem, ability: Ability)
+    func storeItemTapped(_ storeItem: StoreItem, offer: StoreOffer)
     func wasTransactedOn(_ storeItem: StoreItem)
 }
 
 class StoreItem: SKSpriteNode {
     weak var storeItemDelegate: StoreItemDelegate?
-    let ability: Ability
+    let offer: StoreOffer
     var boxShapeNode: SKShapeNode?
     var isSelected = false {
         didSet {
@@ -31,43 +31,35 @@ class StoreItem: SKSpriteNode {
         }
     }
     
-    init(ability: Ability,
+    init(storeOffer: StoreOffer,
          size: CGSize,
          color: UIColor = UIColor.storeItemBackgroundNotSelected,
          delegate: StoreItemDelegate,
          identifier: ButtonIdentifier,
          precedence: Precedence,
          fontSize: CGFloat = UIFont.extraSmallSize) {
-        self.ability = ability
+        
+        self.offer = storeOffer
+        
         super.init(texture: nil, color: color, size: size)
         
-        let costLabel = Label(text: "\(ability.cost)",
+        let costLabel = Label(text: "\(offer.startingPrice)",
                               width: self.frame.width,
                               delegate: self,
                               precedence: .menu,
                               identifier: .storeItem,
                               fontSize: fontSize)
             
-        var abilitySprite: SKSpriteNode?
-        if let abilityFrames = ability.spriteSheet?.animationFrames(), let first = abilityFrames.first  {
-            let sprite = SKSpriteNode(texture: first, color: .clear, size: Style.Store.Item.size)
-            sprite.position = .zero
-            sprite.name = ability.textureName
-            sprite.run(SKAction.repeatForever(SKAction.animate(with: abilityFrames, timePerFrame: AnimationSettings.Store.itemFrameRate)))
-            
-            abilitySprite = sprite
-        } else if let sprite = ability.sprite {
-            sprite.size = Style.Store.Item.size
-            sprite.position = .zero
-            sprite.name = ability.textureName
-            abilitySprite = sprite
-        }
+        let sprite = offer.sprite
+        sprite.size = Style.Store.Item.size
+        sprite.position = .zero
+        sprite.name = offer.textureName
         
-        addChildSafely(abilitySprite)
+        addChildSafely(sprite)
         
-        let currencyTexture = SKTexture(imageNamed: ability.currency.rawValue)
+        let currencyTexture = SKTexture(imageNamed: offer.currency.rawValue)
         let currencySprite = SKSpriteNode(texture: currencyTexture)
-        currencySprite.position = CGPoint.alignHorizontally(currencySprite.frame, relativeTo: abilitySprite?.frame, horizontalAnchor: .left, verticalAlign: .bottom, translatedToBounds: true)
+        currencySprite.position = CGPoint.alignHorizontally(currencySprite.frame, relativeTo: sprite.frame, horizontalAnchor: .left, verticalAlign: .bottom, translatedToBounds: true)
         costLabel.position = CGPoint.alignVertically(costLabel.frame, relativeTo: currencySprite.frame, horizontalAnchor: .right, verticalAlign: .center, translatedToBounds: true)
         
         addChild(currencySprite)
@@ -75,7 +67,7 @@ class StoreItem: SKSpriteNode {
         position = .zero
         zPosition = precedence.rawValue
         isUserInteractionEnabled = true
-        name = ability.textureName
+        name = offer.textureName
         storeItemDelegate = delegate
     }
     
@@ -126,18 +118,18 @@ class StoreItem: SKSpriteNode {
     }
     
     static func ==(_ lhs: StoreItem, rhs: StoreItem) -> Bool {
-        return lhs.ability.type == rhs.ability.type && lhs.isPurchased == rhs.isPurchased
+        return lhs.offer.type == rhs.offer.type && lhs.isPurchased == rhs.isPurchased
     }
 
 }
 
 extension StoreItem: LabelDelegate {
     func labelPressed(_ label: Label) {
-        self.storeItemDelegate?.storeItemTapped(self, ability: ability)
+        self.storeItemDelegate?.storeItemTapped(self, offer: offer)
     }
     
     func labelPressBegan(_ label: Label) {
-        self.storeItemDelegate?.storeItemTapped(self, ability: ability)
+        self.storeItemDelegate?.storeItemTapped(self, offer: offer)
     }
     
     func labelPressCancelled(_ label: Label) {}
@@ -155,7 +147,7 @@ extension StoreItem {
         let position = touch.location(in: self)
         let translatedPosition = CGPoint(x: self.frame.center.x + position.x, y: self.frame.center.y + position.y)
         if self.frame.contains(translatedPosition) {
-            self.storeItemDelegate?.storeItemTapped(self, ability: ability)
+            self.storeItemDelegate?.storeItemTapped(self, offer: offer)
         } else {
             
             //TODO: make the store UI better

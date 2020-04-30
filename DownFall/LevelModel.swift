@@ -6,6 +6,8 @@
 //  Copyright © 2019 William Katz LLC. All rights reserved.
 //
 
+import SpriteKit
+
 enum LevelGoalType: Hashable {
     case unlockExit
 }
@@ -36,6 +38,12 @@ typealias StoreLevelTier = Int
 struct StoreOffer {
     let type: StoreOfferType
     let tier: StoreLevelTier
+    let textureName: String
+    let currency: Currency
+    var sprite: SKSpriteNode {
+        return SKSpriteNode(texture: SKTexture(imageNamed: self.textureName))
+    }
+    let startingPrice: Int
 }
 
 struct LevelGoal: Hashable {

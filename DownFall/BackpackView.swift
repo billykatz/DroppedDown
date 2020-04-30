@@ -155,10 +155,11 @@ class BackpackView: SKSpriteNode {
     
     private func updateReticles() {
         targetingArea.removeAllChildren()
-        
-        for target in viewModel.currentTargets {
+        let areLegal = viewModel.currentTargets.areLegal
+        for target in viewModel.currentTargets.targets {
             let position = translateCoord(target.coord)
-            let identifier: String = target.isLegal ? Identifiers.Sprite.greenReticle : Identifiers.Sprite.redReticle
+            /// choose the reticle based on all targets legality and this individual target legality
+            let identifier: String = (target.isLegal && areLegal) ? Identifiers.Sprite.greenReticle : Identifiers.Sprite.redReticle
             let reticle = SKSpriteNode(texture: SKTexture(imageNamed: identifier), size: CGSize(width: tileSize, height: tileSize))
             reticle.position = position
             reticle.zPosition = Precedence.menu.rawValue

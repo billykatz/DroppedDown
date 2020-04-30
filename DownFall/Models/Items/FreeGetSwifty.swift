@@ -1,26 +1,26 @@
 //
-//  FreeRainEmbers.swift
+//  FreeGetSwifty.swift
 //  DownFall
 //
-//  Created by Katz, Billy on 4/19/20.
+//  Created by Katz, Billy on 4/30/20.
 //  Copyright © 2020 William Katz LLC. All rights reserved.
 //
 
-import Foundation
 import UIKit
 
-struct FreeRainEmbers: Ability {
+struct FreeGetSwifty: Ability {
+    
     var rechargeMinimum: Int {
         return 1
     }
     
     var progressColor: UIColor {
-        return UIColor.darkBarRed
+        return UIColor.lightBarBlue
     }
     
     var cooldown: Int { return 25 }
     
-    var rechargeType: [TileType] { return [TileType.rock(.red)] }
+    var rechargeType: [TileType] { return [TileType.rock(.blue)] }
     
     var count: Int
     
@@ -37,21 +37,21 @@ struct FreeRainEmbers: Ability {
     }
     
     var textureName: String {
-        return "rainEmbers"
+        return "getSwifty"
     }
     
     var cost: Int { return 0 }
     
     var currency: Currency { return .gem }
     
-    var type: AbilityType { return .rainEmbers }
+    var type: AbilityType { return .getSwifty }
     
     var description: String {
-        return "Fling two fireball at two monsters"
+        return "Swap places with an adjacent rock."
     }
     
     var flavorText: String {
-        return "Fire is my second favorite word, second only to `combustion.` - Mack the Wizard"
+        return "Show them the meaning of swift."
     }
     
     var extraAttacksGranted: Int? {
@@ -68,7 +68,11 @@ struct FreeRainEmbers: Ability {
     
     var heal: Int? { return nil }
     var targets: Int? { return 2 }
-    var targetTypes: [TileType]? { return [TileType.monster(.zero)] }
-    var distanceBetweenTargets: Int? { return Int.max }
+    var targetTypes: [TileType]? {
+        var cases = TileType.rockCases
+        cases.append(TileType.player(.playerZero))
+        return cases
+    }
+    var distanceBetweenTargets: Int? { return 1 }
 }
 

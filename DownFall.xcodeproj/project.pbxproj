@@ -147,6 +147,7 @@
 		5866B3DC244D2D2300DF36E0 /* RuneDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5866B3DB244D2D2300DF36E0 /* RuneDetailView.swift */; };
 		5867A591242B0CD1005BFD10 /* TileDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5867A590242B0CD1005BFD10 /* TileDetailView.swift */; };
 		586AE77723CF91AA00302347 /* AttackModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 586AE77623CF91AA00302347 /* AttackModelTests.swift */; };
+		587C80A2245B3D3800997110 /* FreeGetSwifty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 587C80A1245B3D3800997110 /* FreeGetSwifty.swift */; };
 		5881DBF4244FEE440053A690 /* RuneSlotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5881DBF3244FEE440053A690 /* RuneSlotView.swift */; };
 		5881DBF6244FEE630053A690 /* RuneSlotViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5881DBF5244FEE630053A690 /* RuneSlotViewModel.swift */; };
 		5882602123DB809300A77BE8 /* EmptyAbility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5882602023DB809300A77BE8 /* EmptyAbility.swift */; };
@@ -319,6 +320,7 @@
 		5866B3DB244D2D2300DF36E0 /* RuneDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneDetailView.swift; sourceTree = "<group>"; };
 		5867A590242B0CD1005BFD10 /* TileDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileDetailView.swift; sourceTree = "<group>"; };
 		586AE77623CF91AA00302347 /* AttackModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttackModelTests.swift; sourceTree = "<group>"; };
+		587C80A1245B3D3800997110 /* FreeGetSwifty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeGetSwifty.swift; sourceTree = "<group>"; };
 		5881DBF3244FEE440053A690 /* RuneSlotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneSlotView.swift; sourceTree = "<group>"; };
 		5881DBF5244FEE630053A690 /* RuneSlotViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneSlotViewModel.swift; sourceTree = "<group>"; };
 		5882602023DB809300A77BE8 /* EmptyAbility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyAbility.swift; sourceTree = "<group>"; };
@@ -539,6 +541,7 @@
 				3D6279C623ACA8350048EB76 /* Dynamite.swift */,
 				585EF80C2431AD3800E87FCB /* FreeDynamite.swift */,
 				5866B3D7244CFEE800DF36E0 /* FreeRainEmbers.swift */,
+				587C80A1245B3D3800997110 /* FreeGetSwifty.swift */,
 				3DA0A37E2300CE3B0041EF34 /* ShieldEast.swift */,
 				3D6279CA23ACA90E0048EB76 /* GreaterHealingPoition.swift */,
 				585EF80624318B5800E87FCB /* GreatestHealingPotion.swift */,
@@ -1062,6 +1065,7 @@
 				3D6279CD23AD39950048EB76 /* SwordPickAxe.swift in Sources */,
 				3DD72591239DC37B005933B2 /* SKView+Extensions.swift in Sources */,
 				3D7D8B2D2252857E0016FE4C /* CombatSimulator.swift in Sources */,
+				587C80A2245B3D3800997110 /* FreeGetSwifty.swift in Sources */,
 				3DA4E8972290A88C006E90D1 /* EntityModel.swift in Sources */,
 				3DC072BF23748CF80046F224 /* TutorialTileCreator.swift in Sources */,
 				5865D62E23DBF652007D11FC /* abilities.json in Sources */,

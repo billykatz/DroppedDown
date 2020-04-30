@@ -25,6 +25,10 @@ struct AnyAbility: Hashable {
 }
 
 extension AnyAbility: Ability {
+    var distanceBetweenTargets: Int? {
+        return _ability.distanceBetweenTargets
+    }
+    
     var cooldown: Int {
         return _ability.cooldown
     }
@@ -130,6 +134,7 @@ protocol Ability {
     var rechargeType: [TileType] { get }
     var rechargeMinimum: Int { get }
     var progressColor: UIColor { get }
+    var distanceBetweenTargets: Int? { get }
     
     func blocksDamage(from: Direction) -> Int?
     func animatedColumns() -> Int?
@@ -161,6 +166,7 @@ enum AbilityType: Equatable {
     case tapAwayMonster
     case massMineRock
     case rainEmbers
+    case getSwifty
     
     var humanReadable: String {
         switch self {
@@ -177,6 +183,7 @@ enum AbilityType: Equatable {
         case .tapAwayMonster: return "Destory Monster Group"
         case .massMineRock: return "Mass Mine"
         case .rainEmbers: return "Rain Embers"
+        case .getSwifty: return "Swift Shift"
         }
     }
 }

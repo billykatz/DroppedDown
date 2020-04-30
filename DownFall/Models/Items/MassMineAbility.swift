@@ -10,6 +10,9 @@ import Foundation
 import UIKit
 
 struct MassMinePickaxe: Ability {
+    
+    var distanceBetweenTargets: Int? { return nil }
+    
     var rechargeMinimum: Int {
         return 1
     }

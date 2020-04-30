@@ -10,6 +10,10 @@ import Foundation
 import UIKit
 
 struct KillMonsterGroupPotion: Ability {
+    
+    var distanceBetweenTargets: Int? { return nil }
+    
+    
     var rechargeMinimum: Int {
         return 1
     }

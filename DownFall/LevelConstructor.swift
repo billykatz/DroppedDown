@@ -368,10 +368,10 @@ struct LevelConstructor {
         
         switch levelType {
         case .first:
-            abilities = [FreeLesserHealingPotion(), FreeKillMonsterPotion(), FreeDynamite(), FreeRainEmbers()]
+            abilities = [FreeRainEmbers(), FreeGetSwifty()]
         case .second, .third:
-            let temp: [Ability] = [LesserHealingPotion(), TransmogrificationPotion(), KillMonsterPotion(), Dynamite(), GreaterHealingPotion()]
-            abilities = droppingRandom(numberOfElements: 2, from: temp)
+            abilities = [FreeRainEmbers(), FreeGetSwifty()]
+//            abilities = droppingRandom(numberOfElements: 2, from: temp)
         case .fourth:
             let temp: [Ability] = [GreatestHealingPotion(), RockASwap(), TransmogrificationPotion(), KillMonsterGroupPotion(),  KillMonsterPotion(), Dynamite(), GreaterHealingPotion(), MassMinePickaxe()]
                       abilities = droppingRandom(numberOfElements: 2, from: temp)

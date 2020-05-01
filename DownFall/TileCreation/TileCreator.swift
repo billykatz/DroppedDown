@@ -33,7 +33,7 @@ class TileCreator: TileStrategy {
         self.boardSize = level?.boardSize ?? 0
     }
     
-    private func randomTile(_ given: Int) -> TileType {
+    private func randomTile(_ given: Int, extraGemChance: Int) -> TileType {
         guard level?.spawnsMonsters ?? true else { return randomRock() }
         let weight = 97
         let index = abs(given) % (TileType.randomCases.count + weight)
@@ -45,12 +45,13 @@ class TileCreator: TileStrategy {
         /// This should probably vary based on the level
         /// This is worth to think about more
         
+        let upperGemChanceRange = 10 + extraGemChance
         switch index {
         case 0..<9:
             return randomMonster()
-        case 9..<10:
+        case 9..<upperGemChanceRange:
             return TileType.gem
-        case 10...Int.max:
+        case upperGemChanceRange...Int.max:
             return randomRock()
         default:
             preconditionFailure("Shouldnt be here")
@@ -122,13 +123,16 @@ class TileCreator: TileStrategy {
         return 0
     }
     
-    private func randomTile(_ neighbors: [Tile], noMoreMonsters: Bool = false) -> Tile {
+    private func randomTile(_ neighbors: [Tile], noMoreMonsters: Bool, tilesRemoved: Int) -> Tile {
         guard let level = level else { preconditionFailure("We need a level to create tiles") }
-        var nextTile = Tile(type: randomTile(randomSource.nextInt()))
+        let extraGemChance = tilesRemoved/2
+        var nextTile = Tile(type: randomTile(randomSource.nextInt(),
+                                             extraGemChance: extraGemChance))
         
         var validTile = false
         while !validTile {
-            nextTile = Tile(type: randomTile(randomSource.nextInt()))
+            nextTile = Tile(type: randomTile(randomSource.nextInt(),
+                                             extraGemChance: extraGemChance))
             
             switch nextTile.type {
             case .monster:
@@ -136,7 +140,8 @@ class TileCreator: TileStrategy {
             case .rock(.red), .rock(.purple), .rock(.blue), .rock(.brown):
                 validTile = true
             case .item:
-                if specialGems < level.maxSpawnGems {
+                if !neighbors.contains {  $0.type == TileType.item(.gem) },
+                    specialGems < level.maxSpawnGems {
                     specialGems += 1
                     validTile = true
                 }
@@ -165,9 +170,10 @@ class TileCreator: TileStrategy {
         let maxMonsters = Int(Double(tiles.count * tiles.count) * (level?.maxMonsterOnBoardRatio ?? maxMonsterRatio))
         var currMonsterCount = typeCount(for: tiles, of: .monster(.zero)).count
         
+        let emptyTileCount = typeCount(for: tiles, of: .empty).count
+        
         for row in 0..<newTiles.count {
             for col in 0..<newTiles[row].count {
-                
                 
                 //check the old array for empties
                 if tiles[row][col].type == .empty {
@@ -181,7 +187,9 @@ class TileCreator: TileStrategy {
                     }
                     
                     if pillarAboveMe == 0 {
-                        let newTile = randomTile(neighbors(of: TileCoord(row: row, column: col), in: newTiles), noMoreMonsters: currMonsterCount >= maxMonsters)
+                        let newTile = randomTile(neighbors(of: TileCoord(row: row, column: col), in: newTiles),
+                                                 noMoreMonsters: currMonsterCount >= maxMonsters,
+                                                 tilesRemoved: emptyTileCount)
                         if newTile.type == .monster(.zero) {
                             currMonsterCount += 1
                         }

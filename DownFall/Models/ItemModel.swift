@@ -23,12 +23,17 @@ struct Item: Decodable, Hashable {
     
     let type: ItemType
     let amount: Int
+    var color: Color?
     
     var textureName: String {
         switch type {
         case .gold:
             return goldTextureName()
         case .gem:
+            switch color {
+            case .blue:
+                return "
+            }
             return "gem2"
         }
     }
@@ -49,14 +54,14 @@ struct Item: Decodable, Hashable {
     }
     
     static var zero: Item {
-        return Item(type: .gold, amount: 0)
+        return Item(type: .gold, amount: 0, color: nil)
     }
     
     static var gem: Item{
-        return Item(type: .gem, amount: 1)
+        return Item(type: .gem, amount: 1, color: nil)
     }
     
     static var gold: Item{
-        return Item(type: .gold, amount: 1)
+        return Item(type: .gold, amount: 1, color: nil)
     }
 }

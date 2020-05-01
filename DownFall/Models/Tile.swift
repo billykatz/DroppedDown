@@ -8,7 +8,7 @@
 
 import UIKit
 
-enum Color: CaseIterable {
+enum Color: String, Decodable, CaseIterable {
     case blue
     case brown
     case purple

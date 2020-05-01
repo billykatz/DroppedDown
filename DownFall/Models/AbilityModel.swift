@@ -167,6 +167,7 @@ enum AbilityType: Equatable {
     case massMineRock
     case rainEmbers
     case getSwifty
+    case transformRock
     
     var humanReadable: String {
         switch self {
@@ -184,6 +185,8 @@ enum AbilityType: Equatable {
         case .massMineRock: return "Mass Mine"
         case .rainEmbers: return "Rain Embers"
         case .getSwifty: return "Swift Shift"
+        case .transformRock: return "Transform Rock"
+            
         }
     }
 }

@@ -368,7 +368,7 @@ struct LevelConstructor {
         
         switch levelType {
         case .first:
-            abilities = [FreeRainEmbers(), FreeGetSwifty()]
+            abilities = [FreeRainEmbers(), FreeGetSwifty(), TransformRock()]
         case .second, .third:
             abilities = [FreeRainEmbers(), FreeGetSwifty()]
 //            abilities = droppingRandom(numberOfElements: 2, from: temp)

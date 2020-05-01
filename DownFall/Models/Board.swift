@@ -328,6 +328,16 @@ class Board: Equatable {
         }
     }
     
+    private func transform(_ coords: [TileCoord], into type: TileType, input: Input) -> Transformation {
+        
+        for tile in coords {
+            tiles[tile.row][tile.column] = Tile(type: type)
+        }
+        return Transformation(transformation: nil, inputType: input.type, endTiles: tiles)
+        
+    }
+
+    
     private func swap(_ first: TileCoord, with second: TileCoord, input: Input) -> Transformation {
         
         let tempTile = tiles[first]
@@ -422,6 +432,8 @@ extension Board {
             }
             let secondTarget = targets[1]
             return swap(firstTarget, with: secondTarget, input: input)
+        case .transformRock:
+            return transform(targets, into: TileType.rock(.purple), input: input)
         default:
             ()
         }

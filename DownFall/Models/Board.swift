@@ -418,22 +418,19 @@ extension Board {
             use(ability)
             return massMine(tiles: tiles, color: color, input: input)
         case .rainEmbers:
-            guard let firstTarget = targets.first, targets.count > 1 else {
-                return .zero
-            }
             //TODO: we have to rethink how we keep track of rune's progress.  Right now it is not part of the entity's model which mean we will lose the progress between levels-- I think that would feel bad
 //            use(ability)
-            let secondTarget = targets[1]
-            return removeAndReplaces(from: tiles, specificCoord: [firstTarget, secondTarget], input: input)
+            return removeAndReplaces(from: tiles, specificCoord: targets, input: input)
             
         case .getSwifty:
-            guard let firstTarget = targets.first, targets.count > 1 else {
+            guard let firstTarget = targets.first, targets.count == 2 else {
                 return .zero
             }
-            let secondTarget = targets[1]
-            return swap(firstTarget, with: secondTarget, input: input)
+            return swap(firstTarget, with: targets.last!, input: input)
+            
         case .transformRock:
             return transform(targets, into: TileType.rock(.purple), input: input)
+            
         default:
             ()
         }

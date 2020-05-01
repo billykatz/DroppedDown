@@ -263,9 +263,9 @@ class TargetingViewModel: Targeting {
             // remove the first if they are illegally placed
             currentTargets.targets.removeFirst(where: { !$0.isLegal })
             
-            // if nothing has been removed then remove the last one placed
+            // if nothing has been removed then remove the first one placed
             if currentTargets.targets.count == count {
-                currentTargets.targets.removeLast()
+                currentTargets.targets.removeFirst()
             }
             //add the new target
             currentTargets.targets.append(Target(coord: coord, isLegal: isTargetLegal(coord)))

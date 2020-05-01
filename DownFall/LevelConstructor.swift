@@ -33,7 +33,11 @@ struct LevelConstructor {
     }
     
     static func storeOffer(per: LevelType, difficulty: Difficulty) -> [StoreOffer] {
-        return [StoreOffer(type: .fullHeal, tier: 1)]
+        return [StoreOffer(type: .fullHeal,
+                           tier: 1,
+                           textureName: "greaterHealingPotion",
+                           currency: .gem,
+                           startingPrice: 3)]
     }
 
     

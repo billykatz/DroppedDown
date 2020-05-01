@@ -106,7 +106,7 @@ enum TileType: Hashable, CaseIterable {
         case (.monster, .monster):
             return true
         case (.item(let lhsItem), .item(let rhsItem)):
-            return lhsItem == rhsItem
+            return lhsItem.type == rhsItem.type
         case let (.pillar(leftColor), .pillar(rightColor)):
             return leftColor == rightColor
         case let (.rock(leftColor), .rock(rightColor)):

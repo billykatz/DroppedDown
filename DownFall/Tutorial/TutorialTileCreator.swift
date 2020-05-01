@@ -24,6 +24,10 @@
 import GameplayKit
 
 struct TutorialTileCreator: TileStrategy {
+    func gemDropped(from rock: TileType, groupSize: Int) -> Tile {
+        return .empty
+    }
+    
     
     func shuffle(tiles: [[Tile]]) -> [[Tile]] {
         return []
@@ -31,10 +35,6 @@ struct TutorialTileCreator: TileStrategy {
     
     func randomMonster() -> TileType {
         return .monster(.zero)
-    }
-    
-    func tiles(for tiles: [[Tile]]) -> [[Tile]] {
-        return []
     }
     
     func randomMonster(not: EntityModel.EntityType) -> Tile {
@@ -88,10 +88,10 @@ struct TutorialTileCreator: TileStrategy {
     }
     
     
-    func tiles(for tiles: [[Tile]]) -> [Tile] {
+    func tiles(for tiles: [[Tile]]) -> [[Tile]] {
         let count = typeCount(for: tiles, of: .empty).count
         let array = Array(repeating: randomSource.nextInt() % 2 == 0 ? Tile.greenRock : Tile.brownRock, count: count)
-        return array
+        return [array]
     }
     
     var playerEntityData: EntityModel? {

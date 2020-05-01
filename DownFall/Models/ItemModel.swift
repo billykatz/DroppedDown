@@ -7,6 +7,7 @@
 //
 
 struct Item: Decodable, Hashable {
+    
     enum ItemType: String, Decodable {
         case gold
         case gem
@@ -32,9 +33,18 @@ struct Item: Decodable, Hashable {
         case .gem:
             switch color {
             case .blue:
-                return "
+                return "blueCrystal"
+            case .red:
+                return "redCrystal"
+            case .brown:
+                return "brownCrystal"
+            case .purple:
+                return "purpleCrystal"
+            case .green:
+                return "greenCrystal"
+            case .none:
+                return "gem2"
             }
-            return "gem2"
         }
     }
     

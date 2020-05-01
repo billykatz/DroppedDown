@@ -33,7 +33,7 @@ class TileCreator: TileStrategy {
         self.boardSize = level?.boardSize ?? 0
     }
     
-    private func randomTile(_ given: Int, extraGemChance: Int) -> TileType {
+    private func randomTile(_ given: Int) -> TileType {
         guard level?.spawnsMonsters ?? true else { return randomRock() }
         let weight = 97
         let index = abs(given) % (TileType.randomCases.count + weight)
@@ -45,13 +45,11 @@ class TileCreator: TileStrategy {
         /// This should probably vary based on the level
         /// This is worth to think about more
         
-        let upperGemChanceRange = 10 + extraGemChance
+//        let upperGemChanceRange = 10
         switch index {
         case 0..<9:
             return randomMonster()
-        case 9..<upperGemChanceRange:
-            return TileType.gem
-        case upperGemChanceRange...Int.max:
+        case 9...Int.max:
             return randomRock()
         default:
             preconditionFailure("Shouldnt be here")
@@ -115,6 +113,22 @@ class TileCreator: TileStrategy {
         fatalError("The randomNumber between 0-\(upperRange-1) should find itself in the range of one of the rocks")
     }
     
+    func gemDropped(from rock: TileType, groupSize: Int) -> Tile {
+        guard specialGems < level?.maxSpawnGems ?? 0 else { return .empty }
+        let weight = 100
+        let index = randomSource.nextInt() % weight
+        let baseChance = 2
+        let extraChance = groupSize/2
+        let totalChance = baseChance + extraChance
+        if (0..<totalChance).contains(index) {
+            let item = Item(type: .gem, amount: 1, color: rock.color)
+            return Tile(type: TileType.item(item))
+        } else {
+            return .empty
+        }
+        
+    }
+    
     func goldDropped(from monster: EntityModel) -> Int {
         if let goldItem = monster.carry.items.first(where: { $0.type == .gold }) {
             let medianAmount = goldItem.amount * (level?.goldMultiplier ?? 1)
@@ -123,16 +137,13 @@ class TileCreator: TileStrategy {
         return 0
     }
     
-    private func randomTile(_ neighbors: [Tile], noMoreMonsters: Bool, tilesRemoved: Int) -> Tile {
+    private func randomTile(_ neighbors: [Tile], noMoreMonsters: Bool) -> Tile {
         guard let level = level else { preconditionFailure("We need a level to create tiles") }
-        let extraGemChance = tilesRemoved/2
-        var nextTile = Tile(type: randomTile(randomSource.nextInt(),
-                                             extraGemChance: extraGemChance))
+        var nextTile = Tile(type: randomTile(randomSource.nextInt()))
         
         var validTile = false
         while !validTile {
-            nextTile = Tile(type: randomTile(randomSource.nextInt(),
-                                             extraGemChance: extraGemChance))
+            nextTile = Tile(type: randomTile(randomSource.nextInt()))
             
             switch nextTile.type {
             case .monster:
@@ -170,8 +181,6 @@ class TileCreator: TileStrategy {
         let maxMonsters = Int(Double(tiles.count * tiles.count) * (level?.maxMonsterOnBoardRatio ?? maxMonsterRatio))
         var currMonsterCount = typeCount(for: tiles, of: .monster(.zero)).count
         
-        let emptyTileCount = typeCount(for: tiles, of: .empty).count
-        
         for row in 0..<newTiles.count {
             for col in 0..<newTiles[row].count {
                 
@@ -188,8 +197,7 @@ class TileCreator: TileStrategy {
                     
                     if pillarAboveMe == 0 {
                         let newTile = randomTile(neighbors(of: TileCoord(row: row, column: col), in: newTiles),
-                                                 noMoreMonsters: currMonsterCount >= maxMonsters,
-                                                 tilesRemoved: emptyTileCount)
+                                                 noMoreMonsters: currMonsterCount >= maxMonsters)
                         if newTile.type == .monster(.zero) {
                             currMonsterCount += 1
                         }
@@ -299,9 +307,6 @@ class TileCreator: TileStrategy {
 //        let exitQuadrant = playerQuadrant
         let exitPosition = exitQuadrant.randomCoord(for: boardSize, notIn: reservedSet)
         reservedSet.insert(exitPosition)
-        
-        let randomGemPosition = playerQuadrant.adjacent[Int.random(abs(randomSource.nextInt() % 2))].randomCoord(for:boardSize, notIn: reservedSet)
-        tiles[randomGemPosition.x][randomGemPosition.y] = Tile(type: .gem)
         
         tiles[exitPosition.x][exitPosition.y] = Tile(type: .exit(blocked: false))
         

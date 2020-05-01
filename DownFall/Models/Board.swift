@@ -611,8 +611,26 @@ extension Board {
         
         // set the tiles to be removed as Empty placeholder
         var intermediateTiles = tiles
+        let removedCount = selectedTiles.count
+        /// only potentially spawn 1 gem per group
+        var spawnedGem = false
+        
+        var finalSelectedTiles: [TileCoord] = []
         for coord in selectedTiles {
-            intermediateTiles[coord.x][coord.y] = Tile.empty
+            // turn the tile into a gem or into an empty
+            let newTile = tileCreator.gemDropped(from: intermediateTiles[coord.x][coord.y].type, groupSize: removedCount)
+            
+            /// keep track of the emptied tiles
+            finalSelectedTiles.append(coord)
+            
+            /// add the gem only if we havent spawned a gem yet
+            intermediateTiles[coord.x][coord.y] = !spawnedGem ? newTile : .empty
+           
+            // if it is a gem, set that we have spawn a gem so we dont spawn another
+            if case TileType.item(_) = newTile.type {
+                spawnedGem = true
+                finalSelectedTiles.removeFirst { $0 == coord }
+            }
         }
         
         // decrement the health of each pillar
@@ -639,7 +657,7 @@ extension Board {
                     intermediateTiles: &intermediateTiles)
         
         //create selectedTilesTransformation array
-        let selectedTilesTransformation = selectedTiles.map { TileTransformation($0, $0) }
+        let selectedTilesTransformation = finalSelectedTiles.map { TileTransformation($0, $0) }
         
         //update our store of tilesftiles
         self.tiles = intermediateTiles

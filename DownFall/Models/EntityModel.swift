@@ -15,6 +15,7 @@ protocol ResetsAttacks {
 
 struct Pickaxe: Equatable, Codable {
     var runeSlots: Int
+    var runes: [AnyAbility]
 }
 
 struct EntityModel: Equatable, Decodable {

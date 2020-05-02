@@ -152,6 +152,7 @@
 		5881DBF4244FEE440053A690 /* RuneSlotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5881DBF3244FEE440053A690 /* RuneSlotView.swift */; };
 		5881DBF6244FEE630053A690 /* RuneSlotViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5881DBF5244FEE630053A690 /* RuneSlotViewModel.swift */; };
 		5882602123DB809300A77BE8 /* EmptyAbility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5882602023DB809300A77BE8 /* EmptyAbility.swift */; };
+		5893899B245E0D6A00350A2E /* StoreHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5893899A245E0D6A00350A2E /* StoreHUD.swift */; };
 		589A27CF23D8EA1C00174DE7 /* SKShapeNode+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589A27CE23D8EA1C00174DE7 /* SKShapeNode+Extensions.swift */; };
 		589A27D123D90CD900174DE7 /* TargetingState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589A27D023D90CD900174DE7 /* TargetingState.swift */; };
 		589A27D423D90FE000174DE7 /* TargetingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589A27D323D90FE000174DE7 /* TargetingViewModel.swift */; };
@@ -326,6 +327,7 @@
 		5881DBF3244FEE440053A690 /* RuneSlotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneSlotView.swift; sourceTree = "<group>"; };
 		5881DBF5244FEE630053A690 /* RuneSlotViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneSlotViewModel.swift; sourceTree = "<group>"; };
 		5882602023DB809300A77BE8 /* EmptyAbility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyAbility.swift; sourceTree = "<group>"; };
+		5893899A245E0D6A00350A2E /* StoreHUD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreHUD.swift; sourceTree = "<group>"; };
 		589A27CE23D8EA1C00174DE7 /* SKShapeNode+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SKShapeNode+Extensions.swift"; sourceTree = "<group>"; };
 		589A27D023D90CD900174DE7 /* TargetingState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetingState.swift; sourceTree = "<group>"; };
 		589A27D323D90FE000174DE7 /* TargetingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetingViewModel.swift; sourceTree = "<group>"; };
@@ -563,6 +565,7 @@
 			isa = PBXGroup;
 			children = (
 				3D06390E22F1DB8300C4D5E9 /* StoreScene.swift */,
+				5893899A245E0D6A00350A2E /* StoreHUD.swift */,
 				3DA0A37722FFA6250041EF34 /* StoreItem.swift */,
 			);
 			path = Store;
@@ -1041,6 +1044,7 @@
 				3DD7258F239DC151005933B2 /* GameSceneDelegate.swift in Sources */,
 				3D90AAD321D8869200C7428A /* Referee.swift in Sources */,
 				3DA0A37D2300CDFC0041EF34 /* DoubleAttack.swift in Sources */,
+				5893899B245E0D6A00350A2E /* StoreHUD.swift in Sources */,
 				585EF8052431855800E87FCB /* KillMonsterGroupPotion.swift in Sources */,
 				3DC072B72373AA710046F224 /* TutorialScene.swift in Sources */,
 				3D6279C523ACA3DF0048EB76 /* RockASwap.swift in Sources */,

@@ -122,7 +122,8 @@ class TileCreator: TileStrategy {
         let totalChance = baseChance + extraChance
         if (0..<totalChance).contains(index) {
             let item = Item(type: .gem, amount: 1, color: rock.color)
-            return Tile(type: TileType.item(item))
+            specialGems += 1
+            return Tile(type: TileType.item(item)) 
         } else {
             return .empty
         }

@@ -142,7 +142,7 @@ class Renderer: SKSpriteNode {
                     let tiles = input.endTilesStruct else { return }
                 self.sprites = self.createSprites(from: tiles)
                 self.add(sprites: self.sprites, tiles: tiles)
-
+                
             default:
                 self?.renderInput(input)
             }
@@ -339,6 +339,11 @@ class Renderer: SKSpriteNode {
                                               width: width)
                 sprites[row].append(sprite)
                 sprites[row][col].position = CGPoint(x: x, y: y)
+                
+                if let (glow, spin) = sprite.glow() {
+                    sprite.addChild(glow)
+                    glow.run(spin)
+                }
             }
         }
         return sprites
@@ -563,7 +568,7 @@ extension Renderer {
             if let startPoint = positionsInForeground(at: [coord]).first {
                 var addedSprites: [SKSpriteNode] = []
                 for _ in 0..<item.amount {
-                    let identifier: String = item.type == .gold ? Identifiers.gold : Identifiers.gem
+                    let identifier: String = item.type == .gold ? Identifiers.gold : item.textureName
                     let sprite = SKSpriteNode(texture: SKTexture(imageNamed: identifier),
                                               color: .clear,
                                               size: Style.Board.goldGainSize)

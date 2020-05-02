@@ -2,17 +2,17 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "Blue Gem.png",
+      "filename" : "Blue Gem outlined.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
-      "filename" : "Blue Gem@2x.png",
+      "filename" : "Blue Gem outlined@2x.png",
       "scale" : "2x"
     },
     {
       "idiom" : "universal",
-      "filename" : "Blue Gem@3x.png",
+      "filename" : "Blue Gem outlined@3x.png",
       "scale" : "3x"
     }
   ],

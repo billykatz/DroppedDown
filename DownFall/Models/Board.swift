@@ -61,15 +61,17 @@ class Board: Equatable {
                                             inputType: input.type,
                                             endTiles: tiles)
         case .touch(let tileCoord, let type):
-            if case TileType.monster(let data) = type {
+            switch type {
+            case .monster(let data):
                 let attacks = calculateAttacks(for: data, from: tileCoord)
                 InputQueue.append(Input(.tileDetail(type, attacks)))
                 return
-            } else if case TileType.pillar = type {
+            case .pillar, .item:
                 InputQueue.append(Input(.tileDetail(type, [])))
                 return
-            } else {
+            default:
                 transformation = removeAndReplace(from: tiles, tileCoord: tileCoord, input: input)
+
             }
         case .attack:
             transformation = attack(input)
@@ -618,18 +620,18 @@ extension Board {
         var finalSelectedTiles: [TileCoord] = []
         for coord in selectedTiles {
             // turn the tile into a gem or into an empty
-            let newTile = tileCreator.gemDropped(from: intermediateTiles[coord.x][coord.y].type, groupSize: removedCount)
-            
-            /// keep track of the emptied tiles
-            finalSelectedTiles.append(coord)
-            
-            /// add the gem only if we havent spawned a gem yet
-            intermediateTiles[coord.x][coord.y] = !spawnedGem ? newTile : .empty
-           
-            // if it is a gem, set that we have spawn a gem so we dont spawn another
-            if case TileType.item(_) = newTile.type {
-                spawnedGem = true
-                finalSelectedTiles.removeFirst { $0 == coord }
+            if !spawnedGem {
+                let newTile = tileCreator.gemDropped(from: intermediateTiles[coord.x][coord.y].type, groupSize: removedCount)
+                intermediateTiles[coord.x][coord.y] = newTile
+                if newTile.type == TileType.item(.gem) {
+                    spawnedGem = true
+                } else {
+                    finalSelectedTiles.append(coord)
+                }
+            } else {
+                intermediateTiles[coord.x][coord.y] = .empty
+                /// keep track of the emptied tiles
+                finalSelectedTiles.append(coord)
             }
         }
         

@@ -77,7 +77,7 @@ class StoreScene: SKScene {
                             fontColor: .black,
                             backgroundColor: .menuPurple)
         
-        button.position = CGPoint.position(button.frame, inside: playableRect, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: Style.Padding.most)
+        button.position = CGPoint.position(button.frame, inside: playableRect, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: Style.Padding.most*3)
         
         
         items = createStoreItems(from: level)

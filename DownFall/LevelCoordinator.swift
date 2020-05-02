@@ -34,7 +34,7 @@ extension LevelCoordinating where Self: UIViewController {
     func presentStore(_ playerData: EntityModel) {
         if let view = self.view as? SKView {
             view.presentScene(nil)
-            let storeScene = StoreScene(size: CGSize(width: 1536, height: 2048),
+            let storeScene = StoreScene(size: .universalSize,
                                         playerData: playerData,
                                         level: currentLevel,
                                         viewModel: StoreSceneViewModel(offers: currentLevel.storeOffering))
@@ -149,7 +149,7 @@ extension LevelCoordinating where Self: UIViewController {
             levelIndex = min(levels.count - 1, levelIndex + 1)
             
             
-            let storeScene = StoreScene(size: self.view!.frame.size,
+            let storeScene = StoreScene(size: .universalSize,
                                         playerData: playerData,
                                         level: levels[levelIndex],
                                         viewModel: StoreSceneViewModel(offers: levels[levelIndex].storeOffering))

@@ -171,6 +171,7 @@ class HUD: SKSpriteNode {
         // the label with the palyer's amount of gold
         let gemLabel = ParagraphNode(text: "\(data.carry.total(in: .gem))", paragraphWidth: Style.HUD.labelParagraphWidth, fontName: UIFont.pixelFontName, fontSize: UIFont.extraLargeSize, fontColor: .lightText)
         gemLabel.position = CGPoint.alignVertically(gemLabel.frame, relativeTo: gemNode.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: Style.Padding.more, translatedToBounds: true)
+        gemLabel.name = Identifiers.gemSpriteLabel
         self.addChild(gemLabel)
         
         // save this data for later        currentTotalGem = data.carry.total(in: .gem)

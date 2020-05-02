@@ -38,4 +38,8 @@ struct AnimationSettings {
     struct HUD {
         static let goldGainedTime = Double(1.0)
     }
+    
+    struct Renderer {
+        static let glowSpinSpeed = Double(2)
+    }
 }

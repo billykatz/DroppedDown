@@ -75,7 +75,7 @@ struct GoalTracking: Hashable {
     var rewardTextureName: String {
         switch reward {
         case .gem:
-            return "gem2"
+            return "crystals"
         }
     }
     

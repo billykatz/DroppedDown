@@ -154,6 +154,22 @@ class TileDetailView: SKNode {
         
     }
     
+    private func gemDescription(tileType: TileType, nextTo: CGRect) -> ParagraphNode? {
+        guard case TileType.item(let item) = tileType  else { return nil }
+        let text =
+        """
+        \u{2022} Valuable currency.
+        \u{2022} Larger groups of rocks are more likely to drop gems.
+        \u{2022} There are only a few gems to find on each level.
+        """
+        let gemDesc = ParagraphNode(text: text, paragraphWidth: detailViewTemplate.frame.width - Style.DetailView.spriteSize.width - Style.Padding.more, fontSize: UIFont.mediumSize)
+        gemDesc.position = CGPoint.alignHorizontally(gemDesc.frame, relativeTo: nextTo, horizontalAnchor: .left, verticalAlign: .bottom, verticalPadding: Style.Padding.more, translatedToBounds: true)
+        gemDesc.zPosition = Precedence.menu.rawValue
+        return gemDesc
+        
+    }
+
+    
     
     func updateTileDetailView() {
         guard let tileType = tileType else {
@@ -180,6 +196,8 @@ class TileDetailView: SKNode {
             detailViewTemplate.addChild(attackDesc)
         } else if let pillarDesc = pillarDescription(tileType: tileType, nextTo: title.frame) {
             detailViewTemplate.addChild(pillarDesc)
+        } else if let gemDesc = gemDescription(tileType: tileType, nextTo: title.frame) {
+            detailViewTemplate.addChild(gemDesc)
         }
         
         // add the border

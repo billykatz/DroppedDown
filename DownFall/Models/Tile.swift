@@ -262,8 +262,8 @@ extension TileType {
             return data.type.humanReadable
         case .exit:
             return "mineshaft"
-        case .item:
-            return "item"
+        case .item(let item):
+            return item.humanReadable
         case .monster(let data):
             return data.type.humanReadable
         case .gem:

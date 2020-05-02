@@ -24,6 +24,7 @@ class Button: SKShapeNode {
     static let small = CGSize(width: 75, height: 30)
     static let medium = CGSize(width: 110, height: 50)
     static let large = CGSize(width: 150, height: 75)
+    static let extralarge = CGSize(width: 300, height: 150)
     
     static let inGameLarge = CGSize(width: 200, height: 160)
     

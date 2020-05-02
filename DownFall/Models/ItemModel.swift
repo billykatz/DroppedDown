@@ -26,6 +26,19 @@ struct Item: Decodable, Hashable {
     let amount: Int
     var color: Color?
     
+    var humanReadable: String {
+        switch type {
+        case .gold:
+            return "Gold piece"
+        case .gem:
+            if let color = color {
+                return "\(color.humanReadable) gem"
+            } else {
+                return "Gem"
+            }
+        }
+    }
+    
     var textureName: String {
         switch type {
         case .gold:

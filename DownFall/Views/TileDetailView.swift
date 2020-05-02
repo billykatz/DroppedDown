@@ -139,10 +139,10 @@ class TileDetailView: SKNode {
     }
     
     private func pillarDescription(tileType: TileType, nextTo: CGRect) -> ParagraphNode? {
-        guard case TileType.pillar(_ , let health) = tileType  else { return nil }
+        guard case TileType.pillar(let data) = tileType  else { return nil }
         let text =
         """
-        \u{2022} \(health) health
+        \u{2022} \(data.health) health
         \u{2022} blocks attacks from monsters
         \u{2022} takes damage from mining rocks next to it
         \u{2022} collapses when it reaches 0 health

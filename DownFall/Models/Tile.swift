@@ -8,6 +8,16 @@
 
 import UIKit
 
+struct DynamiteFuse: Decodable, Hashable {
+    let count: Int
+    var hasBeenDecremented: Bool
+}
+
+struct PillarData: Decodable, Hashable {
+    let color: Color
+    let health: Int
+}
+
 enum Color: String, Decodable, CaseIterable {
     case blue
     case brown
@@ -23,6 +33,17 @@ enum Color: String, Decodable, CaseIterable {
         case .red: return "Red"
         case .green: return "Green"
         }
+    }
+    
+    var forUI: UIColor {
+        switch self {
+        case .blue: return .lightBarBlue
+        case .brown: return .lightBarMonster
+        case .purple: return .lightBarPurple
+        case .red: return .lightBarRed
+        case .green: return .lightBarGem
+        }
+
     }
 }
 
@@ -88,10 +109,10 @@ extension Tile: Equatable {
     }
 }
 
-enum TileType: Hashable, CaseIterable {
+enum TileType: Hashable, CaseIterable, Decodable {
     
     static var rockCases: [TileType] = [.rock(.blue), .rock(.green), .rock(.red), .rock(.purple), .rock(.brown)]
-    static var allCases: [TileType] = [.player(.zero), .exit(blocked: false), .empty, .monster(.zero), .item(.zero), .rock(.red), .pillar(.red, 3)]
+    static var allCases: [TileType] = [.player(.zero), .exit(blocked: false), .empty, .monster(.zero), .item(.zero), .rock(.red), .pillar(PillarData(color: .red, health: 3))]
     static var randomCases = [TileType.monster(.zero), .rock(.red), .item(Item.gem)]
     typealias AllCases = [TileType]
     
@@ -107,25 +128,81 @@ enum TileType: Hashable, CaseIterable {
             return true
         case (.item(let lhsItem), .item(let rhsItem)):
             return lhsItem.type == rhsItem.type
-        case let (.pillar(leftColor), .pillar(rightColor)):
-            return leftColor == rightColor
+        case let (.pillar(leftData), .pillar(rightData)):
+            return leftData.color == rightData.color
         case let (.rock(leftColor), .rock(rightColor)):
             return leftColor == rightColor
-        case let (.dynamite(_, lhsHasBeen), .dynamite(_, rhsHasBeen)):
-            return lhsHasBeen == rhsHasBeen
+        case let (.dynamite(lhsFuse), .dynamite(rhsFuse)):
+            return lhsFuse.hasBeenDecremented == rhsFuse.hasBeenDecremented
         default:
             return false
         }
     }
+    
+    enum CodingKeys: String, CodingKey {
+        case base
+        case entityData
+        case exitBlocked
+        case item
+        case color
+        case dynamiteFuse
+        case pillarData
+
+    }
+    
+    private enum Base: String, Codable {
+        
+        case player
+        case monster
+        case empty
+        case exit
+        case item
+        case pillar
+        case rock
+        case dynamite
+    }
+    
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let base = try container.decode(Base.self, forKey: .base)
+        
+        switch base {
+        case .empty:
+            self = .empty
+        case .player:
+            let data = try container.decode(EntityModel.self, forKey: .entityData)
+            self = .player(data)
+        case .monster:
+            let data = try container.decode(EntityModel.self, forKey: .entityData)
+            self = .monster(data)
+        case .dynamite:
+            let dynamiteFuse = try container.decode(DynamiteFuse.self, forKey: .dynamiteFuse)
+            self = .dynamite(dynamiteFuse)
+        case .exit:
+            let blocked = try container.decode(Bool.self, forKey: .exitBlocked)
+            self = .exit(blocked: blocked)
+        case .rock:
+            let color = try container.decode(Color.self, forKey: .color)
+            self = .rock(color)
+        case .pillar:
+            let pillarData = try container.decode(PillarData.self, forKey: .pillarData)
+            self = .pillar(pillarData)
+        case .item:
+            let item = try container.decode(Item.self, forKey: .item)
+            self = .item(item)
+        }
+    }
+
     
     case player(EntityModel)
     case monster(EntityModel)
     case empty
     case exit(blocked: Bool)
     case item(Item)
-    case pillar(Color, Int)
+    case pillar(PillarData)
     case rock(Color)
-    case dynamite(fuseCount: Int, hasBeenDecremented: Bool)
+    case dynamite(DynamiteFuse)
     
     var isARock: Bool {
         if case .rock = self {
@@ -149,8 +226,8 @@ enum TileType: Hashable, CaseIterable {
     var color: Color? {
         if case TileType.rock(let color) = self {
             return color
-        } else if case TileType.pillar(let color, _) = self {
-            return color
+        } else if case TileType.pillar(let data) = self {
+            return data.color
         }
         return nil
     }
@@ -201,16 +278,16 @@ enum TileType: Hashable, CaseIterable {
             case .green:
                 return "greenRockv2"
             }
-        case let .pillar(color, health):
-            switch color {
+        case .pillar(let data):
+            switch data.color {
             case .blue:
-                return "bluePillar\(health)Health"
+                return "bluePillar\(data.health)Health"
             case .purple:
-                return "purplePillar\(health)Health"
+                return "purplePillar\(data.health)Health"
             case .brown:
-                return "brownPillar\(health)Health"
+                return "brownPillar\(data.health)Health"
             case .red:
-                return "redPillar\(health)Health"
+                return "redPillar\(data.health)Health"
             case .green:
                 preconditionFailure("Shouldnt be here")
             }
@@ -256,8 +333,8 @@ extension TileType {
         switch self {
         case .rock:
             return "rock"
-        case .pillar(let color, _):
-            return "\(color.humanReadable) pillar"
+        case .pillar(let data):
+            return "\(data.color.humanReadable) pillar"
         case .player(let data):
             return data.type.humanReadable
         case .exit:

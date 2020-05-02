@@ -9,9 +9,9 @@
 import SpriteKit
 
 protocol RuneDetailViewModelable {
-    var ability: AnyAbility? { get }
+    var rune: Rune? { get }
     var progress: CGFloat { get }
-    var confirmed: ((AnyAbility) -> ())? { get set }
+    var confirmed: ((Rune) -> ())? { get set }
     var canceled: (() -> ())? { get set }
     var isCharged: Bool { get }
     var chargeDescription: String? { get }
@@ -19,20 +19,20 @@ protocol RuneDetailViewModelable {
 }
 
 struct RuneDetailViewModel: RuneDetailViewModelable {
-    var ability: AnyAbility?
+    var rune: Rune?
     var progress: CGFloat
-    var confirmed: ((AnyAbility) -> ())?
+    var confirmed: ((Rune) -> ())?
     var canceled: (() -> ())?
     
     /// returns true is we have completed the charging of a rune
     var isCharged: Bool {
-        guard let rune = ability else { return false }
+        guard let rune = rune else { return false }
         return progress >= CGFloat(rune.cooldown)
     }
     
     /// returns a string to display to players that describes how to recahrge the rune
     var chargeDescription: String? {
-        guard let rune = ability else { return nil }
+        guard let rune = rune else { return nil }
         var strings: [String] = []
         for type in rune.rechargeType {
             switch type {
@@ -78,7 +78,7 @@ class RuneDetailView: SKSpriteNode, ButtonDelegate {
     }
     
     func setupRuneView() {
-        let viewModel = RuneSlotViewModel(rune: self.viewModel.ability,
+        let viewModel = RuneSlotViewModel(rune: self.viewModel.rune,
                                           registerForUpdates: false,
                                           progress: Int(self.viewModel.progress))
         let runeSlotView = RuneSlotView(viewModel: viewModel,
@@ -126,9 +126,9 @@ class RuneDetailView: SKSpriteNode, ButtonDelegate {
         // description paragraphs
         let descriptionOffset = textOffset + 3.0
         let descriptionFontSize = UIFont.smallSize
-        let effectDescription = ParagraphNode(text: viewModel.ability?.description ?? "", paragraphWidth: descriptionWidth, fontSize: descriptionFontSize)
+        let effectDescription = ParagraphNode(text: viewModel.rune?.description ?? "", paragraphWidth: descriptionWidth, fontSize: descriptionFontSize)
         let chargeDescription = ParagraphNode(text: viewModel.chargeDescription ?? "", paragraphWidth: descriptionWidth, fontSize: descriptionFontSize)
-        if let ability = viewModel.ability {
+        if let ability = viewModel.rune {
             let progressDescription = ParagraphNode(text: "\(Int(viewModel.progress))/\( ability.cooldown)", paragraphWidth: descriptionWidth, fontSize: descriptionFontSize)
             progressDescription.position = CGPoint.position(progressDescription.frame, inside: descriptionContainer.frame, verticalAlign: .bottom, horizontalAnchor: .left, yOffset: descriptionOffset)
             descriptionContainer.addChild(progressDescription)
@@ -146,7 +146,7 @@ class RuneDetailView: SKSpriteNode, ButtonDelegate {
     }
     
     func setupButtons() {
-        if viewModel.ability != nil {
+        if viewModel.rune != nil {
             
             let confirmSprite = SKSpriteNode(texture: SKTexture(imageNamed: "buttonAffirmitive"), size: .oneHundred)
             let confirmButton = Button(size: .oneHundred, delegate: self, identifier: .backpackConfirm, image: confirmSprite, shape: .circle, showSelection: true, disable: !viewModel.isCharged)
@@ -167,7 +167,7 @@ class RuneDetailView: SKSpriteNode, ButtonDelegate {
         case .backpackCancel:
             viewModel.canceled?()
         case .backpackConfirm:
-            guard let ability = viewModel.ability else { return }
+            guard let ability = viewModel.rune else { return }
             viewModel.confirmed?(ability)
         default:
             break

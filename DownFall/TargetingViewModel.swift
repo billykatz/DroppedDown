@@ -25,10 +25,9 @@ struct AllTarget {
 
 protocol TargetingOutputs {
     var toastMessage: String { get }
-    var usageMessage: String { get }
     var currentTargets: AllTarget { get }
     var legallyTargeted: Bool { get }
-    var inventory: [AnyAbility] { get }
+    var inventory: [Rune] { get }
 }
 
 protocol TargetingInputs {
@@ -37,10 +36,10 @@ protocol TargetingInputs {
     func didTarget(_ coord: TileCoord)
     
     /// Use this to consume the item
-    func didUse(_ ability: AnyAbility?)
+    func didUse(_ rune: Rune?)
     
     /// Use this to select an ability
-    func didSelect(_ ability: AnyAbility?)
+    func didSelect(_ rune: Rune?)
 }
 
 protocol Targeting: TargetingOutputs, TargetingInputs {}
@@ -49,11 +48,11 @@ protocol Targeting: TargetingOutputs, TargetingInputs {}
 class TargetingViewModel: Targeting {
     
     public var updateCallback: (() -> Void)?
-    public var runeSlotsUpdated: ((Int, [AnyAbility]) -> Void)?
+    public var runeSlotsUpdated: ((Int, [Rune]) -> Void)?
     public var targetsUpdated: (() -> Void)?
     
     private var runeSlots: Int = 0
-    var inventory: [AnyAbility] = []
+    var inventory: [Rune] = []
     
     init() {
         Dispatch.shared.register { [weak self] (input) in
@@ -85,11 +84,12 @@ class TargetingViewModel: Targeting {
         case .boardBuilt:
             guard let tiles = input.endTilesStruct else { return }
             
-            if let playerData = playerData(in: tiles) {
+            if let playerData = playerData(in: tiles),
+                let runes = playerData.runes {
                 let runeSlots = playerData.runeSlots ?? 0
                 self.runeSlots = runeSlots
-                inventory = playerData.abilities
-                runeSlotsUpdated?(runeSlots, playerData.abilities)
+                inventory = playerData.runes ?? []
+                runeSlotsUpdated?(runeSlots, runes)
             }
         case .itemUseCanceled:
             ()
@@ -99,11 +99,11 @@ class TargetingViewModel: Targeting {
 
     }
 
-    var ability: AnyAbility? {
+    var rune: Rune? {
         didSet {
             currentTargets = AllTarget(targets: [], areLegal: false)
-            if let ability = ability {
-                InputQueue.append(Input(InputType.itemUseSelected(ability)))
+            if let rune = rune {
+                InputQueue.append(Input(InputType.itemUseSelected(rune)))
                 autoTarget()
             }
             else {
@@ -113,24 +113,19 @@ class TargetingViewModel: Targeting {
     }
     
     var numberOfTargets: Int {
-        return ability?.targets ?? 0
+        return rune?.targets ?? 0
     }
     
     var typesOfTargets: [TileType] {
-        return ability?.targetTypes ?? []
+        return rune?.targetTypes ?? []
     }
     
     var nameMessage: String? {
-        return ability?.type.humanReadable
-    }
-    
-    var usageMessage: String {
-
-        return ability?.usage.message ?? ""
+        return rune?.type.humanReadable
     }
     
     var toastMessage: String {
-        if ability == nil {
+        if rune == nil {
             return ""
         }
         let baseString = "Choose "
@@ -192,7 +187,7 @@ class TargetingViewModel: Targeting {
     
     private func areTargetsLegal(_ coords: [TileCoord]) -> Bool {
         guard let tiles = tiles else { return false }
-        let needsToTargetPlayer: Bool = ability?.targetTypes?.contains(.player(.playerZero)) ?? false
+        let needsToTargetPlayer: Bool = rune?.targetTypes?.contains(.player(.playerZero)) ?? false
         var hasPlayerTargeted = false
         for coord in coords {
             if !isTargetLegal(coord) {
@@ -209,7 +204,7 @@ class TargetingViewModel: Targeting {
         guard needsToTargetPlayer == hasPlayerTargeted else { return false }
         
         /// ensure that the targets are within the correct distance of each other
-        let targetDistance = ability?.distanceBetweenTargets ?? Int.max
+        let targetDistance = rune?.maxDistanceBetweenTargets ?? Int.max
         
         /// we may never append anything to this but thats okay.
         var results: [Bool] = []
@@ -244,7 +239,7 @@ class TargetingViewModel: Targeting {
      - Returns: Nothing
      */
     func didTarget(_ coord: TileCoord) {
-        guard ability != nil else { preconditionFailure("We cant target if we dont have an ability set") }
+        guard rune != nil else { preconditionFailure("We cant target if we dont have an ability set") }
         if currentTargets.targets.contains(where: { return $0.coord == coord } ) {
             // remove the targeting
             currentTargets.targets.removeAll(where: { return $0.coord == coord })
@@ -274,18 +269,18 @@ class TargetingViewModel: Targeting {
         }
     }
     
-    func didUse(_ ability: AnyAbility?) {
-        guard let ability = ability else { return }
+    func didUse(_ rune: Rune?) {
+        guard let rune = rune else { return }
         guard legallyTargeted else { return }
         InputQueue.append(
-            Input(.itemUsed(ability, currentTargets.targets.map { $0.coord }))
+            Input(.itemUsed(rune, currentTargets.targets.map { $0.coord }))
         )
-        self.ability = nil
+        self.rune = nil
         
     }
     
-    func didSelect(_ ability: AnyAbility?) {
-        self.ability = ability
+    func didSelect(_ rune: Rune?) {
+        self.rune = rune
     }
     
     private func autoTarget() {

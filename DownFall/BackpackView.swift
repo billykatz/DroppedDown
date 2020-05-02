@@ -118,11 +118,11 @@ class BackpackView: SKSpriteNode {
     //MARK: - private functions
     // TODO: should this be updated?
     private let maxRuneSlots = 4
-    private func runeSlotsUpdated(_ runes: Int, _ abilities: [AnyAbility]) {
+    private func runeSlotsUpdated(_ runeSlots: Int, _ runes: [Rune]) {
         /// TODO: we only ever want to do this once!!!
         /// Add an update method to the RuneContainer so if you get a rune mid-level or whatever, it will updated accordinly
-        let viewModel = RuneContainerViewModel(abilities: abilities,
-                                               numberOfRuneSlots: runes,
+        let viewModel = RuneContainerViewModel(runes: runes,
+                                               numberOfRuneSlots: runeSlots,
                                                runeWasTapped: runeWasTapped,
                                                runeWasUsed: self.viewModel.didUse,
                                                runeUseWasCanceled: runeUseWasCanceled)
@@ -141,12 +141,12 @@ class BackpackView: SKSpriteNode {
         viewModel.didSelect(nil)
     }
     
-    private func runeWasTapped(ability: AnyAbility?) {
-        viewModel.didSelect(ability)
+    private func runeWasTapped(rune: Rune?) {
+        viewModel.didSelect(rune)
     }
     
     private func updateTargetArea() {
-        if viewModel.ability == nil {
+        if viewModel.rune == nil {
             targetingArea.removeFromParent()
         } else {
             addChildSafely(targetingArea)
@@ -199,7 +199,7 @@ extension BackpackView {
         let position = touch.location(in: self)
         
         for node in self.nodes(at: position) {
-            if node.name == targetingAreaName && viewModel.ability != nil && !background.contains(position) {
+            if node.name == targetingAreaName && viewModel.rune != nil && !background.contains(position) {
                 let tileCoord = translatePoint(position)
                 viewModel.didTarget(tileCoord)
             }

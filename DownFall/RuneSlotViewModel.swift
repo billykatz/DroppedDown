@@ -18,16 +18,17 @@ protocol RuneSlotViewModelOutputs {
     var charged: ((Int, Int) -> ())? { get }
     var textureName: String? { get }
     var isCharged: Bool { get }
-    var runeWasTapped: ((AnyAbility?, Int) -> ())? { get }
+    var runeWasTapped: ((Rune?, Int) -> ())? { get }
     var progressRatio: CGFloat { get }
     var progressColor: UIColor? { get }
 }
 
 class RuneSlotViewModel: RuneSlotViewModelOutputs, RuneSlotViewModelInputs {
     
+    
     // Output
     var charged: ((Int, Int) -> ())? = nil
-    var runeWasTapped: ((AnyAbility?, Int) -> ())? = nil
+    var runeWasTapped: ((Rune?, Int) -> ())? = nil
     
     var progressRatio: CGFloat {
         guard let rune = rune else { return 0 }
@@ -36,7 +37,7 @@ class RuneSlotViewModel: RuneSlotViewModelOutputs, RuneSlotViewModelInputs {
     
     var progressColor: UIColor? {
         guard let rune = rune else { return nil }
-        return rune.progressColor
+        return rune.progressColor.forUI
     }
     
     var textureName: String? {
@@ -45,14 +46,14 @@ class RuneSlotViewModel: RuneSlotViewModelOutputs, RuneSlotViewModelInputs {
     }
     
     // State variables
-    private var rune: AnyAbility?
+    private var rune: Rune?
     private var current: Int = 0 {
         didSet {
             charged?(current, rune?.cooldown ?? 0)
         }
     }
     
-    init(rune: AnyAbility?, registerForUpdates: Bool = true, progress: Int = 0) {
+    init(rune: Rune?, registerForUpdates: Bool = true, progress: Int = 0) {
         self.rune = rune
         self.current = progress
         

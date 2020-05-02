@@ -9,28 +9,28 @@
 import SpriteKit
 
 protocol RuneContainerViewModelable {
-    var runeWasTapped: ((AnyAbility) -> ())? { get }
-    var runeWasUsed: ((AnyAbility) -> ())? { get }
+    var runeWasTapped: ((Rune) -> ())? { get }
+    var runeWasUsed: ((Rune) -> ())? { get }
     var runeUseWasCanceled: (() -> ())? { get }
     
-    var abilities: [AnyAbility] { get }
+    var runes: [Rune] { get }
     var numberOfRuneSlots: Int { get }
 }
 
 struct RuneContainerViewModel: RuneContainerViewModelable {
-    let runeWasTapped: ((AnyAbility) -> ())?
-    let runeWasUsed: ((AnyAbility) -> ())?
+    let runeWasTapped: ((Rune) -> ())?
+    let runeWasUsed: ((Rune) -> ())?
     let runeUseWasCanceled: (() -> ())?
     
-    let abilities: [AnyAbility]
+    let runes: [Rune]
     let numberOfRuneSlots: Int
     
-    init(abilities: [AnyAbility],
+    init(runes: [Rune],
          numberOfRuneSlots: Int,
-         runeWasTapped: ((AnyAbility) -> ())?,
-         runeWasUsed: ((AnyAbility) -> ())?,
+         runeWasTapped: ((Rune) -> ())?,
+         runeWasUsed: ((Rune) -> ())?,
          runeUseWasCanceled: (() -> ())?) {
-        self.abilities = abilities
+        self.runes = runes
         self.numberOfRuneSlots = numberOfRuneSlots
         self.runeWasTapped = runeWasTapped
         self.runeWasUsed = runeWasUsed
@@ -60,19 +60,19 @@ class RuneContainerView: SKSpriteNode {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func runeWasTapped(ability: AnyAbility?, progress: Int) {
+    private func runeWasTapped(rune: Rune?, progress: Int) {
         /// They have tapped on a rune slot, it maybe empty or have a rune
-        if let ability = ability {
+        if let rune = rune {
             // The player tapped on a full rune slot.  Let someone know that we should etner targeting move
-            viewModel.runeWasTapped?(ability)
+            viewModel.runeWasTapped?(rune)
         }
         
-        setupRuneDetailView(ability: ability, progress: progress)
+        setupRuneDetailView(rune: rune, progress: progress)
         toggleRuneSlots()
     }
     
-    private func runeWasUsed(ability: AnyAbility) {
-        viewModel.runeWasUsed?(ability)
+    private func runeWasUsed(rune: Rune) {
+        viewModel.runeWasUsed?(rune)
         removeChild(with: Constants.runeDetailViewName)
         toggleRuneSlots()
     }
@@ -83,8 +83,8 @@ class RuneContainerView: SKSpriteNode {
         toggleRuneSlots()
     }
     
-    private func setupRuneDetailView(ability: AnyAbility?, progress: Int) {
-        let runeDetailView = RuneDetailView(viewModel: RuneDetailViewModel(ability: ability,
+    private func setupRuneDetailView(rune: Rune?, progress: Int) {
+        let runeDetailView = RuneDetailView(viewModel: RuneDetailViewModel(rune: rune,
                                                                            progress: CGFloat(progress),
                                                                            confirmed: runeWasUsed,
                                                                            canceled: runeUseWasCanceled), size: size)
@@ -131,17 +131,17 @@ class RuneContainerView: SKSpriteNode {
         for index in 0..<4 {
             guard index < viewModel.numberOfRuneSlots else { return }
             
-            let ability = viewModel.abilities.optionalElement(at: index)
-            let viewModel = RuneSlotViewModel(rune: ability)
-            let rune = RuneSlotView(viewModel: viewModel, size: .oneFifty)
+            let rune = viewModel.runes.optionalElement(at: index)
+            let viewModel = RuneSlotViewModel(rune: rune)
+            let runeSlotView = RuneSlotView(viewModel: viewModel, size: .oneFifty)
             
             let runeY = CGFloat(0.0)
             let runeX = frame.minX + frame.width/CGFloat(8) + (frame.width/4.0 * CGFloat(index))
             
-            rune.position = CGPoint(x: runeX, y: runeY)
-            rune.zPosition = Precedence.menu.rawValue
-            rune.name = Constants.runeName
-            addChild(rune)
+            runeSlotView.position = CGPoint(x: runeX, y: runeY)
+            runeSlotView.zPosition = Precedence.menu.rawValue
+            runeSlotView.name = Constants.runeName
+            addChild(runeSlotView)
             
             viewModel.runeWasTapped = runeWasTapped
         }

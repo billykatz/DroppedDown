@@ -85,10 +85,10 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
     case newTurn
     case tutorial(TutorialStep)
     case visitStore
-    case itemUseSelected(AnyAbility)
+    case itemUseSelected(Rune)
     case itemUseCanceled
     case itemCanBeUsed(Bool)
-    case itemUsed(AnyAbility, [TileCoord])
+    case itemUsed(Rune, [TileCoord])
     case bossTargetsWhatToEat([TileCoord])
     case bossEatsRocks([TileCoord])
     case bossTargetsWhatToAttack([BossController.BossAttack])

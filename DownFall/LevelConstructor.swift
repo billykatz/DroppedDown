@@ -159,7 +159,7 @@ struct LevelConstructor {
             while set.contains(color) {
                 color = Color.allCases.randomElement()!
             }
-            return TileType.pillar(color, 3)
+            return TileType.pillar(PillarData(color: color, health: 3))
         }
         
         
@@ -231,11 +231,15 @@ struct LevelConstructor {
                 }
             }
             
-            let pillarTypes = [
-                TileType.pillar(.red, 3), .pillar(.red, 3),
-                .pillar(.blue, 3), .pillar(.blue, 3),
-                .pillar(.brown, 3), .pillar(.brown, 3),
-                .pillar(.purple, 3), .pillar(.purple, 3)
+            let pillarTypes: [TileType] = [
+                TileType.pillar(PillarData(color: .red, health: 3)),
+                .pillar(PillarData(color: .red, health: 3)),
+                .pillar(PillarData(color: .blue, health: 3)),
+                .pillar(PillarData(color: .blue, health: 3)),
+                .pillar(PillarData(color: .brown, health: 3)),
+                .pillar(PillarData(color: .brown, health: 3)),
+                .pillar(PillarData(color: .purple, health: 3)),
+                .pillar(PillarData(color: .purple, health: 3))
             ]
             
             var result:  [(TileType, TileCoord)] = []

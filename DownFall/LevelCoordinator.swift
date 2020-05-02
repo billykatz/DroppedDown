@@ -124,7 +124,7 @@ extension LevelCoordinating where Self: UIViewController {
         let remove = SKAction.removeFromParent()
         scene.run(SKAction.group([fadeOut, remove])) { [weak self] in
             guard let self = self else { return }
-            self.levelSelect(self.entities!.entities[0])
+            self.levelSelect(self.entities!.entities[2])
         }
 
     }

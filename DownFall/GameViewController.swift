@@ -24,7 +24,7 @@ class GameViewController: UIViewController, LevelCoordinating {
         do {
             guard let entityData = try Data.data(from: "entities") else { fatalError("Crashing here is okay because we failed to parse our entity json file") }
             entities = try JSONDecoder().decode(EntitiesModel.self, from: entityData)
-            levelSelect(entities!.entities[0])
+            levelSelect(entities!.entities[2])
             
             //TODO: add the actual seed to this source
             randomSource = GKLinearCongruentialRandomSource()

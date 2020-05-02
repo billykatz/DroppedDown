@@ -264,12 +264,8 @@ class Renderer: SKSpriteNode {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func animateRuneUsed(input: InputType, transformations: [Transformation], rune: AnyAbility, targets: [TileCoord]) {
+    private func animateRuneUsed(input: InputType, transformations: [Transformation], rune: Rune, targets: [TileCoord]) {
         switch rune.type {
-        case .massMineRock:
-            computeNewBoard(for: transformations)
-        case .rainEmbers:
-            computeNewBoard(for: transformations)
         default:
             animationsFinished(endTiles: transformations.first?.endTiles)
         }

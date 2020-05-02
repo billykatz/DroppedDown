@@ -13,9 +13,9 @@ protocol ResetsAttacks {
     func resetAttacks() -> EntityModel
 }
 
-struct Pickaxe: Equatable, Codable {
+struct Pickaxe: Equatable, Decodable {
     var runeSlots: Int
-    var runes: [AnyAbility]
+    var runes: [Rune]
 }
 
 struct EntityModel: Equatable, Decodable {
@@ -56,7 +56,7 @@ struct EntityModel: Equatable, Decodable {
     static let playerCases: [EntityType] = [.easyPlayer, .normalPlayer, .hardPlayer]
     
     static let zero: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .rat, carry: .zero, animations: [], abilities: [])
-    static let playerZero: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .player, carry: .zero, animations: [], abilities: [], pickaxe: Pickaxe(runeSlots: 0))
+    static let playerZero: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .player, carry: .zero, animations: [], abilities: [], pickaxe: Pickaxe(runeSlots: 0, runes: []))
     
     static func zeroedEntity(type: EntityType) -> EntityModel {
         return EntityModel(originalHp: 0, hp: 0, name: "", attack: .zero, type: type, carry: .zero, animations: [])
@@ -117,8 +117,11 @@ struct EntityModel: Equatable, Decodable {
     }
     
     var runeSlots: Int? {
-        guard let runeSlots = pickaxe?.runeSlots else { return nil }
-        return runeSlots
+        return pickaxe?.runeSlots
+    }
+    
+    var runes: [Rune]? {
+        return pickaxe?.runes
     }
     
     var canAttack: Bool {

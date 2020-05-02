@@ -52,10 +52,7 @@
                     }
                 ]
             },
-            "abilities": [],
-            "pickaxe": {
-                "runeSlots" : 1
-            }
+            "abilities": []
         },
         { "name": "player3",
             "type": "player",
@@ -109,10 +106,7 @@
                 }
                 ]
             },
-            "abilities": [],
-            "pickaxe": {
-                "runeSlots" : 1
-            }
+            "abilities": []
         },
         { "name": "player3",
             "type": "player",
@@ -168,7 +162,56 @@
             },
             "abilities": [],
             "pickaxe": {
-                "runeSlots" : 1
+                "runeSlots" : 1,
+                "runes" : [
+                    {
+                        "type" : "rainEmbers",
+                        "textureName" : "rainEmbers",
+                        "cost" : 0,
+                        "currency" : "crystals",
+                        "description" : "Fling two fireball at two monsters",
+                        "flavorText" : "Fire is my second favorite word, second only to `combustion.` - Mack the Wizard",
+                        "targets" : 2,
+                        "targetTypes" : [{
+                            "base": "monster",
+                            "entityData": {
+                            "originalHp": 0,
+                            "hp": 0,
+                            "name": "Zero",
+                            "attack": {
+                                "type": "charges",
+                                "frequency" : 3,
+                                "damage": 1,
+                                "range": {
+                                    "lower": 1,
+                                    "upper": 5
+                                },
+                                "attacksPerTurn": 1,
+                                "attackSlope": [
+                                    {
+                                        "over": 0,
+                                        "up": 1
+                                    }
+                                ]
+                            },
+                            "type": "rat",
+                            "carry": {
+                                "items": []
+                            },
+                            "animations": [],
+                            "abilities": []
+                        }
+                        }],
+                        "cooldown" : 25,
+                        "rechargeType" : [{
+                            "base": "rock",
+                            "color": "red"
+                        }],
+                        "rechargeMinimum" : 1,
+                        "progressColor" : "red",
+                        "maxDistanceBetweenTargets" : 200000
+                    }
+                ]
             }
         },
         { "name": "dragon",

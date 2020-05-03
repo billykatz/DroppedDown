@@ -29,63 +29,16 @@ class PickaxeView: SKSpriteNode {
 }
 
 
-protocol CurrencyViewModelable {
-    var currencySprite: SKSpriteNode { get }
-    var amount: Int { get }
-}
-
-struct CurrencyViewModel: CurrencyViewModelable {
-    let currency: Currency
-    let amount: Int
-    
-    var textureName: String {
-        return currency.rawValue
-    }
-    
-    var textureSize: CGSize {
-        return Style.HUD.heartSize
-    }
-    
-    var currencySprite: SKSpriteNode {
-        return SKSpriteNode(texture: SKTexture(imageNamed: textureName), size: textureSize)
-    }
-}
-
-class CurrencyView: SKSpriteNode {
-    let viewModel: CurrencyViewModelable
-    
-    init(viewModel: CurrencyViewModelable, size: CGSize) {
-        self.viewModel = viewModel
-                
-        super.init(texture: nil, color: .lightBarBlue, size: size)
-        
-        let currencySprite = viewModel.currencySprite
-        let currencyParagraph = ParagraphNode(text: "\(viewModel.amount)", paragraphWidth: self.frame.maxX - currencySprite.frame.maxX)
-        
-        currencySprite.position = CGPoint.position(currencySprite.frame, inside: self.frame, verticalAlign: .center, horizontalAnchor: .left)
-        currencySprite.zPosition = Precedence.menu.rawValue
-        
-        currencyParagraph.position = CGPoint.alignVertically(currencyParagraph.frame, relativeTo: currencySprite.frame, horizontalAnchor: .right, verticalAlign: .center, translatedToBounds: true)
-        currencyParagraph.zPosition = Precedence.menu.rawValue
-        
-        addChild(currencySprite)
-        addChild(currencyParagraph)
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-}
-
 protocol StoreHUDViewModelable {
     var currentHealth: Int { get }
     var totalHealth: Int { get }
     var totalGems: Int { get }
-    var pickaze: Pickaxe? { get }
+    var pickaxe: Pickaxe? { get }
     var healthText: String { get }
 }
 
 struct StoreHUDViewModel: StoreHUDViewModelable {
+    
     var currentHealth: Int {
         return playerData.hp
     }
@@ -102,7 +55,7 @@ struct StoreHUDViewModel: StoreHUDViewModelable {
         return playerData.carry.total(in: .gem)
     }
     
-    var pickaze: Pickaxe? {
+    var pickaxe: Pickaxe? {
         return playerData.pickaxe
     }
     
@@ -163,8 +116,10 @@ class StoreHUD: SKSpriteNode {
         addChild(currencyView)
         
         /// Pickaxe View
-        let pickaxeView = PickaxeView(viewModel: PickaxeViewModel(), size: CGSize(width: halfWidth, height: halfHeight))
+        let runeContainerViewModel = RuneContainerViewModel(runes: viewModel.pickaxe?.runes ?? [], numberOfRuneSlots: viewModel.pickaxe?.runeSlots ?? 0, runeWasTapped: nil, runeWasUsed: nil, runeUseWasCanceled: nil)
+        let pickaxeView = RuneContainerView(viewModel: runeContainerViewModel, mode: .storeHUD, size: quarterSize)
         pickaxeView.position = CGPoint.position(currencyView.frame, inside: contentView.frame, verticalAlign: .bottom, horizontalAnchor: .left)
+        pickaxeView.zPosition = Precedence.menu.rawValue
         
         addChild(pickaxeView)
         

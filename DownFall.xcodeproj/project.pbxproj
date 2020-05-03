@@ -153,6 +153,7 @@
 		5881DBF6244FEE630053A690 /* RuneSlotViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5881DBF5244FEE630053A690 /* RuneSlotViewModel.swift */; };
 		5882602123DB809300A77BE8 /* EmptyAbility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5882602023DB809300A77BE8 /* EmptyAbility.swift */; };
 		5893899B245E0D6A00350A2E /* StoreHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5893899A245E0D6A00350A2E /* StoreHUD.swift */; };
+		5893899D245E7AB300350A2E /* CurrencyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5893899C245E7AB300350A2E /* CurrencyView.swift */; };
 		589A27CF23D8EA1C00174DE7 /* SKShapeNode+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589A27CE23D8EA1C00174DE7 /* SKShapeNode+Extensions.swift */; };
 		589A27D123D90CD900174DE7 /* TargetingState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589A27D023D90CD900174DE7 /* TargetingState.swift */; };
 		589A27D423D90FE000174DE7 /* TargetingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589A27D323D90FE000174DE7 /* TargetingViewModel.swift */; };
@@ -328,6 +329,7 @@
 		5881DBF5244FEE630053A690 /* RuneSlotViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneSlotViewModel.swift; sourceTree = "<group>"; };
 		5882602023DB809300A77BE8 /* EmptyAbility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyAbility.swift; sourceTree = "<group>"; };
 		5893899A245E0D6A00350A2E /* StoreHUD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreHUD.swift; sourceTree = "<group>"; };
+		5893899C245E7AB300350A2E /* CurrencyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyView.swift; sourceTree = "<group>"; };
 		589A27CE23D8EA1C00174DE7 /* SKShapeNode+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SKShapeNode+Extensions.swift"; sourceTree = "<group>"; };
 		589A27D023D90CD900174DE7 /* TargetingState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetingState.swift; sourceTree = "<group>"; };
 		589A27D323D90FE000174DE7 /* TargetingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetingViewModel.swift; sourceTree = "<group>"; };
@@ -566,6 +568,7 @@
 			children = (
 				3D06390E22F1DB8300C4D5E9 /* StoreScene.swift */,
 				5893899A245E0D6A00350A2E /* StoreHUD.swift */,
+				5893899C245E7AB300350A2E /* CurrencyView.swift */,
 				3DA0A37722FFA6250041EF34 /* StoreItem.swift */,
 			);
 			path = Store;
@@ -1051,6 +1054,7 @@
 				3DC072BD23747F6B0046F224 /* CGSize+Extension.swift in Sources */,
 				3D9C506021FE206000A2210D /* Renderer.swift in Sources */,
 				3DA4E88F228FC860006E90D1 /* SKNode+Extension.swift in Sources */,
+				5893899D245E7AB300350A2E /* CurrencyView.swift in Sources */,
 				585AAAA9245BB9F20029FDD0 /* TransformRock.swift in Sources */,
 				3DF0A6B02379C4DC00941305 /* ParagraphNode.swift in Sources */,
 				5866B3DC244D2D2300DF36E0 /* RuneDetailView.swift in Sources */,

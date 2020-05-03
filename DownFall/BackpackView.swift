@@ -44,9 +44,6 @@ class BackpackView: SKSpriteNode {
     //rune inventory container
     private var runeInventoryContainer: SKSpriteNode?
     
-    // pick axe
-    var pickaxeHandleView: SKSpriteNode?
-    
     init(playableRect: CGRect, viewModel: TargetingViewModel, levelSize: Int) {
         self.playableRect = playableRect
         self.boardSize = CGFloat(levelSize)

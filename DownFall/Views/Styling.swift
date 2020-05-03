@@ -81,6 +81,7 @@ struct Style {
         static let normal: CGFloat = 8.0
         static let more: CGFloat = 16.0
         static let most: CGFloat = 24.0
+        static let safeArea: CGFloat  = 75.0
     }
     
     struct Spacing {

@@ -11,6 +11,7 @@ import Foundation
 enum ViewMode {
     case inventory
     case itemDetail
+    case storeHUD
 }
 
 struct Target {

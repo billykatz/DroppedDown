@@ -69,7 +69,7 @@ class StoreScene: SKScene {
         self.storeHUD = StoreHUD(viewModel: StoreHUDViewModel(playerData: playerData), size: CGSize(width: playableRect.width, height: 350.0))
         
         super.init(size: playableRect.size)
-        storeHUD.position = CGPoint.position(storeHUD.frame, centeredInTopOf: playableRect)
+        storeHUD.position = CGPoint.position(storeHUD.frame, centeredInTopOf: playableRect, verticalOffset: Style.Padding.safeArea)
         storeHUD.zPosition = Precedence.foreground.rawValue
         addChild(storeHUD)
         

@@ -110,8 +110,8 @@
         },
         { "name": "player3",
             "type": "player",
-            "originalHp": 1,
-            "hp": 1,
+            "originalHp": 3,
+            "hp": 3,
             "attack": {
                 "type": "targets",
                 "frequency" : 1,

@@ -32,6 +32,7 @@ class StoreScene: SKScene {
         static let popup  = "popup"
     }
     
+    private let storeHUD: StoreHUD
     private let viewModel: StoreSceneViewModel
     private let playableRect: CGRect
     private let background: SKSpriteNode
@@ -65,9 +66,14 @@ class StoreScene: SKScene {
         self.playerData = playerData
         self.level = level
         
-        super.init(size: playableRect.size)
-        self.backgroundColor = .clayRed
+        self.storeHUD = StoreHUD(viewModel: StoreHUDViewModel(playerData: playerData), size: CGSize(width: playableRect.width, height: 350.0))
         
+        super.init(size: playableRect.size)
+        storeHUD.position = CGPoint.position(storeHUD.frame, centeredInTopOf: playableRect)
+        storeHUD.zPosition = Precedence.foreground.rawValue
+        addChild(storeHUD)
+        
+        self.backgroundColor = .clayRed
         
         let button = Button(size: Button.large,
                             delegate: self,

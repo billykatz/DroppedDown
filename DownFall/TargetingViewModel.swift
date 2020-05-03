@@ -70,17 +70,6 @@ class TargetingViewModel: Targeting {
                 tiles = endTiles
             }
             
-            if let inputType = trans.first?.inputType,
-                case InputType.itemUsed(_) = inputType,
-                let tiles = trans.first?.endTiles,
-                let playerData = playerData(in: tiles)
-            {
-//                let runeSlots = playerData.runeSlots ?? 0
-//                self.runeSlots = runeSlots
-//                inventory = playerData.abilities
-//                runeSlotsUpdated?(runeSlots, playerData.abilities)
-            }
-            
         case .boardBuilt:
             guard let tiles = input.endTilesStruct else { return }
             

@@ -248,7 +248,7 @@ enum Currency: String, CaseIterable, Codable  {
     case gold
     case gem = "crystals"
     
-    var itemTyp: Item.ItemType {
+    var itemType: Item.ItemType {
         switch self {
         case .gold:
             return Item.ItemType.gold

@@ -16,7 +16,8 @@ import SpriteKit
 class StoreHUD: SKSpriteNode {
     
     struct Constants {
-        static let currentHealthLabel = "currentHealthLabel"
+        static let currentHealthLabelName = "currentHealthLabelName"
+        static let totalHealthLabelName = "totalHealthLabelName"
     }
     
     private var viewModel: StoreHUDViewModel
@@ -49,15 +50,26 @@ class StoreHUD: SKSpriteNode {
     
     func updateHUD() {
         if viewModel.healthWasUpdated,
-            let currentHealthLabel = healthBarContainer.childNode(withName: Constants.currentHealthLabel) as? ParagraphNode {
-            animate(parentNode: self.contentView,
+            let currentHealthLabel = healthBarContainer.childNode(withName: Constants.currentHealthLabelName) as? ParagraphNode {
+            animate(parentNode: healthBarContainer,
                     paragraphNode: currentHealthLabel,
                     start: viewModel.pastHealth,
                     difference: viewModel.healthDifference)
             { [weak self] (newHealthLabel) in
                 self?.healthBarContainer.addChild(newHealthLabel)
             }
+        } else if viewModel.maxHealthWasUpdate,
+            let totalHealthLabel = healthBarContainer.childNode(withName: Constants.totalHealthLabelName) as? ParagraphNode {
+            animate(parentNode: healthBarContainer,
+                    paragraphNode: totalHealthLabel,
+                    start: viewModel.pastOriginalHealth,
+                    difference: viewModel.originalHealthDifference)
+            { [weak self] (newHealthLabel) in
+                self?.healthBarContainer.addChild(newHealthLabel)
+            }
         }
+            
+        
     }
     
     func setupContentView(size: CGSize) {
@@ -75,14 +87,19 @@ class StoreHUD: SKSpriteNode {
         healthBar.zPosition = Precedence.menu.rawValue
         
         let currentHealthParagraph = ParagraphNode(text: "\(viewModel.currentHealth)", paragraphWidth: healthBarContainer.frame.maxX - healthBar.frame.maxX)
-        let totalHealthParagraph = ParagraphNode(text: "/\(viewModel.totalHealth)", paragraphWidth: healthBarContainer.frame.maxX - healthBar.frame.maxX)
+        let outOfParagraph = ParagraphNode(text: "/", paragraphWidth: healthBarContainer.frame.maxX - healthBar.frame.maxX)
+        let totalHealthParagraph = ParagraphNode(text: "\(viewModel.totalHealth)", paragraphWidth: healthBarContainer.frame.maxX - healthBar.frame.maxX)
 
         currentHealthParagraph.position = CGPoint.alignVertically(currentHealthParagraph.frame, relativeTo: healthBar.frame, horizontalAnchor: .right, verticalAlign: .center, translatedToBounds: true)
-        currentHealthParagraph.name = Constants.currentHealthLabel
+        currentHealthParagraph.name = Constants.currentHealthLabelName
         
-        totalHealthParagraph.position = CGPoint.alignVertically(totalHealthParagraph.frame, relativeTo: currentHealthParagraph.frame, horizontalAnchor: .right, verticalAlign: .center)
+        outOfParagraph.position = CGPoint.alignVertically(outOfParagraph.frame, relativeTo: currentHealthParagraph.frame, horizontalAnchor: .right, verticalAlign: .center)
+        
+        totalHealthParagraph.position = CGPoint.alignVertically(totalHealthParagraph.frame, relativeTo: outOfParagraph.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: Style.Padding.most)
+        totalHealthParagraph.name = Constants.totalHealthLabelName
         
         healthBarContainer.addChild(currentHealthParagraph)
+        healthBarContainer.addChild(outOfParagraph)
         healthBarContainer.addChild(totalHealthParagraph)
         healthBarContainer.addChild(heartNode)
         healthBarContainer.addChild(healthBar)

@@ -28,6 +28,9 @@ class StoreHUDViewModel: StoreHUDViewModelable {
     var updateHUD: () -> () = {  }
     
     func selected(offer: StoreOffer, deselected: StoreOffer?) {
+        
+        currentPlayerData = pastPlayerData
+        
         switch offer.type {
         case .fullHeal:
             // save the state so we can animate the difference
@@ -67,6 +70,10 @@ class StoreHUDViewModel: StoreHUDViewModelable {
         return currentPlayerData.pickaxe
     }
     
+    var maxHealthWasUpdate: Bool {
+        return pastPlayerData.originalHp != currentPlayerData.originalHp
+    }
+    
     var healthWasUpdated: Bool {
         return pastPlayerData.hp != currentPlayerData.hp
     }
@@ -75,8 +82,16 @@ class StoreHUDViewModel: StoreHUDViewModelable {
         return currentPlayerData.hp - pastPlayerData.hp 
     }
     
+    var originalHealthDifference: Int {
+        return currentPlayerData.originalHp - pastPlayerData.originalHp
+    }
+    
     var pastHealth: Int {
         return pastPlayerData.hp
+    }
+    
+    var pastOriginalHealth: Int {
+        return pastPlayerData.originalHp
     }
     
     /// playerData that can update

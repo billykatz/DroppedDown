@@ -110,7 +110,7 @@ extension TileType {
                                            carry: carry,
                                            animations: animations,
                                            abilities: abilities,
-                                           pickaxe: Pickaxe(runeSlots: 1)))
+                                           pickaxe: Pickaxe(runeSlots: 0, runes: [])))
         
     }
     

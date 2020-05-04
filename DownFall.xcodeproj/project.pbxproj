@@ -154,6 +154,13 @@
 		5882602123DB809300A77BE8 /* EmptyAbility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5882602023DB809300A77BE8 /* EmptyAbility.swift */; };
 		5893899B245E0D6A00350A2E /* StoreHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5893899A245E0D6A00350A2E /* StoreHUD.swift */; };
 		5893899D245E7AB300350A2E /* CurrencyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5893899C245E7AB300350A2E /* CurrencyView.swift */; };
+		5893899F245E7D0E00350A2E /* StoreOffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5893899E245E7D0E00350A2E /* StoreOffer.swift */; };
+		589389A1245F4BFA00350A2E /* StagingAreaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589389A0245F4BFA00350A2E /* StagingAreaView.swift */; };
+		589389A3245F4C9B00350A2E /* PickaxeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589389A2245F4C9B00350A2E /* PickaxeView.swift */; };
+		589389A5245F52BB00350A2E /* ParagraphNode+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589389A4245F52BB00350A2E /* ParagraphNode+Extensions.swift */; };
+		589389A7245FA6E200350A2E /* StagingTierView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589389A6245FA6E200350A2E /* StagingTierView.swift */; };
+		5894B176245FD68A003B86F1 /* StagingSelectionAreaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5894B175245FD68A003B86F1 /* StagingSelectionAreaView.swift */; };
+		5894B178245FE61B003B86F1 /* StoreHUDViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5894B177245FE61B003B86F1 /* StoreHUDViewModel.swift */; };
 		589A27CF23D8EA1C00174DE7 /* SKShapeNode+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589A27CE23D8EA1C00174DE7 /* SKShapeNode+Extensions.swift */; };
 		589A27D123D90CD900174DE7 /* TargetingState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589A27D023D90CD900174DE7 /* TargetingState.swift */; };
 		589A27D423D90FE000174DE7 /* TargetingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589A27D323D90FE000174DE7 /* TargetingViewModel.swift */; };
@@ -330,6 +337,13 @@
 		5882602023DB809300A77BE8 /* EmptyAbility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyAbility.swift; sourceTree = "<group>"; };
 		5893899A245E0D6A00350A2E /* StoreHUD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreHUD.swift; sourceTree = "<group>"; };
 		5893899C245E7AB300350A2E /* CurrencyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyView.swift; sourceTree = "<group>"; };
+		5893899E245E7D0E00350A2E /* StoreOffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreOffer.swift; sourceTree = "<group>"; };
+		589389A0245F4BFA00350A2E /* StagingAreaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StagingAreaView.swift; sourceTree = "<group>"; };
+		589389A2245F4C9B00350A2E /* PickaxeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickaxeView.swift; sourceTree = "<group>"; };
+		589389A4245F52BB00350A2E /* ParagraphNode+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ParagraphNode+Extensions.swift"; sourceTree = "<group>"; };
+		589389A6245FA6E200350A2E /* StagingTierView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StagingTierView.swift; sourceTree = "<group>"; };
+		5894B175245FD68A003B86F1 /* StagingSelectionAreaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StagingSelectionAreaView.swift; sourceTree = "<group>"; };
+		5894B177245FE61B003B86F1 /* StoreHUDViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreHUDViewModel.swift; sourceTree = "<group>"; };
 		589A27CE23D8EA1C00174DE7 /* SKShapeNode+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SKShapeNode+Extensions.swift"; sourceTree = "<group>"; };
 		589A27D023D90CD900174DE7 /* TargetingState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetingState.swift; sourceTree = "<group>"; };
 		589A27D323D90FE000174DE7 /* TargetingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetingViewModel.swift; sourceTree = "<group>"; };
@@ -568,6 +582,12 @@
 			children = (
 				3D06390E22F1DB8300C4D5E9 /* StoreScene.swift */,
 				5893899A245E0D6A00350A2E /* StoreHUD.swift */,
+				5894B177245FE61B003B86F1 /* StoreHUDViewModel.swift */,
+				589389A2245F4C9B00350A2E /* PickaxeView.swift */,
+				5893899E245E7D0E00350A2E /* StoreOffer.swift */,
+				589389A6245FA6E200350A2E /* StagingTierView.swift */,
+				589389A0245F4BFA00350A2E /* StagingAreaView.swift */,
+				5894B175245FD68A003B86F1 /* StagingSelectionAreaView.swift */,
 				5893899C245E7AB300350A2E /* CurrencyView.swift */,
 				3DA0A37722FFA6250041EF34 /* StoreItem.swift */,
 			);
@@ -591,6 +611,7 @@
 				3DD72590239DC37B005933B2 /* SKView+Extensions.swift */,
 				3DD72592239DC47F005933B2 /* IndexPath+Extensions.swift */,
 				3DC072BC23747F6B0046F224 /* CGSize+Extension.swift */,
+				589389A4245F52BB00350A2E /* ParagraphNode+Extensions.swift */,
 				582CF3F124425CC000AA2A95 /* CGFloat+Extensions.swift */,
 				3DA0A385230457580041EF34 /* SKLabelNode+Extension.swift */,
 			);
@@ -980,12 +1001,14 @@
 				3D7EF45E21D18DAB00A2D9E8 /* TileTransformation.swift in Sources */,
 				3DB270A722AE065300D9BF8B /* Data+Extensions.swift in Sources */,
 				5819AB73242A668400498BB6 /* SwipeTypes.swift in Sources */,
+				5894B178245FE61B003B86F1 /* StoreHUDViewModel.swift in Sources */,
 				3DF2928520A76242006671AC /* Board.swift in Sources */,
 				58153460243993F400483481 /* LevelGoalTracker.swift in Sources */,
 				3D7D8B37225422440016FE4C /* TilesHelper.swift in Sources */,
 				5866B3DA244D2A4600DF36E0 /* GoalTracking.swift in Sources */,
 				582635DD243168B500A944B6 /* ButtonIdentifier.swift in Sources */,
 				58C1AE4A23D19CEE003B5B5A /* TransmogrificationPotion.swift in Sources */,
+				5894B176245FD68A003B86F1 /* StagingSelectionAreaView.swift in Sources */,
 				3DAFBD3721B8E6E7009B116A /* InputQueue.swift in Sources */,
 				582CF3EC2442391900AA2A95 /* FillableBar.swift in Sources */,
 				3DC072BB2373AF510046F224 /* SwipeRecognizerView.swift in Sources */,
@@ -1034,6 +1057,7 @@
 				3DA4E88B228FC156006E90D1 /* Util.swift in Sources */,
 				3DC072C6237545400046F224 /* Rule.swift in Sources */,
 				3D6279D423AD56870048EB76 /* TutorialSelectionScene.swift in Sources */,
+				589389A5245F52BB00350A2E /* ParagraphNode+Extensions.swift in Sources */,
 				5819582D2432790700965108 /* MassMineAbility.swift in Sources */,
 				3DE87C8E2235D05300D750CF /* MenuSpriteNode.swift in Sources */,
 				3D6AACE1222C997800C77B24 /* Header.swift in Sources */,
@@ -1045,6 +1069,7 @@
 				3D1D3D11238D9D37004E255C /* TutorialModel.swift in Sources */,
 				3DB0CEE9239DB072002A8FF3 /* GameScope.swift in Sources */,
 				3DD7258F239DC151005933B2 /* GameSceneDelegate.swift in Sources */,
+				589389A7245FA6E200350A2E /* StagingTierView.swift in Sources */,
 				3D90AAD321D8869200C7428A /* Referee.swift in Sources */,
 				3DA0A37D2300CDFC0041EF34 /* DoubleAttack.swift in Sources */,
 				5893899B245E0D6A00350A2E /* StoreHUD.swift in Sources */,
@@ -1056,6 +1081,7 @@
 				3DA4E88F228FC860006E90D1 /* SKNode+Extension.swift in Sources */,
 				5893899D245E7AB300350A2E /* CurrencyView.swift in Sources */,
 				585AAAA9245BB9F20029FDD0 /* TransformRock.swift in Sources */,
+				589389A3245F4C9B00350A2E /* PickaxeView.swift in Sources */,
 				3DF0A6B02379C4DC00941305 /* ParagraphNode.swift in Sources */,
 				5866B3DC244D2D2300DF36E0 /* RuneDetailView.swift in Sources */,
 				3DC9CA1321D1DDD4004D05D5 /* Difficulty.swift in Sources */,
@@ -1070,11 +1096,13 @@
 				3D6279CB23ACA90E0048EB76 /* GreaterHealingPoition.swift in Sources */,
 				3D4A470F23B3D33B000165FB /* LevelType.swift in Sources */,
 				3DD5AA0D2398025400FB63F4 /* Styling.swift in Sources */,
+				5893899F245E7D0E00350A2E /* StoreOffer.swift in Sources */,
 				58B39BD723D21C9600915858 /* BackpackView.swift in Sources */,
 				3DD72593239DC47F005933B2 /* IndexPath+Extensions.swift in Sources */,
 				3D2C757522C854F8009ABD36 /* ItemModel.swift in Sources */,
 				3D18A39D224D68D300343C29 /* Dispatch.swift in Sources */,
 				3D6279CD23AD39950048EB76 /* SwordPickAxe.swift in Sources */,
+				589389A1245F4BFA00350A2E /* StagingAreaView.swift in Sources */,
 				3DD72591239DC37B005933B2 /* SKView+Extensions.swift in Sources */,
 				3D7D8B2D2252857E0016FE4C /* CombatSimulator.swift in Sources */,
 				587C80A2245B3D3800997110 /* FreeGetSwifty.swift in Sources */,

@@ -228,5 +228,9 @@ extension CGPoint {
     func translateVertically(_ yOffset: CGFloat) -> CGPoint {
         return CGPoint(x: self.x, y: self.y + yOffset)
     }
+    
+    func translate(xOffset: CGFloat = 0.0, yOffset: CGFloat = 0.0) -> CGPoint {
+        return CGPoint(x: self.x + xOffset, y: self.y + yOffset)
+    }
 }
 

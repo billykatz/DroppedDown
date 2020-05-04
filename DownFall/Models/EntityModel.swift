@@ -215,6 +215,14 @@ struct EntityModel: Equatable, Decodable {
         return update(hp: min(originalHp, self.hp + amount))
     }
     
+    func healFull() -> EntityModel {
+        return update(hp: originalHp)
+    }
+    
+    func gainMaxHealth(amount: Int) -> EntityModel {
+        return update(originalHp: originalHp + amount)
+    }
+    
     /// consume 1 count of the ability.  If the ability only has 1 count, then remove it
     func use(_ ability: Ability) -> EntityModel {
         var newAbilities = self.abilities

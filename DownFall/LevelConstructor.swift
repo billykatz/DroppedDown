@@ -37,21 +37,29 @@ struct LevelConstructor {
                            tier: 1,
                            textureName: "greaterHealingPotion",
                            currency: .gem,
-                           startingPrice: 3)]
+                           startingPrice: 0),
+                StoreOffer(type: .plusTwoMaxHealth,
+                           tier: 1,
+                           textureName: "twoMaxHealth",
+                           currency: .gem,
+                           startingPrice: 0),
+        ]
+        
+        
     }
-
+    
     
     static func maxSpawnGems(per: LevelType, difficulty: Difficulty) -> Int {
         return 3
     }
-
-
+    
+    
     
     static func numberOfGoalsNeedToUnlockExit(per: LevelType, difficulty: Difficulty) -> Int {
-    
+        
         return 2
     }
-
+    
     
     static func levelGoal(per: LevelType, difficulty: Difficulty) -> [LevelGoal] {
         let rockGoal = LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .rock(.purple), targetAmount: 10, minimumGroupSize: 5, grouped: true)
@@ -370,7 +378,7 @@ struct LevelConstructor {
             }
             return new
         }
-
+        
         
         var abilities: [Ability]
         
@@ -379,13 +387,13 @@ struct LevelConstructor {
             abilities = [FreeRainEmbers(), FreeGetSwifty(), TransformRock()]
         case .second, .third:
             abilities = [FreeRainEmbers(), FreeGetSwifty()]
-//            abilities = droppingRandom(numberOfElements: 2, from: temp)
+        //            abilities = droppingRandom(numberOfElements: 2, from: temp)
         case .fourth:
             let temp: [Ability] = [GreatestHealingPotion(), RockASwap(), TransmogrificationPotion(), KillMonsterGroupPotion(),  KillMonsterPotion(), Dynamite(), GreaterHealingPotion(), MassMinePickaxe()]
-                      abilities = droppingRandom(numberOfElements: 2, from: temp)
+            abilities = droppingRandom(numberOfElements: 2, from: temp)
         case .fifth, .sixth, .seventh:
-        let temp: [Ability] = [GreatestHealingPotion(), RockASwap(),MassMinePickaxe(), TransmogrificationPotion(), KillMonsterGroupPotion(),  KillMonsterPotion(), Dynamite(), GreaterHealingPotion()]
-                  abilities = droppingRandom(numberOfElements: 2, from: temp)
+            let temp: [Ability] = [GreatestHealingPotion(), RockASwap(),MassMinePickaxe(), TransmogrificationPotion(), KillMonsterGroupPotion(),  KillMonsterPotion(), Dynamite(), GreaterHealingPotion()]
+            abilities = droppingRandom(numberOfElements: 2, from: temp)
         case .boss, .tutorial1, .tutorial2:
             fatalError("Boss level not implemented yet")
         }

@@ -29,23 +29,6 @@ enum LevelGoalReward: Hashable {
     }
 }
 
-enum StoreOfferType {
-    case fullHeal
-}
-
-typealias StoreLevelTier = Int
-
-struct StoreOffer {
-    let type: StoreOfferType
-    let tier: StoreLevelTier
-    let textureName: String
-    let currency: Currency
-    var sprite: SKSpriteNode {
-        return SKSpriteNode(texture: SKTexture(imageNamed: self.textureName))
-    }
-    let startingPrice: Int
-}
-
 struct LevelGoal: Hashable {
     let type: LevelGoalType
     let reward: LevelGoalReward

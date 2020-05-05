@@ -71,7 +71,7 @@ struct EntityModel: Equatable, Decodable {
     let animations: [AnimationModel]
     var abilities: [AnyAbility] = []
     var pickaxe: Pickaxe?
-    var effects: [EffectModel] = []
+    var effects: [EffectModel]
     
     private enum CodingKeys: String, CodingKey {
         case originalHp
@@ -82,6 +82,7 @@ struct EntityModel: Equatable, Decodable {
         case carry
         case animations
         case pickaxe
+        case effects
     }
     
     private func update(originalHp: Int? = nil,

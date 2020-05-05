@@ -8,18 +8,19 @@
 
 import Foundation
 
-enum EffectType: String, Hashable {
+enum EffectType: String, Hashable, Codable {
     case buff
     case debuff
 }
 
-enum StatType: String, Hashable {
+enum StatType: String, Hashable, Codable {
     case health
     case maxHealth
 }
 
-struct EffectModel: Equatable, Hashable {
+struct EffectModel: Equatable, Hashable, Codable {
     let kind: EffectType
     let stat: StatType
     let amount: Int
+    let duration: Int
 }

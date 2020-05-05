@@ -52,7 +52,8 @@
                     }
                 ]
             },
-            "abilities": []
+            "abilities": [],
+            "effects": []
         },
         { "name": "player3",
             "type": "player",
@@ -106,7 +107,8 @@
                 }
                 ]
             },
-            "abilities": []
+            "abilities": [],
+            "effects": []
         },
         { "name": "player3",
             "type": "player",
@@ -199,7 +201,8 @@
                                 "items": []
                             },
                             "animations": [],
-                            "abilities": []
+                            "abilities": [],
+                            "effects": []
                         }
                         }],
                         "cooldown" : 25,
@@ -212,7 +215,8 @@
                         "maxDistanceBetweenTargets" : 200000
                     }
                 ]
-            }
+            },
+            "effects": []
         },
         { "name": "dragon",
             "type": "dragon",
@@ -261,7 +265,8 @@
                 }]
                 
             },
-            "abilities": []
+            "abilities": [],
+            "effects": []
         },
         { "name": "rat",
             "type": "rat",
@@ -316,7 +321,8 @@
                     "amount": 15
                 }]
             },
-            "abilities": []
+            "abilities": [],
+            "effects": []
         },
         { "name": "bat",
             "type": "bat",
@@ -378,7 +384,8 @@
                     "amount": 15
                 }]
             },
-            "abilities": []
+            "abilities": [],
+            "effects": []
         },
         { "name": "alamo",
             "type": "alamo",
@@ -425,7 +432,8 @@
                     "amount": 15
                 }]
             },
-            "abilities": []
+            "abilities": [],
+            "effects": []
         },
         { "name": "sally",
             "type": "sally",
@@ -481,7 +489,8 @@
                     "amount": 15
                 }]
             },
-            "abilities": []
+            "abilities": [],
+            "effects": []
         }
     ]
 }

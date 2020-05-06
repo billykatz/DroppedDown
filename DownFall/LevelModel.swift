@@ -56,6 +56,7 @@ struct Level {
     let numberOfGoalsNeedToUnlockExit: Int
     let maxSpawnGems: Int
     let storeOffering: [StoreOffer]
+    var goalProgress: [GoalTracking] = []
     
     var tutorialData: TutorialData?
     

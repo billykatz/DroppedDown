@@ -109,7 +109,7 @@ class TutorialScene: SKScene {
                 if case let TileType.player(data) = self.board.tiles[playerIndex].type {
                     let revivedData = data.revive()
                     self.removeFromParent()
-                    self.gameSceneDelegate?.visitStore(revivedData)
+                    self.gameSceneDelegate?.visitStore(revivedData, [])
                 }
                 
                 self.level?.tutorialData?.reset()

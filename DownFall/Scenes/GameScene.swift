@@ -120,7 +120,7 @@ class GameScene: SKScene {
                     self.gameSceneDelegate?.resetToMain(self)
                 }
 
-            } else if input.type == .visitStore {
+            } else if case let InputType.goalProgressRecord(progress) = input.type {
                 guard let self = self,
                     let playerIndex = tileIndices(of: .player(.zero), in: self.board.tiles).first
                     else { return }
@@ -129,7 +129,7 @@ class GameScene: SKScene {
                 if case let TileType.player(data) = self.board.tiles[playerIndex].type {
                     self.removeFromParent()
                     self.swipeRecognizerView?.removeFromSuperview()
-                    self.gameSceneDelegate?.visitStore(data)
+                    self.gameSceneDelegate?.visitStore(data, progress)
                 }
 
             }

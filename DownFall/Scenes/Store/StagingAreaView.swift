@@ -16,6 +16,9 @@ class StagingAreaViewModel: StagingAreaViewModelable {
     /// static offers
     let storeOffers: [StoreOffer]
     
+    /// the goal progress
+    let goalProgress: [GoalTracking]
+    
     /// selected offers
     var stagedOffers: [StoreOffer] = []
     
@@ -23,10 +26,11 @@ class StagingAreaViewModel: StagingAreaViewModelable {
     var destroyedRunes: [Rune] = []
     
     // output
-    var offerWasStaged: ((StoreOffer) -> ())? = nil
+    var offerWasStaged: ((StoreOffer, StoreOffer?) -> ())? = nil
     
-    init(storeOffers: [StoreOffer]) {
+    init(storeOffers: [StoreOffer], goalProgress: [GoalTracking]) {
         self.storeOffers = storeOffers
+        self.goalProgress = goalProgress
     }
     
 }
@@ -48,11 +52,16 @@ class StagingAreaView: SKSpriteNode {
     /// selection area
     let stagingSelectionAreaView: StagingSelectionAreaView
     
+    func tierIsUnlocked(tier: Int, goalProgress: [GoalTracking]) -> Bool {
+        return goalProgress.filter { $0.hasBeenRewarded }.count >= tier
+    }
+    
     
     // tier 1 area
     private lazy var tierOneArea: StagingTierView = {
         // tier area
-        let vm = StagingTierViewModel(offers: viewModel.storeOffers.filter { $0.tier == 1 }, tier: 1, unlocked: true, touchDelegate: self, offerThatWasSelected: self.offerWasSelected)
+        let tier = 1
+        let vm = StagingTierViewModel(offers: viewModel.storeOffers.filter { $0.tier == tier }, tier: tier, unlocked: tierIsUnlocked(tier: tier, goalProgress: viewModel.goalProgress), touchDelegate: self, offerThatWasSelected: self.offerWasSelected)
         let tierOneArea = StagingTierView(viewModel: vm, size: CGSize(width: size.width, height: 300))
         tierOneArea.zPosition = Precedence.foreground.rawValue
         tierOneArea.position = CGPoint.alignHorizontally(tierOneArea.frame, relativeTo: stagingSelectionAreaView.frame, horizontalAnchor: .center, verticalAlign: .bottom)
@@ -95,9 +104,9 @@ class StagingAreaView: SKSpriteNode {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func offerWasSelected(offer: StoreOffer) {
+    func offerWasSelected(offer: StoreOffer, deselected: StoreOffer?) {
         stagingSelectionAreaViewModel.offerWasSelected(offer)
-        viewModel.offerWasStaged?(offer)
+        viewModel.offerWasStaged?(offer, deselected)
     }
 
     // MARK: Touch Events

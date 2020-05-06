@@ -11,6 +11,7 @@ import Foundation
 enum EffectType: String, Hashable, Codable {
     case buff
     case debuff
+    case refill
 }
 
 enum StatType: String, Hashable, Codable {
@@ -23,4 +24,5 @@ struct EffectModel: Equatable, Hashable, Codable {
     let stat: StatType
     let amount: Int
     let duration: Int
+    var wasApplied: Bool = false
 }

@@ -59,7 +59,8 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
                                         .boardBuilt,
                                         .playerAwarded([]),
                                         .unlockExit,
-                                        .levelGoalDetail([])
+                                        .levelGoalDetail([]),
+                                        .goalProgressRecord([])
                                                                  
     ]
     
@@ -101,8 +102,8 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
     case shuffleBoard
     case unlockExit
     case levelGoalDetail([GoalTracking])
-    case playerAwarded([LevelGoalReward]
-    )
+    case playerAwarded([LevelGoalReward])
+    case goalProgressRecord([GoalTracking])
     
     var debugDescription: String {
         switch self {
@@ -180,6 +181,8 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
             return "Level Goal Detail"
         case .playerAwarded:
             return "Player is awarded something"
+        case .goalProgressRecord:
+            return "Record goal progress" 
             
         }
     }

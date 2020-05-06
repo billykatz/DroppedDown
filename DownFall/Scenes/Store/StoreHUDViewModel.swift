@@ -9,97 +9,71 @@
 import SpriteKit
 
 protocol StoreHUDViewModelInputs {
-    mutating func selected(offer: StoreOffer, deselected: StoreOffer?)
+    func add(effect: EffectModel, remove otherEffect: EffectModel?)
 }
 
 protocol StoreHUDViewModelOutputs {
-    var currentHealth: Int { get }
+    var baseHealth: Int { get }
     var totalHealth: Int { get }
     var totalGems: Int { get }
     var pickaxe: Pickaxe? { get }
     var healthText: String { get }
+    var previewPlayerData: EntityModel { get }
     
     var updateHUD: () -> () { get set }
+    var removedEffect: (EffectModel) -> () { get set }
+    var addedEffect: (EffectModel) -> () { get set }
 }
 
 protocol StoreHUDViewModelable: StoreHUDViewModelOutputs, StoreHUDViewModelInputs {}
 
 class StoreHUDViewModel: StoreHUDViewModelable {
-    var updateHUD: () -> () = {  }
     
-    func selected(offer: StoreOffer, deselected: StoreOffer?) {
-        
-        currentPlayerData = pastPlayerData
-        
-        switch offer.type {
-        case .fullHeal:
-            // save the state so we can animate the difference
-            pastPlayerData = currentPlayerData
-            // set the state so we can have the most up to date information
-            currentPlayerData = currentPlayerData.healFull()
-        case .plusTwoMaxHealth:
-            // save the state so we can animate the difference
-            pastPlayerData = currentPlayerData
-            
-            // set the state so we can have the most up to date information
-            currentPlayerData = currentPlayerData.gainMaxHealth(amount: 2)
+    var updateHUD: () -> () = {  }
+    var removedEffect: (EffectModel) -> () = { _ in }
+    var addedEffect: (EffectModel) -> () = { _ in }
+    
+    func add(effect: EffectModel, remove otherEffect: EffectModel?) {
+        if let otherEffect = otherEffect {
+            /// We need to update the UI first to capture the pre-removed effect player data
+            removedEffect(otherEffect)
+            basePlayerData = basePlayerData.removeEffect(otherEffect)
         }
         
-        /// tell whoever is listening to update their hud
-        updateHUD()
+        /// Call to update the UI after updating the player data so we capture the new state
+        basePlayerData = basePlayerData.addEffect(effect)
+        addedEffect(effect)
     }
     
+    /// A preview of what the player data will look like when we apply effects
+    var previewPlayerData: EntityModel {
+        return basePlayerData.previewAppliedEffects()
+    }
     
-    var currentHealth: Int {
-        return currentPlayerData.hp
+    var baseHealth: Int {
+        return basePlayerData.hp
     }
     
     var totalHealth: Int {
-        return currentPlayerData.originalHp
+        return basePlayerData.originalHp
     }
     
     var healthText: String {
-        return "\(currentHealth)/\(totalHealth)"
+        return "\(baseHealth)/\(totalHealth)"
     }
     
     var totalGems: Int {
-        return currentPlayerData.carry.total(in: .gem)
+        return basePlayerData.carry.total(in: .gem)
     }
     
     var pickaxe: Pickaxe? {
-        return currentPlayerData.pickaxe
+        return basePlayerData.pickaxe
     }
     
-    var maxHealthWasUpdate: Bool {
-        return pastPlayerData.originalHp != currentPlayerData.originalHp
-    }
+    /// base playerData without any effects
+    private var basePlayerData: EntityModel
     
-    var healthWasUpdated: Bool {
-        return pastPlayerData.hp != currentPlayerData.hp
-    }
-    
-    var healthDifference: Int {
-        return currentPlayerData.hp - pastPlayerData.hp 
-    }
-    
-    var originalHealthDifference: Int {
-        return currentPlayerData.originalHp - pastPlayerData.originalHp
-    }
-    
-    var pastHealth: Int {
-        return pastPlayerData.hp
-    }
-    
-    var pastOriginalHealth: Int {
-        return pastPlayerData.originalHp
-    }
-    
-    /// playerData that can update
-    var currentPlayerData: EntityModel
-    var pastPlayerData: EntityModel
-    
-    init(currentPlayerData: EntityModel, pastPlayerData: EntityModel) {
-        self.currentPlayerData = currentPlayerData
-        self.pastPlayerData = pastPlayerData
+    init(currentPlayerData: EntityModel) {
+        self.basePlayerData = currentPlayerData
     }
 }

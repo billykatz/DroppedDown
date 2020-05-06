@@ -142,7 +142,7 @@ class Board: Equatable {
              .tutorial,
              .visitStore,
              .itemUseCanceled, .itemCanBeUsed, .bossTargetsWhatToEat, .bossTargetsWhatToAttack,
-             .rotatePreview, .tileDetail, .levelGoalDetail:
+             .rotatePreview, .tileDetail, .levelGoalDetail, .goalProgressRecord:
             transformation = nil
         }
         

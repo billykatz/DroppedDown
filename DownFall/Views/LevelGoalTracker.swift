@@ -45,6 +45,8 @@ class LevelGoalTracker: LevelGoalTracking {
             
         case .boardBuilt:
             goalUpdated?(goalProgress)
+        case .visitStore:
+            InputQueue.append(.init(.goalProgressRecord(goalProgress)))
         default:
             return
         }
@@ -55,7 +57,6 @@ class LevelGoalTracker: LevelGoalTracking {
         for (idx, goal) in goalProgress.enumerated(){
             if goal.isCompleted && !goal.hasBeenRewarded {
                 goalProgress[idx] = goal.isAwarded()
-                // return because we can only hand these out one at a time
                 awardedGoals.append(goal.reward)
             }
         }

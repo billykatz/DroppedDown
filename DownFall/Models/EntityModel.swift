@@ -228,6 +228,18 @@ struct EntityModel: Equatable, Decodable {
         return update(originalHp: originalHp + amount)
     }
     
+    func removeEffect(_ effect: EffectModel) -> EntityModel {
+        var effectsCopy = self.effects
+        effectsCopy.removeFirst { $0 == effect }
+        return update(effects: effectsCopy)
+    }
+    
+    func addEffect(_ effect: EffectModel) -> EntityModel {
+        var effectsCopy = self.effects
+        effectsCopy.append(effect)
+        return update(effects: effectsCopy)
+    }
+    
     /// consume 1 count of the ability.  If the ability only has 1 count, then remove it
     func use(_ ability: Ability) -> EntityModel {
         var newAbilities = self.abilities
@@ -244,6 +256,31 @@ struct EntityModel: Equatable, Decodable {
     
     func updateCarry(carry: CarryModel) -> EntityModel {
         return self.update(carry: carry)
+    }
+    
+    func previewAppliedEffects() -> EntityModel {
+        var newModel = self
+        var appliedEffects: [EffectModel] = []
+        for effect in effects {
+            var updatedEffect = effect
+            if !effect.wasApplied {
+                newModel = newModel.applyEffect(effect)
+                updatedEffect.wasApplied = true
+            }
+            appliedEffects.append(updatedEffect)
+        }
+        return newModel.update(effects: appliedEffects)
+    }
+    
+    func applyEffect(_ effect: EffectModel) -> EntityModel {
+        switch (effect.kind, effect.stat) {
+        case (.refill, .health):
+            return update(hp: originalHp)
+        case (.buff, .maxHealth):
+            return update(originalHp: originalHp + effect.amount)
+        default:
+            preconditionFailure("Youll want to implement future cases here")
+        }
     }
     
 }

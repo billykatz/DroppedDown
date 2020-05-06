@@ -41,12 +41,15 @@ func animate(parentNode: SKNode, animator: Animator = Animator(), paragraphNode:
 //    }
     
     // show exaclty how much gold was gained as well
-    let differencePrefix = difference < 0 ? "-" : "+"
-    let gainedGoldLabel = ParagraphNode(text: "\(differencePrefix)\(difference)", paragraphWidth: Style.HUD.labelParagraphWidth, fontName: UIFont.pixelFontName, fontSize: UIFont.extraLargeSize, fontColor: .highlightGold)
+    let differencePrefix = difference < 0 ? "" : "+"
+    let color: UIColor = difference < 0 ? .lightBarRed : .highlightGold
+    let gainedGoldLabel = ParagraphNode(text: "\(differencePrefix)\(difference)", paragraphWidth: Style.HUD.labelParagraphWidth, fontName: UIFont.pixelFontName, fontSize: UIFont.extraLargeSize, fontColor: color)
     gainedGoldLabel.position = oldPosition.translateVertically(40.0)
     parentNode.addChildSafely(gainedGoldLabel)
-    let moveUp = SKAction.move(by: CGVector(dx: 0, dy: 50), duration: AnimationSettings.HUD.goldGainedTime)
-    let sequence = SKAction.sequence([moveUp, SKAction.removeFromParent()])
+    let moveUp = SKAction.move(by: CGVector(dx: 0, dy: 25), duration: AnimationSettings.HUD.goldGainedTime)
+    let fade = SKAction.fadeOut(withDuration: AnimationSettings.HUD.goldGainedTime)
+    let groupMoveUpFade = SKAction.group([moveUp, fade])
+    let sequence = SKAction.sequence([groupMoveUpFade, SKAction.removeFromParent()])
     gainedGoldLabel.run(sequence)
     
     

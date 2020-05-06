@@ -18,10 +18,13 @@ class StagingTierViewModel {
     let offers: [StoreOffer]
     let tier: Int
     let unlocked: Bool
+    
     var selectedOffer: StoreOffer? {
         didSet {
             guard let offer = selectedOffer, offer != oldValue else { return }
-            self.offerThatWasSelected(offer)
+            var otherOffer: StoreOffer? = nil
+            if oldValue != nil { otherOffer = offers.first { $0.type != offer.type } }
+            self.offerThatWasSelected(offer, otherOffer)
         }
     }
     var touchDelegate: SKNode
@@ -30,9 +33,9 @@ class StagingTierViewModel {
     var offerWasSelected: () -> () = { }
     
     // output
-    var offerThatWasSelected: (StoreOffer) -> ()
+    let offerThatWasSelected: (StoreOffer, StoreOffer?) -> ()
     
-    init(offers: [StoreOffer], tier: Int, unlocked: Bool, touchDelegate: SKNode, offerThatWasSelected: @escaping (StoreOffer) -> ()) {
+    init(offers: [StoreOffer], tier: Int, unlocked: Bool, touchDelegate: SKNode, offerThatWasSelected: @escaping (StoreOffer, StoreOffer?) -> ()) {
         self.offers = offers
         self.tier = tier
         self.unlocked = unlocked
@@ -60,7 +63,7 @@ class StagingTierView: SKSpriteNode {
         self.viewModel.offerWasSelected = self.offerWasSelected
         
         /// response to user touch events
-        self.isUserInteractionEnabled = true
+        self.isUserInteractionEnabled = viewModel.unlocked
         
         /// set up our views
         addChild(contentView)

@@ -65,10 +65,10 @@ class StoreScene: SKScene {
         self.playerData = playerData
         self.level = level
         
-        self.storeHUDViewModel = StoreHUDViewModel(currentPlayerData: playerData, pastPlayerData: playerData)
+        self.storeHUDViewModel = StoreHUDViewModel(currentPlayerData: playerData)
         self.storeHUD = StoreHUD(viewModel: storeHUDViewModel, size: CGSize(width: playableRect.width, height: 350.0))
         
-        let stagingViewModel = StagingAreaViewModel(storeOffers: level.storeOffering)
+        let stagingViewModel = StagingAreaViewModel(storeOffers: level.storeOffering, goalProgress: level.goalProgress)
         self.stagingArea = StagingAreaView(viewModel: stagingViewModel, size: CGSize(width: playableRect.width, height: 600))
         
         /// Super init'd
@@ -108,8 +108,14 @@ class StoreScene: SKScene {
         
     }
     
-    func offerWasStaged(offer: StoreOffer) {
-        storeHUDViewModel.selected(offer: offer, deselected: nil)
+    func offerWasStaged(offer: StoreOffer, unstagedOffer: StoreOffer?) {
+        let effects = StoreOfferEffectTranslator.translate(offers: [offer, unstagedOffer])
+        guard let first = effects.first else { return }
+        var lastEffect: EffectModel? = nil
+        if effects.count > 1, let last = effects.last {
+            lastEffect = last
+        }
+        storeHUDViewModel.add(effect: first, remove: lastEffect)
     }
 }
 
@@ -117,9 +123,24 @@ extension StoreScene: ButtonDelegate {
     func buttonTapped(_ button: Button) {
         switch button.identifier {
         case .leaveStore:
-            storeSceneDelegate?.leave(self, updatedPlayerData: playerData)
+            storeSceneDelegate?.leave(self, updatedPlayerData: storeHUDViewModel.previewPlayerData)
         default:
             fatalError("You must add a case for added buttons here")
+        }
+    }
+}
+
+struct StoreOfferEffectTranslator {
+    static func translate(offers: [StoreOffer?]) -> [EffectModel] {
+        return offers.compactMap { offer in
+            switch offer?.type {
+            case .fullHeal:
+                return EffectModel(kind: .refill, stat: .health, amount: 0, duration: 0)
+            case .plusTwoMaxHealth:
+                return EffectModel(kind: .buff, stat: .maxHealth, amount: 2, duration: Int.max)
+            case .none:
+                return nil
+            }
         }
     }
 }

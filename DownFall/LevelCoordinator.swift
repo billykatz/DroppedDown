@@ -138,7 +138,7 @@ extension LevelCoordinating where Self: UIViewController {
         }
     }
     
-    func visitStore(_ playerData: EntityModel) {
+    func visitStore(_ playerData: EntityModel, _ goalTracking: [GoalTracking]) {
         if let view = self.view as! SKView?, let levels = levels {
             view.presentScene(nil)
             gameSceneNode?.removeFromParent()
@@ -147,11 +147,13 @@ extension LevelCoordinating where Self: UIViewController {
             // Increment the level index before we visit the store
             // there might/is be a better place to do this
             levelIndex = min(levels.count - 1, levelIndex + 1)
+            var level = levels[levelIndex]
+            level.goalProgress = goalTracking
             
             
             let storeScene = StoreScene(size: .universalSize,
                                         playerData: playerData,
-                                        level: levels[levelIndex],
+                                        level: level,
                                         viewModel: StoreSceneViewModel(offers: levels[levelIndex].storeOffering))
             storeScene.storeSceneDelegate = self
             view.presentScene(storeScene)

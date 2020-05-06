@@ -12,11 +12,14 @@ enum EffectType: String, Hashable, Codable {
     case buff
     case debuff
     case refill
+    case rune
 }
 
 enum StatType: String, Hashable, Codable {
     case health
     case maxHealth
+    case gems
+    case pickaxe
 }
 
 struct EffectModel: Equatable, Hashable, Codable {

@@ -53,6 +53,8 @@ class StagingAreaView: SKSpriteNode {
     let stagingSelectionAreaView: StagingSelectionAreaView
     
     func tierIsUnlocked(tier: Int, goalProgress: [GoalTracking]) -> Bool {
+        /// TODO: reset when done testing
+        return true
         return goalProgress.filter { $0.hasBeenRewarded }.count >= tier
     }
     
@@ -69,6 +71,18 @@ class StagingAreaView: SKSpriteNode {
         return tierOneArea
     }()
     
+    // tier 1 area
+       private lazy var tierTwoArea: StagingTierView = {
+           // tier area
+           let tier = 2
+           let vm = StagingTierViewModel(offers: viewModel.storeOffers.filter { $0.tier == tier }, tier: tier, unlocked: tierIsUnlocked(tier: tier, goalProgress: viewModel.goalProgress), touchDelegate: self, offerThatWasSelected: self.offerWasSelected)
+           let tierTwoArea = StagingTierView(viewModel: vm, size: CGSize(width: size.width, height: 300))
+           tierTwoArea.zPosition = Precedence.foreground.rawValue
+           tierTwoArea.position = CGPoint.alignHorizontally(tierTwoArea.frame, relativeTo: tierOneArea.frame, horizontalAnchor: .center, verticalAlign: .bottom, translatedToBounds: true)
+           stagingTierViewModels.append(vm)
+           return tierTwoArea
+       }()
+    
     /// Touch property
     private var spriteToMove: SKSpriteNode?
     private var selectedSpritesOriginalPosition: CGPoint? = nil
@@ -78,8 +92,9 @@ class StagingAreaView: SKSpriteNode {
         self.viewModel = viewModel
         self.contentView = SKSpriteNode(texture: nil, size: size)
         
+        let unlockedGoals = 2//viewModel.goalProgress.filter { $0.hasBeenRewarded }.count
         // selection area
-        stagingSelectionAreaViewModel = StagingSelectionAreaViewModel(unlockedGoals: 1, selectedOffers: [])
+        stagingSelectionAreaViewModel = StagingSelectionAreaViewModel(unlockedGoals: unlockedGoals, selectedOffers: [])
         stagingSelectionAreaView = StagingSelectionAreaView(viewModel: stagingSelectionAreaViewModel, size: CGSize(width: size.width, height: 250))
         stagingSelectionAreaView.position = CGPoint.position(stagingSelectionAreaView.frame, inside: contentView.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most)
         
@@ -94,6 +109,7 @@ class StagingAreaView: SKSpriteNode {
         
         // add selection are to content view
         contentView.addChild(tierOneArea)
+        contentView.addChild(tierTwoArea)
         contentView.addChild(stagingSelectionAreaView)
         
         // add contentView to scene

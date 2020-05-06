@@ -11,6 +11,9 @@ import SpriteKit
 enum StoreOfferType {
     case fullHeal
     case plusTwoMaxHealth
+    case rune
+    case runeUpgrade
+    case gems
 }
 
 typealias StoreOfferTier = Int

@@ -72,6 +72,7 @@ class StoreHUD: SKSpriteNode {
                     self?.healthBarContainer.addChild(newHealthLabel)
                 }
             }
+        default: ()
         }
 
     }
@@ -98,6 +99,7 @@ class StoreHUD: SKSpriteNode {
                     self?.healthBarContainer.addChild(newHealthLabel)
                 }
             }
+        default: ()
         }
     }
     

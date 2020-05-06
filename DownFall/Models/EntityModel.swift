@@ -278,6 +278,10 @@ struct EntityModel: Equatable, Decodable {
             return update(hp: originalHp)
         case (.buff, .maxHealth):
             return update(originalHp: originalHp + effect.amount)
+        case (.buff, .gems):
+            return update(carry: self.carry.earn(effect.amount, inCurrency: .gem))
+        case (.rune, .pickaxe):
+            return self
         default:
             preconditionFailure("Youll want to implement future cases here")
         }

@@ -155,7 +155,6 @@ class StagingTierView: SKSpriteNode {
         let point = touch.location(in: self.contentView)
         for sprite in addedSprites {
             if sprite.contains(point) && !sprite.isHidden {
-                print("contains point")
                 selectedSpritesOriginalPosition = sprite.position
                 spriteToMove = sprite
             }

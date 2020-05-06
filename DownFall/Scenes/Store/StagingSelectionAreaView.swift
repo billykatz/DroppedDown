@@ -28,7 +28,7 @@ class StagingSelectionAreaView: SKSpriteNode {
         static let goalPadding = CGFloat(50.0)
         static let goalSize = CGSize.oneFifty
         static let cornerRadius = CGFloat(5.0)
-        static let offerSpriteName = "offerSpriteName"
+        static let offerSpriteNameBase = "offerSpriteName"
     }
     
     let viewModel: StagingSelectionAreaViewModel
@@ -53,24 +53,42 @@ class StagingSelectionAreaView: SKSpriteNode {
     }
     
     func offerWasSelected(_ storeOffer: StoreOffer) {
-        contentView.removeChild(with: Constants.offerSpriteName)
+        /// we create a texture name based off the base name and the store offer tier
+        let offerSpriteTierName = "\(Constants.offerSpriteNameBase)\(storeOffer.tier)"
+        
+        /// remove the offer sprite from the position
+        contentView.removeChild(with: offerSpriteTierName)
         offerSprite = storeOffer.sprite
+        
+        /// grab the position that we saved earlier in setupOfferSlots
+        offerSprite?.position = offerPositions[storeOffer.tier-1]
         offerSprite?.size = .oneFifty
         offerSprite?.zPosition = Precedence.aboveMenu.rawValue
-        offerSprite?.name = Constants.offerSpriteName
+        
+        /// set the name so we can remove it later
+        offerSprite?.name = offerSpriteTierName
+        
+        /// add the sprite
         contentView.addChildSafely(offerSprite)
     }
     
+    var offerPositions: [CGPoint] = []
+    
     func setupOfferSlots() {
         
-        let width = Constants.goalSize.width
+        let width = Constants.goalSize.width * CGFloat(viewModel.unlockedGoals+2)
         let height = Constants.goalSize.height
-        for _ in 0..<viewModel.unlockedGoals {
-            let shape = SKShapeNode(rect: CGRect(x: -width/2,
-                                                 y: -height/2,
+        let divisor = CGFloat(viewModel.unlockedGoals+1)
+        for idx in 0..<viewModel.unlockedGoals {
+            
+            let x = -width/2 + (CGFloat(idx) * width/divisor) + CGFloat(width/divisor) - (Constants.goalSize.width/2)
+            let y = -height/2
+            let shape = SKShapeNode(rect: CGRect(x: x,
+                                                 y: y,
                                                  width: Constants.goalSize.width,
                                                  height: Constants.goalSize.height),
                                     cornerRadius: Constants.cornerRadius)
+            offerPositions.append(CGPoint(x: x+(Constants.goalSize.width/2), y: y+(Constants.goalSize.height/2)))
             shape.zPosition = Precedence.menu.rawValue
             contentView.addChild(shape)
         }

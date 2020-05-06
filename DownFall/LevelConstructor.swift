@@ -43,6 +43,16 @@ struct LevelConstructor {
                            textureName: "twoMaxHealth",
                            currency: .gem,
                            startingPrice: 0),
+                StoreOffer(type: .rune,
+                           tier: 2,
+                           textureName: "getSwifty",
+                           currency: .gem,
+                           startingPrice: 0),
+                StoreOffer(type: .gems,
+                           tier: 2,
+                           textureName: "crystals",
+                           currency: .gem,
+                           startingPrice: 0)
         ]
         
         

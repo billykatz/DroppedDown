@@ -23,6 +23,7 @@ class StoreHUD: SKSpriteNode {
     private var viewModel: StoreHUDViewModel
     private let contentView: SKSpriteNode
     private var healthBarContainer: SKSpriteNode
+    private var runeContainerView: RuneContainerView?
     
     init(viewModel: StoreHUDViewModel, size: CGSize) {
         self.viewModel = viewModel
@@ -42,12 +43,30 @@ class StoreHUD: SKSpriteNode {
         self.viewModel.updateHUD = self.updateHUD
         self.viewModel.removedEffect = self.removedEffect
         self.viewModel.addedEffect = self.addedEffect
+        self.viewModel.startRuneReplacement = self.startRuneReplacement
         
         setupContentView(size: size)
         
         contentView.color = .storeDarkGray
         
         addChild(contentView)
+    }
+    
+    func startRuneReplacement(_ rune: Rune) {
+        let runeContainerViewModel = RuneContainerViewModel(runes: viewModel.pickaxe?.runes ?? [], numberOfRuneSlots: viewModel.pickaxe?.runeSlots ?? 0, runeWasTapped: nil, runeWasUsed: nil, runeUseWasCanceled: nil)
+        let pickaxeView = RuneContainerView(viewModel: runeContainerViewModel, mode: .storeHUDExpanded, size: contentView.size)
+        pickaxeView.position = .zero
+        pickaxeView.zPosition = Precedence.menu.rawValue
+        
+//        runeContainerView?.scale(to: contentView.size)
+        let scaleAction = SKAction.scale(to: contentView.size, duration: 0.5)
+        let moveAction = SKAction.move(to: .zero, duration: 0.5)
+        runeContainerView?.run(SKAction.group([scaleAction, moveAction])) { [weak self] in
+            self?.runeContainerView?.removeFromParent()
+            self?.runeContainerView = pickaxeView
+            self?.contentView.addChildSafely(self?.runeContainerView)
+        }
+        
     }
     
     func removedEffect(_ effect: EffectModel) {
@@ -99,6 +118,9 @@ class StoreHUD: SKSpriteNode {
                     self?.healthBarContainer.addChild(newHealthLabel)
                 }
             }
+        case .pickaxe:
+            /// if the player has reach the max number of runes, make the pickaxe larger and trigger a replace rune flow
+            print(effect.kind)
         default: ()
         }
     }
@@ -172,7 +194,7 @@ class StoreHUD: SKSpriteNode {
         let pickaxeView = RuneContainerView(viewModel: runeContainerViewModel, mode: .storeHUD, size: quarterSize)
         pickaxeView.position = CGPoint.position(currencyView.frame, inside: contentView.frame, verticalAlign: .bottom, horizontalAnchor: .left)
         pickaxeView.zPosition = Precedence.menu.rawValue
-        
+        runeContainerView = pickaxeView
         addChild(pickaxeView)
         
     }

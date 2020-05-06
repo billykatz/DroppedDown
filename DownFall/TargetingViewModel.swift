@@ -12,6 +12,7 @@ enum ViewMode {
     case inventory
     case itemDetail
     case storeHUD
+    case storeHUDExpanded
 }
 
 struct Target {

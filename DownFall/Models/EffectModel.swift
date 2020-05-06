@@ -22,10 +22,11 @@ enum StatType: String, Hashable, Codable {
     case pickaxe
 }
 
-struct EffectModel: Equatable, Hashable, Codable {
+struct EffectModel: Equatable, Hashable, Decodable {
     let kind: EffectType
     let stat: StatType
     let amount: Int
     let duration: Int
+    var rune: Rune?
     var wasApplied: Bool = false
 }

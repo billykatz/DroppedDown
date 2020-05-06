@@ -114,43 +114,6 @@ extension AnyAbility: Equatable {
     }
 }
 
-enum RuneType: String, Codable {
-    case rainEmbers
-    case getSwifty
-    case transformRock
-    
-    var humanReadable: String {
-        switch self {
-        case.getSwifty:
-            return "Get Swifty"
-        case .rainEmbers:
-            return "Rain Embers"
-        case .transformRock:
-            return "Trasnformer Rock"
-        }
-    }
-}
-
-struct Rune: Equatable, Decodable, Hashable {
-    var type: RuneType
-    var textureName: String
-    var cost: Int
-    var currency: Currency
-    var description: String
-    var flavorText: String?
-    var targets: Int?
-    var targetTypes: [TileType]?
-    var heal: Int?
-    var cooldown: Int
-    var rechargeType: [TileType]
-    var rechargeMinimum: Int
-    var progressColor: Color
-    var maxDistanceBetweenTargets: Int
-    
-    static let zero = Rune(type: .getSwifty, textureName: "", cost: 0, currency: .gem, description: "", flavorText: "", targets: 0, targetTypes: [], heal: 0, cooldown: 0, rechargeType: [], rechargeMinimum: 0, progressColor: .red, maxDistanceBetweenTargets: 0)
-}
-
-
 protocol Ability {
     var affectsCombat: Bool { get }
     var type: AbilityType { get }

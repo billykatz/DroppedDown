@@ -281,7 +281,10 @@ struct EntityModel: Equatable, Decodable {
         case (.buff, .gems):
             return update(carry: self.carry.earn(effect.amount, inCurrency: .gem))
         case (.rune, .pickaxe):
-            return self
+            guard let rune = effect.rune else { return self }
+            var pickaxe = self.pickaxe
+            pickaxe?.runes.append(rune)
+            return update(pickaxe: pickaxe)
         default:
             preconditionFailure("Youll want to implement future cases here")
         }

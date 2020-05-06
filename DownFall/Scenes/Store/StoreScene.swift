@@ -139,7 +139,7 @@ struct StoreOfferEffectTranslator {
             case .plusTwoMaxHealth:
                 return EffectModel(kind: .buff, stat: .maxHealth, amount: 2, duration: Int.max)
             case .rune:
-                return EffectModel(kind: .rune, stat: .pickaxe, amount: 0, duration: 0)
+                return EffectModel(kind: .rune, stat: .pickaxe, amount: 0, duration: 0, rune: Rune.rune(for: .getSwifty))
             case .gems:
                 return EffectModel(kind: .buff, stat: .gems, amount: 3, duration: 0)
             case .runeUpgrade:

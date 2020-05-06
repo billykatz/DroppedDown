@@ -130,10 +130,10 @@ class RuneContainerView: SKSpriteNode {
         //TODO: get rune slots from the player data
         for index in 0..<4 {
             guard index < viewModel.numberOfRuneSlots else { return }
-            
+            let size: CGSize = mode == .storeHUD ? CGSize.oneFifty.scale(by: 0.5) : .oneFifty
             let rune = viewModel.runes.optionalElement(at: index)
             let viewModel = RuneSlotViewModel(rune: rune)
-            let runeSlotView = RuneSlotView(viewModel: viewModel, size: .oneFifty)
+            let runeSlotView = RuneSlotView(viewModel: viewModel, size: size)
             
             let runeY = CGFloat(0.0)
             let runeX = frame.minX + frame.width/CGFloat(8) + (frame.width/4.0 * CGFloat(index))

@@ -136,6 +136,7 @@
 		58383643242D7A6E004CA026 /* Array+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58383642242D7A6E004CA026 /* Array+Extensions.swift */; };
 		5838364B242D7E21004CA026 /* ThreatLevelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5838364A242D7E21004CA026 /* ThreatLevelController.swift */; };
 		5843F4542426747100C03612 /* RotatePreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5843F4532426747100C03612 /* RotatePreviewView.swift */; };
+		5853CD552463206500B5D89A /* RuneModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5853CD542463206500B5D89A /* RuneModel.swift */; };
 		585AAAA9245BB9F20029FDD0 /* TransformRock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585AAAA8245BB9F20029FDD0 /* TransformRock.swift */; };
 		585EF8052431855800E87FCB /* KillMonsterGroupPotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585EF8042431855800E87FCB /* KillMonsterGroupPotion.swift */; };
 		585EF80724318B5800E87FCB /* GreatestHealingPotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585EF80624318B5800E87FCB /* GreatestHealingPotion.swift */; };
@@ -320,6 +321,7 @@
 		58383642242D7A6E004CA026 /* Array+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Extensions.swift"; sourceTree = "<group>"; };
 		5838364A242D7E21004CA026 /* ThreatLevelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreatLevelController.swift; sourceTree = "<group>"; };
 		5843F4532426747100C03612 /* RotatePreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RotatePreviewView.swift; sourceTree = "<group>"; };
+		5853CD542463206500B5D89A /* RuneModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneModel.swift; sourceTree = "<group>"; };
 		585AAAA8245BB9F20029FDD0 /* TransformRock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransformRock.swift; sourceTree = "<group>"; };
 		585EF8042431855800E87FCB /* KillMonsterGroupPotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KillMonsterGroupPotion.swift; sourceTree = "<group>"; };
 		585EF80624318B5800E87FCB /* GreatestHealingPotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GreatestHealingPotion.swift; sourceTree = "<group>"; };
@@ -788,6 +790,7 @@
 				3D2C757222C85362009ABD36 /* Direction.swift */,
 				3D2C757422C854F8009ABD36 /* ItemModel.swift */,
 				3D68BF9522FF3D9000FC9B10 /* AbilityModel.swift */,
+				5853CD542463206500B5D89A /* RuneModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1103,6 +1106,7 @@
 				5893899F245E7D0E00350A2E /* StoreOffer.swift in Sources */,
 				58B39BD723D21C9600915858 /* BackpackView.swift in Sources */,
 				3DD72593239DC47F005933B2 /* IndexPath+Extensions.swift in Sources */,
+				5853CD552463206500B5D89A /* RuneModel.swift in Sources */,
 				3D2C757522C854F8009ABD36 /* ItemModel.swift in Sources */,
 				3D18A39D224D68D300343C29 /* Dispatch.swift in Sources */,
 				3D6279CD23AD39950048EB76 /* SwordPickAxe.swift in Sources */,

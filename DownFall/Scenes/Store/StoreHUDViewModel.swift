@@ -10,9 +10,13 @@ import SpriteKit
 
 protocol StoreHUDViewModelInputs {
     func add(effect: EffectModel, remove otherEffect: EffectModel?)
+    func remove(effect: EffectModel)
+    func confirmRuneReplacement(effect: EffectModel, removed rune: Rune)
+    func cancelRuneReplacement(effect: EffectModel)
 }
 
 protocol StoreHUDViewModelOutputs {
+    /// base information
     var baseHealth: Int { get }
     var totalHealth: Int { get }
     var totalGems: Int { get }
@@ -20,36 +24,77 @@ protocol StoreHUDViewModelOutputs {
     var healthText: String { get }
     var previewPlayerData: EntityModel { get }
     
+    /// hook up to parent
+    var effectUseCanceled: (EffectModel) -> () { get }
+    
+    /// hook up to UI
     var updateHUD: () -> () { get set }
     var removedEffect: (EffectModel) -> () { get set }
     var addedEffect: (EffectModel) -> () { get set }
+    var startRuneReplacement: (EffectModel) -> () { get set }
+    
+    /// accept input
+    
+    
 }
 
 protocol StoreHUDViewModelable: StoreHUDViewModelOutputs, StoreHUDViewModelInputs {}
 
 class StoreHUDViewModel: StoreHUDViewModelable {
     
+    var effectUseCanceled: (EffectModel) -> () = { _ in }
+    
+    
     var updateHUD: () -> () = {  }
     var removedEffect: (EffectModel) -> () = { _ in }
     var addedEffect: (EffectModel) -> () = { _ in }
-    var startRuneReplacement: (Rune) -> () = { _ in }
+    var startRuneReplacement: (EffectModel) -> () = { _ in }
+    
+    var removedRune: Rune?
+    
+    func remove(effect: EffectModel) {
+        basePlayerData = basePlayerData.removeEffect(effect)
+        removedEffect(effect)
+    }
     
     func add(effect: EffectModel, remove otherEffect: EffectModel?) {
         if let otherEffect = otherEffect {
             /// We need to update the UI first to capture the pre-removed effect player data
-            removedEffect(otherEffect)
-            basePlayerData = basePlayerData.removeEffect(otherEffect)
+            if otherEffect.rune != nil {
+                basePlayerData = basePlayerData.addRune(removedRune)
+                removedRune = nil
+                basePlayerData = basePlayerData.removeEffect(otherEffect)
+                removedEffect(otherEffect)
+            }
+            else {
+                removedEffect(otherEffect)
+                basePlayerData = basePlayerData.removeEffect(otherEffect)
+            }
         }
         
         /// trigger a rune replacement flow if there isn't an empty slot in your pickaxe handle
         if let rune = effect.rune,
             basePlayerData.pickaxe?.runeSlots == basePlayerData.pickaxe?.runes.count {
-            startRuneReplacement(rune)
+            startRuneReplacement(effect)
         } else {
             /// Call to update the UI after updating the player data so we capture the new state
             basePlayerData = basePlayerData.addEffect(effect)
             addedEffect(effect)
         }
+    }
+    
+    func confirmRuneReplacement(effect: EffectModel, removed rune: Rune) {
+        basePlayerData = basePlayerData.addEffect(effect)
+        basePlayerData = basePlayerData.removeRune(rune)
+        
+        removedRune = rune
+    }
+    
+    func cancelRuneReplacement(effect: EffectModel) {
+        basePlayerData = basePlayerData.removeEffect(effect)
+        removedEffect(effect)
+        
+        effectUseCanceled(effect)
     }
     
     /// A preview of what the player data will look like when we apply effects

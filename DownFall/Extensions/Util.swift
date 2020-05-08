@@ -15,5 +15,6 @@ enum Precedence: CGFloat {
     case foreground = 10
     case menu = 20
     case aboveMenu = 30
+    case floating = 100
 }
 

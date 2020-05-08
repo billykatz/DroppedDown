@@ -15,6 +15,7 @@ class StagingSelectionAreaViewModel {
     
     // input from outside
     var offerWasSelected: (StoreOffer) -> () = { _ in }
+    var offerWasDeselected: (StoreOffer) -> () = { _ in }
     
     init(unlockedGoals: Int, selectedOffers: [StoreOffer]) {
         self.unlockedGoals = unlockedGoals
@@ -41,6 +42,7 @@ class StagingSelectionAreaView: SKSpriteNode {
         self.contentView = SKSpriteNode(color: .clear, size: size)
         super.init(texture: nil, color: .clear, size: size)
         self.viewModel.offerWasSelected = self.offerWasSelected
+        self.viewModel.offerWasDeselected = self.offerWasDeselected
         
         addChild(contentView)
         
@@ -70,6 +72,17 @@ class StagingSelectionAreaView: SKSpriteNode {
         
         /// add the sprite
         contentView.addChildSafely(offerSprite)
+    }
+    
+    
+    // remove the sprite of the offer from the stagin area
+    func offerWasDeselected(_ storeOffer: StoreOffer) {
+        /// we create a texture name based off the base name and the store offer tier
+        let offerSpriteTierName = "\(Constants.offerSpriteNameBase)\(storeOffer.tier)"
+        
+        /// remove the offer sprite from the position
+        contentView.removeChild(with: offerSpriteTierName)
+        offerSprite = nil
     }
     
     var offerPositions: [CGPoint] = []

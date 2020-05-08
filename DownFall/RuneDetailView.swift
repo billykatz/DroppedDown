@@ -15,6 +15,7 @@ protocol RuneDetailViewModelable {
     var canceled: (() -> ())? { get set }
     var isCharged: Bool { get }
     var chargeDescription: String? { get }
+    var mode: ViewMode { get }
     
 }
 
@@ -23,6 +24,7 @@ struct RuneDetailViewModel: RuneDetailViewModelable {
     var progress: CGFloat
     var confirmed: ((Rune) -> ())?
     var canceled: (() -> ())?
+    var mode: ViewMode
     
     /// returns true is we have completed the charging of a rune
     var isCharged: Bool {
@@ -146,19 +148,28 @@ class RuneDetailView: SKSpriteNode, ButtonDelegate {
     }
     
     func setupButtons() {
-        if viewModel.rune != nil {
+        switch viewModel.mode {
+        case .itemDetail, .inventory:
+            if viewModel.rune != nil {
+                
+                let confirmSprite = SKSpriteNode(texture: SKTexture(imageNamed: "buttonAffirmitive"), size: .oneHundred)
+                let confirmButton = Button(size: .oneHundred, delegate: self, identifier: .backpackConfirm, image: confirmSprite, shape: .circle, showSelection: true, disable: !viewModel.isCharged)
+                confirmButton.position = CGPoint.position(confirmButton.frame, inside: self.frame, verticalAlign: .center, horizontalAnchor: .right, xOffset: Style.Padding.more)
+                addChild(confirmButton)
+            }
             
-            let confirmSprite = SKSpriteNode(texture: SKTexture(imageNamed: "buttonAffirmitive"), size: .oneHundred)
-            let confirmButton = Button(size: .oneHundred, delegate: self, identifier: .backpackConfirm, image: confirmSprite, shape: .circle, showSelection: true, disable: !viewModel.isCharged)
-            confirmButton.position = CGPoint.position(confirmButton.frame, inside: self.frame, verticalAlign: .center, horizontalAnchor: .right, xOffset: Style.Padding.more)
-            addChild(confirmButton)
+            let cancelSprite = SKSpriteNode(texture: SKTexture(imageNamed: "buttonNegative"), size: .oneHundred)
+            let cancelButton = Button(size: .oneHundred, delegate: self, identifier: .backpackCancel, image: cancelSprite, shape: .circle, showSelection: true)
+            cancelButton.position = CGPoint.alignHorizontally(cancelButton.frame, relativeTo: frame, horizontalAnchor: .right, verticalAlign: .top, verticalPadding: Style.Padding.more, horizontalPadding: Style.Padding.more)
+            
+            addChild(cancelButton)
+        case .storeHUD, .storeHUDExpanded:
+            let cancelSprite = SKSpriteNode(texture: SKTexture(imageNamed: "buttonNegative"), size: .oneHundred)
+            let cancelButton = Button(size: .oneHundred, delegate: self, identifier: .backpackCancel, image: cancelSprite, shape: .circle, showSelection: true)
+            cancelButton.position = CGPoint.position(cancelButton.frame, inside: self.frame, verticalAlign: .center, horizontalAnchor: .right, xOffset: Style.Padding.more)
+            
+            addChild(cancelButton)
         }
-        
-        let cancelSprite = SKSpriteNode(texture: SKTexture(imageNamed: "buttonNegative"), size: .oneHundred)
-        let cancelButton = Button(size: .oneHundred, delegate: self, identifier: .backpackCancel, image: cancelSprite, shape: .circle, showSelection: true)
-        cancelButton.position = CGPoint.alignHorizontally(cancelButton.frame, relativeTo: frame, horizontalAnchor: .right, verticalAlign: .top, verticalPadding: Style.Padding.more, horizontalPadding: Style.Padding.more)
-        
-        addChild(cancelButton)
     }
     
     /// MARK: ButtonDelegate

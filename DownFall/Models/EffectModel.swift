@@ -28,5 +28,7 @@ struct EffectModel: Equatable, Hashable, Decodable {
     let amount: Int
     let duration: Int
     var rune: Rune?
+    var replaceRune: Rune?
     var wasApplied: Bool = false
+    let offerTier: Int
 }

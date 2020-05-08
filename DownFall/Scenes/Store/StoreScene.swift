@@ -47,6 +47,8 @@ class StoreScene: SKScene {
 
     weak var storeSceneDelegate: StoreSceneDelegate?
     
+    private var offerEffectTranslator = StoreOfferEffectTranslator()
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError()
     }
@@ -74,7 +76,9 @@ class StoreScene: SKScene {
         /// Super init'd
         super.init(size: playableRect.size)
         
+        //set up call backs
         stagingViewModel.offerWasStaged = self.offerWasStaged
+        storeHUDViewModel.effectUseCanceled = self.effectUseCanceled
         
         /// Position and add the store hud
         storeHUD.position = CGPoint.position(storeHUD.frame, centeredInTopOf: playableRect, verticalOffset: Style.Padding.safeArea)
@@ -108,8 +112,14 @@ class StoreScene: SKScene {
         
     }
     
+    func effectUseCanceled(effect: EffectModel) {
+        if let offer = offerEffectTranslator.translate(effect: effect) {
+            self.stagingArea.viewModel.offerWasUnstaged?(offer)
+        }
+    }
+    
     func offerWasStaged(offer: StoreOffer, unstagedOffer: StoreOffer?) {
-        let effects = StoreOfferEffectTranslator.translate(offers: [offer, unstagedOffer])
+        let effects = offerEffectTranslator.translate(offers: [offer, unstagedOffer])
         guard let first = effects.first else { return }
         var lastEffect: EffectModel? = nil
         if effects.count > 1, let last = effects.last {
@@ -130,23 +140,41 @@ extension StoreScene: ButtonDelegate {
     }
 }
 
-struct StoreOfferEffectTranslator {
-    static func translate(offers: [StoreOffer?]) -> [EffectModel] {
+class StoreOfferEffectTranslator {
+    
+    var offerMap: [EffectModel: StoreOffer] = [:]
+    
+    func translate(offers: [StoreOffer?]) -> [EffectModel] {
         return offers.compactMap { offer in
             switch offer?.type {
             case .fullHeal:
-                return EffectModel(kind: .refill, stat: .health, amount: 0, duration: 0)
+                let effect = EffectModel(kind: .refill, stat: .health, amount: 0, duration: 0, offerTier: offer?.tier ?? 0)
+                offerMap[effect] = offer
+                return effect
             case .plusTwoMaxHealth:
-                return EffectModel(kind: .buff, stat: .maxHealth, amount: 2, duration: Int.max)
+                let effect = EffectModel(kind: .buff, stat: .maxHealth, amount: 2, duration: Int.max, offerTier: offer?.tier ?? 0)
+                offerMap[effect] = offer
+                return effect
             case .rune:
-                return EffectModel(kind: .rune, stat: .pickaxe, amount: 0, duration: 0, rune: Rune.rune(for: .getSwifty))
+                let effect = EffectModel(kind: .rune, stat: .pickaxe, amount: 0, duration: 0, rune: Rune.rune(for: .getSwifty), offerTier: offer?.tier ?? 0)
+
+                offerMap[effect] = offer
+                return effect
             case .gems:
-                return EffectModel(kind: .buff, stat: .gems, amount: 3, duration: 0)
+                let effect = EffectModel(kind: .buff, stat: .gems, amount: 3, duration: 0, offerTier: offer?.tier ?? 0)
+                offerMap[effect] = offer
+                return effect
             case .runeUpgrade:
-                return EffectModel(kind: .buff, stat: .pickaxe, amount: 10, duration: 0)
+                let effect = EffectModel(kind: .buff, stat: .pickaxe, amount: 10, duration: 0, offerTier: offer?.tier ?? 0)
+                offerMap[effect] = offer
+                return effect
             case .none:
                 return nil
             }
         }
+    }
+    
+    func translate(effect: EffectModel) -> StoreOffer? {
+        return offerMap[effect]
     }
 }

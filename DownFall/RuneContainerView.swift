@@ -87,7 +87,9 @@ class RuneContainerView: SKSpriteNode {
         let runeDetailView = RuneDetailView(viewModel: RuneDetailViewModel(rune: rune,
                                                                            progress: CGFloat(progress),
                                                                            confirmed: runeWasUsed,
-                                                                           canceled: runeUseWasCanceled), size: size)
+                                                                           canceled: runeUseWasCanceled,
+                                                                           mode: mode),
+                                            size: size)
         runeDetailView.name = Constants.runeDetailViewName
         addChild(runeDetailView)
     }

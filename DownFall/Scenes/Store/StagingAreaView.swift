@@ -28,6 +28,10 @@ class StagingAreaViewModel: StagingAreaViewModelable {
     // output
     var offerWasStaged: ((StoreOffer, StoreOffer?) -> ())? = nil
     
+    // input offer was unstage
+    //TODO: need to figure out a way to translate an effect model back into a store offer
+    var offerWasUnstaged: ((StoreOffer) -> ())? = nil
+    
     init(storeOffers: [StoreOffer], goalProgress: [GoalTracking]) {
         self.storeOffers = storeOffers
         self.goalProgress = goalProgress
@@ -72,16 +76,16 @@ class StagingAreaView: SKSpriteNode {
     }()
     
     // tier 1 area
-       private lazy var tierTwoArea: StagingTierView = {
-           // tier area
-           let tier = 2
-           let vm = StagingTierViewModel(offers: viewModel.storeOffers.filter { $0.tier == tier }, tier: tier, unlocked: tierIsUnlocked(tier: tier, goalProgress: viewModel.goalProgress), touchDelegate: self, offerThatWasSelected: self.offerWasSelected)
-           let tierTwoArea = StagingTierView(viewModel: vm, size: CGSize(width: size.width, height: 300))
-           tierTwoArea.zPosition = Precedence.foreground.rawValue
-           tierTwoArea.position = CGPoint.alignHorizontally(tierTwoArea.frame, relativeTo: tierOneArea.frame, horizontalAnchor: .center, verticalAlign: .bottom, translatedToBounds: true)
-           stagingTierViewModels.append(vm)
-           return tierTwoArea
-       }()
+    private lazy var tierTwoArea: StagingTierView = {
+        // tier area
+        let tier = 2
+        let vm = StagingTierViewModel(offers: viewModel.storeOffers.filter { $0.tier == tier }, tier: tier, unlocked: tierIsUnlocked(tier: tier, goalProgress: viewModel.goalProgress), touchDelegate: self, offerThatWasSelected: self.offerWasSelected)
+        let tierTwoArea = StagingTierView(viewModel: vm, size: CGSize(width: size.width, height: 300))
+        tierTwoArea.zPosition = Precedence.foreground.rawValue
+        tierTwoArea.position = CGPoint.alignHorizontally(tierTwoArea.frame, relativeTo: tierOneArea.frame, horizontalAnchor: .center, verticalAlign: .bottom, translatedToBounds: true)
+        stagingTierViewModels.append(vm)
+        return tierTwoArea
+    }()
     
     /// Touch property
     private var spriteToMove: SKSpriteNode?
@@ -100,9 +104,12 @@ class StagingAreaView: SKSpriteNode {
         
         
         super.init(texture: nil, color: .clear, size: size)
-            
+        
         // touch delegation
         stagingSelectionAreaViewModel.touchDelegate = self
+        
+        // offer cancelation
+        self.viewModel.offerWasUnstaged = self.offerWasUnselected
         
         //user interaction
         self.isUserInteractionEnabled = true
@@ -124,7 +131,15 @@ class StagingAreaView: SKSpriteNode {
         stagingSelectionAreaViewModel.offerWasSelected(offer)
         viewModel.offerWasStaged?(offer, deselected)
     }
-
+    
+    func offerWasUnselected(_ offer: StoreOffer) {
+        // tell the selection area
+        stagingSelectionAreaViewModel.offerWasDeselected(offer)
+        
+        // tell each tier
+        stagingTierViewModels[offer.tier-1].offerWasDeselected(offer)
+    }
+    
     // MARK: Touch Events
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch  = touches.first else { return }
@@ -133,9 +148,9 @@ class StagingAreaView: SKSpriteNode {
         if stagingSelectionAreaView.contains(point.translate(yOffset: 50.0)) {
             /// tell all the staging tier view models that one of their offers was potentially selected.  Basically all viewModels will get a message that says, if you were moving a sprite, it is now selected
             /// we will also need to tell the Selection Area that this happened so it can keep track opf it's state.
-             stagingTierViewModels.forEach { $0.offerWasSelected() }
+            stagingTierViewModels.forEach { $0.offerWasSelected() }
         }
     }
-
+    
     //TODO: implement touches canceled to handle getting system alerts and things like that
 }

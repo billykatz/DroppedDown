@@ -240,6 +240,19 @@ struct EntityModel: Equatable, Decodable {
         return update(effects: effectsCopy)
     }
     
+    func addRune(_ rune: Rune?) -> EntityModel {
+        guard let rune = rune else { return self }
+        var pickaxe = self.pickaxe
+        pickaxe?.runes.append(rune)
+        return update(pickaxe: pickaxe)
+    }
+    
+    func removeRune(_ rune: Rune) -> EntityModel {
+        var pickaxe = self.pickaxe
+        pickaxe?.runes.removeFirst(where: { $0 == rune })
+        return update(pickaxe: pickaxe)
+    }
+    
     /// consume 1 count of the ability.  If the ability only has 1 count, then remove it
     func use(_ ability: Ability) -> EntityModel {
         var newAbilities = self.abilities

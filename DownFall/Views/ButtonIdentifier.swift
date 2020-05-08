@@ -30,6 +30,8 @@ enum ButtonIdentifier: String {
     case cycleLevel
     case seeInventory
     case shuffleBoard
+    case runeReplaceCancel
+    case runeReplaceConfirm
     
     var title: String {
         switch self {
@@ -71,6 +73,10 @@ enum ButtonIdentifier: String {
             return "Inventory"
         case .shuffleBoard:
             return "Pay 2 \u{2665}: Shuffle board"
+        case .runeReplaceCancel:
+            return "Cancel"
+        case .runeReplaceConfirm:
+            return "Replace"
         case .wallet, .infoPopup, .storeItem, .backpack:
             return ""
         }

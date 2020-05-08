@@ -31,6 +31,7 @@ class StagingTierViewModel {
     
     /// input from outside world
     var offerWasSelected: () -> () = { }
+    var offerWasDeselected: (StoreOffer) -> () = { _ in }
     
     // output
     let offerThatWasSelected: (StoreOffer, StoreOffer?) -> ()
@@ -61,6 +62,7 @@ class StagingTierView: SKSpriteNode {
         
         /// get informed when our offer is selected
         self.viewModel.offerWasSelected = self.offerWasSelected
+        self.viewModel.offerWasDeselected = self.offerWasDeselected
         
         /// response to user touch events
         self.isUserInteractionEnabled = viewModel.unlocked
@@ -96,6 +98,19 @@ class StagingTierView: SKSpriteNode {
                 }
             }
         }
+    }
+    
+    func offerWasDeselected(_ offer: StoreOffer) {
+        for offer in viewModel.offers {
+            for sprite in addedSprites {
+                if sprite.name == offer.textureName {
+                    sprite.isHidden = false
+                }
+            }
+        }
+        
+        //reset the selected offer so everything is back to the base state
+        viewModel.selectedOffer = nil
     }
     
     func setupTierView() {

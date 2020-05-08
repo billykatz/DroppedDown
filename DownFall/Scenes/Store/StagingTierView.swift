@@ -32,6 +32,7 @@ class StagingTierViewModel {
     /// input from outside world
     var offerWasSelected: () -> () = { }
     var offerWasDeselected: (StoreOffer) -> () = { _ in }
+    var runeReplacedChanged: (Rune, StoreOffer) -> () = { _,_ in }
     
     // output
     let offerThatWasSelected: (StoreOffer, StoreOffer?) -> ()
@@ -63,6 +64,7 @@ class StagingTierView: SKSpriteNode {
         /// get informed when our offer is selected
         self.viewModel.offerWasSelected = self.offerWasSelected
         self.viewModel.offerWasDeselected = self.offerWasDeselected
+        self.viewModel.runeReplacedChanged = self.runeReplacedChanged
         
         /// response to user touch events
         self.isUserInteractionEnabled = viewModel.unlocked
@@ -81,8 +83,27 @@ class StagingTierView: SKSpriteNode {
         fatalError("init(coder:) has not been implemented")
     }
     
+    var replacedRuneSpriteConatiner: SKSpriteNode? = nil
+    
+    func runeReplacedChanged(_ rune : Rune, offer: StoreOffer) {
+        replacedRuneSpriteConatiner = SKSpriteNode(color: .clear, size: .oneFifty)
+        
+        let runeSprite = SKSpriteNode(texture: SKTexture(imageNamed: rune.textureName), size: .oneFifty)
+        
+        let replaceText = ParagraphNode(text: "Replaced", paragraphWidth: runeSprite.frame.width*2, fontSize: UIFont.largeSize)
+        replaceText.position = CGPoint.alignHorizontally(replaceText.frame, relativeTo: runeSprite.frame, horizontalAnchor: .center, verticalAlign: .bottom, translatedToBounds: true)
+        
+        
+        replacedRuneSpriteConatiner?.position = selectedSpritesOriginalPosition ?? .zero
+        replacedRuneSpriteConatiner?.addChild(replaceText)
+        replacedRuneSpriteConatiner?.addChild(runeSprite)
+        addChildSafely(replacedRuneSpriteConatiner)
+    }
+    
     func offerWasSelected() {
         guard spriteToMove != nil else { return }
+        replacedRuneSpriteConatiner?.removeFromParent()
+        replacedRuneSpriteConatiner = nil
         let selectedOffer = viewModel.offers.filter { $0.textureName == spriteToMove?.name }.first
         viewModel.selectedOffer = selectedOffer
         // hide the sprite and put it back in the original position
@@ -140,13 +161,10 @@ class StagingTierView: SKSpriteNode {
     
     func setupDelimiterView() {
         let horizontalRule = SKSpriteNode(color: .black, size: CGSize(width: contentView.frame.width, height: 2.0))
-        let horizontalRuleCopy = SKSpriteNode(color: .black, size: CGSize(width: contentView.frame.width, height: 2.0))
         
         horizontalRule.position = CGPoint.position(horizontalRule.frame, inside: contentView.frame, verticalAlign: .top, horizontalAnchor: .center)
-        horizontalRuleCopy.position = CGPoint.position(horizontalRuleCopy.frame, inside: contentView.frame, verticalAlign: .bottom, horizontalAnchor: .center)
         
         contentView.addChild(horizontalRule)
-        contentView.addChild(horizontalRuleCopy)
     }
     
     func setupTextView() {

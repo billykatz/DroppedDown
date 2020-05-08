@@ -31,6 +31,7 @@ class StagingAreaViewModel: StagingAreaViewModelable {
     // input offer was unstage
     //TODO: need to figure out a way to translate an effect model back into a store offer
     var offerWasUnstaged: ((StoreOffer) -> ())? = nil
+    var runeReplacedChanged: ((Rune, StoreOffer) -> ())? = nil
     
     init(storeOffers: [StoreOffer], goalProgress: [GoalTracking]) {
         self.storeOffers = storeOffers
@@ -110,6 +111,7 @@ class StagingAreaView: SKSpriteNode {
         
         // offer cancelation
         self.viewModel.offerWasUnstaged = self.offerWasUnselected
+        self.viewModel.runeReplacedChanged = self.runeReplacedChanged
         
         //user interaction
         self.isUserInteractionEnabled = true
@@ -125,6 +127,10 @@ class StagingAreaView: SKSpriteNode {
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func runeReplacedChanged(_ rune: Rune, offer: StoreOffer) {
+        stagingTierViewModels[offer.tierIndex].runeReplacedChanged(rune, offer)
     }
     
     func offerWasSelected(offer: StoreOffer, deselected: StoreOffer?) {

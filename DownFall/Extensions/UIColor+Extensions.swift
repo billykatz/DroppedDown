@@ -57,4 +57,8 @@ extension UIColor {
     
     /// Rune Deteail color
     static let runeDetailColor = UIColor(rgb: 0x572d29)
+    
+    /// Confirmation button
+    static let confirmButtonColor = UIColor(rgb: 0x177a31)
+//    static let cancelButtonColor = UIColor(rgb: 0x)
 }

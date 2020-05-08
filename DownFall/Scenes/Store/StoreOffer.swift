@@ -27,4 +27,8 @@ struct StoreOffer {
         return SKSpriteNode(texture: SKTexture(imageNamed: self.textureName))
     }
     let startingPrice: Int
+    
+    var tierIndex: Int {
+        return tier - 1
+    }
 }

@@ -26,6 +26,7 @@ protocol StoreHUDViewModelOutputs {
     
     /// hook up to parent
     var effectUseCanceled: (EffectModel) -> () { get }
+    var runeRelacedChanged: (Rune) -> () { get }
     
     /// hook up to UI
     var updateHUD: () -> () { get set }
@@ -41,10 +42,8 @@ protocol StoreHUDViewModelOutputs {
 protocol StoreHUDViewModelable: StoreHUDViewModelOutputs, StoreHUDViewModelInputs {}
 
 class StoreHUDViewModel: StoreHUDViewModelable {
-    
+    var runeRelacedChanged: (Rune) -> () = { _ in }
     var effectUseCanceled: (EffectModel) -> () = { _ in }
-    
-    
     var updateHUD: () -> () = {  }
     var removedEffect: (EffectModel) -> () = { _ in }
     var addedEffect: (EffectModel) -> () = { _ in }
@@ -59,13 +58,17 @@ class StoreHUDViewModel: StoreHUDViewModelable {
     
     func add(effect: EffectModel, remove otherEffect: EffectModel?) {
         if let otherEffect = otherEffect {
-            /// We need to update the UI first to capture the pre-removed effect player data
+            /// we need to behave differently for runes
             if otherEffect.rune != nil {
+                /// this means we have replaced the rune in the staging area with another offer
+                /// add back the remove rune
                 basePlayerData = basePlayerData.addRune(removedRune)
                 removedRune = nil
+                /// now remove the rune otherEffect from the player data
                 basePlayerData = basePlayerData.removeEffect(otherEffect)
                 removedEffect(otherEffect)
             }
+            /// We need to update the UI first to capture the pre-removed effect player data
             else {
                 removedEffect(otherEffect)
                 basePlayerData = basePlayerData.removeEffect(otherEffect)
@@ -88,6 +91,9 @@ class StoreHUDViewModel: StoreHUDViewModelable {
         basePlayerData = basePlayerData.removeRune(rune)
         
         removedRune = rune
+        
+        // tell our parent about what happened
+        runeRelacedChanged(rune)
     }
     
     func cancelRuneReplacement(effect: EffectModel) {
@@ -95,6 +101,11 @@ class StoreHUDViewModel: StoreHUDViewModelable {
         removedEffect(effect)
         
         effectUseCanceled(effect)
+        
+        if let rune = removedRune {
+            // tell our parent about what happened
+            runeRelacedChanged(rune)
+        }
     }
     
     /// A preview of what the player data will look like when we apply effects

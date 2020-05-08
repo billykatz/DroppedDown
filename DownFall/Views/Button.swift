@@ -21,6 +21,10 @@ enum ButtonShape {
 
 class Button: SKShapeNode {
     
+    struct Constants {
+        static let disabledBackgroundColor = UIColor.darkGray
+    }
+    
     static let small = CGSize(width: 75, height: 30)
     static let medium = CGSize(width: 110, height: 50)
     static let large = CGSize(width: 150, height: 75)
@@ -145,14 +149,16 @@ class Button: SKShapeNode {
         buttonView?.color = self.originalBackground
         
         //add the shadow
-        let shadowPath = CGPath(roundedRect: CGRect(x: -size.width/2, y: -size.height/2 - dropShadowOffset, width: size.width, height: size.height), cornerWidth: 5.0, cornerHeight: 5.0, transform: nil)
-        let shadowShape = SKShapeNode(path: shadowPath)
-        shadowShape.color = .storeBlack
-        self.dropShadow = shadowShape
+        if !disable {
+            let shadowPath = CGPath(roundedRect: CGRect(x: -size.width/2, y: -size.height/2 - dropShadowOffset, width: size.width, height: size.height), cornerWidth: 5.0, cornerHeight: 5.0, transform: nil)
+            let shadowShape = SKShapeNode(path: shadowPath)
+            shadowShape.color = .storeBlack
+            self.dropShadow = shadowShape
+            // does this have to be hardcoded?
+            shadowShape.zPosition = -1
+            addChild(shadowShape)
+        }
         
-        // does this have to be hardcoded?
-        shadowShape.zPosition = -1
-        addChild(shadowShape)
         
         if addTextLabel {
             //Create Label
@@ -174,6 +180,7 @@ class Button: SKShapeNode {
         
         //enable/disable
         self.isDisabled = disable
+        enable(!disable)
         
         self.color = .clear
         
@@ -238,9 +245,23 @@ extension Button {
         addChildSafely(dropShadow)
     }
     
-    public func enabled(_ on: Bool) {
+    public func enable(_ on: Bool) {
         self.isDisabled = !on
-        buttonView?.color = on ? originalBackground : .lightGray
+        buttonView?.color = on ? originalBackground : Constants.disabledBackgroundColor
+        if on { setupShadow() }
+        else { removeShadow() }
+    }
+    
+    func setupShadow() {
+        if dropShadow == nil {
+            let shadowPath = CGPath(roundedRect: CGRect(x: -frame.size.width/2, y: -frame.size.height/2 - dropShadowOffset, width: frame.size.width, height: frame.size.height), cornerWidth: 5.0, cornerHeight: 5.0, transform: nil)
+            let shadowShape = SKShapeNode(path: shadowPath)
+            shadowShape.color = .storeBlack
+            self.dropShadow = shadowShape
+            // does this have to be hardcoded?
+            shadowShape.zPosition = -1
+            addChild(shadowShape)
+        }
     }
     
     

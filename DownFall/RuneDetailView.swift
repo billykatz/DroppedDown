@@ -80,16 +80,22 @@ class RuneDetailView: SKSpriteNode, ButtonDelegate {
     }
     
     func setupRuneView() {
+        let size: CGSize
+        if viewModel.mode == .storeHUD {
+            size = CGSize.oneFifty.scale(by: 0.5)
+        }else {
+            size = .oneFifty
+        }
+        
         let viewModel = RuneSlotViewModel(rune: self.viewModel.rune,
                                           registerForUpdates: false,
                                           progress: Int(self.viewModel.progress))
         let runeSlotView = RuneSlotView(viewModel: viewModel,
-                                        size: .oneFifty)
+                                        size: size)
         runeSlotView.position = CGPoint.position(runeSlotView.frame, inside: frame, verticalAlign: .center, horizontalAnchor: .left)
         runeSlotView.zPosition = Precedence.foreground.rawValue
         viewModel.runeWasTapped = { [weak self] (_,_) in self?.viewModel.canceled?() }
         addChild(runeSlotView)
-        
     }
     
     func setupDetailView() {
@@ -101,7 +107,7 @@ class RuneDetailView: SKSpriteNode, ButtonDelegate {
         
         let textOffset = Style.Padding.less
         
-        let titleColumnWidth = CGFloat(180.0)
+        let titleColumnWidth = viewModel.mode == .storeHUD ? 0.0 : CGFloat(180.0)
         let titleContainer = SKSpriteNode(color: .clear, size: CGSize(width: titleColumnWidth, height: detailView.frame.height))
         titleContainer.position = CGPoint.position(titleContainer.frame, inside: detailView.frame, verticalAlign: .center, horizontalAnchor: .left)
         
@@ -115,9 +121,12 @@ class RuneDetailView: SKSpriteNode, ButtonDelegate {
         chargeTitle.position = CGPoint.position(chargeTitle.frame, inside: titleContainer.frame, verticalAlign: .center, horizontalAnchor: .right)
         effectTitle.position = CGPoint.position(effectTitle.frame, inside: titleContainer.frame, verticalAlign: .top, horizontalAnchor: .right, yOffset: textOffset)
         
-        titleContainer.addChild(progressTitle)
-        titleContainer.addChild(chargeTitle)
-        titleContainer.addChild(effectTitle)
+        
+        if viewModel.mode != .storeHUD {
+            titleContainer.addChild(effectTitle)
+            titleContainer.addChild(progressTitle)
+            titleContainer.addChild(chargeTitle)
+        }
         
         
         // description container
@@ -130,20 +139,29 @@ class RuneDetailView: SKSpriteNode, ButtonDelegate {
         let descriptionFontSize = UIFont.smallSize
         let effectDescription = ParagraphNode(text: viewModel.rune?.description ?? "", paragraphWidth: descriptionWidth, fontSize: descriptionFontSize)
         let chargeDescription = ParagraphNode(text: viewModel.chargeDescription ?? "", paragraphWidth: descriptionWidth, fontSize: descriptionFontSize)
-        if let ability = viewModel.rune {
-            let progressDescription = ParagraphNode(text: "\(Int(viewModel.progress))/\( ability.cooldown)", paragraphWidth: descriptionWidth, fontSize: descriptionFontSize)
-            progressDescription.position = CGPoint.position(progressDescription.frame, inside: descriptionContainer.frame, verticalAlign: .bottom, horizontalAnchor: .left, yOffset: descriptionOffset)
-            descriptionContainer.addChild(progressDescription)
-        }
+        
+        
         
         effectDescription.position = CGPoint.position(effectDescription.frame, inside: descriptionContainer.frame, verticalAlign: .top, horizontalAnchor: .left, yOffset: descriptionOffset)
         chargeDescription.position = CGPoint.position(chargeDescription.frame, inside: descriptionContainer.frame, verticalAlign: .center, horizontalAnchor: .left)
         
         descriptionContainer.addChild(effectDescription)
-        descriptionContainer.addChild(chargeDescription)
         
-        detailView.addChild(titleContainer)
+        if viewModel.mode != .storeHUD {
+            if let ability = viewModel.rune {
+                let progressDescription = ParagraphNode(text: "\(Int(viewModel.progress))/\( ability.cooldown)", paragraphWidth: descriptionWidth, fontSize: descriptionFontSize)
+                progressDescription.position = CGPoint.position(progressDescription.frame, inside: descriptionContainer.frame, verticalAlign: .bottom, horizontalAnchor: .left, yOffset: descriptionOffset)
+                descriptionContainer.addChild(progressDescription)
+            }
+            
+            
+            
+            descriptionContainer.addChild(chargeDescription)
+            
+        }
+        
         detailView.addChild(descriptionContainer)
+        detailView.addChild(titleContainer)
         
     }
     

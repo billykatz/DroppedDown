@@ -160,6 +160,7 @@
 		589389A3245F4C9B00350A2E /* PickaxeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589389A2245F4C9B00350A2E /* PickaxeView.swift */; };
 		589389A5245F52BB00350A2E /* ParagraphNode+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589389A4245F52BB00350A2E /* ParagraphNode+Extensions.swift */; };
 		589389A7245FA6E200350A2E /* StagingTierView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589389A6245FA6E200350A2E /* StagingTierView.swift */; };
+		58946E3A2465BEC3003115D2 /* StoreMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58946E392465BEC3003115D2 /* StoreMenuView.swift */; };
 		5894B176245FD68A003B86F1 /* StagingSelectionAreaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5894B175245FD68A003B86F1 /* StagingSelectionAreaView.swift */; };
 		5894B178245FE61B003B86F1 /* StoreHUDViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5894B177245FE61B003B86F1 /* StoreHUDViewModel.swift */; };
 		5894B17A24607422003B86F1 /* EffectModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5894B17924607422003B86F1 /* EffectModel.swift */; };
@@ -345,6 +346,7 @@
 		589389A2245F4C9B00350A2E /* PickaxeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickaxeView.swift; sourceTree = "<group>"; };
 		589389A4245F52BB00350A2E /* ParagraphNode+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ParagraphNode+Extensions.swift"; sourceTree = "<group>"; };
 		589389A6245FA6E200350A2E /* StagingTierView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StagingTierView.swift; sourceTree = "<group>"; };
+		58946E392465BEC3003115D2 /* StoreMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreMenuView.swift; sourceTree = "<group>"; };
 		5894B175245FD68A003B86F1 /* StagingSelectionAreaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StagingSelectionAreaView.swift; sourceTree = "<group>"; };
 		5894B177245FE61B003B86F1 /* StoreHUDViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreHUDViewModel.swift; sourceTree = "<group>"; };
 		5894B17924607422003B86F1 /* EffectModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EffectModel.swift; sourceTree = "<group>"; };
@@ -585,8 +587,8 @@
 			isa = PBXGroup;
 			children = (
 				3D06390E22F1DB8300C4D5E9 /* StoreScene.swift */,
-				5893899A245E0D6A00350A2E /* StoreHUD.swift */,
-				5894B177245FE61B003B86F1 /* StoreHUDViewModel.swift */,
+				58946E3B2465D5D3003115D2 /* StoreHUD */,
+				58946E392465BEC3003115D2 /* StoreMenuView.swift */,
 				589389A2245F4C9B00350A2E /* PickaxeView.swift */,
 				5893899E245E7D0E00350A2E /* StoreOffer.swift */,
 				589389A6245FA6E200350A2E /* StagingTierView.swift */,
@@ -836,14 +838,31 @@
 			name = Threat;
 			sourceTree = "<group>";
 		};
+		58946E382465BD10003115D2 /* RuneSlot */ = {
+			isa = PBXGroup;
+			children = (
+				5881DBF3244FEE440053A690 /* RuneSlotView.swift */,
+				5881DBF5244FEE630053A690 /* RuneSlotViewModel.swift */,
+			);
+			name = RuneSlot;
+			sourceTree = "<group>";
+		};
+		58946E3B2465D5D3003115D2 /* StoreHUD */ = {
+			isa = PBXGroup;
+			children = (
+				5893899A245E0D6A00350A2E /* StoreHUD.swift */,
+				5894B177245FE61B003B86F1 /* StoreHUDViewModel.swift */,
+			);
+			name = StoreHUD;
+			sourceTree = "<group>";
+		};
 		589A27D223D90FD500174DE7 /* Backpack */ = {
 			isa = PBXGroup;
 			children = (
 				589A27D323D90FE000174DE7 /* TargetingViewModel.swift */,
 				5866B3DB244D2D2300DF36E0 /* RuneDetailView.swift */,
 				58DCC9832451FBC700DC7AD8 /* RuneContainerView.swift */,
-				5881DBF3244FEE440053A690 /* RuneSlotView.swift */,
-				5881DBF5244FEE630053A690 /* RuneSlotViewModel.swift */,
+				58946E382465BD10003115D2 /* RuneSlot */,
 				58B39BD623D21C9600915858 /* BackpackView.swift */,
 			);
 			name = Backpack;
@@ -1116,6 +1135,7 @@
 				587C80A2245B3D3800997110 /* FreeGetSwifty.swift in Sources */,
 				3DA4E8972290A88C006E90D1 /* EntityModel.swift in Sources */,
 				3DC072BF23748CF80046F224 /* TutorialTileCreator.swift in Sources */,
+				58946E3A2465BEC3003115D2 /* StoreMenuView.swift in Sources */,
 				5865D62E23DBF652007D11FC /* abilities.json in Sources */,
 				3D06390722EEB53C00C4D5E9 /* ComputingState.swift in Sources */,
 				3D674C9522C9D6640003AEB4 /* MainMenu.swift in Sources */,

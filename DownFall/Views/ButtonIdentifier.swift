@@ -76,7 +76,7 @@ enum ButtonIdentifier: String {
         case .runeReplaceCancel:
             return "Cancel"
         case .runeReplaceConfirm:
-            return "Replace"
+            return "Confirm"
         case .wallet, .infoPopup, .storeItem, .backpack:
             return ""
         }

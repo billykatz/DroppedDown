@@ -79,7 +79,7 @@ class StoreScene: SKScene {
         //set up call backs
         stagingViewModel.offerWasStaged = self.offerWasStaged
         storeHUDViewModel.effectUseCanceled = self.effectUseCanceled
-        
+        storeHUDViewModel.runeRelacedChanged = self.runeReplacedChanged
         /// Position and add the store hud
         storeHUD.position = CGPoint.position(storeHUD.frame, centeredInTopOf: playableRect, verticalOffset: Style.Padding.safeArea)
         storeHUD.zPosition = Precedence.foreground.rawValue
@@ -110,6 +110,12 @@ class StoreScene: SKScene {
         anchorPoint = CGPoint(x: 0.5, y: 0.5)
         addChild(background)
         
+    }
+    
+    func runeReplacedChanged(_ rune: Rune) {
+        if let offer = offerEffectTranslator.offer(for: .rune) {
+            stagingArea.viewModel.runeReplacedChanged?(rune, offer)
+        }
     }
     
     func effectUseCanceled(effect: EffectModel) {
@@ -143,6 +149,15 @@ extension StoreScene: ButtonDelegate {
 class StoreOfferEffectTranslator {
     
     var offerMap: [EffectModel: StoreOffer] = [:]
+    
+    func offer(for offerType: StoreOfferType) -> StoreOffer? {
+        for (_, offer) in offerMap {
+            if offer.type == offerType {
+                return offer
+            }
+        }
+        return nil
+    }
     
     func translate(offers: [StoreOffer?]) -> [EffectModel] {
         return offers.compactMap { offer in

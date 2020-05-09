@@ -171,7 +171,7 @@ class Renderer: SKSpriteNode {
                 }
             case .monsterDies:
                 computeNewBoard(for: trans)
-            case .newTurn, .bossTargetsWhatToEat, .bossAttacks, .unlockExit, .playerAwarded:
+            case .newTurn, .bossTargetsWhatToEat, .bossAttacks, .unlockExit, .playerAwarded, .runeProgressRecord:
                 animationsFinished(endTiles: trans.endTiles)
             case .itemUsed(let ability, let targets):
                 animateRuneUsed(input: inputType, transformations: transformations, rune: ability, targets: targets)
@@ -197,7 +197,6 @@ class Renderer: SKSpriteNode {
                         self.animationsFinished(endTiles: nil, ref: false)
                     }
                 }
-                
             case .reffingFinished, .touchBegan, .itemUseSelected:
                 () // Purposely left blank.
             default:

@@ -130,8 +130,8 @@ class GameScene: SKScene {
                     self.removeFromParent()
                     self.swipeRecognizerView?.removeFromSuperview()
                     self.gameSceneDelegate?.visitStore(data, progress)
+                
                 }
-
             }
         }
 

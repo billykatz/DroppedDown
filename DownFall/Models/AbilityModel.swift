@@ -207,7 +207,7 @@ enum Usage {
     }
 }
 
-enum Currency: String, CaseIterable, Codable  {
+enum Currency: String, CaseIterable, Codable, Hashable  {
     case gold
     case gem = "crystals"
     

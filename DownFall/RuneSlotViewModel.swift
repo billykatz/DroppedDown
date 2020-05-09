@@ -21,6 +21,7 @@ protocol RuneSlotViewModelOutputs {
     var runeWasTapped: ((Rune?, Int) -> ())? { get }
     var progressRatio: CGFloat { get }
     var progressColor: UIColor? { get }
+    var rune: Rune? { get }
 }
 
 class RuneSlotViewModel: RuneSlotViewModelOutputs, RuneSlotViewModelInputs {
@@ -46,7 +47,7 @@ class RuneSlotViewModel: RuneSlotViewModelOutputs, RuneSlotViewModelInputs {
     }
     
     // State variables
-    private var rune: Rune?
+    var rune: Rune?
     private var current: Int = 0 {
         didSet {
             charged?(current, rune?.cooldown ?? 0)
@@ -56,6 +57,11 @@ class RuneSlotViewModel: RuneSlotViewModelOutputs, RuneSlotViewModelInputs {
     init(rune: Rune?, registerForUpdates: Bool = true, progress: Int = 0) {
         self.rune = rune
         self.current = progress
+        
+        if let progress = rune?.recordedProgress {
+            let cooldown = CGFloat(rune?.cooldown ?? 0)
+            current = Int(progress * cooldown)
+        }
         
         if registerForUpdates {
             Dispatch.shared.register { [weak self] (input) in

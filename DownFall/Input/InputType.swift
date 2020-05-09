@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CoreGraphics
 
 indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
     static func fuzzyEqual(_ lhs: InputType, _ rhs: InputType) -> Bool {
@@ -60,7 +61,8 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
                                         .playerAwarded([]),
                                         .unlockExit,
                                         .levelGoalDetail([]),
-                                        .goalProgressRecord([])
+                                        .goalProgressRecord([]),
+                                        .runeProgressRecord([:])
                                                                  
     ]
     
@@ -104,6 +106,7 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
     case levelGoalDetail([GoalTracking])
     case playerAwarded([LevelGoalReward])
     case goalProgressRecord([GoalTracking])
+    case runeProgressRecord([Rune: CGFloat])
     
     var debugDescription: String {
         switch self {
@@ -182,7 +185,9 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
         case .playerAwarded:
             return "Player is awarded something"
         case .goalProgressRecord:
-            return "Record goal progress" 
+            return "Record goal progress"
+        case .runeProgressRecord:
+            return "Record rune progres"
             
         }
     }

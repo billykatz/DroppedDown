@@ -41,6 +41,7 @@ struct RuneContainerViewModel: RuneContainerViewModelable {
 class RuneContainerView: SKSpriteNode {
     let viewModel: RuneContainerViewModelable
     let mode: ViewMode
+    var runeSlotViewModels: [RuneSlotViewModel] = []
     
     struct Constants {
         static let runeName = "rune"
@@ -54,6 +55,22 @@ class RuneContainerView: SKSpriteNode {
         isUserInteractionEnabled = true
         
         setupView()
+        
+        Dispatch.shared.register { [weak self] (input) in
+            if input.type == .visitStore {
+                guard let self = self else { return }
+                
+                var runeDict: [Rune: CGFloat] = [:]
+                for vm in self.runeSlotViewModels {
+                    if let rune = vm.rune {
+                        runeDict[rune] = vm.progressRatio
+                    }
+                }
+                InputQueue.append(.init(.runeProgressRecord(runeDict)))
+                
+            }
+        }
+
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -136,7 +153,7 @@ class RuneContainerView: SKSpriteNode {
             let rune = viewModel.runes.optionalElement(at: index)
             let viewModel = RuneSlotViewModel(rune: rune)
             let runeSlotView = RuneSlotView(viewModel: viewModel, size: size)
-            
+            runeSlotViewModels.append(viewModel)
             let runeY = CGFloat(0.0)
             let runeX = frame.minX + frame.width/CGFloat(8) + (frame.width/4.0 * CGFloat(index))
             

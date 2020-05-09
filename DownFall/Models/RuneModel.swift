@@ -7,8 +7,9 @@
 //
 
 import Foundation
+import CoreGraphics
 
-enum RuneType: String, Codable {
+enum RuneType: String, Codable, Hashable {
     case rainEmbers
     case getSwifty
     case transformRock
@@ -25,7 +26,7 @@ enum RuneType: String, Codable {
     }
 }
 
-struct Rune: Equatable, Decodable, Hashable {
+struct Rune: Hashable, Decodable {
     var type: RuneType
     var textureName: String
     var cost: Int
@@ -40,6 +41,7 @@ struct Rune: Equatable, Decodable, Hashable {
     var rechargeMinimum: Int
     var progressColor: Color
     var maxDistanceBetweenTargets: Int
+    var recordedProgress: CGFloat? = 0
     
     static let zero = Rune(type: .getSwifty, textureName: "", cost: 0, currency: .gem, description: "", flavorText: "", targets: 0, targetTypes: [], heal: 0, cooldown: 0, rechargeType: [], rechargeMinimum: 0, progressColor: .red, maxDistanceBetweenTargets: 0)
     

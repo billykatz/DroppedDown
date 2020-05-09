@@ -131,6 +131,11 @@ class Board: Equatable {
         case .playerAwarded(let rewards):
             let trans = playerAccepts(rewards: rewards, inputType: input.type)
             InputQueue.append(Input(.transformation([trans])))
+        case .runeProgressRecord(let runeProgress):
+            guard let pp = playerPosition,
+                case let .player(data) = tiles[pp].type else { return }
+            tiles[pp.row][pp.column] = Tile(type: .player(data.recordRuneProgress(runeProgress)))
+            transformation = playerDataUpdated(inputType: input.type)
         case .gameLose(_),
              .play,
              .pause,
@@ -148,6 +153,10 @@ class Board: Equatable {
         
         guard let trans = transformation else { return }
         InputQueue.append(Input(.transformation([trans])))
+    }
+    
+    private func playerDataUpdated(inputType: InputType) -> Transformation {
+        return Transformation(transformation: nil, inputType: inputType, endTiles: tiles)
     }
     
     private func playerAccepts(rewards: [LevelGoalReward], inputType: InputType) -> Transformation {

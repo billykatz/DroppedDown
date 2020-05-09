@@ -147,6 +147,8 @@ extension LevelCoordinating where Self: UIViewController {
             // Increment the level index before we visit the store
             // there might/is be a better place to do this
             levelIndex = min(levels.count - 1, levelIndex + 1)
+            
+            /// attached how many goals we completed so the store knows which offers to unlock
             var level = levels[levelIndex]
             level.goalProgress = goalTracking
             

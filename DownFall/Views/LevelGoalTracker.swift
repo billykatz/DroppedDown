@@ -45,7 +45,7 @@ class LevelGoalTracker: LevelGoalTracking {
             
         case .boardBuilt:
             goalUpdated?(goalProgress)
-        case .visitStore:
+        case .runeProgressRecord:
             InputQueue.append(.init(.goalProgressRecord(goalProgress)))
         default:
             return

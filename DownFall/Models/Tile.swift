@@ -18,7 +18,7 @@ struct PillarData: Decodable, Hashable {
     let health: Int
 }
 
-enum Color: String, Decodable, CaseIterable {
+enum Color: String, Decodable, CaseIterable, Hashable {
     case blue
     case brown
     case purple

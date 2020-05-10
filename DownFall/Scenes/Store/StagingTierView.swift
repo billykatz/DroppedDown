@@ -36,17 +36,25 @@ class StagingTierViewModel {
     
     // output
     let offerThatWasSelected: (StoreOffer, StoreOffer?) -> ()
+    let offerWasTappedForInformation: (StoreOffer) -> ()
     
-    init(offers: [StoreOffer], tier: Int, unlocked: Bool, touchDelegate: SKNode, offerThatWasSelected: @escaping (StoreOffer, StoreOffer?) -> ()) {
+    init(offers: [StoreOffer], tier: Int, unlocked: Bool, touchDelegate: SKNode, offerThatWasSelected: @escaping (StoreOffer, StoreOffer?) -> (),
+         offerWasTappedForInformation: @escaping (StoreOffer) -> ()) {
         self.offers = offers
         self.tier = tier
         self.unlocked = unlocked
         self.touchDelegate = touchDelegate
         self.offerThatWasSelected = offerThatWasSelected
+        self.offerWasTappedForInformation = offerWasTappedForInformation
     }
 }
 
 class StagingTierView: SKSpriteNode {
+    
+    struct Constants {
+        static let dragThreshold = CGFloat(15.0)
+    }
+    
     var viewModel: StagingTierViewModel
     let contentView: SKSpriteNode
     
@@ -102,15 +110,24 @@ class StagingTierView: SKSpriteNode {
     
     func offerWasSelected() {
         guard spriteToMove != nil else { return }
+        
+        /// if an ffer was selected at any point then we should remove the replace rune container
+        /// This will break if we add more than two offers to the tier
         replacedRuneSpriteConatiner?.removeFromParent()
         replacedRuneSpriteConatiner = nil
+        
+        /// find the selected offer by comparing the sprite we were moving name to the name of the offer texture
         let selectedOffer = viewModel.offers.filter { $0.textureName == spriteToMove?.name }.first
+        
+        /// trigger our view model on the selected offer
         viewModel.selectedOffer = selectedOffer
+        
         // hide the sprite and put it back in the original position
         spriteToMove?.isHidden = true
         spriteToMove?.position = selectedSpritesOriginalPosition ?? .zero
         spriteToMove = nil
         
+        /// unhide the other offers we may have hidden
         let otherOffers = viewModel.offers.filter { $0.textureName != selectedOffer?.textureName }
         for offer in otherOffers {
             for sprite in addedSprites {
@@ -122,9 +139,11 @@ class StagingTierView: SKSpriteNode {
     }
     
     func offerWasDeselected(_ offer: StoreOffer) {
+        /// at any point we deselect an offer, we should remove the replaced rune sprite
         replacedRuneSpriteConatiner?.removeFromParent()
         replacedRuneSpriteConatiner = nil
         
+        //un hide all the offers as non are currently selected
         for offer in viewModel.offers {
             for sprite in addedSprites {
                 if sprite.name == offer.textureName {
@@ -183,12 +202,17 @@ class StagingTierView: SKSpriteNode {
     }
     
     // MARK: Touch Events
+    
+    var touchIsDrag = false
+    var lastTouchPoint: CGPoint? = nil
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         defer {
             viewModel.touchDelegate.touchesBegan(touches, with: event)
         }
+        
         guard let touch  = touches.first else { return }
         let point = touch.location(in: self.contentView)
+        
         for sprite in addedSprites {
             if sprite.contains(point) && !sprite.isHidden {
                 selectedSpritesOriginalPosition = sprite.position
@@ -196,16 +220,9 @@ class StagingTierView: SKSpriteNode {
                 spriteToMove?.zPosition = Precedence.floating.rawValue
             }
         }
-    }
-    
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        defer {
-            viewModel.touchDelegate.touchesMoved(touches, with: event)
-        }
-        guard let touch  = touches.first else { return }
-        let point = touch.location(in: self.contentView)
-        spriteToMove?.position = point.translate(xOffset: -50.0, yOffset:100.0)
-        
+
+        touchIsDrag = false
+        lastTouchPoint = nil
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -213,13 +230,53 @@ class StagingTierView: SKSpriteNode {
             viewModel.touchDelegate.touchesEnded(touches, with: event)
         }
         
-        /// if we are still moving a sprite then we havent reached the selection area
-        if spriteToMove != nil {
-            let action = SKAction.move(to: selectedSpritesOriginalPosition ?? .zero, duration: 0.25)
-            
-            spriteToMove?.run(action)
-            spriteToMove = nil
+        guard let touch  = touches.first else { return }
+        let point = touch.location(in: self.contentView)
+        
+        if touchIsDrag {
+            touchIsDrag = false
+            /// if we are still moving a sprite then we havent reached the selection area
+            if spriteToMove != nil {
+                let action = SKAction.move(to: selectedSpritesOriginalPosition ?? .zero, duration: 0.25)
+                
+                spriteToMove?.run(action)
+                spriteToMove = nil
+            }
+            return
+        } else {
+            for node in nodes(at: point)
+            {
+                if let offer = viewModel.offers.first(where: { $0.textureName == node.name }) {
+                    viewModel.offerWasTappedForInformation(offer)
+                }
+            }
         }
+        
+        spriteToMove = nil
     }
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        defer {
+            viewModel.touchDelegate.touchesMoved(touches, with: event)
+        }
+
+        guard let touch  = touches.first else { return }
+        let point = touch.location(in: self.contentView)
+        
+        if lastTouchPoint == nil {
+            lastTouchPoint = point
+        }
+        
+        guard let lastPosition = lastTouchPoint else { return }
+        let touchIsPastDragThreshold =
+            (abs(point.x - lastPosition.x) > Constants.dragThreshold ||
+                abs(point.y - lastPosition.y) > Constants.dragThreshold)
+        
+        guard touchIsPastDragThreshold || touchIsDrag else { return }
+        
+        touchIsDrag = true
+        
+        spriteToMove?.position = point.translate(xOffset: -50.0, yOffset:100.0)
+    }
+    
 }
 

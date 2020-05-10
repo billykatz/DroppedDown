@@ -132,6 +132,11 @@ class StoreHUDViewModel: StoreHUDViewModelable {
         return basePlayerData.originalHp
     }
     
+    var previewTotalGems: Int {
+        return previewPlayerData.carry.total(in: .gem)
+    }
+    
+    
     var healthText: String {
         return "\(baseHealth)/\(totalHealth)"
     }

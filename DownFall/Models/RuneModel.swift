@@ -8,6 +8,7 @@
 
 import Foundation
 import CoreGraphics
+import SpriteKit
 
 enum RuneType: String, Codable, Hashable {
     case rainEmbers
@@ -42,8 +43,29 @@ struct Rune: Hashable, Decodable {
     var progressColor: Color
     var maxDistanceBetweenTargets: Int
     var recordedProgress: CGFloat? = 0
+    let animationTextureName: String
+    let animationColumns: Int
     
-    static let zero = Rune(type: .getSwifty, textureName: "", cost: 0, currency: .gem, description: "", flavorText: "", targets: 0, targetTypes: [], heal: 0, cooldown: 0, rechargeType: [], rechargeMinimum: 0, progressColor: .red, maxDistanceBetweenTargets: 0)
+    var animationTexture: SKTexture {
+        return SKTexture(imageNamed: animationTextureName)
+    }
+    
+    var fullDescription: String {
+        return
+            """
+            Effect: \(description)
+            Charges: Mine \(cooldown) \(rechargeTypeString)\(cooldown > 1 ? "s" : "").
+            """
+    }
+    
+    var rechargeTypeString: String {
+        if let first = rechargeType.first {
+            return first.humanReadable
+        }
+        return ""
+    }
+    
+    static let zero = Rune(type: .getSwifty, textureName: "", cost: 0, currency: .gem, description: "", flavorText: "", targets: 0, targetTypes: [], heal: 0, cooldown: 0, rechargeType: [], rechargeMinimum: 0, progressColor: .red, maxDistanceBetweenTargets: 0, animationTextureName: "", animationColumns: 0)
     
     static func rune(for type: RuneType) -> Rune {
         switch type {
@@ -64,7 +86,10 @@ struct Rune: Hashable, Decodable {
                         rechargeType: [TileType.rock(.blue)],
                         rechargeMinimum: 1,
                         progressColor: .blue,
-                        maxDistanceBetweenTargets: 1)
+                        maxDistanceBetweenTargets: 1,
+                        animationTextureName: "getSwiftySpriteSheet",
+                        animationColumns: 6
+            )
         case .transformRock:
             return Rune(type: .transformRock,
                         textureName: "transformRock",
@@ -79,7 +104,10 @@ struct Rune: Hashable, Decodable {
                         rechargeType: [TileType.rock(.purple)],
                         rechargeMinimum: 1,
                         progressColor: .purple,
-                        maxDistanceBetweenTargets: Int.max)
+                        maxDistanceBetweenTargets: Int.max,
+                        animationTextureName: "transformRockSpriteSheet",
+                        animationColumns: 8
+            )
         case .rainEmbers:
             return Rune(type: .rainEmbers,
                         textureName: "rainEmbers",
@@ -94,7 +122,10 @@ struct Rune: Hashable, Decodable {
                         rechargeType: [TileType.rock(.red)],
                         rechargeMinimum: 1,
                         progressColor: .red,
-                        maxDistanceBetweenTargets: Int.max)
+                        maxDistanceBetweenTargets: Int.max,
+                        animationTextureName: "rainEmbersSpriteSheet",
+                        animationColumns: 5
+            )
         }
     }
 }

@@ -20,6 +20,7 @@ struct RuneReplacementViewModel {
 
 enum MenuMode {
     case runeReplacement(RuneReplacementViewModel)
+    case offerDescription
 }
 
 class StoreMenuViewModel {
@@ -119,7 +120,8 @@ class StoreMenuView: SKSpriteNode, ButtonDelegate {
             withText.position = CGPoint.alignVertically(withText.frame, relativeTo: oldOutline.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: (spaceBetweenBoxes - withText.frame.width)/2, translatedToBounds: true)
             
             addChild(withText)
-            
+        case .offerDescription:
+            ()
         }
     }
     

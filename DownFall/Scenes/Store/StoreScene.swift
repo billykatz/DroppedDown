@@ -118,7 +118,7 @@ class StoreScene: SKScene {
     }
     
     func runeReplacedChanged(_ rune: Rune) {
-        if let offer = offerEffectTranslator.offer(for: .rune) {
+        if let offer = offerEffectTranslator.offer(for: .rune(rune)) {
             stagingArea.viewModel.runeReplacedChanged?(rune, offer)
         }
     }
@@ -181,13 +181,13 @@ class StoreOfferEffectTranslator {
                 let effect = EffectModel(kind: .buff, stat: .maxHealth, amount: 2, duration: Int.max, offerTier: offer?.tier ?? 0)
                 offerMap[effect] = offer
                 return effect
-            case .rune:
-                let effect = EffectModel(kind: .rune, stat: .pickaxe, amount: 0, duration: 0, rune: Rune.rune(for: .getSwifty), offerTier: offer?.tier ?? 0)
+            case .rune(let rune):
+                let effect = EffectModel(kind: .rune, stat: .pickaxe, amount: 0, duration: 0, rune: rune, offerTier: offer?.tier ?? 0)
 
                 offerMap[effect] = offer
                 return effect
-            case .gems:
-                let effect = EffectModel(kind: .buff, stat: .gems, amount: 3, duration: 0, offerTier: offer?.tier ?? 0)
+            case .gems(let amount):
+                let effect = EffectModel(kind: .buff, stat: .gems, amount: amount, duration: 0, offerTier: offer?.tier ?? 0)
                 offerMap[effect] = offer
                 return effect
             case .runeUpgrade:

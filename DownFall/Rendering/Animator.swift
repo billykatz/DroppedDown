@@ -12,6 +12,21 @@ import SpriteKit
 
 struct Animator {
     
+    public func animateRune(_ rune: Rune,
+                            transformations: [Transformation],
+                            affectedTiles: [TileCoord]) {
+        let runeAnimation = SpriteSheet(texture: rune.animationTexture, rows: 1, columns: rune.animationColumns)
+        switch rune.type {
+        case .getSwifty:
+            ()
+        case .rainEmbers:
+            ()
+        case .transformRock:
+            ()
+            
+        }
+    }
+    
     public func smokeAnimation() -> SKAction {
         let smokeTexture = SpriteSheet(texture: SKTexture(imageNamed: "smokeAnimation"), rows: 1, columns: 6).animationFrames()
         let smokeAnimation = SKAction.animate(with: smokeTexture, timePerFrame: 0.07)

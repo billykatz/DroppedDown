@@ -36,7 +36,7 @@ class CurrencyView: SKSpriteNode {
     init(viewModel: CurrencyViewModelable, size: CGSize) {
         self.viewModel = viewModel
                 
-        super.init(texture: nil, color: .lightBarBlue, size: size)
+        super.init(texture: nil, color: .clear, size: size)
         
         let currencySprite = viewModel.currencySprite
         let currencyParagraph = ParagraphNode(text: "\(viewModel.amount)", paragraphWidth: self.frame.maxX - currencySprite.frame.maxX)

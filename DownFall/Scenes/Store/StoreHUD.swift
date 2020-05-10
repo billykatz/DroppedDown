@@ -19,6 +19,7 @@ class StoreHUD: SKSpriteNode {
         static let currentHealthLabelName = "currentHealthLabelName"
         static let totalHealthLabelName = "totalHealthLabelName"
         static let healthBarName = "healthBarName"
+        static let currencyViewName = "currencyViewName"
     }
     
     private var viewModel: StoreHUDViewModel
@@ -69,7 +70,7 @@ class StoreHUD: SKSpriteNode {
         case .health:
             if let healthBarContainer = healthBarContainer,
                 let currentHealthLabel = healthBarContainer.childNode(withName: Constants.currentHealthLabelName) as? ParagraphNode,
-            let healthBar = healthBarContainer.childNode(withName: Constants.healthBarName) as? FillableBar{
+                let healthBar = healthBarContainer.childNode(withName: Constants.healthBarName) as? FillableBar{
                 
                 //redraw the health bar
                 redrawHealthBarNode(healthBar, currentHealth: viewModel.baseHealth, totalHealth: viewModel.totalHealth)
@@ -98,12 +99,16 @@ class StoreHUD: SKSpriteNode {
                     self?.healthBarContainer?.addChild(newHealthLabel)
                 }
             }
+        case .gems:
+            if let currencyView = contentView.childNode(withName: Constants.currencyViewName) {
+                currencyView.removeFromParent()
+                redrawCurrencyView(newAmount: effect.amount, removed: true)
+            }
         case .pickaxe:
             self.createRuneContainerView(mode: .storeHUD, playerData: viewModel.previewPlayerData)
             swapRunesMenuView?.removeFromParent()
-        default: ()
         }
-
+        
     }
     
     func addedEffect(_ effect: EffectModel) {
@@ -111,8 +116,8 @@ class StoreHUD: SKSpriteNode {
         case .health:
             if let healthBarContainer = healthBarContainer, let currentHealthLabel = healthBarContainer.childNode(withName: Constants.currentHealthLabelName) as? ParagraphNode,
                 let healthBar = healthBarContainer.childNode(withName: Constants.healthBarName) as? FillableBar
-                {
-                    
+            {
+                
                 
                 //redraw the health bar
                 redrawHealthBarNode(healthBar, currentHealth: viewModel.previewPlayerData.hp, totalHealth: viewModel.previewPlayerData.originalHp)
@@ -144,11 +149,24 @@ class StoreHUD: SKSpriteNode {
                     self?.healthBarContainer?.addChild(newHealthLabel)
                 }
             }
+        case .gems:
+            if let currencyView = contentView.childNode(withName: Constants.currencyViewName) {
+                currencyView.removeFromParent()
+                redrawCurrencyView(newAmount: effect.amount, removed: false)
+            }
         case .pickaxe:
             /// if the player has reach the max number of runes, make the pickaxe larger and trigger a replace rune flow
             self.createRuneContainerView(mode: .storeHUD, playerData: viewModel.previewPlayerData)
-        default: ()
         }
+    }
+    
+    func redrawCurrencyView(newAmount: Int, removed: Bool) {
+        /// Currency View
+        let gemAmount = removed ? viewModel.totalGems : viewModel.previewTotalGems
+        let currencyView = CurrencyView(viewModel: CurrencyViewModel(currency: .gem, amount: gemAmount), size: CGSize(width: halfWidth, height: halfHeight))
+        currencyView.position = CGPoint.position(currencyView.frame, inside: contentView.frame, verticalAlign: .top, horizontalAnchor: .right)
+        currencyView.name = Constants.currencyViewName
+        contentView.addChild(currencyView)
     }
     
     func redrawHealthBarNode(_ healthBar: SKSpriteNode, currentHealth: Int, totalHealth: Int) {
@@ -181,7 +199,7 @@ class StoreHUD: SKSpriteNode {
         let currentHealthParagraph = ParagraphNode(text: "\(viewModel.baseHealth)", paragraphWidth: healthBarContainerMaxX - healthBar.frame.maxX)
         let outOfParagraph = ParagraphNode(text: "/", paragraphWidth: healthBarContainerMaxX - healthBar.frame.maxX)
         let totalHealthParagraph = ParagraphNode(text: "\(viewModel.totalHealth)", paragraphWidth: healthBarContainerMaxX - healthBar.frame.maxX)
-
+        
         currentHealthParagraph.position = CGPoint.alignVertically(currentHealthParagraph.frame, relativeTo: healthBar.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: Style.Padding.more, translatedToBounds: true)
         currentHealthParagraph.name = Constants.currentHealthLabelName
         
@@ -196,19 +214,20 @@ class StoreHUD: SKSpriteNode {
         healthBarContainer?.addChild(heartNode)
         healthBarContainer?.addChild(healthBar)
         healthBarContainer?.position = CGPoint.position(healthBarContainer?.frame, inside: contentView.frame, verticalAlign: .bottom, horizontalAnchor: .right)
-        addChildSafely(healthBarContainer)
+        contentView.addChildSafely(healthBarContainer)
         
         
         /// Currency View
         let currencyView = CurrencyView(viewModel: CurrencyViewModel(currency: .gem, amount: viewModel.totalGems), size: CGSize(width: halfWidth, height: halfHeight))
         currencyView.position = CGPoint.position(currencyView.frame, inside: contentView.frame, verticalAlign: .top, horizontalAnchor: .right)
-        addChild(currencyView)
+        currencyView.name = Constants.currencyViewName
+        contentView.addChild(currencyView)
         
         /// Pickaxe View
         self.createRuneContainerView(mode: .storeHUD, playerData: self.viewModel.previewPlayerData)
         
     }
-
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -227,7 +246,7 @@ extension StoreHUD {
             CGPoint.position(CGRect(origin: .zero, size: sizeToUse), inside: contentView.frame, verticalAlign: .bottom, horizontalAnchor: .left)
             :
             .zero
-
+        
         
         let playerData = playerData ?? viewModel.previewPlayerData
         /// Add a new rune container with an updated view mode to avoid scaling issues
@@ -249,7 +268,7 @@ extension StoreHUD {
     func selectedRune(_ rune: Rune) {
         self.removedRune = rune
         storeMenuViewModel?.selectedRuneToReplace(rune)
-
+        
     }
     
     func deselctedRune() {
@@ -292,7 +311,7 @@ extension StoreHUD {
         runeContainerView?.run(SKAction.group([scaleAction, moveAction])) { [weak self] in
             self?.createRuneContainerView(mode: .storeHUD, playerData: self?.viewModel.previewPlayerData)
         }
-
+        
         
         /// remove the menu
         menu.removeFromParent()
@@ -331,7 +350,7 @@ extension StoreHUD {
         }
         
         let runeReplacementViewModel = RuneReplacementViewModel(newRune: rune, oldRune: nil)
-        storeMenuViewModel = StoreMenuViewModel(title: "Rune Slots Full", body: "Select a rune to replace\nYou can reverse your decision", backgroundColor: .lightBarPurple, mode: .runeReplacement(runeReplacementViewModel), buttonAction: ButtonAction(button: .runeReplaceCancel, action: canceled), secondaryButtonAction: ButtonAction(button: .runeReplaceConfirm, action: cofirmed))
+        storeMenuViewModel = StoreMenuViewModel(title: "Rune Slots Full", body: "Tap a rune in your pickaxe handle", backgroundColor: .lightBarPurple, mode: .runeReplacement(runeReplacementViewModel), buttonAction: ButtonAction(button: .runeReplaceCancel, action: canceled), secondaryButtonAction: ButtonAction(button: .runeReplaceConfirm, action: cofirmed))
         let swapRunes = StoreMenuView(viewModel: storeMenuViewModel!, size: CGSize(width: contentView.frame.width * 0.9, height: 800.0))
         swapRunes.position = CGPoint.alignHorizontally(swapRunes.frame, relativeTo: contentView.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.more)
         swapRunes.zPosition = Precedence.flying.rawValue

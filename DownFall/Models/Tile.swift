@@ -331,8 +331,9 @@ enum TileType: Hashable, CaseIterable, Decodable {
 extension TileType {
     var humanReadable: String {
         switch self {
-        case .rock:
-            return "rock"
+        case .rock(let color):
+            //TODO: this might have some consequences
+            return "\(color.humanReadable) rock"
         case .pillar(let data):
             return "\(data.color.humanReadable) pillar"
         case .player(let data):

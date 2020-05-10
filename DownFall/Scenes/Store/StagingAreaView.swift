@@ -46,6 +46,7 @@ class StagingAreaView: SKSpriteNode {
     struct Constants {
         static let offerSize: CGSize = .oneFifty
         static let selectionAreaToTierOnePadding = CGFloat(200)
+        static let dragThreshold = CGFloat(15.0)
     }
     
     var stagingTierViewModels: [StagingTierViewModel] = []
@@ -68,12 +69,11 @@ class StagingAreaView: SKSpriteNode {
         return goalProgress.filter { $0.hasBeenRewarded }.count >= tier
     }
     
-    
     // tier 1 area
     private lazy var tierOneArea: StagingTierView = {
         // tier area
         let tier = 1
-        let vm = StagingTierViewModel(offers: viewModel.storeOffers.filter { $0.tier == tier }, tier: tier, unlocked: tierIsUnlocked(tier: tier, goalProgress: viewModel.goalProgress), touchDelegate: self, offerThatWasSelected: self.offerWasSelected)
+        let vm = StagingTierViewModel(offers: viewModel.storeOffers.filter { $0.tier == tier }, tier: tier, unlocked: tierIsUnlocked(tier: tier, goalProgress: viewModel.goalProgress), touchDelegate: self, offerThatWasSelected: self.offerWasSelected, offerWasTappedForInformation: storeOfferWasTappedForInformation)
         let tierOneArea = StagingTierView(viewModel: vm, size: CGSize(width: size.width, height: 300))
         tierOneArea.zPosition = Precedence.foreground.rawValue
         tierOneArea.position = CGPoint.alignHorizontally(tierOneArea.frame, relativeTo: stagingSelectionAreaView.frame, horizontalAnchor: .center, verticalAlign: .bottom)
@@ -86,7 +86,7 @@ class StagingAreaView: SKSpriteNode {
     private lazy var tierTwoArea: StagingTierView = {
         // tier area
         let tier = 2
-        let vm = StagingTierViewModel(offers: viewModel.storeOffers.filter { $0.tier == tier }, tier: tier, unlocked: tierIsUnlocked(tier: tier, goalProgress: viewModel.goalProgress), touchDelegate: self, offerThatWasSelected: self.offerWasSelected)
+        let vm = StagingTierViewModel(offers: viewModel.storeOffers.filter { $0.tier == tier }, tier: tier, unlocked: tierIsUnlocked(tier: tier, goalProgress: viewModel.goalProgress), touchDelegate: self, offerThatWasSelected: self.offerWasSelected, offerWasTappedForInformation: storeOfferWasTappedForInformation)
         let tierTwoArea = StagingTierView(viewModel: vm, size: CGSize(width: size.width, height: 300))
         tierTwoArea.zPosition = Precedence.foreground.rawValue
         tierTwoArea.position = CGPoint.alignHorizontally(tierTwoArea.frame, relativeTo: tierOneArea.frame, horizontalAnchor: .center, verticalAlign: .bottom, translatedToBounds: true)
@@ -153,7 +153,20 @@ class StagingAreaView: SKSpriteNode {
         viewModel.offerWasUnstagedByXButton?(offer)
     }
     
+    func storeOfferWasTappedForInformation(_ offer: StoreOffer) {
+        let storeMenuViewModel = StoreMenuViewModel(title: offer.title, body: offer.description, backgroundColor: .lightBarPurple, mode: .offerDescription, buttonAction: ButtonAction(button: .okay, action: closeInformationalPopup))
+        let storeMenu = StoreMenuView(viewModel: storeMenuViewModel, size: CGSize(width: self.contentView.frame.width * 0.9, height: 600.0))
+        storeMenu.zPosition = Precedence.flying.rawValue
+        contentView.addChild(storeMenu)
+        
+    }
+    
+    func closeInformationalPopup(_ storeMenuView: StoreMenuView) {
+        storeMenuView.removeFromParent()
+    }
+    
     // MARK: Touch Events
+
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch  = touches.first else { return }
         let point = touch.location(in: self.contentView)

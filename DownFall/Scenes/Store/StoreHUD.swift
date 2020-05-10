@@ -25,6 +25,8 @@ class StoreHUD: SKSpriteNode {
     private var healthBarContainer: SKSpriteNode?
     private var runeContainerView: RuneContainerView?
     var storeMenuViewModel: StoreMenuViewModel?
+    var removedRune: Rune?
+    var swapRunesMenuView: StoreMenuView?
     
     var halfWidth: CGFloat {
         return size.width/2
@@ -88,8 +90,6 @@ class StoreHUD: SKSpriteNode {
         runeContainerView = pickaxeView
         contentView.addChildSafely(runeContainerView)
     }
-    
-    var removedRune: Rune?
     
     func selectedRune(_ rune: Rune) {
         self.removedRune = rune
@@ -179,9 +179,10 @@ class StoreHUD: SKSpriteNode {
         let runeReplacementViewModel = RuneReplacementViewModel(newRune: rune, oldRune: nil)
         storeMenuViewModel = StoreMenuViewModel(title: "Rune Slots Full", body: "Select a rune to replace\nYou can reverse your decision", backgroundColor: .lightBarPurple, mode: .runeReplacement(runeReplacementViewModel), buttonAction: ButtonAction(button: .runeReplaceCancel, action: canceled), secondaryButtonAction: ButtonAction(button: .runeReplaceConfirm, action: cofirmed))
         let swapRunes = StoreMenuView(viewModel: storeMenuViewModel!, size: CGSize(width: contentView.frame.width * 0.9, height: 800.0))
-        swapRunes.position = CGPoint.alignHorizontally(swapRunes.frame, relativeTo: contentView.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: 200.0)
-        swapRunes.zPosition = Precedence.floating.rawValue
+        swapRunes.position = CGPoint.alignHorizontally(swapRunes.frame, relativeTo: contentView.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.more)
+        swapRunes.zPosition = Precedence.flying.rawValue
         addChildSafely(swapRunes)
+        swapRunesMenuView = swapRunes
     }
     
     func removedEffect(_ effect: EffectModel) {
@@ -209,6 +210,7 @@ class StoreHUD: SKSpriteNode {
             }
         case .pickaxe:
             self.createRuneContainerView(mode: .storeHUD, playerData: viewModel.previewPlayerData)
+            swapRunesMenuView?.removeFromParent()
         default: ()
         }
 

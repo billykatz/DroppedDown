@@ -16,5 +16,6 @@ enum Precedence: CGFloat {
     case menu = 20
     case aboveMenu = 30
     case floating = 100
+    case flying = 200
 }
 

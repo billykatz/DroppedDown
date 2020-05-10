@@ -8,6 +8,93 @@
 
 import SpriteKit
 
+class StagingSelectedOfferView: SKSpriteNode {
+    var storeOffer: StoreOffer?
+    let contentView: SKSpriteNode
+    var offerWasRemoved: (StoreOffer) -> ()
+    
+    
+    struct Constants {
+//        static let goalPadding = CGFloat(50.0)
+        static let goalSize = CGSize.oneFifty
+        static let cornerRadius = CGFloat(5.0)
+        static let shapeName = "shapeName"
+        static let closeName = "closeName"
+    }
+    
+    init(storeOffer: StoreOffer?, size: CGSize, offerWasRemoved: @escaping (StoreOffer) -> ()) {
+        self.storeOffer = storeOffer
+        self.contentView = SKSpriteNode(color: .clear, size: size)
+        self.offerWasRemoved = offerWasRemoved
+        super.init(texture: nil, color: .clear, size: size)
+        
+        addChild(contentView)
+        self.zPosition = Precedence.aboveMenu.rawValue
+        
+        setupView()
+        
+        self.isUserInteractionEnabled = true
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func update(with offer: StoreOffer) {
+        removeOffer()
+        let offerSprite = offer.sprite
+        
+        /// grab the position that we saved earlier in setupOfferSlots
+        offerSprite.size = .oneFifty
+        offerSprite.zPosition = Precedence.aboveMenu.rawValue
+        
+        let xButtonEnlarger = SKSpriteNode(color: .clear, size: .oneHundred)
+        let xButton = SKSpriteNode(texture: SKTexture(imageNamed: "buttonNegativeWhiteX"), size: CGSize(width: 35.0, height: 35.0))
+        xButton.position = CGPoint.position(xButton.frame, inside: offerSprite.frame, verticalAlign: .top, horizontalAnchor: .right)
+        xButton.zPosition = Precedence.aboveMenu.rawValue
+        xButtonEnlarger.addChild(xButton)
+        
+        xButtonEnlarger.name = Constants.closeName
+        offerSprite.addChild(xButtonEnlarger)
+        /// add the sprite
+        contentView.addChildSafely(offerSprite)
+        
+        self.storeOffer = offer
+
+    }
+    
+    func removeOffer() {
+        contentView.removeAllChildren(exclude: [Constants.shapeName])
+    }
+    
+    private func setupView() {
+        let shape = SKShapeNode(rect:
+            CGRect(x: -Constants.goalSize.width/2,
+                     y: -Constants.goalSize.height/2,
+                     width: Constants.goalSize.width,
+                     height: Constants.goalSize.height),
+                cornerRadius: Constants.cornerRadius)
+        shape.name = Constants.shapeName
+        shape.zPosition = Precedence.menu.rawValue
+        contentView.addChild(shape)
+    }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = touches.first, let offer = self.storeOffer else { return }
+        let positionInScene = touch.location(in: self.contentView)
+        let nodes = contentView.nodes(at: positionInScene)
+        
+        for node in nodes {
+            if node.name?.contains(Constants.closeName) ?? false {
+                offerWasRemoved(offer)
+                contentView.removeAllChildren(exclude: [Constants.shapeName])
+                
+            }
+        }
+
+    }
+}
+
 class StagingSelectionAreaViewModel {
     let unlockedGoals: Int
     var selectedOffers: [StoreOffer]
@@ -16,6 +103,9 @@ class StagingSelectionAreaViewModel {
     // input from outside
     var offerWasSelected: (StoreOffer) -> () = { _ in }
     var offerWasDeselected: (StoreOffer) -> () = { _ in }
+    
+    /// output
+    var offerWasCanceled: (StoreOffer) -> () = { _ in }
     
     init(unlockedGoals: Int, selectedOffers: [StoreOffer]) {
         self.unlockedGoals = unlockedGoals
@@ -35,6 +125,9 @@ class StagingSelectionAreaView: SKSpriteNode {
     let viewModel: StagingSelectionAreaViewModel
     let contentView: SKSpriteNode
     var offerSprite: SKSpriteNode?
+    var selectedOffers: [StoreOffer] = []
+    var stagingSelectedOfferViews: [StagingSelectedOfferView] = []
+
     
     init(viewModel: StagingSelectionAreaViewModel, size: CGSize) {
         self.viewModel = viewModel
@@ -55,37 +148,14 @@ class StagingSelectionAreaView: SKSpriteNode {
     }
     
     func offerWasSelected(_ storeOffer: StoreOffer) {
-        /// we create a texture name based off the base name and the store offer tier
-        let offerSpriteTierName = "\(Constants.offerSpriteNameBase)\(storeOffer.tier)"
-        
-        /// remove the offer sprite from the position
-        contentView.removeChild(with: offerSpriteTierName)
-        offerSprite = storeOffer.sprite
-        
-        /// grab the position that we saved earlier in setupOfferSlots
-        offerSprite?.position = offerPositions[storeOffer.tier-1]
-        offerSprite?.size = .oneFifty
-        offerSprite?.zPosition = Precedence.aboveMenu.rawValue
-        
-        /// set the name so we can remove it later
-        offerSprite?.name = offerSpriteTierName
-        
-        /// add the sprite
-        contentView.addChildSafely(offerSprite)
+        stagingSelectedOfferViews[storeOffer.tierIndex].update(with: storeOffer)
     }
     
     
     // remove the sprite of the offer from the stagin area
     func offerWasDeselected(_ storeOffer: StoreOffer) {
-        /// we create a texture name based off the base name and the store offer tier
-        let offerSpriteTierName = "\(Constants.offerSpriteNameBase)\(storeOffer.tier)"
-        
-        /// remove the offer sprite from the position
-        contentView.removeChild(with: offerSpriteTierName)
-        offerSprite = nil
+        stagingSelectedOfferViews[storeOffer.tierIndex].removeOffer()
     }
-    
-    var offerPositions: [CGPoint] = []
     
     func setupOfferSlots() {
         
@@ -94,17 +164,21 @@ class StagingSelectionAreaView: SKSpriteNode {
         let divisor = CGFloat(viewModel.unlockedGoals+1)
         for idx in 0..<viewModel.unlockedGoals {
             
-            let x = -width/2 + (CGFloat(idx) * width/divisor) + CGFloat(width/divisor) - (Constants.goalSize.width/2)
-            let y = -height/2
-            let shape = SKShapeNode(rect: CGRect(x: x,
-                                                 y: y,
-                                                 width: Constants.goalSize.width,
-                                                 height: Constants.goalSize.height),
-                                    cornerRadius: Constants.cornerRadius)
-            offerPositions.append(CGPoint(x: x+(Constants.goalSize.width/2), y: y+(Constants.goalSize.height/2)))
-            shape.zPosition = Precedence.menu.rawValue
-            contentView.addChild(shape)
+            let x = -width/2 + (CGFloat(idx) * width/divisor) + CGFloat(width/divisor)
+            let y = -height/2 + Constants.goalSize.height/2
+            let stagingSelectedOfferView = StagingSelectedOfferView(storeOffer: nil, size: Constants.goalSize, offerWasRemoved: self.offerWasRemoved)
+            stagingSelectedOfferView.position = CGPoint(x: x, y: y)
+            
+            // add to scene
+            contentView.addChild(stagingSelectedOfferView)
+            
+            //save for later
+            stagingSelectedOfferViews.append(stagingSelectedOfferView)
         }
+    }
+    
+    func offerWasRemoved(offer: StoreOffer) {
+        viewModel.offerWasCanceled(offer)
     }
     
     func setupBackground() {

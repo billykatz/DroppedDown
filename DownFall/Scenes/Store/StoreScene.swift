@@ -77,9 +77,14 @@ class StoreScene: SKScene {
         super.init(size: playableRect.size)
         
         //set up call backs
+        //staging area call backs
         stagingViewModel.offerWasStaged = self.offerWasStaged
+        stagingViewModel.offerWasUnstagedByXButton = self.offerWasUnstagedByXButton
+        
+        // store HUD call backs
         storeHUDViewModel.effectUseCanceled = self.effectUseCanceled
         storeHUDViewModel.runeRelacedChanged = self.runeReplacedChanged
+        
         /// Position and add the store hud
         storeHUD.position = CGPoint.position(storeHUD.frame, centeredInTopOf: playableRect, verticalOffset: Style.Padding.safeArea)
         storeHUD.zPosition = Precedence.foreground.rawValue
@@ -132,6 +137,12 @@ class StoreScene: SKScene {
             lastEffect = last
         }
         storeHUDViewModel.add(effect: first, remove: lastEffect)
+    }
+    
+    func offerWasUnstagedByXButton(offer: StoreOffer) {
+        let effects = offerEffectTranslator.translate(offers: [offer])
+        guard let first = effects.first else { return }
+        storeHUDViewModel.remove(effect: first)
     }
 }
 

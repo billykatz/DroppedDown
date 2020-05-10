@@ -27,6 +27,7 @@ class StagingAreaViewModel: StagingAreaViewModelable {
     
     // output
     var offerWasStaged: ((StoreOffer, StoreOffer?) -> ())? = nil
+    var offerWasUnstagedByXButton: ((StoreOffer) -> ())? = nil
     
     // input offer was unstage
     //TODO: need to figure out a way to translate an effect model back into a store offer
@@ -57,6 +58,10 @@ class StagingAreaView: SKSpriteNode {
     /// selection area
     let stagingSelectionAreaView: StagingSelectionAreaView
     
+    /// Touch property
+    private var spriteToMove: SKSpriteNode?
+    private var selectedSpritesOriginalPosition: CGPoint? = nil
+    
     func tierIsUnlocked(tier: Int, goalProgress: [GoalTracking]) -> Bool {
         /// TODO: reset when done testing
         return true
@@ -72,6 +77,7 @@ class StagingAreaView: SKSpriteNode {
         let tierOneArea = StagingTierView(viewModel: vm, size: CGSize(width: size.width, height: 300))
         tierOneArea.zPosition = Precedence.foreground.rawValue
         tierOneArea.position = CGPoint.alignHorizontally(tierOneArea.frame, relativeTo: stagingSelectionAreaView.frame, horizontalAnchor: .center, verticalAlign: .bottom)
+        
         stagingTierViewModels.append(vm)
         return tierOneArea
     }()
@@ -88,10 +94,6 @@ class StagingAreaView: SKSpriteNode {
         return tierTwoArea
     }()
     
-    /// Touch property
-    private var spriteToMove: SKSpriteNode?
-    private var selectedSpritesOriginalPosition: CGPoint? = nil
-    
     
     init(viewModel: StagingAreaViewModel, size: CGSize) {
         self.viewModel = viewModel
@@ -101,6 +103,7 @@ class StagingAreaView: SKSpriteNode {
         // selection area
         stagingSelectionAreaViewModel = StagingSelectionAreaViewModel(unlockedGoals: unlockedGoals, selectedOffers: [])
         stagingSelectionAreaView = StagingSelectionAreaView(viewModel: stagingSelectionAreaViewModel, size: CGSize(width: size.width, height: 250))
+        stagingSelectionAreaView.zPosition = Precedence.floating.rawValue
         stagingSelectionAreaView.position = CGPoint.position(stagingSelectionAreaView.frame, inside: contentView.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most)
         
         
@@ -112,6 +115,7 @@ class StagingAreaView: SKSpriteNode {
         // offer cancelation
         self.viewModel.offerWasUnstaged = self.offerWasUnselected
         self.viewModel.runeReplacedChanged = self.runeReplacedChanged
+        stagingSelectionAreaViewModel.offerWasCanceled = self.offerWasUnselected
         
         //user interaction
         self.isUserInteractionEnabled = true
@@ -144,12 +148,16 @@ class StagingAreaView: SKSpriteNode {
         
         // tell each tier
         stagingTierViewModels[offer.tier-1].offerWasDeselected(offer)
+        
+        // tell out parente
+        viewModel.offerWasUnstagedByXButton?(offer)
     }
     
     // MARK: Touch Events
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch  = touches.first else { return }
         let point = touch.location(in: self.contentView)
+        
         
         if stagingSelectionAreaView.contains(point.translate(yOffset: 50.0)) {
             /// tell all the staging tier view models that one of their offers was potentially selected.  Basically all viewModels will get a message that says, if you were moving a sprite, it is now selected

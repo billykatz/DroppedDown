@@ -122,6 +122,9 @@ class StagingTierView: SKSpriteNode {
     }
     
     func offerWasDeselected(_ offer: StoreOffer) {
+        replacedRuneSpriteConatiner?.removeFromParent()
+        replacedRuneSpriteConatiner = nil
+        
         for offer in viewModel.offers {
             for sprite in addedSprites {
                 if sprite.name == offer.textureName {
@@ -190,6 +193,7 @@ class StagingTierView: SKSpriteNode {
             if sprite.contains(point) && !sprite.isHidden {
                 selectedSpritesOriginalPosition = sprite.position
                 spriteToMove = sprite
+                spriteToMove?.zPosition = Precedence.floating.rawValue
             }
         }
     }
@@ -216,9 +220,6 @@ class StagingTierView: SKSpriteNode {
             spriteToMove?.run(action)
             spriteToMove = nil
         }
-        
-        
     }
-    
 }
 

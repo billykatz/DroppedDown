@@ -9,7 +9,7 @@
 import CoreGraphics
 
 extension CGSize {
-    
+    static var twentyFive = CGSize(width: 25, height: 25)
     static var fifty = CGSize(width: 50, height: 50)
     static var oneHundred = CGSize(width: 100, height: 100)
     static var oneFifty = CGSize(width: 150, height: 150)

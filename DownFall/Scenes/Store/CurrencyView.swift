@@ -42,10 +42,10 @@ class CurrencyView: SKSpriteNode {
         let currencyParagraph = ParagraphNode(text: "\(viewModel.amount)", paragraphWidth: self.frame.maxX - currencySprite.frame.maxX)
         
         currencySprite.position = CGPoint.position(currencySprite.frame, inside: self.frame, verticalAlign: .center, horizontalAnchor: .left)
-        currencySprite.zPosition = Precedence.menu.rawValue
+        currencySprite.zPosition = Precedence.foreground.rawValue
         
         currencyParagraph.position = CGPoint.alignVertically(currencyParagraph.frame, relativeTo: currencySprite.frame, horizontalAnchor: .right, verticalAlign: .center, translatedToBounds: true)
-        currencyParagraph.zPosition = Precedence.menu.rawValue
+        currencyParagraph.zPosition = Precedence.foreground.rawValue
         
         addChild(currencySprite)
         addChild(currencyParagraph)

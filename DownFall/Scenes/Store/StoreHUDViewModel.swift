@@ -51,9 +51,24 @@ class StoreHUDViewModel: StoreHUDViewModelable {
     
     var removedRune: Rune?
     
-    func remove(effect: EffectModel) {
+    private func addBackRemovedRuneAndRemoveRuneEffect(_ effect: EffectModel) {
+        basePlayerData = basePlayerData.addRune(removedRune)
+        removedRune = nil
+        
         basePlayerData = basePlayerData.removeEffect(effect)
         removedEffect(effect)
+    }
+    
+    func remove(effect: EffectModel) {
+        if effect.kind == .rune {
+            /// add back the remove rune
+            addBackRemovedRuneAndRemoveRuneEffect(effect)
+
+
+        } else {
+            removedEffect(effect)
+            basePlayerData = basePlayerData.removeEffect(effect)
+        }
     }
     
     func add(effect: EffectModel, remove otherEffect: EffectModel?) {
@@ -62,11 +77,7 @@ class StoreHUDViewModel: StoreHUDViewModelable {
             if otherEffect.rune != nil {
                 /// this means we have replaced the rune in the staging area with another offer
                 /// add back the remove rune
-                basePlayerData = basePlayerData.addRune(removedRune)
-                removedRune = nil
-                /// now remove the rune otherEffect from the player data
-                basePlayerData = basePlayerData.removeEffect(otherEffect)
-                removedEffect(otherEffect)
+                addBackRemovedRuneAndRemoveRuneEffect(otherEffect)
             }
             /// We need to update the UI first to capture the pre-removed effect player data
             else {

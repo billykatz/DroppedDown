@@ -18,6 +18,7 @@ class StoreHUD: SKSpriteNode {
     struct Constants {
         static let currentHealthLabelName = "currentHealthLabelName"
         static let totalHealthLabelName = "totalHealthLabelName"
+        static let healthBarName = "healthBarName"
     }
     
     private var viewModel: StoreHUDViewModel
@@ -63,6 +64,160 @@ class StoreHUD: SKSpriteNode {
         addChild(contentView)
     }
     
+    func removedEffect(_ effect: EffectModel) {
+        switch effect.stat {
+        case .health:
+            if let healthBarContainer = healthBarContainer,
+                let currentHealthLabel = healthBarContainer.childNode(withName: Constants.currentHealthLabelName) as? ParagraphNode,
+            let healthBar = healthBarContainer.childNode(withName: Constants.healthBarName) as? FillableBar{
+                
+                //redraw the health bar
+                redrawHealthBarNode(healthBar, currentHealth: viewModel.baseHealth, totalHealth: viewModel.totalHealth)
+                
+                animate(parentNode: healthBarContainer,
+                        paragraphNode: currentHealthLabel,
+                        start: viewModel.previewPlayerData.hp,
+                        difference: -(viewModel.previewPlayerData.hp - viewModel.baseHealth))
+                { [weak self] (newHealthLabel) in
+                    self?.healthBarContainer?.addChild(newHealthLabel)
+                }
+            }
+        case .maxHealth:
+            if let healthBarContainer = healthBarContainer, let totalHealthLabel = healthBarContainer.childNode(withName: Constants.totalHealthLabelName) as? ParagraphNode,
+                let healthBar = healthBarContainer.childNode(withName: Constants.healthBarName) as? FillableBar{
+                
+                
+                //redraw the health bar
+                redrawHealthBarNode(healthBar, currentHealth: viewModel.baseHealth, totalHealth: viewModel.totalHealth)
+                
+                animate(parentNode: healthBarContainer,
+                        paragraphNode: totalHealthLabel,
+                        start: viewModel.previewPlayerData.originalHp,
+                        difference: -effect.amount)
+                { [weak self] (newHealthLabel) in
+                    self?.healthBarContainer?.addChild(newHealthLabel)
+                }
+            }
+        case .pickaxe:
+            self.createRuneContainerView(mode: .storeHUD, playerData: viewModel.previewPlayerData)
+            swapRunesMenuView?.removeFromParent()
+        default: ()
+        }
+
+    }
+    
+    func addedEffect(_ effect: EffectModel) {
+        switch effect.stat {
+        case .health:
+            if let healthBarContainer = healthBarContainer, let currentHealthLabel = healthBarContainer.childNode(withName: Constants.currentHealthLabelName) as? ParagraphNode,
+                let healthBar = healthBarContainer.childNode(withName: Constants.healthBarName) as? FillableBar
+                {
+                    
+                
+                //redraw the health bar
+                redrawHealthBarNode(healthBar, currentHealth: viewModel.previewPlayerData.hp, totalHealth: viewModel.previewPlayerData.originalHp)
+                
+                
+                
+                animate(parentNode: healthBarContainer,
+                        paragraphNode: currentHealthLabel,
+                        start: viewModel.baseHealth,
+                        difference: viewModel.previewPlayerData.hp - viewModel.baseHealth)
+                { [weak self] (newHealthLabel) in
+                    self?.healthBarContainer?.addChild(newHealthLabel)
+                }
+            }
+        case .maxHealth:
+            if let healthBarContainer = healthBarContainer,
+                let totalHealthLabel = healthBarContainer.childNode(withName: Constants.totalHealthLabelName) as? ParagraphNode,
+                let healthBar = healthBarContainer.childNode(withName: Constants.healthBarName) as? FillableBar
+            {
+                //redraw the health bar
+                redrawHealthBarNode(healthBar, currentHealth: viewModel.previewPlayerData.hp, totalHealth: viewModel.previewPlayerData.originalHp)
+                
+                // animate the numbers
+                animate(parentNode: healthBarContainer,
+                        paragraphNode: totalHealthLabel,
+                        start: viewModel.totalHealth,
+                        difference: effect.amount)
+                { [weak self] (newHealthLabel) in
+                    self?.healthBarContainer?.addChild(newHealthLabel)
+                }
+            }
+        case .pickaxe:
+            /// if the player has reach the max number of runes, make the pickaxe larger and trigger a replace rune flow
+            self.createRuneContainerView(mode: .storeHUD, playerData: viewModel.previewPlayerData)
+        default: ()
+        }
+    }
+    
+    func redrawHealthBarNode(_ healthBar: SKSpriteNode, currentHealth: Int, totalHealth: Int) {
+        let oldPosition = healthBar.position
+        healthBar.removeFromParent()
+        let newHealthBar = FillableBar(size: quarterSize.scale(by: 0.25), viewModel: FillableBarViewModel(total: totalHealth, progress: currentHealth, fillColor: .red, backgroundColor: nil, text: nil, horiztonal: true))
+        newHealthBar.position = oldPosition
+        newHealthBar.zPosition = Precedence.menu.rawValue
+        newHealthBar.name = Constants.healthBarName
+        self.healthBarContainer?.addChild(newHealthBar)
+    }
+    
+    func updateHUD() {
+        
+    }
+    
+    func setupContentView(size: CGSize) {
+        contentView.removeAllChildren()
+        
+        let heartNode = SKSpriteNode(texture: SKTexture(imageNamed: Identifiers.fullHeart), size: Style.HUD.heartSize)
+        heartNode.position = CGPoint.position(heartNode.frame, inside: healthBarContainer?.frame, verticalAlign: .center, horizontalAnchor: .left)
+        
+        let healthBar = FillableBar(size: quarterSize.scale(by: 0.25), viewModel: FillableBarViewModel(total: viewModel.totalHealth, progress: viewModel.baseHealth, fillColor: .red, backgroundColor: nil, text: nil, horiztonal: true))
+        healthBar.position = CGPoint.alignVertically(healthBar.frame, relativeTo: heartNode.frame, horizontalAnchor: .right, verticalAlign: .center, translatedToBounds: true)
+        healthBar.zPosition = Precedence.menu.rawValue
+        healthBar.name = Constants.healthBarName
+        
+        let healthBarContainerMaxX = healthBarContainer?.frame.maxX ?? 0
+        
+        let currentHealthParagraph = ParagraphNode(text: "\(viewModel.baseHealth)", paragraphWidth: healthBarContainerMaxX - healthBar.frame.maxX)
+        let outOfParagraph = ParagraphNode(text: "/", paragraphWidth: healthBarContainerMaxX - healthBar.frame.maxX)
+        let totalHealthParagraph = ParagraphNode(text: "\(viewModel.totalHealth)", paragraphWidth: healthBarContainerMaxX - healthBar.frame.maxX)
+
+        currentHealthParagraph.position = CGPoint.alignVertically(currentHealthParagraph.frame, relativeTo: healthBar.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: Style.Padding.more, translatedToBounds: true)
+        currentHealthParagraph.name = Constants.currentHealthLabelName
+        
+        outOfParagraph.position = CGPoint.alignVertically(outOfParagraph.frame, relativeTo: currentHealthParagraph.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: Style.Padding.more, translatedToBounds: true)
+        
+        totalHealthParagraph.position = CGPoint.alignVertically(totalHealthParagraph.frame, relativeTo: outOfParagraph.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: Style.Padding.normal, translatedToBounds: true)
+        totalHealthParagraph.name = Constants.totalHealthLabelName
+        
+        healthBarContainer?.addChild(currentHealthParagraph)
+        healthBarContainer?.addChild(outOfParagraph)
+        healthBarContainer?.addChild(totalHealthParagraph)
+        healthBarContainer?.addChild(heartNode)
+        healthBarContainer?.addChild(healthBar)
+        healthBarContainer?.position = CGPoint.position(healthBarContainer?.frame, inside: contentView.frame, verticalAlign: .bottom, horizontalAnchor: .right)
+        addChildSafely(healthBarContainer)
+        
+        
+        /// Currency View
+        let currencyView = CurrencyView(viewModel: CurrencyViewModel(currency: .gem, amount: viewModel.totalGems), size: CGSize(width: halfWidth, height: halfHeight))
+        currencyView.position = CGPoint.position(currencyView.frame, inside: contentView.frame, verticalAlign: .top, horizontalAnchor: .right)
+        addChild(currencyView)
+        
+        /// Pickaxe View
+        self.createRuneContainerView(mode: .storeHUD, playerData: self.viewModel.previewPlayerData)
+        
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    
+}
+
+// MARK: Rune Replacement
+extension StoreHUD {
     func createRuneContainerView(mode: ViewMode, playerData: EntityModel?) {
         let fullSize = contentView.size
         
@@ -93,7 +248,6 @@ class StoreHUD: SKSpriteNode {
     
     func selectedRune(_ rune: Rune) {
         self.removedRune = rune
-        
         storeMenuViewModel?.selectedRuneToReplace(rune)
 
     }
@@ -184,119 +338,4 @@ class StoreHUD: SKSpriteNode {
         addChildSafely(swapRunes)
         swapRunesMenuView = swapRunes
     }
-    
-    func removedEffect(_ effect: EffectModel) {
-        switch effect.stat {
-        case .health:
-            if let healthBarContainer = healthBarContainer,
-                let currentHealthLabel = healthBarContainer.childNode(withName: Constants.currentHealthLabelName) as? ParagraphNode {
-                animate(parentNode: healthBarContainer,
-                        paragraphNode: currentHealthLabel,
-                        start: viewModel.previewPlayerData.hp,
-                        difference: -(viewModel.previewPlayerData.hp - viewModel.baseHealth))
-                { [weak self] (newHealthLabel) in
-                    self?.healthBarContainer?.addChild(newHealthLabel)
-                }
-            }
-        case .maxHealth:
-            if let healthBarContainer = healthBarContainer, let totalHealthLabel = healthBarContainer.childNode(withName: Constants.totalHealthLabelName) as? ParagraphNode {
-                animate(parentNode: healthBarContainer,
-                        paragraphNode: totalHealthLabel,
-                        start: viewModel.previewPlayerData.originalHp,
-                        difference: -effect.amount)
-                { [weak self] (newHealthLabel) in
-                    self?.healthBarContainer?.addChild(newHealthLabel)
-                }
-            }
-        case .pickaxe:
-            self.createRuneContainerView(mode: .storeHUD, playerData: viewModel.previewPlayerData)
-            swapRunesMenuView?.removeFromParent()
-        default: ()
-        }
-
-    }
-    
-    func addedEffect(_ effect: EffectModel) {
-        switch effect.stat {
-        case .health:
-            if let healthBarContainer = healthBarContainer, let currentHealthLabel = healthBarContainer.childNode(withName: Constants.currentHealthLabelName) as? ParagraphNode {
-                animate(parentNode: healthBarContainer,
-                        paragraphNode: currentHealthLabel,
-                        start: viewModel.baseHealth,
-                        difference: viewModel.previewPlayerData.hp - viewModel.baseHealth)
-                { [weak self] (newHealthLabel) in
-                    self?.healthBarContainer?.addChild(newHealthLabel)
-                }
-            }
-        case .maxHealth:
-            if let healthBarContainer = healthBarContainer,
-                let totalHealthLabel = healthBarContainer.childNode(withName: Constants.totalHealthLabelName) as? ParagraphNode {
-                animate(parentNode: healthBarContainer,
-                        paragraphNode: totalHealthLabel,
-                        start: viewModel.totalHealth,
-                        difference: effect.amount)
-                { [weak self] (newHealthLabel) in
-                    self?.healthBarContainer?.addChild(newHealthLabel)
-                }
-            }
-        case .pickaxe:
-            /// if the player has reach the max number of runes, make the pickaxe larger and trigger a replace rune flow
-            self.createRuneContainerView(mode: .storeHUD, playerData: viewModel.previewPlayerData)
-        default: ()
-        }
-    }
-    
-    func updateHUD() {
-        
-    }
-    
-    func setupContentView(size: CGSize) {
-        contentView.removeAllChildren()
-        
-        let heartNode = SKSpriteNode(texture: SKTexture(imageNamed: Identifiers.fullHeart), size: Style.HUD.heartSize)
-        heartNode.position = CGPoint.position(heartNode.frame, inside: healthBarContainer?.frame, verticalAlign: .center, horizontalAnchor: .left)
-        
-        let healthBar = FillableBar(size: quarterSize.scale(by: 0.25), viewModel: FillableBarViewModel(total: viewModel.totalHealth, progress: viewModel.baseHealth, fillColor: .red, backgroundColor: nil, text: nil, horiztonal: true))
-        healthBar.position = CGPoint.alignVertically(healthBar.frame, relativeTo: heartNode.frame, horizontalAnchor: .right, verticalAlign: .center, translatedToBounds: true)
-        healthBar.zPosition = Precedence.menu.rawValue
-        
-        let healthBarContainerMaxX = healthBarContainer?.frame.maxX ?? 0
-        
-        let currentHealthParagraph = ParagraphNode(text: "\(viewModel.baseHealth)", paragraphWidth: healthBarContainerMaxX - healthBar.frame.maxX)
-        let outOfParagraph = ParagraphNode(text: "/", paragraphWidth: healthBarContainerMaxX - healthBar.frame.maxX)
-        let totalHealthParagraph = ParagraphNode(text: "\(viewModel.totalHealth)", paragraphWidth: healthBarContainerMaxX - healthBar.frame.maxX)
-
-        currentHealthParagraph.position = CGPoint.alignVertically(currentHealthParagraph.frame, relativeTo: healthBar.frame, horizontalAnchor: .right, verticalAlign: .center, translatedToBounds: true)
-        currentHealthParagraph.name = Constants.currentHealthLabelName
-        
-        outOfParagraph.position = CGPoint.alignVertically(outOfParagraph.frame, relativeTo: currentHealthParagraph.frame, horizontalAnchor: .right, verticalAlign: .center)
-        
-        totalHealthParagraph.position = CGPoint.alignVertically(totalHealthParagraph.frame, relativeTo: outOfParagraph.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: Style.Padding.most)
-        totalHealthParagraph.name = Constants.totalHealthLabelName
-        
-        healthBarContainer?.addChild(currentHealthParagraph)
-        healthBarContainer?.addChild(outOfParagraph)
-        healthBarContainer?.addChild(totalHealthParagraph)
-        healthBarContainer?.addChild(heartNode)
-        healthBarContainer?.addChild(healthBar)
-        healthBarContainer?.position = CGPoint.position(healthBarContainer?.frame, inside: contentView.frame, verticalAlign: .bottom, horizontalAnchor: .right)
-        addChildSafely(healthBarContainer)
-        
-        
-        /// Currency View
-        let currencyView = CurrencyView(viewModel: CurrencyViewModel(currency: .gem, amount: viewModel.totalGems), size: CGSize(width: halfWidth, height: halfHeight))
-        currencyView.position = CGPoint.position(currencyView.frame, inside: contentView.frame, verticalAlign: .top, horizontalAnchor: .right)
-        addChild(currencyView)
-        
-        /// Pickaxe View
-        self.createRuneContainerView(mode: .storeHUD, playerData: self.viewModel.previewPlayerData)
-        
-    }
-
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    
 }

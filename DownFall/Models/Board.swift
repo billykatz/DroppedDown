@@ -758,18 +758,11 @@ extension Board {
     
     
     private func monsterDied(at coord: TileCoord, input: Input) -> Transformation {
-        //TODO: remove the code that makes a monster drop gold.
-        //        if case let .monster(monsterData) = tiles[coord].type {
-        //            let gold = tileCreator.goldDropped(from: monsterData)
-        //            let item = Item(type: .gold, amount: gold * level.threatLevelController.threatLevel.color.goldDamageMultiplier)
-        //            let itemTile = TileType.item(item)
-        //            tiles[coord.x][coord.y] = Tile(type: itemTile)
-        //            //TODO: dont recreate the input
-        //            return Transformation(transformation: nil,
-        //                                  inputType: .monsterDies(coord, monsterData.type),
-        //                                  endTiles: tiles)
-        //        } else {
-        //no item! remove and replace
+        // When a monster dies, the player should reset the attack
+        // This isnt fool proof if we , but for the most part this will work
+        // This may lead to bugs if we introduce another way that players can attack
+        // But basically we should only reset attacks if the monster died directly from a player attack
+        
         guard let pp = playerPosition,
             case let .player(data) = tiles[pp].type
             else { return Transformation.zero }

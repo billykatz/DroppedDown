@@ -18,6 +18,11 @@ enum ButtonShape {
     case circle
 }
 
+enum ButtonType {
+    case text
+    case image
+}
+
 
 class Button: SKShapeNode {
     
@@ -33,6 +38,8 @@ class Button: SKShapeNode {
     static let inGameLarge = CGSize(width: 200, height: 160)
     
     weak var delegate: ButtonDelegate?
+    
+    var buttonType: ButtonType
     
     var identifier: ButtonIdentifier
     var originalBackground: UIColor = .clear
@@ -54,6 +61,7 @@ class Button: SKShapeNode {
     
     /// view that is the visual button
     var buttonView: SKShapeNode?
+    var grayOutButtonView: SKShapeNode?
     
     private var isDisabled: Bool = false
     
@@ -65,7 +73,7 @@ class Button: SKShapeNode {
          precedence: Precedence = Precedence.aboveMenu,
          showSelection: Bool = true,
          disable: Bool = false) {
-        
+        self.buttonType = .image
         self.delegate = delegate
         self.identifier = identifier
         self.showSelection = showSelection
@@ -93,6 +101,8 @@ class Button: SKShapeNode {
             let buttonPath = CGPath(ellipseIn: rectangle, transform: nil)
             self.buttonView = SKShapeNode(path: buttonPath)
             
+            
+            
         }
         
         // add the image
@@ -109,6 +119,19 @@ class Button: SKShapeNode {
         
         //enable/disable
         self.isDisabled = disable
+        
+        if disable {
+            if let grayOutShape = self.buttonView?.copy() as? SKShapeNode {
+                grayOutShape.color = .darkGray
+                addChild(grayOutShape)
+                grayOutShape.zPosition = Precedence.aboveMenu.rawValue
+                grayOutShape.alpha = 0.75
+                
+                removeShadow()
+                
+                grayOutButtonView = grayOutShape
+            }
+        }
         
         // set points for moving the button slightly
         unpressedPosition = self.frame.center
@@ -132,6 +155,7 @@ class Button: SKShapeNode {
          disable: Bool = false) {
         
         //Set properties
+        self.buttonType = .text
         self.delegate = delegate
         self.identifier = identifier
         self.showSelection = showSelection
@@ -247,9 +271,20 @@ extension Button {
     
     public func enable(_ on: Bool) {
         self.isDisabled = !on
-        buttonView?.color = on ? originalBackground : Constants.disabledBackgroundColor
-        if on { setupShadow() }
-        else { removeShadow() }
+        if buttonType == .text {
+            buttonView?.color = on ? originalBackground : Constants.disabledBackgroundColor
+            if on { setupShadow() }
+            else { removeShadow() }
+        } else {
+            if on {
+                grayOutButtonView?.removeFromParent()
+                setupShadow()
+            }
+            else {
+                addChildSafely(grayOutButtonView)
+                removeShadow()
+            }
+        }
     }
     
     func setupShadow() {

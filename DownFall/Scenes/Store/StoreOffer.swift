@@ -25,7 +25,10 @@ enum StoreOfferType: Equatable {
     case plusTwoMaxHealth
     case rune(Rune)
     case runeUpgrade
+    case runeSlot
     case gems(amount: Int)
+    case dodge
+    case luck
 }
 
 typealias StoreOfferTier = Int
@@ -56,4 +59,47 @@ struct StoreOffer {
     var tierIndex: Int {
         return tier - 1
     }
+    
+    static func offer(type: StoreOfferType, tier: StoreOfferTier) -> StoreOffer {
+        let title: String
+        let body: String
+        let textureName: String
+        switch type {
+        case .dodge:
+            textureName = "dodgeUp"
+            title = "Increase Dodge Chance"
+            body = "Increase your chance to dodge an enemy's attack by 5%"
+        case .fullHeal:
+            title = "Greater Healing Potion"
+            body = "Fully heals you."
+            textureName = "greaterHealingPotion"
+        case .gems(let amount):
+            title = "Gems"
+            body = "Gain \(amount) gems."
+            textureName = "crystals"
+        case .luck:
+            title = "Luck Up"
+            body = "Increase the number of gems your can find."
+            textureName = "luckUp"
+        case .plusTwoMaxHealth:
+            title = "Increase Max Health"
+            body = "Add 2 max health."
+            textureName = "twoMaxHealth"
+        case .rune(let rune):
+            title = rune.type.humanReadable
+            body = rune.fullDescription
+            textureName = rune.textureName
+        case .runeSlot:
+            title = "+1 Rune Slot"
+            body = "Add a rune slot to your pickaxe handle"
+            textureName = "runeSlot"
+        case .runeUpgrade:
+            title = "Rune Upgrade"
+            body = "Your runes will be better"
+            textureName = "trustMe"
+        }
+        
+        return StoreOffer(type: type, tier: tier, textureName: textureName, currency: .gem, title: title, body: body, startingPrice: 0)
+    }
 }
+

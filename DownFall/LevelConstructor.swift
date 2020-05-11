@@ -32,58 +32,112 @@ struct LevelConstructor {
         }
     }
     
-    static func storeOffer(per: LevelType, difficulty: Difficulty) -> [StoreOffer] {
-        return [StoreOffer(type: .fullHeal,
-                           tier: 1,
-                           textureName: "greaterHealingPotion",
-                           currency: .gem,
-                           title: "Greater Healing Potion",
-                           body: "Fully heals you",
-                           startingPrice: 0),
-                StoreOffer(type: .plusTwoMaxHealth,
-                           tier: 1,
-                           textureName: "twoMaxHealth",
-                           currency: .gem,
-                           title: "+2 Max Health",
-                           body: "Adds 2 max health",
-                           startingPrice: 0),
-                StoreOffer(type: .rune(Rune.rune(for: .getSwifty)),
-                           tier: 2,
-                           textureName: "getSwifty",
-                           currency: .gem,
-                           title: "Get Swifty",
-                           body: "Rune",
-                           startingPrice: 0),
-                StoreOffer(type: .gems(amount: 3),
-                           tier: 2,
-                           textureName: "crystals",
-                           currency: .gem,
-                           title: "Gems",
-                           body: "A reasonable amount of gems",
-                           startingPrice: 0)
+    static func storeOffer(per levelType: LevelType, difficulty: Difficulty) -> [StoreOffer] {
+        var storeOffers: [StoreOffer] = [
+            StoreOffer(type: .fullHeal, tier: 1, textureName: "greaterHealingPotion", currency: .gem, title: "Greater Healing Potion", body: "Fully heals you", startingPrice: 0),
+        
+            StoreOffer(type: .plusTwoMaxHealth, tier: 1, textureName: "twoMaxHealth", currency: .gem, title: "+2 Max Health", body: "Adds 2 max health", startingPrice: 0)
         ]
+        let getSwitfy = StoreOffer(type: .rune(Rune.rune(for: .getSwifty)), tier: 2, textureName: "getSwifty", currency: .gem, title: "Get Swifty", body: "Rune", startingPrice: 0)
         
+        let runeSlot = StoreOffer(type: .runeSlot, tier: 2, textureName: "runeSlot", currency: .gem, title: "Rune Slot", body: "Add an extra rune slot to your pickaxe", startingPrice: 0)
         
+        let dodgeUp = StoreOffer.offer(type: .dodge, tier: 2)
+        let luckUp = StoreOffer.offer(type: .luck, tier: 2)
+        switch levelType {
+        case .first:
+            storeOffers.append(getSwitfy)
+            storeOffers.append(runeSlot)
+        case .second:
+            storeOffers.append(contentsOf: [dodgeUp, luckUp])
+        case .third:
+            
+            let getSwifty = StoreOffer.offer(type: .rune(Rune.rune(for: .getSwifty)), tier: 3)
+            let rainEmbers = StoreOffer.offer(type: .rune(Rune.rune(for: .rainEmbers)), tier: 3)
+            
+            storeOffers.append(contentsOf: [dodgeUp, luckUp, getSwifty, rainEmbers])
+        case .fourth:
+            let runeSlot = StoreOffer.offer(type: .runeSlot, tier: 3)
+            let runeUpgrade = StoreOffer.offer(type: .runeUpgrade, tier: 3)
+            
+            storeOffers.append(contentsOf: [dodgeUp, luckUp, runeSlot, runeUpgrade])
+            
+        case .fifth:
+            storeOffers.append(getSwitfy)
+            storeOffers.append(runeSlot)
+        default: ()
+        }
+        return storeOffers
     }
     
     
-    static func maxSpawnGems(per: LevelType, difficulty: Difficulty) -> Int {
-        return 3
+    static func maxSpawnGems(per levelType: LevelType, difficulty: Difficulty) -> Int {
+        switch levelType {
+        case .first, .second, .third:
+            return 3
+        case .fourth, .fifth:
+            return 4
+        case .sixth, .seventh, .boss:
+            return 5
+        default:
+            return 0
+        }
     }
     
     
     
     static func numberOfGoalsNeedToUnlockExit(per: LevelType, difficulty: Difficulty) -> Int {
-        
         return 2
     }
     
     
-    static func levelGoal(per: LevelType, difficulty: Difficulty) -> [LevelGoal] {
+    static func levelGoal(per levelType: LevelType, difficulty: Difficulty) -> [LevelGoal] {
         let rockGoal = LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .rock(.purple), targetAmount: 10, minimumGroupSize: 5, grouped: true)
         let gemGoal = LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .gem, targetAmount: 3, minimumGroupSize: 1, grouped: false)
         let monsterGoal = LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .monster(.zeroedEntity(type: .rat)), targetAmount: 5, minimumGroupSize: 1, grouped: false)
-        return [rockGoal, gemGoal, monsterGoal]
+        
+        func randomRockGoal(_ colors: [Color], amount: Int, minimumGroupSize: Int) -> LevelGoal? {
+            guard let randomColor = colors.randomElement() else { return nil }
+            return LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .rock(randomColor), targetAmount: amount, minimumGroupSize: minimumGroupSize, grouped: minimumGroupSize > 1)
+        }
+        
+        switch levelType {
+        case .first:
+            let monsterGoal = LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .monster(.zeroedEntity(type: .rat)), targetAmount: 3, minimumGroupSize: 1, grouped: false)
+            if let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 25, minimumGroupSize: 1) {
+                return [rockGoal, monsterGoal]
+            }
+            return [monsterGoal]
+        case .second:
+            let monsterGoal = LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .monster(.zeroedEntity(type: .rat)), targetAmount: 5, minimumGroupSize: 1, grouped: false)
+            if let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 35, minimumGroupSize: 1) {
+                return [rockGoal, monsterGoal]
+            }
+            return [monsterGoal]
+        case .third:
+            let gemGoal = LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .gem, targetAmount: 3, minimumGroupSize: 1, grouped: false)
+            let pillarGoal = LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .pillar(PillarData(color: .blue, health: 1)), targetAmount: 2, minimumGroupSize: 1, grouped: false)
+            if let rockGoal = randomRockGoal([.red, .purple,. blue], amount: 8, minimumGroupSize: 4) {
+                return [gemGoal, pillarGoal, rockGoal]
+            }
+            return [gemGoal, pillarGoal]
+        case .fourth:
+            let gemGoal = LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .gem, targetAmount: 4, minimumGroupSize: 1, grouped: false)
+            let monsterGoal = LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .monster(.zeroedEntity(type: .rat)), targetAmount: 7, minimumGroupSize: 1, grouped: false)
+            if let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 10, minimumGroupSize: 4) {
+                return [gemGoal, rockGoal, monsterGoal]
+            }
+            return [gemGoal, monsterGoal]
+        case .fifth:
+            let monsterGoal = LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .monster(.zeroedEntity(type: .rat)), targetAmount: 10, minimumGroupSize: 1, grouped: false)
+            let runeGoal = LevelGoal(type: .useRune, reward: .gem(1), tileType: .empty, targetAmount: 3, minimumGroupSize: 1, grouped: false)
+            if let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 8, minimumGroupSize: 5) {
+                return [runeGoal, rockGoal, monsterGoal]
+            }
+            return [runeGoal, monsterGoal]
+        default:
+            return [rockGoal, gemGoal, monsterGoal]
+        }
     }
     
     static func buildTutorialLevels() -> [Level] {
@@ -108,7 +162,9 @@ struct LevelConstructor {
     
     static func boardSize(per levelType: LevelType, difficulty: Difficulty) -> Int {
         switch levelType {
-        case .first, .second:
+        case .first:
+            return 7
+        case .second:
             return 8
         case .third, .fourth:
             return 9
@@ -170,7 +226,17 @@ struct LevelConstructor {
         case .first, .second, .third, .fourth:
             let rocks = matchUp([.rock(.red), .rock(.blue), .rock(.purple)], range: normalRockRange, subRanges: 3)
             return rocks
-        case .fifth, .sixth, .seventh, .boss:
+        case .fifth:
+            let rocks = matchUp([.rock(.red), .rock(.blue), .rock(.purple), .rock(.brown)], range: normalRockRange, subRanges: 4)
+            return rocks
+            
+            let redRange = RangeModel(lower: 0, upper: 27)
+            let blueRange = redRange.next(27)
+            let purpleRange = blueRange.next(27)
+            let brownRange = purpleRange.next(15)
+            return [.rock(.red): redRange, .rock(.blue): blueRange, .rock(.purple): purpleRange, .rock(.brown): brownRange]
+
+        case .sixth, .seventh, .boss:
             let rocks = matchUp([.rock(.red), .rock(.blue), .rock(.purple), .rock(.brown)], range: normalRockRange, subRanges: 4)
             return rocks
         case .tutorial1, .tutorial2:

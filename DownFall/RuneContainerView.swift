@@ -100,6 +100,12 @@ class RuneContainerView: SKSpriteNode {
         toggleRuneSlots()
     }
     
+    public func enableButton(_ enabled: Bool) {
+        runeDetailView?.enableButton(enabled)
+    }
+    
+    var runeDetailView: RuneDetailView?
+    
     private func setupRuneDetailView(rune: Rune?, progress: Int) {
         let runeDetailView = RuneDetailView(viewModel: RuneDetailViewModel(rune: rune,
                                                                            progress: CGFloat(progress),
@@ -109,6 +115,7 @@ class RuneContainerView: SKSpriteNode {
                                             size: size)
         runeDetailView.name = Constants.runeDetailViewName
         addChild(runeDetailView)
+        self.runeDetailView = runeDetailView
     }
     
     private func toggleRuneSlots() {

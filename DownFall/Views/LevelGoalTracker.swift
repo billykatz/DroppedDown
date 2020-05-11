@@ -47,6 +47,8 @@ class LevelGoalTracker: LevelGoalTracking {
             goalUpdated?(goalProgress)
         case .runeProgressRecord:
             InputQueue.append(.init(.goalProgressRecord(goalProgress)))
+        case .itemUsed(let rune, _):
+            advanceRuneUseGoal()
         default:
             return
         }
@@ -81,6 +83,23 @@ class LevelGoalTracker: LevelGoalTracking {
                 ()
             }
         }
+    }
+    
+    private func advanceRuneUseGoal() {
+        var newGoalProgess: [GoalTracking] = []
+        for goal in goalProgress {
+            if goal.levelGoalType == .useRune {
+                let newGoalTracker = goal.update(with: 1)
+                newGoalProgess.append(newGoalTracker)
+            } else {
+                newGoalProgess.append(goal)
+            }
+        }
+        if newGoalProgess != goalProgress {
+            goalProgress = newGoalProgess
+            goalUpdated?(goalProgress)
+        }
+
     }
     
     private func advanceGoal(for type: TileType, units: Int) {

@@ -42,7 +42,7 @@ class BackpackView: SKSpriteNode {
     private var targetingArea: SKSpriteNode
     
     //rune inventory container
-    private var runeInventoryContainer: SKSpriteNode?
+    private var runeInventoryContainer: RuneContainerView?
     
     init(playableRect: CGRect, viewModel: TargetingViewModel, levelSize: Int) {
         self.playableRect = playableRect
@@ -108,8 +108,8 @@ class BackpackView: SKSpriteNode {
      Passed into our viewModel as a callback function to "bind" everything together
      */
     func updated() {
-        updateReticles()
         updateTargetArea()
+        updateReticles()
     }
     
     //MARK: - private functions
@@ -162,6 +162,8 @@ class BackpackView: SKSpriteNode {
             reticle.zPosition = Precedence.menu.rawValue
             targetingArea.addChildSafely(reticle)
         }
+        
+        runeInventoryContainer?.enableButton(areLegal)
     }
     
     private func translateCoord(_ coord: TileCoord) -> CGPoint {

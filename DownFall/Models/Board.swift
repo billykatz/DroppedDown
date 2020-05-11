@@ -341,10 +341,13 @@ class Board: Equatable {
     
     private func transform(_ coords: [TileCoord], into type: TileType, input: Input) -> Transformation {
         
+        var tileTransform : [TileTransformation] = []
         for tile in coords {
             tiles[tile.row][tile.column] = Tile(type: type)
+            tileTransform.append(TileTransformation(tile, tile))
         }
-        return Transformation(transformation: nil, inputType: input.type, endTiles: tiles)
+        
+        return Transformation(transformation: [tileTransform], inputType: input.type, endTiles: tiles)
         
     }
     
@@ -739,19 +742,10 @@ extension Board {
             else { return Transformation.zero }
         
         let newCarryModel = data.carry.earn(item.amount, inCurrency: item.type.currencyType)
-        let playerData = EntityModel(originalHp: data.originalHp,
-                                     hp: data.hp,
-                                     name: data.name,
-                                     // we have to reset attack here because the player has moved but the turn may not be over
-            // Eg: it is possible that there could be two or more monsters
-            // under the player and the player should be able to attack
-            attack: data.attack.resetAttack(),
-            type: data.type,
-            carry: newCarryModel,
-            animations: data.animations,
-            abilities: data.abilities,
-            pickaxe: data.pickaxe,
-            effects: data.effects)
+        // we have to reset attack here because the player has moved but the turn may not be over
+        // Eg: it is possible that there could be two or more monsters
+        // under the player and the player should be able to attack
+        let playerData = data.update(attack: data.attack.resetAttack(), carry: newCarryModel)
         
         updatedTiles[pp.x][pp.y] = Tile(type: .player(playerData))
         
@@ -776,7 +770,13 @@ extension Board {
         //                                  endTiles: tiles)
         //        } else {
         //no item! remove and replace
-        return removeAndReplace(from: tiles, tileCoord: coord, singleTile: true, input: input)
+        guard let pp = playerPosition,
+            case let .player(data) = tiles[pp].type
+            else { return Transformation.zero }
+
+        var newTiles = tiles
+        newTiles[pp.row][pp.column] = Tile(type: .player(data.update(attack: data.attack.resetAttack())))
+        return removeAndReplace(from: newTiles, tileCoord: coord, singleTile: true, input: input)
         //        }
         
     }

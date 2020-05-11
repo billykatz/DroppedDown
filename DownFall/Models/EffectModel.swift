@@ -20,6 +20,9 @@ enum StatType: String, Hashable, Codable {
     case maxHealth
     case gems
     case pickaxe
+    case runeSlot
+    case dodge
+    case luck
 }
 
 struct EffectModel: Equatable, Hashable, Decodable {

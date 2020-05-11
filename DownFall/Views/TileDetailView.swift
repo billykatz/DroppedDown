@@ -80,7 +80,7 @@ class TileDetailView: SKNode {
         let detailView = SKSpriteNode(color: .clayRed, size: CGSize(width: maxWidth, height: maxHeight))
         
         detailView.position = CGPoint.position(detailView.frame, inside: playableRect, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: Style.Padding.most*8)
-        detailView.zPosition = Precedence.aboveMenu.rawValue
+        detailView.zPosition = Precedence.flying.rawValue
         self.detailViewTemplate = detailView
         
         /// Add nodes to the foreground
@@ -91,7 +91,8 @@ class TileDetailView: SKNode {
         super.init()
         
         // set out own z position
-        self.zPosition = Precedence.aboveMenu.rawValue
+        self.zPosition = Precedence.flying.rawValue
+        
         
         // default interaction is false
         isUserInteractionEnabled = false

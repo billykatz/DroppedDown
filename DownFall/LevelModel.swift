@@ -10,6 +10,7 @@ import SpriteKit
 
 enum LevelGoalType: Hashable {
     case unlockExit
+    case useRune
 }
 
 enum LevelGoalReward: Hashable {

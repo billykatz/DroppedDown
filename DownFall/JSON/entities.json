@@ -2,8 +2,8 @@
     "entities": [
         { "name": "player3",
             "type": "player",
-            "originalHp": 8,
-            "hp": 8,
+            "originalHp": 3,
+            "hp": 3,
             "attack": {
                 "type": "targets",
                 "frequency" : 1,
@@ -53,12 +53,14 @@
                 ]
             },
             "abilities": [],
-            "effects": []
+            "effects": [],
+            "dodge": 0,
+            "luck": 0
         },
         { "name": "player3",
             "type": "player",
-            "originalHp": 2,
-            "hp": 2,
+            "originalHp": 3,
+            "hp": 3,
             "attack": {
                 "type": "targets",
                 "frequency" : 1,
@@ -108,12 +110,14 @@
                 ]
             },
             "abilities": [],
-            "effects": []
+            "effects": [],
+            "dodge": 0,
+            "luck": 0
         },
         { "name": "player3",
             "type": "player",
             "originalHp": 3,
-            "hp": 1,
+            "hp": 3,
             "attack": {
                 "type": "targets",
                 "frequency" : 1,
@@ -165,58 +169,11 @@
             "abilities": [],
             "pickaxe": {
                 "runeSlots" : 1,
-                "runes" : [
-                    {
-                        "type" : "rainEmbers",
-                        "textureName" : "rainEmbers",
-                        "cost" : 0,
-                        "currency" : "crystals",
-                        "description" : "Fling two fireball at two monsters",
-                        "flavorText" : "Fire is my second favorite word, second only to `combustion.` - Mack the Wizard",
-                        "targets" : 2,
-                        "targetTypes" : [{
-                            "base": "monster",
-                            "entityData": {
-                            "originalHp": 0,
-                            "hp": 0,
-                            "name": "Zero",
-                            "attack": {
-                                "type": "charges",
-                                "frequency" : 3,
-                                "damage": 1,
-                                "range": {
-                                    "lower": 1,
-                                    "upper": 5
-                                },
-                                "attacksPerTurn": 1,
-                                "attackSlope": [
-                                    {
-                                        "over": 0,
-                                        "up": 1
-                                    }
-                                ]
-                            },
-                            "type": "rat",
-                            "carry": {
-                                "items": []
-                            },
-                            "animations": [],
-                            "abilities": [],
-                            "effects": []
-                        }
-                        }],
-                        "cooldown" : 25,
-                        "rechargeType" : [{
-                            "base": "rock",
-                            "color": "red"
-                        }],
-                        "rechargeMinimum" : 1,
-                        "progressColor" : "red",
-                        "maxDistanceBetweenTargets" : 200000
-                    }
-                ]
+                "runes" : []
             },
-            "effects": []
+            "effects": [],
+            "dodge": 0,
+            "luck": 0
         },
         { "name": "dragon",
             "type": "dragon",
@@ -266,7 +223,9 @@
                 
             },
             "abilities": [],
-            "effects": []
+            "effects": [],
+            "dodge": 0,
+            "luck": 0
         },
         { "name": "rat",
             "type": "rat",
@@ -322,7 +281,9 @@
                 }]
             },
             "abilities": [],
-            "effects": []
+            "effects": [],
+            "dodge": 0,
+            "luck": 0
         },
         { "name": "bat",
             "type": "bat",
@@ -385,7 +346,9 @@
                 }]
             },
             "abilities": [],
-            "effects": []
+            "effects": [],
+            "dodge": 0,
+            "luck": 0
         },
         { "name": "alamo",
             "type": "alamo",
@@ -433,7 +396,9 @@
                 }]
             },
             "abilities": [],
-            "effects": []
+            "effects": [],
+            "dodge": 0,
+            "luck": 0
         },
         { "name": "sally",
             "type": "sally",
@@ -490,7 +455,9 @@
                 }]
             },
             "abilities": [],
-            "effects": []
+            "effects": [],
+            "dodge": 0,
+            "luck": 0
         }
     ]
 }

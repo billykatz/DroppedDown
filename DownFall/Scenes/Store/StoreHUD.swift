@@ -20,11 +20,16 @@ class StoreHUD: SKSpriteNode {
         static let totalHealthLabelName = "totalHealthLabelName"
         static let healthBarName = "healthBarName"
         static let currencyViewName = "currencyViewName"
+        static let totalDodgeLabelName = "totalDodgeLabelName"
+        static let totalLuckLabelName = "totalLuckLabelName"
     }
     
     private var viewModel: StoreHUDViewModel
     private let contentView: SKSpriteNode
     private var healthBarContainer: SKSpriteNode?
+    private var luckContainer: SKSpriteNode?
+    private var dodgeContainer: SKSpriteNode?
+    
     private var runeContainerView: RuneContainerView?
     var storeMenuViewModel: StoreMenuViewModel?
     var removedRune: Rune?
@@ -42,6 +47,10 @@ class StoreHUD: SKSpriteNode {
         return CGSize(width: halfWidth, height: halfHeight)
     }
     
+    var thirdWidth: CGFloat {
+        return size.width/3
+    }
+    
     init(viewModel: StoreHUDViewModel, size: CGSize) {
         self.viewModel = viewModel
         contentView = SKSpriteNode(texture: nil, size: size)
@@ -50,7 +59,7 @@ class StoreHUD: SKSpriteNode {
         super.init(texture: nil, color: .clear, size: size)
         
         /// Health Bar Container
-        self.healthBarContainer = SKSpriteNode(color: .clear, size: quarterSize)
+        self.healthBarContainer = SKSpriteNode(color: .clear, size: CGSize(width: thirdWidth, height: halfHeight))
         
         /// hook up to the view models update hud
         self.viewModel.updateHUD = self.updateHUD
@@ -107,6 +116,31 @@ class StoreHUD: SKSpriteNode {
         case .pickaxe:
             self.createRuneContainerView(mode: .storeHUD, playerData: viewModel.previewPlayerData)
             swapRunesMenuView?.removeFromParent()
+        case .runeSlot:
+            self.createRuneContainerView(mode: .storeHUD, playerData: viewModel.previewPlayerData)
+        case .dodge:
+            if let container = dodgeContainer,
+                let dodgeLabel = container.childNode(withName: Constants.totalDodgeLabelName) as? ParagraphNode {
+                animate(parentNode: container,
+                        paragraphNode: dodgeLabel,
+                        start: viewModel.previewPlayerData.dodge,
+                        difference: -effect.amount)
+                { [weak self] (newLabel) in
+                    self?.dodgeContainer?.addChild(newLabel)
+                }
+            }
+
+        case .luck:
+            if let container = luckContainer,
+                let luckLabel = container.childNode(withName: Constants.totalLuckLabelName) as? ParagraphNode {
+                animate(parentNode: container,
+                        paragraphNode: luckLabel,
+                        start: viewModel.previewPlayerData.luck,
+                        difference: -effect.amount)
+                { [weak self] (newLabel) in
+                    self?.luckContainer?.addChild(newLabel)
+                }
+            }
         }
         
     }
@@ -157,6 +191,31 @@ class StoreHUD: SKSpriteNode {
         case .pickaxe:
             /// if the player has reach the max number of runes, make the pickaxe larger and trigger a replace rune flow
             self.createRuneContainerView(mode: .storeHUD, playerData: viewModel.previewPlayerData)
+        case .runeSlot:
+            self.createRuneContainerView(mode: .storeHUD, playerData: viewModel.previewPlayerData)
+        case .dodge:
+            if let container = dodgeContainer,
+                let dodgeLabel = container.childNode(withName: Constants.totalDodgeLabelName) as? ParagraphNode {
+                animate(parentNode: container,
+                        paragraphNode: dodgeLabel,
+                        start: viewModel.baseDodge,
+                        difference: effect.amount)
+                { [weak self] (newLabel) in
+                    self?.dodgeContainer?.addChild(newLabel)
+                }
+            }
+
+        case .luck:
+            if let container = luckContainer,
+                let luckLabel = container.childNode(withName: Constants.totalLuckLabelName) as? ParagraphNode {
+                animate(parentNode: container,
+                        paragraphNode: luckLabel,
+                        start: viewModel.baseLuck,
+                        difference: effect.amount)
+                { [weak self] (newLabel) in
+                    self?.luckContainer?.addChild(newLabel)
+                }
+            }
         }
     }
     
@@ -186,7 +245,7 @@ class StoreHUD: SKSpriteNode {
     func setupContentView(size: CGSize) {
         contentView.removeAllChildren()
         
-        let heartNode = SKSpriteNode(texture: SKTexture(imageNamed: Identifiers.fullHeart), size: Style.HUD.heartSize)
+        let heartNode = SKSpriteNode(texture: SKTexture(imageNamed: Identifiers.fullHeart), size: .fifty)
         heartNode.position = CGPoint.position(heartNode.frame, inside: healthBarContainer?.frame, verticalAlign: .center, horizontalAnchor: .left)
         
         let healthBar = FillableBar(size: quarterSize.scale(by: 0.25), viewModel: FillableBarViewModel(total: viewModel.totalHealth, progress: viewModel.baseHealth, fillColor: .red, backgroundColor: nil, text: nil, horiztonal: true))
@@ -218,11 +277,46 @@ class StoreHUD: SKSpriteNode {
         
         
         /// Currency View
-        let currencyView = CurrencyView(viewModel: CurrencyViewModel(currency: .gem, amount: viewModel.totalGems), size: CGSize(width: halfWidth, height: halfHeight))
+        let currencyView = CurrencyView(viewModel: CurrencyViewModel(currency: .gem, amount: viewModel.totalGems), size: CGSize(width: thirdWidth, height: halfHeight))
         currencyView.position = CGPoint.position(currencyView.frame, inside: contentView.frame, verticalAlign: .top, horizontalAnchor: .right)
         currencyView.name = Constants.currencyViewName
         contentView.addChild(currencyView)
         
+        /// Dodge View
+        let dodgeContainer = SKSpriteNode(color: .clear, size: CGSize(width: thirdWidth, height: halfHeight))
+        let dodgeSprite = SKSpriteNode(texture: SKTexture(imageNamed: "dodge"), size: .oneHundred)
+        let dodgeAmountNode = ParagraphNode(text: "\(viewModel.baseDodge)", paragraphWidth: thirdWidth)
+        
+        dodgeSprite.position = CGPoint.position(dodgeSprite.frame, inside: dodgeContainer.frame, verticalAlign: .center, horizontalAnchor: .left, xOffset: Style.Padding.most)
+        dodgeAmountNode.position = CGPoint.alignVertically(dodgeAmountNode.frame, relativeTo: dodgeSprite.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: Style.Padding.more, translatedToBounds: true)
+        dodgeAmountNode.name = Constants.totalDodgeLabelName
+        
+        dodgeContainer.addChild(dodgeSprite)
+        dodgeContainer.addChild(dodgeAmountNode)
+        
+        dodgeContainer.position = CGPoint.position(dodgeContainer.frame, inside: contentView.frame, verticalAlign: .top, horizontalAnchor: .center)
+        
+        contentView.addChild(dodgeContainer)
+        self.dodgeContainer = dodgeContainer
+        
+        
+        /// Luck view
+        let luckContainer = SKSpriteNode(color: .clear, size: CGSize(width: thirdWidth, height: halfHeight))
+        let luckSprite = SKSpriteNode(texture: SKTexture(imageNamed: "luck"), size: .oneHundred)
+        let luckAmountNode = ParagraphNode(text: "\(viewModel.baseLuck)", paragraphWidth: thirdWidth)
+        
+        luckSprite.position = CGPoint.position(luckSprite.frame, inside: luckContainer.frame, verticalAlign: .center, horizontalAnchor: .left)
+        luckAmountNode.position = CGPoint.alignVertically(luckAmountNode.frame, relativeTo: luckSprite.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: Style.Padding.more, translatedToBounds: true)
+        luckAmountNode.name = Constants.totalLuckLabelName
+        
+        luckContainer.addChild(luckSprite)
+        luckContainer.addChild(luckAmountNode)
+        
+        luckContainer.position = CGPoint.position(luckContainer.frame, inside: contentView.frame, verticalAlign: .top, horizontalAnchor: .left)
+        
+        contentView.addChild(luckContainer)
+        self.luckContainer = luckContainer
+
         /// Pickaxe View
         self.createRuneContainerView(mode: .storeHUD, playerData: self.viewModel.previewPlayerData)
         
@@ -240,7 +334,7 @@ extension StoreHUD {
     func createRuneContainerView(mode: ViewMode, playerData: EntityModel?) {
         let fullSize = contentView.size
         
-        let sizeToUse = mode == .storeHUD ? quarterSize : fullSize
+        let sizeToUse = mode == .storeHUD ? CGSize(width: 2*thirdWidth, height: halfHeight) : fullSize
         
         let positionToUse = mode == .storeHUD ?
             CGPoint.position(CGRect(origin: .zero, size: sizeToUse), inside: contentView.frame, verticalAlign: .bottom, horizontalAnchor: .left)

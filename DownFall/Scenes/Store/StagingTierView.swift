@@ -21,9 +21,9 @@ class StagingTierViewModel {
     
     var selectedOffer: StoreOffer? {
         didSet {
-            guard let offer = selectedOffer, offer != oldValue else { return }
+            guard let offer = selectedOffer, offer.textureName != oldValue?.textureName ?? "" else { return }
             var otherOffer: StoreOffer? = nil
-            if oldValue != nil { otherOffer = offers.first { $0.type != offer.type } }
+            if oldValue != nil { otherOffer = offers.first { $0.textureName != offer.textureName } }
             self.offerThatWasSelected(offer, otherOffer)
         }
     }
@@ -157,7 +157,7 @@ class StagingTierView: SKSpriteNode {
     }
     
     func setupTierView() {
-        guard viewModel.offers.count == 2 else { preconditionFailure("This is not set up for more than 2 store offers") }
+        guard viewModel.offers.count == 2 else { return }
         
         let first = viewModel.offers.first!
         let second = viewModel.offers.last!

@@ -71,6 +71,10 @@ class TargetingViewModel: Targeting {
             {
                 tiles = endTiles
             }
+            else {
+                /// clear out targets after any transformation
+                currentTargets = AllTarget(targets: [], areLegal: false)
+            }
             
         case .boardBuilt:
             guard let tiles = input.endTilesStruct else { return }
@@ -262,16 +266,23 @@ class TargetingViewModel: Targeting {
     
     func didUse(_ rune: Rune?) {
         guard let rune = rune else { return }
-        guard legallyTargeted else { return }
+        guard legallyTargeted else {
+            self.rune = nil
+            return
+        }
         InputQueue.append(
             Input(.itemUsed(rune, currentTargets.targets.map { $0.coord }))
         )
         self.rune = nil
+        currentTargets = AllTarget(targets: [], areLegal: false)
         
     }
     
     func didSelect(_ rune: Rune?) {
         self.rune = rune
+        if rune == nil {
+            currentTargets = AllTarget(targets: [], areLegal: false)
+        }
     }
     
     private func autoTarget() {

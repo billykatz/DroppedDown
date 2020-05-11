@@ -124,6 +124,14 @@ class StoreHUDViewModel: StoreHUDViewModelable {
         return basePlayerData.previewAppliedEffects()
     }
     
+    var baseDodge: Int {
+        return basePlayerData.dodge
+    }
+    
+    var baseLuck: Int {
+        return basePlayerData.luck
+    }
+    
     var baseHealth: Int {
         return basePlayerData.hp
     }

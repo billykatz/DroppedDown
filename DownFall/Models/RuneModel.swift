@@ -82,7 +82,7 @@ struct Rune: Hashable, Decodable {
                         targets: 2,
                         targetTypes: cases,
                         heal: 0,
-                        cooldown: 25,
+                        cooldown: 5,
                         rechargeType: [TileType.rock(.blue)],
                         rechargeMinimum: 1,
                         progressColor: .blue,

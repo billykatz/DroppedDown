@@ -71,7 +71,7 @@ class Renderer: SKSpriteNode {
                                                  horizontalAnchor: .right,
                                                  verticalAlign: .bottom,
                                                  translatedToBounds: true)
-        hud.zPosition = Precedence.foreground.rawValue
+        hud.zPosition = Precedence.flying.rawValue
         return hud
     }()
     
@@ -264,9 +264,8 @@ class Renderer: SKSpriteNode {
     }
     
     private func animateRuneUsed(input: InputType, transformations: [Transformation], rune: Rune, targets: [TileCoord]) {
-        switch rune.type {
-        default:
-            animationsFinished(endTiles: transformations.first?.endTiles)
+        animator.animateRune(rune, transformations: transformations, affectedTiles: targets, sprites: sprites, spriteForeground: spriteForeground) { [weak self] in
+            self?.animationsFinished(endTiles: transformations.first?.endTiles)
         }
         
     }

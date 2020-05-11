@@ -65,7 +65,6 @@ class StagingAreaView: SKSpriteNode {
     
     func tierIsUnlocked(tier: Int, goalProgress: [GoalTracking]) -> Bool {
         /// TODO: reset when done testing
-        return true
         return goalProgress.filter { $0.hasBeenRewarded }.count >= tier
     }
     

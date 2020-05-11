@@ -165,6 +165,12 @@ class RuneDetailView: SKSpriteNode, ButtonDelegate {
         
     }
     
+    var confirmButton: Button?
+    
+    func enableButton(_ enable: Bool) {
+        confirmButton?.enable(enable && viewModel.isCharged)
+    }
+    
     func setupButtons() {
         switch viewModel.mode {
         case .itemDetail, .inventory:
@@ -174,6 +180,8 @@ class RuneDetailView: SKSpriteNode, ButtonDelegate {
                 let confirmButton = Button(size: .oneHundred, delegate: self, identifier: .backpackConfirm, image: confirmSprite, shape: .circle, showSelection: true, disable: !viewModel.isCharged)
                 confirmButton.position = CGPoint.position(confirmButton.frame, inside: self.frame, verticalAlign: .center, horizontalAnchor: .right, xOffset: Style.Padding.more)
                 addChild(confirmButton)
+                
+                self.confirmButton = confirmButton
             }
             
             let cancelSprite = SKSpriteNode(texture: SKTexture(imageNamed: "buttonNegative"), size: .oneHundred)

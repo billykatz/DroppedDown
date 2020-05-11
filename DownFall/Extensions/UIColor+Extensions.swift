@@ -49,6 +49,8 @@ extension UIColor {
     static let lightBarMonster = UIColor(rgb: 0xe11a1a)
     static let darkBarGem = UIColor(rgb: 0x65b596)
     static let lightBarGem = UIColor(rgb: 0x9edfc6)
+    static let lightBarRune = UIColor(rgb: 0xafafaf)
+    static let darkBarRune = UIColor(rgb: 0x817e7e)
 
     /// Rune colors
     static let goldOutlineDull = UIColor(rgb: 0x9E8B2C)
@@ -61,4 +63,5 @@ extension UIColor {
     /// Confirmation button
     static let confirmButtonColor = UIColor(rgb: 0x177a31)
 //    static let cancelButtonColor = UIColor(rgb: 0x)
+    
 }

@@ -36,15 +36,20 @@ struct GoalTracking: Hashable {
     
     func textureName() -> String {
         var goalKeyTextureName: String {
-            switch tileType {
-            case .rock:
-                return tileType.textureName
-            case .monster:
-                return "skullAndCrossbones"
-            case .gem:
-                return "gem2"
-            default:
-                return ""
+            switch levelGoalType {
+                case .unlockExit:
+                    switch tileType {
+                    case .rock:
+                        return tileType.textureName
+                    case .monster:
+                        return "skullAndCrossbones"
+                    case .gem:
+                        return "gem2"
+                    default:
+                        return ""
+                    }
+            case .useRune:
+                return "blankRune"
             }
         }
         
@@ -53,19 +58,24 @@ struct GoalTracking: Hashable {
 
     func description() -> String {
         var goalKeyDescription: String {
-            switch tileType {
-            case .rock:
-                if grouped {
-                    return "Mine \(target) groups of \(minimumAmount) or more."
-                } else {
-                    return "Mine \(target) rocks."
+            switch levelGoalType {
+            case .unlockExit:
+                switch tileType {
+                case .rock:
+                    if grouped {
+                        return "Mine \(target) groups of \(minimumAmount) or more."
+                    } else {
+                        return "Mine \(target) rocks."
+                    }
+                case .monster:
+                    return "Destory \(target) monsters."
+                case .gem:
+                    return "Collect \(target) gems."
+                default:
+                    return ""
                 }
-            case .monster:
-                return "Destory \(target) monsters."
-            case .gem:
-                return "Collect \(target) gems."
-            default:
-                return ""
+            case .useRune:
+                return "Use your rune(s) \(target) times."
             }
         }
         
@@ -91,19 +101,24 @@ struct GoalTracking: Hashable {
     }
     
     var fillBarColor: (UIColor, UIColor) {
-        switch self.tileType {
-        case .rock(.blue):
-            return (.lightBarBlue, .darkBarBlue)
-        case .rock(.red):
-            return (.lightBarRed, .darkBarRed)
-        case .rock(.purple):
-            return (.lightBarPurple, .darkBarPurple)
-        case .monster:
-            return (.lightBarMonster, .darkBarMonster)
-        case .gem:
-            return (.lightBarGem, .darkBarGem)
-        default:
-            return (.clear, .clear)
+        switch levelGoalType {
+        case .unlockExit:
+            switch self.tileType {
+            case .rock(.blue):
+                return (.lightBarBlue, .darkBarBlue)
+            case .rock(.red):
+                return (.lightBarRed, .darkBarRed)
+            case .rock(.purple):
+                return (.lightBarPurple, .darkBarPurple)
+            case .monster:
+                return (.lightBarMonster, .darkBarMonster)
+            case .gem:
+                return (.lightBarGem, .darkBarGem)
+            default:
+                return (.clear, .clear)
+            }
+        case .useRune:
+            return (.lightBarRune, .darkBarRune)
         }
     }
     

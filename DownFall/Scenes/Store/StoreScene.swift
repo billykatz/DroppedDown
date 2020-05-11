@@ -194,6 +194,18 @@ class StoreOfferEffectTranslator {
                 let effect = EffectModel(kind: .buff, stat: .pickaxe, amount: 10, duration: 0, offerTier: offer?.tier ?? 0)
                 offerMap[effect] = offer
                 return effect
+            case .runeSlot:
+                let effect = EffectModel(kind: .buff, stat: .runeSlot, amount: 1, duration: 0, offerTier: offer?.tier ?? 0)
+                offerMap[effect] = offer
+                return effect
+            case .dodge:
+                let effect = EffectModel(kind: .buff, stat: .dodge, amount: 5, duration: 0, offerTier: offer?.tier ?? 0)
+                offerMap[effect] = offer
+                return effect
+            case .luck:
+                let effect = EffectModel(kind: .buff, stat: .luck, amount: 5, duration: 0, offerTier: offer?.tier ?? 0)
+                offerMap[effect] = offer
+                return effect
             case .none:
                 return nil
             }

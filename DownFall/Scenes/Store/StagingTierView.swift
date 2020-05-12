@@ -200,7 +200,7 @@ class StagingTierView: SKSpriteNode {
             :
         "Complete \(viewModel.tier) goal\(viewModel.tier > 1 ? "s" : "") to unlock."
         
-        let text = ParagraphNode(text: textString, paragraphWidth: contentView.frame.width)
+        let text = ParagraphNode(text: textString, paragraphWidth: contentView.frame.width, fontSize: UIFont.largeSize)
         text.position = CGPoint.position(text.frame, inside: contentView.frame, verticalAlign: .top, horizontalAnchor: .center)
         
         contentView.addChild(text)

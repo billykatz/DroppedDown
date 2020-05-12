@@ -45,6 +45,7 @@ class LevelGoalTracker: LevelGoalTracking {
             
         case .boardBuilt:
             goalUpdated?(goalProgress)
+            countPillars(in: input.endTilesStruct ?? [])
         case .runeProgressRecord:
             checkForCompletedGoals()
             InputQueue.append(.init(.goalProgressRecord(goalProgress)))
@@ -56,16 +57,36 @@ class LevelGoalTracker: LevelGoalTracking {
     }
     
     private func checkForCompletedGoals() {
-//        var awardedGoals: [LevelGoalReward] = []
         for (idx, goal) in goalProgress.enumerated(){
             if goal.isCompleted && !goal.hasBeenRewarded {
                 goalProgress[idx] = goal.isAwarded()
-//                awardedGoals.append(goal.reward)
             }
         }
-//        if !awardedGoals.isEmpty {
-//            InputQueue.append(Input(.playerAwarded(awardedGoals)))
-//        }
+    }
+    
+    var pillarColor =  Set<Color>(Color.allCases)
+    var numberOfIndividualPillars: Int = 0
+    
+    private func countPillars(in tiles: [[Tile]]) {
+        var positions = Set<TileCoord>()
+        for color in pillarColor {
+            for health in 1...3 {
+                positions = positions.union(getTilePositions(.pillar(PillarData(color: color, health: health)), tiles: tiles) ?? Set<TileCoord>())
+            }
+        }
+        pillarColor = Set<Color>()
+        var newNumberOfIndividualPillars = 0
+        for position in positions {
+            if case let TileType.pillar(data) = tiles[position].type {
+                newNumberOfIndividualPillars += data.health
+                pillarColor.insert(data.color)
+            }
+        }
+        
+        if numberOfIndividualPillars - newNumberOfIndividualPillars != 0 {
+            advanceGoal(for: .pillar(PillarData(color: .blue, health: 3)), units: numberOfIndividualPillars - newNumberOfIndividualPillars)
+        }
+        numberOfIndividualPillars = newNumberOfIndividualPillars
     }
     
     /// Determines if the transformation advances the level goal
@@ -76,6 +97,7 @@ class LevelGoalTracker: LevelGoalTracking {
                 if let count = trans.first?.tileTransformation?.first?.count {
                     advanceGoal(for: type, units: count)
                 }
+                countPillars(in: trans.first?.endTiles ?? [])
             case .monsterDies(_, let type):
                 advanceGoal(for: .monster(EntityModel.zeroedEntity(type: type)), units: 1)
             case .collectItem(_, let item, _):

@@ -45,6 +45,8 @@ struct GoalTracking: Hashable {
                         return "skullAndCrossbones"
                     case .gem:
                         return "crystals"
+                    case .pillar:
+                        return "allSinglePillars"
                     default:
                         return ""
                     }
@@ -71,6 +73,8 @@ struct GoalTracking: Hashable {
                     return "Destory \(target) monsters."
                 case .gem:
                     return "Collect \(target) gems."
+                case .pillar:
+                    return "Destory \(target) individual pillars."
                 default:
                     return ""
                 }
@@ -114,6 +118,8 @@ struct GoalTracking: Hashable {
                 return (.lightBarMonster, .darkBarMonster)
             case .gem:
                 return (.lightBarGem, .darkBarGem)
+            case .pillar:
+                return (.lightBarPillar, .darkBarPillar)
             default:
                 return (.clear, .clear)
             }

@@ -116,7 +116,7 @@ struct LevelConstructor {
             return [monsterGoal]
         case .third:
             let gemGoal = LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .gem, targetAmount: 3, minimumGroupSize: 1, grouped: false)
-            let pillarGoal = LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .pillar(PillarData(color: .blue, health: 1)), targetAmount: 2, minimumGroupSize: 1, grouped: false)
+            let pillarGoal = LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .pillar(PillarData(color: .blue, health: 1)), targetAmount: 6, minimumGroupSize: 1, grouped: false)
             if let rockGoal = randomRockGoal([.red, .purple,. blue], amount: 8, minimumGroupSize: 4) {
                 return [gemGoal, pillarGoal, rockGoal]
             }

@@ -54,6 +54,7 @@ class StagingSelectionAreaView: SKSpriteNode {
         
         setupOfferSlots()
         setupBackground()
+        setupTextView()
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -70,9 +71,17 @@ class StagingSelectionAreaView: SKSpriteNode {
         stagingSelectedOfferViews[storeOffer.tierIndex].removeOffer()
     }
     
+    func setupTextView() {
+        let text = ParagraphNode(text: "Drag unlocked offers here", paragraphWidth: contentView.frame.width, fontSize: UIFont.mediumSize, fontColor: .eggshellWhite)
+        text.position = CGPoint.position(text.frame, inside: contentView.frame, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: Style.Padding.normal)
+        text.zPosition = Precedence.foreground.rawValue
+        contentView.addChild(text)
+        
+    }
+    
     func setupOfferSlots() {
         
-        let width = Constants.goalSize.width * CGFloat(viewModel.unlockedGoals+2)
+        let width = Constants.goalSize.width * CGFloat(viewModel.unlockedGoals+3)
         let height = Constants.goalSize.height
         let divisor = CGFloat(viewModel.unlockedGoals+1)
         for idx in 0..<viewModel.unlockedGoals {
@@ -81,6 +90,7 @@ class StagingSelectionAreaView: SKSpriteNode {
             let y = -height/2 + Constants.goalSize.height/2
             let stagingSelectedOfferView = StagingSelectedOfferView(storeOffer: nil, size: Constants.goalSize, offerWasRemoved: self.offerWasRemoved)
             stagingSelectedOfferView.position = CGPoint(x: x, y: y)
+            
             
             // add to scene
             contentView.addChild(stagingSelectedOfferView)
@@ -95,14 +105,14 @@ class StagingSelectionAreaView: SKSpriteNode {
     }
     
     func setupBackground() {
-        let width = Constants.goalSize.width * CGFloat(viewModel.unlockedGoals+2)
+        let width = Constants.goalSize.width * CGFloat(viewModel.unlockedGoals+3)
         let height = contentView.frame.size.height
         let background = SKShapeNode(rect: CGRect(x: -width/2,
                                                   y: -height/2,
                                                   width: width,
                                                   height: height),
                                      cornerRadius: Constants.cornerRadius)
-        background.color = .foregroundBlue
+        background.color = .storeDarkGray
         background.zPosition = Precedence.foreground.rawValue
         background.position = .zero
         contentView.addChild(background)

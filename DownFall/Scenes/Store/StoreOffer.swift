@@ -79,7 +79,7 @@ struct StoreOffer {
             textureName = "crystals"
         case .luck:
             title = "Luck Up"
-            body = "Increase the number of gems your can find."
+            body = "Increase the frequency and overall number of gems you find."
             textureName = "luckUp"
         case .plusTwoMaxHealth:
             title = "Increase Max Health"

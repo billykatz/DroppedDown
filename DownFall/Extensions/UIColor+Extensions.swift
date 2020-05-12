@@ -64,6 +64,5 @@ extension UIColor {
     
     /// Confirmation button
     static let confirmButtonColor = UIColor(rgb: 0x177a31)
-//    static let cancelButtonColor = UIColor(rgb: 0x)
     
 }

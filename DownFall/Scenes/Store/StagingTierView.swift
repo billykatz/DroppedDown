@@ -18,6 +18,7 @@ class StagingTierViewModel {
     let offers: [StoreOffer]
     let tier: Int
     let unlocked: Bool
+    let goalTracker: GoalTracking
     
     var selectedOffer: StoreOffer? {
         didSet {
@@ -39,13 +40,15 @@ class StagingTierViewModel {
     let offerWasTappedForInformation: (StoreOffer) -> ()
     
     init(offers: [StoreOffer], tier: Int, unlocked: Bool, touchDelegate: SKNode, offerThatWasSelected: @escaping (StoreOffer, StoreOffer?) -> (),
-         offerWasTappedForInformation: @escaping (StoreOffer) -> ()) {
+         offerWasTappedForInformation: @escaping (StoreOffer) -> (),
+         goalTracker: GoalTracking) {
         self.offers = offers
         self.tier = tier
         self.unlocked = unlocked
         self.touchDelegate = touchDelegate
         self.offerThatWasSelected = offerThatWasSelected
         self.offerWasTappedForInformation = offerWasTappedForInformation
+        self.goalTracker = goalTracker
     }
 }
 
@@ -75,7 +78,7 @@ class StagingTierView: SKSpriteNode {
         self.viewModel.runeReplacedChanged = self.runeReplacedChanged
         
         /// response to user touch events
-        self.isUserInteractionEnabled = viewModel.unlocked
+        self.isUserInteractionEnabled = true
         
         /// set up our views
         addChild(contentView)
@@ -85,6 +88,8 @@ class StagingTierView: SKSpriteNode {
         setupDelimiterView()
         
         setupTextView()
+        
+        setupGoalView()
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -182,7 +187,7 @@ class StagingTierView: SKSpriteNode {
     }
     
     func setupDelimiterView() {
-        let horizontalRule = SKSpriteNode(color: .black, size: CGSize(width: contentView.frame.width, height: 2.0))
+        let horizontalRule = SKSpriteNode(color: .eggshellWhite, size: CGSize(width: contentView.frame.width, height: 2.0))
         
         horizontalRule.position = CGPoint.position(horizontalRule.frame, inside: contentView.frame, verticalAlign: .top, horizontalAnchor: .center)
         
@@ -199,6 +204,20 @@ class StagingTierView: SKSpriteNode {
         text.position = CGPoint.position(text.frame, inside: contentView.frame, verticalAlign: .top, horizontalAnchor: .center)
         
         contentView.addChild(text)
+    }
+    
+    func setupGoalView() {
+        let goalCircleViewModel = FillableCircleViewModel(horiztonal: false,
+                                                          radius: 100.0,
+                                                          total: viewModel.goalTracker.target,
+                                                          progress: viewModel.goalTracker.current,
+                                                          fillColor: viewModel.goalTracker.fillBarColor.0,
+                                                          darkFillColor: viewModel.goalTracker.fillBarColor.1,
+                                                          text: nil,
+                                                          backgroundColor: .storeBlack)
+        let goalCircleSprite = FillableCircleBar(size: .oneFifty, viewModel: goalCircleViewModel)
+        goalCircleSprite.position = goalCircleSprite.position.translateVertically(-10.0)
+        contentView.addChild(goalCircleSprite)
     }
     
     // MARK: Touch Events
@@ -255,10 +274,11 @@ class StagingTierView: SKSpriteNode {
         spriteToMove = nil
     }
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard viewModel.unlocked else { return }
+        
         defer {
             viewModel.touchDelegate.touchesMoved(touches, with: event)
         }
-
         guard let touch  = touches.first else { return }
         let point = touch.location(in: self.contentView)
         

@@ -32,6 +32,7 @@ class StoreScene: SKScene {
     struct Constants {
         static let gemWallet = "gemWallet"
         static let popup  = "popup"
+        static let storeHUDHeight = CGFloat(350)
     }
     
     /// Store HUD
@@ -70,10 +71,10 @@ class StoreScene: SKScene {
         self.level = level
         
         self.storeHUDViewModel = StoreHUDViewModel(currentPlayerData: playerData)
-        self.storeHUD = StoreHUD(viewModel: storeHUDViewModel, size: CGSize(width: playableRect.width, height: 350.0))
+        self.storeHUD = StoreHUD(viewModel: storeHUDViewModel, size: CGSize(width: playableRect.width, height: Constants.storeHUDHeight))
         
         let stagingViewModel = StagingAreaViewModel(storeOffers: level.storeOffering, goalProgress: level.goalProgress)
-        self.stagingArea = StagingAreaView(viewModel: stagingViewModel, size: CGSize(width: playableRect.width, height: 600))
+        self.stagingArea = StagingAreaView(viewModel: stagingViewModel, size: CGSize(width: playableRect.width, height: playableRect.height - Constants.storeHUDHeight))
         
         /// Super init'd
         super.init(size: playableRect.size)

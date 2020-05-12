@@ -48,8 +48,18 @@ struct LevelConstructor {
         case .first:
             storeOffers.append(getSwitfy)
             storeOffers.append(runeSlot)
+            
+            
+            let getSwifty = StoreOffer.offer(type: .rune(Rune.rune(for: .getSwifty)), tier: 3)
+            let rainEmbers = StoreOffer.offer(type: .rune(Rune.rune(for: .rainEmbers)), tier: 3)
+            storeOffers.append(contentsOf: [getSwifty, rainEmbers])
         case .second:
             storeOffers.append(contentsOf: [dodgeUp, luckUp])
+            
+            
+            let getSwifty = StoreOffer.offer(type: .rune(Rune.rune(for: .getSwifty)), tier: 3)
+            let rainEmbers = StoreOffer.offer(type: .rune(Rune.rune(for: .rainEmbers)), tier: 3)
+            storeOffers.append(contentsOf: [getSwifty, rainEmbers])
         case .third:
             
             let getSwifty = StoreOffer.offer(type: .rune(Rune.rune(for: .getSwifty)), tier: 3)
@@ -103,9 +113,10 @@ struct LevelConstructor {
         
         switch levelType {
         case .first:
+        let gemGoal = LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .gem, targetAmount: 3, minimumGroupSize: 1, grouped: false)
             let monsterGoal = LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .monster(.zeroedEntity(type: .rat)), targetAmount: 1, minimumGroupSize: 1, grouped: false)
             if let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 25, minimumGroupSize: 1) {
-                return [rockGoal, monsterGoal]
+                return [rockGoal, monsterGoal, gemGoal]
             }
             return [monsterGoal]
         case .second:

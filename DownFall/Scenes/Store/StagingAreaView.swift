@@ -36,7 +36,10 @@ class StagingAreaViewModel: StagingAreaViewModelable {
     
     init(storeOffers: [StoreOffer], goalProgress: [GoalTracking]) {
         self.storeOffers = storeOffers
-        self.goalProgress = goalProgress
+        /// sort the goals by the ones that have been rewarded first
+        self.goalProgress = goalProgress.sorted(by: { goalA, goalB -> Bool in
+            return goalA.hasBeenRewarded
+        })
     }
     
 }
@@ -47,6 +50,7 @@ class StagingAreaView: SKSpriteNode {
         static let offerSize: CGSize = .oneFifty
         static let selectionAreaToTierOnePadding = CGFloat(200)
         static let dragThreshold = CGFloat(15.0)
+        static let stagingTierHeight = CGFloat(350)
     }
     
     var stagingTierViewModels: [StagingTierViewModel] = []
@@ -69,28 +73,63 @@ class StagingAreaView: SKSpriteNode {
     }
     
     // tier 1 area
-    private lazy var tierOneArea: StagingTierView = {
+    private lazy var tierOneArea: StagingTierView? = {
         // tier area
         let tier = 1
-        let vm = StagingTierViewModel(offers: viewModel.storeOffers.filter { $0.tier == tier }, tier: tier, unlocked: tierIsUnlocked(tier: tier, goalProgress: viewModel.goalProgress), touchDelegate: self, offerThatWasSelected: self.offerWasSelected, offerWasTappedForInformation: storeOfferWasTappedForInformation)
-        let tierOneArea = StagingTierView(viewModel: vm, size: CGSize(width: size.width, height: 300))
+        guard viewModel.storeOffers.filter({$0.tier == tier }).count > 0 else { return nil}
+        let tierIndex = 0
+        let vm = StagingTierViewModel(offers: viewModel.storeOffers.filter { $0.tier == tier }, tier: tier, unlocked: tierIsUnlocked(tier: tier, goalProgress: viewModel.goalProgress), touchDelegate: self, offerThatWasSelected: self.offerWasSelected, offerWasTappedForInformation: storeOfferWasTappedForInformation, goalTracker: viewModel.goalProgress[tierIndex])
+        let tierOneArea = StagingTierView(viewModel: vm, size: CGSize(width: size.width, height: Constants.stagingTierHeight))
         tierOneArea.zPosition = Precedence.foreground.rawValue
-        tierOneArea.position = CGPoint.alignHorizontally(tierOneArea.frame, relativeTo: stagingSelectionAreaView.frame, horizontalAnchor: .center, verticalAlign: .bottom)
+        tierOneArea.position = CGPoint.alignHorizontally(tierOneArea.frame, relativeTo: stagingSelectionAreaView.frame, horizontalAnchor: .center, verticalAlign: .bottom, translatedToBounds: true)
         
         stagingTierViewModels.append(vm)
         return tierOneArea
     }()
     
     // tier 1 area
-    private lazy var tierTwoArea: StagingTierView = {
+    private lazy var tierTwoArea: StagingTierView? = {
         // tier area
         let tier = 2
-        let vm = StagingTierViewModel(offers: viewModel.storeOffers.filter { $0.tier == tier }, tier: tier, unlocked: tierIsUnlocked(tier: tier, goalProgress: viewModel.goalProgress), touchDelegate: self, offerThatWasSelected: self.offerWasSelected, offerWasTappedForInformation: storeOfferWasTappedForInformation)
-        let tierTwoArea = StagingTierView(viewModel: vm, size: CGSize(width: size.width, height: 300))
+        guard viewModel.storeOffers.filter({$0.tier == tier }).count > 0,
+            let tierOneFrame = self.tierOneArea?.frame
+            else { return nil }
+        let tierIndex = 1
+        let offer = viewModel.storeOffers.filter { $0.tier == tier }
+        let vm = StagingTierViewModel(offers: offer,
+                                      tier: tier,
+                                      unlocked: tierIsUnlocked(tier: tier, goalProgress: viewModel.goalProgress),
+                                      touchDelegate: self,
+                                      offerThatWasSelected: self.offerWasSelected,
+                                      offerWasTappedForInformation: storeOfferWasTappedForInformation,
+                                      goalTracker: viewModel.goalProgress[tierIndex])
+        let tierTwoArea = StagingTierView(viewModel: vm, size: CGSize(width: size.width, height: Constants.stagingTierHeight))
         tierTwoArea.zPosition = Precedence.foreground.rawValue
-        tierTwoArea.position = CGPoint.alignHorizontally(tierTwoArea.frame, relativeTo: tierOneArea.frame, horizontalAnchor: .center, verticalAlign: .bottom, translatedToBounds: true)
+        tierTwoArea.position = CGPoint.alignHorizontally(tierTwoArea.frame, relativeTo: tierOneFrame, horizontalAnchor: .center, verticalAlign: .bottom, translatedToBounds: true)
         stagingTierViewModels.append(vm)
         return tierTwoArea
+    }()
+    
+    private lazy var tierThreeArea: StagingTierView? = {
+        // tier area
+        let tier = 3
+        guard viewModel.storeOffers.filter({$0.tier == tier }).count > 0,
+            let tierTwoFrame = self.tierTwoArea?.frame
+            else { return nil }
+        let tierIndex = 2
+        let offer = viewModel.storeOffers.filter { $0.tier == tier }
+        let vm = StagingTierViewModel(offers: offer,
+                                      tier: tier,
+                                      unlocked: tierIsUnlocked(tier: tier, goalProgress: viewModel.goalProgress),
+                                      touchDelegate: self,
+                                      offerThatWasSelected: self.offerWasSelected,
+                                      offerWasTappedForInformation: storeOfferWasTappedForInformation,
+                                      goalTracker: viewModel.goalProgress[tierIndex])
+        let tierThreeArea = StagingTierView(viewModel: vm, size: CGSize(width: size.width, height: Constants.stagingTierHeight))
+        tierThreeArea.zPosition = Precedence.foreground.rawValue
+        tierThreeArea.position = CGPoint.alignHorizontally(tierThreeArea.frame, relativeTo: tierTwoFrame, horizontalAnchor: .center, verticalAlign: .bottom, translatedToBounds: true)
+        stagingTierViewModels.append(vm)
+        return tierThreeArea
     }()
     
     
@@ -98,15 +137,15 @@ class StagingAreaView: SKSpriteNode {
         self.viewModel = viewModel
         self.contentView = SKSpriteNode(texture: nil, size: size)
         
-        let unlockedGoals = 2//viewModel.goalProgress.filter { $0.hasBeenRewarded }.count
+        let unlockedGoals = viewModel.goalProgress.filter { $0.hasBeenRewarded }.count
         // selection area
         stagingSelectionAreaViewModel = StagingSelectionAreaViewModel(unlockedGoals: unlockedGoals, selectedOffers: [])
         stagingSelectionAreaView = StagingSelectionAreaView(viewModel: stagingSelectionAreaViewModel, size: CGSize(width: size.width, height: 250))
         stagingSelectionAreaView.zPosition = Precedence.floating.rawValue
-        stagingSelectionAreaView.position = CGPoint.position(stagingSelectionAreaView.frame, inside: contentView.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most)
+        stagingSelectionAreaView.position = CGPoint.position(stagingSelectionAreaView.frame, inside: contentView.frame, verticalAlign: .top, horizontalAnchor: .center)
         
         
-        super.init(texture: nil, color: .clear, size: size)
+        super.init(texture: nil, color: .storeBlack, size: size)
         
         // touch delegation
         stagingSelectionAreaViewModel.touchDelegate = self
@@ -120,8 +159,9 @@ class StagingAreaView: SKSpriteNode {
         self.isUserInteractionEnabled = true
         
         // add selection are to content view
-        contentView.addChild(tierOneArea)
-        contentView.addChild(tierTwoArea)
+        contentView.addChildSafely(tierOneArea)
+        contentView.addChildSafely(tierTwoArea)
+        contentView.addChildSafely(tierThreeArea)
         contentView.addChild(stagingSelectionAreaView)
         
         // add contentView to scene

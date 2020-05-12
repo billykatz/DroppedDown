@@ -588,8 +588,10 @@ extension Board {
         var finalSelectedTiles: [TileCoord] = []
         for coord in selectedTiles {
             // turn the tile into a gem or into an empty
-            if !spawnedGem {
-                let newTile = tileCreator.gemDropped(from: intermediateTiles[coord.x][coord.y].type, groupSize: removedCount)
+            if !spawnedGem,
+                let pp = getTilePosition(.player(.playerZero), tiles: tiles),
+                case let TileType.player(data) = tiles[pp.row][pp.column].type {
+                let newTile = tileCreator.gemDropped(from: intermediateTiles[coord.x][coord.y].type, groupSize: removedCount, playerData: data)
                 intermediateTiles[coord.x][coord.y] = newTile
                 if newTile.type == TileType.item(.gem) {
                     spawnedGem = true
@@ -1011,14 +1013,16 @@ extension Board {
 extension Board {
     
     func attack(_ input: Input) -> Transformation {
-        guard case InputType.attack(_,
+        guard case InputType.attack(let type,
                                     let attackerPosition,
                                     let defenderPostion,
+                                    let affectedTiles,
                                     _) = input.type else {
                                         return Transformation.zero
         }
         var attacker: EntityModel
         var defender: EntityModel
+        var dodged = false
         
         
         //TODO: DRY, extract and shorten this code
@@ -1030,12 +1034,14 @@ extension Board {
             attacker = playerModel
             defender = monsterModel
             
-            let (newAttackerData, newDefenderData) = CombatSimulator.simulate(attacker: attacker,
+            let (newAttackerData, newDefenderData, defenderDodged) = CombatSimulator.simulate(attacker: attacker,
                                                                               defender: defender,
                                                                               attacked: relativeAttackDirection)
             
             tiles[attackerPosition.x][attackerPosition.y] = Tile(type: TileType.player(newAttackerData))
             tiles[defenderPosition.x][defenderPosition.y] = Tile(type: TileType.monster(newDefenderData))
+            
+            dodged = defenderDodged
             
         } else if let defenderPosition = defenderPostion,
             case let .player(playerModel) = tiles[defenderPosition].type,
@@ -1045,13 +1051,14 @@ extension Board {
             attacker = monsterModel
             defender = playerModel
             
-            let (newAttackerData, newDefenderData) = CombatSimulator.simulate(attacker: attacker,
+            let (newAttackerData, newDefenderData, defenderDodged) = CombatSimulator.simulate(attacker: attacker,
                                                                               defender: defender,
-                                                                              attacked: relativeAttackDirection,
-                                                                              threatLevel: level.threatLevelController.threatLevel)
+                                                                              attacked: relativeAttackDirection)
             
             tiles[attackerPosition.x][attackerPosition.y] = Tile(type: TileType.monster(newAttackerData))
             tiles[defenderPosition.x][defenderPosition.y] = Tile(type: TileType.player(newDefenderData))
+            
+            dodged = defenderDodged
         } else if case let .player(playerModel) = tiles[attackerPosition].type,
             defenderPostion == nil {
             //just note that the player attacked
@@ -1075,9 +1082,11 @@ extension Board {
             tiles[attackerPosition.x][attackerPosition.y] = Tile(type: TileType.monster(monsterModel.didAttack()))
         }
         
-        
-        
-        return Transformation(inputType: input.type,
+        return Transformation(inputType: InputType.attack(attackType: type,
+                                                          attacker: attackerPosition,
+                                                          defender: defenderPostion,
+                                                          affectedTiles: affectedTiles,
+                                                          dodged: dodged),
                               endTiles: tiles)
     }
 }

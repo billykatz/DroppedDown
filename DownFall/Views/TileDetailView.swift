@@ -77,7 +77,7 @@ class TileDetailView: SKNode {
         
         let maxWidth = self.contentView.frame.width * Constants.widthCoefficient
         let maxHeight = Constants.maxHeight// bottomLeft.y - playableRect.minY - tileSize/2 - Style.Padding.more
-        let detailView = SKSpriteNode(color: .clayRed, size: CGSize(width: maxWidth, height: maxHeight))
+        let detailView = SKSpriteNode(color: .foregroundBlue, size: CGSize(width: maxWidth, height: maxHeight))
         
         detailView.position = CGPoint.position(detailView.frame, inside: playableRect, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: Style.Padding.most*8)
         detailView.zPosition = Precedence.flying.rawValue
@@ -222,7 +222,7 @@ class TileDetailView: SKNode {
             return
         }
         
-        let subTitleNode = ParagraphNode(text: "Optional objectives.\nComplete for bonuses", paragraphWidth: detailViewTemplate.frame.width, fontSize: UIFont.largeSize)
+        let subTitleNode = ParagraphNode(text: "Complete to unlock\noffers between levels", paragraphWidth: detailViewTemplate.frame.width, fontSize: UIFont.largeSize)
         
         subTitleNode.position = CGPoint.position(subTitleNode.frame, inside: detailViewTemplate.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.less)
         
@@ -255,30 +255,14 @@ class TileDetailView: SKNode {
             descriptionLabel.position = CGPoint.alignVertically(descriptionLabel.frame, relativeTo: sprite.frame, horizontalAnchor: .right, verticalAlign: .center, verticalPadding: Style.Padding.less, horizontalPadding: Style.Padding.most,  translatedToBounds: true)
             
             detailViewTemplate.addChild(descriptionLabel)
+    
             
-            // reward view
-            
-            let size = CGSize(width: 60, height: 60)
-            let rewardView = SKSpriteNode(color: .clear, size: size)
-            
-            let gemSprite = SKSpriteNode(texture: SKTexture(imageNamed: goal.rewardTextureName), size: size)
-            gemSprite.position = CGPoint.position(gemSprite.frame, inside: rewardView.frame, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: Style.Padding.normal)
-            
-            if let amount = goal.rewardAmount {
-                gemSprite.addIndicator(of: amount)
-            }
-            
-            rewardView.addChild(gemSprite)
-            
-            rewardView.position = CGPoint.alignVertically(rewardView.frame, relativeTo: descriptionLabel.frame, horizontalAnchor: .right, verticalAlign: .center, translatedToBounds: true)
-            let xPosition = CGPoint.position(rewardView.frame, inside: detailViewTemplate.frame, verticalAlign: .center, horizontalAnchor: .right, xOffset: Style.Padding.more)
-            rewardView.position = CGPoint(x: xPosition.x, y: rewardView.position.y)
-            
-            detailViewTemplate.addChild(rewardView)
-            
-            
+            // Progress label  
             let progressLabel = ParagraphNode(text: goal.progressDescription, paragraphWidth: detailViewTemplate.frame.maxX - sprite.frame.maxX, fontSize: UIFont.mediumSize)
-            progressLabel.position = CGPoint.alignVertically(progressLabel.frame, relativeTo: rewardView.frame, horizontalAnchor: .left, verticalAlign: .center, horizontalPadding: Style.Padding.more, translatedToBounds: true)
+            let x = CGPoint.position(progressLabel.frame, inside: detailViewTemplate.frame, verticalAlign: .center, horizontalAnchor: .right, xOffset: Style.Padding.most*3).x
+            let y = CGPoint.alignVertically(progressLabel.frame, relativeTo: descriptionLabel.frame, horizontalAnchor: .right, verticalAlign: .center, translatedToBounds: true).y
+            progressLabel.position = CGPoint(x:x, y: y)
+                
             
             detailViewTemplate.addChild(progressLabel)
         

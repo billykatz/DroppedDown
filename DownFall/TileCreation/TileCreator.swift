@@ -113,12 +113,15 @@ class TileCreator: TileStrategy {
         fatalError("The randomNumber between 0-\(upperRange-1) should find itself in the range of one of the rocks")
     }
     
-    func gemDropped(from rock: TileType, groupSize: Int) -> Tile {
-        guard specialGems < level?.maxSpawnGems ?? 0 else { return .empty }
+    func gemDropped(from rock: TileType, groupSize: Int, playerData: EntityModel) -> Tile {
+        guard let level = level else { return .empty }
+        let extraGemsBasedOnLuck = playerData.luck / 5
+        let extraChanceBasedOnLuck = extraGemsBasedOnLuck * 2
+        guard specialGems < level.maxSpawnGems + extraGemsBasedOnLuck else { return .empty }
         let weight = 100
         let index = randomSource.nextInt() % weight
         let baseChance = 2
-        let extraChance = groupSize/2
+        let extraChance = extraChanceBasedOnLuck
         let totalChance = baseChance + extraChance
         if (0..<totalChance).contains(index) {
             let item = Item(type: .gem, amount: 1, color: rock.color)

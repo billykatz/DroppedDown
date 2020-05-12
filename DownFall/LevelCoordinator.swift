@@ -37,7 +37,7 @@ extension LevelCoordinating where Self: UIViewController {
             let storeScene = StoreScene(size: .universalSize,
                                         playerData: playerData,
                                         level: currentLevel,
-                                        viewModel: StoreSceneViewModel(offers: currentLevel.storeOffering))
+                                        viewModel: StoreSceneViewModel(offers: currentLevel.storeOffering, goalTracking: currentLevel.goalProgress))
             storeScene.scaleMode = .aspectFill
             storeScene.storeSceneDelegate = self
             view.presentScene(storeScene)
@@ -157,7 +157,7 @@ extension LevelCoordinating where Self: UIViewController {
             let storeScene = StoreScene(size: .universalSize,
                                         playerData: playerData,
                                         level: level,
-                                        viewModel: StoreSceneViewModel(offers: levels[levelIndex].storeOffering))
+                                        viewModel: StoreSceneViewModel(offers: levels[levelIndex].storeOffering, goalTracking: currentLevel.goalProgress))
             storeScene.storeSceneDelegate = self
             view.presentScene(storeScene)
         }

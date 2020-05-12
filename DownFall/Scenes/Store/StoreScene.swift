@@ -19,9 +19,11 @@ protocol StoreSceneViewModelable {
 
 struct StoreSceneViewModel: StoreSceneViewModelable {
     let offers: [StoreOffer]
+    let goalTracking: [GoalTracking]
     
-    init(offers: [StoreOffer]) {
+    init(offers: [StoreOffer], goalTracking: [GoalTracking]) {
         self.offers = offers
+        self.goalTracking = goalTracking
     }
 }
 

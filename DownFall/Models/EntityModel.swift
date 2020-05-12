@@ -226,6 +226,15 @@ struct EntityModel: Equatable, Decodable {
         return update(hp: hp - finalDamage)
     }
     
+    func doesDodge() -> Bool {
+        if self.type == .easyPlayer ||
+            self.type == .normalPlayer ||
+            self.type == .hardPlayer {
+            return (1...dodge+1).contains(Int.random(100))
+        }
+        return false
+    }
+    
     func buy(_ ability: Ability) -> EntityModel {
         return update(carry: carry.pay(ability.cost, inCurrency: ability.currency))
     }

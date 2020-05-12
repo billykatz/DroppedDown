@@ -14,6 +14,7 @@ class GameScene: SKScene {
     
     struct Constants {
         static let swipeDistanceThreshold = CGFloat(25.0)
+        static let quickSwipeDistanceThreshold = CGFloat(100.0)
     }
     
     // only strong reference to the Board

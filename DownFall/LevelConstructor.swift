@@ -103,7 +103,7 @@ struct LevelConstructor {
         
         switch levelType {
         case .first:
-            let monsterGoal = LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .monster(.zeroedEntity(type: .rat)), targetAmount: 3, minimumGroupSize: 1, grouped: false)
+            let monsterGoal = LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .monster(.zeroedEntity(type: .rat)), targetAmount: 1, minimumGroupSize: 1, grouped: false)
             if let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 25, minimumGroupSize: 1) {
                 return [rockGoal, monsterGoal]
             }

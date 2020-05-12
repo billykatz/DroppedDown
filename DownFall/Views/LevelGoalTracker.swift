@@ -46,8 +46,9 @@ class LevelGoalTracker: LevelGoalTracking {
         case .boardBuilt:
             goalUpdated?(goalProgress)
         case .runeProgressRecord:
+            checkForCompletedGoals()
             InputQueue.append(.init(.goalProgressRecord(goalProgress)))
-        case .itemUsed(let rune, _):
+        case .itemUsed:
             advanceRuneUseGoal()
         default:
             return
@@ -55,16 +56,16 @@ class LevelGoalTracker: LevelGoalTracking {
     }
     
     private func checkForCompletedGoals() {
-        var awardedGoals: [LevelGoalReward] = []
+//        var awardedGoals: [LevelGoalReward] = []
         for (idx, goal) in goalProgress.enumerated(){
             if goal.isCompleted && !goal.hasBeenRewarded {
                 goalProgress[idx] = goal.isAwarded()
-                awardedGoals.append(goal.reward)
+//                awardedGoals.append(goal.reward)
             }
         }
-        if !awardedGoals.isEmpty {
-            InputQueue.append(Input(.playerAwarded(awardedGoals)))
-        }
+//        if !awardedGoals.isEmpty {
+//            InputQueue.append(Input(.playerAwarded(awardedGoals)))
+//        }
     }
     
     /// Determines if the transformation advances the level goal

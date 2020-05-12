@@ -303,7 +303,9 @@ struct Animator {
         guard case InputType.attack(_,
                                     let attackerPosition,
                                     let defenderPosition,
-                                    let affectedTiles) = attackInputType else { return }
+                                    let affectedTiles,
+                                    let defenderDodged
+            ) = attackInputType else { return }
         
         /*
          Attack animations involve a few things depending on the attack.
@@ -343,8 +345,32 @@ struct Animator {
         }
         
         // defender animation
-        if let defend = animation(for: .hurt, fromPosition: defenderPosition, toPosition: nil, in: tiles, sprites: sprites, dispatchGroup: dispatchGroup) {
+        if !defenderDodged,
+            let defend = animation(for: .hurt, fromPosition: defenderPosition, toPosition: nil, in: tiles, sprites: sprites, dispatchGroup: dispatchGroup) {
             groupedActions.append(defend)
+        } else if defenderDodged {
+            let dodgedText = ParagraphNode(text: "Dodged!", paragraphWidth: 800.0, fontSize: UIFont.giantSize, fontColor: .yellow)
+            dodgedText.zPosition = Precedence.flying.rawValue
+            let scaleAction = SKAction.run {
+                let action = SKAction.scale(by: 1.75, duration: 0.75)
+                let rotateAction = SKAction.rotate(byAngle: .pi/16, duration: 0.30)
+                let antiRotateAction = SKAction.rotate(byAngle: -.pi/8, duration: 0.45)
+                
+                dodgedText.run(SKAction.group([action, SKAction.sequence([rotateAction, antiRotateAction])]))
+            }
+            
+            let addToSceneAction = SKAction.run {
+                foreground.addChild(dodgedText)
+            }
+            let removeAction = SKAction.run {
+                dodgedText.removeFromParent()
+            }
+            let addMoveUpAndScaleAction = SKAction.group([addToSceneAction, SKAction.wait(forDuration: 0.75),  scaleAction])
+            let sequence = SKAction.sequence([addMoveUpAndScaleAction, removeAction])
+            
+            
+            
+            groupedActions.append(sequence)
         }
         
         

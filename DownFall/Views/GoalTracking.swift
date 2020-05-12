@@ -44,7 +44,7 @@ struct GoalTracking: Hashable {
                     case .monster:
                         return "skullAndCrossbones"
                     case .gem:
-                        return "gem2"
+                        return "crystals"
                     default:
                         return ""
                     }

@@ -254,7 +254,8 @@ class TargetingViewModel: Targeting {
             currentTargets.targets.removeFirst(where: { !$0.isLegal })
             
             // if nothing has been removed then remove the first one placed
-            if currentTargets.targets.count == count {
+            if !currentTargets.targets.isEmpty,
+                currentTargets.targets.count == count {
                 currentTargets.targets.removeFirst()
             }
             //add the new target

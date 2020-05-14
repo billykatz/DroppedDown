@@ -113,10 +113,11 @@ class StagingAreaView: SKSpriteNode {
     private lazy var tierThreeArea: StagingTierView? = {
         // tier area
         let tier = 3
-        guard viewModel.storeOffers.filter({$0.tier == tier }).count > 0,
-            let tierTwoFrame = self.tierTwoArea?.frame
-            else { return nil }
         let tierIndex = 2
+        guard viewModel.storeOffers.filter({$0.tier == tier }).count > 0,
+            let tierTwoFrame = self.tierTwoArea?.frame,
+            tierIndex < viewModel.goalProgress.count
+            else { return nil }
         let offer = viewModel.storeOffers.filter { $0.tier == tier }
         let vm = StagingTierViewModel(offers: offer,
                                       tier: tier,

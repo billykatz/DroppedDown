@@ -10,6 +10,6 @@ import SpriteKit
 
 protocol GameSceneCoordinatingDelegate: class {
     func reset(_ scene: SKScene, playerData: EntityModel)
-    func resetToMain(_ scene: SKScene)
+    func resetToMain(_ scene: SKScene, playerData: EntityModel)
     func visitStore(_ playerData: EntityModel, _ goalProgress: [GoalTracking])
 }

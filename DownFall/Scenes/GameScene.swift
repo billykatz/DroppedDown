@@ -115,10 +115,10 @@ class GameScene: SKScene {
                 else { return }
                 
                 self.foreground.removeAllChildren()
-                if case TileType.player = self.board.tiles[playerIndex].type {
+                if case let TileType.player(data) = self.board.tiles[playerIndex].type {
                     self.removeFromParent()
                     self.swipeRecognizerView?.removeFromSuperview()
-                    self.gameSceneDelegate?.resetToMain(self)
+                    self.gameSceneDelegate?.resetToMain(self, playerData: data)
                 }
 
             } else if case let InputType.goalProgressRecord(progress) = input.type {

@@ -8,7 +8,7 @@
 
 import SpriteKit
 
-enum StoreOfferType: Equatable {
+enum StoreOfferType: Hashable {
     static func ==(lhs: StoreOfferType, rhs: StoreOfferType) -> Bool {
         switch (lhs, rhs) {
         case (.fullHeal, .fullHeal): return true
@@ -33,7 +33,7 @@ enum StoreOfferType: Equatable {
 
 typealias StoreOfferTier = Int
 
-struct StoreOffer {
+struct StoreOffer: Hashable {
     let type: StoreOfferType
     let tier: StoreOfferTier
     let textureName: String

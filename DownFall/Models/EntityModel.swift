@@ -210,6 +210,17 @@ struct EntityModel: Equatable, Decodable {
         return self.update(hp: originalHp)
     }
     
+    func resetToBaseStats() -> EntityModel {
+        let player = self.update(originalHp: 3,
+                                 carry: CarryModel(items: [Item(type: .gem, amount: 0, color: nil)]),
+                           pickaxe: Pickaxe(runeSlots: 1, runes: []),
+                           effects: [],
+                           dodge: 0,
+                           luck: 0
+        )
+        return player.previewAppliedEffects()
+    }
+    
     func didAttack() -> EntityModel {
         return update(attack: attack.didAttack())
     }
@@ -258,6 +269,10 @@ struct EntityModel: Equatable, Decodable {
     
     func gainMaxHealth(amount: Int) -> EntityModel {
         return update(originalHp: originalHp + amount)
+    }
+    
+    func hasEffect(_ effect: EffectModel) -> Bool {
+        return effects.contains(effect)
     }
     
     func removeEffect(_ effect: EffectModel) -> EntityModel {
@@ -354,6 +369,10 @@ struct EntityModel: Equatable, Decodable {
         default:
             preconditionFailure("Youll want to implement future cases here")
         }
+    }
+    
+    func numberOfEffects(_ effect: EffectModel) -> Int {
+        return effects.filter( { $0 == effect }).count
     }
     
 }

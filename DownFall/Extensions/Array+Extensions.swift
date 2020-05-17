@@ -31,4 +31,17 @@ extension Array where Element: Hashable {
         self = self.removingDuplicates()
     }
     
+    func dropRandom() -> [Element] {
+        guard self.count > 1 else { return [] }
+        let randomIndex = Int.random(in: 0..<self.count)
+        var newArray: [Element] = []
+        for (idx, element) in self.enumerated() {
+            if idx != randomIndex {
+                newArray.append(element)
+            }
+        }
+        
+        return newArray
+    }
+    
 }

@@ -18,7 +18,7 @@ class StagingTierViewModel {
     let offers: [StoreOffer]
     let tier: Int
     let unlocked: Bool
-    let goalTracker: GoalTracking
+    var goalTracker: GoalTracking?
     
     var selectedOffer: StoreOffer? {
         didSet {
@@ -41,7 +41,7 @@ class StagingTierViewModel {
     
     init(offers: [StoreOffer], tier: Int, unlocked: Bool, touchDelegate: SKNode, offerThatWasSelected: @escaping (StoreOffer, StoreOffer?) -> (),
          offerWasTappedForInformation: @escaping (StoreOffer) -> (),
-         goalTracker: GoalTracking) {
+         goalTracker: GoalTracking?) {
         self.offers = offers
         self.tier = tier
         self.unlocked = unlocked
@@ -207,12 +207,13 @@ class StagingTierView: SKSpriteNode {
     }
     
     func setupGoalView() {
+        guard let goalTrack = viewModel.goalTracker else { return }
         let goalCircleViewModel = FillableCircleViewModel(horiztonal: false,
                                                           radius: 100.0,
-                                                          total: viewModel.goalTracker.target,
-                                                          progress: viewModel.goalTracker.current,
-                                                          fillColor: viewModel.goalTracker.fillBarColor.0,
-                                                          darkFillColor: viewModel.goalTracker.fillBarColor.1,
+                                                          total: goalTrack.target,
+                                                          progress: goalTrack.current,
+                                                          fillColor: goalTrack.fillBarColor.0,
+                                                          darkFillColor: goalTrack.fillBarColor.1,
                                                           text: nil,
                                                           backgroundColor: .storeBlack)
         let goalCircleSprite = FillableCircleBar(size: .oneFifty, viewModel: goalCircleViewModel)

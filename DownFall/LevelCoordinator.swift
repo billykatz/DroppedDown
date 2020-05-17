@@ -104,8 +104,8 @@ extension LevelCoordinating where Self: UIViewController {
         let index = LevelType.gameCases.firstIndex(of: level) ?? 0
         levelIndex = index
         levels = LevelConstructor.buildLevels(difficulty, randomSource: randomSource ?? GKLinearCongruentialRandomSource())
-        presentNextLevel(player)
-//        presentStore(player)
+//        presentNextLevel(player)
+        presentStore(player)
     }
     
     
@@ -119,13 +119,12 @@ extension LevelCoordinating where Self: UIViewController {
     }
     
     // MARK: - GameSceneCoordinatingDelegate
-    
-    func resetToMain(_ scene: SKScene) {
+    func resetToMain(_ scene: SKScene, playerData: EntityModel) {
         let fadeOut = SKAction.fadeOut(withDuration: 0.75)
         let remove = SKAction.removeFromParent()
         scene.run(SKAction.group([fadeOut, remove])) { [weak self] in
             guard let self = self else { return }
-            self.levelSelect(self.entities!.entities[2])
+            self.levelSelect(playerData.resetToBaseStats())
         }
 
     }

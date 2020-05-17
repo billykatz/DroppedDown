@@ -31,5 +31,11 @@ extension SKSpriteNode {
         
         addChild(amountBackground)
     }
+    
+    func addZPositionToChildren(_ zPos: CGFloat) {
+        for child in children {
+            child.zPosition = zPos
+        }
+    }
 }
 

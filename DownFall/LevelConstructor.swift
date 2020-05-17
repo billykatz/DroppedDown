@@ -46,13 +46,10 @@ struct LevelConstructor {
         let luckUp = StoreOffer.offer(type: .luck, tier: 2)
         switch levelType {
         case .first:
-            storeOffers.append(getSwitfy)
-            storeOffers.append(runeSlot)
-            
-            
-            let getSwifty = StoreOffer.offer(type: .rune(Rune.rune(for: .getSwifty)), tier: 3)
-            let rainEmbers = StoreOffer.offer(type: .rune(Rune.rune(for: .rainEmbers)), tier: 3)
-            storeOffers.append(contentsOf: [getSwifty, rainEmbers])
+            let getSwifty = StoreOffer.offer(type: .rune(Rune.rune(for: .getSwifty)), tier: 1)
+            let rainEmbers = StoreOffer.offer(type: .rune(Rune.rune(for: .rainEmbers)), tier: 1)
+            let transform = StoreOffer.offer(type: .rune(Rune.rune(for: .transformRock)), tier: 1)
+            storeOffers = [getSwifty, rainEmbers, transform].dropRandom()
         case .second:
             storeOffers.append(contentsOf: [dodgeUp, luckUp])
             

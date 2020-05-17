@@ -93,12 +93,11 @@ class MainMenu: SKScene {
         
         //        addOptionalChild(header)
         
-        self.gems = 20// playerModel?.carry.total(in: .gem) ?? 0
+        self.gems = playerModel?.carry.total(in: .gem) ?? 0
         playerModel = playerModel?.resetToBaseStats()
         
         gemContainer = SKSpriteNode(color: .clear, size: CGSize(width: 200.0, height: 250.0))
         gemContainer?.position = CGPoint.position(gemContainer?.frame, inside: playableRect, verticalAlign: .top, horizontalAnchor: .center, yOffset: 75.0)
-        addChildSafely(gemContainer)
         
         
         let heightToWidthRatio = CGFloat(2.66)
@@ -110,7 +109,6 @@ class MainMenu: SKScene {
                                             size: CGSize(width: height * heightToWidthRatio,
                                                          height: height))
         healthOfferContainer?.position = CGPoint.alignHorizontally(healthOfferContainer?.frame, relativeTo: gemContainer?.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Constants.offerSlabPadding, translatedToBounds: true)
-        addChildSafely(healthOfferContainer)
         
         
         /// luck offer container
@@ -119,7 +117,6 @@ class MainMenu: SKScene {
                                           size: CGSize(width: height * heightToWidthRatio,
                                                        height: height))
         luckOfferContainer?.position = CGPoint.alignHorizontally(luckOfferContainer?.frame, relativeTo: healthOfferContainer?.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Constants.offerSlabPadding, translatedToBounds: true)
-        addChildSafely(luckOfferContainer)
         
         
         /// dodge offer container
@@ -128,7 +125,6 @@ class MainMenu: SKScene {
                                            size: CGSize(width: height * heightToWidthRatio,
                                                         height: height))
         dodgeOfferContainer?.position = CGPoint.alignHorizontally(dodgeOfferContainer?.frame, relativeTo: luckOfferContainer?.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Constants.offerSlabPadding, translatedToBounds: true)
-        addChildSafely(dodgeOfferContainer)
         
         //rune slot offer container
         runeSlotOfferContainer = SKSpriteNode(texture: SKTexture(imageNamed: "offerSlab"),
@@ -136,10 +132,14 @@ class MainMenu: SKScene {
                                               size: CGSize(width: height * heightToWidthRatio,
                                                            height: height))
         runeSlotOfferContainer?.position = CGPoint.alignHorizontally(runeSlotOfferContainer?.frame, relativeTo: dodgeOfferContainer?.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Constants.offerSlabPadding, translatedToBounds: true)
-        addChildSafely(runeSlotOfferContainer)
         
         
         if gems > 0 {
+            addChildSafely(gemContainer)
+            addChildSafely(luckOfferContainer)
+            addChildSafely(dodgeOfferContainer)
+            addChildSafely(healthOfferContainer)
+            addChildSafely(runeSlotOfferContainer)
             updateGemLabel(gems)
             createHealthOffer()
             createLuckOffer()

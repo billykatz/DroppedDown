@@ -65,9 +65,9 @@ struct LevelConstructor {
             storeOffers.append(contentsOf: [dodgeUp, luckUp, getSwifty, rainEmbers])
         case .fourth:
             let runeSlot = StoreOffer.offer(type: .runeSlot, tier: 3)
-            let runeUpgrade = StoreOffer.offer(type: .runeUpgrade, tier: 3)
+            let gemOffer = StoreOffer.offer(type: .gems(amount: 5), tier: 3)
             
-            storeOffers.append(contentsOf: [dodgeUp, luckUp, runeSlot, runeUpgrade])
+            storeOffers.append(contentsOf: [dodgeUp, luckUp, runeSlot, gemOffer])
             
         case .fifth:
             storeOffers.append(getSwitfy)
@@ -203,9 +203,9 @@ struct LevelConstructor {
             return 0.05
         case .second, .third:
             return 0.08
-        case .fourth:
+        case .fourth, .fifth:
             return 0.10
-        case .fifth, .sixth, .boss:
+        case .sixth, .boss:
             return 0.12
         case .seventh:
             return  0.15
@@ -235,16 +235,19 @@ struct LevelConstructor {
             let rocks = matchUp([.rock(.red), .rock(.blue), .rock(.purple)], range: normalRockRange, subRanges: 3)
             return rocks
         case .fifth:
-            let rocks = matchUp([.rock(.red), .rock(.blue), .rock(.purple), .rock(.brown)], range: normalRockRange, subRanges: 4)
-            return rocks
-            
+            let redRange = RangeModel(lower: 0, upper: 30)
+            let blueRange = redRange.next(30)
+            let purpleRange = blueRange.next(30)
+            let brownRange = purpleRange.next(10)
+            return [.rock(.red): redRange, .rock(.blue): blueRange, .rock(.purple): purpleRange, .rock(.brown): brownRange]
+        case .sixth:
             let redRange = RangeModel(lower: 0, upper: 27)
             let blueRange = redRange.next(27)
             let purpleRange = blueRange.next(27)
-            let brownRange = purpleRange.next(15)
+            let brownRange = purpleRange.next(19)
             return [.rock(.red): redRange, .rock(.blue): blueRange, .rock(.purple): purpleRange, .rock(.brown): brownRange]
 
-        case .sixth, .seventh, .boss:
+        case .seventh, .boss:
             let rocks = matchUp([.rock(.red), .rock(.blue), .rock(.purple), .rock(.brown)], range: normalRockRange, subRanges: 4)
             return rocks
         case .tutorial1, .tutorial2:
@@ -288,8 +291,8 @@ struct LevelConstructor {
             ]
             
         case .fifth:
-            let randomPillar1 = randomPillar(notIn: Set<Color>([.green]))
-            let randomPillar2 = randomPillar(notIn: Set<Color>([.green]))
+            let randomPillar1 = randomPillar(notIn: Set<Color>([.brown, .green]))
+            let randomPillar2 = randomPillar(notIn: Set<Color>([.brown, .green]))
             return [
                 (randomPillar1, TileCoord(0, 0)),
                 (randomPillar1, TileCoord(0, 1)),
@@ -361,7 +364,9 @@ struct LevelConstructor {
             return 3
         case .third, .fourth:
             return 6
-        case .fifth, .sixth, .seventh:
+        case .fifth:
+            return 7
+        case .sixth, .seventh:
             return 8
         case .boss:
             return 0

@@ -51,7 +51,7 @@ enum ButtonIdentifier: String {
         case .selectLevel:
             return "Level Select"
         case .leaveStore:
-            return "Leave Store"
+            return "Continue"
         case .rotate:
             return "Got it! 👍"
         case .visitStore:

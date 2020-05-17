@@ -103,11 +103,11 @@ class StoreScene: SKScene {
         self.backgroundColor = .clayRed
         
         /// Leave store button
-        let button = Button(size: Button.large,
+        let button = Button(size: Button.extralarge,
                             delegate: self,
                             identifier: .leaveStore,
                             precedence: .foreground,
-                            fontSize:  UIFont.mediumSize,
+                            fontSize:  UIFont.largeSize,
                             fontColor: .black,
                             backgroundColor: .menuPurple)
         

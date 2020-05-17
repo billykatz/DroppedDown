@@ -206,13 +206,13 @@
                     "animationFilename": "fireballStart",
                     "numberOfFrames": 6,
                     "animationType": "projectileStart",
-                    "keyframe": 4
+                    "keyframe": 3
                 },
                 {
                     "animationFilename": "fireballMid",
                     "numberOfFrames": 5,
                     "animationType": "projectileMid",
-                    "keyframe": 2
+                    "keyframe": 1
                 }
             ],
             "carry": {

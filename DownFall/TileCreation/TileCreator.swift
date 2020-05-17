@@ -19,6 +19,7 @@ class TileCreator: TileStrategy {
     var specialGems = 0
     var goldVariance = 2
     let maxMonsterRatio: Double = 0.15
+    var numberOfTilesSinceLastGemDropped = 0
     
     required init(_ entities: EntitiesModel,
                   difficulty: Difficulty,
@@ -122,8 +123,10 @@ class TileCreator: TileStrategy {
         let index = randomSource.nextInt() % weight
         let baseChance = 2
         let extraChance = extraChanceBasedOnLuck
-        let totalChance = baseChance + extraChance
+        let moreChanceBasedOnLastTimeAGemDropped = numberOfTilesSinceLastGemDropped / 10
+        let totalChance = baseChance + extraChance + moreChanceBasedOnLastTimeAGemDropped
         if (0..<totalChance).contains(index) {
+            numberOfTilesSinceLastGemDropped = 0
             let item = Item(type: .gem, amount: 1, color: rock.color)
             specialGems += 1
             return Tile(type: TileType.item(item)) 
@@ -183,6 +186,7 @@ class TileCreator: TileStrategy {
         var newTiles: [[Tile]] = tiles
         
         let maxMonsters = Int(Double(tiles.count * tiles.count) * (level?.maxMonsterOnBoardRatio ?? maxMonsterRatio))
+        numberOfTilesSinceLastGemDropped += typeCount(for: tiles, of: .empty).count
         var currMonsterCount = typeCount(for: tiles, of: .monster(.zero)).count
         
         for row in 0..<newTiles.count {

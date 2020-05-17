@@ -176,9 +176,11 @@ struct LevelConstructor {
             return 8
         case .third, .fourth:
             return 9
-        case .fifth, .sixth, .seventh, .boss:
+        case .fifth:
             return 10
-        case .tutorial1, .tutorial2:
+        case .sixth, .seventh:
+            return 11
+        case .tutorial1, .tutorial2, .boss:
             fatalError()
         }
     }
@@ -241,10 +243,10 @@ struct LevelConstructor {
             let brownRange = purpleRange.next(10)
             return [.rock(.red): redRange, .rock(.blue): blueRange, .rock(.purple): purpleRange, .rock(.brown): brownRange]
         case .sixth:
-            let redRange = RangeModel(lower: 0, upper: 27)
-            let blueRange = redRange.next(27)
-            let purpleRange = blueRange.next(27)
-            let brownRange = purpleRange.next(19)
+            let redRange = RangeModel(lower: 0, upper: 28)
+            let blueRange = redRange.next(28)
+            let purpleRange = blueRange.next(28)
+            let brownRange = purpleRange.next(15)
             return [.rock(.red): redRange, .rock(.blue): blueRange, .rock(.purple): purpleRange, .rock(.brown): brownRange]
 
         case .seventh, .boss:

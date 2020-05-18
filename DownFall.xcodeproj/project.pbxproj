@@ -170,6 +170,7 @@
 		589A27D123D90CD900174DE7 /* TargetingState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589A27D023D90CD900174DE7 /* TargetingState.swift */; };
 		589A27D423D90FE000174DE7 /* TargetingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589A27D323D90FE000174DE7 /* TargetingViewModel.swift */; };
 		589A27D623D9210900174DE7 /* TargetingViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589A27D523D9210900174DE7 /* TargetingViewModelTests.swift */; };
+		58A4B91D2472E5620011624A /* ChanceModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58A4B91C2472E5620011624A /* ChanceModel.swift */; };
 		58A51663241DF3E2009E84E1 /* TargetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58A51662241DF3E2009E84E1 /* TargetView.swift */; };
 		58AD4883243581FC00F90A87 /* RandomTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4A470C23B3CEFC000165FB /* RandomTests.swift */; };
 		58AD9282243C283300B5B1EC /* LevelGoalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58AD9281243C283300B5B1EC /* LevelGoalView.swift */; };
@@ -358,6 +359,7 @@
 		589A27D023D90CD900174DE7 /* TargetingState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetingState.swift; sourceTree = "<group>"; };
 		589A27D323D90FE000174DE7 /* TargetingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetingViewModel.swift; sourceTree = "<group>"; };
 		589A27D523D9210900174DE7 /* TargetingViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetingViewModelTests.swift; sourceTree = "<group>"; };
+		58A4B91C2472E5620011624A /* ChanceModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChanceModel.swift; sourceTree = "<group>"; };
 		58A51662241DF3E2009E84E1 /* TargetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetView.swift; sourceTree = "<group>"; };
 		58AD9281243C283300B5B1EC /* LevelGoalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelGoalView.swift; sourceTree = "<group>"; };
 		58B39BD623D21C9600915858 /* BackpackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackpackView.swift; sourceTree = "<group>"; };
@@ -781,6 +783,7 @@
 			children = (
 				3DA0A37B2300CDEB0041EF34 /* Items */,
 				3D58468722A6322900EDD845 /* RangeModel.swift */,
+				58A4B91C2472E5620011624A /* ChanceModel.swift */,
 				5819AB70242A5CA600498BB6 /* SpriteAction.swift */,
 				3D58468B22A632F100EDD845 /* AttackModel.swift */,
 				3D58468922A6325300EDD845 /* CarryModel.swift */,
@@ -1147,6 +1150,7 @@
 				5865D62E23DBF652007D11FC /* abilities.json in Sources */,
 				3D06390722EEB53C00C4D5E9 /* ComputingState.swift in Sources */,
 				3D674C9522C9D6640003AEB4 /* MainMenu.swift in Sources */,
+				58A4B91D2472E5620011624A /* ChanceModel.swift in Sources */,
 				5881DBF4244FEE440053A690 /* RuneSlotView.swift in Sources */,
 				58383643242D7A6E004CA026 /* Array+Extensions.swift in Sources */,
 				58C1AE4C23D19E03003B5B5A /* KillMonsterPotion.swift in Sources */,

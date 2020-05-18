@@ -34,7 +34,7 @@ class TileCreator: TileStrategy {
         self.boardSize = level?.boardSize ?? 0
     }
     
-    private func randomTile(_ given: Int) -> TileType {
+    private func randomTile(given: Int, neighbors: [Tile]) -> TileType {
         guard level?.spawnsMonsters ?? true else { return randomRock() }
         let weight = 97
         let index = abs(given) % (TileType.randomCases.count + weight)
@@ -51,7 +51,7 @@ class TileCreator: TileStrategy {
         case 0..<9:
             return randomMonster()
         case 9...Int.max:
-            return randomRock()
+            return randomRock(neighbors)
         default:
             preconditionFailure("Shouldnt be here")
         }
@@ -98,20 +98,26 @@ class TileCreator: TileStrategy {
         return tileCoord
     }
     
-    private func randomRock() -> TileType {
+    private func randomRock(_ neighbors: [Tile] = []) -> TileType {
         guard let level = level else { fatalError("You need to init with a level") }
-        let totalNumber = level.rocksRatio.values.max { (first, second) -> Bool in
-            return first.upper < second.upper
+        var tileTypeChances = level.tileTypeChances
+        if !neighbors.isEmpty {
+            tileTypeChances = tileTypeChances.increaseChances(basedOn: neighbors
+                .map { $0.type }
+                .filter { TileType.rockCases.contains($0) }
+            )
         }
-        guard let upperRange = totalNumber?.upper else { fatalError("We need the max number or else we cannot continue") }
-        let randomNumber = Int.random(upperRange)
-        for (key, value) in level.rocksRatio {
-            if value.contains(randomNumber) {
+        let randomNumber = Int.random(tileTypeChances.outcomes)
+        var lowerBound = 0
+        for (key, value) in tileTypeChances.chances {
+            if (lowerBound..<lowerBound+value).contains(randomNumber) {
                 return key
+            } else {
+                lowerBound = lowerBound + value
             }
         }
         
-        fatalError("The randomNumber between 0-\(upperRange-1) should find itself in the range of one of the rocks")
+        fatalError("The randomNumber should between 0 and \(randomNumber-1) should map to a TileType.")
     }
     
     func gemDropped(from rock: TileType, groupSize: Int, playerData: EntityModel) -> Tile {
@@ -146,11 +152,11 @@ class TileCreator: TileStrategy {
     
     private func randomTile(_ neighbors: [Tile], noMoreMonsters: Bool) -> Tile {
         guard let level = level else { preconditionFailure("We need a level to create tiles") }
-        var nextTile = Tile(type: randomTile(randomSource.nextInt()))
+        var nextTile = Tile(type: randomTile(given: randomSource.nextInt(), neighbors: neighbors))
         
         var validTile = false
         while !validTile {
-            nextTile = Tile(type: randomTile(randomSource.nextInt()))
+            nextTile = Tile(type: randomTile(given: randomSource.nextInt(), neighbors: neighbors))
             
             switch nextTile.type {
             case .monster:

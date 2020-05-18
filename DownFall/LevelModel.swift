@@ -49,7 +49,7 @@ struct Level {
     let boardSize: Int
     let abilities: [AnyAbility]
     let goldMultiplier: Int
-    let rocksRatio: [TileType: RangeModel]
+    let tileTypeChances: TileTypeChanceModel
     let maxSpecialRocks = 5
     let pillarCoordinates: [(TileType, TileCoord)]
     let threatLevelController:  ThreatLevelController
@@ -73,5 +73,5 @@ struct Level {
         return type != .boss
     }
         
-    static let zero = Level(type: .first, monsterTypeRatio: [:], monsterCountStart: 0, maxMonsterOnBoardRatio: 0.0, maxGems: 0, maxTime: 0, boardSize: 0, abilities: [], goldMultiplier: 1, rocksRatio: [:], pillarCoordinates: [], threatLevelController:  ThreatLevelController(), goals: [LevelGoal(type: .unlockExit, reward: .gem(0), tileType: .empty, targetAmount: 0, minimumGroupSize: 0, grouped: false)], numberOfGoalsNeedToUnlockExit: 0, maxSpawnGems: 0, storeOffering: [], tutorialData: nil)
+    static let zero = Level(type: .first, monsterTypeRatio: [:], monsterCountStart: 0, maxMonsterOnBoardRatio: 0.0, maxGems: 0, maxTime: 0, boardSize: 0, abilities: [], goldMultiplier: 1, tileTypeChances: TileTypeChanceModel(chances: [.empty: 1]), pillarCoordinates: [], threatLevelController:  ThreatLevelController(), goals: [LevelGoal(type: .unlockExit, reward: .gem(0), tileType: .empty, targetAmount: 0, minimumGroupSize: 0, grouped: false)], numberOfGoalsNeedToUnlockExit: 0, maxSpawnGems: 0, storeOffering: [], tutorialData: nil)
 }

@@ -22,7 +22,7 @@ struct LevelConstructor {
                          boardSize: boardSize(per: levelType, difficulty: difficulty),
                          abilities: availableAbilities(per: levelType, difficulty: difficulty),
                          goldMultiplier: difficulty.goldMultiplier,
-                         rocksRatio: availableRocksPerLevel(levelType, difficulty: difficulty),
+                         tileTypeChances: availableRocksPerLevel(levelType, difficulty: difficulty),
                          pillarCoordinates: pillars(per: levelType, difficulty: difficulty),
                          threatLevelController: buildThreatLevelController(per: levelType, difficulty: difficulty),
                          goals: levelGoal(per: levelType, difficulty: difficulty),
@@ -159,7 +159,7 @@ struct LevelConstructor {
                   boardSize: 4,
                   abilities: [],
                   goldMultiplier: 1,
-                  rocksRatio: [:],
+                  tileTypeChances: TileTypeChanceModel(chances: [.empty: 1]),
                   pillarCoordinates: [],
                   threatLevelController: ThreatLevelController(),
                   goals: [LevelGoal(type: .unlockExit, reward: .gem(0), tileType: .empty, targetAmount: 0, minimumGroupSize: 0, grouped: false)],
@@ -217,41 +217,33 @@ struct LevelConstructor {
     }
     
     
-    static func availableRocksPerLevel(_ levelType: LevelType, difficulty: Difficulty) -> [TileType: RangeModel] {
-        let normalRockRange = RangeModel(lower: 0, upper: 90)
-        
-        func matchUp(_ types: [TileType], range: RangeModel, subRanges: Int) -> [TileType: RangeModel] {
-            guard types.count == subRanges else { fatalError("The number of types nust match the number of subranges") }
-            let dividedRockRanges = range.divivdedIntoSubRanges(subRanges)
-            var count = 0
-            return types.reduce([:], { (prior, type) -> [TileType: RangeModel] in
-                var new = prior
-                new[type] = dividedRockRanges[count]
-                count += 1
-                return new
-            })
-        }
+    static func availableRocksPerLevel(_ levelType: LevelType, difficulty: Difficulty) -> TileTypeChanceModel {
         
         switch levelType {
         case .first, .second, .third, .fourth:
-            let rocks = matchUp([.rock(.red), .rock(.blue), .rock(.purple)], range: normalRockRange, subRanges: 3)
-            return rocks
+            let chances = TileTypeChanceModel(chances: [.rock(.red): 33,
+                                                        .rock(.blue): 33,
+                                                        .rock(.purple): 33])
+            return chances
         case .fifth:
-            let redRange = RangeModel(lower: 0, upper: 30)
-            let blueRange = redRange.next(30)
-            let purpleRange = blueRange.next(30)
-            let brownRange = purpleRange.next(10)
-            return [.rock(.red): redRange, .rock(.blue): blueRange, .rock(.purple): purpleRange, .rock(.brown): brownRange]
+            let chances = TileTypeChanceModel(chances: [.rock(.red): 30,
+                                                        .rock(.blue): 30,
+                                                        .rock(.purple): 30,
+                                                        .rock(.brown): 10])
+            return chances
         case .sixth:
-            let redRange = RangeModel(lower: 0, upper: 28)
-            let blueRange = redRange.next(28)
-            let purpleRange = blueRange.next(28)
-            let brownRange = purpleRange.next(15)
-            return [.rock(.red): redRange, .rock(.blue): blueRange, .rock(.purple): purpleRange, .rock(.brown): brownRange]
+            let chances = TileTypeChanceModel(chances: [.rock(.red): 28,
+                                                        .rock(.blue): 28,
+                                                        .rock(.purple): 28,
+                                                        .rock(.brown): 15])
+            return chances
 
         case .seventh, .boss:
-            let rocks = matchUp([.rock(.red), .rock(.blue), .rock(.purple), .rock(.brown)], range: normalRockRange, subRanges: 4)
-            return rocks
+            let chances = TileTypeChanceModel(tileTypes: [.rock(.red),
+                                                        .rock(.blue),
+                                                        .rock(.purple),
+                                                        .rock(.brown)])
+            return chances
         case .tutorial1, .tutorial2:
             fatalError("Do not call this for tutorial")
         }

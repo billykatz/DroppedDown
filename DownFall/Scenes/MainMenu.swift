@@ -91,8 +91,6 @@ class MainMenu: SKScene {
                               delegate: self)
         header?.position = CGPoint.position(this: header?.frame ?? .zero, centeredInBottomOf: playableRect, verticalPadding: 25.0)
         
-        //        addOptionalChild(header)
-        
         self.gems = playerModel?.carry.total(in: .gem) ?? 0
         playerModel = playerModel?.resetToBaseStats()
         

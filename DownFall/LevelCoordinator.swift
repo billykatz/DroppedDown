@@ -124,7 +124,7 @@ extension LevelCoordinating where Self: UIViewController {
         let remove = SKAction.removeFromParent()
         scene.run(SKAction.group([fadeOut, remove])) { [weak self] in
             guard let self = self else { return }
-            self.levelSelect(playerData.resetToBaseStats())
+            self.levelSelect(playerData)
         }
 
     }
@@ -157,6 +157,7 @@ extension LevelCoordinating where Self: UIViewController {
                                         playerData: playerData,
                                         level: level,
                                         viewModel: StoreSceneViewModel(offers: levels[levelIndex].storeOffering, goalTracking: currentLevel.goalProgress))
+            storeScene.scaleMode = .aspectFill
             storeScene.storeSceneDelegate = self
             view.presentScene(storeScene)
         }

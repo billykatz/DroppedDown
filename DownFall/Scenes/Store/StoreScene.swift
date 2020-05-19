@@ -77,7 +77,10 @@ class StoreScene: SKScene {
         self.stagingArea = StagingAreaView(viewModel: stagingViewModel, size: CGSize(width: playableRect.width, height: playableRect.height - Constants.storeHUDHeight))
         
         /// Super init'd
-        super.init(size: playableRect.size)
+        super.init(size: size)
+        
+        //acnhor point
+        self.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         
         //set up call backs
         //staging area call backs

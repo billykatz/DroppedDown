@@ -79,6 +79,10 @@ class StoreHUDViewModel: StoreHUDViewModelable {
                 /// add back the remove rune
                 addBackRemovedRuneAndRemoveRuneEffect(otherEffect)
             }
+            else if otherEffect.stat == .runeSlot {
+                basePlayerData = basePlayerData.removeEffect(otherEffect)
+                removedEffect(otherEffect)
+            }
             /// We need to update the UI first to capture the pre-removed effect player data
             else {
                 removedEffect(otherEffect)

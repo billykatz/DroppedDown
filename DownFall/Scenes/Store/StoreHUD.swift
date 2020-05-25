@@ -62,7 +62,6 @@ class StoreHUD: SKSpriteNode {
         self.healthBarContainer = SKSpriteNode(color: .clear, size: CGSize(width: thirdWidth, height: halfHeight))
         
         /// hook up to the view models update hud
-        self.viewModel.updateHUD = self.updateHUD
         self.viewModel.removedEffect = self.removedEffect
         self.viewModel.addedEffect = self.addedEffect
         self.viewModel.startRuneReplacement = self.startRuneReplacement
@@ -109,10 +108,7 @@ class StoreHUD: SKSpriteNode {
                 }
             }
         case .gems:
-            if let currencyView = contentView.childNode(withName: Constants.currencyViewName) {
-                currencyView.removeFromParent()
-                redrawCurrencyView(newAmount: effect.amount, removed: true)
-            }
+            redrawCurrencyView(newAmount: effect.amount, removed: true)
         case .pickaxe:
             self.createRuneContainerView(mode: .storeHUD, playerData: viewModel.previewPlayerData)
             swapRunesMenuView?.removeFromParent()
@@ -221,8 +217,9 @@ class StoreHUD: SKSpriteNode {
     
     func redrawCurrencyView(newAmount: Int, removed: Bool) {
         /// Currency View
+        contentView.removeChild(with: Constants.currencyViewName)
         let gemAmount = removed ? viewModel.totalGems : viewModel.previewTotalGems
-        let currencyView = CurrencyView(viewModel: CurrencyViewModel(currency: .gem, amount: gemAmount), size: CGSize(width: halfWidth, height: halfHeight))
+        let currencyView = CurrencyView(viewModel: CurrencyViewModel(currency: .gem, amount: gemAmount), size: CGSize(width: thirdWidth, height: halfHeight))
         currencyView.position = CGPoint.position(currencyView.frame, inside: contentView.frame, verticalAlign: .top, horizontalAnchor: .right)
         currencyView.name = Constants.currencyViewName
         contentView.addChild(currencyView)
@@ -236,10 +233,6 @@ class StoreHUD: SKSpriteNode {
         newHealthBar.zPosition = Precedence.menu.rawValue
         newHealthBar.name = Constants.healthBarName
         self.healthBarContainer?.addChild(newHealthBar)
-    }
-    
-    func updateHUD() {
-        
     }
     
     func setupContentView(size: CGSize) {

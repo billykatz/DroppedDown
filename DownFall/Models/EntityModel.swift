@@ -278,21 +278,17 @@ struct EntityModel: Equatable, Decodable {
     func removeEffect(_ effect: EffectModel) -> EntityModel {
         var effectsCopy = self.effects
         effectsCopy.removeFirst { $0 == effect }
-        var pickaxe: Pickaxe?
-        if effect.stat == .runeSlot {
-            pickaxe = removeRuneSlot()
-        }
-        return update(pickaxe: pickaxe ?? self.pickaxe,  effects: effectsCopy)
+        return update(effects: effectsCopy)
     }
     
-    func removeRuneSlot() -> Pickaxe? {
-        guard var pickaxe = self.pickaxe else { return self.pickaxe }
-        let newRuneCount = pickaxe.runeSlots - 1
-        if pickaxe.runes.count > newRuneCount {
-            pickaxe.runes.removeLast()
-        }
-        return Pickaxe(runeSlots: max(1, newRuneCount), runes: pickaxe.runes)
-    }
+//    func removeRuneSlot() -> Pickaxe? {
+//        guard var pickaxe = self.pickaxe else { return self.pickaxe }
+//        let newRuneCount = pickaxe.runeSlots - 1
+//        if pickaxe.runes.count > newRuneCount {
+//            pickaxe.runes.removeLast()
+//        }
+//        return Pickaxe(runeSlots: max(1, newRuneCount), runes: pickaxe.runes)
+//    }
     
     func addEffect(_ effect: EffectModel) -> EntityModel {
         var effectsCopy = self.effects

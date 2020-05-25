@@ -33,48 +33,62 @@ struct LevelConstructor {
     }
     
     static func storeOffer(per levelType: LevelType, difficulty: Difficulty) -> [StoreOffer] {
+        
+        /// Baseline offers for every level after the first
         var storeOffers: [StoreOffer] = [
-            StoreOffer(type: .fullHeal, tier: 1, textureName: "greaterHealingPotion", currency: .gem, title: "Greater Healing Potion", body: "Fully heals you", startingPrice: 0),
-        
-            StoreOffer(type: .plusTwoMaxHealth, tier: 1, textureName: "twoMaxHealth", currency: .gem, title: "+2 Max Health", body: "Adds 2 max health", startingPrice: 0)
+            StoreOffer.offer(type: .fullHeal, tier: 1),
+            StoreOffer.offer(type: .plusTwoMaxHealth, tier: 1)
         ]
-        let getSwitfy = StoreOffer(type: .rune(Rune.rune(for: .getSwifty)), tier: 2, textureName: "getSwifty", currency: .gem, title: "Get Swifty", body: "Rune", startingPrice: 0)
         
-        let runeSlot = StoreOffer(type: .runeSlot, tier: 2, textureName: "runeSlot", currency: .gem, title: "Rune Slot", body: "Add an extra rune slot to your pickaxe", startingPrice: 0)
+        // Rune slot
+        let runeSlotOffer = StoreOffer.offer(type: .runeSlot, tier: 3)
         
+        /// some tier two offers
         let dodgeUp = StoreOffer.offer(type: .dodge, tier: 2)
         let luckUp = StoreOffer.offer(type: .luck, tier: 2)
+        let gemsOffer = StoreOffer.offer(type: .gems(amount: 3), tier: 2)
+        
+        /// rune offerings
+        let getSwifty = StoreOffer.offer(type: .rune(Rune.rune(for: .getSwifty)), tier: 3)
+        let rainEmbers = StoreOffer.offer(type: .rune(Rune.rune(for: .rainEmbers)), tier: 3)
+        let transform = StoreOffer.offer(type: .rune(Rune.rune(for: .transformRock)), tier: 3)
+
+            
+        storeOffers.append(contentsOf: [dodgeUp, luckUp, gemsOffer])
+
+        
         switch levelType {
         case .first:
+            /// This is a special case where we want to start our play testers with a rune
             let getSwifty = StoreOffer.offer(type: .rune(Rune.rune(for: .getSwifty)), tier: 1)
             let rainEmbers = StoreOffer.offer(type: .rune(Rune.rune(for: .rainEmbers)), tier: 1)
             let transform = StoreOffer.offer(type: .rune(Rune.rune(for: .transformRock)), tier: 1)
-            storeOffers = [getSwifty, rainEmbers, transform]
+            return [getSwifty, rainEmbers, transform]
         case .second:
-            storeOffers.append(contentsOf: [dodgeUp, luckUp])
-            
-            
-            let getSwifty = StoreOffer.offer(type: .rune(Rune.rune(for: .getSwifty)), tier: 3)
-            let rainEmbers = StoreOffer.offer(type: .rune(Rune.rune(for: .rainEmbers)), tier: 3)
-            let transform = StoreOffer.offer(type: .rune(Rune.rune(for: .transformRock)), tier: 3)
-            storeOffers.append(contentsOf: [getSwifty, rainEmbers, transform])
+            // two goals
+            ()
         case .third:
-            
-            let getSwifty = StoreOffer.offer(type: .rune(Rune.rune(for: .getSwifty)), tier: 3)
-            let rainEmbers = StoreOffer.offer(type: .rune(Rune.rune(for: .rainEmbers)), tier: 3)
-            
-            storeOffers.append(contentsOf: [dodgeUp, luckUp, getSwifty, rainEmbers])
+            /// two goals
+            /// give the player a chance at the rune slot
+            ()
         case .fourth:
-            let runeSlot = StoreOffer.offer(type: .runeSlot, tier: 3)
             let gemOffer = StoreOffer.offer(type: .gems(amount: 5), tier: 3)
-            
-            storeOffers.append(contentsOf: [dodgeUp, luckUp, runeSlot, gemOffer])
-            
+            storeOffers.append(contentsOf: [runeSlotOffer, gemOffer])
         case .fifth:
-            storeOffers.append(getSwitfy)
-            storeOffers.append(runeSlot)
+            /// give the player taste of another rune or something to add to the rune slot
+            storeOffers.append(contentsOf: [getSwifty, rainEmbers, transform])
+        case .sixth:
+            /// give the player a chance at the rune slot
+            let gemOffer = StoreOffer.offer(type: .gems(amount: 10), tier: 3)
+            storeOffers.append(contentsOf: [runeSlotOffer, gemOffer])
+        case .seventh:
+            /// give the player a chance to fill their last rune slot or just gems
+            let gemOffer = StoreOffer.offer(type: .gems(amount: 10), tier: 3)
+            storeOffers.append(contentsOf: [getSwifty, rainEmbers, transform, gemOffer])
+            
         default: ()
         }
+        
         return storeOffers
     }
     
@@ -109,44 +123,66 @@ struct LevelConstructor {
             return LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .rock(randomColor), targetAmount: amount, minimumGroupSize: minimumGroupSize, grouped: minimumGroupSize > 1)
         }
         
+        
+        var goals: [LevelGoal?]
         switch levelType {
         case .first:
-        let gemGoal = LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .gem, targetAmount: 3, minimumGroupSize: 1, grouped: false)
-            let monsterGoal = LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .monster(.zeroedEntity(type: .rat)), targetAmount: 1, minimumGroupSize: 1, grouped: false)
-            if let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 25, minimumGroupSize: 1) {
-                return [rockGoal, monsterGoal, gemGoal]
-            }
-            return [monsterGoal]
+            let monsterGoal = LevelGoal.killMonsterGoal(amount: 2)
+            let gemGoal = LevelGoal.gemGoal(amount: 1)
+            let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 25, minimumGroupSize: 1)
+            goals = [gemGoal, rockGoal, monsterGoal]
         case .second:
-            let monsterGoal = LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .monster(.zeroedEntity(type: .rat)), targetAmount: 5, minimumGroupSize: 1, grouped: false)
-            if let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 35, minimumGroupSize: 1) {
-                return [rockGoal, monsterGoal]
-            }
-            return [monsterGoal]
+            let monsterGoal = LevelGoal.killMonsterGoal(amount: 3)
+            let gemGoal = LevelGoal.gemGoal(amount: 2)
+            let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 35, minimumGroupSize: 1)
+            goals = [gemGoal, rockGoal, monsterGoal]
         case .third:
-            let gemGoal = LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .gem, targetAmount: 3, minimumGroupSize: 1, grouped: false)
-            let pillarGoal = LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .pillar(PillarData(color: .blue, health: 1)), targetAmount: 6, minimumGroupSize: 1, grouped: false)
-            if let rockGoal = randomRockGoal([.red, .purple,. blue], amount: 8, minimumGroupSize: 4) {
-                return [gemGoal, pillarGoal, rockGoal]
-            }
-            return [gemGoal, pillarGoal]
+            let gemGoal = LevelGoal.gemGoal(amount: 3)
+            let pillarGoal = LevelGoal.pillarGoal(amount: 6)
+            let rockGoal = randomRockGoal([.red, .purple,. blue], amount: 8, minimumGroupSize: 4)
+            let monsterGoal = LevelGoal.killMonsterGoal(amount: 5)
+            goals = [gemGoal, pillarGoal, rockGoal, monsterGoal]
         case .fourth:
-            let gemGoal = LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .gem, targetAmount: 4, minimumGroupSize: 1, grouped: false)
-            let monsterGoal = LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .monster(.zeroedEntity(type: .rat)), targetAmount: 7, minimumGroupSize: 1, grouped: false)
-            if let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 10, minimumGroupSize: 4) {
-                return [gemGoal, rockGoal, monsterGoal]
-            }
-            return [gemGoal, monsterGoal]
+            let gemGoal = LevelGoal.gemGoal(amount: 4)
+            let runeGoal = LevelGoal.useRuneGoal(amount: 2)
+            let monsterGoal = LevelGoal.killMonsterGoal(amount: 7)
+            let pillarGoal = LevelGoal.pillarGoal(amount: 9)
+            let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 10, minimumGroupSize: 4)
+            goals = [gemGoal, rockGoal, monsterGoal, pillarGoal, runeGoal]
         case .fifth:
-            let monsterGoal = LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .monster(.zeroedEntity(type: .rat)), targetAmount: 10, minimumGroupSize: 1, grouped: false)
-            let runeGoal = LevelGoal(type: .useRune, reward: .gem(1), tileType: .empty, targetAmount: 3, minimumGroupSize: 1, grouped: false)
-            if let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 8, minimumGroupSize: 5) {
-                return [runeGoal, rockGoal, monsterGoal]
-            }
-            return [runeGoal, monsterGoal]
+            let monsterGoal = LevelGoal.killMonsterGoal(amount: 10)
+            let runeGoal = LevelGoal.useRuneGoal(amount: 3)
+            let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 8, minimumGroupSize: 5)
+            let pillarGoal = LevelGoal.pillarGoal(amount: 12)
+            let gemGoal = LevelGoal.gemGoal(amount: 4)
+            goals = [runeGoal, rockGoal, monsterGoal, pillarGoal, gemGoal]
+        case .sixth:
+            let monsterGoal = LevelGoal.killMonsterGoal(amount: 12)
+            let runeGoal = LevelGoal.useRuneGoal(amount: 4)
+            let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 5, minimumGroupSize: 6)
+            let pillarGoal = LevelGoal.pillarGoal(amount: 12)
+            let gemGoal = LevelGoal.gemGoal(amount: 5)
+            goals = [rockGoal, gemGoal, monsterGoal, pillarGoal, runeGoal]
+        case .seventh:
+            let monsterGoal = LevelGoal.killMonsterGoal(amount: 15)
+            let runeGoal = LevelGoal.useRuneGoal(amount: 5)
+            let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 8, minimumGroupSize: 5)
+            let pillarGoal = LevelGoal.pillarGoal(amount: 24)
+            let gemGoal = LevelGoal.gemGoal(amount: 5)
+            goals = [rockGoal, gemGoal, monsterGoal, pillarGoal, runeGoal]
         default:
-            return [rockGoal, gemGoal, monsterGoal]
+            goals = []
         }
+        
+        switch levelType {
+        case .first, .second:
+            return goals.compactMap { $0 }.choose(random: 2)
+        default:
+            return goals.compactMap { $0 }.choose(random: 3)
+        }
+
+        
+        
     }
     
     static func buildTutorialLevels() -> [Level] {

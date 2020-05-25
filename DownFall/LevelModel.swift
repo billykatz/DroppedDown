@@ -37,6 +37,22 @@ struct LevelGoal: Hashable {
     let targetAmount: Int
     let minimumGroupSize: Int
     let grouped: Bool
+    
+    static func gemGoal(amount: Int) -> LevelGoal {
+        return LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .gem, targetAmount: amount, minimumGroupSize: 1, grouped: false)
+    }
+    
+    static func killMonsterGoal(amount: Int) -> LevelGoal {
+        return LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .monster(.zeroedEntity(type: .rat)), targetAmount: amount, minimumGroupSize: 1, grouped: false)
+    }
+    
+    static func pillarGoal(amount: Int) -> LevelGoal {
+        return LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .pillar(PillarData(color: .blue, health: 1)), targetAmount: amount, minimumGroupSize: 1, grouped: false)
+    }
+    
+    static func useRuneGoal(amount: Int) -> LevelGoal {
+        return LevelGoal(type: .useRune, reward: .gem(1), tileType: .empty, targetAmount: amount, minimumGroupSize: 1, grouped: false)
+    }
 }
 
 struct Level {

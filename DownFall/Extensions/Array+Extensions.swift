@@ -44,4 +44,14 @@ extension Array where Element: Hashable {
         return newArray
     }
     
+    func choose(random x: Int) -> [Element] {
+        guard x < count else { return self }
+        let elementsToRemove = count - x
+        var arrayToRemoveFrom = self
+        (0..<elementsToRemove).forEach { _ in
+            arrayToRemoveFrom = arrayToRemoveFrom.dropRandom()
+        }
+        return arrayToRemoveFrom
+    }
+    
 }

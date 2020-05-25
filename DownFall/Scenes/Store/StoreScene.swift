@@ -73,7 +73,9 @@ class StoreScene: SKScene {
         self.storeHUDViewModel = StoreHUDViewModel(currentPlayerData: playerData)
         self.storeHUD = StoreHUD(viewModel: storeHUDViewModel, size: CGSize(width: playableRect.width, height: Constants.storeHUDHeight))
         
-        let stagingViewModel = StagingAreaViewModel(storeOffers: level.storeOffering, goalProgress: level.goalProgress, isBeforeLevelOne: level.type == .first)
+        
+        let trimmedOffers = StoreOffer.trimStoreOffers(storeOffers: level.storeOffering, playerData: playerData)
+        let stagingViewModel = StagingAreaViewModel(storeOffers: trimmedOffers, goalProgress: level.goalProgress, isBeforeLevelOne: level.type == .first)
         self.stagingArea = StagingAreaView(viewModel: stagingViewModel, size: CGSize(width: playableRect.width, height: playableRect.height - Constants.storeHUDHeight))
         
         /// Super init'd

@@ -243,7 +243,7 @@ class MainMenu: SKScene {
         
         let heartNode = SKSpriteNode(texture: SKTexture(imageNamed: "luck"), size: .oneHundred)
         let description = ParagraphNode(text: "Luck: \(playerModel.previewAppliedEffects().luck)", paragraphWidth: 400.0, fontSize: UIFont.largeSize)
-        let costDescription = ParagraphNode(text: "Cost: 2 gems ( Max \(maxLuckBuys) )", paragraphWidth: 800.0, fontSize: UIFont.largeSize)
+        let costDescription = ParagraphNode(text: "Cost: 3 gems ( Max \(maxLuckBuys) )", paragraphWidth: 800.0, fontSize: UIFont.largeSize)
         
         
         minusButton.position = CGPoint.position(minusButton.frame,
@@ -298,7 +298,7 @@ class MainMenu: SKScene {
         
         let heartNode = SKSpriteNode(texture: SKTexture(imageNamed: "dodge"), size: .oneHundred)
         let description = ParagraphNode(text: "Dodge: \(playerModel.previewAppliedEffects().dodge)", paragraphWidth: 400.0, fontSize: UIFont.largeSize)
-        let costDescription = ParagraphNode(text: "Cost: 2 gems ( Max \(maxDodgeBuys) )", paragraphWidth: 800.0, fontSize: UIFont.largeSize)
+        let costDescription = ParagraphNode(text: "Cost: 3 gems ( Max \(maxDodgeBuys) )", paragraphWidth: 800.0, fontSize: UIFont.largeSize)
         
         
         minusButton.position = CGPoint.position(minusButton.frame,

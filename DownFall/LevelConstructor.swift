@@ -69,13 +69,13 @@ struct LevelConstructor {
             ()
         case .third:
             /// two goals
-            /// give the player a chance at the rune slot
             ()
         case .fourth:
+            /// offer a rune slot or gems
             let gemOffer = StoreOffer.offer(type: .gems(amount: 5), tier: 3)
             storeOffers.append(contentsOf: [runeSlotOffer, gemOffer])
         case .fifth:
-            /// give the player taste of another rune or something to add to the rune slot
+            /// give the player chance to fill their last rune slot or just gems
             storeOffers.append(contentsOf: [getSwifty, rainEmbers, transform])
         case .sixth:
             /// give the player a chance at the rune slot
@@ -138,8 +138,8 @@ struct LevelConstructor {
             goals = [gemGoal, rockGoal, monsterGoal]
         case .third:
             let gemGoal = LevelGoal.gemGoal(amount: 3)
-            let pillarGoal = LevelGoal.pillarGoal(amount: 6)
-            let rockGoal = randomRockGoal([.red, .purple,. blue], amount: 8, minimumGroupSize: 4)
+            let pillarGoal = LevelGoal.pillarGoal(amount: 4)
+            let rockGoal = randomRockGoal([.red, .purple,. blue], amount: 5, minimumGroupSize: 4)
             let monsterGoal = LevelGoal.killMonsterGoal(amount: 5)
             goals = [gemGoal, pillarGoal, rockGoal, monsterGoal]
         case .fourth:
@@ -147,13 +147,13 @@ struct LevelConstructor {
             let runeGoal = LevelGoal.useRuneGoal(amount: 2)
             let monsterGoal = LevelGoal.killMonsterGoal(amount: 7)
             let pillarGoal = LevelGoal.pillarGoal(amount: 9)
-            let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 10, minimumGroupSize: 4)
+            let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 8, minimumGroupSize: 4)
             goals = [gemGoal, rockGoal, monsterGoal, pillarGoal, runeGoal]
         case .fifth:
             let monsterGoal = LevelGoal.killMonsterGoal(amount: 10)
             let runeGoal = LevelGoal.useRuneGoal(amount: 3)
             let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 8, minimumGroupSize: 5)
-            let pillarGoal = LevelGoal.pillarGoal(amount: 12)
+            let pillarGoal = LevelGoal.pillarGoal(amount: 8)
             let gemGoal = LevelGoal.gemGoal(amount: 4)
             goals = [runeGoal, rockGoal, monsterGoal, pillarGoal, gemGoal]
         case .sixth:

@@ -71,13 +71,12 @@ struct StoreOffer: Hashable {
         return offers.map { $0.tier }.removingDuplicates().count
     }
     
-    
     /// Remove any player runes from the offers so we dont offer the same rune
     static func removePlayerRunes(storeOffers: [StoreOffer], playerData: EntityModel) -> [StoreOffer] {
         guard let runes = playerData.runes else { return storeOffers }
         let newOffers = storeOffers.filter { offer in
             if case StoreOfferType.rune(let rune) = offer.type {
-                return !runes.contains(rune)
+                return !runes.contains(where: { $0.type == rune.type } )
             }
             return true
         }
@@ -94,7 +93,7 @@ struct StoreOffer: Hashable {
             if tierOffersWithoutPlayerRunes.count > maximumPerTier {
                 tierOffersWithoutPlayerRunes = tierOffersWithoutPlayerRunes.choose(random: 2)
             }
-            newOffers.append(contentsOf: tierOffersWithoutPlayerRunes )
+            newOffers.append(contentsOf: tierOffersWithoutPlayerRunes)
         }
         
         return newOffers

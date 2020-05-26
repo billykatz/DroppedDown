@@ -214,11 +214,7 @@ class TileDetailView: SKNode {
         guard let updatedGoals = levelGoals else {
             detailViewTemplate.removeAllChildren()
             detailViewTemplate.removeFromParent()
-            for child in contentView.children {
-                if child.name == Constants.borderName {
-                    child.removeFromParent()
-                }
-            }
+            contentView.removeChild(with: Constants.borderName)
             return
         }
         
@@ -318,8 +314,7 @@ class TileDetailView: SKNode {
 
 extension TileDetailView {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if let firstTouch = touches.first,
-            !detailViewTemplate.frame.contains(firstTouch.location(in: self.contentView)) {
+        if touches.first != nil {
             // then dismiss the view
             tileType = nil
             tileAttacks = []

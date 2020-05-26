@@ -114,7 +114,7 @@ struct Style {
     }
     
     struct Menu {
-        static let borderWidth: CGFloat = 10.0
+        static let borderWidth: CGFloat = 20.0
     }
     
     struct RunMenu {

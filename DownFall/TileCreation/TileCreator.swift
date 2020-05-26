@@ -110,10 +110,11 @@ class TileCreator: TileStrategy {
         let randomNumber = Int.random(tileTypeChances.outcomes)
         var lowerBound = 0
         for (key, value) in tileTypeChances.chances {
-            if (lowerBound..<lowerBound+value).contains(randomNumber) {
+            let minValue = max(1, value)
+            if (lowerBound..<lowerBound+minValue).contains(randomNumber) {
                 return key
             } else {
-                lowerBound = lowerBound + value
+                lowerBound = lowerBound + minValue
             }
         }
         

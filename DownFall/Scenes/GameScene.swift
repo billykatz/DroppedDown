@@ -164,9 +164,8 @@ extension GameScene {
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         // avoid inputing touchEnded when a touch is cancelled.
-        if !touchWasSwipe {
-            touchWasCanceled = true
-        }
+        touchWasCanceled = true
+        touchWasSwipe = false
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -178,6 +177,7 @@ extension GameScene {
             lastPosition = currentPosition
         }
         guard let lastPosition = lastPosition, (abs(currentPosition.x - lastPosition.x) > Constants.swipeDistanceThreshold || abs(currentPosition.y - lastPosition.y) > Constants.swipeDistanceThreshold || touchWasSwipe) else {
+            touchWasSwipe = false
             return
         }
         touchWasSwipe = true

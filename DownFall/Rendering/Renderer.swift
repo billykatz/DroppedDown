@@ -71,7 +71,7 @@ class Renderer: SKSpriteNode {
                                                  horizontalAnchor: .right,
                                                  verticalAlign: .bottom,
                                                  translatedToBounds: true)
-        hud.zPosition = Precedence.foreground.rawValue
+        hud.zPosition = Precedence.flying.rawValue
         return hud
     }()
     
@@ -169,14 +169,12 @@ class Renderer: SKSpriteNode {
                 animate(trans.tileTransformation?.first) { [weak self] in
                     self?.gameWin(transformation: trans)
                 }
-            case .monsterDies, .newTurn, .bossTargetsWhatToEat, .bossAttacks, .unlockExit, .playerAwarded:
+            case .monsterDies:
+                computeNewBoard(for: trans)
+            case .newTurn, .bossTargetsWhatToEat, .bossAttacks, .unlockExit, .playerAwarded, .runeProgressRecord:
                 animationsFinished(endTiles: trans.endTiles)
-            case .itemUsed(let ability, _):
-                if ability.type == .massMineRock {
-                    computeNewBoard(for: transformations)
-                } else {
-                    animationsFinished(endTiles: trans.endTiles)
-                }
+            case .itemUsed(let ability, let targets):
+                animateRuneUsed(input: inputType, transformations: transformations, rune: ability, targets: targets)
             case .collectItem:
                 computeNewBoard(for: trans)
             case .bossEatsRocks:
@@ -199,7 +197,6 @@ class Renderer: SKSpriteNode {
                         self.animationsFinished(endTiles: nil, ref: false)
                     }
                 }
-                
             case .reffingFinished, .touchBegan, .itemUseSelected:
                 () // Purposely left blank.
             default:
@@ -266,6 +263,13 @@ class Renderer: SKSpriteNode {
         fatalError("init(coder:) has not been implemented")
     }
     
+    private func animateRuneUsed(input: InputType, transformations: [Transformation], rune: Rune, targets: [TileCoord]) {
+        animator.animateRune(rune, transformations: transformations, affectedTiles: targets, sprites: sprites, spriteForeground: spriteForeground) { [weak self] in
+            self?.animationsFinished(endTiles: transformations.first?.endTiles)
+        }
+        
+    }
+    
     private func animateAttack(attackInput: InputType, endTiles: [[Tile]]?) {
         guard let tiles = endTiles else {
             animationsFinished(endTiles: endTiles)
@@ -329,6 +333,11 @@ class Renderer: SKSpriteNode {
                                               width: width)
                 sprites[row].append(sprite)
                 sprites[row][col].position = CGPoint(x: x, y: y)
+                
+                if let (glow, spin) = sprite.glow() {
+                    sprite.addChild(glow)
+                    glow.run(spin)
+                }
             }
         }
         return sprites
@@ -553,10 +562,10 @@ extension Renderer {
             if let startPoint = positionsInForeground(at: [coord]).first {
                 var addedSprites: [SKSpriteNode] = []
                 for _ in 0..<item.amount {
-                    let identifier: String = item.type == .gold ? Identifiers.gold : Identifiers.gem
+                    let identifier: String = item.type == .gold ? Identifiers.gold : item.textureName
                     let sprite = SKSpriteNode(texture: SKTexture(imageNamed: identifier),
-                                                  color: .clear,
-                                                  size: Style.Board.goldGainSize)
+                                              color: .clear,
+                                              size: Style.Board.goldGainSize)
                     sprite.position = startPoint
                     sprite.zPosition = Precedence.menu.rawValue
                     spriteForeground.addChild(sprite)

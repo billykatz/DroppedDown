@@ -28,6 +28,7 @@ protocol TileStrategy {
     func randomMonster() -> TileType
     func randomMonster(not: EntityModel.EntityType) -> Tile
     func shuffle(tiles: [[Tile]]) -> [[Tile]]
+    func gemDropped(from rock: TileType, groupSize: Int, playerData: EntityModel) -> Tile
 
 }
     

@@ -9,8 +9,6 @@
 protocol LevelGoalTrackingOutputs {
     var goalUpdated: (([GoalTracking]) -> ())? { get set }
     var goalProgress: [GoalTracking] { get }
-    var exitLocked: Bool { get }
-    var numberOfExitGoals: Int { get }
 }
 
 protocol LevelGoalTracking: LevelGoalTrackingOutputs {}
@@ -21,31 +19,6 @@ class LevelGoalTracker: LevelGoalTracking {
     public var goalProgress: [GoalTracking] = []
     
     private let level: Level
-    
-    // state to make sure we dont keep trying to unlock the door
-    var exitHasBeenUnlocked = false
-    
-    /// Outuputs flase if the player has not reach the number of goals needed to unlock the exit
-    var exitLocked: Bool {
-        numberOfExitGoalsUnlocked < level.numberOfGoalsNeedToUnlockExit
-    }
-    
-    /// Return the number of exit goals that the player has completed
-    var numberOfExitGoalsUnlocked: Int {
-        return goalProgress.filter { (goal) -> Bool in
-            return goal.levelGoalType == LevelGoalType.unlockExit
-                && goal.current == goal.target
-        }.count
-
-    }
-    
-    /// Returns the number of unlockExit goals there are on this level
-    var numberOfExitGoals: Int {
-        let exitGoals = goalProgress.filter { (goal) -> Bool in
-            return goal.levelGoalType == LevelGoalType.unlockExit
-        }
-        return exitGoals.count
-    }
     
     init(level: Level) {
         self.level = level
@@ -72,26 +45,49 @@ class LevelGoalTracker: LevelGoalTracking {
             
         case .boardBuilt:
             goalUpdated?(goalProgress)
+            countPillars(in: input.endTilesStruct ?? [])
+            InputQueue.append(Input(.levelGoalDetail(goalProgress)))
+        case .runeProgressRecord:
+            checkForCompletedGoals()
+            InputQueue.append(.init(.goalProgressRecord(goalProgress)))
+        case .itemUsed:
+            advanceRuneUseGoal()
         default:
             return
         }
     }
     
     private func checkForCompletedGoals() {
-        for (idx, goal) in goalProgress.enumerated() {
+        for (idx, goal) in goalProgress.enumerated(){
             if goal.isCompleted && !goal.hasBeenRewarded {
                 goalProgress[idx] = goal.isAwarded()
-                // return because we can only hand tphese out one at a time
-                InputQueue.append(Input(.playerAwarded([goal.reward])))
-                return
+            }
+        }
+    }
+    
+    var pillarColor =  Set<Color>(Color.allCases)
+    var numberOfIndividualPillars: Int = 0
+    
+    private func countPillars(in tiles: [[Tile]]) {
+        var positions = Set<TileCoord>()
+        for color in pillarColor {
+            for health in 1...3 {
+                positions = positions.union(getTilePositions(.pillar(PillarData(color: color, health: health)), tiles: tiles) ?? Set<TileCoord>())
+            }
+        }
+        pillarColor = Set<Color>()
+        var newNumberOfIndividualPillars = 0
+        for position in positions {
+            if case let TileType.pillar(data) = tiles[position].type {
+                newNumberOfIndividualPillars += data.health
+                pillarColor.insert(data.color)
             }
         }
         
-        // unlock the goal last so we dont exit the baord before getting rewards
-        if !exitHasBeenUnlocked && !exitLocked {
-            exitHasBeenUnlocked = true
-            InputQueue.append(Input(.unlockExit))
+        if numberOfIndividualPillars - newNumberOfIndividualPillars != 0 {
+            advanceGoal(for: .pillar(PillarData(color: .blue, health: 3)), units: numberOfIndividualPillars - newNumberOfIndividualPillars)
         }
+        numberOfIndividualPillars = newNumberOfIndividualPillars
     }
     
     /// Determines if the transformation advances the level goal
@@ -102,6 +98,7 @@ class LevelGoalTracker: LevelGoalTracking {
                 if let count = trans.first?.tileTransformation?.first?.count {
                     advanceGoal(for: type, units: count)
                 }
+                countPillars(in: trans.first?.endTiles ?? [])
             case .monsterDies(_, let type):
                 advanceGoal(for: .monster(EntityModel.zeroedEntity(type: type)), units: 1)
             case .collectItem(_, let item, _):
@@ -110,6 +107,23 @@ class LevelGoalTracker: LevelGoalTracking {
                 ()
             }
         }
+    }
+    
+    private func advanceRuneUseGoal() {
+        var newGoalProgess: [GoalTracking] = []
+        for goal in goalProgress {
+            if goal.levelGoalType == .useRune {
+                let newGoalTracker = goal.update(with: 1)
+                newGoalProgess.append(newGoalTracker)
+            } else {
+                newGoalProgess.append(goal)
+            }
+        }
+        if newGoalProgess != goalProgress {
+            goalProgress = newGoalProgess
+            goalUpdated?(goalProgress)
+        }
+
     }
     
     private func advanceGoal(for type: TileType, units: Int) {

@@ -9,6 +9,10 @@
 import UIKit
 
 struct TransmogrificationPotion: Ability {
+    
+    var distanceBetweenTargets: Int? { return nil }
+    
+    
     var rechargeMinimum: Int {
         return 1
     }

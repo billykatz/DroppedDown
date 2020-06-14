@@ -7,6 +7,7 @@
 //
 
 struct Item: Decodable, Hashable {
+    
     enum ItemType: String, Decodable {
         case gold
         case gem
@@ -23,13 +24,40 @@ struct Item: Decodable, Hashable {
     
     let type: ItemType
     let amount: Int
+    var color: Color?
+    
+    var humanReadable: String {
+        switch type {
+        case .gold:
+            return "Gold piece"
+        case .gem:
+            if let color = color {
+                return "\(color.humanReadable) gem"
+            } else {
+                return "Gem"
+            }
+        }
+    }
     
     var textureName: String {
         switch type {
         case .gold:
             return goldTextureName()
         case .gem:
-            return "gem2"
+            switch color {
+            case .blue:
+                return "blueCrystal"
+            case .red:
+                return "redCrystal"
+            case .brown:
+                return "brownCrystal"
+            case .purple:
+                return "purpleCrystal"
+            case .green:
+                return "greenCrystal"
+            case .none:
+                return "crystals"
+            }
         }
     }
     
@@ -49,14 +77,14 @@ struct Item: Decodable, Hashable {
     }
     
     static var zero: Item {
-        return Item(type: .gold, amount: 0)
+        return Item(type: .gold, amount: 0, color: nil)
     }
     
     static var gem: Item{
-        return Item(type: .gem, amount: 1)
+        return Item(type: .gem, amount: 1, color: nil)
     }
     
     static var gold: Item{
-        return Item(type: .gold, amount: 1)
+        return Item(type: .gold, amount: 1, color: nil)
     }
 }

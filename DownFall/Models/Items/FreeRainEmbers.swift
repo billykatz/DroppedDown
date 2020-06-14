@@ -42,16 +42,16 @@ struct FreeRainEmbers: Ability {
     
     var cost: Int { return 0 }
     
-    var currency: Currency { return .gold }
+    var currency: Currency { return .gem }
     
     var type: AbilityType { return .rainEmbers }
     
     var description: String {
-        return "Fling a fireball at a monster"
+        return "Fling two fireball at two monsters"
     }
     
     var flavorText: String {
-        return "Fire is my second favorite word, second only to `combustion.` - Macrkarel the Fish Wizard"
+        return "Fire is my second favorite word, second only to `combustion.` - Mack the Wizard"
     }
     
     var extraAttacksGranted: Int? {
@@ -67,7 +67,8 @@ struct FreeRainEmbers: Ability {
     }
     
     var heal: Int? { return nil }
-    var targets: Int? { return 1 }
+    var targets: Int? { return 2 }
     var targetTypes: [TileType]? { return [TileType.monster(.zero)] }
+    var distanceBetweenTargets: Int? { return Int.max }
 }
 

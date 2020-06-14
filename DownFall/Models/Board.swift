@@ -61,15 +61,17 @@ class Board: Equatable {
                                             inputType: input.type,
                                             endTiles: tiles)
         case .touch(let tileCoord, let type):
-            if case TileType.monster(let data) = type {
+            switch type {
+            case .monster(let data):
                 let attacks = calculateAttacks(for: data, from: tileCoord)
                 InputQueue.append(Input(.tileDetail(type, attacks)))
                 return
-            } else if case TileType.pillar = type {
+            case .pillar, .item:
                 InputQueue.append(Input(.tileDetail(type, [])))
                 return
-            } else {
+            default:
                 transformation = removeAndReplace(from: tiles, tileCoord: tileCoord, input: input)
+                
             }
         case .attack:
             transformation = attack(input)
@@ -99,8 +101,8 @@ class Board: Equatable {
                 )
             )
             
-        case .itemUsed(let ability, let targets):
-            let trans = use(ability, on: targets, input: input)
+        case .itemUsed(let rune, let targets):
+            let trans = useRune(rune, on: targets, input: input)
             
             InputQueue.append(
                 Input(
@@ -129,6 +131,11 @@ class Board: Equatable {
         case .playerAwarded(let rewards):
             let trans = playerAccepts(rewards: rewards, inputType: input.type)
             InputQueue.append(Input(.transformation([trans])))
+        case .runeProgressRecord(let runeProgress):
+            guard let pp = playerPosition,
+                case let .player(data) = tiles[pp].type else { return }
+            tiles[pp.row][pp.column] = Tile(type: .player(data.recordRuneProgress(runeProgress)))
+            transformation = playerDataUpdated(inputType: input.type)
         case .gameLose(_),
              .play,
              .pause,
@@ -140,7 +147,7 @@ class Board: Equatable {
              .tutorial,
              .visitStore,
              .itemUseCanceled, .itemCanBeUsed, .bossTargetsWhatToEat, .bossTargetsWhatToAttack,
-             .rotatePreview, .tileDetail, .levelGoalDetail:
+             .rotatePreview, .tileDetail, .levelGoalDetail, .goalProgressRecord:
             transformation = nil
         }
         
@@ -148,8 +155,12 @@ class Board: Equatable {
         InputQueue.append(Input(.transformation([trans])))
     }
     
+    private func playerDataUpdated(inputType: InputType) -> Transformation {
+        return Transformation(transformation: nil, inputType: inputType, endTiles: tiles)
+    }
+    
     private func playerAccepts(rewards: [LevelGoalReward], inputType: InputType) -> Transformation {
-
+        
         // grab mutable copy of tiles
         var newTiles = tiles
         
@@ -225,8 +236,8 @@ class Board: Equatable {
         
         var removedRocksAndPillars: [TileCoord] = []
         for coord in dynamiteCoords {
-            if case let TileType.dynamite(fuse, _) = tiles[coord].type {
-                let newFuse = fuse - 1
+            if case let TileType.dynamite(data) = tiles[coord].type {
+                let newFuse = data.count - 1
                 
                 if newFuse <= 0 {
                     /// EXPLODE
@@ -237,7 +248,7 @@ class Board: Equatable {
                         guard isWithinBounds(neighborCoord) else { continue }
                         switch tiles[neighborCoord].type {
                         case .dynamite:
-                            tiles[neighborCoord.row][neighborCoord.column] = Tile(type: .dynamite(fuseCount: 0, hasBeenDecremented: false))
+                            tiles[neighborCoord.row][neighborCoord.column] = Tile(type: .dynamite(DynamiteFuse(count: 3, hasBeenDecremented: false)))
                         case .player(let playerData):
                             tiles[neighborCoord.row][neighborCoord.column] = Tile(type: .player(playerData.wasAttacked(for: 1, from: neighborCoord.direction(relative: coord) ?? .east)))
                         case .rock, .pillar:
@@ -249,7 +260,7 @@ class Board: Equatable {
                         }
                     }
                 } else {
-                    tiles[coord.row][coord.column] = Tile(type: .dynamite(fuseCount:newFuse, hasBeenDecremented: true))
+                    tiles[coord.row][coord.column] = Tile(type: .dynamite(DynamiteFuse(count: newFuse, hasBeenDecremented: true)))
                 }
             }
             
@@ -266,19 +277,19 @@ class Board: Equatable {
                 if case TileType.player(let data) = tiles[target.row][target.column].type {
                     /// deal 3 damage to the player
                     tiles[target.row][target.column] = Tile(type: .player(data.wasAttacked(for: 3, from: .south)))
-                } else if case TileType.pillar(let color, let health) = tiles[target.row][target.column].type {
+                } else if case TileType.pillar(let data) = tiles[target.row][target.column].type {
                     /// reconstruct pillars if we rotate into them
-                    tiles[target.row][target.column] = Tile(type: .pillar(color, min(3, health + 1)))
+                    tiles[target.row][target.column] = Tile(type: .pillar(PillarData(color: data.color, health: min(3, data.health+1))))
                 } else {
-                    self.tiles[target.row][target.column] = Tile(type: .dynamite(fuseCount: 3, hasBeenDecremented: false))
+                    self.tiles[target.row][target.column] = Tile(type: .dynamite(DynamiteFuse(count: 3, hasBeenDecremented: false)))
                 }
             case .spawn(let target):
                 if case TileType.player(let data) = tiles[target.row][target.column].type {
                     /// deal 3 damage to the player
                     tiles[target.row][target.column] = Tile(type: .player(data.wasAttacked(for: 3, from: .south)))
-                } else if case TileType.pillar(let color, let health) = tiles[target.row][target.column].type {
+                } else if case TileType.pillar(let data) = tiles[target.row][target.column].type {
                     /// reconstruct pillars if we rotate into them
-                    tiles[target.row][target.column] = Tile(type: .pillar(color, min(3, health + 1)))
+                    tiles[target.row][target.column] = Tile(type: .pillar(PillarData(color: data.color, health: min(3, data.health + 1))))
                 }
                 else {
                     self.tiles[target.row][target.column] = Tile(type: tileCreator.randomMonster())
@@ -328,6 +339,19 @@ class Board: Equatable {
         }
     }
     
+    private func transform(_ coords: [TileCoord], into type: TileType, input: Input) -> Transformation {
+        
+        var tileTransform : [TileTransformation] = []
+        for tile in coords {
+            tiles[tile.row][tile.column] = Tile(type: type)
+            tileTransform.append(TileTransformation(tile, tile))
+        }
+        
+        return Transformation(transformation: [tileTransform], inputType: input.type, endTiles: tiles)
+        
+    }
+    
+    
     private func swap(_ first: TileCoord, with second: TileCoord, input: Input) -> Transformation {
         
         let tempTile = tiles[first]
@@ -364,54 +388,24 @@ extension Board {
 //MARK: - use ability
 
 extension Board {
-    private func use(_ ability: AnyAbility, on targets: [TileCoord], input: Input) -> Transformation {
-        switch ability.type {
-        case .greaterHealingPotion, .lesserHealingPotion, .greatestHealingPotion:
-            if let playerCoord = self.tiles(of: .player(.zero)).first {
-                if case TileType.player(let data) = tiles[playerCoord].type, let heal = ability.heal {
-                    let newData = data.heal(for: heal).use(ability)
-                    tiles[playerCoord.x][playerCoord.y] = Tile(type: .player(newData))
-                    return Transformation(transformation: nil,
-                                          inputType: input.type,
-                                          endTiles: tiles)
-                    
-                    
-                    
-                    
-                }
+    
+    private func useRune(_ rune: Rune, on targets: [TileCoord], input: Input) -> Transformation {
+        switch rune.type {
+        case .rainEmbers:
+            //TODO: we have to rethink how we keep track of rune's progress.  Right now it is not part of the entity's model which mean we will lose the progress between levels-- I think that would feel bad
+            //            use(ability)
+            return removeAndReplaces(from: tiles, specificCoord: targets, input: input)
+            
+        case .getSwifty:
+            guard let firstTarget = targets.first, targets.count == 2 else {
+                return .zero
             }
-        case .dynamite:
-            use(ability)
-            return removeAndReplace(from: tiles, tileCoord: targets.first!, singleTile: true, input: input)
-        case .rockASwap:
-            use(ability)
-            let firstTarget = targets.first!
-            let secondTarget = targets.last!
-            return swap(firstTarget, with: secondTarget, input: input)
-        case .transmogrificationPotion:
-            use(ability)
-            let target = targets.first!
-            return transmogrify(target, input: input)
-        case .killMonsterPotion:
-            use(ability)
-            return removeAndReplace(from: tiles, tileCoord: targets.first!, singleTile: true, input: input)
-        case .tapAwayMonster:
-            let monsters = removeAndReplace(from: tiles, tileCoord: targets.first!, singleTile: false, input: input, killMonsters: true)
-            if monsters.tileTransformation != nil {
-                
-                // TODO: Check a different way to see if this is legal. we are doing the same calculation twice because we need to call `use` before removeAndReplace()
-                use(ability)
-                return removeAndReplace(from: tiles, tileCoord: targets.first!, singleTile: false, input: input, killMonsters: true)
-            }
-        case .massMineRock:
-            guard let target = targets.first, case TileType.rock(let color) = tiles[target.row][target.column].type else { return .zero }
-            use(ability)
-            return massMine(tiles: tiles, color: color, input: input)
-        default:
-            ()
+            return swap(firstTarget, with: targets.last!, input: input)
+            
+        case .transformRock:
+            return transform(targets, into: TileType.rock(.purple), input: input)
         }
         
-        return .zero
     }
 }
 
@@ -587,19 +581,39 @@ extension Board {
         
         // set the tiles to be removed as Empty placeholder
         var intermediateTiles = tiles
+        let removedCount = selectedTiles.count
+        /// only potentially spawn 1 gem per group
+        var spawnedGem = false
+        
+        var finalSelectedTiles: [TileCoord] = []
         for coord in selectedTiles {
-            intermediateTiles[coord.x][coord.y] = Tile.empty
+            // turn the tile into a gem or into an empty
+            if !spawnedGem,
+                let pp = getTilePosition(.player(.playerZero), tiles: tiles),
+                case let TileType.player(data) = tiles[pp.row][pp.column].type {
+                let newTile = tileCreator.gemDropped(from: intermediateTiles[coord.x][coord.y].type, groupSize: removedCount, playerData: data)
+                intermediateTiles[coord.x][coord.y] = newTile
+                if newTile.type == TileType.item(.gem) {
+                    spawnedGem = true
+                } else {
+                    finalSelectedTiles.append(coord)
+                }
+            } else {
+                intermediateTiles[coord.x][coord.y] = .empty
+                /// keep track of the emptied tiles
+                finalSelectedTiles.append(coord)
+            }
         }
         
         // decrement the health of each pillar
         for pillarCoord in selectedPillars {
-            if case let .pillar(color, health) = intermediateTiles[pillarCoord.x][pillarCoord.y].type {
-                if health == 1 {
+            if case let .pillar(data) = intermediateTiles[pillarCoord.x][pillarCoord.y].type {
+                if data.health == 1 {
                     // remove the pillar from the board
                     intermediateTiles[pillarCoord.x][pillarCoord.y] = Tile.empty
                 } else {
                     //decrement the pillar's health
-                    intermediateTiles[pillarCoord.x][pillarCoord.y] = Tile(type: .pillar(color, health-1))
+                    intermediateTiles[pillarCoord.x][pillarCoord.y] = Tile(type: .pillar(PillarData(color: data.color, health: data.health-1)))
                 }
             }
         }
@@ -615,7 +629,7 @@ extension Board {
                     intermediateTiles: &intermediateTiles)
         
         //create selectedTilesTransformation array
-        let selectedTilesTransformation = selectedTiles.map { TileTransformation($0, $0) }
+        let selectedTilesTransformation = finalSelectedTiles.map { TileTransformation($0, $0) }
         
         //update our store of tilesftiles
         self.tiles = intermediateTiles
@@ -631,9 +645,9 @@ extension Board {
     
     
     func removeAndReplaces(from tiles: [[Tile]],
-                          specificCoord: [TileCoord],
-                          singleTile: Bool = false,
-                          input: Input) -> Transformation {
+                           specificCoord: [TileCoord],
+                           singleTile: Bool = false,
+                           input: Input) -> Transformation {
         // Check that the tile group at row, col has more than 3 tiles
         let selectedTiles: [TileCoord] = specificCoord
         
@@ -641,19 +655,21 @@ extension Board {
         var intermediateTiles = tiles
         for coord in selectedTiles {
             switch tiles[coord].type {
-            case let .pillar(color, health):
-                if health == 1 {
+            case let .pillar(data):
+                if data.health == 1 {
                     // remove the pillar from the board
                     intermediateTiles[coord.x][coord.y] = Tile.empty
                 } else {
                     //decrement the pillar's health
-                    intermediateTiles[coord.x][coord.y] = Tile(type: .pillar(color, health-1))
+                    intermediateTiles[coord.x][coord.y] = Tile(type: .pillar(PillarData(color: data.color, health: data.health-1)))
                 }
                 
             case .rock:
                 intermediateTiles[coord.x][coord.y] = Tile.empty
+            case .monster:
+                intermediateTiles[coord.x][coord.y] = Tile.empty
             default:
-                preconditionFailure("We should only use this for rocks and pillars")
+                preconditionFailure("We should only use this for rocks, pillars and monsters")
             }
         }
         
@@ -696,8 +712,8 @@ extension Board {
                         newTiles[i][j] = Tile(type: .player(data.resetAttacks()))
                     }
                     
-                    if case let .dynamite(fuseCount, _) = tiles[i][j].type {
-                        newTiles[i][j] = Tile(type: .dynamite(fuseCount: fuseCount, hasBeenDecremented: false))
+                    if case let .dynamite(data) = tiles[i][j].type {
+                        newTiles[i][j] = Tile(type: .dynamite(DynamiteFuse(count: data.count, hasBeenDecremented: false)))
                     }
                 }
             }
@@ -728,17 +744,10 @@ extension Board {
             else { return Transformation.zero }
         
         let newCarryModel = data.carry.earn(item.amount, inCurrency: item.type.currencyType)
-        let playerData = EntityModel(originalHp: data.originalHp,
-                                     hp: data.hp,
-                                     name: data.name,
-                                     // we have to reset attack here because the player has moved but the turn may not be over
-            // Eg: it is possible that there could be two or more monsters
-            // under the player and the player should be able to attack
-            attack: data.attack.resetAttack(),
-            type: data.type,
-            carry: newCarryModel,
-            animations: data.animations,
-            abilities: data.abilities)
+        // we have to reset attack here because the player has moved but the turn may not be over
+        // Eg: it is possible that there could be two or more monsters
+        // under the player and the player should be able to attack
+        let playerData = data.update(attack: data.attack.resetAttack(), carry: newCarryModel)
         
         updatedTiles[pp.x][pp.y] = Tile(type: .player(playerData))
         
@@ -751,19 +760,19 @@ extension Board {
     
     
     private func monsterDied(at coord: TileCoord, input: Input) -> Transformation {
-        if case let .monster(monsterData) = tiles[coord].type {
-            let gold = tileCreator.goldDropped(from: monsterData)
-            let item = Item(type: .gold, amount: gold * level.threatLevelController.threatLevel.color.goldDamageMultiplier)
-            let itemTile = TileType.item(item)
-            tiles[coord.x][coord.y] = Tile(type: itemTile)
-            //TODO: dont recreate the input
-            return Transformation(transformation: nil,
-                                  inputType: .monsterDies(coord, monsterData.type),
-                                  endTiles: tiles)
-        } else {
-            //no item! remove and replace
-            return removeAndReplace(from: tiles, tileCoord: coord, singleTile: true, input: input)
-        }
+        // When a monster dies, the player should reset the attack
+        // This isnt fool proof if we , but for the most part this will work
+        // This may lead to bugs if we introduce another way that players can attack
+        // But basically we should only reset attacks if the monster died directly from a player attack
+        
+        guard let pp = playerPosition,
+            case let .player(data) = tiles[pp].type
+            else { return Transformation.zero }
+
+        var newTiles = tiles
+        newTiles[pp.row][pp.column] = Tile(type: .player(data.update(attack: data.attack.resetAttack())))
+        return removeAndReplace(from: newTiles, tileCoord: coord, singleTile: true, input: input)
+        //        }
         
     }
     
@@ -1004,14 +1013,16 @@ extension Board {
 extension Board {
     
     func attack(_ input: Input) -> Transformation {
-        guard case InputType.attack(_,
+        guard case InputType.attack(let type,
                                     let attackerPosition,
                                     let defenderPostion,
+                                    let affectedTiles,
                                     _) = input.type else {
                                         return Transformation.zero
         }
         var attacker: EntityModel
         var defender: EntityModel
+        var dodged = false
         
         
         //TODO: DRY, extract and shorten this code
@@ -1023,12 +1034,14 @@ extension Board {
             attacker = playerModel
             defender = monsterModel
             
-            let (newAttackerData, newDefenderData) = CombatSimulator.simulate(attacker: attacker,
+            let (newAttackerData, newDefenderData, defenderDodged) = CombatSimulator.simulate(attacker: attacker,
                                                                               defender: defender,
                                                                               attacked: relativeAttackDirection)
             
             tiles[attackerPosition.x][attackerPosition.y] = Tile(type: TileType.player(newAttackerData))
             tiles[defenderPosition.x][defenderPosition.y] = Tile(type: TileType.monster(newDefenderData))
+            
+            dodged = defenderDodged
             
         } else if let defenderPosition = defenderPostion,
             case let .player(playerModel) = tiles[defenderPosition].type,
@@ -1038,13 +1051,14 @@ extension Board {
             attacker = monsterModel
             defender = playerModel
             
-            let (newAttackerData, newDefenderData) = CombatSimulator.simulate(attacker: attacker,
+            let (newAttackerData, newDefenderData, defenderDodged) = CombatSimulator.simulate(attacker: attacker,
                                                                               defender: defender,
-                                                                              attacked: relativeAttackDirection,
-                                                                              threatLevel: level.threatLevelController.threatLevel)
+                                                                              attacked: relativeAttackDirection)
             
             tiles[attackerPosition.x][attackerPosition.y] = Tile(type: TileType.monster(newAttackerData))
             tiles[defenderPosition.x][defenderPosition.y] = Tile(type: TileType.player(newDefenderData))
+            
+            dodged = defenderDodged
         } else if case let .player(playerModel) = tiles[attackerPosition].type,
             defenderPostion == nil {
             //just note that the player attacked
@@ -1052,14 +1066,14 @@ extension Board {
             
         } else if case let .monster(monsterModel) = tiles[attackerPosition].type,
             let defenderPosition = defenderPostion,
-            case .pillar (let color, let health) = tiles[defenderPosition].type {
+            case .pillar (let data) = tiles[defenderPosition].type {
             //just note that the monster attacked
             // and the pillar takes one damage
             tiles[attackerPosition.x][attackerPosition.y] = Tile(type: TileType.monster(monsterModel.didAttack()))
-            if health == 1 {
+            if data.health == 1 {
                 tiles[defenderPosition.x][defenderPosition.y] = Tile.empty
             } else {
-                tiles[defenderPosition.x][defenderPosition.y] = Tile(type: .pillar(color, health - 1))
+                tiles[defenderPosition.x][defenderPosition.y] = Tile(type: .pillar(PillarData(color: data.color, health: data.health - 1)))
                 
             }
         } else if case let .monster(monsterModel) = tiles[attackerPosition].type,
@@ -1068,9 +1082,11 @@ extension Board {
             tiles[attackerPosition.x][attackerPosition.y] = Tile(type: TileType.monster(monsterModel.didAttack()))
         }
         
-        
-        
-        return Transformation(inputType: input.type,
+        return Transformation(inputType: InputType.attack(attackType: type,
+                                                          attacker: attackerPosition,
+                                                          defender: defenderPostion,
+                                                          affectedTiles: affectedTiles,
+                                                          dodged: dodged),
                               endTiles: tiles)
     }
 }

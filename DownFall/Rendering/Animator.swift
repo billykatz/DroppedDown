@@ -12,6 +12,107 @@ import SpriteKit
 
 struct Animator {
     
+    public func animateRune(_ rune: Rune,
+                            transformations: [Transformation],
+                            affectedTiles: [TileCoord],
+                            sprites: [[DFTileSpriteNode]],
+                            spriteForeground: SKNode,
+                            completion: (() -> ())? = nil) {
+        let runeAnimation = SpriteSheet(texture: rune.animationTexture, rows: 1, columns: rune.animationColumns)
+        guard let endTiles = transformations.first?.endTiles else {
+            completion?()
+            return
+        }
+        
+        guard let tileTransformation = transformations.first?.tileTransformation?.first else {
+            completion?()
+            return
+        }
+
+        
+        switch rune.type {
+        case .getSwifty:
+            var spriteActions: [SpriteAction] = []
+            for tileTrans in tileTransformation {
+                let start = tileTrans.initial
+                let end = tileTrans.end
+                let endPosition = sprites[end.row][end.column].position
+                let runeAnimationAction = SKAction.animate(with: runeAnimation.animationFrames(), timePerFrame: 0.07)
+                let moveAction = SKAction.move(to: endPosition, duration: 0.07)
+                
+                let runeAndMoveAnimation = SKAction.group([runeAnimationAction, moveAction])
+                let spriteAction = SpriteAction(sprite: sprites[start.row][start.column], action: runeAndMoveAnimation)
+                spriteActions.append(spriteAction)
+            }
+        animate(spriteActions) { completion?() }
+        
+ 
+            
+        case .rainEmbers:
+                       
+            var spriteActions: [SpriteAction] = []
+            guard let pp = getTilePosition(.player(.playerZero), tiles: endTiles) else {
+                completion?()
+                return
+            }
+            
+            for target in affectedTiles {
+                let horizontalDistane = pp.distance(to: target, along: .horizontal)
+                let verticalDistane = pp.distance(to: target, along: .vertical)
+                let distance = CGFloat.hypotenuseDistance(sideALength: CGFloat(horizontalDistane), sideBLength: CGFloat(verticalDistane))
+                
+                let duration = Double(distance * 0.1)
+                let angle = CGFloat.angle(sideALength: CGFloat(horizontalDistane),
+                                          sideBLength: CGFloat(verticalDistane))
+                
+                let fireballAction = SKAction.repeat(SKAction.animate(with: runeAnimation.animationFrames(), timePerFrame: 0.07), count: Int(duration * 0.07))
+                
+                let xDistance = CGFloat(pp.totalDistance(to: target, along: .horizontal))
+                let yDistance = CGFloat(pp.totalDistance(to: target, along: .vertical))
+                
+                let rotateAngle = CGFloat.rotateAngle(startAngle: .pi*3/2, targetAngle: angle, xDistance: xDistance, yDistance: yDistance)
+                
+                
+                let moveAction = SKAction.move(to:sprites[target.row][target.column].position, duration: duration)
+                let rotateAction = SKAction.rotate(byAngle: rotateAngle, duration: 0)
+                let combinedAction = SKAction.group([fireballAction, moveAction])
+                let removeAction = SKAction.removeFromParent()
+                
+                let sequencedActions = SKAction.sequence([
+                    rotateAction,
+                                                          combinedAction,
+                                                          smokeAnimation(),
+                                                          removeAction])
+                
+                let fireballSpriteContainer = SKSpriteNode(color: .clear,
+                                                           size: sprites[target.row][target.column].size)
+                
+                
+                //start the fireball from the player
+                fireballSpriteContainer.position = sprites[pp.row][pp.column].position
+                fireballSpriteContainer.zPosition = Precedence.flying.rawValue
+                spriteForeground.addChild(fireballSpriteContainer)
+                spriteActions.append(SpriteAction(sprite: fireballSpriteContainer, action: sequencedActions))
+                
+            }
+            
+            animate(spriteActions) { completion?() }
+
+        case .transformRock:
+            var spriteActions: [SpriteAction] = []
+            for tileTrans in tileTransformation {
+                let start = tileTrans.initial
+                let runeAnimationAction = SKAction.animate(with: runeAnimation.animationFrames(), timePerFrame: 0.07)
+                
+                let spriteAction = SpriteAction(sprite: sprites[start.row][start.column], action: runeAnimationAction)
+                spriteActions.append(spriteAction)
+            }
+            animate(spriteActions) { completion?() }
+
+            
+        }
+    }
+    
     public func smokeAnimation() -> SKAction {
         let smokeTexture = SpriteSheet(texture: SKTexture(imageNamed: "smokeAnimation"), rows: 1, columns: 6).animationFrames()
         let smokeAnimation = SKAction.animate(with: smokeTexture, timePerFrame: 0.07)
@@ -202,7 +303,9 @@ struct Animator {
         guard case InputType.attack(_,
                                     let attackerPosition,
                                     let defenderPosition,
-                                    let affectedTiles) = attackInputType else { return }
+                                    let affectedTiles,
+                                    let defenderDodged
+            ) = attackInputType else { return }
         
         /*
          Attack animations involve a few things depending on the attack.
@@ -242,8 +345,32 @@ struct Animator {
         }
         
         // defender animation
-        if let defend = animation(for: .hurt, fromPosition: defenderPosition, toPosition: nil, in: tiles, sprites: sprites, dispatchGroup: dispatchGroup) {
+        if !defenderDodged,
+            let defend = animation(for: .hurt, fromPosition: defenderPosition, toPosition: nil, in: tiles, sprites: sprites, dispatchGroup: dispatchGroup) {
             groupedActions.append(defend)
+        } else if defenderDodged {
+            let dodgedText = ParagraphNode(text: "Dodged!", paragraphWidth: 800.0, fontSize: UIFont.giantSize, fontColor: .yellow)
+            dodgedText.zPosition = Precedence.flying.rawValue
+            let scaleAction = SKAction.run {
+                let action = SKAction.scale(by: 1.75, duration: 0.75)
+                let rotateAction = SKAction.rotate(byAngle: .pi/16, duration: 0.30)
+                let antiRotateAction = SKAction.rotate(byAngle: -.pi/8, duration: 0.45)
+                
+                dodgedText.run(SKAction.group([action, SKAction.sequence([rotateAction, antiRotateAction])]))
+            }
+            
+            let addToSceneAction = SKAction.run {
+                foreground.addChild(dodgedText)
+            }
+            let removeAction = SKAction.run {
+                dodgedText.removeFromParent()
+            }
+            let addMoveUpAndScaleAction = SKAction.group([addToSceneAction, SKAction.wait(forDuration: 0.75),  scaleAction])
+            let sequence = SKAction.sequence([addMoveUpAndScaleAction, removeAction])
+            
+            
+            
+            groupedActions.append(sequence)
         }
         
         

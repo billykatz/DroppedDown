@@ -88,7 +88,7 @@ class Referee {
         
         let playerPosition = getTilePosition(.player(.zero), tiles: tiles)
         let exitPosition = getTilePosition(.exit(blocked: false), tiles: tiles)
-        let dynamitePositions = getTilePositions(.dynamite(fuseCount: 0, hasBeenDecremented: false), tiles: tiles)
+        let dynamitePositions = getTilePositions(.dynamite(DynamiteFuse(count: 0, hasBeenDecremented: false)), tiles: tiles)
         let emptyPositions = getTilePosition(.empty, tiles: tiles)
         
         func boardHasMoreMoves() -> Bool {
@@ -231,7 +231,8 @@ class Referee {
                     return Input(.attack(attackType: playerData.attack.type,
                                          attacker: playerPosition,
                                          defender: attackedTile,
-                                         affectedTiles: attackedTileArray))
+                                         affectedTiles: attackedTileArray,
+                                         dodged: false))
                 }
             }
             return nil
@@ -268,7 +269,8 @@ class Referee {
                             return Input(.attack(attackType: monsterData.attack.type,
                                                  attacker: potentialMonsterPosition,
                                                  defender: attackedTile,
-                                                 affectedTiles: nonBlockedAttackedTiles))
+                                                 affectedTiles: nonBlockedAttackedTiles,
+                                                 dodged: false))
                         } else if case TileType.pillar = tiles[attackedTile].type,
                             allAttackedTileArray.contains(where: { (coord) -> Bool in
                                 if case TileType.player = tiles[coord].type {
@@ -280,7 +282,9 @@ class Referee {
                             return Input(.attack(attackType: monsterData.attack.type,
                                                  attacker: potentialMonsterPosition,
                                                  defender: attackedTile,
-                                                 affectedTiles: nonBlockedAttackedTiles))
+                                                 affectedTiles: nonBlockedAttackedTiles,
+                                                 dodged: false
+                                ))
                         }
                     }
                     
@@ -291,7 +295,8 @@ class Referee {
                         return Input(.attack(attackType: monsterData.attack.type,
                                              attacker: potentialMonsterPosition,
                                              defender: nil,
-                                             affectedTiles: nonBlockedAttackedTiles))
+                                             affectedTiles: nonBlockedAttackedTiles,
+                                             dodged: false))
                     }
                     
                 }

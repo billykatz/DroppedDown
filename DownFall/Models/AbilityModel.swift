@@ -25,6 +25,10 @@ struct AnyAbility: Hashable {
 }
 
 extension AnyAbility: Ability {
+    var distanceBetweenTargets: Int? {
+        return _ability.distanceBetweenTargets
+    }
+    
     var cooldown: Int {
         return _ability.cooldown
     }
@@ -110,7 +114,6 @@ extension AnyAbility: Equatable {
     }
 }
 
-
 protocol Ability {
     var affectsCombat: Bool { get }
     var type: AbilityType { get }
@@ -130,6 +133,7 @@ protocol Ability {
     var rechargeType: [TileType] { get }
     var rechargeMinimum: Int { get }
     var progressColor: UIColor { get }
+    var distanceBetweenTargets: Int? { get }
     
     func blocksDamage(from: Direction) -> Int?
     func animatedColumns() -> Int?
@@ -161,6 +165,8 @@ enum AbilityType: Equatable {
     case tapAwayMonster
     case massMineRock
     case rainEmbers
+    case getSwifty
+    case transformRock
     
     var humanReadable: String {
         switch self {
@@ -177,6 +183,9 @@ enum AbilityType: Equatable {
         case .tapAwayMonster: return "Destory Monster Group"
         case .massMineRock: return "Mass Mine"
         case .rainEmbers: return "Rain Embers"
+        case .getSwifty: return "Swift Shift"
+        case .transformRock: return "Transform Rock"
+            
         }
     }
 }
@@ -198,11 +207,11 @@ enum Usage {
     }
 }
 
-enum Currency: String, CaseIterable  {
+enum Currency: String, CaseIterable, Codable, Hashable  {
     case gold
-    case gem = "gem2"
+    case gem = "crystals"
     
-    var itemTyp: Item.ItemType {
+    var itemType: Item.ItemType {
         switch self {
         case .gold:
             return Item.ItemType.gold

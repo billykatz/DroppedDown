@@ -54,4 +54,6 @@ struct Empty: Ability {
     var targets: Int? { return nil }
     
     var targetTypes: [TileType]? { return nil }
+    
+    var distanceBetweenTargets: Int? { return nil }
 }

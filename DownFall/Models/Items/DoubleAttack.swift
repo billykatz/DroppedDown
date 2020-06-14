@@ -9,6 +9,8 @@
 import UIKit
 
 struct DoubleAttack: Ability {
+    var distanceBetweenTargets: Int? { return nil }
+    
     var rechargeMinimum: Int {
         return 1
     }

@@ -9,6 +9,9 @@
 import UIKit
 
 struct RockASwap: Ability {
+    
+    var distanceBetweenTargets: Int? { return nil }
+    
     var rechargeMinimum: Int {
         return 1
     }

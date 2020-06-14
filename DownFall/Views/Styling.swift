@@ -47,7 +47,7 @@ struct Style {
         }
         
         struct Item {
-            static let size: CGSize = CGSize(width: 75.0, height: 75.0)
+            static let size: CGSize = CGSize(width: 400.0, height: 400.0)
         }
         
         struct ItemGrid {
@@ -81,6 +81,7 @@ struct Style {
         static let normal: CGFloat = 8.0
         static let more: CGFloat = 16.0
         static let most: CGFloat = 24.0
+        static let safeArea: CGFloat  = 75.0
     }
     
     struct Spacing {
@@ -113,7 +114,7 @@ struct Style {
     }
     
     struct Menu {
-        static let borderWidth: CGFloat = 10.0
+        static let borderWidth: CGFloat = 20.0
     }
     
     struct RunMenu {

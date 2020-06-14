@@ -42,10 +42,7 @@ class BackpackView: SKSpriteNode {
     private var targetingArea: SKSpriteNode
     
     //rune inventory container
-    private var runeInventoryContainer: SKSpriteNode?
-    
-    // pick axe
-    var pickaxeHandleView: SKSpriteNode?
+    private var runeInventoryContainer: RuneContainerView?
     
     init(playableRect: CGRect, viewModel: TargetingViewModel, levelSize: Int) {
         self.playableRect = playableRect
@@ -111,18 +108,18 @@ class BackpackView: SKSpriteNode {
      Passed into our viewModel as a callback function to "bind" everything together
      */
     func updated() {
-        updateReticles()
         updateTargetArea()
+        updateReticles()
     }
     
     //MARK: - private functions
     // TODO: should this be updated?
     private let maxRuneSlots = 4
-    private func runeSlotsUpdated(_ runes: Int, _ abilities: [AnyAbility]) {
+    private func runeSlotsUpdated(_ runeSlots: Int, _ runes: [Rune]) {
         /// TODO: we only ever want to do this once!!!
         /// Add an update method to the RuneContainer so if you get a rune mid-level or whatever, it will updated accordinly
-        let viewModel = RuneContainerViewModel(abilities: abilities,
-                                               numberOfRuneSlots: runes,
+        let viewModel = RuneContainerViewModel(runes: runes,
+                                               numberOfRuneSlots: runeSlots,
                                                runeWasTapped: runeWasTapped,
                                                runeWasUsed: self.viewModel.didUse,
                                                runeUseWasCanceled: runeUseWasCanceled)
@@ -131,7 +128,7 @@ class BackpackView: SKSpriteNode {
                                               size: CGSize(width: playableRect.width, height: Style.Backpack.runeInventorySize))
         
         runeContainer.position = CGPoint.position(runeContainer.frame, inside: playableRect, verticalAnchor: .bottom, horizontalAnchor: .center, padding: Style.Padding.most*3)
-
+        runeContainer.zPosition = Precedence.aboveMenu.rawValue
         
         runeInventoryContainer = runeContainer
         addChild(runeContainer)
@@ -141,12 +138,12 @@ class BackpackView: SKSpriteNode {
         viewModel.didSelect(nil)
     }
     
-    private func runeWasTapped(ability: AnyAbility?) {
-        viewModel.didSelect(ability)
+    private func runeWasTapped(rune: Rune?) {
+        viewModel.didSelect(rune)
     }
     
     private func updateTargetArea() {
-        if viewModel.ability == nil {
+        if viewModel.rune == nil {
             targetingArea.removeFromParent()
         } else {
             addChildSafely(targetingArea)
@@ -155,15 +152,18 @@ class BackpackView: SKSpriteNode {
     
     private func updateReticles() {
         targetingArea.removeAllChildren()
-        
-        for target in viewModel.currentTargets {
+        let areLegal = viewModel.currentTargets.areLegal
+        for target in viewModel.currentTargets.targets {
             let position = translateCoord(target.coord)
-            let identifier: String = target.isLegal ? Identifiers.Sprite.greenReticle : Identifiers.Sprite.redReticle
+            /// choose the reticle based on all targets legality and this individual target legality
+            let identifier: String = (target.isLegal && areLegal) ? Identifiers.Sprite.greenReticle : Identifiers.Sprite.redReticle
             let reticle = SKSpriteNode(texture: SKTexture(imageNamed: identifier), size: CGSize(width: tileSize, height: tileSize))
             reticle.position = position
             reticle.zPosition = Precedence.menu.rawValue
             targetingArea.addChildSafely(reticle)
         }
+        
+        runeInventoryContainer?.enableButton(areLegal)
     }
     
     private func translateCoord(_ coord: TileCoord) -> CGPoint {
@@ -198,7 +198,7 @@ extension BackpackView {
         let position = touch.location(in: self)
         
         for node in self.nodes(at: position) {
-            if node.name == targetingAreaName && viewModel.ability != nil && !background.contains(position) {
+            if node.name == targetingAreaName && viewModel.rune != nil && !background.contains(position) {
                 let tileCoord = translatePoint(position)
                 viewModel.didTarget(tileCoord)
             }

@@ -14,6 +14,7 @@ class GameScene: SKScene {
     
     struct Constants {
         static let swipeDistanceThreshold = CGFloat(25.0)
+        static let quickSwipeDistanceThreshold = CGFloat(100.0)
     }
     
     // only strong reference to the Board
@@ -114,13 +115,13 @@ class GameScene: SKScene {
                 else { return }
                 
                 self.foreground.removeAllChildren()
-                if case TileType.player = self.board.tiles[playerIndex].type {
+                if case let TileType.player(data) = self.board.tiles[playerIndex].type {
                     self.removeFromParent()
                     self.swipeRecognizerView?.removeFromSuperview()
-                    self.gameSceneDelegate?.resetToMain(self)
+                    self.gameSceneDelegate?.resetToMain(self, playerData: data)
                 }
 
-            } else if input.type == .visitStore {
+            } else if case let InputType.goalProgressRecord(progress) = input.type {
                 guard let self = self,
                     let playerIndex = tileIndices(of: .player(.zero), in: self.board.tiles).first
                     else { return }
@@ -129,9 +130,9 @@ class GameScene: SKScene {
                 if case let TileType.player(data) = self.board.tiles[playerIndex].type {
                     self.removeFromParent()
                     self.swipeRecognizerView?.removeFromSuperview()
-                    self.gameSceneDelegate?.visitStore(data)
+                    self.gameSceneDelegate?.visitStore(data, progress)
+                
                 }
-
             }
         }
 
@@ -163,9 +164,8 @@ extension GameScene {
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         // avoid inputing touchEnded when a touch is cancelled.
-        if !touchWasSwipe {
-            touchWasCanceled = true
-        }
+        touchWasCanceled = true
+        touchWasSwipe = false
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -177,6 +177,7 @@ extension GameScene {
             lastPosition = currentPosition
         }
         guard let lastPosition = lastPosition, (abs(currentPosition.x - lastPosition.x) > Constants.swipeDistanceThreshold || abs(currentPosition.y - lastPosition.y) > Constants.swipeDistanceThreshold || touchWasSwipe) else {
+            touchWasSwipe = false
             return
         }
         touchWasSwipe = true
@@ -222,11 +223,11 @@ extension GameScene {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         defer {
             self.renderer?.touchesEnded(touches, with: event)
+            self.lastPosition = nil
+            self.swipeDirection = nil
+            self.touchWasSwipe = false
         }
         
-        
-        self.lastPosition = nil
-        self.swipeDirection = nil
         if !touchWasSwipe {
             guard !touchWasCanceled else {
                 touchWasCanceled = false
@@ -235,7 +236,6 @@ extension GameScene {
         } else {
             self.rotatePreview?.touchesEnded()
         }
-        self.touchWasSwipe = false
     }
 }
 

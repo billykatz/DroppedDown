@@ -11,6 +11,8 @@ import Foundation
 enum ViewMode {
     case inventory
     case itemDetail
+    case storeHUD
+    case storeHUDExpanded
 }
 
 struct Target {
@@ -18,12 +20,16 @@ struct Target {
     let isLegal: Bool
 }
 
+struct AllTarget {
+    var targets: [Target]
+    let areLegal: Bool
+}
+
 protocol TargetingOutputs {
     var toastMessage: String { get }
-    var usageMessage: String { get }
-    var currentTargets: [Target] { get }
+    var currentTargets: AllTarget { get }
     var legallyTargeted: Bool { get }
-    var inventory: [AnyAbility] { get }
+    var inventory: [Rune] { get }
 }
 
 protocol TargetingInputs {
@@ -32,10 +38,10 @@ protocol TargetingInputs {
     func didTarget(_ coord: TileCoord)
     
     /// Use this to consume the item
-    func didUse(_ ability: AnyAbility?)
+    func didUse(_ rune: Rune?)
     
     /// Use this to select an ability
-    func didSelect(_ ability: AnyAbility?)
+    func didSelect(_ rune: Rune?)
 }
 
 protocol Targeting: TargetingOutputs, TargetingInputs {}
@@ -44,11 +50,11 @@ protocol Targeting: TargetingOutputs, TargetingInputs {}
 class TargetingViewModel: Targeting {
     
     public var updateCallback: (() -> Void)?
-    public var runeSlotsUpdated: ((Int, [AnyAbility]) -> Void)?
+    public var runeSlotsUpdated: ((Int, [Rune]) -> Void)?
     public var targetsUpdated: (() -> Void)?
     
     private var runeSlots: Int = 0
-    var inventory: [AnyAbility] = []
+    var inventory: [Rune] = []
     
     init() {
         Dispatch.shared.register { [weak self] (input) in
@@ -65,26 +71,20 @@ class TargetingViewModel: Targeting {
             {
                 tiles = endTiles
             }
-            
-            if let inputType = trans.first?.inputType,
-                case InputType.itemUsed(_) = inputType,
-                let tiles = trans.first?.endTiles,
-                let playerData = playerData(in: tiles)
-            {
-                let runeSlots = playerData.runeSlots ?? 0
-                self.runeSlots = runeSlots
-                inventory = playerData.abilities
-                runeSlotsUpdated?(runeSlots, playerData.abilities)
+            else {
+                /// clear out targets after any transformation
+                currentTargets = AllTarget(targets: [], areLegal: false)
             }
             
         case .boardBuilt:
             guard let tiles = input.endTilesStruct else { return }
             
-            if let playerData = playerData(in: tiles) {
+            if let playerData = playerData(in: tiles),
+                let runes = playerData.runes {
                 let runeSlots = playerData.runeSlots ?? 0
                 self.runeSlots = runeSlots
-                inventory = playerData.abilities
-                runeSlotsUpdated?(runeSlots, playerData.abilities)
+                inventory = playerData.runes ?? []
+                runeSlotsUpdated?(runeSlots, runes)
             }
         case .itemUseCanceled:
             ()
@@ -94,11 +94,11 @@ class TargetingViewModel: Targeting {
 
     }
 
-    var ability: AnyAbility? {
+    var rune: Rune? {
         didSet {
-            currentTargets = []
-            if let ability = ability {
-                InputQueue.append(Input(InputType.itemUseSelected(ability)))
+            currentTargets = AllTarget(targets: [], areLegal: false)
+            if let rune = rune {
+                InputQueue.append(Input(InputType.itemUseSelected(rune)))
                 autoTarget()
             }
             else {
@@ -108,24 +108,19 @@ class TargetingViewModel: Targeting {
     }
     
     var numberOfTargets: Int {
-        return ability?.targets ?? 0
+        return rune?.targets ?? 0
     }
     
     var typesOfTargets: [TileType] {
-        return ability?.targetTypes ?? []
+        return rune?.targetTypes ?? []
     }
     
     var nameMessage: String? {
-        return ability?.type.humanReadable
-    }
-    
-    var usageMessage: String {
-
-        return ability?.usage.message ?? ""
+        return rune?.type.humanReadable
     }
     
     var toastMessage: String {
-        if ability == nil {
+        if rune == nil {
             return ""
         }
         let baseString = "Choose "
@@ -161,7 +156,7 @@ class TargetingViewModel: Targeting {
         return baseString + "\(self.numberOfTargets) " + types + "\(self.numberOfTargets > 1 ? "s" : "")"
     }
     
-    var currentTargets: [Target] = [] {
+    var currentTargets: AllTarget = AllTarget(targets: [], areLegal: false) {
         didSet {
             updateCallback?()
             targetsUpdated?()
@@ -171,9 +166,10 @@ class TargetingViewModel: Targeting {
     
     
     var legallyTargeted: Bool {
-        return self.currentTargets.allSatisfy({
+        return self.currentTargets.targets.allSatisfy({
             return $0.isLegal
-        }) && self.currentTargets.count == self.numberOfTargets
+        }) && self.currentTargets.targets.count == self.numberOfTargets
+            && self.currentTargets.areLegal
     }
     
     
@@ -182,6 +178,44 @@ class TargetingViewModel: Targeting {
             autoTarget()
             updateCallback?()
         }
+    }
+    
+    private func areTargetsLegal(_ coords: [TileCoord]) -> Bool {
+        guard let tiles = tiles else { return false }
+        let needsToTargetPlayer: Bool = rune?.targetTypes?.contains(.player(.playerZero)) ?? false
+        var hasPlayerTargeted = false
+        for coord in coords {
+            if !isTargetLegal(coord) {
+                return false
+            }
+            if  tiles[coord].type == TileType.player(.zero) {
+                hasPlayerTargeted = true
+            }
+        }
+        
+        /// For some items we MUST target the player.
+        /// If needsToTargetPlayer == false, then the palyer is not a legal target and we will continue past the guard
+        /// If needsToTargetPlayer == true, then we need to check if we have the player targeted in set of targets
+        guard needsToTargetPlayer == hasPlayerTargeted else { return false }
+        
+        /// ensure that the targets are within the correct distance of each other
+        let targetDistance = rune?.maxDistanceBetweenTargets ?? Int.max
+        
+        /// we may never append anything to this but thats okay.
+        var results: [Bool] = []
+        
+        for (outIdx, outerElement) in coords.enumerated() {
+            for (inIdx, innerElement) in coords.enumerated() {
+                if outIdx == inIdx { continue }
+                results.append(outerElement.distance(to: innerElement, along: .vertical) <= targetDistance)
+                results.append(outerElement.distance(to: innerElement, along: .horizontal) <= targetDistance)
+            }
+        }
+        
+        /// If every single target is within the targetDistance then every entry in results will be true
+        /// Return false when results contains 1 or more elements of `false`
+        return !results.contains(false)
+        
     }
 
     private func isTargetLegal(_ coord: TileCoord) -> Bool {
@@ -200,37 +234,56 @@ class TargetingViewModel: Targeting {
      - Returns: Nothing
      */
     func didTarget(_ coord: TileCoord) {
-        guard ability != nil else { preconditionFailure("We should be able to target if we dont have an ability selected") }
-        if currentTargets.contains(where: { return $0.coord == coord } ) {
-            //remove the new target
-            currentTargets.removeAll(where: { return $0.coord == coord })
-        } else if currentTargets.count < self.numberOfTargets {
+        guard rune != nil else { preconditionFailure("We cant target if we dont have an ability set") }
+        if currentTargets.targets.contains(where: { return $0.coord == coord } ) {
+            // remove the targeting
+            currentTargets.targets.removeAll(where: { return $0.coord == coord })
+            let newTargets = currentTargets.targets
+            let areLegal = areTargetsLegal(newTargets.map { $0.coord })
+            currentTargets = AllTarget(targets: newTargets, areLegal: areLegal)
+        } else if currentTargets.targets.count < self.numberOfTargets {
             //add the new target
-            currentTargets.append(Target(coord: coord, isLegal: isTargetLegal(coord)))
+            currentTargets.targets.append(Target(coord: coord, isLegal: isTargetLegal(coord)))
+            let areLegal = areTargetsLegal(currentTargets.targets.map { $0.coord })
+            currentTargets = AllTarget(targets: currentTargets.targets, areLegal: areLegal)
+            
         } else {
             // move the most recently placed unless there is one that is "illegal" then move that one.
-            let count = currentTargets.count
-            currentTargets.removeFirst(where: { !$0.isLegal })
-            if currentTargets.count == count {
-                currentTargets.removeLast()
+            let count = currentTargets.targets.count
+            // remove the first if they are illegally placed
+            currentTargets.targets.removeFirst(where: { !$0.isLegal })
+            
+            // if nothing has been removed then remove the first one placed
+            if !currentTargets.targets.isEmpty,
+                currentTargets.targets.count == count {
+                currentTargets.targets.removeFirst()
             }
             //add the new target
-            currentTargets.append(Target(coord: coord, isLegal: isTargetLegal(coord)))
+            currentTargets.targets.append(Target(coord: coord, isLegal: isTargetLegal(coord)))
+            let areLegal = areTargetsLegal(currentTargets.targets.map { $0.coord })
+            currentTargets = AllTarget(targets: currentTargets.targets, areLegal: areLegal)
         }
     }
     
-    func didUse(_ ability: AnyAbility?) {
-        guard let ability = ability else { return }
-        guard legallyTargeted else { return }
+    func didUse(_ rune: Rune?) {
+        guard let rune = rune else { return }
+        guard legallyTargeted else {
+            self.rune = nil
+            return
+        }
         InputQueue.append(
-            Input(.itemUsed(ability, currentTargets.map { $0.coord }))
+            Input(.itemUsed(rune, currentTargets.targets.map { $0.coord }))
         )
-        self.ability = nil
+        self.rune = nil
+        currentTargets = AllTarget(targets: [], areLegal: false)
         
     }
     
-    func didSelect(_ ability: AnyAbility?) {
-        self.ability = ability
+    func didSelect(_ rune: Rune?) {
+        self.rune = rune
+        if rune == nil {
+            currentTargets = AllTarget(targets: [], areLegal: false)
+        }
     }
     
     private func autoTarget() {
@@ -241,7 +294,9 @@ class TargetingViewModel: Targeting {
         }
         if targetCoords.count <= numberOfTargets {
             // targets are necessarily legal because we looped over types of targets
-            currentTargets = targetCoords.map { Target(coord: $0, isLegal: true) }
+            let targets = targetCoords.map { Target(coord: $0, isLegal: true) }
+            let areLegal = areTargetsLegal(targets.map { $0.coord })
+            currentTargets = AllTarget(targets: targets, areLegal: areLegal)
         }
     }
 }

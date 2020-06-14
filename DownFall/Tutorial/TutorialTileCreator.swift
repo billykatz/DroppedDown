@@ -24,7 +24,7 @@
 import GameplayKit
 
 struct TutorialTileCreator: TileStrategy {
-    func gemDropped(from rock: TileType, groupSize: Int) -> Tile {
+    func gemDropped(from rock: TileType, groupSize: Int, playerData: EntityModel) -> Tile {
         return .empty
     }
     

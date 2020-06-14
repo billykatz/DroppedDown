@@ -56,7 +56,7 @@ struct Item: Decodable, Hashable {
             case .green:
                 return "greenCrystal"
             case .none:
-                return "gem2"
+                return "crystals"
             }
         }
     }

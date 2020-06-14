@@ -71,7 +71,7 @@ class Renderer: SKSpriteNode {
                                                  horizontalAnchor: .right,
                                                  verticalAlign: .bottom,
                                                  translatedToBounds: true)
-        hud.zPosition = Precedence.foreground.rawValue
+        hud.zPosition = Precedence.flying.rawValue
         return hud
     }()
     
@@ -171,7 +171,7 @@ class Renderer: SKSpriteNode {
                 }
             case .monsterDies:
                 computeNewBoard(for: trans)
-            case .newTurn, .bossTargetsWhatToEat, .bossAttacks, .unlockExit, .playerAwarded:
+            case .newTurn, .bossTargetsWhatToEat, .bossAttacks, .unlockExit, .playerAwarded, .runeProgressRecord:
                 animationsFinished(endTiles: trans.endTiles)
             case .itemUsed(let ability, let targets):
                 animateRuneUsed(input: inputType, transformations: transformations, rune: ability, targets: targets)
@@ -197,7 +197,6 @@ class Renderer: SKSpriteNode {
                         self.animationsFinished(endTiles: nil, ref: false)
                     }
                 }
-                
             case .reffingFinished, .touchBegan, .itemUseSelected:
                 () // Purposely left blank.
             default:
@@ -265,9 +264,8 @@ class Renderer: SKSpriteNode {
     }
     
     private func animateRuneUsed(input: InputType, transformations: [Transformation], rune: Rune, targets: [TileCoord]) {
-        switch rune.type {
-        default:
-            animationsFinished(endTiles: transformations.first?.endTiles)
+        animator.animateRune(rune, transformations: transformations, affectedTiles: targets, sprites: sprites, spriteForeground: spriteForeground) { [weak self] in
+            self?.animationsFinished(endTiles: transformations.first?.endTiles)
         }
         
     }

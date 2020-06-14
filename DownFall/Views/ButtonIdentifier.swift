@@ -30,6 +30,17 @@ enum ButtonIdentifier: String {
     case cycleLevel
     case seeInventory
     case shuffleBoard
+    case runeReplaceCancel
+    case runeReplaceConfirm
+    case okay
+    case sellHealth
+    case buyHealth
+    case sellDodge
+    case buyDodge
+    case sellLuck
+    case buyLuck
+    case buyRuneSlot
+    case sellRuneSlot
     
     var title: String {
         switch self {
@@ -40,7 +51,7 @@ enum ButtonIdentifier: String {
         case .selectLevel:
             return "Level Select"
         case .leaveStore:
-            return "Leave Store"
+            return "Continue"
         case .rotate:
             return "Got it! 👍"
         case .visitStore:
@@ -66,12 +77,18 @@ enum ButtonIdentifier: String {
         case .mainMenu:
             return "Main Menu"
         case .cycleLevel:
-            return "Level start"
+            return "Level select"
         case .seeInventory:
             return "Inventory"
         case .shuffleBoard:
             return "Pay 2 \u{2665}: Shuffle board"
-        case .wallet, .infoPopup, .storeItem, .backpack:
+        case .runeReplaceCancel:
+            return "Cancel"
+        case .runeReplaceConfirm:
+            return "Confirm"
+        case .okay:
+            return "Okay"
+        case .wallet, .infoPopup, .storeItem, .backpack, .sellHealth, .buyHealth, .sellDodge, .buyDodge, .sellLuck, .buyLuck, .buyRuneSlot, .sellRuneSlot:
             return ""
         }
     }

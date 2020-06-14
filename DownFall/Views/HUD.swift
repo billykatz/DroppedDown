@@ -81,6 +81,7 @@ class HUD: SKSpriteNode {
         if case InputType.attack(_,
                                  _,
                                  let defenderPosition,
+                                 _,
                                  _) = attackInput.type {
             print("Defender position \(String(describing: defenderPosition))")
         }

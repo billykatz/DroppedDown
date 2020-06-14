@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CoreGraphics
 
 indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
     static func fuzzyEqual(_ lhs: InputType, _ rhs: InputType) -> Bool {
@@ -32,7 +33,8 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
                                         .attack(attackType: .targets,
                                                 attacker: TileCoord(0,0),
                                                 defender: TileCoord(0,0),
-                                                affectedTiles: []),
+                                                affectedTiles: [],
+                                                dodged: false),
                                         .monsterDies(TileCoord(0,0), .wizard),
                                         .gameWin,
                                         .gameLose(""),
@@ -59,7 +61,9 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
                                         .boardBuilt,
                                         .playerAwarded([]),
                                         .unlockExit,
-                                        .levelGoalDetail([])
+                                        .levelGoalDetail([]),
+                                        .goalProgressRecord([]),
+                                        .runeProgressRecord([:])
                                                                  
     ]
     
@@ -70,7 +74,7 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
     case rotateCounterClockwise(preview: Bool)
     case rotateClockwise(preview: Bool)
     case monsterDies(TileCoord, EntityModel.EntityType)
-    case attack(attackType: AttackType, attacker: TileCoord, defender: TileCoord?, affectedTiles: [TileCoord])
+    case attack(attackType: AttackType, attacker: TileCoord, defender: TileCoord?, affectedTiles: [TileCoord], dodged: Bool)
     case gameWin
     case gameLose(String)
     case play
@@ -101,8 +105,9 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
     case shuffleBoard
     case unlockExit
     case levelGoalDetail([GoalTracking])
-    case playerAwarded([LevelGoalReward]
-    )
+    case playerAwarded([LevelGoalReward])
+    case goalProgressRecord([GoalTracking])
+    case runeProgressRecord([Rune: CGFloat])
     
     var debugDescription: String {
         switch self {
@@ -130,7 +135,7 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
             return "Play Again"
         case .reffingFinished:
             return "Reffing Finished"
-        case .attack(_, let attacker, let defender, _):
+        case .attack(_, let attacker, let defender, _, _):
             return "Attacked from \(attacker) to \(String(describing: defender))"
         case .boardBuilt:
             return "Board has been built"
@@ -180,6 +185,10 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
             return "Level Goal Detail"
         case .playerAwarded:
             return "Player is awarded something"
+        case .goalProgressRecord:
+            return "Record goal progress"
+        case .runeProgressRecord:
+            return "Record rune progres"
             
         }
     }

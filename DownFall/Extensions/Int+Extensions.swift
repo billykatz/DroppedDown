@@ -48,5 +48,6 @@ public extension Int {
     static func random(lower: Int, upper: Int) -> Int {
         return Int(arc4random_uniform(UInt32(lower))) + lower
     }
+    
 
 }

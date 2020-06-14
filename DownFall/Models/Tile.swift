@@ -18,7 +18,7 @@ struct PillarData: Decodable, Hashable {
     let health: Int
 }
 
-enum Color: String, Decodable, CaseIterable {
+enum Color: String, Decodable, CaseIterable, Hashable {
     case blue
     case brown
     case purple
@@ -331,8 +331,9 @@ enum TileType: Hashable, CaseIterable, Decodable {
 extension TileType {
     var humanReadable: String {
         switch self {
-        case .rock:
-            return "rock"
+        case .rock(let color):
+            //TODO: this might have some consequences
+            return "\(color.humanReadable) rock"
         case .pillar(let data):
             return "\(data.color.humanReadable) pillar"
         case .player(let data):

@@ -109,7 +109,7 @@ class TutorialScene: SKScene {
                 if case let TileType.player(data) = self.board.tiles[playerIndex].type {
                     let revivedData = data.revive()
                     self.removeFromParent()
-                    self.gameSceneDelegate?.visitStore(revivedData)
+                    self.gameSceneDelegate?.visitStore(revivedData, [])
                 }
                 
                 self.level?.tutorialData?.reset()
@@ -210,9 +210,8 @@ extension TutorialScene {
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         // avoid inputing touchEnded when a touch is cancelled.
-        if !touchWasSwipe {
-            touchWasCanceled = true
-        }
+        touchWasCanceled = true
+        touchWasSwipe = false
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -223,6 +222,7 @@ extension TutorialScene {
             }
             self.renderer?.touchesEnded(touches, with: event)
         }
+        touchWasSwipe = false
     }
 }
 

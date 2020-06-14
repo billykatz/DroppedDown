@@ -18,8 +18,17 @@ enum ButtonShape {
     case circle
 }
 
+enum ButtonType {
+    case text
+    case image
+}
+
 
 class Button: SKShapeNode {
+    
+    struct Constants {
+        static let disabledBackgroundColor = UIColor.darkGray
+    }
     
     static let small = CGSize(width: 75, height: 30)
     static let medium = CGSize(width: 110, height: 50)
@@ -29,6 +38,8 @@ class Button: SKShapeNode {
     static let inGameLarge = CGSize(width: 200, height: 160)
     
     weak var delegate: ButtonDelegate?
+    
+    var buttonType: ButtonType
     
     var identifier: ButtonIdentifier
     var originalBackground: UIColor = .clear
@@ -50,6 +61,7 @@ class Button: SKShapeNode {
     
     /// view that is the visual button
     var buttonView: SKShapeNode?
+    var grayOutButtonView: SKShapeNode?
     
     private var isDisabled: Bool = false
     
@@ -61,7 +73,7 @@ class Button: SKShapeNode {
          precedence: Precedence = Precedence.aboveMenu,
          showSelection: Bool = true,
          disable: Bool = false) {
-        
+        self.buttonType = .image
         self.delegate = delegate
         self.identifier = identifier
         self.showSelection = showSelection
@@ -89,6 +101,8 @@ class Button: SKShapeNode {
             let buttonPath = CGPath(ellipseIn: rectangle, transform: nil)
             self.buttonView = SKShapeNode(path: buttonPath)
             
+            
+            
         }
         
         // add the image
@@ -105,6 +119,19 @@ class Button: SKShapeNode {
         
         //enable/disable
         self.isDisabled = disable
+        
+        if disable {
+            if let grayOutShape = self.buttonView?.copy() as? SKShapeNode {
+                grayOutShape.color = .darkGray
+                addChild(grayOutShape)
+                grayOutShape.zPosition = Precedence.aboveMenu.rawValue
+                grayOutShape.alpha = 0.75
+                
+                removeShadow()
+                
+                grayOutButtonView = grayOutShape
+            }
+        }
         
         // set points for moving the button slightly
         unpressedPosition = self.frame.center
@@ -128,6 +155,7 @@ class Button: SKShapeNode {
          disable: Bool = false) {
         
         //Set properties
+        self.buttonType = .text
         self.delegate = delegate
         self.identifier = identifier
         self.showSelection = showSelection
@@ -145,14 +173,16 @@ class Button: SKShapeNode {
         buttonView?.color = self.originalBackground
         
         //add the shadow
-        let shadowPath = CGPath(roundedRect: CGRect(x: -size.width/2, y: -size.height/2 - dropShadowOffset, width: size.width, height: size.height), cornerWidth: 5.0, cornerHeight: 5.0, transform: nil)
-        let shadowShape = SKShapeNode(path: shadowPath)
-        shadowShape.color = .storeBlack
-        self.dropShadow = shadowShape
+        if !disable {
+            let shadowPath = CGPath(roundedRect: CGRect(x: -size.width/2, y: -size.height/2 - dropShadowOffset, width: size.width, height: size.height), cornerWidth: 5.0, cornerHeight: 5.0, transform: nil)
+            let shadowShape = SKShapeNode(path: shadowPath)
+            shadowShape.color = .storeBlack
+            self.dropShadow = shadowShape
+            // does this have to be hardcoded?
+            shadowShape.zPosition = -1
+            addChild(shadowShape)
+        }
         
-        // does this have to be hardcoded?
-        shadowShape.zPosition = -1
-        addChild(shadowShape)
         
         if addTextLabel {
             //Create Label
@@ -174,6 +204,7 @@ class Button: SKShapeNode {
         
         //enable/disable
         self.isDisabled = disable
+        enable(!disable)
         
         self.color = .clear
         
@@ -238,9 +269,34 @@ extension Button {
         addChildSafely(dropShadow)
     }
     
-    public func enabled(_ on: Bool) {
+    public func enable(_ on: Bool) {
         self.isDisabled = !on
-        buttonView?.color = on ? originalBackground : .lightGray
+        if buttonType == .text {
+            buttonView?.color = on ? originalBackground : Constants.disabledBackgroundColor
+            if on { setupShadow() }
+            else { removeShadow() }
+        } else {
+            if on {
+                grayOutButtonView?.removeFromParent()
+                setupShadow()
+            }
+            else {
+                addChildSafely(grayOutButtonView)
+                removeShadow()
+            }
+        }
+    }
+    
+    func setupShadow() {
+        if dropShadow == nil {
+            let shadowPath = CGPath(roundedRect: CGRect(x: -frame.size.width/2, y: -frame.size.height/2 - dropShadowOffset, width: frame.size.width, height: frame.size.height), cornerWidth: 5.0, cornerHeight: 5.0, transform: nil)
+            let shadowShape = SKShapeNode(path: shadowPath)
+            shadowShape.color = .storeBlack
+            self.dropShadow = shadowShape
+            // does this have to be hardcoded?
+            shadowShape.zPosition = -1
+            addChild(shadowShape)
+        }
     }
     
     

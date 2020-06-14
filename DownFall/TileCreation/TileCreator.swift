@@ -19,6 +19,7 @@ class TileCreator: TileStrategy {
     var specialGems = 0
     var goldVariance = 2
     let maxMonsterRatio: Double = 0.15
+    var numberOfTilesSinceLastGemDropped = 0
     
     required init(_ entities: EntitiesModel,
                   difficulty: Difficulty,
@@ -33,7 +34,7 @@ class TileCreator: TileStrategy {
         self.boardSize = level?.boardSize ?? 0
     }
     
-    private func randomTile(_ given: Int) -> TileType {
+    private func randomTile(given: Int, neighbors: [Tile]) -> TileType {
         guard level?.spawnsMonsters ?? true else { return randomRock() }
         let weight = 97
         let index = abs(given) % (TileType.randomCases.count + weight)
@@ -50,7 +51,7 @@ class TileCreator: TileStrategy {
         case 0..<9:
             return randomMonster()
         case 9...Int.max:
-            return randomRock()
+            return randomRock(neighbors)
         default:
             preconditionFailure("Shouldnt be here")
         }
@@ -97,30 +98,42 @@ class TileCreator: TileStrategy {
         return tileCoord
     }
     
-    private func randomRock() -> TileType {
+    private func randomRock(_ neighbors: [Tile] = []) -> TileType {
         guard let level = level else { fatalError("You need to init with a level") }
-        let totalNumber = level.rocksRatio.values.max { (first, second) -> Bool in
-            return first.upper < second.upper
+        var tileTypeChances = level.tileTypeChances
+        if !neighbors.isEmpty {
+            tileTypeChances = tileTypeChances.increaseChances(basedOn: neighbors
+                .map { $0.type }
+                .filter { TileType.rockCases.contains($0) }
+            )
         }
-        guard let upperRange = totalNumber?.upper else { fatalError("We need the max number or else we cannot continue") }
-        let randomNumber = Int.random(upperRange)
-        for (key, value) in level.rocksRatio {
-            if value.contains(randomNumber) {
+        let randomNumber = Int.random(tileTypeChances.outcomes)
+        var lowerBound = 0
+        for (key, value) in tileTypeChances.chances {
+            let minValue = max(1, value)
+            if (lowerBound..<lowerBound+minValue).contains(randomNumber) {
                 return key
+            } else {
+                lowerBound = lowerBound + minValue
             }
         }
         
-        fatalError("The randomNumber between 0-\(upperRange-1) should find itself in the range of one of the rocks")
+        fatalError("The randomNumber should between 0 and \(randomNumber-1) should map to a TileType.")
     }
     
-    func gemDropped(from rock: TileType, groupSize: Int) -> Tile {
-        guard specialGems < level?.maxSpawnGems ?? 0 else { return .empty }
+    func gemDropped(from rock: TileType, groupSize: Int, playerData: EntityModel) -> Tile {
+        guard let level = level else { return .empty }
+        let extraGemsBasedOnLuck = playerData.luck / 5
+        let extraChanceBasedOnLuck = extraGemsBasedOnLuck * 2
+        guard specialGems < level.maxSpawnGems + extraGemsBasedOnLuck else { return .empty }
         let weight = 100
         let index = randomSource.nextInt() % weight
         let baseChance = 2
-        let extraChance = groupSize/2
-        let totalChance = baseChance + extraChance
+        let extraChance = extraChanceBasedOnLuck
+        let moreChanceBasedOnLastTimeAGemDropped = numberOfTilesSinceLastGemDropped / 10
+        let totalChance = baseChance + extraChance + moreChanceBasedOnLastTimeAGemDropped
         if (0..<totalChance).contains(index) {
+            numberOfTilesSinceLastGemDropped = 0
             let item = Item(type: .gem, amount: 1, color: rock.color)
             specialGems += 1
             return Tile(type: TileType.item(item)) 
@@ -140,11 +153,11 @@ class TileCreator: TileStrategy {
     
     private func randomTile(_ neighbors: [Tile], noMoreMonsters: Bool) -> Tile {
         guard let level = level else { preconditionFailure("We need a level to create tiles") }
-        var nextTile = Tile(type: randomTile(randomSource.nextInt()))
+        var nextTile = Tile(type: randomTile(given: randomSource.nextInt(), neighbors: neighbors))
         
         var validTile = false
         while !validTile {
-            nextTile = Tile(type: randomTile(randomSource.nextInt()))
+            nextTile = Tile(type: randomTile(given: randomSource.nextInt(), neighbors: neighbors))
             
             switch nextTile.type {
             case .monster:
@@ -180,6 +193,7 @@ class TileCreator: TileStrategy {
         var newTiles: [[Tile]] = tiles
         
         let maxMonsters = Int(Double(tiles.count * tiles.count) * (level?.maxMonsterOnBoardRatio ?? maxMonsterRatio))
+        numberOfTilesSinceLastGemDropped += typeCount(for: tiles, of: .empty).count
         var currMonsterCount = typeCount(for: tiles, of: .monster(.zero)).count
         
         for row in 0..<newTiles.count {

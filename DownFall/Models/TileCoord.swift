@@ -107,6 +107,15 @@ struct TileCoord: Hashable {
         return false
     }
     
+    func totalDistance(to: TileCoord, along axis: Axis) -> Int {
+        switch axis {
+        case .vertical:
+            return to.x - x
+        case .horizontal:
+            return to.y - y
+        }
+    }
+    
     func distance(to: TileCoord, along axis: Axis) -> Int {
         switch axis {
         case .vertical:

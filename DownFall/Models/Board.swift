@@ -131,6 +131,11 @@ class Board: Equatable {
         case .playerAwarded(let rewards):
             let trans = playerAccepts(rewards: rewards, inputType: input.type)
             InputQueue.append(Input(.transformation([trans])))
+        case .runeProgressRecord(let runeProgress):
+            guard let pp = playerPosition,
+                case let .player(data) = tiles[pp].type else { return }
+            tiles[pp.row][pp.column] = Tile(type: .player(data.recordRuneProgress(runeProgress)))
+            transformation = playerDataUpdated(inputType: input.type)
         case .gameLose(_),
              .play,
              .pause,
@@ -142,12 +147,16 @@ class Board: Equatable {
              .tutorial,
              .visitStore,
              .itemUseCanceled, .itemCanBeUsed, .bossTargetsWhatToEat, .bossTargetsWhatToAttack,
-             .rotatePreview, .tileDetail, .levelGoalDetail:
+             .rotatePreview, .tileDetail, .levelGoalDetail, .goalProgressRecord:
             transformation = nil
         }
         
         guard let trans = transformation else { return }
         InputQueue.append(Input(.transformation([trans])))
+    }
+    
+    private func playerDataUpdated(inputType: InputType) -> Transformation {
+        return Transformation(transformation: nil, inputType: inputType, endTiles: tiles)
     }
     
     private func playerAccepts(rewards: [LevelGoalReward], inputType: InputType) -> Transformation {
@@ -332,10 +341,13 @@ class Board: Equatable {
     
     private func transform(_ coords: [TileCoord], into type: TileType, input: Input) -> Transformation {
         
+        var tileTransform : [TileTransformation] = []
         for tile in coords {
             tiles[tile.row][tile.column] = Tile(type: type)
+            tileTransform.append(TileTransformation(tile, tile))
         }
-        return Transformation(transformation: nil, inputType: input.type, endTiles: tiles)
+        
+        return Transformation(transformation: [tileTransform], inputType: input.type, endTiles: tiles)
         
     }
     
@@ -576,8 +588,10 @@ extension Board {
         var finalSelectedTiles: [TileCoord] = []
         for coord in selectedTiles {
             // turn the tile into a gem or into an empty
-            if !spawnedGem {
-                let newTile = tileCreator.gemDropped(from: intermediateTiles[coord.x][coord.y].type, groupSize: removedCount)
+            if !spawnedGem,
+                let pp = getTilePosition(.player(.playerZero), tiles: tiles),
+                case let TileType.player(data) = tiles[pp.row][pp.column].type {
+                let newTile = tileCreator.gemDropped(from: intermediateTiles[coord.x][coord.y].type, groupSize: removedCount, playerData: data)
                 intermediateTiles[coord.x][coord.y] = newTile
                 if newTile.type == TileType.item(.gem) {
                     spawnedGem = true
@@ -730,18 +744,10 @@ extension Board {
             else { return Transformation.zero }
         
         let newCarryModel = data.carry.earn(item.amount, inCurrency: item.type.currencyType)
-        let playerData = EntityModel(originalHp: data.originalHp,
-                                     hp: data.hp,
-                                     name: data.name,
-                                     // we have to reset attack here because the player has moved but the turn may not be over
-            // Eg: it is possible that there could be two or more monsters
-            // under the player and the player should be able to attack
-            attack: data.attack.resetAttack(),
-            type: data.type,
-            carry: newCarryModel,
-            animations: data.animations,
-            abilities: data.abilities,
-            pickaxe: data.pickaxe)
+        // we have to reset attack here because the player has moved but the turn may not be over
+        // Eg: it is possible that there could be two or more monsters
+        // under the player and the player should be able to attack
+        let playerData = data.update(attack: data.attack.resetAttack(), carry: newCarryModel)
         
         updatedTiles[pp.x][pp.y] = Tile(type: .player(playerData))
         
@@ -754,19 +760,18 @@ extension Board {
     
     
     private func monsterDied(at coord: TileCoord, input: Input) -> Transformation {
-        //TODO: remove the code that makes a monster drop gold.
-        //        if case let .monster(monsterData) = tiles[coord].type {
-        //            let gold = tileCreator.goldDropped(from: monsterData)
-        //            let item = Item(type: .gold, amount: gold * level.threatLevelController.threatLevel.color.goldDamageMultiplier)
-        //            let itemTile = TileType.item(item)
-        //            tiles[coord.x][coord.y] = Tile(type: itemTile)
-        //            //TODO: dont recreate the input
-        //            return Transformation(transformation: nil,
-        //                                  inputType: .monsterDies(coord, monsterData.type),
-        //                                  endTiles: tiles)
-        //        } else {
-        //no item! remove and replace
-        return removeAndReplace(from: tiles, tileCoord: coord, singleTile: true, input: input)
+        // When a monster dies, the player should reset the attack
+        // This isnt fool proof if we , but for the most part this will work
+        // This may lead to bugs if we introduce another way that players can attack
+        // But basically we should only reset attacks if the monster died directly from a player attack
+        
+        guard let pp = playerPosition,
+            case let .player(data) = tiles[pp].type
+            else { return Transformation.zero }
+
+        var newTiles = tiles
+        newTiles[pp.row][pp.column] = Tile(type: .player(data.update(attack: data.attack.resetAttack())))
+        return removeAndReplace(from: newTiles, tileCoord: coord, singleTile: true, input: input)
         //        }
         
     }
@@ -1008,14 +1013,16 @@ extension Board {
 extension Board {
     
     func attack(_ input: Input) -> Transformation {
-        guard case InputType.attack(_,
+        guard case InputType.attack(let type,
                                     let attackerPosition,
                                     let defenderPostion,
+                                    let affectedTiles,
                                     _) = input.type else {
                                         return Transformation.zero
         }
         var attacker: EntityModel
         var defender: EntityModel
+        var dodged = false
         
         
         //TODO: DRY, extract and shorten this code
@@ -1027,12 +1034,14 @@ extension Board {
             attacker = playerModel
             defender = monsterModel
             
-            let (newAttackerData, newDefenderData) = CombatSimulator.simulate(attacker: attacker,
+            let (newAttackerData, newDefenderData, defenderDodged) = CombatSimulator.simulate(attacker: attacker,
                                                                               defender: defender,
                                                                               attacked: relativeAttackDirection)
             
             tiles[attackerPosition.x][attackerPosition.y] = Tile(type: TileType.player(newAttackerData))
             tiles[defenderPosition.x][defenderPosition.y] = Tile(type: TileType.monster(newDefenderData))
+            
+            dodged = defenderDodged
             
         } else if let defenderPosition = defenderPostion,
             case let .player(playerModel) = tiles[defenderPosition].type,
@@ -1042,13 +1051,14 @@ extension Board {
             attacker = monsterModel
             defender = playerModel
             
-            let (newAttackerData, newDefenderData) = CombatSimulator.simulate(attacker: attacker,
+            let (newAttackerData, newDefenderData, defenderDodged) = CombatSimulator.simulate(attacker: attacker,
                                                                               defender: defender,
-                                                                              attacked: relativeAttackDirection,
-                                                                              threatLevel: level.threatLevelController.threatLevel)
+                                                                              attacked: relativeAttackDirection)
             
             tiles[attackerPosition.x][attackerPosition.y] = Tile(type: TileType.monster(newAttackerData))
             tiles[defenderPosition.x][defenderPosition.y] = Tile(type: TileType.player(newDefenderData))
+            
+            dodged = defenderDodged
         } else if case let .player(playerModel) = tiles[attackerPosition].type,
             defenderPostion == nil {
             //just note that the player attacked
@@ -1072,9 +1082,11 @@ extension Board {
             tiles[attackerPosition.x][attackerPosition.y] = Tile(type: TileType.monster(monsterModel.didAttack()))
         }
         
-        
-        
-        return Transformation(inputType: input.type,
+        return Transformation(inputType: InputType.attack(attackType: type,
+                                                          attacker: attackerPosition,
+                                                          defender: defenderPostion,
+                                                          affectedTiles: affectedTiles,
+                                                          dodged: dodged),
                               endTiles: tiles)
     }
 }

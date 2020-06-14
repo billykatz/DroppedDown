@@ -18,7 +18,7 @@ class RotatePreviewView {
     private var distancedMoved = CGFloat(0.0)
     private var rotateInputType: InputType?
     private var distanceTraveledRatio: CGFloat = 0
-    private let returnToStartRatio = CGFloat(0.6)
+    private let returnToStartRatio = CGFloat(0.33)
     
     init() {
         Dispatch.shared.register { [weak self] (input) in

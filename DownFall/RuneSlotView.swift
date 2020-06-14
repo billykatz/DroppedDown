@@ -44,7 +44,7 @@ class RuneSlotView: SKSpriteNode {
     }
     
     private var outline: SKShapeNode {
-        let goldOutline = SKShapeNode(rectOf: Constants.outlineSize)
+        let goldOutline = SKShapeNode(rectOf: self.size)
         goldOutline.color = viewModel.isCharged ? .goldOutlineBright : .goldOutlineDull
         goldOutline.zPosition = Precedence.background.rawValue
         goldOutline.name = Constants.outlineName

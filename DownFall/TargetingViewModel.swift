@@ -11,6 +11,8 @@ import Foundation
 enum ViewMode {
     case inventory
     case itemDetail
+    case storeHUD
+    case storeHUDExpanded
 }
 
 struct Target {
@@ -69,16 +71,9 @@ class TargetingViewModel: Targeting {
             {
                 tiles = endTiles
             }
-            
-            if let inputType = trans.first?.inputType,
-                case InputType.itemUsed(_) = inputType,
-                let tiles = trans.first?.endTiles,
-                let playerData = playerData(in: tiles)
-            {
-//                let runeSlots = playerData.runeSlots ?? 0
-//                self.runeSlots = runeSlots
-//                inventory = playerData.abilities
-//                runeSlotsUpdated?(runeSlots, playerData.abilities)
+            else {
+                /// clear out targets after any transformation
+                currentTargets = AllTarget(targets: [], areLegal: false)
             }
             
         case .boardBuilt:
@@ -259,7 +254,8 @@ class TargetingViewModel: Targeting {
             currentTargets.targets.removeFirst(where: { !$0.isLegal })
             
             // if nothing has been removed then remove the first one placed
-            if currentTargets.targets.count == count {
+            if !currentTargets.targets.isEmpty,
+                currentTargets.targets.count == count {
                 currentTargets.targets.removeFirst()
             }
             //add the new target
@@ -271,16 +267,23 @@ class TargetingViewModel: Targeting {
     
     func didUse(_ rune: Rune?) {
         guard let rune = rune else { return }
-        guard legallyTargeted else { return }
+        guard legallyTargeted else {
+            self.rune = nil
+            return
+        }
         InputQueue.append(
             Input(.itemUsed(rune, currentTargets.targets.map { $0.coord }))
         )
         self.rune = nil
+        currentTargets = AllTarget(targets: [], areLegal: false)
         
     }
     
     func didSelect(_ rune: Rune?) {
         self.rune = rune
+        if rune == nil {
+            currentTargets = AllTarget(targets: [], areLegal: false)
+        }
     }
     
     private func autoTarget() {

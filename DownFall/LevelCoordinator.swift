@@ -37,7 +37,7 @@ extension LevelCoordinating where Self: UIViewController {
             let storeScene = StoreScene(size: .universalSize,
                                         playerData: playerData,
                                         level: currentLevel,
-                                        viewModel: StoreSceneViewModel(offers: currentLevel.storeOffering))
+                                        viewModel: StoreSceneViewModel(offers: currentLevel.storeOffering, goalTracking: currentLevel.goalProgress))
             storeScene.scaleMode = .aspectFill
             storeScene.storeSceneDelegate = self
             view.presentScene(storeScene)
@@ -104,6 +104,7 @@ extension LevelCoordinating where Self: UIViewController {
         let index = LevelType.gameCases.firstIndex(of: level) ?? 0
         levelIndex = index
         levels = LevelConstructor.buildLevels(difficulty, randomSource: randomSource ?? GKLinearCongruentialRandomSource())
+//        presentNextLevel(player)
         presentStore(player)
     }
     
@@ -118,13 +119,12 @@ extension LevelCoordinating where Self: UIViewController {
     }
     
     // MARK: - GameSceneCoordinatingDelegate
-    
-    func resetToMain(_ scene: SKScene) {
+    func resetToMain(_ scene: SKScene, playerData: EntityModel) {
         let fadeOut = SKAction.fadeOut(withDuration: 0.75)
         let remove = SKAction.removeFromParent()
         scene.run(SKAction.group([fadeOut, remove])) { [weak self] in
             guard let self = self else { return }
-            self.levelSelect(self.entities!.entities[2])
+            self.levelSelect(playerData)
         }
 
     }
@@ -138,7 +138,7 @@ extension LevelCoordinating where Self: UIViewController {
         }
     }
     
-    func visitStore(_ playerData: EntityModel) {
+    func visitStore(_ playerData: EntityModel, _ goalTracking: [GoalTracking]) {
         if let view = self.view as! SKView?, let levels = levels {
             view.presentScene(nil)
             gameSceneNode?.removeFromParent()
@@ -148,11 +148,16 @@ extension LevelCoordinating where Self: UIViewController {
             // there might/is be a better place to do this
             levelIndex = min(levels.count - 1, levelIndex + 1)
             
+            /// attached how many goals we completed so the store knows which offers to unlock
+            var level = levels[levelIndex]
+            level.goalProgress = goalTracking
+            
             
             let storeScene = StoreScene(size: .universalSize,
                                         playerData: playerData,
-                                        level: levels[levelIndex],
-                                        viewModel: StoreSceneViewModel(offers: levels[levelIndex].storeOffering))
+                                        level: level,
+                                        viewModel: StoreSceneViewModel(offers: levels[levelIndex].storeOffering, goalTracking: currentLevel.goalProgress))
+            storeScene.scaleMode = .aspectFill
             storeScene.storeSceneDelegate = self
             view.presentScene(storeScene)
         }

@@ -91,4 +91,8 @@ extension GameViewController: MainMenuDelegate {
             startGame(player: player, difficulty: difficulty, level: level)
         }
     }
+    
+    var mainViewController: UIViewController {
+        return self
+    }
 }

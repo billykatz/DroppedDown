@@ -11,6 +11,7 @@ import SpriteKit
 protocol MainMenuDelegate: class {
     func newGame(_ difficulty: Difficulty, _ playerModel: EntityModel?, level: LevelType)
     func didSelectStartTutorial(_ playerModel: EntityModel?)
+    var mainViewController: UIViewController { get }
 }
 
 class MainMenu: SKScene {
@@ -24,6 +25,9 @@ class MainMenu: SKScene {
     private var difficultyLabel: ParagraphNode?
     private var levelLabel: ParagraphNode?
     private var levelSelectButton: Button?
+    private var profileSelectButton: Button?
+    private var newProfileButton:Button?
+    private var profileSaving: ProfileSaving = ProfileViewModel()
     private var gems: Int = 0
     weak var mainMenuDelegate: MainMenuDelegate?
     var playerModel: EntityModel?
@@ -42,6 +46,10 @@ class MainMenu: SKScene {
     }
     
     override func didMove(to view: SKView) {
+        
+        // start to authenticate
+        profileSaving.authenticate(mainMenuDelegate!.mainViewController)
+        
         background = self.childNode(withName: "background") as? SKSpriteNode
         background.color = UIColor.clayRed
         
@@ -80,6 +88,46 @@ class MainMenu: SKScene {
         levelSelectButton = levelButton
         
         addChild(levelButton)
+        
+        
+        let profileButton = Button(size: Style.RunMenu.buttonSize,
+                                 delegate: self,
+                                 identifier: .selectProfile,
+                                 precedence: .menu,
+                                 fontSize: UIFont.largeSize,
+                                 fontColor: UIColor.white,
+                                 backgroundColor: .menuPurple)
+        
+        profileButton.position = CGPoint.position(profileButton.frame,
+                                                    inside: size.playableRect,
+                                                    verticalAlign: .top,
+                                                    horizontalAnchor: .right,
+                                                    xOffset: 50.0,
+                                                    yOffset: 100.0)
+        profileSelectButton = profileButton
+        
+        addChild(profileButton)
+        
+        
+        let newProfileButton = Button(size: Style.RunMenu.buttonSize,
+                                 delegate: self,
+                                 identifier: .newProfile,
+                                 precedence: .menu,
+                                 fontSize: UIFont.largeSize,
+                                 fontColor: UIColor.white,
+                                 backgroundColor: .menuPurple)
+        
+        newProfileButton.position = CGPoint.alignVertically(levelButton.frame,
+                                                            relativeTo: profileSelectButton?.frame,
+                                                            horizontalAnchor: .left,
+                                                            verticalAlign: .center,
+                                                            horizontalPadding: 200.0,
+                                                            translatedToBounds: true)
+
+        self.newProfileButton = newProfileButton
+        
+        addChild(newProfileButton)
+
         
         levelTypeIndex = 0
         
@@ -430,6 +478,14 @@ extension MainMenu: ButtonDelegate {
                                       level: LevelType.gameCases[levelTypeIndex])
         case .startTutorial:
             mainMenuDelegate?.didSelectStartTutorial(playerModel)
+        case .selectProfile:
+            profileSaving.loadProfile(name: "Billy") {
+                print($0?.name)
+            }
+        case .newProfile:
+            profileSaving.saveProfile(name: "Billy") { (success) in
+                print(success)
+            }
         case .cycleLevel:
             if levelTypeIndex + 1 == LevelType.gameCases.count {
                 levelTypeIndex = 0

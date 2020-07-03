@@ -21,10 +21,11 @@ protocol ProfileSaving {
 
 class ProfileViewModel: ProfileSaving {
     func authenticate(_ presenter: UIViewController) {
+        print("Starting to authenticate with game center")
         GKLocalPlayer().authenticateHandler = { viewController, error in
             if let vc = viewController {
                 presenter.present(vc, animated: true)
-            } else if GKLocalPlayer().isAuthenticated {
+            } else if GKLocalPlayer.local.isAuthenticated {
                 print("we are authenticated")
             } else {
                 print("disable GameCenter")

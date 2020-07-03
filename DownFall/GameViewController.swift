@@ -22,6 +22,10 @@ class GameViewController: UIViewController, LevelCoordinating {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        /// Needed when we stopped using a storyboard
+        view = SKView(frame: view.bounds)
+        
         do {
             guard let entityData = try Data.data(from: "entities") else { fatalError("Crashing here is okay because we failed to parse our entity json file") }
             entities = try JSONDecoder().decode(EntitiesModel.self, from: entityData)
@@ -59,7 +63,7 @@ extension GameViewController {
             mainMenuScene.scaleMode = .aspectFill
             mainMenuScene.mainMenuDelegate = self
             mainMenuScene.playerModel = updatedPlayerData
-
+            
             if let view = self.view as! SKView? {
                 view.presentScene(mainMenuScene)
                 view.ignoresSiblingOrder = true

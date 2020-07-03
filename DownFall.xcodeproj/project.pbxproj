@@ -118,7 +118,6 @@
 		3DF2924E20A37FEE006671AC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2924D20A37FEE006671AC /* AppDelegate.swift */; };
 		3DF2925420A37FEE006671AC /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2925320A37FEE006671AC /* GameScene.swift */; };
 		3DF2925620A37FEE006671AC /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2925520A37FEE006671AC /* GameViewController.swift */; };
-		3DF2925920A37FEE006671AC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3DF2925720A37FEE006671AC /* Main.storyboard */; };
 		3DF2925E20A37FF0006671AC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3DF2925C20A37FF0006671AC /* LaunchScreen.storyboard */; };
 		3DF2926920A37FF0006671AC /* BoardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2926820A37FF0006671AC /* BoardTests.swift */; };
 		3DF2928320A66BEB006671AC /* Tile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2928220A66BEB006671AC /* Tile.swift */; };
@@ -307,7 +306,6 @@
 		3DF2924D20A37FEE006671AC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		3DF2925320A37FEE006671AC /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
 		3DF2925520A37FEE006671AC /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
-		3DF2925820A37FEE006671AC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		3DF2925D20A37FF0006671AC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		3DF2925F20A37FF0006671AC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3DF2926420A37FF0006671AC /* DownFallTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DownFallTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -461,7 +459,6 @@
 		3D10609F2340406C00ECE7E6 /* Storyboards */ = {
 			isa = PBXGroup;
 			children = (
-				3DF2925720A37FEE006671AC /* Main.storyboard */,
 				3DF2925C20A37FF0006671AC /* LaunchScreen.storyboard */,
 			);
 			path = Storyboards;
@@ -1008,7 +1005,6 @@
 			files = (
 				3DA4E8952290A7B4006E90D1 /* gloop.png in Resources */,
 				3D73D2E621C2226F00DB6FB7 /* PlayerWait.sks in Resources */,
-				3DF2925920A37FEE006671AC /* Main.storyboard in Resources */,
 				3D528FD62154A50300EF65CA /* GameScene.sks in Resources */,
 				3DF2925E20A37FF0006671AC /* LaunchScreen.storyboard in Resources */,
 				3DA4E89D2290B156006E90D1 /* EntityTest.json in Resources */,
@@ -1217,14 +1213,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		3DF2925720A37FEE006671AC /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				3DF2925820A37FEE006671AC /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		3DF2925C20A37FF0006671AC /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (

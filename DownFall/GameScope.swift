@@ -8,10 +8,12 @@
 
 import CoreGraphics
 
-struct GameScope {
+/// Singleton to hold references to game-wide variables
+class GameScope {
     static let boardSizeCoefficient = CGFloat(0.9)
     static var shared: GameScope = GameScope(difficulty: .normal)
     var difficulty: Difficulty
+    let profileManager: ProfileSaving = ProfileViewModel()
     
     var tutorials: [TutorialData] = [GameScope.tutorialOne, GameScope.tutorialTwo]
     
@@ -65,5 +67,10 @@ struct GameScope {
                                  inputToContinue: InputType.monsterDies(.zero, .wizard))
         ]
     )
+    
+    
+    init(difficulty: Difficulty) {
+        self.difficulty = difficulty
+    }
 }
 

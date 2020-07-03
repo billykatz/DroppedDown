@@ -47,9 +47,6 @@ class MainMenu: SKScene {
     
     override func didMove(to view: SKView) {
         
-        // start to authenticate
-        profileSaving.authenticate(mainMenuDelegate!.mainViewController)
-        
         background = self.childNode(withName: "background") as? SKSpriteNode
         background.color = UIColor.clayRed
         

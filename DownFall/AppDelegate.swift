@@ -18,6 +18,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         //TODO: Consider init the GameViewController here and injecting everything it needs to function
         // Use this as a resource https://medium.com/ios-os-x-development/ios-start-an-app-without-storyboard-5f57e3251a25
+        window = UIWindow(frame: UIScreen.main.bounds)
+        let gameViewController = GameViewController(nibName: nil, bundle: nil)
+        window!.rootViewController = gameViewController
+        window!.makeKeyAndVisible()
+        
+        // Start the authentication process
+        GameScope.shared.profileManager.authenticate(gameViewController)
         
         return true
     }

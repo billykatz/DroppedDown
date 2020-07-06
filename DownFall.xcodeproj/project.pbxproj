@@ -125,6 +125,7 @@
 		5605D6D321CC2DF400C1C5C2 /* DFTileSpriteNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5605D6D221CC2DF400C1C5C2 /* DFTileSpriteNode.swift */; };
 		5802612F24AFB78B00D7CF20 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5802612E24AFB78B00D7CF20 /* GameKit.framework */; };
 		5802613224AFC23300D7CF20 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5802613124AFC23300D7CF20 /* CloudKit.framework */; };
+		5802613424AFF04F00D7CF20 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5802613324AFF04F00D7CF20 /* ProfileView.swift */; };
 		58153460243993F400483481 /* LevelGoalTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5815345F243993F400483481 /* LevelGoalTracker.swift */; };
 		5819582D2432790700965108 /* MassMineAbility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5819582C2432790700965108 /* MassMineAbility.swift */; };
 		5819AB71242A5CA600498BB6 /* SpriteAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5819AB70242A5CA600498BB6 /* SpriteAction.swift */; };
@@ -317,6 +318,7 @@
 		5802612E24AFB78B00D7CF20 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 		5802613024AFC1BE00D7CF20 /* Shift Shaft.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Shift Shaft.entitlements"; sourceTree = "<group>"; };
 		5802613124AFC23300D7CF20 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
+		5802613324AFF04F00D7CF20 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		5815345F243993F400483481 /* LevelGoalTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelGoalTracker.swift; sourceTree = "<group>"; };
 		5819582C2432790700965108 /* MassMineAbility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MassMineAbility.swift; sourceTree = "<group>"; };
 		5819AB70242A5CA600498BB6 /* SpriteAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteAction.swift; sourceTree = "<group>"; };
@@ -532,6 +534,7 @@
 				3D73D2E521C2226F00DB6FB7 /* PlayerWait.sks */,
 				3D674C9222C9D54C0003AEB4 /* MainMenu.sks */,
 				3D674C9422C9D6640003AEB4 /* MainMenu.swift */,
+				5802613324AFF04F00D7CF20 /* ProfileView.swift */,
 				3DA0A3822303D62A0041EF34 /* Store */,
 			);
 			path = Scenes;
@@ -1168,6 +1171,7 @@
 				5865D62E23DBF652007D11FC /* abilities.json in Sources */,
 				3D06390722EEB53C00C4D5E9 /* ComputingState.swift in Sources */,
 				3D674C9522C9D6640003AEB4 /* MainMenu.swift in Sources */,
+				5802613424AFF04F00D7CF20 /* ProfileView.swift in Sources */,
 				58A4B91D2472E5620011624A /* ChanceModel.swift in Sources */,
 				5881DBF4244FEE440053A690 /* RuneSlotView.swift in Sources */,
 				58383643242D7A6E004CA026 /* Array+Extensions.swift in Sources */,

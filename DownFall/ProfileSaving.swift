@@ -13,11 +13,15 @@ struct Profile {
 }
 
 protocol ProfileSaving {
-    func saveProfile(name: String, completion: @escaping (Bool) -> Void)
+    func saveProfile(name: String, overwriteFile: Bool, completion: @escaping (Result<Bool, ProfileError>) -> Void)
     func loadProfile(name: String, completion: @escaping (Profile?) -> Void)
     func authenticate(_ presenter: UIViewController)
 }
 
+enum ProfileError: Error {
+    case fileWithNameAlreadyExists
+    case saveError(Error)
+}
 
 class ProfileViewModel: ProfileSaving {
     func authenticate(_ presenter: UIViewController) {
@@ -34,11 +38,35 @@ class ProfileViewModel: ProfileSaving {
     }
     
     
-    func saveProfile(name: String, completion: @escaping (Bool) -> Void) {
+    func saveProfile(name: String, overwriteFile: Bool = false, completion: @escaping (Result<Bool, ProfileError>) -> Void) {
         let localPlayer = GKLocalPlayer()
         let fauxData = "Billy".data(using: .utf8)!
-        localPlayer.saveGameData(fauxData, withName: name) { (savedGame, error) in
-            completion(savedGame != nil)
+        
+        /// Fetch the save games to see if there are any other games with the same name
+        localPlayer.fetchSavedGames { (savedGames, error) in
+            guard error == nil else {
+                completion(.failure(.saveError(error!)))
+                return
+            }
+            
+            /// Check if a profile already exists with the name
+            savedGames?
+                .filter({ (game) -> Bool in
+                    return game.name == name
+                })
+                .forEach { game in
+                    if !overwriteFile {
+                        completion(.failure(.fileWithNameAlreadyExists))
+                        return
+                    }
+                }
+            
+            guard overwriteFile else { return }
+            
+            /// If we have reach this point, we should save the data
+            localPlayer.saveGameData(fauxData, withName: name) { (savedGame, error) in
+                completion(.success(true))
+            }
         }
     }
     
@@ -53,9 +81,10 @@ class ProfileViewModel: ProfileSaving {
                     }
                 }
             } else {
+                // This should be considered a failure.
                 completion(nil)
             }
         }
-
+        
     }
 }

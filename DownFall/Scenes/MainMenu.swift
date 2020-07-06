@@ -14,10 +14,11 @@ protocol MainMenuDelegate: class {
     var mainViewController: UIViewController { get }
 }
 
-class MainMenu: SKScene {
+class MainMenu: SKScene, ProfileViewDelegate {
     
     struct Constants {
         static let offerSlabPadding = CGFloat(35)
+        static let provileViewName = "profileViewName"
     }
     
     private var background: SKSpriteNode!
@@ -454,6 +455,18 @@ class MainMenu: SKScene {
         guard let playerModel = playerModel else { return false }
         return playerModel.numberOfEffects(dodgeEffect) >= maxDodgeBuys
     }
+    
+    func presentProfile() {
+        let profileView = ProfileView(size: .universalSize, navigationDelegate: self)
+        profileView.name = Constants.provileViewName
+        profileView.zPosition = Precedence.floating.rawValue
+        addChild(profileView)
+    }
+    
+    /// Profile View Delegate
+    func navigateToMainMenu(_ profileView: SKSpriteNode) {
+        removeChild(with: Constants.provileViewName)
+    }
 }
 
 
@@ -476,12 +489,17 @@ extension MainMenu: ButtonDelegate {
         case .startTutorial:
             mainMenuDelegate?.didSelectStartTutorial(playerModel)
         case .selectProfile:
-            profileSaving.loadProfile(name: "Billy") {
-                print($0?.name)
-            }
+            presentProfile()
         case .newProfile:
-            profileSaving.saveProfile(name: "Billy") { (success) in
-                print(success)
+            profileSaving.saveProfile(name: "Billy", overwriteFile: false) { (result) in
+                switch result {
+                case .success(let successful):
+                    print("success \(successful)")
+                case .failure(.fileWithNameAlreadyExists):
+                    print("file already exists, overwrite?")
+                case .failure(.saveError(let err)):
+                    print(err)
+                }
             }
         case .cycleLevel:
             if levelTypeIndex + 1 == LevelType.gameCases.count {

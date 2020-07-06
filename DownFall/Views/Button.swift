@@ -165,16 +165,16 @@ class Button: SKShapeNode {
         
         //Call super
         super.init()
-        self.path = CGPath(roundedRect: CGRect(x: -size.width/2, y: -size.height/2, width: size.width, height: size.height), cornerWidth: 5.0, cornerHeight: 5.0, transform: nil)
+        let path = CGPath(roundedRect: CGRect(x: -size.width/2, y: -size.height/2, width: size.width, height: size.height), cornerWidth: 15.0, cornerHeight: 15.0, transform: nil)
+        self.path = path
         
-        
-        let buttonPath = CGPath(roundedRect: CGRect(x: -size.width/2, y: -size.height/2, width: size.width, height: size.height), cornerWidth: 5.0, cornerHeight: 5.0, transform: nil)
+        let buttonPath = path
         self.buttonView = SKShapeNode(path: buttonPath)
         buttonView?.color = self.originalBackground
         
         //add the shadow
         if !disable {
-            let shadowPath = CGPath(roundedRect: CGRect(x: -size.width/2, y: -size.height/2 - dropShadowOffset, width: size.width, height: size.height), cornerWidth: 5.0, cornerHeight: 5.0, transform: nil)
+            let shadowPath = path
             let shadowShape = SKShapeNode(path: shadowPath)
             shadowShape.color = .storeBlack
             self.dropShadow = shadowShape

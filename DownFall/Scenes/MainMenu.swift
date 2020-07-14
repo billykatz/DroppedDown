@@ -27,7 +27,7 @@ class MainMenu: SKScene, ProfileViewDelegate {
     private var levelLabel: ParagraphNode?
     private var levelSelectButton: Button?
     private var profileSelectButton: Button?
-    private var newProfileButton:Button?
+    
     private var profileSaving: ProfileSaving = ProfileViewModel()
     private var gems: Int = 0
     weak var mainMenuDelegate: MainMenuDelegate?
@@ -106,26 +106,6 @@ class MainMenu: SKScene, ProfileViewDelegate {
         
         addChild(profileButton)
         
-        
-        let newProfileButton = Button(size: Style.RunMenu.buttonSize,
-                                 delegate: self,
-                                 identifier: .newProfile,
-                                 precedence: .menu,
-                                 fontSize: UIFont.largeSize,
-                                 fontColor: UIColor.white,
-                                 backgroundColor: .menuPurple)
-        
-        newProfileButton.position = CGPoint.alignVertically(levelButton.frame,
-                                                            relativeTo: profileSelectButton?.frame,
-                                                            horizontalAnchor: .left,
-                                                            verticalAlign: .center,
-                                                            horizontalPadding: 200.0,
-                                                            translatedToBounds: true)
-
-        self.newProfileButton = newProfileButton
-        
-        addChild(newProfileButton)
-
         
         levelTypeIndex = 0
         
@@ -490,23 +470,13 @@ extension MainMenu: ButtonDelegate {
             mainMenuDelegate?.didSelectStartTutorial(playerModel)
         case .selectProfile:
             presentProfile()
-        case .newProfile:
-            profileSaving.saveProfile(name: "Billy", overwriteFile: false) { (result) in
-                switch result {
-                case .success(let successful):
-                    print("success \(successful)")
-                case .failure(.fileWithNameAlreadyExists):
-                    print("file already exists, overwrite?")
-                case .failure(.saveError(let err)):
-                    print(err)
-                }
-            }
         case .cycleLevel:
-            if levelTypeIndex + 1 == LevelType.gameCases.count {
-                levelTypeIndex = 0
-            } else {
-                levelTypeIndex += 1
-            }
+            GameScope.shared.profileManager.start(self.mainMenuDelegate as! UIViewController)
+//            if levelTypeIndex + 1 == LevelType.gameCases.count {
+//                levelTypeIndex = 0
+//            } else {
+//                levelTypeIndex += 1
+//            }
             
         case .buyHealth:
             if gems >= healthCost && playerModel.numberOfEffects(healthEffect) < maxHealthBuys {

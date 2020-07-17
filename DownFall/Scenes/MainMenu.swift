@@ -27,7 +27,7 @@ class MainMenu: SKScene, ProfileViewDelegate {
     private var levelLabel: ParagraphNode?
     private var levelSelectButton: Button?
     private var profileSelectButton: Button?
-    
+    private var newProfileButton:Button?
     private var profileSaving: ProfileSaving = ProfileViewModel()
     private var gems: Int = 0
     weak var mainMenuDelegate: MainMenuDelegate?
@@ -106,6 +106,26 @@ class MainMenu: SKScene, ProfileViewDelegate {
         
         addChild(profileButton)
         
+        
+        let newProfileButton = Button(size: Style.RunMenu.buttonSize,
+                                 delegate: self,
+                                 identifier: .newProfile,
+                                 precedence: .menu,
+                                 fontSize: UIFont.largeSize,
+                                 fontColor: UIColor.white,
+                                 backgroundColor: .menuPurple)
+        
+        newProfileButton.position = CGPoint.alignVertically(levelButton.frame,
+                                                            relativeTo: profileSelectButton?.frame,
+                                                            horizontalAnchor: .left,
+                                                            verticalAlign: .center,
+                                                            horizontalPadding: 200.0,
+                                                            translatedToBounds: true)
+
+        self.newProfileButton = newProfileButton
+        
+        addChild(newProfileButton)
+
         
         levelTypeIndex = 0
         
@@ -437,10 +457,12 @@ class MainMenu: SKScene, ProfileViewDelegate {
     }
     
     func presentProfile() {
-        let profileView = ProfileView(size: .universalSize, navigationDelegate: self)
-        profileView.name = Constants.provileViewName
-        profileView.zPosition = Precedence.floating.rawValue
-        addChild(profileView)
+        GameScope.shared.profileManager.deleteLocalProfile()
+    }
+    
+    func deleteRemoteFile()
+    {
+        GameScope.shared.profileManager.deleteRemoteProfile()
     }
     
     /// Profile View Delegate
@@ -463,13 +485,16 @@ extension MainMenu: ButtonDelegate {
         guard let playerModel = self.playerModel else { return }
         switch button.identifier {
         case .newGame:
-            mainMenuDelegate?.newGame(GameScope.shared.difficulty,
-                                      playerModel.previewAppliedEffects().healFull(),
-                                      level: LevelType.gameCases[levelTypeIndex])
+            GameScope.shared.profileManager.resetUserDefaults()
+//            mainMenuDelegate?.newGame(GameScope.shared.difficulty,
+//                                      playerModel.previewAppliedEffects().healFull(),
+//                                      level: LevelType.gameCases[levelTypeIndex])
         case .startTutorial:
             mainMenuDelegate?.didSelectStartTutorial(playerModel)
         case .selectProfile:
             presentProfile()
+        case .newProfile:
+            deleteRemoteFile()
         case .cycleLevel:
             GameScope.shared.profileManager.start(self.mainMenuDelegate as! UIViewController)
 //            if levelTypeIndex + 1 == LevelType.gameCases.count {

@@ -147,6 +147,7 @@
 		585EF8092431ACEF00E87FCB /* FreeLesserHealingPotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585EF8082431ACEF00E87FCB /* FreeLesserHealingPotion.swift */; };
 		585EF80B2431AD2400E87FCB /* FreeKillMonsterPotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585EF80A2431AD2400E87FCB /* FreeKillMonsterPotion.swift */; };
 		585EF80D2431AD3800E87FCB /* FreeDynamite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585EF80C2431AD3800E87FCB /* FreeDynamite.swift */; };
+		586319C224C1FF890090CD6D /* newProfile.json in Resources */ = {isa = PBXBuildFile; fileRef = 586319C124C1FF890090CD6D /* newProfile.json */; };
 		5865D62E23DBF652007D11FC /* abilities.json in Sources */ = {isa = PBXBuildFile; fileRef = 5865D62D23DBF652007D11FC /* abilities.json */; };
 		5866B3D8244CFEE800DF36E0 /* FreeRainEmbers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5866B3D7244CFEE800DF36E0 /* FreeRainEmbers.swift */; };
 		5866B3DA244D2A4600DF36E0 /* GoalTracking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5866B3D9244D2A4600DF36E0 /* GoalTracking.swift */; };
@@ -340,6 +341,7 @@
 		585EF8082431ACEF00E87FCB /* FreeLesserHealingPotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeLesserHealingPotion.swift; sourceTree = "<group>"; };
 		585EF80A2431AD2400E87FCB /* FreeKillMonsterPotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeKillMonsterPotion.swift; sourceTree = "<group>"; };
 		585EF80C2431AD3800E87FCB /* FreeDynamite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeDynamite.swift; sourceTree = "<group>"; };
+		586319C124C1FF890090CD6D /* newProfile.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = newProfile.json; sourceTree = "<group>"; };
 		5865D62D23DBF652007D11FC /* abilities.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = abilities.json; sourceTree = "<group>"; };
 		5866B3D7244CFEE800DF36E0 /* FreeRainEmbers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeRainEmbers.swift; sourceTree = "<group>"; };
 		5866B3D9244D2A4600DF36E0 /* GoalTracking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalTracking.swift; sourceTree = "<group>"; };
@@ -732,6 +734,7 @@
 		3DF2924C20A37FEE006671AC /* DownFall */ = {
 			isa = PBXGroup;
 			children = (
+				586319C024C1FF530090CD6D /* Defaults */,
 				5802613024AFC1BE00D7CF20 /* Shift Shaft.entitlements */,
 				58C9734F24969C8D00288133 /* Save */,
 				58383649242D7E11004CA026 /* Threat */,
@@ -857,6 +860,14 @@
 				5838364A242D7E21004CA026 /* ThreatLevelController.swift */,
 			);
 			name = Threat;
+			sourceTree = "<group>";
+		};
+		586319C024C1FF530090CD6D /* Defaults */ = {
+			isa = PBXGroup;
+			children = (
+				586319C124C1FF890090CD6D /* newProfile.json */,
+			);
+			name = Defaults;
 			sourceTree = "<group>";
 		};
 		58946E382465BD10003115D2 /* RuneSlot */ = {
@@ -1008,6 +1019,7 @@
 			files = (
 				3DA4E8952290A7B4006E90D1 /* gloop.png in Resources */,
 				3D73D2E621C2226F00DB6FB7 /* PlayerWait.sks in Resources */,
+				586319C224C1FF890090CD6D /* newProfile.json in Resources */,
 				3D528FD62154A50300EF65CA /* GameScene.sks in Resources */,
 				3DF2925E20A37FF0006671AC /* LaunchScreen.storyboard in Resources */,
 				3DA4E89D2290B156006E90D1 /* EntityTest.json in Resources */,

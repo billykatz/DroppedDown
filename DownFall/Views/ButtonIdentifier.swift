@@ -91,9 +91,9 @@ enum ButtonIdentifier: String {
         case .okay:
             return "Okay"
         case .selectProfile:
-            return "Select Profile"
+            return "Delete Local Profile"
         case .newProfile:
-            return "New Profile"
+            return "Delete Remote profile"
         case .wallet, .infoPopup, .storeItem, .backpack, .sellHealth, .buyHealth, .sellDodge, .buyDodge, .sellLuck, .buyLuck, .buyRuneSlot, .sellRuneSlot:
             return ""
         }

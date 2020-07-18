@@ -32,7 +32,7 @@ class LoadingScene: SKScene {
     }
     
     func fadeOut(_ completion: @escaping (() -> ())) {
-        let fadeOut = SKAction.fadeOut(withDuration: 1.0)
+        let fadeOut = SKAction.fadeOut(withDuration: 1.25)
         loadingSprite?.run(fadeOut, completion: completion)
     }
 }

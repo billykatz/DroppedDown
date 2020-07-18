@@ -162,6 +162,7 @@ enum TileType: Hashable, CaseIterable, Codable {
         case dynamite
     }
     
+    /// This implementation is written about in https://medium.com/@hllmandel/codable-enum-with-associated-values-swift-4-e7d75d6f4370
     
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -194,6 +195,7 @@ enum TileType: Hashable, CaseIterable, Codable {
         }
     }
     
+    /// This implementation is written about in https://medium.com/@hllmandel/codable-enum-with-associated-values-swift-4-e7d75d6f4370
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         switch self {

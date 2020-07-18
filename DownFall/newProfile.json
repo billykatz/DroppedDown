@@ -1,6 +1,6 @@
 {
     "name": "Profile Name",
-    "progress": 0
+    "progress": 0,
     "player" :
         { "name": "player3",
             "type": "player",

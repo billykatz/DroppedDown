@@ -27,7 +27,7 @@ enum RuneType: String, Codable, Hashable {
     }
 }
 
-struct Rune: Hashable, Decodable {
+struct Rune: Hashable, Codable {
     var type: RuneType
     var textureName: String
     var cost: Int

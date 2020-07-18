@@ -9,7 +9,7 @@
 import Foundation
 
 
-struct AttackSlope: Equatable, Decodable {
+struct AttackSlope: Equatable, Codable {
     let over: Int
     let up: Int
     
@@ -39,13 +39,13 @@ struct AttackSlope: Equatable, Decodable {
 }
 
 
-enum AttackType: String, Decodable {
+enum AttackType: String, Codable {
     case targets
     case areaOfEffect
     case charges
 }
 
-struct AttackModel: Equatable, Decodable {
+struct AttackModel: Equatable, Codable {
     let type: AttackType
     let frequency: Int
     let range: RangeModel

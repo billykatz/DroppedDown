@@ -25,7 +25,7 @@ enum StatType: String, Hashable, Codable {
     case luck
 }
 
-struct EffectModel: Equatable, Hashable, Decodable {
+struct EffectModel: Equatable, Hashable, Codable {
     let kind: EffectType
     let stat: StatType
     let amount: Int

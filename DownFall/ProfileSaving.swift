@@ -13,6 +13,7 @@ import Combine
 struct Profile: Codable {
     let name: String
     let progress: Int
+    let player: EntityModel
 }
 
 protocol ProfileSaving {
@@ -349,7 +350,7 @@ class ProfileViewModel: ProfileSaving {
                 let profile = try JSONDecoder().decode(Profile.self, from: newPlayerProfile)
                 /// save the profile with the uuid as the name
                 /// copy all other defaults
-                let newProfile = Profile(name: uuid, progress: profile.progress)
+                let newProfile = Profile(name: uuid, progress: profile.progress, player: profile.player)
                 
                 /// encode the new profile into data
                 let jsonData = try JSONEncoder().encode(newProfile)

@@ -43,13 +43,8 @@
             "carry": {
                 "items": [
                     {
-                        "type": "gold",
-                        "amount": 50
-                        
-                    },
-                    {
                         "type": "gem",
-                        "amount": 0
+                        "amount": 10
                         
                     }
                 ]

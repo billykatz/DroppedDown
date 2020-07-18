@@ -21,6 +21,8 @@ protocol ProfileSaving {
     func resetUserDefaults()
     func deleteLocalProfile()
     func deleteAllRemoteProfile()
+    
+    var loadedProfile: AnyPublisher<Profile, Error> { get }
 }
 
 enum ProfileError: Error {
@@ -36,6 +38,10 @@ enum ProfileError: Error {
 }
 
 class ProfileViewModel: ProfileSaving {
+    
+    private lazy var loadedProfileSubject = PassthroughSubject<Profile, Error>()
+    lazy var loadedProfile = loadedProfileSubject.eraseToAnyPublisher()
+    
     
     struct Constants {
         static let playerUUIDKey = "playerUUID"
@@ -152,7 +158,9 @@ class ProfileViewModel: ProfileSaving {
             case .finished:
                 print("Successfully created and sync local and remote profiles")
             }
-        }, receiveValue: { _ in })
+        }, receiveValue: { [weak self] profile in
+            self?.loadedProfileSubject.send(profile)
+        })
             .store(in: &disposables)
         
         

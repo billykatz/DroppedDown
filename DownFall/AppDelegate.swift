@@ -7,24 +7,32 @@
 //
 
 import UIKit
+import Combine
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
+    private var disposables = Set<AnyCancellable>()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         
-        //TODO: Consider init the GameViewController here and injecting everything it needs to function
-        // Use this as a resource https://medium.com/ios-os-x-development/ios-start-an-app-without-storyboard-5f57e3251a25
         window = UIWindow(frame: UIScreen.main.bounds)
+        
         let gameViewController = GameViewController(nibName: nil, bundle: nil)
-        window!.rootViewController = gameViewController
-        window!.makeKeyAndVisible()
+        
+        GameScope.shared.profileManager.loadedProfile.sink(receiveCompletion: { _ in }) { (profile) in
+            gameViewController.profile = profile
+        }.store(in: &disposables)
         
         // Start the authentication process
         GameScope.shared.profileManager.start(gameViewController)
+        
+        
+        
+        window!.rootViewController = gameViewController
+        window!.makeKeyAndVisible()
         
         return true
     }

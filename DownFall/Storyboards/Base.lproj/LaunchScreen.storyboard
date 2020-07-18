@@ -16,15 +16,15 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="logo" translatesAutoresizingMaskIntoConstraints="NO" id="mV4-RC-pq2">
-                                <rect key="frame" x="41.5" y="406" width="331" height="94"/>
+                                <rect key="frame" x="41.5" y="355" width="331" height="186"/>
                             </imageView>
                         </subviews>
                         <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                         <constraints>
                             <constraint firstItem="mV4-RC-pq2" firstAttribute="width" secondItem="Ze5-6b-2t3" secondAttribute="width" multiplier="0.8" id="4TK-XG-QCQ"/>
-                            <constraint firstItem="mV4-RC-pq2" firstAttribute="centerY" secondItem="6Tk-OE-BBY" secondAttribute="centerY" id="jfn-4r-KuY"/>
-                            <constraint firstItem="mV4-RC-pq2" firstAttribute="height" secondItem="Ze5-6b-2t3" secondAttribute="width" multiplier="0.228" id="nhd-ui-nxw"/>
-                            <constraint firstItem="mV4-RC-pq2" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="xkP-ra-KAz"/>
+                            <constraint firstItem="mV4-RC-pq2" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="jfn-4r-KuY"/>
+                            <constraint firstItem="mV4-RC-pq2" firstAttribute="height" secondItem="Ze5-6b-2t3" secondAttribute="width" multiplier="0.45" id="nhd-ui-nxw"/>
+                            <constraint firstItem="mV4-RC-pq2" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="xkP-ra-KAz"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>

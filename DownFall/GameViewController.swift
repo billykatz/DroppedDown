@@ -24,10 +24,7 @@ class GameViewController: UIViewController, LevelCoordinating {
     public var profile: Profile? = nil {
         didSet {
             guard let profile = profile else { return }
-            let fadeOut = SKAction.fadeOut(withDuration: 2.0)
-            let remove = SKAction.removeFromParent()
-            loadingSceneNode?.run(SKAction.group([fadeOut, remove])) { [weak self] in
-                guard let self = self else { return }
+            loadingSceneNode?.fadeOut {
                 self.levelSelect(profile.player)
             }
             

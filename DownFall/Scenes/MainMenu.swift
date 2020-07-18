@@ -462,7 +462,7 @@ class MainMenu: SKScene, ProfileViewDelegate {
     
     func deleteRemoteFile()
     {
-        GameScope.shared.profileManager.deleteRemoteProfile()
+        GameScope.shared.profileManager.deleteAllRemoteProfile()
     }
     
     /// Profile View Delegate

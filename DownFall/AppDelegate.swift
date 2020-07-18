@@ -26,25 +26,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Start the authentication process
         GameScope.shared.profileManager.start(gameViewController)
         
-//        GameScope.shared.profileManager.authenticate(gameViewController) { result in
-//            print("App Delegat result handler")
-//            switch result {
-//                case .success(let successful):
-//                    print("success \(successful)")
-//                case .failure(.fileWithNameAlreadyExists):
-//                    print("file already exists, overwrite?")
-//                case .failure(.saveError(let err)):
-//                    print(err)
-//                case .failure(.failedToLoadProfile):
-//                    print("Failed to load profile")
-//                case .failure(.failedToLoadLocalProfile):
-//                    print("Failed to load local profile")
-//                case .failure(.failedToSaveLocalProfile(let error)):
-//                    print("Failed to save local profile \(error)")
-//
-//            }
-//        }
-//
         return true
     }
 

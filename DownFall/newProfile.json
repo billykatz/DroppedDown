@@ -1,4 +1,62 @@
 {
     "name": "Profile Name",
     "progress": 0
+    "player" :
+        { "name": "player3",
+            "type": "player",
+            "originalHp": 3,
+            "hp": 3,
+            "attack": {
+                "type": "targets",
+                "frequency" : 1,
+                "damage": 1,
+                "range": {
+                    "lower": 1,
+                    "upper": 1
+                },
+                "attacksPerTurn": 1,
+                "attackSlope": [
+                    {
+                        "over": 0,
+                        "up": -1
+                    }
+                ]
+            },
+            "animations":
+            [
+                {
+                    "animationFilename": "playerAttack",
+                    "numberOfFrames": 10,
+                    "animationType": "attack"
+                },
+                {
+                    "animationFilename": "playerDamaged",
+                    "numberOfFrames": 9,
+                    "animationType": "hurt"
+                },
+                {
+                    "animationFilename": "playerFall",
+                    "numberOfFrames": 9,
+                    "animationType": "fall"
+                }
+            ],
+            "carry": {
+                "items": [
+                    {
+                        "type": "gold",
+                        "amount": 50
+                        
+                    },
+                    {
+                        "type": "gem",
+                        "amount": 0
+                        
+                    }
+                ]
+            },
+            "abilities": [],
+            "effects": [],
+            "dodge": 0,
+            "luck": 0
+        }
 }

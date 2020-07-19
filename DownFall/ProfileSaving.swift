@@ -17,14 +17,26 @@ struct Profile: Codable {
 }
 
 protocol ProfileSaving {
+    /// Call this when the app is loaded into memory
     func start(_ presenter: UIViewController)
+    
+    /// Resets user defaults. Only do this when resetting the player's data
     func resetUserDefaults()
+    
+    /// Deletes the local profile file. Only do this when resetting the player's data. This only works if we have the UUID from User Defaults
     func deleteLocalProfile()
+    
+    /// Deletes all the remote files in Game Center.  I
     func deleteAllRemoteProfile()
     
+    /// Emits the profile that should be loaded and use to player the game
     var loadedProfile: AnyPublisher<Profile, Error> { get }
+    
+    /// Saves a profile
+    func saveProfile(_ profile: Profile)
 }
 
+/// Errors emitted during Profile loading and saving
 enum ProfileError: Error {
     case failedToLoadProfile
     case noUserDefaultsValue
@@ -39,30 +51,28 @@ enum ProfileError: Error {
 
 class ProfileViewModel: ProfileSaving {
     
-    private lazy var loadedProfileSubject = PassthroughSubject<Profile, Error>()
-    lazy var loadedProfile = loadedProfileSubject.eraseToAnyPublisher()
-    
-    
     struct Constants {
         static let playerUUIDKey = "playerUUID"
         static let saveFilePath = NSHomeDirectory()
         static let tempFilePath = NSTemporaryDirectory()
     }
     
+    /// Gets sent the loaded profile
+    private lazy var loadedProfileSubject = PassthroughSubject<Profile, Error>()
+    /// Public interface with the loaded profile
+    lazy var loadedProfile = loadedProfileSubject.eraseToAnyPublisher()
+    
+    /// Gets sent the authenication status of the GKLocalPlayer
     private lazy var authenicatedSubject = PassthroughSubject<Bool, Error>()
-    lazy var authenicated = authenicatedSubject.eraseToAnyPublisher()
+    private lazy var authenicated = authenicatedSubject.eraseToAnyPublisher()
     
-    private lazy var savedGames = PassthroughSubject<[GKSavedGame], Error>()
-    
+    /// The dispose bag
     private var disposables = Set<AnyCancellable>()
     
-    //Saved games
-    private var gameCenterSavedGame = PassthroughSubject<GKSavedGame?, Error>()
-    private var localSavedGame = PassthroughSubject<Profile?, Error>()
+    /// Background Queue
+    private var backgroundQueue = DispatchQueue.init(label: "profile-saving-thread", qos: .userInitiated, attributes: .concurrent)
     
-    private lazy var loadedGameSubject = PassthroughSubject<GKSavedGame, Error>()
-    lazy var savedGame = loadedGameSubject.eraseToAnyPublisher()
-    
+    /// Defines all business logic and kickoffs the pipeline by attempting to authenicate with GameCenter
     func start(_ presenter: UIViewController) {
         
         /// Load the remote save file into data
@@ -140,30 +150,32 @@ class ProfileViewModel: ProfileSaving {
                 })
                 .eraseToAnyPublisher()
         
-        
+        /// Resolves the profile conflict
+        /// re-saves the profiles locally and remotely
+        /// Writes to loadedProfileSubject on success
         resolveProfileConflict
             .print("Resolving profile conflicts")
             .tryFlatMap { [weak self] (profile) -> Future<Profile, Error> in
                 guard let self = self else { throw ProfileError.profileLoadCancelled }
                 return self.saveProfileLocally(profile)
-        }
-        .tryFlatMap { [weak self] (profile) -> Future<Profile, Error> in
-            guard let self = self else { throw ProfileError.profileLoadCancelled }
-            return self.saveProfileRemotely(profile)
-        }
-        .sink(receiveCompletion: { completion in
-            switch completion {
-            case .failure(let err):
-                print("Error saving local or remote \(err)")
-            case .finished:
-                print("Successfully created and sync local and remote profiles")
             }
-        }, receiveValue: { [weak self] profile in
-            self?.loadedProfileSubject.send(profile)
-        })
+            .tryFlatMap { [weak self] (profile) -> Future<Profile, Error> in
+                guard let self = self else { throw ProfileError.profileLoadCancelled }
+                return self.saveProfileRemotely(profile)
+            }
+            .subscribe(on: backgroundQueue)
+            .receive(on: RunLoop.main)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .failure(let err):
+                    print("Error saving local or remote \(err)")
+                case .finished:
+                    print("Successfully created and sync local and remote profiles")
+                }
+            }, receiveValue: { [weak self] profile in
+                self?.loadedProfileSubject.send(profile)
+            })
             .store(in: &disposables)
-        
-        
         
         /// Start the authenicated process
         print("Starting to authenticate with game center")
@@ -175,85 +187,87 @@ class ProfileViewModel: ProfileSaving {
                 self?.authenicatedSubject.send(GKLocalPlayer.local.isAuthenticated)
             }
         }
-        
-        
-        //DEBUG
-        /// Zip together the local and remote data. Erase errors to .success(nil) so the main body still executes
-        /// Mostly debug right now
-        loadedProfilesZip
-            .print("loaded data pipeline")
-            .sink(receiveCompletion: { completion in
-                switch completion {
-                case .finished:
-                    break
-                case .failure(let error):
-                    preconditionFailure("This shouldnt be possible as we erase all errors in the Publishers.Zip. \(error)")
-                    ()
+    }
+    
+    /// Saves a profile locally and remotely if the file has progressed further than current loaded profile
+    /// Sends the updated profile after saving completes
+    public func saveProfile(_ profile: Profile) {
+        Publishers.CombineLatest(loadedProfile, Just(profile).setFailureType(to: Error.self))
+            .tryFlatMap { [weak self](loadedProfile, newProfile) -> Future<Profile, Error> in
+                guard let self = self else { throw ProfileError.profileLoadCancelled }
+                if loadedProfile.progress < newProfile.progress {
+                    return self.saveProfileLocally(newProfile)
+                } else {
+                    throw ProfileError.failedToDeleteLocalProfile
                 }
-            }) { (data) in
-                let (savedGame, profile) = data
-                switch (savedGame, profile) {
-                case (.none, .none):
-                    print("branch new player")
-                case (.some, .none):
-                    print("Have remote.  No local")
-                case (.none, .some):
-                    print("Have local.  No remote")
-                case (.some, .some):
-                    print("Have both remote and local")
-                }
-        }.store(in: &disposables)
-        
-        
+        }
+        .tryFlatMap { [weak self] (profile) -> Future<Profile, Error> in
+            guard let self = self else { throw ProfileError.profileLoadCancelled }
+            return self.saveProfileRemotely(profile)
+        }
+        .subscribe(on: backgroundQueue)
+        .receive(on: RunLoop.main)
+        .sink(receiveCompletion: { completion in
+            switch completion {
+            case .failure(let err):
+                print("Error saving local or remote \(err)")
+            case .finished:
+                print("Successfully created and sync local and remote profiles")
+            }
+        }, receiveValue: { [weak self] profile in
+            self?.loadedProfileSubject.send(profile)
+        }).store(in: &disposables)
     }
     
     /// Reset user defaults
-       public func resetUserDefaults() {
-           UserDefaults.standard.set(nil, forKey: Constants.playerUUIDKey)
-       }
-       
-       /// Delete the local profile
-       public func deleteLocalProfile() {
-           fetchPlayerUUID()
-               .eraseToAnyPublisher()
-               .print("Delete Local Profile")
-               .flatMap( { uuid -> Future<Void, Error> in
-                   return Future { promise in
-                       guard let domain =  FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
-                           promise(.failure(ProfileError.failedToDeleteLocalProfile))
-                           return
-                       }
-                       let pathURL = domain.appendingPathComponent(uuid)
-                       do {
-                           try FileManager.default.removeItem(at: pathURL)
-                           promise(.success(()))
-                       }
-                       catch {
-                           promise(.failure(ProfileError.failedToDeleteLocalProfile))
-                       }
-                   }
-               }).eraseToAnyPublisher()
-               .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-               .store(in: &disposables)
-           
-       }
-       
-       /// Delete all profiles saved in GameKit
-       public func deleteAllRemoteProfile() {
-           GKLocalPlayer
-               .local
-               .fetchGCSavedGames()
-               .print("Deleting Saved Games")
-               .flatMap({ games in
-                   return games.publisher.setFailureType(to: Error.self)
-               })
-               .flatMap( { game in
-                   return GKLocalPlayer.local.deleteGame(game)
-               })
-               .eraseToAnyPublisher()
-               .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-               .store(in: &disposables)
-       }
+    public func resetUserDefaults() {
+        UserDefaults.standard.set(nil, forKey: Constants.playerUUIDKey)
+    }
+    
+    /// Delete the local profile
+    public func deleteLocalProfile() {
+        fetchPlayerUUID()
+            .eraseToAnyPublisher()
+            .print("Delete Local Profile")
+            .flatMap( { uuid -> Future<Void, Error> in
+                return Future { promise in
+                    guard let domain =  FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+                        promise(.failure(ProfileError.failedToDeleteLocalProfile))
+                        return
+                    }
+                    let pathURL = domain.appendingPathComponent(uuid)
+                    do {
+                        try FileManager.default.removeItem(at: pathURL)
+                        promise(.success(()))
+                    }
+                    catch {
+                        promise(.failure(ProfileError.failedToDeleteLocalProfile))
+                    }
+                }
+            }).eraseToAnyPublisher()
+            .subscribe(on: backgroundQueue)
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+            .store(in: &disposables)
+        
+    }
+    
+    /// Delete all profiles saved in GameKit
+    public func deleteAllRemoteProfile() {
+        GKLocalPlayer
+            .local
+            .fetchGCSavedGames()
+            .print("Deleting Saved Games")
+            .flatMap({ games in
+                return games.publisher.setFailureType(to: Error.self)
+            })
+            .flatMap( { game in
+                return GKLocalPlayer.local.deleteGame(game)
+            })
+            .eraseToAnyPublisher()
+            .subscribe(on: backgroundQueue)
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+            .store(in: &disposables)
+    }
     
     /// Loads a local profile from the App's Directory
     private func loadLocalProfile(name: String) -> Future<Profile?, Error> {
@@ -284,7 +298,6 @@ class ProfileViewModel: ProfileSaving {
     
     /// Returns the UUID saved in UserDefaults or an error if no UserDefaults exists
     private func fetchPlayerUUID() -> Future<String, Error> {
-        //        return Future { promise in promise(.success("C53421AE-4C82-489E-AA79-3A32C21D798E"))}
         return Future { promise in
             if let playerUUID = UserDefaults.standard.string(forKey: Constants.playerUUIDKey) { promise(.success(playerUUID))
             } else {
@@ -312,6 +325,8 @@ class ProfileViewModel: ProfileSaving {
         }
     }
     
+    /// Takes a Profile and saves it locally.
+    /// Also overwrites the UserDefaults key
     private func saveProfileLocally(_ profile: Profile) -> Future<Profile, Error> {
         return Future { promise in
             let uuid = profile.name
@@ -338,7 +353,8 @@ class ProfileViewModel: ProfileSaving {
         }
     }
     
-    /// Saves a data file locally
+    /// Create a data file from the local tempate file called "newProfile"
+    /// Also is responsible for saving the UUID in User Defaults
     private func createLocalProfile() -> Future<Profile, Error> {
         return Future { promise in
             let uuid = UUID().uuidString
@@ -378,6 +394,9 @@ class ProfileViewModel: ProfileSaving {
         }
     }
     
+    
+    /// Saves the profile remotely
+    /// Uses a JSON encoder to save the data
     private func saveProfileRemotely(_ profile: Profile) -> Future<Profile, Error> {
         return Future { promise in
             print("Saving profile to GameCenter")

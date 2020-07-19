@@ -6,7 +6,7 @@
 //  Copyright © 2019 William Katz LLC. All rights reserved.
 //
 
-struct CarryModel: Decodable, Equatable {
+struct CarryModel: Codable, Equatable {
     let items: [Item]
     
     static let zero = CarryModel(items: [])

@@ -8,17 +8,17 @@
 
 import UIKit
 
-struct DynamiteFuse: Decodable, Hashable {
+struct DynamiteFuse: Codable, Hashable {
     let count: Int
     var hasBeenDecremented: Bool
 }
 
-struct PillarData: Decodable, Hashable {
+struct PillarData: Codable, Hashable {
     let color: Color
     let health: Int
 }
 
-enum Color: String, Decodable, CaseIterable, Hashable {
+enum Color: String, Codable, CaseIterable, Hashable {
     case blue
     case brown
     case purple
@@ -109,7 +109,7 @@ extension Tile: Equatable {
     }
 }
 
-enum TileType: Hashable, CaseIterable, Decodable {
+enum TileType: Hashable, CaseIterable, Codable {
     
     static var rockCases: [TileType] = [.rock(.blue), .rock(.green), .rock(.red), .rock(.purple), .rock(.brown)]
     static var allCases: [TileType] = [.player(.zero), .exit(blocked: false), .empty, .monster(.zero), .item(.zero), .rock(.red), .pillar(PillarData(color: .red, health: 3))]
@@ -162,6 +162,7 @@ enum TileType: Hashable, CaseIterable, Decodable {
         case dynamite
     }
     
+    /// This implementation is written about in https://medium.com/@hllmandel/codable-enum-with-associated-values-swift-4-e7d75d6f4370
     
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -191,6 +192,36 @@ enum TileType: Hashable, CaseIterable, Decodable {
         case .item:
             let item = try container.decode(Item.self, forKey: .item)
             self = .item(item)
+        }
+    }
+    
+    /// This implementation is written about in https://medium.com/@hllmandel/codable-enum-with-associated-values-swift-4-e7d75d6f4370
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        switch self {
+        case .player(let data):
+            try container.encode(Base.player, forKey: .base)
+            try container.encode(data, forKey: .entityData)
+        case .monster(let data):
+            try container.encode(Base.monster, forKey: .base)
+            try container.encode(data, forKey: .entityData)
+        case .empty:
+            try container.encode(Base.empty, forKey: .base)
+        case .exit(blocked: let blocked):
+            try container.encode(Base.exit, forKey: .base)
+            try container.encode(blocked, forKey: .exitBlocked)
+        case .item(let item):
+            try container.encode(Base.item, forKey: .base)
+            try container.encode(item, forKey: .item)
+        case .pillar(let pillarData):
+            try container.encode(Base.pillar, forKey: .base)
+            try container.encode(pillarData, forKey: .pillarData)
+        case .rock(let rock):
+            try container.encode(Base.rock, forKey: .base)
+            try container.encode(rock, forKey: .color)
+        case .dynamite(let fuseCount):
+            try container.encode(Base.dynamite, forKey: .base)
+            try container.encode(fuseCount, forKey: .dynamiteFuse)
         }
     }
 

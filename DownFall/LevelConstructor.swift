@@ -201,7 +201,7 @@ struct LevelConstructor {
                   threatLevelController: ThreatLevelController(),
                   goals: [LevelGoal(type: .unlockExit, reward: .gem(0), tileType: .empty, targetAmount: 0, minimumGroupSize: 0, grouped: false)],
                   numberOfGoalsNeedToUnlockExit: 0, maxSpawnGems: 0, storeOffering: [],
-                  tutorialData: GameScope.shared.tutorials[index])
+                  tutorialData: nil)
         }
     }
     

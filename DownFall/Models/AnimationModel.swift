@@ -8,7 +8,7 @@
 
 import SpriteKit
 
-enum AnimationType: String, Decodable {
+enum AnimationType: String, Codable {
     case attack
     case hurt
     case dying
@@ -19,7 +19,7 @@ enum AnimationType: String, Decodable {
     case projectileEnd
 }
 
-struct AnimationModel: Equatable, Decodable {
+struct AnimationModel: Equatable, Codable {
     let animationFilename: String
     let numberOfFrames: Int
     let animationType: AnimationType

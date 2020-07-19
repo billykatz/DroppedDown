@@ -104,7 +104,8 @@ extension LevelCoordinating where Self: UIViewController {
         let index = LevelType.gameCases.firstIndex(of: level) ?? 0
         levelIndex = index
         levels = LevelConstructor.buildLevels(difficulty, randomSource: randomSource ?? GKLinearCongruentialRandomSource())
-//        presentNextLevel(player)
+        
+        /// Present the store to give the player the option to take a Rune
         presentStore(player)
     }
     

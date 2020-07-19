@@ -13,14 +13,14 @@ protocol ResetsAttacks {
     func resetAttacks() -> EntityModel
 }
 
-struct Pickaxe: Equatable, Decodable {
+struct Pickaxe: Equatable, Codable {
     var runeSlots: Int
     var runes: [Rune]
 }
 
-struct EntityModel: Equatable, Decodable {
+struct EntityModel: Equatable, Codable {
     
-    enum EntityType: String, Decodable, CaseIterable {
+    enum EntityType: String, Codable, CaseIterable {
         case bat
         case rat
         case dragon

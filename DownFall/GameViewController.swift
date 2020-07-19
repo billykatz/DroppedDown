@@ -19,16 +19,39 @@ class GameViewController: UIViewController, LevelCoordinating {
     internal var entities: EntitiesModel?
     internal var levelIndex: Int = 1
     internal var levels: [Level]?
+    var loadingSceneNode: LoadingScene?
+    
+    public var profile: Profile? = nil {
+        didSet {
+            guard let profile = profile else { return }
+            loadingSceneNode?.fadeOut {
+                self.levelSelect(profile.player)
+            }
+            
+            
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        /// Needed when we stopped using a storyboard
+        view = SKView(frame: view.bounds)
+        
         do {
             guard let entityData = try Data.data(from: "entities") else { fatalError("Crashing here is okay because we failed to parse our entity json file") }
             entities = try JSONDecoder().decode(EntitiesModel.self, from: entityData)
-            levelSelect(entities!.entities[2])
             
             //TODO: add the actual seed to this source
             randomSource = GKLinearCongruentialRandomSource()
+            
+            /// Show the loading screeen
+            if let view = view as? SKView,
+                let loadingScene = GKScene(fileNamed: "LoadingScene")?.rootNode as? LoadingScene {
+                loadingScene.scaleMode = .aspectFill
+                view.presentScene(loadingScene)
+                loadingSceneNode = loadingScene
+            }
         }
         catch(let error) {
             fatalError("Crashing due to \(error) while trying to parse json entity file")
@@ -55,11 +78,12 @@ class GameViewController: UIViewController, LevelCoordinating {
 extension GameViewController {
     
     func levelSelect(_ updatedPlayerData: EntityModel) {
+        
         if let mainMenuScene = GKScene(fileNamed: Identifiers.mainMenuScene)?.rootNode as? MainMenu {
             mainMenuScene.scaleMode = .aspectFill
             mainMenuScene.mainMenuDelegate = self
             mainMenuScene.playerModel = updatedPlayerData
-
+            
             if let view = self.view as! SKView? {
                 view.presentScene(mainMenuScene)
                 view.ignoresSiblingOrder = true

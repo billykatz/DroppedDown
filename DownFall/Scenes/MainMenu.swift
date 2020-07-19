@@ -17,7 +17,6 @@ class MainMenu: SKScene {
     
     struct Constants {
         static let offerSlabPadding = CGFloat(35)
-        static let provileViewName = "profileViewName"
     }
     
     private var background: SKSpriteNode!
@@ -25,9 +24,6 @@ class MainMenu: SKScene {
     private var difficultyLabel: ParagraphNode?
     private var levelLabel: ParagraphNode?
     private var levelSelectButton: Button?
-    private var profileSelectButton: Button?
-    private var newProfileButton:Button?
-    private var profileSaving: ProfileSaving = ProfileViewModel()
     private var gems: Int = 0
     weak var mainMenuDelegate: MainMenuDelegate?
     var playerModel: EntityModel?
@@ -46,7 +42,6 @@ class MainMenu: SKScene {
     }
     
     override func didMove(to view: SKView) {
-        
         background = self.childNode(withName: "background") as? SKSpriteNode
         background.color = UIColor.clayRed
         
@@ -85,46 +80,6 @@ class MainMenu: SKScene {
         levelSelectButton = levelButton
         
         addChild(levelButton)
-        
-        
-        let profileButton = Button(size: Style.RunMenu.buttonSize,
-                                 delegate: self,
-                                 identifier: .selectProfile,
-                                 precedence: .menu,
-                                 fontSize: UIFont.largeSize,
-                                 fontColor: UIColor.white,
-                                 backgroundColor: .menuPurple)
-        
-        profileButton.position = CGPoint.position(profileButton.frame,
-                                                    inside: size.playableRect,
-                                                    verticalAlign: .top,
-                                                    horizontalAnchor: .right,
-                                                    xOffset: 50.0,
-                                                    yOffset: 100.0)
-        profileSelectButton = profileButton
-        
-        addChild(profileButton)
-        
-        
-        let newProfileButton = Button(size: Style.RunMenu.buttonSize,
-                                 delegate: self,
-                                 identifier: .newProfile,
-                                 precedence: .menu,
-                                 fontSize: UIFont.largeSize,
-                                 fontColor: UIColor.white,
-                                 backgroundColor: .menuPurple)
-        
-        newProfileButton.position = CGPoint.alignVertically(levelButton.frame,
-                                                            relativeTo: profileSelectButton?.frame,
-                                                            horizontalAnchor: .left,
-                                                            verticalAlign: .center,
-                                                            horizontalPadding: 200.0,
-                                                            translatedToBounds: true)
-
-        self.newProfileButton = newProfileButton
-        
-        addChild(newProfileButton)
-
         
         levelTypeIndex = 0
         
@@ -454,15 +409,6 @@ class MainMenu: SKScene {
         guard let playerModel = playerModel else { return false }
         return playerModel.numberOfEffects(dodgeEffect) >= maxDodgeBuys
     }
-    
-    func presentProfile() {
-        GameScope.shared.profileManager.deleteLocalProfile()
-    }
-    
-    func deleteRemoteFile() {
-        GameScope.shared.profileManager.deleteAllRemoteProfile()
-    }
-    
 }
 
 
@@ -479,23 +425,17 @@ extension MainMenu: ButtonDelegate {
         guard let playerModel = self.playerModel else { return }
         switch button.identifier {
         case .newGame:
-            GameScope.shared.profileManager.resetUserDefaults()
-//            mainMenuDelegate?.newGame(GameScope.shared.difficulty,
-//                                      playerModel.previewAppliedEffects().healFull(),
-//                                      level: LevelType.gameCases[levelTypeIndex])
+            mainMenuDelegate?.newGame(GameScope.shared.difficulty,
+                                      playerModel.previewAppliedEffects().healFull(),
+                                      level: LevelType.gameCases[levelTypeIndex])
         case .startTutorial:
             mainMenuDelegate?.didSelectStartTutorial(playerModel)
-        case .selectProfile:
-            presentProfile()
-        case .newProfile:
-            deleteRemoteFile()
         case .cycleLevel:
-            GameScope.shared.profileManager.start(self.mainMenuDelegate as! UIViewController)
-//            if levelTypeIndex + 1 == LevelType.gameCases.count {
-//                levelTypeIndex = 0
-//            } else {
-//                levelTypeIndex += 1
-//            }
+            if levelTypeIndex + 1 == LevelType.gameCases.count {
+                levelTypeIndex = 0
+            } else {
+                levelTypeIndex += 1
+            }
             
         case .buyHealth:
             if gems >= healthCost && playerModel.numberOfEffects(healthEffect) < maxHealthBuys {

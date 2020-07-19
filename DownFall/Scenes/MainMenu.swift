@@ -11,10 +11,9 @@ import SpriteKit
 protocol MainMenuDelegate: class {
     func newGame(_ difficulty: Difficulty, _ playerModel: EntityModel?, level: LevelType)
     func didSelectStartTutorial(_ playerModel: EntityModel?)
-    var mainViewController: UIViewController { get }
 }
 
-class MainMenu: SKScene, ProfileViewDelegate {
+class MainMenu: SKScene {
     
     struct Constants {
         static let offerSlabPadding = CGFloat(35)
@@ -460,15 +459,10 @@ class MainMenu: SKScene, ProfileViewDelegate {
         GameScope.shared.profileManager.deleteLocalProfile()
     }
     
-    func deleteRemoteFile()
-    {
+    func deleteRemoteFile() {
         GameScope.shared.profileManager.deleteAllRemoteProfile()
     }
     
-    /// Profile View Delegate
-    func navigateToMainMenu(_ profileView: SKSpriteNode) {
-        removeChild(with: Constants.provileViewName)
-    }
 }
 
 

@@ -1,6 +1,6 @@
 {
     "name": "Profile Name",
-    "progress": 0,
+    "progress": 3,
     "player" :
         { "name": "player3",
             "type": "player",
@@ -44,7 +44,7 @@
                 "items": [
                     {
                         "type": "gem",
-                        "amount": 10
+                        "amount": 60
                         
                     }
                 ]

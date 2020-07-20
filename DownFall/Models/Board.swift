@@ -328,17 +328,6 @@ class Board: Equatable {
         return nil
     }
     
-    private func use(_ ability: AnyAbility) {
-        if let playerCoord = self.tiles(of: .player(.zero)).first {
-            if case TileType.player(let data) = tiles[playerCoord].type {
-                let newData = data.use(ability)
-                var newTiles = tiles
-                newTiles[playerCoord.row][playerCoord.column] = Tile(type: .player(newData))
-                tiles = newTiles
-            }
-        }
-    }
-    
     private func transform(_ coords: [TileCoord], into type: TileType, input: Input) -> Transformation {
         
         var tileTransform : [TileTransformation] = []

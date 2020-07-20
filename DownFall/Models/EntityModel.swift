@@ -55,8 +55,8 @@ struct EntityModel: Equatable, Codable {
     
     static let playerCases: [EntityType] = [.easyPlayer, .normalPlayer, .hardPlayer]
     
-    static let zero: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .rat, carry: .zero, animations: [], abilities: [], effects: [], dodge: 0, luck: 0)
-    static let playerZero: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .player, carry: .zero, animations: [], abilities: [], pickaxe: Pickaxe(runeSlots: 0, runes: []), effects: [], dodge: 0, luck: 0)
+    static let zero: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .rat, carry: .zero, animations: [], effects: [], dodge: 0, luck: 0)
+    static let playerZero: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .player, carry: .zero, animations: [], pickaxe: Pickaxe(runeSlots: 0, runes: []), effects: [], dodge: 0, luck: 0)
     
     static func zeroedEntity(type: EntityType) -> EntityModel {
         return EntityModel(originalHp: 0, hp: 0, name: "", attack: .zero, type: type, carry: .zero, animations: [], effects: [], dodge: 0, luck: 0)
@@ -69,7 +69,6 @@ struct EntityModel: Equatable, Codable {
     let type: EntityType
     let carry: CarryModel
     let animations: [AnimationModel]
-    var abilities: [AnyAbility] = []
     var pickaxe: Pickaxe?
     var effects: [EffectModel]
     let dodge: Int
@@ -96,7 +95,6 @@ struct EntityModel: Equatable, Codable {
                         type: EntityType? = nil,
                         carry: CarryModel? = nil,
                         animations: [AnimationModel]? = nil,
-                        abilities: [AnyAbility]? = nil,
                         pickaxe: Pickaxe? = nil,
                         effects: [EffectModel]? = nil,
                         dodge: Int? = nil,
@@ -109,7 +107,6 @@ struct EntityModel: Equatable, Codable {
         let updatedType = type ?? self.type
         let updatedCarry = carry ?? self.carry
         let updatedAnimations = animations ?? self.animations
-        let updatedAbilities = abilities ?? self.abilities
         let pickaxe = pickaxe ?? self.pickaxe
         let effects = effects ?? self.effects
         let dodge = dodge ?? self.dodge
@@ -122,7 +119,6 @@ struct EntityModel: Equatable, Codable {
                            type: updatedType,
                            carry: updatedCarry,
                            animations: updatedAnimations,
-                           abilities: updatedAbilities,
                            pickaxe: pickaxe,
                            effects: effects,
                            dodge: dodge,
@@ -142,13 +138,7 @@ struct EntityModel: Equatable, Codable {
     }
     
     var canAttack: Bool {
-        var bonusAttacks = 0
-        for ability in abilities {
-            if let attacks = ability.extraAttacksGranted  {
-                bonusAttacks += attacks
-            }
-        }
-        return attack.attacksPerTurn + bonusAttacks - attack.attacksThisTurn > 0
+        return attack.attacksPerTurn - attack.attacksThisTurn > 0
     }
     
     func recordRuneProgress(_ progressDictionary: [Rune: CGFloat]) -> EntityModel {
@@ -172,39 +162,6 @@ struct EntityModel: Equatable, Codable {
         return animations.first(where: { $0.animationType == animationType })?.keyframe
     }
     
-    /**
-     Add an ability to entities model.  If the model already contains that ability, then just increment the count
-     
-     - Returns: an updated entity model
-     
-     */
-    func add(_ ability: Ability) -> EntityModel {
-        var newAbilities = abilities
-        if let index = newAbilities.firstIndex(of: AnyAbility(ability)) {
-            var updatedAbility = newAbilities[index]
-            updatedAbility.count += 1
-            newAbilities[index] = updatedAbility
-        } else {
-            var anyAbility = AnyAbility(ability)
-            anyAbility.count = 1
-            newAbilities.append(anyAbility)
-        }
-        
-        return self.update(abilities: newAbilities)
-        
-    }
-    
-    func remove(_ ability: Ability) -> EntityModel {
-        var newAbilities = abilities
-        if var newAbility = abilities.first(where: { $0.type == ability.type }) {
-            newAbility.count -= 1
-            newAbilities.removeAll(where: { $0.type == ability.type })
-            if newAbility.count > 0 {
-                newAbilities.append(newAbility)
-            }
-        }
-        return self.update(abilities: newAbilities)
-    }
     
     func revive() -> EntityModel {
         return self.update(hp: originalHp)
@@ -227,12 +184,6 @@ struct EntityModel: Equatable, Codable {
     
     func wasAttacked(for damage: Int, from direction: Direction) -> EntityModel {
         var shieldedDamage = 0
-        for ability in abilities {
-            if let blockedDamage = ability.blocksDamage(from: direction) {
-                shieldedDamage = blockedDamage
-            }
-        }
-        
         let finalDamage = damage - shieldedDamage
         return update(hp: hp - finalDamage)
     }
@@ -309,19 +260,6 @@ struct EntityModel: Equatable, Codable {
         return update(pickaxe: pickaxe)
     }
     
-    /// consume 1 count of the ability.  If the ability only has 1 count, then remove it
-    func use(_ ability: Ability) -> EntityModel {
-        var newAbilities = self.abilities
-        guard let index = newAbilities.firstIndex(of: AnyAbility(ability)),
-            var newAbility = self.abilities.first(where: { $0 == AnyAbility(ability) }) else { return self }
-        newAbility.count -= 1
-        if newAbility.count > 0, let range = Range(NSRange(location: index, length: 1)) {
-            newAbilities.replaceSubrange(range, with: [AnyAbility(newAbility)])
-        } else {
-            newAbilities.removeFirst(where: { $0 == AnyAbility(ability) })
-        }
-        return update(abilities: newAbilities)
-    }
     
     func updateCarry(carry: CarryModel) -> EntityModel {
         return self.update(carry: carry)

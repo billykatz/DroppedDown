@@ -20,7 +20,6 @@ struct LevelConstructor {
                          maxGems: 1,
                          maxTime: timePer(levelType, difficulty: difficulty),
                          boardSize: boardSize(per: levelType, difficulty: difficulty),
-                         abilities: availableAbilities(per: levelType, difficulty: difficulty),
                          goldMultiplier: difficulty.goldMultiplier,
                          tileTypeChances: availableRocksPerLevel(levelType, difficulty: difficulty),
                          pillarCoordinates: pillars(per: levelType, difficulty: difficulty),
@@ -194,7 +193,6 @@ struct LevelConstructor {
                   maxGems: 0,
                   maxTime: 0,
                   boardSize: 4,
-                  abilities: [],
                   goldMultiplier: 1,
                   tileTypeChances: TileTypeChanceModel(chances: [.empty: 1]),
                   pillarCoordinates: [],
@@ -492,40 +490,4 @@ struct LevelConstructor {
         }
     }
     
-    static func availableAbilities(per levelType: LevelType, difficulty: Difficulty) -> [AnyAbility] {
-        
-        func droppingRandom(numberOfElements: Int, from array: [Ability]) -> [Ability] {
-            if numberOfElements >= array.count { return [] }
-            if numberOfElements == 0 { return array }
-            var new = array
-            var removed = 0
-            while removed < numberOfElements {
-                let randomNumber = Int.random(new.count)
-                removed += 1
-                new.remove(at: randomNumber)
-            }
-            return new
-        }
-        
-        
-        var abilities: [Ability]
-        
-        switch levelType {
-        case .first:
-            abilities = [FreeRainEmbers(), FreeGetSwifty(), TransformRock()]
-        case .second, .third:
-            abilities = [FreeRainEmbers(), FreeGetSwifty()]
-        //            abilities = droppingRandom(numberOfElements: 2, from: temp)
-        case .fourth:
-            let temp: [Ability] = [GreatestHealingPotion(), RockASwap(), TransmogrificationPotion(), KillMonsterGroupPotion(),  KillMonsterPotion(), Dynamite(), GreaterHealingPotion(), MassMinePickaxe()]
-            abilities = droppingRandom(numberOfElements: 2, from: temp)
-        case .fifth, .sixth, .seventh:
-            let temp: [Ability] = [GreatestHealingPotion(), RockASwap(),MassMinePickaxe(), TransmogrificationPotion(), KillMonsterGroupPotion(),  KillMonsterPotion(), Dynamite(), GreaterHealingPotion()]
-            abilities = droppingRandom(numberOfElements: 2, from: temp)
-        case .boss, .tutorial1, .tutorial2:
-            fatalError("Boss level not implemented yet")
-        }
-        
-        return abilities.map { AnyAbility($0) }
-    }
 }

@@ -41,17 +41,11 @@
 		3D58468A22A6325300EDD845 /* CarryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D58468922A6325300EDD845 /* CarryModel.swift */; };
 		3D58468C22A632F100EDD845 /* AttackModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D58468B22A632F100EDD845 /* AttackModel.swift */; };
 		3D5FB09420AE768700ACD716 /* AnimationSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D5FB09320AE768700ACD716 /* AnimationSettings.swift */; };
-		3D6279C523ACA3DF0048EB76 /* RockASwap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D6279C423ACA3DF0048EB76 /* RockASwap.swift */; };
-		3D6279C723ACA8350048EB76 /* Dynamite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D6279C623ACA8350048EB76 /* Dynamite.swift */; };
-		3D6279C923ACA8A00048EB76 /* LesserHealingPotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D6279C823ACA8A00048EB76 /* LesserHealingPotion.swift */; };
-		3D6279CB23ACA90E0048EB76 /* GreaterHealingPoition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D6279CA23ACA90E0048EB76 /* GreaterHealingPoition.swift */; };
-		3D6279CD23AD39950048EB76 /* SwordPickAxe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D6279CC23AD39950048EB76 /* SwordPickAxe.swift */; };
 		3D6279D423AD56870048EB76 /* TutorialSelectionScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D6279D323AD56870048EB76 /* TutorialSelectionScene.swift */; };
 		3D635E8F22E20CDA0090C99C /* AnimationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D635E8E22E20CDA0090C99C /* AnimationModel.swift */; };
 		3D674C9122C9BFDB0003AEB4 /* UIColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D674C9022C9BFDB0003AEB4 /* UIColor+Extensions.swift */; };
 		3D674C9322C9D54C0003AEB4 /* MainMenu.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3D674C9222C9D54C0003AEB4 /* MainMenu.sks */; };
 		3D674C9522C9D6640003AEB4 /* MainMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D674C9422C9D6640003AEB4 /* MainMenu.swift */; };
-		3D68BF9622FF3D9000FC9B10 /* AbilityModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D68BF9522FF3D9000FC9B10 /* AbilityModel.swift */; };
 		3D6AACD8222A324D00C77B24 /* CGRect+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D6AACD7222A324D00C77B24 /* CGRect+Extensions.swift */; };
 		3D6AACE1222C997800C77B24 /* Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D6AACE0222C997800C77B24 /* Header.swift */; };
 		3D6AACE4222CD38E00C77B24 /* Controls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D6AACE3222CD38E00C77B24 /* Controls.swift */; };
@@ -69,8 +63,6 @@
 		3DA0087D21E6D1960017D8DA /* TileCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DA0087C21E6D1960017D8DA /* TileCreator.swift */; };
 		3DA0A37822FFA6250041EF34 /* StoreItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DA0A37722FFA6250041EF34 /* StoreItem.swift */; };
 		3DA0A37A22FFAECE0041EF34 /* UIFont+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DA0A37922FFAECE0041EF34 /* UIFont+Extensions.swift */; };
-		3DA0A37D2300CDFC0041EF34 /* DoubleAttack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DA0A37C2300CDFC0041EF34 /* DoubleAttack.swift */; };
-		3DA0A37F2300CE3B0041EF34 /* ShieldEast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DA0A37E2300CE3B0041EF34 /* ShieldEast.swift */; };
 		3DA0A384230455B90041EF34 /* CGPoint+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DA0A383230455B90041EF34 /* CGPoint+Extension.swift */; };
 		3DA0A386230457580041EF34 /* SKLabelNode+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DA0A385230457580041EF34 /* SKLabelNode+Extension.swift */; };
 		3DA4E883228E5D2F006E90D1 /* SKSpriteNode+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DA4E882228E5D2F006E90D1 /* SKSpriteNode+Extensions.swift */; };
@@ -126,7 +118,6 @@
 		5802612F24AFB78B00D7CF20 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5802612E24AFB78B00D7CF20 /* GameKit.framework */; };
 		5802613224AFC23300D7CF20 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5802613124AFC23300D7CF20 /* CloudKit.framework */; };
 		58153460243993F400483481 /* LevelGoalTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5815345F243993F400483481 /* LevelGoalTracker.swift */; };
-		5819582D2432790700965108 /* MassMineAbility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5819582C2432790700965108 /* MassMineAbility.swift */; };
 		5819AB71242A5CA600498BB6 /* SpriteAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5819AB70242A5CA600498BB6 /* SpriteAction.swift */; };
 		5819AB73242A668400498BB6 /* SwipeTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5819AB72242A668400498BB6 /* SwipeTypes.swift */; };
 		582635DD243168B500A944B6 /* ButtonIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 582635DC243168B500A944B6 /* ButtonIdentifier.swift */; };
@@ -140,23 +131,14 @@
 		583FC00C2467A7A4002E354E /* StagingSelectedOfferView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 583FC00B2467A7A4002E354E /* StagingSelectedOfferView.swift */; };
 		5843F4542426747100C03612 /* RotatePreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5843F4532426747100C03612 /* RotatePreviewView.swift */; };
 		5853CD552463206500B5D89A /* RuneModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5853CD542463206500B5D89A /* RuneModel.swift */; };
-		585AAAA9245BB9F20029FDD0 /* TransformRock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585AAAA8245BB9F20029FDD0 /* TransformRock.swift */; };
-		585EF8052431855800E87FCB /* KillMonsterGroupPotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585EF8042431855800E87FCB /* KillMonsterGroupPotion.swift */; };
-		585EF80724318B5800E87FCB /* GreatestHealingPotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585EF80624318B5800E87FCB /* GreatestHealingPotion.swift */; };
-		585EF8092431ACEF00E87FCB /* FreeLesserHealingPotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585EF8082431ACEF00E87FCB /* FreeLesserHealingPotion.swift */; };
-		585EF80B2431AD2400E87FCB /* FreeKillMonsterPotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585EF80A2431AD2400E87FCB /* FreeKillMonsterPotion.swift */; };
-		585EF80D2431AD3800E87FCB /* FreeDynamite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585EF80C2431AD3800E87FCB /* FreeDynamite.swift */; };
 		586319C224C1FF890090CD6D /* newProfile.json in Resources */ = {isa = PBXBuildFile; fileRef = 586319C124C1FF890090CD6D /* newProfile.json */; };
 		5865D62E23DBF652007D11FC /* abilities.json in Sources */ = {isa = PBXBuildFile; fileRef = 5865D62D23DBF652007D11FC /* abilities.json */; };
-		5866B3D8244CFEE800DF36E0 /* FreeRainEmbers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5866B3D7244CFEE800DF36E0 /* FreeRainEmbers.swift */; };
 		5866B3DA244D2A4600DF36E0 /* GoalTracking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5866B3D9244D2A4600DF36E0 /* GoalTracking.swift */; };
 		5866B3DC244D2D2300DF36E0 /* RuneDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5866B3DB244D2D2300DF36E0 /* RuneDetailView.swift */; };
 		5867A591242B0CD1005BFD10 /* TileDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5867A590242B0CD1005BFD10 /* TileDetailView.swift */; };
 		586AE77723CF91AA00302347 /* AttackModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 586AE77623CF91AA00302347 /* AttackModelTests.swift */; };
-		587C80A2245B3D3800997110 /* FreeGetSwifty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 587C80A1245B3D3800997110 /* FreeGetSwifty.swift */; };
 		5881DBF4244FEE440053A690 /* RuneSlotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5881DBF3244FEE440053A690 /* RuneSlotView.swift */; };
 		5881DBF6244FEE630053A690 /* RuneSlotViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5881DBF5244FEE630053A690 /* RuneSlotViewModel.swift */; };
-		5882602123DB809300A77BE8 /* EmptyAbility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5882602023DB809300A77BE8 /* EmptyAbility.swift */; };
 		5893899B245E0D6A00350A2E /* StoreHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5893899A245E0D6A00350A2E /* StoreHUD.swift */; };
 		5893899D245E7AB300350A2E /* CurrencyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5893899C245E7AB300350A2E /* CurrencyView.swift */; };
 		5893899F245E7D0E00350A2E /* StoreOffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5893899E245E7D0E00350A2E /* StoreOffer.swift */; };
@@ -169,6 +151,8 @@
 		5894A44C24C36B4600FBF839 /* Publishers+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5894A44B24C36B4600FBF839 /* Publishers+Extensions.swift */; };
 		5894A44E24C379C800FBF839 /* LoadingScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 5894A44D24C379C800FBF839 /* LoadingScene.sks */; };
 		5894A45024C37A1100FBF839 /* LoadingScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5894A44F24C37A1100FBF839 /* LoadingScene.swift */; };
+		5894A45424C5FFCD00FBF839 /* AbilityModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5894A45324C5FFCD00FBF839 /* AbilityModel.swift */; };
+		5894A45824C6048B00FBF839 /* CurrencyModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5894A45724C6048B00FBF839 /* CurrencyModel.swift */; };
 		5894B176245FD68A003B86F1 /* StagingSelectionAreaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5894B175245FD68A003B86F1 /* StagingSelectionAreaView.swift */; };
 		5894B178245FE61B003B86F1 /* StoreHUDViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5894B177245FE61B003B86F1 /* StoreHUDViewModel.swift */; };
 		5894B17A24607422003B86F1 /* EffectModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5894B17924607422003B86F1 /* EffectModel.swift */; };
@@ -181,8 +165,6 @@
 		58AD4883243581FC00F90A87 /* RandomTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4A470C23B3CEFC000165FB /* RandomTests.swift */; };
 		58AD9282243C283300B5B1EC /* LevelGoalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58AD9281243C283300B5B1EC /* LevelGoalView.swift */; };
 		58B39BD723D21C9600915858 /* BackpackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58B39BD623D21C9600915858 /* BackpackView.swift */; };
-		58C1AE4A23D19CEE003B5B5A /* TransmogrificationPotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C1AE4923D19CEE003B5B5A /* TransmogrificationPotion.swift */; };
-		58C1AE4C23D19E03003B5B5A /* KillMonsterPotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C1AE4B23D19E03003B5B5A /* KillMonsterPotion.swift */; };
 		58C9735124969CA100288133 /* ProfileSaving.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C9735024969CA100288133 /* ProfileSaving.swift */; };
 		58DCC9842451FBC700DC7AD8 /* RuneContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58DCC9832451FBC700DC7AD8 /* RuneContainerView.swift */; };
 		58F034C32408B7CF00BE1863 /* BossController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F034C22408B7CF00BE1863 /* BossController.swift */; };
@@ -234,17 +216,11 @@
 		3D58468922A6325300EDD845 /* CarryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarryModel.swift; sourceTree = "<group>"; };
 		3D58468B22A632F100EDD845 /* AttackModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttackModel.swift; sourceTree = "<group>"; };
 		3D5FB09320AE768700ACD716 /* AnimationSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationSettings.swift; sourceTree = "<group>"; };
-		3D6279C423ACA3DF0048EB76 /* RockASwap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RockASwap.swift; sourceTree = "<group>"; };
-		3D6279C623ACA8350048EB76 /* Dynamite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dynamite.swift; sourceTree = "<group>"; };
-		3D6279C823ACA8A00048EB76 /* LesserHealingPotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LesserHealingPotion.swift; sourceTree = "<group>"; };
-		3D6279CA23ACA90E0048EB76 /* GreaterHealingPoition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GreaterHealingPoition.swift; sourceTree = "<group>"; };
-		3D6279CC23AD39950048EB76 /* SwordPickAxe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwordPickAxe.swift; sourceTree = "<group>"; };
 		3D6279D323AD56870048EB76 /* TutorialSelectionScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialSelectionScene.swift; sourceTree = "<group>"; };
 		3D635E8E22E20CDA0090C99C /* AnimationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationModel.swift; sourceTree = "<group>"; };
 		3D674C9022C9BFDB0003AEB4 /* UIColor+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extensions.swift"; sourceTree = "<group>"; };
 		3D674C9222C9D54C0003AEB4 /* MainMenu.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = MainMenu.sks; sourceTree = "<group>"; };
 		3D674C9422C9D6640003AEB4 /* MainMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenu.swift; sourceTree = "<group>"; };
-		3D68BF9522FF3D9000FC9B10 /* AbilityModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AbilityModel.swift; sourceTree = "<group>"; };
 		3D6AACD7222A324D00C77B24 /* CGRect+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGRect+Extensions.swift"; sourceTree = "<group>"; };
 		3D6AACE0222C997800C77B24 /* Header.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Header.swift; sourceTree = "<group>"; };
 		3D6AACE3222CD38E00C77B24 /* Controls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Controls.swift; sourceTree = "<group>"; };
@@ -262,8 +238,6 @@
 		3DA0087C21E6D1960017D8DA /* TileCreator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileCreator.swift; sourceTree = "<group>"; };
 		3DA0A37722FFA6250041EF34 /* StoreItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreItem.swift; sourceTree = "<group>"; };
 		3DA0A37922FFAECE0041EF34 /* UIFont+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIFont+Extensions.swift"; sourceTree = "<group>"; };
-		3DA0A37C2300CDFC0041EF34 /* DoubleAttack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoubleAttack.swift; sourceTree = "<group>"; };
-		3DA0A37E2300CE3B0041EF34 /* ShieldEast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShieldEast.swift; sourceTree = "<group>"; };
 		3DA0A383230455B90041EF34 /* CGPoint+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGPoint+Extension.swift"; sourceTree = "<group>"; };
 		3DA0A385230457580041EF34 /* SKLabelNode+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SKLabelNode+Extension.swift"; sourceTree = "<group>"; };
 		3DA4E882228E5D2F006E90D1 /* SKSpriteNode+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SKSpriteNode+Extensions.swift"; sourceTree = "<group>"; };
@@ -323,7 +297,6 @@
 		5802613024AFC1BE00D7CF20 /* Shift Shaft.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Shift Shaft.entitlements"; sourceTree = "<group>"; };
 		5802613124AFC23300D7CF20 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		5815345F243993F400483481 /* LevelGoalTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelGoalTracker.swift; sourceTree = "<group>"; };
-		5819582C2432790700965108 /* MassMineAbility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MassMineAbility.swift; sourceTree = "<group>"; };
 		5819AB70242A5CA600498BB6 /* SpriteAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteAction.swift; sourceTree = "<group>"; };
 		5819AB72242A668400498BB6 /* SwipeTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeTypes.swift; sourceTree = "<group>"; };
 		582635DC243168B500A944B6 /* ButtonIdentifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonIdentifier.swift; sourceTree = "<group>"; };
@@ -337,23 +310,14 @@
 		583FC00B2467A7A4002E354E /* StagingSelectedOfferView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StagingSelectedOfferView.swift; sourceTree = "<group>"; };
 		5843F4532426747100C03612 /* RotatePreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RotatePreviewView.swift; sourceTree = "<group>"; };
 		5853CD542463206500B5D89A /* RuneModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneModel.swift; sourceTree = "<group>"; };
-		585AAAA8245BB9F20029FDD0 /* TransformRock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransformRock.swift; sourceTree = "<group>"; };
-		585EF8042431855800E87FCB /* KillMonsterGroupPotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KillMonsterGroupPotion.swift; sourceTree = "<group>"; };
-		585EF80624318B5800E87FCB /* GreatestHealingPotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GreatestHealingPotion.swift; sourceTree = "<group>"; };
-		585EF8082431ACEF00E87FCB /* FreeLesserHealingPotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeLesserHealingPotion.swift; sourceTree = "<group>"; };
-		585EF80A2431AD2400E87FCB /* FreeKillMonsterPotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeKillMonsterPotion.swift; sourceTree = "<group>"; };
-		585EF80C2431AD3800E87FCB /* FreeDynamite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeDynamite.swift; sourceTree = "<group>"; };
 		586319C124C1FF890090CD6D /* newProfile.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = newProfile.json; sourceTree = "<group>"; };
 		5865D62D23DBF652007D11FC /* abilities.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = abilities.json; sourceTree = "<group>"; };
-		5866B3D7244CFEE800DF36E0 /* FreeRainEmbers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeRainEmbers.swift; sourceTree = "<group>"; };
 		5866B3D9244D2A4600DF36E0 /* GoalTracking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalTracking.swift; sourceTree = "<group>"; };
 		5866B3DB244D2D2300DF36E0 /* RuneDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneDetailView.swift; sourceTree = "<group>"; };
 		5867A590242B0CD1005BFD10 /* TileDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileDetailView.swift; sourceTree = "<group>"; };
 		586AE77623CF91AA00302347 /* AttackModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttackModelTests.swift; sourceTree = "<group>"; };
-		587C80A1245B3D3800997110 /* FreeGetSwifty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeGetSwifty.swift; sourceTree = "<group>"; };
 		5881DBF3244FEE440053A690 /* RuneSlotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneSlotView.swift; sourceTree = "<group>"; };
 		5881DBF5244FEE630053A690 /* RuneSlotViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneSlotViewModel.swift; sourceTree = "<group>"; };
-		5882602023DB809300A77BE8 /* EmptyAbility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyAbility.swift; sourceTree = "<group>"; };
 		5893899A245E0D6A00350A2E /* StoreHUD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreHUD.swift; sourceTree = "<group>"; };
 		5893899C245E7AB300350A2E /* CurrencyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyView.swift; sourceTree = "<group>"; };
 		5893899E245E7D0E00350A2E /* StoreOffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreOffer.swift; sourceTree = "<group>"; };
@@ -366,6 +330,8 @@
 		5894A44B24C36B4600FBF839 /* Publishers+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Publishers+Extensions.swift"; sourceTree = "<group>"; };
 		5894A44D24C379C800FBF839 /* LoadingScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = LoadingScene.sks; sourceTree = "<group>"; };
 		5894A44F24C37A1100FBF839 /* LoadingScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingScene.swift; sourceTree = "<group>"; };
+		5894A45324C5FFCD00FBF839 /* AbilityModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AbilityModel.swift; sourceTree = "<group>"; };
+		5894A45724C6048B00FBF839 /* CurrencyModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyModel.swift; sourceTree = "<group>"; };
 		5894B175245FD68A003B86F1 /* StagingSelectionAreaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StagingSelectionAreaView.swift; sourceTree = "<group>"; };
 		5894B177245FE61B003B86F1 /* StoreHUDViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreHUDViewModel.swift; sourceTree = "<group>"; };
 		5894B17924607422003B86F1 /* EffectModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EffectModel.swift; sourceTree = "<group>"; };
@@ -377,8 +343,6 @@
 		58A51662241DF3E2009E84E1 /* TargetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetView.swift; sourceTree = "<group>"; };
 		58AD9281243C283300B5B1EC /* LevelGoalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelGoalView.swift; sourceTree = "<group>"; };
 		58B39BD623D21C9600915858 /* BackpackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackpackView.swift; sourceTree = "<group>"; };
-		58C1AE4923D19CEE003B5B5A /* TransmogrificationPotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransmogrificationPotion.swift; sourceTree = "<group>"; };
-		58C1AE4B23D19E03003B5B5A /* KillMonsterPotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KillMonsterPotion.swift; sourceTree = "<group>"; };
 		58C9735024969CA100288133 /* ProfileSaving.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSaving.swift; sourceTree = "<group>"; };
 		58DCC9832451FBC700DC7AD8 /* RuneContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneContainerView.swift; sourceTree = "<group>"; };
 		58F034C22408B7CF00BE1863 /* BossController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BossController.swift; sourceTree = "<group>"; };
@@ -586,25 +550,6 @@
 		3DA0A37B2300CDEB0041EF34 /* Items */ = {
 			isa = PBXGroup;
 			children = (
-				3DA0A37C2300CDFC0041EF34 /* DoubleAttack.swift */,
-				5882602023DB809300A77BE8 /* EmptyAbility.swift */,
-				3D6279CC23AD39950048EB76 /* SwordPickAxe.swift */,
-				3D6279C423ACA3DF0048EB76 /* RockASwap.swift */,
-				3D6279C623ACA8350048EB76 /* Dynamite.swift */,
-				585EF80C2431AD3800E87FCB /* FreeDynamite.swift */,
-				5866B3D7244CFEE800DF36E0 /* FreeRainEmbers.swift */,
-				587C80A1245B3D3800997110 /* FreeGetSwifty.swift */,
-				585AAAA8245BB9F20029FDD0 /* TransformRock.swift */,
-				3DA0A37E2300CE3B0041EF34 /* ShieldEast.swift */,
-				3D6279CA23ACA90E0048EB76 /* GreaterHealingPoition.swift */,
-				585EF80624318B5800E87FCB /* GreatestHealingPotion.swift */,
-				585EF8082431ACEF00E87FCB /* FreeLesserHealingPotion.swift */,
-				3D6279C823ACA8A00048EB76 /* LesserHealingPotion.swift */,
-				58C1AE4923D19CEE003B5B5A /* TransmogrificationPotion.swift */,
-				58C1AE4B23D19E03003B5B5A /* KillMonsterPotion.swift */,
-				585EF80A2431AD2400E87FCB /* FreeKillMonsterPotion.swift */,
-				585EF8042431855800E87FCB /* KillMonsterGroupPotion.swift */,
-				5819582C2432790700965108 /* MassMineAbility.swift */,
 			);
 			path = Items;
 			sourceTree = "<group>";
@@ -809,6 +754,8 @@
 				3DA0A37B2300CDEB0041EF34 /* Items */,
 				3D58468722A6322900EDD845 /* RangeModel.swift */,
 				58A4B91C2472E5620011624A /* ChanceModel.swift */,
+				5894A45324C5FFCD00FBF839 /* AbilityModel.swift */,
+				5894A45724C6048B00FBF839 /* CurrencyModel.swift */,
 				5819AB70242A5CA600498BB6 /* SpriteAction.swift */,
 				3D58468B22A632F100EDD845 /* AttackModel.swift */,
 				3D58468922A6325300EDD845 /* CarryModel.swift */,
@@ -824,7 +771,6 @@
 				5605D6D221CC2DF400C1C5C2 /* DFTileSpriteNode.swift */,
 				3D2C757222C85362009ABD36 /* Direction.swift */,
 				3D2C757422C854F8009ABD36 /* ItemModel.swift */,
-				3D68BF9522FF3D9000FC9B10 /* AbilityModel.swift */,
 				5853CD542463206500B5D89A /* RuneModel.swift */,
 			);
 			path = Models;
@@ -1058,7 +1004,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				3DD72595239DC4FE005933B2 /* MenuType.swift in Sources */,
-				5866B3D8244CFEE800DF36E0 /* FreeRainEmbers.swift in Sources */,
 				5894B17A24607422003B86F1 /* EffectModel.swift in Sources */,
 				3D4F569422B33B44003695D8 /* Helpers.swift in Sources */,
 				3DF2925420A37FEE006671AC /* GameScene.swift in Sources */,
@@ -1068,9 +1013,7 @@
 				3D06390B22EEB56100C4D5E9 /* AnimatingState.swift in Sources */,
 				3DEF7FF3237DB8B90070FB3D /* InputType.swift in Sources */,
 				3D5FB09420AE768700ACD716 /* AnimationSettings.swift in Sources */,
-				3D6279C923ACA8A00048EB76 /* LesserHealingPotion.swift in Sources */,
 				58AD9282243C283300B5B1EC /* LevelGoalView.swift in Sources */,
-				3D68BF9622FF3D9000FC9B10 /* AbilityModel.swift in Sources */,
 				3DF2925620A37FEE006671AC /* GameViewController.swift in Sources */,
 				3D7EF45C21D18D9000A2D9E8 /* Transformation.swift in Sources */,
 				3D6AACE4222CD38E00C77B24 /* Controls.swift in Sources */,
@@ -1086,13 +1029,13 @@
 				3D7D8B37225422440016FE4C /* TilesHelper.swift in Sources */,
 				5866B3DA244D2A4600DF36E0 /* GoalTracking.swift in Sources */,
 				582635DD243168B500A944B6 /* ButtonIdentifier.swift in Sources */,
-				58C1AE4A23D19CEE003B5B5A /* TransmogrificationPotion.swift in Sources */,
 				5894B176245FD68A003B86F1 /* StagingSelectionAreaView.swift in Sources */,
 				58C9735124969CA100288133 /* ProfileSaving.swift in Sources */,
 				3DAFBD3721B8E6E7009B116A /* InputQueue.swift in Sources */,
 				582CF3EC2442391900AA2A95 /* FillableBar.swift in Sources */,
 				3DC072BB2373AF510046F224 /* SwipeRecognizerView.swift in Sources */,
 				5605D6D321CC2DF400C1C5C2 /* DFTileSpriteNode.swift in Sources */,
+				5894A45824C6048B00FBF839 /* CurrencyModel.swift in Sources */,
 				5894A44C24C36B4600FBF839 /* Publishers+Extensions.swift in Sources */,
 				589A27D123D90CD900174DE7 /* TargetingState.swift in Sources */,
 				3DA0A384230455B90041EF34 /* CGPoint+Extension.swift in Sources */,
@@ -1105,7 +1048,6 @@
 				3D06390522EEB52300C4D5E9 /* LoseState.swift in Sources */,
 				5894A45024C37A1100FBF839 /* LoadingScene.swift in Sources */,
 				3D30A42B2217F63500AFA1E1 /* TileCoord.swift in Sources */,
-				585EF80724318B5800E87FCB /* GreatestHealingPotion.swift in Sources */,
 				3D58468C22A632F100EDD845 /* AttackModel.swift in Sources */,
 				3D06390922EEB54E00C4D5E9 /* ReffingState.swift in Sources */,
 				5843F4542426747100C03612 /* RotatePreviewView.swift in Sources */,
@@ -1113,7 +1055,6 @@
 				58F034C32408B7CF00BE1863 /* BossController.swift in Sources */,
 				3D635E8F22E20CDA0090C99C /* AnimationModel.swift in Sources */,
 				3DE87C94223D691100D750CF /* GameState.swift in Sources */,
-				585EF80D2431AD3800E87FCB /* FreeDynamite.swift in Sources */,
 				3D674C9122C9BFDB0003AEB4 /* UIColor+Extensions.swift in Sources */,
 				3DA4E883228E5D2F006E90D1 /* SKSpriteNode+Extensions.swift in Sources */,
 				589A27D423D90FE000174DE7 /* TargetingViewModel.swift in Sources */,
@@ -1125,14 +1066,11 @@
 				3D14C82123A83D93003E211D /* LevelCoordinator.swift in Sources */,
 				3D4A471123B3D34F000165FB /* LevelModel.swift in Sources */,
 				5881DBF6244FEE630053A690 /* RuneSlotViewModel.swift in Sources */,
-				3DA0A37F2300CE3B0041EF34 /* ShieldEast.swift in Sources */,
 				3D106098232E9A0200ECE7E6 /* Animator.swift in Sources */,
 				5894A44A24C36AFA00FBF839 /* GKLocalPlayer+Extensions.swift in Sources */,
 				3DF2924E20A37FEE006671AC /* AppDelegate.swift in Sources */,
-				585EF8092431ACEF00E87FCB /* FreeLesserHealingPotion.swift in Sources */,
 				3D10609B233DD05500ECE7E6 /* TurnWatcher.swift in Sources */,
 				3D06390122EEB4FB00C4D5E9 /* PauseState.swift in Sources */,
-				585EF80B2431AD2400E87FCB /* FreeKillMonsterPotion.swift in Sources */,
 				3D58468A22A6325300EDD845 /* CarryModel.swift in Sources */,
 				5819AB71242A5CA600498BB6 /* SpriteAction.swift in Sources */,
 				582CF3F224425CC000AA2A95 /* CGFloat+Extensions.swift in Sources */,
@@ -1141,7 +1079,6 @@
 				3DC072C6237545400046F224 /* Rule.swift in Sources */,
 				3D6279D423AD56870048EB76 /* TutorialSelectionScene.swift in Sources */,
 				589389A5245F52BB00350A2E /* ParagraphNode+Extensions.swift in Sources */,
-				5819582D2432790700965108 /* MassMineAbility.swift in Sources */,
 				3DE87C8E2235D05300D750CF /* MenuSpriteNode.swift in Sources */,
 				3D6AACE1222C997800C77B24 /* Header.swift in Sources */,
 				3DC072C42375452D0046F224 /* Rulebook.swift in Sources */,
@@ -1154,16 +1091,13 @@
 				3DD7258F239DC151005933B2 /* GameSceneDelegate.swift in Sources */,
 				589389A7245FA6E200350A2E /* StagingTierView.swift in Sources */,
 				3D90AAD321D8869200C7428A /* Referee.swift in Sources */,
-				3DA0A37D2300CDFC0041EF34 /* DoubleAttack.swift in Sources */,
 				5893899B245E0D6A00350A2E /* StoreHUD.swift in Sources */,
-				585EF8052431855800E87FCB /* KillMonsterGroupPotion.swift in Sources */,
+				5894A45424C5FFCD00FBF839 /* AbilityModel.swift in Sources */,
 				3DC072B72373AA710046F224 /* TutorialScene.swift in Sources */,
-				3D6279C523ACA3DF0048EB76 /* RockASwap.swift in Sources */,
 				3DC072BD23747F6B0046F224 /* CGSize+Extension.swift in Sources */,
 				3D9C506021FE206000A2210D /* Renderer.swift in Sources */,
 				3DA4E88F228FC860006E90D1 /* SKNode+Extension.swift in Sources */,
 				5893899D245E7AB300350A2E /* CurrencyView.swift in Sources */,
-				585AAAA9245BB9F20029FDD0 /* TransformRock.swift in Sources */,
 				589389A3245F4C9B00350A2E /* PickaxeView.swift in Sources */,
 				3DF0A6B02379C4DC00941305 /* ParagraphNode.swift in Sources */,
 				5866B3DC244D2D2300DF36E0 /* RuneDetailView.swift in Sources */,
@@ -1175,8 +1109,6 @@
 				5867A591242B0CD1005BFD10 /* TileDetailView.swift in Sources */,
 				3D7D8B332253E5BC0016FE4C /* HUD.swift in Sources */,
 				582CF3F02442553000AA2A95 /* FillableCircle.swift in Sources */,
-				3D6279C723ACA8350048EB76 /* Dynamite.swift in Sources */,
-				3D6279CB23ACA90E0048EB76 /* GreaterHealingPoition.swift in Sources */,
 				3D4A470F23B3D33B000165FB /* LevelType.swift in Sources */,
 				3DD5AA0D2398025400FB63F4 /* Styling.swift in Sources */,
 				5893899F245E7D0E00350A2E /* StoreOffer.swift in Sources */,
@@ -1185,11 +1117,9 @@
 				5853CD552463206500B5D89A /* RuneModel.swift in Sources */,
 				3D2C757522C854F8009ABD36 /* ItemModel.swift in Sources */,
 				3D18A39D224D68D300343C29 /* Dispatch.swift in Sources */,
-				3D6279CD23AD39950048EB76 /* SwordPickAxe.swift in Sources */,
 				589389A1245F4BFA00350A2E /* StagingAreaView.swift in Sources */,
 				3DD72591239DC37B005933B2 /* SKView+Extensions.swift in Sources */,
 				3D7D8B2D2252857E0016FE4C /* CombatSimulator.swift in Sources */,
-				587C80A2245B3D3800997110 /* FreeGetSwifty.swift in Sources */,
 				3DA4E8972290A88C006E90D1 /* EntityModel.swift in Sources */,
 				3DC072BF23748CF80046F224 /* TutorialTileCreator.swift in Sources */,
 				58946E3A2465BEC3003115D2 /* StoreMenuView.swift in Sources */,
@@ -1199,9 +1129,7 @@
 				58A4B91D2472E5620011624A /* ChanceModel.swift in Sources */,
 				5881DBF4244FEE440053A690 /* RuneSlotView.swift in Sources */,
 				58383643242D7A6E004CA026 /* Array+Extensions.swift in Sources */,
-				58C1AE4C23D19E03003B5B5A /* KillMonsterPotion.swift in Sources */,
 				3DA4E88D228FC7FC006E90D1 /* Label.swift in Sources */,
-				5882602123DB809300A77BE8 /* EmptyAbility.swift in Sources */,
 				3D7D8B352253F9850016FE4C /* HelperTextView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

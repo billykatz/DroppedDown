@@ -10,7 +10,6 @@ import SpriteKit
 
 protocol MainMenuDelegate: class {
     func newGame(_ difficulty: Difficulty, _ playerModel: EntityModel?, level: LevelType)
-    func didSelectStartTutorial(_ playerModel: EntityModel?)
 }
 
 class MainMenu: SKScene {
@@ -428,8 +427,6 @@ extension MainMenu: ButtonDelegate {
             mainMenuDelegate?.newGame(GameScope.shared.difficulty,
                                       playerModel.previewAppliedEffects().healFull(),
                                       level: LevelType.gameCases[levelTypeIndex])
-        case .startTutorial:
-            mainMenuDelegate?.didSelectStartTutorial(playerModel)
         case .cycleLevel:
             if levelTypeIndex + 1 == LevelType.gameCases.count {
                 levelTypeIndex = 0

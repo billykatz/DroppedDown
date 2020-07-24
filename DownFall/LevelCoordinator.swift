@@ -10,102 +10,78 @@ import UIKit
 import SpriteKit
 import GameplayKit
 
-protocol LevelCoordinating: StoreSceneDelegate, GameSceneCoordinatingDelegate, MainMenuDelegate {
+protocol LevelCoordinating: StoreSceneDelegate, GameSceneCoordinatingDelegate {
     var gameSceneNode: GameScene? { get set }
-    var tutorialSceneNode: TutorialScene? { get set }
     var entities: EntitiesModel? { get set }
-    var levels: [Level]? { get set }
     var levelIndex: Int { get set }
     var randomSource: GKLinearCongruentialRandomSource? { get }
+    var delegate: MenuCoordinating? { get set }
     
     func presentStore(_ playerData: EntityModel)
     func presentNextLevel(_ playerData: EntityModel?)
-    func levelSelect(_ updatedPlayerData: EntityModel)
-    func startGame(player playerData: EntityModel, difficulty: Difficulty, level: LevelType)
+    func startGame(profile: Profile)
 }
 
-extension LevelCoordinating where Self: UIViewController {
+class LevelCoordinator: LevelCoordinating {
     
-    var currentLevel: Level {
-        guard let levels = levels else { fatalError("No levels") }
-        return levels[levelIndex]
+    weak var delegate: MenuCoordinating?
+    var gameSceneNode: GameScene?
+    var entities: EntitiesModel?
+    var levelIndex: Int = 0
+    let view: SKView
+    var randomSource: GKLinearCongruentialRandomSource?
+    
+    init(gameSceneNode: GameScene, entities: EntitiesModel, levelIndex: Int, view: SKView, randomSource: GKLinearCongruentialRandomSource) {
+        self.gameSceneNode = gameSceneNode
+        self.entities = entities
+        self.levelIndex = levelIndex
+        self.view = view
+        self.randomSource = randomSource
     }
     
     func presentStore(_ playerData: EntityModel) {
-        if let view = self.view as? SKView {
-            view.presentScene(nil)
-            let storeScene = StoreScene(size: .universalSize,
-                                        playerData: playerData,
-                                        level: currentLevel,
-                                        viewModel: StoreSceneViewModel(offers: currentLevel.storeOffering, goalTracking: currentLevel.goalProgress))
-            storeScene.scaleMode = .aspectFill
-            storeScene.storeSceneDelegate = self
-            view.presentScene(storeScene)
-        }
+        view.presentScene(nil)
+        let currentLevel = LevelConstructor.buildLevel(depth: levelIndex)
+        let storeScene = StoreScene(size: .universalSize,
+                                    playerData: playerData,
+                                    level: currentLevel,
+                                    viewModel: StoreSceneViewModel(offers: currentLevel.storeOffering, goalTracking: currentLevel.goalProgress))
+        storeScene.scaleMode = .aspectFill
+        storeScene.storeSceneDelegate = self
+        view.presentScene(storeScene)
     }
     
     func presentNextLevel(_ playerData: EntityModel?) {
-        switch currentLevel.type {
-        case .tutorial2, .tutorial1:
-            tutorialSceneNode?.prepareForReuse()
-            if let scene = GKScene(fileNamed: "TutorialScene")?.rootNode as? TutorialScene,
-                let entities = entities,
-                let level = levels?[levelIndex] {
-                tutorialSceneNode = scene
-                tutorialSceneNode!.gameSceneDelegate = self
-                tutorialSceneNode!.scaleMode = .aspectFill
-                tutorialSceneNode!.commonInit(boardSize: level.boardSize,
-                                              entities: entities,
-                                              difficulty: GameScope.shared.difficulty,
-                                              updatedEntity: playerData,
-                                              level: level)
+        gameSceneNode?.prepareForReuse()
+        if let scene = GKScene(fileNamed: "GameScene")?.rootNode as? GameScene,
+            let entities = entities {
+            let level = LevelConstructor.buildLevel(depth: levelIndex)
+            gameSceneNode = scene
+            gameSceneNode!.scaleMode = .aspectFill
+            gameSceneNode!.gameSceneDelegate = self
+            gameSceneNode!.commonInit(boardSize: level.boardSize,
+                                      entities: entities,
+                                      difficulty: GameScope.shared.difficulty,
+                                      updatedEntity: playerData,
+                                      level: level,
+                                      randomSource: randomSource)
+            
+            view.presentScene(gameSceneNode)
+            view.ignoresSiblingOrder = true
+            
+            //Debug settings
+            #if DEBUG
+            view.showsFPS = true
+            view.showsNodeCount = true
+            #endif
                 
-                if let view = self.view as! SKView? {
-                    view.presentScene(tutorialSceneNode)
-                    view.ignoresSiblingOrder = true
-                    
-                    #if DEBUG
-                    view.showsFPS = true
-                    view.showsNodeCount = true
-                    #endif
-                }
-            }
-        case .first, .second, .third, .fourth, .fifth, .sixth, .seventh, .boss:
-            gameSceneNode?.prepareForReuse()
-            if let scene = GKScene(fileNamed: "GameScene")?.rootNode as? GameScene,
-                let entities = entities,
-                let level = levels?[levelIndex] {
-                gameSceneNode = scene
-                gameSceneNode!.scaleMode = .aspectFill
-                gameSceneNode!.gameSceneDelegate = self
-                gameSceneNode!.commonInit(boardSize: level.boardSize,
-                                          entities: entities,
-                                          difficulty: GameScope.shared.difficulty,
-                                          updatedEntity: playerData,
-                                          level: level,
-                                          randomSource: randomSource)
-                
-                if let view = self.view as! SKView? {
-                    view.presentScene(gameSceneNode)
-                    view.ignoresSiblingOrder = true
-                    
-                    //Debug settings
-                    #if DEBUG
-                    view.showsFPS = true
-                    view.showsNodeCount = true
-                    #endif
-                    
-                }
-            }
         }
     }
     
-    func startGame(player: EntityModel, difficulty: Difficulty, level: LevelType) {
-        let index = LevelType.gameCases.firstIndex(of: level) ?? 0
-        levelIndex = index
-        levels = LevelConstructor.buildLevels(difficulty, randomSource: randomSource ?? GKLinearCongruentialRandomSource())
-        
+    /// Kicks off the process of starting a new game
+    func startGame(profile: Profile) {
         /// Present the store to give the player the option to take a Rune
+        let player = profile.player
         presentStore(player)
     }
     
@@ -113,10 +89,8 @@ extension LevelCoordinating where Self: UIViewController {
     // MARK: - StoreSceneDelegate
     
     func leave(_ storeScene: StoreScene, updatedPlayerData: EntityModel) {
-        if let view = self.view as? SKView {
-            view.presentScene(nil)
-            presentNextLevel(updatedPlayerData)
-        }
+        view.presentScene(nil)
+        presentNextLevel(updatedPlayerData)
     }
     
     // MARK: - GameSceneCoordinatingDelegate
@@ -125,7 +99,7 @@ extension LevelCoordinating where Self: UIViewController {
         let remove = SKAction.removeFromParent()
         scene.run(SKAction.group([fadeOut, remove])) { [weak self] in
             guard let self = self else { return }
-            self.levelSelect(playerData)
+            self.delegate?.levelSelect(playerData)
         }
 
     }
@@ -140,28 +114,26 @@ extension LevelCoordinating where Self: UIViewController {
     }
     
     func visitStore(_ playerData: EntityModel, _ goalTracking: [GoalTracking]) {
-        if let view = self.view as! SKView?, let levels = levels {
-            view.presentScene(nil)
-            gameSceneNode?.removeFromParent()
-            
-            
-            // Increment the level index before we visit the store
-            // there might/is be a better place to do this
-            levelIndex = min(levels.count - 1, levelIndex + 1)
-            
-            /// attached how many goals we completed so the store knows which offers to unlock
-            var level = levels[levelIndex]
-            level.goalProgress = goalTracking
-            
-            
-            let storeScene = StoreScene(size: .universalSize,
-                                        playerData: playerData,
-                                        level: level,
-                                        viewModel: StoreSceneViewModel(offers: levels[levelIndex].storeOffering, goalTracking: currentLevel.goalProgress))
-            storeScene.scaleMode = .aspectFill
-            storeScene.storeSceneDelegate = self
-            view.presentScene(storeScene)
-        }
+        view.presentScene(nil)
+        gameSceneNode?.removeFromParent()
+        
+        
+        // Increment the level index before we visit the store
+        // there might/is be a better place to do this
+        levelIndex = levelIndex + 1
+        
+        /// attached how many goals we completed so the store knows which offers to unlock
+        var level = LevelConstructor.buildLevel(depth: levelIndex)
+        level.goalProgress = goalTracking
+        
+        
+        let storeScene = StoreScene(size: .universalSize,
+                                    playerData: playerData,
+                                    level: level,
+                                    viewModel: StoreSceneViewModel(offers: level.storeOffering, goalTracking: level.goalProgress))
+        storeScene.scaleMode = .aspectFill
+        storeScene.storeSceneDelegate = self
+        view.presentScene(storeScene)
     }
 }
 

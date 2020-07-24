@@ -63,7 +63,6 @@ class GameScene: SKScene {
                            level: Level,
                            randomSource: GKLinearCongruentialRandomSource?) {
         // init our level
-        level.threatLevelController.reset()
         self.level = level
         Referee.injectLevel(level)
         

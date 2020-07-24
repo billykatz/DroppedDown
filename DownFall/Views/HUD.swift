@@ -67,9 +67,6 @@ class HUD: SKSpriteNode {
     
     var delegate: SettingsDelegate?
     var level: Level?
-    lazy var threatLevelController: ThreatLevelController = {
-        return self.level?.threatLevelController ?? ThreatLevelController()
-    }()
     
     private var threatIndicator: SKSpriteNode? {
         return nil

@@ -145,7 +145,7 @@ class TileCreator: TileStrategy {
     
     func goldDropped(from monster: EntityModel) -> Int {
         if let goldItem = monster.carry.items.first(where: { $0.type == .gold }) {
-            let medianAmount = goldItem.amount * (level?.goldMultiplier ?? 1)
+            let medianAmount = goldItem.amount
             return Int.random(lower: max(1, medianAmount-goldVariance), upper: medianAmount+goldVariance)
         }
         return 0

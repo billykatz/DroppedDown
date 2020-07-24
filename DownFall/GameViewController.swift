@@ -10,7 +10,7 @@ import UIKit
 import SpriteKit
 import GameplayKit
 
-class GameViewController: UIViewController, LevelCoordinating {
+class GameViewController: UIViewController {
     
     var randomSource: GKLinearCongruentialRandomSource?
 
@@ -21,11 +21,15 @@ class GameViewController: UIViewController, LevelCoordinating {
     internal var levels: [Level]?
     var loadingSceneNode: LoadingScene?
     
+    /// coordinators
+    var levelCoordinator: LevelCoordinating?
+    var menuCoordinator: MenuCoordinating?
+    
     public var profile: Profile? = nil {
         didSet {
             guard let profile = profile else { return }
             loadingSceneNode?.fadeOut {
-                self.levelSelect(profile.player)
+                self.menuCoordinator?.newGame(profile: profile)
             }
             
             
@@ -56,6 +60,12 @@ class GameViewController: UIViewController, LevelCoordinating {
         catch(let error) {
             fatalError("Crashing due to \(error) while trying to parse json entity file")
         }
+        
+        guard let gameScene = GKScene(fileNamed: "GameScene")?.rootNode as? GameScene, let entities = entities, let randomSource = randomSource else { fatalError() }
+        let levelCoordinator = LevelCoordinator.init(gameSceneNode: gameScene, entities: entities, levelIndex: 0, view: view as! SKView, randomSource: randomSource)
+        self.menuCoordinator = MenuCoordinator(levelCoordinator: levelCoordinator)
+        self.levelCoordinator = levelCoordinator
+        self.levelCoordinator?.delegate = menuCoordinator
     }
     
     override var shouldAutorotate: Bool {
@@ -73,46 +83,11 @@ class GameViewController: UIViewController, LevelCoordinating {
     override var prefersStatusBarHidden: Bool {
         return true
     }
-}
-
-extension GameViewController {
-    
-    func levelSelect(_ updatedPlayerData: EntityModel) {
-        
-        if let mainMenuScene = GKScene(fileNamed: Identifiers.mainMenuScene)?.rootNode as? MainMenu {
-            mainMenuScene.scaleMode = .aspectFill
-            mainMenuScene.mainMenuDelegate = self
-            mainMenuScene.playerModel = updatedPlayerData
-            
-            if let view = self.view as! SKView? {
-                view.presentScene(mainMenuScene)
-                view.ignoresSiblingOrder = true
-            }
-
-        }
-    }
-}
-
-extension GameViewController: MainMenuDelegate {
-    func didSelectStartTutorial(_ playerModel: EntityModel?) {
-        if let view = self.view as! SKView? {
-            view.presentScene(nil)
-            levels = LevelConstructor.buildTutorialLevels()
-            presentNextLevel(playerModel)
-        }
-    }
     
     func setFrame() {
         view.frame = CGRect(x: view.frame.origin.x,
                             y: view.frame.origin.y,
                             width: self.view.frame.width,
                             height: self.view.safeAreaLayoutGuide.layoutFrame.height)
-    }
-    
-    func newGame(_ difficulty: Difficulty, _ playerModel: EntityModel?, level: LevelType) {
-        if let view = self.view as! SKView?, let player = playerModel {
-            view.presentScene(nil)
-            startGame(player: player, difficulty: difficulty, level: level)
-        }
     }
 }

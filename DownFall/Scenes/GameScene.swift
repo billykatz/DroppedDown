@@ -41,9 +41,6 @@ class GameScene: SKScene {
     //level
     private var level: Level?
     
-    //boss controller
-    private var bossController: BossController?
-    
     //touch state
     private var touchWasSwipe = false
     private var touchWasCanceled = false
@@ -84,11 +81,6 @@ class GameScene: SKScene {
         
         // create haptic generator
         generator = HapticGenerator()
-        
-        // create boss controller
-        if level.type == .boss {
-            bossController = BossController(foreground: foreground, playableRect: size.playableRect, levelSize: level.boardSize, boardSize: boardSize)
-        }
         
     }
     
@@ -145,7 +137,6 @@ class GameScene: SKScene {
         foreground = nil
         gameSceneDelegate = nil
         generator = nil
-        bossController = nil
         rotatePreview = nil
         swipeRecognizerView?.removeFromSuperview()
         InputQueue.reset()

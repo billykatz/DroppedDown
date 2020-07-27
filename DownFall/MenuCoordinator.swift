@@ -13,36 +13,35 @@ protocol MenuCoordinating: class {
     var levelCoordinator: LevelCoordinating { get }
     
     func levelSelect(_ updatedPlayerData: EntityModel)
-    func newGame(profile: Profile)
+    func loadedProfile(_ profile: Profile)
 }
 
 
 class MenuCoordinator: MenuCoordinating {
     
+    var view: SKView
     var profile: Profile?
     var levelCoordinator: LevelCoordinating
     
-    init(levelCoordinator: LevelCoordinating) {
+    init(levelCoordinator: LevelCoordinating, view: SKView) {
         self.levelCoordinator = levelCoordinator
+        self.view = view
     }
     
-    func newGame(profile: Profile) {
+    func loadedProfile(_ profile: Profile) {
         self.profile = profile
-        levelCoordinator.startGame(profile: profile)
+        
+        if let mainMenuScene = GKScene(fileNamed: Identifiers.mainMenuScene)?.rootNode as? MainMenu {
+            mainMenuScene.scaleMode = .aspectFill
+            mainMenuScene.playerModel = profile.player
+
+            view.presentScene(mainMenuScene)
+            view.ignoresSiblingOrder = true
+
+        }
     }
     
     func levelSelect(_ updatedPlayerData: EntityModel) {
-        
-//        if let mainMenuScene = GKScene(fileNamed: Identifiers.mainMenuScene)?.rootNode as? MainMenu {
-//            mainMenuScene.scaleMode = .aspectFill
-//            mainMenuScene.playerModel = updatedPlayerData
-//
-//            if let view = self.view as! SKView? {
-//                view.presentScene(mainMenuScene)
-//                view.ignoresSiblingOrder = true
-//            }
-//
-//        }
     }
 
 }

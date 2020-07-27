@@ -29,7 +29,7 @@ class GameViewController: UIViewController {
         didSet {
             guard let profile = profile else { return }
             loadingSceneNode?.fadeOut {
-                self.menuCoordinator?.newGame(profile: profile)
+                self.menuCoordinator?.loadedProfile(profile)
             }
             
             
@@ -42,28 +42,33 @@ class GameViewController: UIViewController {
         /// Needed when we stopped using a storyboard
         view = SKView(frame: view.bounds)
         
+        /// Show the loading screeen
+        if let view = view as? SKView,
+           let loadingScene = GKScene(fileNamed: "LoadingScene")?.rootNode as? LoadingScene {
+           loadingScene.scaleMode = .aspectFill
+           view.presentScene(loadingScene)
+           loadingSceneNode = loadingScene
+        }
+        
         do {
             guard let entityData = try Data.data(from: "entities") else { fatalError("Crashing here is okay because we failed to parse our entity json file") }
             entities = try JSONDecoder().decode(EntitiesModel.self, from: entityData)
             
             //TODO: add the actual seed to this source
             randomSource = GKLinearCongruentialRandomSource()
-            
-            /// Show the loading screeen
-            if let view = view as? SKView,
-                let loadingScene = GKScene(fileNamed: "LoadingScene")?.rootNode as? LoadingScene {
-                loadingScene.scaleMode = .aspectFill
-                view.presentScene(loadingScene)
-                loadingSceneNode = loadingScene
-            }
         }
         catch(let error) {
             fatalError("Crashing due to \(error) while trying to parse json entity file")
         }
         
-        guard let gameScene = GKScene(fileNamed: "GameScene")?.rootNode as? GameScene, let entities = entities, let randomSource = randomSource else { fatalError() }
-        let levelCoordinator = LevelCoordinator.init(gameSceneNode: gameScene, entities: entities, levelIndex: 0, view: view as! SKView, randomSource: randomSource)
-        self.menuCoordinator = MenuCoordinator(levelCoordinator: levelCoordinator)
+        /// Init the coordinators
+        guard let gameScene = GKScene(fileNamed: "GameScene")?.rootNode as? GameScene, let entities = entities,
+            let randomSource = randomSource,
+            let view = self.view as? SKView
+        else { fatalError() }
+        
+        let levelCoordinator = LevelCoordinator.init(gameSceneNode: gameScene, entities: entities, levelIndex: 0, view: view, randomSource: randomSource)
+        self.menuCoordinator = MenuCoordinator(levelCoordinator: levelCoordinator, view: view)
         self.levelCoordinator = levelCoordinator
         self.levelCoordinator?.delegate = menuCoordinator
     }

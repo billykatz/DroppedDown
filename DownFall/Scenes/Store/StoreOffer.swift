@@ -33,7 +33,7 @@ enum StoreOfferType: Hashable {
 
 typealias StoreOfferTier = Int
 
-struct StoreOffer: Hashable {
+struct StoreOffer: Codable, Hashable {
     let type: StoreOfferType
     let tier: StoreOfferTier
     let textureName: String

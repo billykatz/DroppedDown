@@ -8,7 +8,7 @@
 
 import UIKit
 
-struct GoalTracking: Hashable {
+struct GoalTracking: Codable, Hashable {
     let tileType: TileType
     let current: Int
     let target: Int

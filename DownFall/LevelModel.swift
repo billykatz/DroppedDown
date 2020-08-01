@@ -8,12 +8,20 @@
 
 import SpriteKit
 
-enum LevelGoalType: Hashable {
+enum LevelGoalType: Codable, Hashable {
     case unlockExit
     case useRune
 }
 
-enum LevelGoalReward: Hashable {
+enum LevelGoalReward: Codable, Hashable {
+    init(from decoder: Decoder) throws {
+        <#code#>
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        <#code#>
+    }
+    
     case gem(Int)
     
     var currency: Currency{
@@ -30,7 +38,7 @@ enum LevelGoalReward: Hashable {
     }
 }
 
-struct LevelGoal: Hashable {
+struct LevelGoal: Codable, Hashable {
     let type: LevelGoalType
     let reward: LevelGoalReward
     let tileType: TileType
@@ -55,7 +63,7 @@ struct LevelGoal: Hashable {
     }
 }
 
-struct Level {
+struct Level: Codable {
     let type: LevelType
     let depth: Depth
     let monsterTypeRatio: [EntityModel.EntityType: RangeModel]

@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct TileTypeChanceModel {
+struct TileTypeChanceModel: Codable {
     /// Assume that we are working with chances based on 100 outcomes
     let outcomes: Int
     let chances: [TileType: Int]

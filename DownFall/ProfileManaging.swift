@@ -14,6 +14,11 @@ struct Profile: Codable {
     let name: String
     let progress: Int
     let player: EntityModel
+    var currentRun: RunModel?
+    
+    func updatePlayer(_ entityModel: EntityModel) -> Profile {
+        return Profile(name: name, progress: progress, player: entityModel)
+    }
 }
 
 protocol ProfileManaging {

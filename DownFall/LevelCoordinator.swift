@@ -13,13 +13,13 @@ import GameplayKit
 protocol LevelCoordinating: StoreSceneDelegate, GameSceneCoordinatingDelegate {
     var gameSceneNode: GameScene? { get set }
     var entities: EntitiesModel? { get set }
-    var levelIndex: Int { get set }
     var randomSource: GKLinearCongruentialRandomSource? { get }
     var delegate: MenuCoordinating? { get set }
     
     func presentStore(_ playerData: EntityModel)
     func presentNextLevel(_ playerData: EntityModel?)
     func startGame(profile: Profile)
+    func loadRun(_ runModel: RunModel?, profile: Profile)
 }
 
 class LevelCoordinator: LevelCoordinating {
@@ -27,21 +27,21 @@ class LevelCoordinator: LevelCoordinating {
     weak var delegate: MenuCoordinating?
     var gameSceneNode: GameScene?
     var entities: EntitiesModel?
-    var levelIndex: Int = 0
     let view: SKView
     var randomSource: GKLinearCongruentialRandomSource?
-    
+    var runModel: RunModel = RunModel(player: .zero, depth: 0)
+        
     init(gameSceneNode: GameScene, entities: EntitiesModel, levelIndex: Int, view: SKView, randomSource: GKLinearCongruentialRandomSource) {
         self.gameSceneNode = gameSceneNode
         self.entities = entities
-        self.levelIndex = levelIndex
         self.view = view
         self.randomSource = randomSource
+        
     }
     
     func presentStore(_ playerData: EntityModel) {
         view.presentScene(nil)
-        let currentLevel = LevelConstructor.buildLevel(depth: levelIndex)
+        let currentLevel = runModel.currentLevel()
         let storeScene = StoreScene(size: .universalSize,
                                     playerData: playerData,
                                     level: currentLevel,
@@ -55,7 +55,7 @@ class LevelCoordinator: LevelCoordinating {
         gameSceneNode?.prepareForReuse()
         if let scene = GKScene(fileNamed: "GameScene")?.rootNode as? GameScene,
             let entities = entities {
-            let level = LevelConstructor.buildLevel(depth: levelIndex)
+            let level = runModel.currentLevel()
             gameSceneNode = scene
             gameSceneNode!.scaleMode = .aspectFill
             gameSceneNode!.gameSceneDelegate = self
@@ -76,6 +76,14 @@ class LevelCoordinator: LevelCoordinating {
             #endif
                 
         }
+    }
+    
+    /// Loads up a model or creates a new one
+    func loadRun(_ runModel: RunModel?, profile: Profile) {
+        let freshRunModel = RunModel(player: profile.player, depth: 0)
+        
+        self.runModel = runModel ?? freshRunModel
+        presentStore(profile.player)
     }
     
     /// Kicks off the process of starting a new game
@@ -99,7 +107,7 @@ class LevelCoordinator: LevelCoordinating {
         let remove = SKAction.removeFromParent()
         scene.run(SKAction.group([fadeOut, remove])) { [weak self] in
             guard let self = self else { return }
-            self.delegate?.levelSelect(playerData)
+            self.delegate?.finishGame(playerData: playerData)
         }
 
     }
@@ -120,10 +128,10 @@ class LevelCoordinator: LevelCoordinating {
         
         // Increment the level index before we visit the store
         // there might/is be a better place to do this
-        levelIndex = levelIndex + 1
+        runModel.depth += 1
         
         /// attached how many goals we completed so the store knows which offers to unlock
-        var level = LevelConstructor.buildLevel(depth: levelIndex)
+        var level = runModel.currentLevel()
         level.goalProgress = goalTracking
         
         

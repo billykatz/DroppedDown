@@ -41,13 +41,13 @@ class OptionsScene: SKScene, ButtonDelegate {
     
         let foreground = SKSpriteNode(color: .backgroundGray, size: self.size.playableRect.size)
         self.foreground = foreground
-        addChild(foreground)
+        addChildSafely(foreground)
         
-        foreground.addChild(resetDataButton)
+        foreground.addChildSafely(resetDataButton)
         
         backButton.position = .position(backButton.frame, inside: foreground.frame, verticalAlign: .top, horizontalAnchor: .left)
         
-        foreground.addChild(backButton)
+        foreground.addChildSafely(backButton)
     }
     
     func buttonTapped(_ button: Button) {

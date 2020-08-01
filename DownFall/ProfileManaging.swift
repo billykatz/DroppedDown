@@ -16,7 +16,7 @@ struct Profile: Codable {
     let player: EntityModel
 }
 
-protocol ProfileSaving {
+protocol ProfileManaging {
     /// Call this when the app is loaded into memory
     func start(_ presenter: UIViewController)
     
@@ -49,7 +49,7 @@ enum ProfileError: Error {
     case failedToLoadRemoteProfile(Error?)
 }
 
-class ProfileViewModel: ProfileSaving {
+class ProfileViewModel: ProfileManaging {
     
     struct Constants {
         static let playerUUIDKey = "playerUUID"
@@ -258,7 +258,9 @@ class ProfileViewModel: ProfileSaving {
             .fetchGCSavedGames()
             .print("Deleting Saved Games")
             .flatMap({ games in
-                return games.publisher.setFailureType(to: Error.self)
+                return games
+                    .publisher /// Turns array of objects into publisher.
+                    .setFailureType(to: Error.self) // Sets the failure type for type consistentency, otherwise this would have error type Never
             })
             .flatMap( { game in
                 return GKLocalPlayer.local.deleteGame(game)

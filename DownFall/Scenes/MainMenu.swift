@@ -10,6 +10,7 @@ import SpriteKit
 
 protocol MainMenuDelegate: class {
     func newGame(_ difficulty: Difficulty, _ playerModel: EntityModel?, level: LevelType)
+    func optionsSelected()
 }
 
 class MainMenu: SKScene {
@@ -79,6 +80,22 @@ class MainMenu: SKScene {
         levelSelectButton = levelButton
         
         addChild(levelButton)
+        
+        
+        let optionsButton = Button(size: .buttonLarge, delegate: self, identifier: .mainMenuOptions, image: SKSpriteNode(imageNamed: "lanternOn"), shape: .circle)
+        
+        optionsButton.position = CGPoint.position(optionsButton.frame,
+                                                inside: size.playableRect,
+                                                verticalAlign: .top,
+                                                horizontalAnchor: .right,
+                                                xOffset: 50.0,
+                                                yOffset: 100.0
+        )
+        addChild(optionsButton)
+
+        
+        
+        
         
         levelTypeIndex = 0
         
@@ -497,6 +514,8 @@ extension MainMenu: ButtonDelegate {
                 createRuneSlotOffer()
                 updateGemLabel(gems)
             }
+        case .mainMenuOptions:
+            mainMenuDelegate?.optionsSelected()
 
         default:
             ()

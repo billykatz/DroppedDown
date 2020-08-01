@@ -166,8 +166,9 @@
 		58AD4883243581FC00F90A87 /* RandomTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4A470C23B3CEFC000165FB /* RandomTests.swift */; };
 		58AD9282243C283300B5B1EC /* LevelGoalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58AD9281243C283300B5B1EC /* LevelGoalView.swift */; };
 		58B39BD723D21C9600915858 /* BackpackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58B39BD623D21C9600915858 /* BackpackView.swift */; };
-		58C9735124969CA100288133 /* ProfileSaving.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C9735024969CA100288133 /* ProfileSaving.swift */; };
+		58C9735124969CA100288133 /* ProfileManaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C9735024969CA100288133 /* ProfileManaging.swift */; };
 		58DCC9842451FBC700DC7AD8 /* RuneContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58DCC9832451FBC700DC7AD8 /* RuneContainerView.swift */; };
+		58DFB63C24D5EC2D00EBB13F /* OptionsScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 58DFB63B24D5EC2D00EBB13F /* OptionsScene.sks */; };
 		58F034C32408B7CF00BE1863 /* BossController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F034C22408B7CF00BE1863 /* BossController.swift */; };
 /* End PBXBuildFile section */
 
@@ -345,8 +346,9 @@
 		58A51662241DF3E2009E84E1 /* TargetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetView.swift; sourceTree = "<group>"; };
 		58AD9281243C283300B5B1EC /* LevelGoalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelGoalView.swift; sourceTree = "<group>"; };
 		58B39BD623D21C9600915858 /* BackpackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackpackView.swift; sourceTree = "<group>"; };
-		58C9735024969CA100288133 /* ProfileSaving.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSaving.swift; sourceTree = "<group>"; };
+		58C9735024969CA100288133 /* ProfileManaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileManaging.swift; sourceTree = "<group>"; };
 		58DCC9832451FBC700DC7AD8 /* RuneContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneContainerView.swift; sourceTree = "<group>"; };
+		58DFB63B24D5EC2D00EBB13F /* OptionsScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = OptionsScene.sks; sourceTree = "<group>"; };
 		58F034C22408B7CF00BE1863 /* BossController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BossController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -510,6 +512,7 @@
 				5894A44D24C379C800FBF839 /* LoadingScene.sks */,
 				5894A44F24C37A1100FBF839 /* LoadingScene.swift */,
 				581A64CC24CE99D100B92EA6 /* OptionsScene.swift */,
+				58DFB63B24D5EC2D00EBB13F /* OptionsScene.sks */,
 				3DA0A3822303D62A0041EF34 /* Store */,
 			);
 			path = Scenes;
@@ -873,7 +876,7 @@
 		58C9734F24969C8D00288133 /* Save */ = {
 			isa = PBXGroup;
 			children = (
-				58C9735024969CA100288133 /* ProfileSaving.swift */,
+				58C9735024969CA100288133 /* ProfileManaging.swift */,
 			);
 			name = Save;
 			sourceTree = "<group>";
@@ -980,6 +983,7 @@
 				3D73D2E621C2226F00DB6FB7 /* PlayerWait.sks in Resources */,
 				586319C224C1FF890090CD6D /* newProfile.json in Resources */,
 				3D528FD62154A50300EF65CA /* GameScene.sks in Resources */,
+				58DFB63C24D5EC2D00EBB13F /* OptionsScene.sks in Resources */,
 				3DF2925E20A37FF0006671AC /* LaunchScreen.storyboard in Resources */,
 				3DA4E89D2290B156006E90D1 /* EntityTest.json in Resources */,
 				3DC072B92373AAC50046F224 /* TutorialScene.sks in Resources */,
@@ -1035,7 +1039,7 @@
 				5866B3DA244D2A4600DF36E0 /* GoalTracking.swift in Sources */,
 				582635DD243168B500A944B6 /* ButtonIdentifier.swift in Sources */,
 				5894B176245FD68A003B86F1 /* StagingSelectionAreaView.swift in Sources */,
-				58C9735124969CA100288133 /* ProfileSaving.swift in Sources */,
+				58C9735124969CA100288133 /* ProfileManaging.swift in Sources */,
 				3DAFBD3721B8E6E7009B116A /* InputQueue.swift in Sources */,
 				582CF3EC2442391900AA2A95 /* FillableBar.swift in Sources */,
 				3DC072BB2373AF510046F224 /* SwipeRecognizerView.swift in Sources */,

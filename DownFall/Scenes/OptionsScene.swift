@@ -8,14 +8,59 @@
 
 import SpriteKit
 
-class OptionsScene: SKScene {
+protocol OptionsSceneDelegate: class {
+    func backSelected()
+}
+
+class OptionsScene: SKScene, ButtonDelegate {
     
-    var foreground: SKSpriteNode!
+    private var foreground: SKSpriteNode!
+    weak var myDelegate: OptionsSceneDelegate?
+    
+    private lazy var resetDataButton: Button = {
+        
+        let button = Button(size: .buttonExtralarge,
+                            delegate: self,
+                            identifier: .resetData)
+        return button
+        
+        
+    }()
+    
+    private lazy var backButton: Button = {
+        
+        let button = Button(size: .buttonExtralarge,
+                            delegate: self,
+                            identifier: .back)
+        return button
+        
+        
+    }()
     
     override func didMove(to view: SKView) {
     
-        let foreground = SKSpriteNode(color: .backgroundGray, size: self.size)
+        let foreground = SKSpriteNode(color: .backgroundGray, size: self.size.playableRect.size)
         self.foreground = foreground
         addChild(foreground)
+        
+        foreground.addChild(resetDataButton)
+        
+        backButton.position = .position(backButton.frame, inside: foreground.frame, verticalAlign: .top, horizontalAnchor: .left)
+        
+        foreground.addChild(backButton)
+    }
+    
+    func buttonTapped(_ button: Button) {
+        switch button.identifier {
+            case .resetData:
+                /// Order matters here
+                GameScope.shared.profileManager.deleteLocalProfile()
+                GameScope.shared.profileManager.deleteAllRemoteProfile()
+                GameScope.shared.profileManager.resetUserDefaults()
+        case .back:
+            myDelegate?.backSelected()
+            default:
+                break
+        }
     }
 }

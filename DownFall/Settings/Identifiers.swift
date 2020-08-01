@@ -38,4 +38,5 @@ struct Identifiers {
     }
     
     static let mainMenuScene = "MainMenu"
+    static let optionsScene = "OptionsScene"
 }

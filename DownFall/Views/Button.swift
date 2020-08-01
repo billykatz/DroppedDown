@@ -23,35 +23,27 @@ enum ButtonType {
     case image
 }
 
-
 class Button: SKShapeNode {
     
     struct Constants {
         static let disabledBackgroundColor = UIColor.darkGray
     }
     
-    static let small = CGSize(width: 75, height: 30)
-    static let medium = CGSize(width: 110, height: 50)
-    static let large = CGSize(width: 150, height: 75)
-    static let extralarge = CGSize(width: 300, height: 150)
+    private weak var delegate: ButtonDelegate?
+    private var buttonType: ButtonType
+    private var originalBackground: UIColor = .clear
+    private var showSelection = false
     
-    static let inGameLarge = CGSize(width: 200, height: 160)
+    private var dropShadow: SKShapeNode?
+    private var dropShadowOffset: CGFloat = 5.0
+    private var unpressedPosition: CGPoint? = nil
+    private var depressedPosition: CGPoint? = nil
     
-    weak var delegate: ButtonDelegate?
-    
-    var buttonType: ButtonType
-    
-    var identifier: ButtonIdentifier
-    var originalBackground: UIColor = .clear
-    var showSelection = false
-    
-    var dropShadow: SKShapeNode?
-    var dropShadowOffset: CGFloat = 5.0
-    var unpressedPosition: CGPoint? = nil
-    var depressedPosition: CGPoint? = nil
+    /// Identifier passed in on init that ids the button on press
+    public var identifier: ButtonIdentifier
     
     /// view to expand touch region of button
-    lazy var touchTargetExpandingView: SKSpriteNode = {
+    private lazy var touchTargetExpandingView: SKSpriteNode = {
         let view = SKSpriteNode(texture: nil, color: .clear, size: self.frame.scale(by: Style.Button.touchzone, andYAmount: Style.Button.touchzone).size)
         view.alpha = 0.0
         view.zPosition = Precedence.underground.rawValue
@@ -60,11 +52,19 @@ class Button: SKShapeNode {
     }()
     
     /// view that is the visual button
-    var buttonView: SKShapeNode?
-    var grayOutButtonView: SKShapeNode?
+    private var buttonView: SKShapeNode?
+    private var grayOutButtonView: SKShapeNode?
     
+    // set thru init or `enable()`
     private var isDisabled: Bool = false
     
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    
+    /// Creates a button with a image represented in a SKSpriteNode
     init(size: CGSize,
          delegate: ButtonDelegate,
          identifier: ButtonIdentifier,
@@ -81,34 +81,45 @@ class Button: SKShapeNode {
         // Call super
         super.init()
         
+        /// create the rectangle the image will live in
         let rectangle = CGRect(x: -size.width/2, y: -size.height/2, width: size.width, height: size.height)
+        
+        /// create the shadow of the rectangle
         let shadowRect = CGRect(x: -size.width/2, y: -size.height/2 - dropShadowOffset, width: size.width, height: size.height)
+        
+        /// The shared cornder radius
         let cornerRadius = CGFloat(5.0)
         let shadowShape: SKShapeNode
         switch shape {
         case .rectangle:
-            self.path = CGPath(roundedRect: rectangle, cornerWidth: cornerRadius, cornerHeight: cornerRadius, transform: nil)
+            /// create the path
+            let path = CGPath(roundedRect: rectangle, cornerWidth: cornerRadius, cornerHeight: cornerRadius, transform: nil)
+            
+            /// create the shadow shape we may use later
             let shadowPath = CGPath(roundedRect: shadowRect, cornerWidth: cornerRadius, cornerHeight: cornerRadius, transform: nil)
             shadowShape = SKShapeNode(path: shadowPath)
             
-            let buttonPath = CGPath(roundedRect: rectangle, cornerWidth: cornerRadius, cornerHeight: cornerRadius, transform: nil)
-            self.buttonView = SKShapeNode(path: buttonPath)
+            self.buttonView = SKShapeNode(path: path)
+            self.path = path
+            
         case .circle:
-            self.path = CGPath(ellipseIn: rectangle, transform: nil)
+            /// create the path
+            let path = CGPath(ellipseIn: rectangle, transform: nil)
+            
+            /// create the shadow path we may use later
             let shadowPath = CGPath(ellipseIn: shadowRect, transform: nil)
             shadowShape = SKShapeNode(path: shadowPath)
             
-            let buttonPath = CGPath(ellipseIn: rectangle, transform: nil)
-            self.buttonView = SKShapeNode(path: buttonPath)
-            
-            
-            
+            /// set our properties
+            self.buttonView = SKShapeNode(path: path)
+            self.path = path
         }
         
         // add the image
         image.zPosition = 0
         addChildSafely(image)
         
+        /// add the path
         addChildSafely(buttonView)
         
         /// add the drop shadow and keep a reference to it
@@ -133,16 +144,11 @@ class Button: SKShapeNode {
             }
         }
         
-        // set points for moving the button slightly
-        unpressedPosition = self.frame.center
-        depressedPosition = self.frame.center.translateVertically(-dropShadowOffset)
-        
-        self.color = .lightBarBlue
-        
         commonInit(precedence: precedence)
         
     }
     
+    /// Creates a button with a text label based on the ButtonIdentifier
     init(size: CGSize,
          delegate: ButtonDelegate,
          identifier: ButtonIdentifier,
@@ -206,13 +212,6 @@ class Button: SKShapeNode {
         self.isDisabled = disable
         enable(!disable)
         
-        self.color = .clear
-        
-        // set points for moving the button slightly
-        
-        unpressedPosition = self.frame.center
-        depressedPosition = self.frame.center.translateVertically(-dropShadowOffset)
-        
         commonInit(precedence: precedence)
     }
     
@@ -224,17 +223,114 @@ class Button: SKShapeNode {
         name = identifier.rawValue
         isUserInteractionEnabled = true
         zPosition = precedence.rawValue
+        
+        /// set the positions for pressing and releasing
+        unpressedPosition = self.frame.center
+        depressedPosition = self.frame.center.translateVertically(-dropShadowOffset)
+        
+        /// set the color to clear
+        self.color = .clear
+        
     }
     
+    /// Sets the internal disabled state.  Updates the UI.
+    public func enable(_ on: Bool) {
+        self.isDisabled = !on
+        if buttonType == .text {
+            buttonView?.color = on ? originalBackground : Constants.disabledBackgroundColor
+            if on { setupShadow() }
+            else { removeShadow() }
+        } else {
+            if on {
+                grayOutButtonView?.removeFromParent()
+                setupShadow()
+            }
+            else {
+                addChildSafely(grayOutButtonView)
+                removeShadow()
+            }
+        }
+    }
     
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    private func removeShadow() {
+        dropShadow?.removeFromParent()
+    }
+    private func addShadow() {
+        addChildSafely(dropShadow)
+    }
+    
+    /// Creates the shadow if necessary
+    ///
+    private func setupShadow() {
+        if dropShadow == nil {
+            let shadowPath = CGPath(roundedRect: CGRect(x: -frame.size.width/2, y: -frame.size.height/2 - dropShadowOffset, width: frame.size.width, height: frame.size.height), cornerWidth: 5.0, cornerHeight: 5.0, transform: nil)
+            let shadowShape = SKShapeNode(path: shadowPath)
+            shadowShape.color = .storeBlack
+            self.dropShadow = shadowShape
+            // does this have to be hardcoded?
+            shadowShape.zPosition = -1
+            addChild(shadowShape)
+        }
+    }
+    
+    /// Call when the button tap was cancelled
+    /// Changes the color back to the original color
+    /// Unpresses the button
+    private func buttonTapWasCancelled() {
+        guard !isDisabled else { return }
+        if showSelection {
+            buttonView?.color = originalBackground
+        }
+        unpress()
+    }
+    
+    /// Call when button was tapped
+    /// Changes the color back to the original color
+    /// Unpresses the button
+    /// Informs the delegate that the button was tapped
+    private func buttonWasTapped() {
+        guard !isDisabled else { return }
+        if showSelection {
+            buttonView?.color = originalBackground
+        }
+        delegate?.buttonTapped(self)
+        unpress()
+    }
+    
+    /// Call when the button tap has started
+    /// Changes the color and calls depress
+    private func buttonTapBegan() {
+        guard !isDisabled else { return }
+        if showSelection {
+            buttonView?.color = .lightGray
+        }
+        depress()
+    }
+    
+    /// Sets our position to 'depressed'
+    /// Removes shadow as well
+    private func depress() {
+        guard let newPosition = depressedPosition else { return }
+        buttonView?.position = newPosition
+        dropShadow?.removeFromParent()
+    }
+    
+    /// Sets our position to 'unpressed'
+    private func unpress() {
+        guard let newPosition = unpressedPosition else { return }
+        buttonView?.position = newPosition
+        addOptionalChild(dropShadow)
     }
 }
 
 //MARK:- Touch Events
 
 extension Button {
+    private func frameContains(_ p: CGPoint) -> Bool {
+        let translatedPosition = CGPoint(x: self.frame.center.x + position.x, y: self.frame.center.y + position.y)
+        return frame.contains(translatedPosition)
+    }
+    
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
         let position = touch.location(in: self)
@@ -260,81 +356,6 @@ extension Button {
         if self.wasTouched(touches, with: event) {
             buttonTapBegan()
         }
-    }
-    
-    public func removeShadow() {
-        dropShadow?.removeFromParent()
-    }
-    public func addShadow() {
-        addChildSafely(dropShadow)
-    }
-    
-    public func enable(_ on: Bool) {
-        self.isDisabled = !on
-        if buttonType == .text {
-            buttonView?.color = on ? originalBackground : Constants.disabledBackgroundColor
-            if on { setupShadow() }
-            else { removeShadow() }
-        } else {
-            if on {
-                grayOutButtonView?.removeFromParent()
-                setupShadow()
-            }
-            else {
-                addChildSafely(grayOutButtonView)
-                removeShadow()
-            }
-        }
-    }
-    
-    func setupShadow() {
-        if dropShadow == nil {
-            let shadowPath = CGPath(roundedRect: CGRect(x: -frame.size.width/2, y: -frame.size.height/2 - dropShadowOffset, width: frame.size.width, height: frame.size.height), cornerWidth: 5.0, cornerHeight: 5.0, transform: nil)
-            let shadowShape = SKShapeNode(path: shadowPath)
-            shadowShape.color = .storeBlack
-            self.dropShadow = shadowShape
-            // does this have to be hardcoded?
-            shadowShape.zPosition = -1
-            addChild(shadowShape)
-        }
-    }
-    
-    
-    private func buttonTapWasCancelled() {
-        guard !isDisabled else { return }
-        if showSelection {
-            buttonView?.color = originalBackground
-        }
-        unpress()
-    }
-    
-    private func buttonWasTapped() {
-        guard !isDisabled else { return }
-        if showSelection {
-            buttonView?.color = originalBackground
-        }
-        delegate?.buttonTapped(self)
-        unpress()
-    }
-    
-    private func buttonTapBegan() {
-        guard !isDisabled else { return }
-        if showSelection {
-            buttonView?.color = .lightGray
-        }
-        depress()
-    }
-    
-    private func depress() {
-        guard let newPosition = depressedPosition else { return }
-        buttonView?.position = newPosition
-        dropShadow?.removeFromParent()
-    }
-    
-    private func unpress() {
-        guard let newPosition = unpressedPosition else { return }
-        buttonView?.position = newPosition
-        addOptionalChild(dropShadow)
     }
 }
 

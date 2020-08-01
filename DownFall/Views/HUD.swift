@@ -35,18 +35,6 @@ class HUD: SKSpriteNode {
         
         header.level = level
         
-//        let button = Button(size: Button.inGameLarge,
-//                            delegate: header,
-//                            identifier: .shuffleBoard,
-//                            precedence: .background,
-//                            fontSize: UIFont.mediumSize,
-//                            fontColor: .white)
-//        button.position = CGPoint.alignHorizontally(button.frame, relativeTo: header.frame, horizontalAnchor: .right, verticalAlign: .bottom, verticalPadding: Style.Padding.most)
-//        button.zPosition = Precedence.foreground.rawValue
-//        button.name = Constants.shuffleBoardButton
-//
-//        header.addChild(button)
-        
         Dispatch.shared.register {
             header.handle($0)
         }

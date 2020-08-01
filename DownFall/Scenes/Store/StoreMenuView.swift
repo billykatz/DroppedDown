@@ -148,12 +148,12 @@ class StoreMenuView: SKSpriteNode, ButtonDelegate {
         
         /// Button
         let horizontalPositioning: CGPoint.Anchor = viewModel.secondaryButtonAction == nil ? .center : .left
-        let button = Button(size: Button.extralarge, delegate: self, identifier: viewModel.buttonAction.button, fontColor: UIColor.darkGray, backgroundColor: UIColor.lightGray)
+        let button = Button(size: .buttonExtralarge, delegate: self, identifier: viewModel.buttonAction.button, fontColor: UIColor.darkGray, backgroundColor: UIColor.lightGray)
         button.position = CGPoint.position(button.frame, inside: contentView.frame, verticalAlign: .bottom, horizontalAnchor: horizontalPositioning, xOffset: Style.Padding.more, yOffset: Style.Padding.more)
         button.zPosition = Precedence.foreground.rawValue
         
         if let secondaryButtonAction = viewModel.secondaryButtonAction {
-            secondaryButton = Button(size: Button.extralarge, delegate: self, identifier: secondaryButtonAction.button, fontColor: UIColor.eggshellWhite, backgroundColor: UIColor.confirmButtonColor, disable: true)
+            secondaryButton = Button(size: .buttonExtralarge, delegate: self, identifier: secondaryButtonAction.button, fontColor: UIColor.eggshellWhite, backgroundColor: UIColor.confirmButtonColor, disable: true)
             secondaryButton?.position = CGPoint.position(secondaryButton?.frame, inside: contentView.frame, verticalAlign: .bottom, horizontalAnchor: .right, xOffset: Style.Padding.more, yOffset: Style.Padding.more)
             secondaryButton?.zPosition = Precedence.foreground.rawValue
             contentView.addChildSafely(secondaryButton)

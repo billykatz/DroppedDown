@@ -120,6 +120,7 @@
 		58153460243993F400483481 /* LevelGoalTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5815345F243993F400483481 /* LevelGoalTracker.swift */; };
 		5819AB71242A5CA600498BB6 /* SpriteAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5819AB70242A5CA600498BB6 /* SpriteAction.swift */; };
 		5819AB73242A668400498BB6 /* SwipeTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5819AB72242A668400498BB6 /* SwipeTypes.swift */; };
+		581A64CD24CE99D100B92EA6 /* OptionsScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 581A64CC24CE99D100B92EA6 /* OptionsScene.swift */; };
 		582635DD243168B500A944B6 /* ButtonIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 582635DC243168B500A944B6 /* ButtonIdentifier.swift */; };
 		582CF3EC2442391900AA2A95 /* FillableBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 582CF3EB2442391900AA2A95 /* FillableBar.swift */; };
 		582CF3EE244239A000AA2A95 /* Template.swift in Sources */ = {isa = PBXBuildFile; fileRef = 582CF3ED244239A000AA2A95 /* Template.swift */; };
@@ -299,6 +300,7 @@
 		5815345F243993F400483481 /* LevelGoalTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelGoalTracker.swift; sourceTree = "<group>"; };
 		5819AB70242A5CA600498BB6 /* SpriteAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteAction.swift; sourceTree = "<group>"; };
 		5819AB72242A668400498BB6 /* SwipeTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeTypes.swift; sourceTree = "<group>"; };
+		581A64CC24CE99D100B92EA6 /* OptionsScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionsScene.swift; sourceTree = "<group>"; };
 		582635DC243168B500A944B6 /* ButtonIdentifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonIdentifier.swift; sourceTree = "<group>"; };
 		582CF3EB2442391900AA2A95 /* FillableBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FillableBar.swift; sourceTree = "<group>"; };
 		582CF3ED244239A000AA2A95 /* Template.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Template.swift; sourceTree = "<group>"; };
@@ -480,7 +482,6 @@
 		3D3D31ED23ABEFBB002B87EE /* Level */ = {
 			isa = PBXGroup;
 			children = (
-				3D14C82023A83D93003E211D /* LevelCoordinator.swift */,
 				3D4A471023B3D34F000165FB /* LevelModel.swift */,
 				3D4A470E23B3D33B000165FB /* LevelType.swift */,
 				3D3D31EB23ABEFA8002B87EE /* LevelConstructor.swift */,
@@ -508,6 +509,7 @@
 				3D674C9422C9D6640003AEB4 /* MainMenu.swift */,
 				5894A44D24C379C800FBF839 /* LoadingScene.sks */,
 				5894A44F24C37A1100FBF839 /* LoadingScene.swift */,
+				581A64CC24CE99D100B92EA6 /* OptionsScene.swift */,
 				3DA0A3822303D62A0041EF34 /* Store */,
 			);
 			path = Scenes;
@@ -698,7 +700,7 @@
 				3D6279CE23AD55010048EB76 /* Game Scope */,
 				58383644242D7D04004CA026 /* TurnWatcher */,
 				3D3D31ED23ABEFBB002B87EE /* Level */,
-				58A1C82924CB3C6D00302183 /* Menus */,
+				58A1C82924CB3C6D00302183 /* Coordinators */,
 				58383646242D7D1E004CA026 /* Combat */,
 				58F034C12408B7C000BE1863 /* Boss */,
 				3DF2925F20A37FF0006671AC /* Info.plist */,
@@ -849,12 +851,13 @@
 			path = ..;
 			sourceTree = "<group>";
 		};
-		58A1C82924CB3C6D00302183 /* Menus */ = {
+		58A1C82924CB3C6D00302183 /* Coordinators */ = {
 			isa = PBXGroup;
 			children = (
+				3D14C82023A83D93003E211D /* LevelCoordinator.swift */,
 				58A1C82A24CB3CAF00302183 /* MenuCoordinator.swift */,
 			);
-			name = Menus;
+			name = Coordinators;
 			sourceTree = "<group>";
 		};
 		58AD9280243C282100B5B1EC /* LevelGoalTracker */ = {
@@ -1026,6 +1029,7 @@
 				5819AB73242A668400498BB6 /* SwipeTypes.swift in Sources */,
 				5894B178245FE61B003B86F1 /* StoreHUDViewModel.swift in Sources */,
 				3DF2928520A76242006671AC /* Board.swift in Sources */,
+				581A64CD24CE99D100B92EA6 /* OptionsScene.swift in Sources */,
 				58153460243993F400483481 /* LevelGoalTracker.swift in Sources */,
 				3D7D8B37225422440016FE4C /* TilesHelper.swift in Sources */,
 				5866B3DA244D2A4600DF36E0 /* GoalTracking.swift in Sources */,

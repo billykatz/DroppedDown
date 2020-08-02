@@ -15,7 +15,6 @@ class GameViewController: UIViewController {
     var randomSource: GKLinearCongruentialRandomSource?
 
     internal var gameSceneNode: GameScene?
-    internal var tutorialSceneNode: TutorialScene?
     internal var entities: EntitiesModel?
     internal var levelIndex: Int = 1
     internal var levels: [Level]?
@@ -94,5 +93,18 @@ class GameViewController: UIViewController {
                             y: view.frame.origin.y,
                             width: self.view.frame.width,
                             height: self.view.safeAreaLayoutGuide.layoutFrame.height)
+    }
+    
+    // save the current run if there is one
+    // add it to the profile then returns the profile
+    func applicationDidEnterBackground() -> Profile {
+        guard var profile = menuCoordinator?.profile else {
+            fatalError("Cannot continue without the profile")
+        }
+        if let runModel = levelCoordinator?.runModel {
+            profile = profile.updateRunModel(runModel)
+        }
+        
+        return profile
     }
 }

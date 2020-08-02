@@ -47,8 +47,6 @@ class TileDetailView: SKNode {
         }
     }
     
-    private var levelReward: LevelGoalReward?
-    
     init(foreground: SKNode, playableRect: CGRect, alignedTo: CGRect, levelSize: Int) {
         self.foreground = foreground
         contentView = SKSpriteNode(color: .clear, size: playableRect.size)

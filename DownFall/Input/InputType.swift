@@ -59,7 +59,6 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
                                         .refillEmpty,
                                         .tileDetail(.exit(blocked: false), []),
                                         .boardBuilt,
-                                        .playerAwarded([]),
                                         .unlockExit,
                                         .levelGoalDetail([]),
                                         .goalProgressRecord([]),
@@ -105,7 +104,6 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
     case shuffleBoard
     case unlockExit
     case levelGoalDetail([GoalTracking])
-    case playerAwarded([LevelGoalReward])
     case goalProgressRecord([GoalTracking])
     case runeProgressRecord([Rune: CGFloat])
     
@@ -183,8 +181,6 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
             return "Unlock Exit"
         case .levelGoalDetail:
             return "Level Goal Detail"
-        case .playerAwarded:
-            return "Player is awarded something"
         case .goalProgressRecord:
             return "Record goal progress"
         case .runeProgressRecord:

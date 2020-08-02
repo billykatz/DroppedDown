@@ -25,6 +25,9 @@ protocol MenuCoordinating: class {
     
     func finishGame(playerData updatedPlayerData: EntityModel)
     func loadedProfile(_ profile: Profile)
+    
+    /// exposed so that we can save the profile
+    var profile: Profile? { get }
 }
 
 
@@ -66,11 +69,15 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate, OptionsSceneDelegate 
     func loadedProfile(_ profile: Profile) {
         self.profile = profile
         
-        presentMainMenu()
+        if profile.currentRun != nil {
+            levelCoordinator.loadRun(profile.currentRun, profile: profile)
+        } else {
+            presentMainMenu()
+        }
     }
     
     func newGame(_ difficulty: Difficulty, _ playerModel: EntityModel?, level: LevelType) {
-        levelCoordinator.startGame(profile: profile!)
+        levelCoordinator.loadRun(profile?.currentRun, profile: profile!)
     }
     
     func finishGame(playerData updatedPlayerData: EntityModel) {
@@ -79,6 +86,9 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate, OptionsSceneDelegate 
         guard let profile = profile else { fatalError("We need a profile to continue") }
         let profileUpdateWithGems = profile.player.updateCarry(carry: updatedPlayerData.carry)
         self.profile = profile.updatePlayer(profileUpdateWithGems)
+        
+        GameScope.shared.profileManager.saveProfile(self.profile!)
+        
         presentMainMenu(transition: SKTransition.fade(withDuration: 0.2))
         
     }

@@ -8,59 +8,44 @@
 
 import SpriteKit
 
-enum LevelGoalType: Codable, Hashable {
+enum LevelGoalType: String, Codable, Hashable {
     case unlockExit
     case useRune
 }
 
-enum LevelGoalReward: Codable, Hashable {
-    init(from decoder: Decoder) throws {
-        <#code#>
-    }
-    
-    func encode(to encoder: Encoder) throws {
-        <#code#>
-    }
-    
-    case gem(Int)
-    
-    var currency: Currency{
-        switch self {
-        case .gem:
-            return .gem
-        }
-    }
-    
-    var amount: Int {
-        switch self {
-        case .gem(let amt): return amt
-        }
-    }
-}
-
 struct LevelGoal: Codable, Hashable {
     let type: LevelGoalType
-    let reward: LevelGoalReward
     let tileType: TileType
     let targetAmount: Int
     let minimumGroupSize: Int
     let grouped: Bool
     
     static func gemGoal(amount: Int) -> LevelGoal {
-        return LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .gem, targetAmount: amount, minimumGroupSize: 1, grouped: false)
+        return LevelGoal(type: .unlockExit, tileType: .gem, targetAmount: amount, minimumGroupSize: 1, grouped: false)
     }
     
     static func killMonsterGoal(amount: Int) -> LevelGoal {
-        return LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .monster(.zeroedEntity(type: .rat)), targetAmount: amount, minimumGroupSize: 1, grouped: false)
+        return LevelGoal(type: .unlockExit, tileType: .monster(.zeroedEntity(type: .rat)), targetAmount: amount, minimumGroupSize: 1, grouped: false)
     }
     
     static func pillarGoal(amount: Int) -> LevelGoal {
-        return LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .pillar(PillarData(color: .blue, health: 1)), targetAmount: amount, minimumGroupSize: 1, grouped: false)
+        return LevelGoal(type: .unlockExit, tileType: .pillar(PillarData(color: .blue, health: 1)), targetAmount: amount, minimumGroupSize: 1, grouped: false)
     }
     
     static func useRuneGoal(amount: Int) -> LevelGoal {
-        return LevelGoal(type: .useRune, reward: .gem(1), tileType: .empty, targetAmount: amount, minimumGroupSize: 1, grouped: false)
+        return LevelGoal(type: .useRune, tileType: .empty, targetAmount: amount, minimumGroupSize: 1, grouped: false)
     }
+}
+
+struct PillarCoorindates: Codable {
+    let pillar: TileType
+    let coord: TileCoord
+    
+    init(_ tuple: (TileType, TileCoord)) {
+        self.pillar = tuple.0
+        self.coord = tuple.1
+    }
+    
 }
 
 struct Level: Codable {
@@ -72,17 +57,11 @@ struct Level: Codable {
     let boardSize: Int
     let tileTypeChances: TileTypeChanceModel
     let maxSpecialRocks = 5
-    let pillarCoordinates: [(TileType, TileCoord)]
+    let pillarCoordinates: [PillarCoorindates]
     let goals: [LevelGoal]
     let maxSpawnGems: Int
     let storeOffering: [StoreOffer]
-    var goalProgress: [GoalTracking] = []
-    
-    var tutorialData: TutorialData?
-    
-    var isTutorial: Bool {
-        return tutorialData != nil
-    }
+    var goalProgress: [GoalTracking]
     
     var hasExit: Bool {
         return type != .boss
@@ -92,5 +71,5 @@ struct Level: Codable {
         return type != .boss
     }
         
-    static let zero = Level(type: .first, depth: 0, monsterTypeRatio: [:], monsterCountStart: 0, maxMonsterOnBoardRatio: 0.0, boardSize: 0, tileTypeChances: TileTypeChanceModel(chances: [.empty: 1]), pillarCoordinates: [], goals: [LevelGoal(type: .unlockExit, reward: .gem(0), tileType: .empty, targetAmount: 0, minimumGroupSize: 0, grouped: false)], maxSpawnGems: 0, storeOffering: [], tutorialData: nil)
+    static let zero = Level(type: .first, depth: 0, monsterTypeRatio: [:], monsterCountStart: 0, maxMonsterOnBoardRatio: 0.0, boardSize: 0, tileTypeChances: TileTypeChanceModel(chances: [.empty: 1]), pillarCoordinates: [], goals: [LevelGoal(type: .unlockExit, tileType: .empty, targetAmount: 0, minimumGroupSize: 0, grouped: false)], maxSpawnGems: 0, storeOffering: [], goalProgress: [])
 }

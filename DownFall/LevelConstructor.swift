@@ -24,7 +24,8 @@ struct LevelConstructor {
                      pillarCoordinates: pillars(depth: depth),
                      goals: levelGoal(depth: depth),
                      maxSpawnGems: maxSpawnGems(depth: depth),
-                     storeOffering: storeOffer(depth: depth))
+                     storeOffering: storeOffer(depth: depth),
+                     goalProgress: [])
     }
     
     static func buildLevels(_ difficulty: Difficulty, randomSource: GKLinearCongruentialRandomSource) -> [Level] {
@@ -36,10 +37,10 @@ struct LevelConstructor {
                          maxMonsterOnBoardRatio: maxMonsterOnBoardRatio(per: levelType, difficulty: difficulty),
                          boardSize: boardSize(per: levelType, difficulty: difficulty),
                          tileTypeChances: availableRocksPerLevel(levelType, difficulty: difficulty),
-                         pillarCoordinates: pillars(per: levelType, difficulty: difficulty),
+                         pillarCoordinates: pillars(depth: levelType.rawValue),
                          goals: levelGoal(per: levelType, difficulty: difficulty),
                          maxSpawnGems: 3,
-                         storeOffering: storeOffer(per: levelType, difficulty: difficulty))
+                         storeOffering: storeOffer(per: levelType, difficulty: difficulty), goalProgress: [])
         }
     }
     
@@ -195,7 +196,7 @@ struct LevelConstructor {
     static func levelGoal(depth: Depth) -> [LevelGoal] {
         func randomRockGoal(_ colors: [Color], amount: Int, minimumGroupSize: Int) -> LevelGoal? {
             guard let randomColor = colors.randomElement() else { return nil }
-            return LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .rock(randomColor), targetAmount: amount, minimumGroupSize: minimumGroupSize, grouped: minimumGroupSize > 1)
+            return LevelGoal(type: .unlockExit, tileType: .rock(randomColor), targetAmount: amount, minimumGroupSize: minimumGroupSize, grouped: minimumGroupSize > 1)
         }
         
         
@@ -272,7 +273,7 @@ struct LevelConstructor {
         
         func randomRockGoal(_ colors: [Color], amount: Int, minimumGroupSize: Int) -> LevelGoal? {
             guard let randomColor = colors.randomElement() else { return nil }
-            return LevelGoal(type: .unlockExit, reward: .gem(1), tileType: .rock(randomColor), targetAmount: amount, minimumGroupSize: minimumGroupSize, grouped: minimumGroupSize > 1)
+            return LevelGoal(type: .unlockExit, tileType: .rock(randomColor), targetAmount: amount, minimumGroupSize: minimumGroupSize, grouped: minimumGroupSize > 1)
         }
         
         
@@ -347,10 +348,10 @@ struct LevelConstructor {
                   boardSize: 4,
                   tileTypeChances: TileTypeChanceModel(chances: [.empty: 1]),
                   pillarCoordinates: [],
-                  goals: [LevelGoal(type: .unlockExit, reward: .gem(0), tileType: .empty, targetAmount: 0, minimumGroupSize: 0, grouped: false)],
+                  goals: [LevelGoal(type: .unlockExit, tileType: .empty, targetAmount: 0, minimumGroupSize: 0, grouped: false)],
                   maxSpawnGems: 0,
                   storeOffering: [],
-                  tutorialData: nil)
+                  goalProgress: [])
         }
     }
     
@@ -479,109 +480,109 @@ struct LevelConstructor {
         }
     }
     
-    static func pillars(depth: Depth) -> [(TileType, TileCoord)] {
+    static func pillars(depth: Depth) -> [PillarCoorindates] {
         return []
     }
     
-    static func pillars(per levelType: LevelType, difficulty: Difficulty) -> [(TileType, TileCoord)] {
-        
-        func randomPillar(notIn set: Set<Color>) -> TileType {
-            var color = Color.allCases.randomElement()!
-            while set.contains(color) {
-                color = Color.allCases.randomElement()!
-            }
-            return TileType.pillar(PillarData(color: color, health: 3))
-        }
-        
-        
-        let boardWidth = boardSize(per: levelType, difficulty: difficulty)
-        let inset = 2
-        switch levelType {
-        case .first:
-            return []
-        case .second:
-            return [
-                (randomPillar(notIn: Set<Color>([.purple, .brown, .green])), TileCoord(boardWidth/2, boardWidth/2)),
-                (randomPillar(notIn: Set<Color>([.purple, .brown, .green])), TileCoord(boardWidth/2 - 1, boardWidth/2 - 1)),
-            ]
-        case .third:
-            return [
-                (randomPillar(notIn: Set<Color>([.brown, .green])), TileCoord(inset, inset)),
-                (randomPillar(notIn: Set<Color>([.brown, .green])), TileCoord(boardWidth-inset-1, boardWidth-inset-1))
-            ]
-        case .fourth:
-            let inset = 4
-            let randoPillar = randomPillar(notIn: Set<Color>([.brown, .green]))
-            return [
-                (randoPillar, TileCoord(inset, boardWidth-inset-2)),
-                (randoPillar, TileCoord(inset, boardWidth-inset-1)),
-                (randoPillar, TileCoord(inset, boardWidth-inset))
-            ]
-            
-        case .fifth:
-            let randomPillar1 = randomPillar(notIn: Set<Color>([.brown, .green]))
-            let randomPillar2 = randomPillar(notIn: Set<Color>([.brown, .green]))
-            return [
-                (randomPillar1, TileCoord(0, 0)),
-                (randomPillar1, TileCoord(0, 1)),
-                (randomPillar1, TileCoord(1, 0)),
-                (randomPillar2, TileCoord(boardWidth-1, boardWidth-2)),
-                (randomPillar2, TileCoord(boardWidth-1, boardWidth-1)),
-                (randomPillar2, TileCoord(boardWidth-2, boardWidth-1))
-            ]
-        case .sixth:
-            let localInset = 3
-            return [
-                (randomPillar(notIn: Set<Color>([.green])), TileCoord(boardWidth-localInset-1, localInset)),
-                (randomPillar(notIn: Set<Color>([.green])), TileCoord(boardWidth-localInset-1, boardWidth-localInset-1)),
-                (randomPillar(notIn: Set<Color>([.green])), TileCoord(localInset, boardWidth-localInset-1)),
-                (randomPillar(notIn: Set<Color>([.green])), TileCoord(localInset, localInset))
-            ]
-        case .seventh:
-            let localInset = 2
-            let otherInset = 4
-            return [
-                (randomPillar(notIn: Set<Color>([.green])), TileCoord(boardWidth-localInset-1, localInset)),
-                (randomPillar(notIn: Set<Color>([.green])), TileCoord(boardWidth-localInset-1, boardWidth-localInset-1)),
-                (randomPillar(notIn: Set<Color>([.green])), TileCoord(localInset, boardWidth-localInset-1)),
-                (randomPillar(notIn: Set<Color>([.green])), TileCoord(localInset, localInset)),
-                (randomPillar(notIn: Set<Color>([.green])), TileCoord(boardWidth-otherInset-1, otherInset)),
-                (randomPillar(notIn: Set<Color>([.green])), TileCoord(boardWidth-otherInset-1, boardWidth-otherInset-1)),
-                (randomPillar(notIn: Set<Color>([.green])), TileCoord(otherInset, boardWidth-otherInset-1)),
-                (randomPillar(notIn: Set<Color>([.green])), TileCoord(otherInset, otherInset))
-            ]
-        case .tutorial1, .tutorial2:
-            return []
-        case .boss:
-            var pillarCoords: [TileCoord] = []
-            let beforeHalf = boardWidth/2 - 1
-            let afterHalf = boardWidth/2
-            for column in beforeHalf...afterHalf {
-                for row in (boardWidth/2 - 2)...(boardWidth/2 + 1) {
-                    pillarCoords.append(TileCoord(row, column))
-                }
-            }
-            
-            let pillarTypes: [TileType] = [
-                TileType.pillar(PillarData(color: .red, health: 3)),
-                .pillar(PillarData(color: .red, health: 3)),
-                .pillar(PillarData(color: .blue, health: 3)),
-                .pillar(PillarData(color: .blue, health: 3)),
-                .pillar(PillarData(color: .brown, health: 3)),
-                .pillar(PillarData(color: .brown, health: 3)),
-                .pillar(PillarData(color: .purple, health: 3)),
-                .pillar(PillarData(color: .purple, health: 3))
-            ]
-            
-            var result:  [(TileType, TileCoord)] = []
-            //TODO: make this determinstically randomized
-            for (index, type) in pillarTypes.shuffled().enumerated() {
-                result.append( (type, pillarCoords[index]) )
-            }
-            
-            return result
-        }
-    }
+//    static func pillars(per levelType: LevelType, difficulty: Difficulty) -> [PillarCoorindates] {
+//        
+//        func randomPillar(notIn set: Set<Color>) -> TileType {
+//            var color = Color.allCases.randomElement()!
+//            while set.contains(color) {
+//                color = Color.allCases.randomElement()!
+//            }
+//            return TileType.pillar(PillarData(color: color, health: 3))
+//        }
+//        
+//        
+//        let boardWidth = boardSize(per: levelType, difficulty: difficulty)
+//        let inset = 2
+//        switch levelType {
+//        case .first:
+//            return []
+//        case .second:
+//            return [
+//                (randomPillar(notIn: Set<Color>([.purple, .brown, .green])), TileCoord(boardWidth/2, boardWidth/2)),
+//                (randomPillar(notIn: Set<Color>([.purple, .brown, .green])), TileCoord(boardWidth/2 - 1, boardWidth/2 - 1)),
+//            ]
+//        case .third:
+//            return [
+//                (randomPillar(notIn: Set<Color>([.brown, .green])), TileCoord(inset, inset)),
+//                (randomPillar(notIn: Set<Color>([.brown, .green])), TileCoord(boardWidth-inset-1, boardWidth-inset-1))
+//            ]
+//        case .fourth:
+//            let inset = 4
+//            let randoPillar = randomPillar(notIn: Set<Color>([.brown, .green]))
+//            return [
+//                (randoPillar, TileCoord(inset, boardWidth-inset-2)),
+//                (randoPillar, TileCoord(inset, boardWidth-inset-1)),
+//                (randoPillar, TileCoord(inset, boardWidth-inset))
+//            ]
+//            
+//        case .fifth:
+//            let randomPillar1 = randomPillar(notIn: Set<Color>([.brown, .green]))
+//            let randomPillar2 = randomPillar(notIn: Set<Color>([.brown, .green]))
+//            return [
+//                (randomPillar1, TileCoord(0, 0)),
+//                (randomPillar1, TileCoord(0, 1)),
+//                (randomPillar1, TileCoord(1, 0)),
+//                (randomPillar2, TileCoord(boardWidth-1, boardWidth-2)),
+//                (randomPillar2, TileCoord(boardWidth-1, boardWidth-1)),
+//                (randomPillar2, TileCoord(boardWidth-2, boardWidth-1))
+//            ]
+//        case .sixth:
+//            let localInset = 3
+//            return [
+//                (randomPillar(notIn: Set<Color>([.green])), TileCoord(boardWidth-localInset-1, localInset)),
+//                (randomPillar(notIn: Set<Color>([.green])), TileCoord(boardWidth-localInset-1, boardWidth-localInset-1)),
+//                (randomPillar(notIn: Set<Color>([.green])), TileCoord(localInset, boardWidth-localInset-1)),
+//                (randomPillar(notIn: Set<Color>([.green])), TileCoord(localInset, localInset))
+//            ]
+//        case .seventh:
+//            let localInset = 2
+//            let otherInset = 4
+//            return [
+//                (randomPillar(notIn: Set<Color>([.green])), TileCoord(boardWidth-localInset-1, localInset)),
+//                (randomPillar(notIn: Set<Color>([.green])), TileCoord(boardWidth-localInset-1, boardWidth-localInset-1)),
+//                (randomPillar(notIn: Set<Color>([.green])), TileCoord(localInset, boardWidth-localInset-1)),
+//                (randomPillar(notIn: Set<Color>([.green])), TileCoord(localInset, localInset)),
+//                (randomPillar(notIn: Set<Color>([.green])), TileCoord(boardWidth-otherInset-1, otherInset)),
+//                (randomPillar(notIn: Set<Color>([.green])), TileCoord(boardWidth-otherInset-1, boardWidth-otherInset-1)),
+//                (randomPillar(notIn: Set<Color>([.green])), TileCoord(otherInset, boardWidth-otherInset-1)),
+//                (randomPillar(notIn: Set<Color>([.green])), TileCoord(otherInset, otherInset))
+//            ]
+//        case .tutorial1, .tutorial2:
+//            return []
+//        case .boss:
+//            var pillarCoords: [TileCoord] = []
+//            let beforeHalf = boardWidth/2 - 1
+//            let afterHalf = boardWidth/2
+//            for column in beforeHalf...afterHalf {
+//                for row in (boardWidth/2 - 2)...(boardWidth/2 + 1) {
+//                    pillarCoords.append(TileCoord(row, column))
+//                }
+//            }
+//            
+//            let pillarTypes: [TileType] = [
+//                TileType.pillar(PillarData(color: .red, health: 3)),
+//                .pillar(PillarData(color: .red, health: 3)),
+//                .pillar(PillarData(color: .blue, health: 3)),
+//                .pillar(PillarData(color: .blue, health: 3)),
+//                .pillar(PillarData(color: .brown, health: 3)),
+//                .pillar(PillarData(color: .brown, health: 3)),
+//                .pillar(PillarData(color: .purple, health: 3)),
+//                .pillar(PillarData(color: .purple, health: 3))
+//            ]
+//            
+//            var result:  [(TileType, TileCoord)] = []
+//            //TODO: make this determinstically randomized
+//            for (index, type) in pillarTypes.shuffled().enumerated() {
+//                result.append( (type, pillarCoords[index]) )
+//            }
+//            
+//            return result.map { PillarCoorindates($0) }
+//        }
+//    }
     
     
     static func monsterCountStart(depth: Depth) -> Int {

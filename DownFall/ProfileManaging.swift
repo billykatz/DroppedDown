@@ -17,8 +17,13 @@ struct Profile: Codable {
     var currentRun: RunModel?
     
     func updatePlayer(_ entityModel: EntityModel) -> Profile {
-        return Profile(name: name, progress: progress, player: entityModel)
+        return Profile(name: name, progress: progress + 1, player: entityModel)
     }
+    
+    func updateRunModel(_ currentRun: RunModel) -> Profile {
+        return Profile(name: name, progress: progress + 1, player: player, currentRun: currentRun)
+    }
+        
 }
 
 protocol ProfileManaging {
@@ -35,7 +40,7 @@ protocol ProfileManaging {
     func deleteAllRemoteProfile()
     
     /// Emits the profile that should be loaded and use to player the game
-    var loadedProfile: AnyPublisher<Profile, Error> { get }
+    var loadedProfile: AnyPublisher<Profile?, Error> { get }
     
     /// Saves a profile
     func saveProfile(_ profile: Profile)
@@ -63,7 +68,7 @@ class ProfileViewModel: ProfileManaging {
     }
     
     /// Gets sent the loaded profile
-    private lazy var loadedProfileSubject = PassthroughSubject<Profile, Error>()
+    private lazy var loadedProfileSubject = CurrentValueSubject<Profile?, Error>(nil)
     /// Public interface with the loaded profile
     lazy var loadedProfile = loadedProfileSubject.eraseToAnyPublisher()
     
@@ -197,10 +202,13 @@ class ProfileViewModel: ProfileManaging {
     /// Saves a profile locally and remotely if the file has progressed further than current loaded profile
     /// Sends the updated profile after saving completes
     public func saveProfile(_ profile: Profile) {
-        Publishers.CombineLatest(loadedProfile, Just(profile).setFailureType(to: Error.self))
-            .tryFlatMap { [weak self](loadedProfile, newProfile) -> Future<Profile, Error> in
+        Publishers.CombineLatest(
+            Just(loadedProfileSubject.value).setFailureType(to: Error.self),
+            Just(profile).setFailureType(to: Error.self)
+        )
+            .tryFlatMap { [weak self] (loadedProfile, newProfile) -> Future<Profile, Error> in
                 guard let self = self else { throw ProfileError.profileLoadCancelled }
-                if loadedProfile.progress < newProfile.progress {
+                if loadedProfile?.progress ?? 0 < newProfile.progress {
                     return self.saveProfileLocally(newProfile)
                 } else {
                     throw ProfileError.failedToDeleteLocalProfile

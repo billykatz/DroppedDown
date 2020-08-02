@@ -171,7 +171,7 @@ class Renderer: SKSpriteNode {
                 }
             case .monsterDies:
                 computeNewBoard(for: trans)
-            case .newTurn, .bossTargetsWhatToEat, .bossAttacks, .unlockExit, .playerAwarded, .runeProgressRecord:
+            case .newTurn, .bossTargetsWhatToEat, .bossAttacks, .unlockExit, .runeProgressRecord:
                 animationsFinished(endTiles: trans.endTiles)
             case .itemUsed(let ability, let targets):
                 animateRuneUsed(input: inputType, transformations: transformations, rune: ability, targets: targets)
@@ -645,34 +645,11 @@ extension Renderer {
                             newTileCoord == lastTileCoord else { return }
                         
                         //special case for tutorial
-                        if level.type != .tutorial2 {
-                            InputQueue.append(
-                                Input(.touch(TileCoord(row, col),
-                                             sprites[row][col].type))
-                            )
-                        } else if level.type == .tutorial2, let data = level.tutorialData {
-                            if InputType.fuzzyEqual(data.currentStep.inputToContinue,
-                                                    .touch(TileCoord(row, col), sprites[row][col].type)) {
-                                InputQueue.append(
-                                    Input(.touch(TileCoord(row, col),
-                                                 sprites[row][col].type))
-                                )
-                            }
-                                
-                                // the following logic is specific to the tutorial at hand.
-                                // if we want to constrain where a user can click, then we need to
-                                // understand where and when they are clicking
-                                // where on the board
-                                // and when in the tutorial
-                            else if InputType.fuzzyEqual(data.currentStep.inputToContinue,
-                                                         .monsterDies(.zero, .rat)) {
-                                InputQueue.append(
-                                    Input(.touch(TileCoord(row, col),
-                                                 sprites[row][col].type))
-                                )
-                            }
-                            
-                        }
+                        InputQueue.append(
+                            Input(.touch(TileCoord(row, col),
+                                         sprites[row][col].type))
+                        )
+                        
                     }
                 }
             }

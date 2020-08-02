@@ -8,7 +8,7 @@
 
 import SpriteKit
 
-enum StoreOfferType: Hashable {
+enum StoreOfferType: Codable, Hashable {
     static func ==(lhs: StoreOfferType, rhs: StoreOfferType) -> Bool {
         switch (lhs, rhs) {
         case (.fullHeal, .fullHeal): return true
@@ -29,6 +29,76 @@ enum StoreOfferType: Hashable {
     case gems(amount: Int)
     case dodge
     case luck
+    
+    enum CodingKeys: String, CodingKey {
+        case base
+        case runeModel
+        case gemAmount
+
+    }
+    
+    private enum Base: String, Codable {
+        case fullHeal
+        case plusTwoMaxHealth
+        case rune
+        case runeUpgrade
+        case runeSlot
+        case gems
+        case dodge
+        case luck
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let base = try container.decode(Base.self, forKey: .base)
+        
+        switch base {
+        case .fullHeal:
+            self = .fullHeal
+        case .plusTwoMaxHealth:
+            self = .plusTwoMaxHealth
+        case .rune:
+            let data = try container.decode(Rune.self, forKey: .runeModel)
+            self = .rune(data)
+        case .runeUpgrade:
+            self = .runeUpgrade
+        case .runeSlot:
+            self = .runeSlot
+        case .gems:
+            let amount = try container.decode(Int.self, forKey: .gemAmount)
+            self = .gems(amount: amount)
+        case .dodge:
+            self = .dodge
+        case .luck:
+            self = .luck
+        }
+    }
+    
+    /// This implementation is written about in https://medium.com/@hllmandel/codable-enum-with-associated-values-swift-4-e7d75d6f4370
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        switch self {
+        case .plusTwoMaxHealth:
+            try container.encode(Base.plusTwoMaxHealth, forKey: .base)
+        case .rune(let runeModel):
+            try container.encode(Base.rune, forKey: .base)
+            try container.encode(runeModel, forKey: .runeModel)
+        case .runeUpgrade:
+            try container.encode(Base.runeUpgrade, forKey: .base)
+        case .runeSlot:
+            try container.encode(Base.runeSlot, forKey: .base)
+        case .gems(let amount):
+            try container.encode(Base.gems, forKey: .base)
+            try container.encode(amount, forKey: .gemAmount)
+        case .dodge:
+            try container.encode(Base.dodge, forKey: .base)
+        case .luck:
+            try container.encode(Base.luck, forKey: .base)
+        case .fullHeal:
+            try container.encode(Base.fullHeal, forKey: .base)
+        }
+    }
+
 }
 
 typealias StoreOfferTier = Int
@@ -140,5 +210,72 @@ struct StoreOffer: Codable, Hashable {
         
         return StoreOffer(type: type, tier: tier, textureName: textureName, currency: .gem, title: title, body: body, startingPrice: 0)
     }
+    
+    
+    static func storeOffer(depth: Depth) -> [StoreOffer] {
+        
+        /// Baseline offers for every level after the first
+        var storeOffers: [StoreOffer] = [
+            StoreOffer.offer(type: .fullHeal, tier: 1),
+            StoreOffer.offer(type: .plusTwoMaxHealth, tier: 1)
+        ]
+        
+        // Rune slot
+        let runeSlotOffer = StoreOffer.offer(type: .runeSlot, tier: 3)
+        
+        /// some tier two offers
+        let dodgeUp = StoreOffer.offer(type: .dodge, tier: 2)
+        let luckUp = StoreOffer.offer(type: .luck, tier: 2)
+        let gemsOffer = StoreOffer.offer(type: .gems(amount: 3), tier: 2)
+        
+        /// rune offerings
+        let getSwifty = StoreOffer.offer(type: .rune(Rune.rune(for: .getSwifty)), tier: 3)
+        let rainEmbers = StoreOffer.offer(type: .rune(Rune.rune(for: .rainEmbers)), tier: 3)
+        let transform = StoreOffer.offer(type: .rune(Rune.rune(for: .transformRock)), tier: 3)
+
+            
+        storeOffers.append(contentsOf: [dodgeUp, luckUp, gemsOffer])
+
+        
+        switch depth {
+        case 0:
+            /// This is a special case where we want to start our play testers with a rune
+            let getSwifty = StoreOffer.offer(type: .rune(Rune.rune(for: .getSwifty)), tier: 1)
+            let rainEmbers = StoreOffer.offer(type: .rune(Rune.rune(for: .rainEmbers)), tier: 1)
+            let transform = StoreOffer.offer(type: .rune(Rune.rune(for: .transformRock)), tier: 1)
+            return [getSwifty, rainEmbers, transform]
+        case 1:
+            // two goals
+            ()
+        case 2:
+            /// two goals
+            ()
+        case 3:
+            /// offer a rune slot or gems
+            let gemOffer = StoreOffer.offer(type: .gems(amount: 5), tier: 3)
+            storeOffers.append(contentsOf: [runeSlotOffer, gemOffer])
+        case 4:
+            /// give the player chance to fill their last rune slot or just gems
+            storeOffers.append(contentsOf: [getSwifty, rainEmbers, transform])
+        case 5:
+            /// give the player a chance at the rune slot
+            let gemOffer = StoreOffer.offer(type: .gems(amount: 10), tier: 3)
+            storeOffers.append(contentsOf: [runeSlotOffer, gemOffer])
+        case 6:
+            /// give the player a chance to fill their last rune slot or just gems
+            let gemOffer = StoreOffer.offer(type: .gems(amount: 10), tier: 3)
+            storeOffers.append(contentsOf: [getSwifty, rainEmbers, transform, gemOffer])
+            
+        case (7...Int.max):
+            /// give the player a chance to fill their last rune slot or just gems
+            let gemOffer = StoreOffer.offer(type: .gems(amount: 10), tier: 3)
+            storeOffers.append(gemOffer)
+        default:
+            fatalError("Depth must be postitive Int")
+        }
+        
+        return storeOffers
+    }
+
 }
 

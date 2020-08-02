@@ -25,7 +25,7 @@ class LevelGoalTracker: LevelGoalTracking {
         var goalProgress: [GoalTracking] = []
         var count = 0
         for goal in level.goals {
-            goalProgress.append(GoalTracking(tileType: goal.tileType, current: 0, target: goal.targetAmount, levelGoalType: goal.type, minimumAmount: goal.minimumGroupSize, grouped: goal.grouped, reward: goal.reward, hasBeenRewarded: false))
+            goalProgress.append(GoalTracking(tileType: goal.tileType, current: 0, target: goal.targetAmount, levelGoalType: goal.type, minimumAmount: goal.minimumGroupSize, grouped: goal.grouped, hasBeenRewarded: false))
             count += 1
         }
         self.goalProgress = goalProgress

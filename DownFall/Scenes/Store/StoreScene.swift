@@ -46,7 +46,6 @@ class StoreScene: SKScene {
     private let playableRect: CGRect
     private let background: SKSpriteNode
     private var playerData: EntityModel
-    private let level: Level
 
     weak var storeSceneDelegate: StoreSceneDelegate?
     
@@ -59,7 +58,9 @@ class StoreScene: SKScene {
     
     init(size: CGSize,
          playerData: EntityModel,
-         level: Level,
+         levelGoalProgress: [GoalTracking],
+         storeOffers: [StoreOffer],
+         levelDepth: Int,
          viewModel: StoreSceneViewModel) {
         //playable rect
         playableRect = size.playableRect
@@ -68,14 +69,13 @@ class StoreScene: SKScene {
                                   size: playableRect.size)
         self.viewModel = viewModel
         self.playerData = playerData
-        self.level = level
         
         self.storeHUDViewModel = StoreHUDViewModel(currentPlayerData: playerData)
         self.storeHUD = StoreHUD(viewModel: storeHUDViewModel, size: CGSize(width: playableRect.width, height: Constants.storeHUDHeight))
         
         
-        let trimmedOffers = StoreOffer.trimStoreOffers(storeOffers: level.storeOffering, playerData: playerData)
-        let stagingViewModel = StagingAreaViewModel(storeOffers: trimmedOffers, goalProgress: level.goalProgress, isBeforeLevelOne: level.type == .first)
+        let trimmedOffers = StoreOffer.trimStoreOffers(storeOffers: storeOffers, playerData: playerData)
+        let stagingViewModel = StagingAreaViewModel(storeOffers: trimmedOffers, goalProgress: levelGoalProgress, isBeforeLevelOne: levelDepth == 0)
         self.stagingArea = StagingAreaView(viewModel: stagingViewModel, size: CGSize(width: playableRect.width, height: playableRect.height - Constants.storeHUDHeight))
         
         /// Super init'd

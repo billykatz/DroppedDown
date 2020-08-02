@@ -290,9 +290,9 @@ class TileCreator: TileStrategy {
         }
         
         // place the pillars
-        let pillarCoordinates: Set<TileCoord> = Set(level.pillarCoordinates.map { $0.1 })
-        for (tiletype, coord) in level.pillarCoordinates {
-            tiles[coord.row][coord.column] = Tile(type: tiletype)
+        let pillarCoordinates: Set<TileCoord> = Set(level.pillarCoordinates.map { $0.coord })
+        for (pillar) in level.pillarCoordinates {
+            tiles[pillar.coord.row][pillar.coord.column] = Tile(type: pillar.pillar)
         }
         
         // place the player in a quadrant

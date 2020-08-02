@@ -89,6 +89,7 @@ class LevelCoordinator: LevelCoordinating {
         presentCurrentArea(profile.player)
     }
     
+    /// This should be used when you want load the run from the last part
     func presentCurrentArea(_ entityData: EntityModel) {
         let nextArea = runModel.currentArea()
         switch nextArea.type {
@@ -99,6 +100,7 @@ class LevelCoordinator: LevelCoordinating {
         }
     }
     
+    /// This should be used most of the the time.  When ever you want to proceed in the run, you should call this function.
     func presentNextArea(_ entityData: EntityModel) {
         let nextArea = runModel.nextArea()
         switch nextArea.type {

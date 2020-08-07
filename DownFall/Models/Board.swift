@@ -111,11 +111,6 @@ class Board: Equatable {
                     )
                 )
             )
-        case .bossEatsRocks(let coords):
-            let trans = bossEatsRocks(input, targets: coords)
-            InputQueue.append(Input(.transformation(trans)))
-        case .bossAttacks(let attacks):
-            transformation = bossAttacks(attacks, input: input)
         case .decrementDynamites(let dynamiteCoords):
             let trans = decrementDynamites(input: input, dynamiteCoords: dynamiteCoords)
             InputQueue.append(Input(.transformation(trans)))
@@ -141,10 +136,8 @@ class Board: Equatable {
              .boardBuilt,
              .selectLevel,
              .newTurn,
-             .tutorial,
              .visitStore,
-             .itemUseCanceled, .itemCanBeUsed, .bossTargetsWhatToEat, .bossTargetsWhatToAttack,
-             .rotatePreview, .tileDetail, .levelGoalDetail, .goalProgressRecord:
+             .itemUseCanceled, .itemCanBeUsed, .rotatePreview, .tileDetail, .levelGoalDetail, .goalProgressRecord:
             transformation = nil
         }
         
@@ -240,42 +233,6 @@ class Board: Equatable {
         return [Transformation(transformation: nil, inputType: input.type, endTiles: tiles), removedAndReplaced]
     }
     
-    func bossAttacks(_ attacks: [BossController.BossAttack], input: Input) -> Transformation {
-        for attack in attacks {
-            switch attack {
-            case .bomb(let target):
-                if case TileType.player(let data) = tiles[target.row][target.column].type {
-                    /// deal 3 damage to the player
-                    tiles[target.row][target.column] = Tile(type: .player(data.wasAttacked(for: 3, from: .south)))
-                } else if case TileType.pillar(let data) = tiles[target.row][target.column].type {
-                    /// reconstruct pillars if we rotate into them
-                    tiles[target.row][target.column] = Tile(type: .pillar(PillarData(color: data.color, health: min(3, data.health+1))))
-                } else {
-                    self.tiles[target.row][target.column] = Tile(type: .dynamite(DynamiteFuse(count: 3, hasBeenDecremented: false)))
-                }
-            case .spawn(let target):
-                if case TileType.player(let data) = tiles[target.row][target.column].type {
-                    /// deal 3 damage to the player
-                    tiles[target.row][target.column] = Tile(type: .player(data.wasAttacked(for: 3, from: .south)))
-                } else if case TileType.pillar(let data) = tiles[target.row][target.column].type {
-                    /// reconstruct pillars if we rotate into them
-                    tiles[target.row][target.column] = Tile(type: .pillar(PillarData(color: data.color, health: min(3, data.health + 1))))
-                }
-                else {
-                    self.tiles[target.row][target.column] = Tile(type: tileCreator.randomMonster())
-                }
-            case .destroy(let destroyedRocks):
-                return removeAndReplaces(from: tiles, specificCoord: Array(destroyedRocks), input: input)
-            default:
-                ()
-            }
-        }
-        return Transformation(transformation: nil, inputType: input.type, endTiles: self.tiles)
-    }
-    
-    func bossEatsRocks(_ input: Input, targets: [TileCoord]) -> [Transformation] {
-        return [removeAndReplaces(from: tiles, specificCoord: targets, input: input)]
-    }
     
     func calculateAttacks(for entity: EntityModel, from position: TileCoord) -> [TileCoord] {
         return entity.attack.targets(from: position).compactMap { target in
@@ -942,9 +899,6 @@ extension Board {
         guard let playerPosition = getTileStructPosition(TileType.player(.zero)),
             isWithinBounds(playerPosition.rowBelow) else {
                 return Transformation(transformation: [], inputType: .gameWin)
-        }
-        if level.type == .tutorial1 || level.type == .tutorial2 {
-            return Transformation(transformation: [], inputType: .gameWin)
         }
         
         return Transformation(transformation: [[TileTransformation(playerPosition, playerPosition.rowBelow)]],

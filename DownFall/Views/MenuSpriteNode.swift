@@ -38,58 +38,13 @@ class MenuSpriteNode: SKSpriteNode {
         let menuSizeWidth = playableRect.size.width * menuType.widthCoefficient
         let buttonSize = CGSize(width: menuSizeWidth * 0.4, height: 120)
         
-        if menuType == .rotate {
-            addFingerSprite(menuType, playableRect, precedence)
-            addRotateParagraph(menuType, playableRect, precedence)
-        } else if menuType == .tutorial1Win {
-            // In this case, we want to inform the player about how smart they are
-            // and encourage them to continue to tutorial.  There should only be one button
-            // and it should say "Continue"
-            let paragraphNode = ParagraphNode.labelNode(text:
-                """
-                    Awesome job.
-                    That gem is very valuable, always try to collect gems if you have a chance.
-                    Let's head to the store and spend our gems.
-                """
-                ,paragraphWidth: playableRect.width * 0.70)
-            paragraphNode.position = .zero
-            paragraphNode.zPosition = precedence.rawValue
+        if menuType == .gameWin {
             
-            addChild(paragraphNode)
-            
-
-        } else if menuType == .tutorial2Win {
-            // In this case, we want to inform the player about how smart they are
-            // and encourage them to continue to tutorial.  There should only be one button
-            // and it should say "Continue"
-            let paragraphNode = ParagraphNode.labelNode(text:
-                """
-                    Great job!
-                    Most monsters drop gold when they die.
-                    You can use gold to buy items at the store.
-                """
-                ,paragraphWidth: playableRect.width * 0.70)
-            paragraphNode.position = .zero
-            paragraphNode.zPosition = precedence.rawValue
-            
-            addChild(paragraphNode)
-            
-
-        } else if menuType == .gameWin {
-            
-            let text = level.type == .seventh ?
+            let text =
             """
-            You are a BOSS!
-
-            🎊 🎊 🎊 🎊 🎊
-
-            You beat the seventh and final level.
-            """
-                :
-            """
-            You beat the \(level.type) level.
+            You passed \(level.humanReadableDepth) depth.
             
-            Visit the store to buy some items.
+            Your personal best is: _
             """
             let paragraphNode = ParagraphNode.labelNode(text: text, paragraphWidth: menuSizeWidth * 0.95,
                 fontSize: UIFont.largeSize)
@@ -104,7 +59,7 @@ class MenuSpriteNode: SKSpriteNode {
             """
             Paused
 
-            You will lose all progress if you tap "Main Menu"
+            This is the \(level.humanReadableDepth) depth
             """
             let paragraphNode = ParagraphNode.labelNode(text: text, paragraphWidth: menuSizeWidth * 0.95,
                 fontSize: UIFont.largeSize)

@@ -49,7 +49,6 @@ struct PillarCoorindates: Codable {
 }
 
 struct Level: Codable {
-    let type: LevelType
     let depth: Depth
     let monsterTypeRatio: [EntityModel.EntityType: RangeModel]
     let monsterCountStart: Int
@@ -60,16 +59,19 @@ struct Level: Codable {
     let pillarCoordinates: [PillarCoorindates]
     let goals: [LevelGoal]
     let maxSpawnGems: Int
-    let storeOffering: [StoreOffer]
     var goalProgress: [GoalTracking]
     
     var hasExit: Bool {
-        return type != .boss
+        return true
     }
     
     var spawnsMonsters: Bool {
-        return type != .boss
+        return true
+    }
+    
+    var humanReadableDepth: String {
+        return "\(depth + 1)"
     }
         
-    static let zero = Level(type: .first, depth: 0, monsterTypeRatio: [:], monsterCountStart: 0, maxMonsterOnBoardRatio: 0.0, boardSize: 0, tileTypeChances: TileTypeChanceModel(chances: [.empty: 1]), pillarCoordinates: [], goals: [LevelGoal(type: .unlockExit, tileType: .empty, targetAmount: 0, minimumGroupSize: 0, grouped: false)], maxSpawnGems: 0, storeOffering: [], goalProgress: [])
+    static let zero = Level(depth: 0, monsterTypeRatio: [:], monsterCountStart: 0, maxMonsterOnBoardRatio: 0.0, boardSize: 0, tileTypeChances: TileTypeChanceModel(chances: [.empty: 1]), pillarCoordinates: [], goals: [LevelGoal(type: .unlockExit, tileType: .empty, targetAmount: 0, minimumGroupSize: 0, grouped: false)], maxSpawnGems: 0, goalProgress: [])
 }

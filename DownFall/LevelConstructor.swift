@@ -14,7 +14,7 @@ typealias Depth = Int
 struct LevelConstructor {
     
     static func buildLevel(depth: Depth) -> Level {
-        return Level(type: .first,
+        return Level(
                      depth: 0,
                      monsterTypeRatio: monsterTypes(depth: depth),
                      monsterCountStart: monsterCountStart(depth: depth),
@@ -24,13 +24,12 @@ struct LevelConstructor {
                      pillarCoordinates: pillars(depth: depth),
                      goals: levelGoal(depth: depth),
                      maxSpawnGems: maxSpawnGems(depth: depth),
-                     storeOffering: storeOffer(depth: depth),
                      goalProgress: [])
     }
     
     static func buildLevels(_ difficulty: Difficulty, randomSource: GKLinearCongruentialRandomSource) -> [Level] {
         return LevelType.gameCases.map { levelType in
-            return Level(type: levelType,
+            return Level(
                          depth: levelType.rawValue,
                          monsterTypeRatio: monsterTypes(per: levelType, difficulty: difficulty),
                          monsterCountStart: monsterCountStart(depth: levelType.rawValue),
@@ -40,7 +39,7 @@ struct LevelConstructor {
                          pillarCoordinates: pillars(depth: levelType.rawValue),
                          goals: levelGoal(per: levelType, difficulty: difficulty),
                          maxSpawnGems: 3,
-                         storeOffering: storeOffer(per: levelType, difficulty: difficulty), goalProgress: [])
+                         goalProgress: [])
         }
     }
     
@@ -340,7 +339,7 @@ struct LevelConstructor {
     
     static func buildTutorialLevels() -> [Level] {
         return (0..<LevelType.tutorialCases.count).map { index in
-            Level(type: LevelType.tutorialCases[index],
+            Level(
                   depth: 0,
                   monsterTypeRatio: [:],
                   monsterCountStart: 0,
@@ -350,7 +349,6 @@ struct LevelConstructor {
                   pillarCoordinates: [],
                   goals: [LevelGoal(type: .unlockExit, tileType: .empty, targetAmount: 0, minimumGroupSize: 0, grouped: false)],
                   maxSpawnGems: 0,
-                  storeOffering: [],
                   goalProgress: [])
         }
     }

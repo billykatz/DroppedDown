@@ -165,7 +165,7 @@ class TileCreator: TileStrategy {
             case .rock(.red), .rock(.purple), .rock(.blue), .rock(.brown):
                 validTile = true
             case .item:
-                if !neighbors.contains {  $0.type == TileType.item(.gem) },
+                if !neighbors.contains(where: {  $0.type == TileType.item(.gem) }),
                     specialGems < level.maxSpawnGems {
                     specialGems += 1
                     validTile = true

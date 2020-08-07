@@ -44,15 +44,10 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
                                         .playAgain,
                                         .reffingFinished(newTurn: false),
                                         .collectItem(TileCoord(0,0), .zero, 0),
-                                        .tutorial(.zero),
                                         .itemUseCanceled,
                                         .itemUseSelected(.zero),
                                         .itemCanBeUsed(false),
                                         .itemUsed(.zero, []),
-                                        .bossTargetsWhatToEat([]),
-                                        .bossEatsRocks([]),
-                                        .bossTargetsWhatToAttack([]),
-                                        .bossAttacks([]),
                                         .decrementDynamites(Set<TileCoord>()),
                                         .rotatePreview([], .zero),
                                         .rotatePreviewFinish([], nil),
@@ -86,16 +81,11 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
     case collectItem(TileCoord, Item, Int)
     case selectLevel
     case newTurn
-    case tutorial(TutorialStep)
     case visitStore
     case itemUseSelected(Rune)
     case itemUseCanceled
     case itemCanBeUsed(Bool)
     case itemUsed(Rune, [TileCoord])
-    case bossTargetsWhatToEat([TileCoord])
-    case bossEatsRocks([TileCoord])
-    case bossTargetsWhatToAttack([BossController.BossAttack])
-    case bossAttacks([BossController.BossAttack])
     case decrementDynamites(Set<TileCoord>)
     case rotatePreview([[DFTileSpriteNode]], Transformation)
     case rotatePreviewFinish([SpriteAction], Transformation?)
@@ -145,8 +135,6 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
             return "New Turn"
         case .touchBegan:
             return "Touch began"
-        case .tutorial(let dialog):
-            return "Tutorial with \(dialog)"
         case .visitStore:
             return "Visiting store between levels"
         case .itemUseCanceled:
@@ -157,14 +145,6 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
             return "item can be used: \(used)"
         case .itemUsed(let ability, let targets):
             return "\(ability.textureName) used on targets \(targets)"
-        case .bossTargetsWhatToEat:
-            return "Boss targets what to eat"
-        case .bossEatsRocks:
-            return "Boss eats rocks"
-        case .bossTargetsWhatToAttack:
-            return "Boss targets what to attack"
-        case .bossAttacks:
-            return "Boss attacks"
         case .decrementDynamites:
             return "Decrement the dynamite fuses"
         case .rotatePreview:

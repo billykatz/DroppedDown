@@ -187,9 +187,7 @@ struct EntityModel: Equatable, Codable {
     }
     
     func wasAttacked(for damage: Int, from direction: Direction) -> EntityModel {
-        var shieldedDamage = 0
-        let finalDamage = damage - shieldedDamage
-        return update(hp: hp - finalDamage)
+        return update(hp: hp - damage)
     }
     
     func doesDodge() -> Bool {

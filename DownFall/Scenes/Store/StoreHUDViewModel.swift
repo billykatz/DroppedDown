@@ -91,7 +91,7 @@ class StoreHUDViewModel: StoreHUDViewModelable {
         }
         
         /// trigger a rune replacement flow if there isn't an empty slot in your pickaxe handle
-        if let rune = effect.rune,
+        if let _ = effect.rune,
             basePlayerData.pickaxe?.runeSlots == basePlayerData.pickaxe?.runes.count {
             startRuneReplacement(effect)
         } else {

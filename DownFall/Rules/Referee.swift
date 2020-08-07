@@ -89,7 +89,6 @@ class Referee {
         let playerPosition = getTilePosition(.player(.zero), tiles: tiles)
         let exitPosition = getTilePosition(.exit(blocked: false), tiles: tiles)
         let dynamitePositions = getTilePositions(.dynamite(DynamiteFuse(count: 0, hasBeenDecremented: false)), tiles: tiles)
-        let emptyPositions = getTilePosition(.empty, tiles: tiles)
         
         func boardHasMoreMoves() -> Bool {
             guard let playerPosition = playerPosition else { return false }

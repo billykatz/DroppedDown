@@ -154,7 +154,7 @@ class TileDetailView: SKNode {
     }
     
     private func gemDescription(tileType: TileType, nextTo: CGRect) -> ParagraphNode? {
-        guard case TileType.item(let item) = tileType  else { return nil }
+        guard case TileType.item = tileType  else { return nil }
         let text =
         """
         \u{2022} Valuable currency.

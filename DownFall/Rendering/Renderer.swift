@@ -163,14 +163,12 @@ class Renderer: SKSpriteNode {
                 }
             case .monsterDies:
                 computeNewBoard(for: trans)
-            case .newTurn, .bossTargetsWhatToEat, .bossAttacks, .unlockExit, .runeProgressRecord:
+            case .newTurn, .unlockExit, .runeProgressRecord:
                 animationsFinished(endTiles: trans.endTiles)
             case .itemUsed(let ability, let targets):
                 animateRuneUsed(input: inputType, transformations: transformations, rune: ability, targets: targets)
             case .collectItem:
                 computeNewBoard(for: trans)
-            case .bossEatsRocks:
-                computeNewBoard(for: transformations)
             case .decrementDynamites:
                 computeNewBoard(for: transformations)
             case .refillEmpty:
@@ -444,13 +442,8 @@ extension Renderer {
                 // set the position way in the background so that new nodes come in over
                 sprites[tileTrans.end.x][tileTrans.end.y].zPosition = Precedence.underground.rawValue
                 
-                var crumbleAnimations: [SKAction] = [crumble.1]
-                if case InputType.bossEatsRocks? = transformation.inputType {
-                    let targetPosition = CGPoint.alignVertically(sprites[tileTrans.end.x][tileTrans.end.y].frame, relativeTo: self.hud.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: -3 * Style.Padding.most, translatedToBounds: true)
-                    let action = SKAction.move(to: targetPosition, duration: 0.5)
-                    crumbleAnimations.insert(action, at: 0)
-                    
-                }
+                let crumbleAnimations: [SKAction] = [crumble.1]
+
                 let newCrumble = (sprites[tileTrans.end.x][tileTrans.end.y], SKAction.sequence(crumbleAnimations))
                 removedAnimations.append(newCrumble)
             }

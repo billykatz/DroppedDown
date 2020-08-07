@@ -79,8 +79,6 @@ class HelperTextView: SKSpriteNode {
             ()
         case .rotateCounterClockwise, .rotateClockwise:
             descriptionText = "Try swiping up or down on the\n right side of the screen!!"
-        case .tutorial(let step):
-            showStep(step)
         default:
             descriptionText = ""
         }
@@ -95,39 +93,9 @@ class HelperTextView: SKSpriteNode {
         descLabel.fontName = "Helvetica"
         descLabel.position = CGPoint(x: 0, y: -45)
         descLabel.numberOfLines = 0
-  
-        
-//        if showGem {
-//            let spriteNode = SKSpriteNode(texture: SKTexture(imageNamed: "gem1"), size: CGSize(width: 100, height: 100))
-//            spriteNode.position = CGPoint(x: 300, y: 20)
-//            self.addChild(spriteNode)
-//        }
     }
     
     var paragraphWidth: CGFloat {
         return frame.width - Style.Padding.more
     }
-    
-    func showStep(_ step: TutorialStep) {
-        self.removeAllChildren()
-        let paragraph = ParagraphNode.labelNode(text: step.dialog,
-                                                paragraphWidth: paragraphWidth,
-                                                fontSize: UIFont.extraLargeSize)
-        paragraph.position = CGPoint(x: 0.0, y: Style.Padding.most)
-        paragraph.zPosition = Precedence.foreground.rawValue
-        
-        
-        addChild(paragraph)
-
-        if step.tapToContinue {
-            let tapToContinue = ParagraphNode.labelNode(text: "Tap anywhere to continue",
-                                                        paragraphWidth: paragraphWidth,
-                                                        fontSize: UIFont.mediumSize)
-        
-            tapToContinue.position = CGPoint.position(this: tapToContinue.frame, centeredInBottomOf: self.frame, verticalPadding: Style.Padding.most)
-            
-            addChild(tapToContinue)
-        }
-    }
-        
 }

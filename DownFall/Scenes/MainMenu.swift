@@ -31,6 +31,7 @@ class MainMenu: SKScene {
     override func didMove(to view: SKView) {
         background = self.childNode(withName: "background") as? SKSpriteNode
         background.color = UIColor.clayRed
+        self.removeAllChildren(exclude: ["background"])
         
         
         let startButton = Button(size: Style.RunMenu.buttonSize,

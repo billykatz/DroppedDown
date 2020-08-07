@@ -86,7 +86,7 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate, OptionsSceneDelegate 
         /// update the profile to show
         /// the player's gems
         guard let profile = profile else { fatalError("We need a profile to continue") }
-        let currentRun: RunModel? = profile.player.isDead ? nil : currentRun
+        let currentRun: RunModel? = updatedPlayerData.isDead ? nil : currentRun
         let profileWithCurrentRun = profile.updateRunModel(currentRun)
         let profileUpdateWithGems = profileWithCurrentRun.player.updateCarry(carry: updatedPlayerData.carry)
         self.profile = profileWithCurrentRun.updatePlayer(profileUpdateWithGems)

@@ -82,12 +82,17 @@ class ProfileViewModel: ProfileManaging {
     /// Background Queue
     private var backgroundQueue = DispatchQueue.init(label: "profile-saving-thread", qos: .userInitiated, attributes: .concurrent)
     
+    private let localPlayer: GKLocalPlayer
+    init(localPlayer: GKLocalPlayer = GKLocalPlayer.local) {
+        self.localPlayer = localPlayer
+    }
+    
     /// Defines all business logic and kickoffs the pipeline by attempting to authenicate with GameCenter
     func start(_ presenter: UIViewController) {
         
         /// Load the remote save file into data
         let loadRemoteData =
-            GKLocalPlayer.local.fetchGCSavedGames()
+            localPlayer.fetchGCSavedGames()
                 .print("load remote data")
                 .combineLatest(authenicated.map { _ in })
                 .eraseToAnyPublisher()
@@ -189,12 +194,12 @@ class ProfileViewModel: ProfileManaging {
         
         /// Start the authenicated process
         print("Starting to authenticate with game center")
-        GKLocalPlayer().authenticateHandler = { [weak self] viewController, error in
-            print("Authenitcation handler. Authenticated: \(GKLocalPlayer.local.isAuthenticated)")
+        localPlayer.authenticateHandler = { [weak self] viewController, error in
+            print("Authenitcation handler. Authenticated: \(String(describing: self?.localPlayer.isAuthenticated))")
             if let vc = viewController {
                 presenter.present(vc, animated: true)
             } else {
-                self?.authenicatedSubject.send(GKLocalPlayer.local.isAuthenticated)
+                self?.authenicatedSubject.send(self?.localPlayer.isAuthenticated ?? false)
             }
         }
     }
@@ -266,8 +271,7 @@ class ProfileViewModel: ProfileManaging {
     
     /// Delete all profiles saved in GameKit
     public func deleteAllRemoteProfile() {
-        GKLocalPlayer
-            .local
+        localPlayer
             .fetchGCSavedGames()
             .print("Deleting Saved Games")
             .flatMap({ games in
@@ -275,8 +279,11 @@ class ProfileViewModel: ProfileManaging {
                     .publisher /// Turns array of objects into publisher.
                     .setFailureType(to: Error.self) // Sets the failure type for type consistentency, otherwise this would have error type Never
             })
-            .flatMap( { game in
-                return GKLocalPlayer.local.deleteGame(game)
+            .tryFlatMap( { [weak self] game -> Future<Bool, Error>  in
+                guard let self = self else {
+                    throw ProfileError.profileLoadCancelled
+                }
+                return self.localPlayer.deleteGame(game)
             })
             .eraseToAnyPublisher()
             .subscribe(on: backgroundQueue)
@@ -413,14 +420,13 @@ class ProfileViewModel: ProfileManaging {
     /// Saves the profile remotely
     /// Uses a JSON encoder to save the data
     private func saveProfileRemotely(_ profile: Profile) -> Future<Profile, Error> {
-        return Future { promise in
+        return Future { [weak self] promise in
             print("Saving profile to GameCenter")
             
-            let localPlayer = GKLocalPlayer()
             let name = profile.name
             do {
                 let data = try JSONEncoder().encode(profile)
-                localPlayer.saveGameData(data, withName: name) { (savedGame, error) in
+                self?.localPlayer.saveGameData(data, withName: name) { (savedGame, error) in
                     if let error = error {
                         print("Error saving game file in Game Center with name \(name)")
                         promise(.failure(ProfileError.failureToSaveRemoteProfile(error)))

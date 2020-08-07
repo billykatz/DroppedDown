@@ -121,12 +121,12 @@ class LevelCoordinator: LevelCoordinating {
     }
     
     // MARK: - GameSceneCoordinatingDelegate
-    func resetToMain(_ scene: SKScene, playerData: EntityModel) {
+    func navigateToMainMenu(_ scene: SKScene, playerData: EntityModel) {
         let fadeOut = SKAction.fadeOut(withDuration: 0.75)
         let remove = SKAction.removeFromParent()
         scene.run(SKAction.group([fadeOut, remove])) { [weak self] in
             guard let self = self else { return }
-            self.delegate?.finishGame(playerData: playerData)
+            self.delegate?.finishGame(playerData: playerData, currentRun: self.runModel)
         }
 
     }

@@ -46,14 +46,6 @@ class Renderer: SKSpriteNode {
         return MenuSpriteNode(.rotate, playableRect: self.playableRect, precedence: .menu, level: self.level)
     }()
     
-    private lazy var tutorial1WinSprite: MenuSpriteNode = {
-        return MenuSpriteNode(.tutorial1Win, playableRect: self.playableRect, precedence: .menu, level: self.level)
-    }()
-    
-    private lazy var tutorial2WinSprite: MenuSpriteNode = {
-        return MenuSpriteNode(.tutorial2Win, playableRect: self.playableRect, precedence: .menu, level: self.level)
-    }()
-    
     private lazy var safeArea: SKSpriteNode = {
         //create safe area
         let safeArea = SKSpriteNode(color: .clear, size: CGSize(width: playableRect.width, height: 75.0))
@@ -223,39 +215,10 @@ class Renderer: SKSpriteNode {
             foreground.addChildSafely(menuForeground)
         case .playAgain:
             menuForeground.removeFromParent()
-        case .tutorial(let step):
-            renderTutorial(step)
         case .newTurn:
             animationsFinished(endTiles: input.endTilesStruct, ref: false)
         default:
             ()
-        }
-    }
-    
-    private func renderTutorial(_ step: TutorialStep) {
-        let types = step.highlightType
-        let coords = step.highlightCoordinates
-        let showFinger = step.showFingerWithHighlight
-        for (row, spriteRow) in sprites.enumerated() {
-            for (col, _) in spriteRow.enumerated() {
-                let sprite = sprites[row][col]
-                sprite.removeAllChildren()
-                if types.contains(sprite.type) {
-                    sprite.tutorialHighlight()
-                    if showFinger {
-                        sprite.showFinger()
-                    }
-                }
-                
-                if coords.contains(TileCoord(row, col)) {
-                    sprite.indicateSpriteWillBeAttacked()
-                }
-            }
-        }
-        
-        if step.showClockwiseRotate {
-            menuForeground.addChildSafely(rotateSprite)
-            foreground.addChildSafely(menuForeground)
         }
     }
     
@@ -358,9 +321,9 @@ class Renderer: SKSpriteNode {
         }
         
         /// It is possible to create shift down without new tiles. Consider the scenario where there is one column with two pillars with at least one tile separating them. A player could destory the lower pillar and expect the tiles above it to fall down.
-        /// [pillar]        [pillar]
-        /// [rock]      ->  [empty]
-        /// [pillar]        [rock]
+        /// [pillar]                  [pillar]
+        /// [rock]        ->          [empty]
+        /// [pillar]  (destroyed)     [rock]
         let newTiles = transformation.tileTransformation?.first ?? []
         
         // START THE SHIFT DOWN ANIMATION
@@ -408,29 +371,6 @@ class Renderer: SKSpriteNode {
             guard let self = self else { return }
             completion?() ?? self.animationsFinished(endTiles: finalTiles)
         }
-    }
-    
-    /// Animate each tileTransformation to display rotation
-    private func rotate(for transformations: [Transformation]) {
-        guard let rotateTrans = transformations.first,
-            let trans = transformations.first?.tileTransformation?.first,
-            let rotateEndTiles = rotateTrans.endTiles else {
-                preconditionFailure("All conditions must be met to rotate")
-        }
-        
-        guard transformations.count > 1 else {
-            var animationCount = 0
-            animate(trans) { [weak self] in
-                guard let strongSelf = self else { return }
-                animationCount += 1
-                if animationCount == trans.count {
-                    strongSelf.animationsFinished(endTiles: rotateEndTiles)
-                }
-            }
-            return
-        }
-        
-        refillEmptyTiles(with: transformations[1])
     }
     
     private func animationsFinished(endTiles: [[Tile]]?,
@@ -644,7 +584,6 @@ extension Renderer {
                             case let InputType.touchBegan(lastTileCoord, _) = lastTouchInput.type,
                             newTileCoord == lastTileCoord else { return }
                         
-                        //special case for tutorial
                         InputQueue.append(
                             Input(.touch(TileCoord(row, col),
                                          sprites[row][col].type))
@@ -663,25 +602,15 @@ extension Renderer {
             
             guard let strongSelf = self else { return }
             strongSelf.menuForeground.removeAllChildren()
-            let gameWinMenu: SKSpriteNode
-            switch strongSelf.level.type {
-            case .first, .second, .third, .fourth, .fifth, .sixth, .seventh, .boss:
-                //TODO: program the boss win sprite
-                gameWinMenu = strongSelf.gameWinSpriteNode
-            case .tutorial1:
-                gameWinMenu = strongSelf.tutorial1WinSprite
-            case .tutorial2:
-                gameWinMenu = strongSelf.tutorial2WinSprite
-            }
+            let gameWinMenu = strongSelf.gameWinSpriteNode
             strongSelf.menuForeground.addChild(gameWinMenu)
-            strongSelf.menuForeground.removeFromParent()
-            strongSelf.foreground.addChild(strongSelf.menuForeground)
+            strongSelf.foreground.addChildSafely(strongSelf.menuForeground)
         }
     }
 }
 
+#if DEBUG
 //MARK: Debug
-
 extension Renderer {
     
     private func debugDrawPlayableArea() {
@@ -706,21 +635,8 @@ extension Renderer {
         outs += "\nbottom of Sprites"
         return outs
     }
-    
-    private func compare(_ a: [[DFTileSpriteNode]], _ b: [[DFTileSpriteNode]]) {
-        var output = ""
-        for (ridx, _) in a.enumerated() {
-            for (cidx, _) in a[ridx].enumerated() {
-                if a[ridx][cidx].type !=  b[ridx][cidx].type {
-                    output += "\n-----\nRow \(ridx), Col \(cidx) are different.\nBefore is \(a[ridx][cidx].type) \nAfter is \(b[ridx][cidx].type)"
-                }
-            }
-        }
-        if output == "" { output = "\n-----\nThere are no differences" }
-        print(output)
-    }
-    
 }
+#endif
 
 extension Renderer: SettingsDelegate {
     func settingsTapped() {

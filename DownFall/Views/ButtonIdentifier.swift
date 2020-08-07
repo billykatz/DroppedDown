@@ -45,6 +45,7 @@ enum ButtonIdentifier: String {
     case newProfile
     case resetData
     case mainMenuOptions
+    case continueRun
     
     var title: String {
         switch self {
@@ -54,7 +55,7 @@ enum ButtonIdentifier: String {
             return "Play Again?"
         case .selectLevel:
             return "Level Select"
-        case .leaveStore:
+        case .leaveStore, .continueRun:
             return "Continue"
         case .rotate:
             return "Got it! 👍"

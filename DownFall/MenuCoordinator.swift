@@ -23,7 +23,7 @@ extension SKView {
 protocol MenuCoordinating: class {
     var levelCoordinator: LevelCoordinating { get }
     
-    func finishGame(playerData updatedPlayerData: EntityModel)
+    func finishGame(playerData updatedPlayerData: EntityModel, currentRun: RunModel)
     func loadedProfile(_ profile: Profile)
     
     /// exposed so that we can save the profile
@@ -60,6 +60,7 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate, OptionsSceneDelegate 
     private func presentMainMenu(transition: SKTransition? = nil) {
         guard let mainMenu = mainMenuScene else { fatalError("Unable to unwrap the main menu scene")}
         mainMenu.playerModel = profile?.player
+        mainMenu.hasRunToContinue = profile?.currentRun != nil
 
         view.presentScene(mainMenu, transition: transition)
         view.ignoresSiblingOrder = true
@@ -69,23 +70,26 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate, OptionsSceneDelegate 
     func loadedProfile(_ profile: Profile) {
         self.profile = profile
         
-        if profile.currentRun != nil {
-            levelCoordinator.loadRun(profile.currentRun, profile: profile)
-        } else {
-            presentMainMenu()
-        }
+        presentMainMenu()
     }
     
-    func newGame(_ difficulty: Difficulty, _ playerModel: EntityModel?, level: LevelType) {
-        levelCoordinator.loadRun(profile?.currentRun, profile: profile!)
+    func newGame(_ playerModel: EntityModel?) {
+        profile?.currentRun = nil
+        levelCoordinator.loadRun(nil, profile: profile!)
     }
     
-    func finishGame(playerData updatedPlayerData: EntityModel) {
+    func continueRun() {
+        levelCoordinator.loadRun(profile!.currentRun, profile: profile!)
+    }
+    
+    func finishGame(playerData updatedPlayerData: EntityModel, currentRun: RunModel) {
         /// update the profile to show
         /// the player's gems
         guard let profile = profile else { fatalError("We need a profile to continue") }
-        let profileUpdateWithGems = profile.player.updateCarry(carry: updatedPlayerData.carry)
-        self.profile = profile.updatePlayer(profileUpdateWithGems)
+        let currentRun: RunModel? = profile.player.isDead ? nil : currentRun
+        let profileWithCurrentRun = profile.updateRunModel(currentRun)
+        let profileUpdateWithGems = profileWithCurrentRun.player.updateCarry(carry: updatedPlayerData.carry)
+        self.profile = profileWithCurrentRun.updatePlayer(profileUpdateWithGems)
         
         GameScope.shared.profileManager.saveProfile(self.profile!)
         

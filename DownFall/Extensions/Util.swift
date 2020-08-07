@@ -19,3 +19,16 @@ enum Precedence: CGFloat {
     case flying = 200
 }
 
+func compare(_ a: [[DFTileSpriteNode]], _ b: [[DFTileSpriteNode]]) {
+    var output = ""
+    for (ridx, _) in a.enumerated() {
+        for (cidx, _) in a[ridx].enumerated() {
+            if a[ridx][cidx].type !=  b[ridx][cidx].type {
+                output += "\n-----\nRow \(ridx), Col \(cidx) are different.\nBefore is \(a[ridx][cidx].type) \nAfter is \(b[ridx][cidx].type)"
+            }
+        }
+    }
+    if output == "" { output = "\n-----\nThere are no differences" }
+    print(output)
+}
+

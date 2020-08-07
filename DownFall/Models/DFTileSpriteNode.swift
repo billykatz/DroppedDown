@@ -178,9 +178,13 @@ class DFTileSpriteNode: SKSpriteNode {
         guard type == TileType.item(.gem)  else { return nil }
         let gemGlow = SKSpriteNode(texture: SKTexture(imageNamed: "crystalGlow"), color: .clear, size: self.size)
         let spin = SKAction.rotate(byAngle: .pi*2.0, duration: AnimationSettings.Renderer.glowSpinSpeed)
+        let shrink = SKAction.scale(by: 0.8, duration: 1.0)
+        let grow = SKAction.scale(to: self.size, duration: 1.0)
+        let shrinkThenGrow = SKAction.sequence([shrink, grow])
+        let shrinkGrowForever = SKAction.repeatForever(shrinkThenGrow)
         let spinIndefinitelyAction = SKAction.repeatForever(spin)
         gemGlow.zPosition = Precedence.underground.rawValue
-        return (gemGlow, spinIndefinitelyAction)
+        return (gemGlow, SKAction.group([shrinkGrowForever, spinIndefinitelyAction]))
     }
     
     func crumble() -> (SKSpriteNode, SKAction)? {

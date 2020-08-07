@@ -9,8 +9,9 @@
 import SpriteKit
 
 protocol MainMenuDelegate: class {
-    func newGame(_ difficulty: Difficulty, _ playerModel: EntityModel?, level: LevelType)
+    func newGame(_ playerModel: EntityModel?)
     func optionsSelected()
+    func continueRun()
 }
 
 class MainMenu: SKScene {
@@ -21,25 +22,11 @@ class MainMenu: SKScene {
     
     private var background: SKSpriteNode!
     private var header: Header?
-    private var difficultyLabel: ParagraphNode?
-    private var levelLabel: ParagraphNode?
-    private var levelSelectButton: Button?
+    private var continueRunButton: Button?
     private var gems: Int = 0
     weak var mainMenuDelegate: MainMenuDelegate?
     var playerModel: EntityModel?
-    
-    private var levelTypeIndex = 0 {
-        didSet {
-            levelLabel?.removeFromParent()
-            levelLabel = ParagraphNode(text: "\(LevelType.gameCases[levelTypeIndex])",
-                paragraphWidth: 300,
-                fontColor: .white)
-            levelLabel?.zPosition = Precedence.menu.rawValue
-            levelLabel?.position = CGPoint.alignHorizontally(levelLabel?.frame, relativeTo: levelSelectButton?.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: Style.Padding.most, translatedToBounds: true)
-            addOptionalChild(levelLabel)
-            
-        }
-    }
+    var hasRunToContinue: Bool?
     
     override func didMove(to view: SKView) {
         background = self.childNode(withName: "background") as? SKSpriteNode
@@ -63,23 +50,26 @@ class MainMenu: SKScene {
         )
         addChild(startButton)
         
-        let levelButton = Button(size: Style.RunMenu.buttonSize,
-                                 delegate: self,
-                                 identifier: .cycleLevel,
-                                 precedence: .menu,
-                                 fontSize: UIFont.largeSize,
-                                 fontColor: UIColor.white,
-                                 backgroundColor: .menuPurple)
+        if hasRunToContinue ?? false {
+            let levelButton = Button(size: Style.RunMenu.buttonSize,
+                                     delegate: self,
+                                     identifier: .continueRun,
+                                     precedence: .menu,
+                                     fontSize: UIFont.largeSize,
+                                     fontColor: UIColor.white,
+                                     backgroundColor: .menuPurple)
+            
+            levelButton.position = CGPoint.alignVertically(levelButton.frame,
+                                                           relativeTo: startButton.frame,
+                                                           horizontalAnchor: .left,
+                                                           verticalAlign: .center,
+                                                           horizontalPadding: 200.0,
+                                                           translatedToBounds: true)
+            continueRunButton = levelButton
+    
+            addChild(levelButton)
+        }
         
-        levelButton.position = CGPoint.alignVertically(levelButton.frame,
-                                                       relativeTo: startButton.frame,
-                                                       horizontalAnchor: .left,
-                                                       verticalAlign: .center,
-                                                       horizontalPadding: 200.0,
-                                                       translatedToBounds: true)
-        levelSelectButton = levelButton
-        
-        addChild(levelButton)
         
         
         let optionsButton = Button(size: .buttonLarge, delegate: self, identifier: .mainMenuOptions, image: SKSpriteNode(imageNamed: "lanternOn"), shape: .circle)
@@ -93,11 +83,6 @@ class MainMenu: SKScene {
         )
         addChild(optionsButton)
 
-        
-        
-        
-        
-        levelTypeIndex = 0
         
         let playableRect = size.playableRect
         
@@ -441,16 +426,9 @@ extension MainMenu: ButtonDelegate {
         guard let playerModel = self.playerModel else { return }
         switch button.identifier {
         case .newGame:
-            mainMenuDelegate?.newGame(GameScope.shared.difficulty,
-                                      playerModel.previewAppliedEffects().healFull(),
-                                      level: LevelType.gameCases[levelTypeIndex])
-        case .cycleLevel:
-            if levelTypeIndex + 1 == LevelType.gameCases.count {
-                levelTypeIndex = 0
-            } else {
-                levelTypeIndex += 1
-            }
-            
+            mainMenuDelegate?.newGame(playerModel.previewAppliedEffects().healFull())
+        case .continueRun:
+            mainMenuDelegate?.continueRun()
         case .buyHealth:
             if gems >= healthCost && playerModel.numberOfEffects(healthEffect) < maxHealthBuys {
                 gems -= healthCost

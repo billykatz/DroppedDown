@@ -17,10 +17,10 @@ struct Profile: Codable {
     var currentRun: RunModel?
     
     func updatePlayer(_ entityModel: EntityModel) -> Profile {
-        return Profile(name: name, progress: progress + 1, player: entityModel)
+        return Profile(name: name, progress: progress + 1, player: entityModel, currentRun: currentRun)
     }
     
-    func updateRunModel(_ currentRun: RunModel) -> Profile {
+    func updateRunModel(_ currentRun: RunModel?) -> Profile {
         return Profile(name: name, progress: progress + 1, player: player, currentRun: currentRun)
     }
         

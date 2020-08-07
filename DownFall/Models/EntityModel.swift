@@ -129,6 +129,10 @@ struct EntityModel: Equatable, Codable {
         
     }
     
+    var isDead: Bool {
+        return hp <= 0
+    }
+    
     var runeSlots: Int? {
         return pickaxe?.runeSlots
     }

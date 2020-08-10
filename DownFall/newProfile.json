@@ -1,6 +1,7 @@
 {
     "name": "Profile Name",
     "progress": 3,
+    "deepestDepth": 0,
     "player" :
         { "name": "player3",
             "type": "player",
@@ -44,13 +45,13 @@
                 "items": [
                     {
                         "type": "gem",
-                        "amount": 65
+                        "amount": 0
                         
                     }
                 ]
             },
             "pickaxe": {
-                "runeSlots" : 3,
+                "runeSlots" : 0,
                 "runes" : []
             },
             "abilities": [],

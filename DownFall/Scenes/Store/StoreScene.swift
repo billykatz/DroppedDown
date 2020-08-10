@@ -112,7 +112,7 @@ class StoreScene: SKScene {
                             delegate: self,
                             identifier: .leaveStore,
                             precedence: .foreground,
-                            fontSize:  UIFont.largeSize,
+                            fontSize:  .fontLargeSize,
                             fontColor: .black,
                             backgroundColor: .menuPurple)
         

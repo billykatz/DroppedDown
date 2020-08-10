@@ -87,7 +87,7 @@ class HelperTextView: SKSpriteNode {
         self.removeAllChildren()
         
         let descLabel = SKLabelNode(text: descriptionText)
-        descLabel.fontSize = UIFont.mediumSize
+        descLabel.fontSize = .fontMediumSize
         descLabel.zPosition = 11
         descLabel.fontColor = .lightText
         descLabel.fontName = "Helvetica"

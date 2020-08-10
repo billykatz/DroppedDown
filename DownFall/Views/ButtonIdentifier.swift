@@ -45,6 +45,7 @@ enum ButtonIdentifier: String {
     case newProfile
     case resetData
     case mainMenuOptions
+    case mainMenuStore
     case continueRun
     
     var title: String {
@@ -99,7 +100,11 @@ enum ButtonIdentifier: String {
             return "Delete Remote profile"
         case .resetData:
             return "Reset Data"
-        case .wallet, .infoPopup, .storeItem, .backpack, .sellHealth, .buyHealth, .sellDodge, .buyDodge, .sellLuck, .buyLuck, .buyRuneSlot, .sellRuneSlot, .mainMenuOptions:
+        case .mainMenuStore:
+            return "Store"
+        case .mainMenuOptions:
+            return "Settings"
+        case .wallet, .infoPopup, .storeItem, .backpack, .sellHealth, .buyHealth, .sellDodge, .buyDodge, .sellLuck, .buyLuck, .buyRuneSlot, .sellRuneSlot:
             return ""
         }
     }

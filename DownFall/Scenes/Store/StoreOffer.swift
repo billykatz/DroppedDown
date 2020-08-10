@@ -232,39 +232,54 @@ struct StoreOffer: Codable, Hashable {
         let getSwifty = StoreOffer.offer(type: .rune(Rune.rune(for: .getSwifty)), tier: 3)
         let rainEmbers = StoreOffer.offer(type: .rune(Rune.rune(for: .rainEmbers)), tier: 3)
         let transform = StoreOffer.offer(type: .rune(Rune.rune(for: .transformRock)), tier: 3)
-
+        let vortex = StoreOffer.offer(type: .rune(Rune.rune(for: .vortex)), tier: 3)
+        let bubbleUp = StoreOffer.offer(type: .rune(Rune.rune(for: .bubbleUp)), tier: 3)
+        let flameWall = StoreOffer.offer(type: .rune(Rune.rune(for: .flameWall)), tier: 3)
+        
+        let runeOffers = [
+            getSwifty,
+            rainEmbers,
+            transform,
+            vortex,
+            bubbleUp,
+            flameWall
+        ]
             
         storeOffers.append(contentsOf: [dodgeUp, luckUp, gemsOffer])
 
         
         switch depth {
+            /// 1 Rune Slot
         case 0:
             /// This is a special case where we want to start our play testers with a rune
             let getSwifty = StoreOffer.offer(type: .rune(Rune.rune(for: .getSwifty)), tier: 1)
             let rainEmbers = StoreOffer.offer(type: .rune(Rune.rune(for: .rainEmbers)), tier: 1)
             let transform = StoreOffer.offer(type: .rune(Rune.rune(for: .transformRock)), tier: 1)
-            let vortex = StoreOffer.offer(type: .rune(Rune.rune(for: .vortex)), tier: 2)
-            let bubbleUp = StoreOffer.offer(type: .rune(Rune.rune(for: .bubbleUp)), tier: 2)
-            let flameWall = StoreOffer.offer(type: .rune(Rune.rune(for: .flameWall)), tier: 2)
-            return [getSwifty, rainEmbers, transform, vortex, bubbleUp, flameWall]
+            return [getSwifty, rainEmbers, transform]
         case 1:
             // two goals
             ()
+            
         case 2:
+            // Two Rune Slots
             /// two goals
-            ()
+            storeOffers.append(contentsOf: [getSwifty, rainEmbers, transform])
         case 3:
             /// offer a rune slot or gems
             let gemOffer = StoreOffer.offer(type: .gems(amount: 5), tier: 3)
             storeOffers.append(contentsOf: [runeSlotOffer, gemOffer])
+            
         case 4:
+            /// Three Rune Slots
             /// give the player chance to fill their last rune slot or just gems
             storeOffers.append(contentsOf: [getSwifty, rainEmbers, transform])
         case 5:
             /// give the player a chance at the rune slot
             let gemOffer = StoreOffer.offer(type: .gems(amount: 10), tier: 3)
             storeOffers.append(contentsOf: [runeSlotOffer, gemOffer])
+            
         case 6:
+            /// Four Rune Slots
             /// give the player a chance to fill their last rune slot or just gems
             let gemOffer = StoreOffer.offer(type: .gems(amount: 10), tier: 3)
             storeOffers.append(contentsOf: [getSwifty, rainEmbers, transform, gemOffer])

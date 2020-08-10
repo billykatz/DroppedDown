@@ -15,7 +15,7 @@ import UIKit
 class ParagraphNode: SKSpriteNode {
     static let defaultFontName = "Alterebro-Pixel-Font"
     static let defaultFontColor = UIColor.white
-    static let defaultFontSize: CGFloat = UIFont.extraLargeSize
+    static let defaultFontSize: CGFloat = .fontExtraLargeSize
     
     var fontName: String
     var fontColor: UIColor

@@ -16,9 +16,15 @@ protocol ResetsAttacks {
 struct Pickaxe: Equatable, Codable {
     var runeSlots: Int
     var runes: [Rune]
+    
+    static let maxRuneSlots = 4
 }
 
 struct EntityModel: Equatable, Codable {
+    
+    static let maxPlayerHealth = 5
+    static let maxPlayerLuck = 15
+    static let maxPlayerDodge = 15
     
     enum EntityType: String, Codable, CaseIterable {
         case bat
@@ -28,9 +34,6 @@ struct EntityModel: Equatable, Codable {
         case wizard
         case lavaHorse
         case player
-        case easyPlayer
-        case normalPlayer
-        case hardPlayer
         case sally
         
         var humanReadable: String {
@@ -45,7 +48,7 @@ struct EntityModel: Equatable, Codable {
                 return "Alamo the Tree"
             case .sally:
                 return "Sally the Salamander"
-            case .player, .easyPlayer, .hardPlayer, .normalPlayer:
+            case .player:
                 return "Player"
             default:
                 return self.rawValue
@@ -53,7 +56,7 @@ struct EntityModel: Equatable, Codable {
         }
     }
     
-    static let playerCases: [EntityType] = [.easyPlayer, .normalPlayer, .hardPlayer]
+    static let playerCases: [EntityType] = [.player]
     
     static let zero: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .rat, carry: .zero, animations: [], effects: [], dodge: 0, luck: 0)
     static let playerZero: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .player, carry: .zero, animations: [], pickaxe: Pickaxe(runeSlots: 0, runes: []), effects: [], dodge: 0, luck: 0)
@@ -191,9 +194,7 @@ struct EntityModel: Equatable, Codable {
     }
     
     func doesDodge() -> Bool {
-        if self.type == .easyPlayer ||
-            self.type == .normalPlayer ||
-            self.type == .hardPlayer {
+        if self.type == .player {
             return (1...dodge+1).contains(Int.random(100))
         }
         return false
@@ -234,19 +235,24 @@ struct EntityModel: Equatable, Codable {
         return update(effects: effectsCopy)
     }
     
-//    func removeRuneSlot() -> Pickaxe? {
-//        guard var pickaxe = self.pickaxe else { return self.pickaxe }
-//        let newRuneCount = pickaxe.runeSlots - 1
-//        if pickaxe.runes.count > newRuneCount {
-//            pickaxe.runes.removeLast()
-//        }
-//        return Pickaxe(runeSlots: max(1, newRuneCount), runes: pickaxe.runes)
-//    }
+    func spend(amount inGems: Int) -> EntityModel {
+        return updateCarry(carry: carry.pay(inGems, inCurrency: .gem))
+    }
+    
+    func earn(amount inGems: Int) -> EntityModel {
+        return updateCarry(carry: carry.earn(inGems, inCurrency: .gem))
+    }
     
     func addEffect(_ effect: EffectModel) -> EntityModel {
         var effectsCopy = self.effects
         effectsCopy.append(effect)
         return update(effects: effectsCopy)
+    }
+    
+    func addRuneSlot() -> EntityModel {
+        guard let pickaxe = pickaxe, pickaxe.runeSlots <= Pickaxe.maxRuneSlots else { return self }
+        let newPickaxe = Pickaxe(runeSlots: pickaxe.runeSlots + 1, runes: pickaxe.runes)
+        return update(pickaxe: newPickaxe)
     }
     
     func addRune(_ rune: Rune?) -> EntityModel {
@@ -337,18 +343,6 @@ struct EntitiesModel: Equatable, Decodable {
     
     func entity(with type: EntityModel.EntityType) -> EntityModel? {
         return entities.first(where: { $0.type == type})
-    }
-    
-    var easyPlayer: EntityModel? {
-        return entity(with: .easyPlayer)
-    }
-    
-    var normalPlayer: EntityModel? {
-        return entity(with: .normalPlayer)
-    }
-    
-    var hardPlayer: EntityModel? {
-        return entity(with: .hardPlayer)
     }
 }
 

@@ -407,7 +407,7 @@ struct Animator {
             let defend = animation(for: .hurt, fromPosition: defenderPosition, toPosition: nil, in: tiles, sprites: sprites, dispatchGroup: dispatchGroup) {
             groupedActions.append(defend)
         } else if defenderDodged {
-            let dodgedText = ParagraphNode(text: "Dodged!", paragraphWidth: 800.0, fontSize: UIFont.giantSize, fontColor: .yellow)
+            let dodgedText = ParagraphNode(text: "Dodged!", paragraphWidth: 800.0, fontSize: .fontGiantSize, fontColor: .yellow)
             dodgedText.zPosition = Precedence.flying.rawValue
             let scaleAction = SKAction.run {
                 let action = SKAction.scale(by: 1.75, duration: 0.75)

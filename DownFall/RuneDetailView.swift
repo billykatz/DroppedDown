@@ -112,7 +112,7 @@ class RuneDetailView: SKSpriteNode, ButtonDelegate {
         titleContainer.position = CGPoint.position(titleContainer.frame, inside: detailView.frame, verticalAlign: .center, horizontalAnchor: .left)
         
         /// effect text
-        let titleFontSize = UIFont.mediumSize
+        let titleFontSize: CGFloat = .fontMediumSize
         let effectTitle = ParagraphNode(text: "Effect:", paragraphWidth: titleColumnWidth, fontSize: titleFontSize)
         let chargeTitle = ParagraphNode(text: "Charge:", paragraphWidth: titleColumnWidth, fontSize: titleFontSize)
         let progressTitle = ParagraphNode(text: "Progress:", paragraphWidth: titleColumnWidth, fontSize: titleFontSize)
@@ -136,7 +136,7 @@ class RuneDetailView: SKSpriteNode, ButtonDelegate {
         
         // description paragraphs
         let descriptionOffset = textOffset + 3.0
-        let descriptionFontSize = UIFont.smallSize
+        let descriptionFontSize: CGFloat = .fontSmallSize
         let effectDescription = ParagraphNode(text: viewModel.rune?.description ?? "", paragraphWidth: descriptionWidth, fontSize: descriptionFontSize)
         let chargeDescription = ParagraphNode(text: viewModel.chargeDescription ?? "", paragraphWidth: descriptionWidth, fontSize: descriptionFontSize)
         

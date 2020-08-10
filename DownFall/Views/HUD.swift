@@ -142,7 +142,7 @@ class HUD: SKSpriteNode {
         let healthBar = FillableBar(size: CGSize(width: self.size.width * Style.HUD.healthBarWidthRatio, height: Style.HUD.healthBarHeight), viewModel: viewModel)
         healthBar.position = CGPoint.position(healthBar.frame, inside: frame, verticalAlign: .bottom, horizontalAnchor: .left, xOffset: heartNode.frame.width + Style.Padding.normal, yOffset: heartNode.frame.height/2 - Style.HUD.healthBarHeight/2)
         
-        let healthText = ParagraphNode(text: "\(data.hp)/\(data.originalHp)", paragraphWidth: Style.HUD.heartSize.width*2, fontName: UIFont.pixelFontName, fontSize: UIFont.extraLargeSize, fontColor: .lightText)
+        let healthText = ParagraphNode(text: "\(data.hp)/\(data.originalHp)", paragraphWidth: Style.HUD.heartSize.width*2, fontSize: .fontExtraLargeSize, fontColor: .lightText)
         healthText.position = CGPoint.position(healthText.frame, inside: self.frame, verticalAlign: .bottom, horizontalAnchor: .right, yOffset: heartNode.frame.height/2 - healthText.frame.height/2 + Style.Padding.normal)
         
         self.addChildSafely(heartNode)
@@ -155,7 +155,7 @@ class HUD: SKSpriteNode {
         self.addChild(gemNode)
         
         // the label with the palyer's amount of gold
-        let gemLabel = ParagraphNode(text: "\(data.carry.total(in: .gem))", paragraphWidth: Style.HUD.labelParagraphWidth, fontName: UIFont.pixelFontName, fontSize: UIFont.extraLargeSize, fontColor: .lightText)
+        let gemLabel = ParagraphNode(text: "\(data.carry.total(in: .gem))", paragraphWidth: Style.HUD.labelParagraphWidth, fontSize: .fontExtraLargeSize, fontColor: .lightText)
         gemLabel.position = CGPoint.alignVertically(gemLabel.frame, relativeTo: gemNode.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: Style.Padding.more, translatedToBounds: true)
         gemLabel.name = Identifiers.gemSpriteLabel
         self.addChild(gemLabel)
@@ -175,7 +175,7 @@ class HUD: SKSpriteNode {
             var animations: [(SKSpriteNode, SKAction)] = []
             let goldGained = total-localCurrenTotal
             for gain in 1..<goldGained+1 {
-                let newCurrencyLabel = ParagraphNode(text: "\(localCurrenTotal + gain)", paragraphWidth: Style.HUD.labelParagraphWidth, fontName: UIFont.pixelFontName, fontSize: UIFont.extraLargeSize, fontColor: .lightText)
+                let newCurrencyLabel = ParagraphNode(text: "\(localCurrenTotal + gain)", paragraphWidth: Style.HUD.labelParagraphWidth, fontSize: .fontExtraLargeSize, fontColor: .lightText)
                 newCurrencyLabel.position = oldPosition
                 newCurrencyLabel.name = currencyLabelIdentifier
                 newCurrencyLabel.isHidden = true
@@ -199,7 +199,7 @@ class HUD: SKSpriteNode {
             }
             
             // show exaclty how much gold was gained as well
-            let gainedGoldLabel = ParagraphNode(text: "+\(goldGained)", paragraphWidth: Style.HUD.labelParagraphWidth, fontName: UIFont.pixelFontName, fontSize: UIFont.extraLargeSize, fontColor: .highlightGold)
+            let gainedGoldLabel = ParagraphNode(text: "+\(goldGained)", paragraphWidth: Style.HUD.labelParagraphWidth, fontSize: .fontExtraLargeSize, fontColor: .highlightGold)
             gainedGoldLabel.position = oldPosition.translateVertically(40.0)
             addChildSafely(gainedGoldLabel)
             let moveUp = SKAction.move(by: CGVector(dx: 0, dy: 50), duration: AnimationSettings.HUD.goldGainedTime)

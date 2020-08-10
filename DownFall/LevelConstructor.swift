@@ -15,6 +15,7 @@ struct LevelConstructor {
     
     static func buildLevel(depth: Depth, randomSource: GKLinearCongruentialRandomSource) -> Level {
         let pillarCoords = pillars(depth: depth)
+        let maxGems = maxSpawnGems(depth: depth)
         
         
         return Level(depth: depth,
@@ -24,8 +25,8 @@ struct LevelConstructor {
                      boardSize: boardSize(depth: depth),
                      tileTypeChances: availableRocksPerLevel(depth: depth),
                      pillarCoordinates: pillarCoords,
-                     goals: levelGoal(depth: depth, pillars: pillarCoords),
-                     maxSpawnGems: maxSpawnGems(depth: depth),
+                     goals: levelGoal(depth: depth, pillars: pillarCoords, gemAtDepth: maxGems),
+                     maxSpawnGems: maxGems,
                      goalProgress: [])
     }
     
@@ -33,7 +34,7 @@ struct LevelConstructor {
         return max(1, depth / 4) * 3
     }
     
-    static func levelGoal(depth: Depth, pillars: [PillarCoorindates]) -> [LevelGoal] {
+    static func levelGoal(depth: Depth, pillars: [PillarCoorindates], gemAtDepth: Int) -> [LevelGoal] {
         func randomRockGoal(_ colors: [Color], amount: Int, minimumGroupSize: Int) -> LevelGoal? {
             guard let randomColor = colors.randomElement() else { return nil }
             return LevelGoal(type: .unlockExit, tileType: .rock(randomColor), targetAmount: amount, minimumGroupSize: minimumGroupSize, grouped: minimumGroupSize > 1)
@@ -53,12 +54,12 @@ struct LevelConstructor {
             let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 35, minimumGroupSize: 1)
             goals = [gemGoal, rockGoal, monsterGoal]
         case 2:
-            let gemGoal = LevelGoal.gemGoal(amount: 3)
+            let gemGoal = LevelGoal.gemGoal(amount: gemAtDepth)
             let rockGoal = randomRockGoal([.red, .purple,. blue], amount: 5, minimumGroupSize: 4)
             let monsterGoal = LevelGoal.killMonsterGoal(amount: 5)
             goals = [gemGoal, rockGoal, monsterGoal]
         case 3:
-            let gemGoal = LevelGoal.gemGoal(amount: 4)
+            let gemGoal = LevelGoal.gemGoal(amount: gemAtDepth)
             let runeGoal = LevelGoal.useRuneGoal(amount: 2)
             let monsterGoal = LevelGoal.killMonsterGoal(amount: 7)
             let pillarGoal = LevelGoal.pillarGoal(amount: pillars.count * 2)
@@ -69,28 +70,28 @@ struct LevelConstructor {
             let runeGoal = LevelGoal.useRuneGoal(amount: 3)
             let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 8, minimumGroupSize: 5)
             let pillarGoal = LevelGoal.pillarGoal(amount: pillars.count * 2)
-            let gemGoal = LevelGoal.gemGoal(amount: 4)
+            let gemGoal = LevelGoal.gemGoal(amount: gemAtDepth)
             goals = [runeGoal, rockGoal, monsterGoal, pillarGoal, gemGoal]
         case 5:
             let monsterGoal = LevelGoal.killMonsterGoal(amount: 12)
             let runeGoal = LevelGoal.useRuneGoal(amount: 4)
             let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 5, minimumGroupSize: 6)
             let pillarGoal = LevelGoal.pillarGoal(amount: pillars.count * 2)
-            let gemGoal = LevelGoal.gemGoal(amount: 5)
+            let gemGoal = LevelGoal.gemGoal(amount: gemAtDepth)
             goals = [rockGoal, gemGoal, monsterGoal, pillarGoal, runeGoal]
         case 6:
             let monsterGoal = LevelGoal.killMonsterGoal(amount: 15)
             let runeGoal = LevelGoal.useRuneGoal(amount: 5)
             let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 8, minimumGroupSize: 5)
             let pillarGoal = LevelGoal.pillarGoal(amount: pillars.count * 3)
-            let gemGoal = LevelGoal.gemGoal(amount: 5)
+            let gemGoal = LevelGoal.gemGoal(amount: gemAtDepth)
             goals = [rockGoal, gemGoal, monsterGoal, pillarGoal, runeGoal]
         case (7...Int.max):
             let monsterGoal = LevelGoal.killMonsterGoal(amount: 15)
             let runeGoal = LevelGoal.useRuneGoal(amount: 5)
             let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 8, minimumGroupSize: 5)
             let pillarGoal = LevelGoal.pillarGoal(amount: pillars.count * 3)
-            let gemGoal = LevelGoal.gemGoal(amount: 5)
+            let gemGoal = LevelGoal.gemGoal(amount: gemAtDepth)
             goals = [rockGoal, gemGoal, monsterGoal, pillarGoal, runeGoal]
         default:
             goals = []
@@ -102,9 +103,9 @@ struct LevelConstructor {
         default:
             return goals.compactMap { $0 }.choose(random: 3)
         }
-
         
-
+        
+        
     }
     
     static func boardSize(depth: Depth) -> Int {
@@ -125,8 +126,21 @@ struct LevelConstructor {
     }
     
     static func maxMonsterOnBoardRatio(depth: Depth) -> Double {
-        let doubleDepth = max(1.0, Double(depth))
-        return (1.0 / (doubleDepth * (20.0 - doubleDepth)))
+        switch depth {
+        case 0, 1, 2:
+            return 0.05
+        case 3, 4:
+            return 0.1
+        case 5, 6, 7:
+            return 0.15
+        case 8, 9, 10:
+            return 0.2
+        case 10...Int.max:
+            return 0.25
+        default:
+            preconditionFailure("Failed")
+        }
+        
     }
     
     static func availableRocksPerLevel(depth: Depth) -> TileTypeChanceModel {
@@ -149,18 +163,18 @@ struct LevelConstructor {
                                                         .rock(.purple): 28,
                                                         .rock(.brown): 15])
             return chances
-
+            
         case 6, (7...Int.max):
             let chances = TileTypeChanceModel(tileTypes: [.rock(.red),
-                                                        .rock(.blue),
-                                                        .rock(.purple),
-                                                        .rock(.brown)])
+                                                          .rock(.blue),
+                                                          .rock(.purple),
+                                                          .rock(.brown)])
             return chances
         default:
             fatalError("Level must be positive")
         }
     }
-
+    
     /// Randomly creates 0 up to a max of boardsize/8 pillar coordinates
     static func pillars(depth: Depth, randomSource: GKLinearCongruentialRandomSource = GKLinearCongruentialRandomSource()) -> [PillarCoorindates] {
         

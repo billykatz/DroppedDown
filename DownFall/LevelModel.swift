@@ -37,7 +37,7 @@ struct LevelGoal: Codable, Hashable {
     }
 }
 
-struct PillarCoorindates: Codable {
+struct PillarCoorindates: Codable, Hashable {
     let pillar: TileType
     let coord: TileCoord
     
@@ -48,7 +48,7 @@ struct PillarCoorindates: Codable {
     
 }
 
-struct Level: Codable {
+struct Level: Codable, Hashable {
     let depth: Depth
     let monsterTypeRatio: [EntityModel.EntityType: RangeModel]
     let monsterCountStart: Int

@@ -13,12 +13,12 @@ protocol TileStrategy {
     var entities: EntitiesModel { get }
     var difficulty: Difficulty { get }
     var updatedEntity: EntityModel? { get }
-    var level: Level? { get }
+    var level: Level { get }
     
     init(_ entities: EntitiesModel,
          difficulty: Difficulty,
          updatedEntity: EntityModel?,
-         level: Level?,
+         level: Level,
          randomSource: GKLinearCongruentialRandomSource)
     
     

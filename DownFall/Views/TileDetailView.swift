@@ -116,7 +116,7 @@ class TileDetailView: SKNode {
     
     private func titleNode(tileType: TileType, nextTo: CGRect) -> ParagraphNode {
         let string = tileType.humanReadable
-        let title = ParagraphNode(text: string, paragraphWidth: detailViewTemplate.frame.width, fontSize: UIFont.largeSize)
+        let title = ParagraphNode(text: string, paragraphWidth: detailViewTemplate.frame.width, fontSize: .fontLargeSize)
         title.position = CGPoint.alignVertically(title.frame, relativeTo: nextTo, horizontalAnchor: .right, verticalAlign: .top, horizontalPadding: Style.Padding.most, translatedToBounds: true)
         title.zPosition = Precedence.menu.rawValue
         return title
@@ -131,7 +131,7 @@ class TileDetailView: SKNode {
     
     private func attackDescription(tileType: TileType, nextTo: CGRect) -> ParagraphNode? {
         guard case let TileType.monster(data) = tileType else { return nil }
-        let attackDesc = ParagraphNode(text: data.attack.humanReadable(), paragraphWidth: detailViewTemplate.frame.width - Style.DetailView.spriteSize.width, fontSize: UIFont.mediumSize)
+        let attackDesc = ParagraphNode(text: data.attack.humanReadable(), paragraphWidth: detailViewTemplate.frame.width - Style.DetailView.spriteSize.width, fontSize: .fontMediumSize)
         attackDesc.position = CGPoint.alignHorizontally(attackDesc.frame, relativeTo: nextTo, horizontalAnchor: .left, verticalAlign: .bottom, verticalPadding: Style.Padding.more, translatedToBounds: true)
         attackDesc.zPosition = Precedence.menu.rawValue
         return attackDesc
@@ -146,7 +146,7 @@ class TileDetailView: SKNode {
         \u{2022} takes damage from mining rocks next to it
         \u{2022} collapses when it reaches 0 health
         """
-        let pillarDesc = ParagraphNode(text: text, paragraphWidth: detailViewTemplate.frame.width - Style.DetailView.spriteSize.width, fontSize: UIFont.mediumSize)
+        let pillarDesc = ParagraphNode(text: text, paragraphWidth: detailViewTemplate.frame.width - Style.DetailView.spriteSize.width, fontSize: .fontMediumSize)
         pillarDesc.position = CGPoint.alignHorizontally(pillarDesc.frame, relativeTo: nextTo, horizontalAnchor: .left, verticalAlign: .bottom, verticalPadding: Style.Padding.more, translatedToBounds: true)
         pillarDesc.zPosition = Precedence.menu.rawValue
         return pillarDesc
@@ -161,7 +161,7 @@ class TileDetailView: SKNode {
         \u{2022} Larger groups of rocks are more likely to drop gems.
         \u{2022} There are only a few gems to find on each level.
         """
-        let gemDesc = ParagraphNode(text: text, paragraphWidth: detailViewTemplate.frame.width - Style.DetailView.spriteSize.width - Style.Padding.more, fontSize: UIFont.mediumSize)
+        let gemDesc = ParagraphNode(text: text, paragraphWidth: detailViewTemplate.frame.width - Style.DetailView.spriteSize.width - Style.Padding.more, fontSize: .fontMediumSize)
         gemDesc.position = CGPoint.alignHorizontally(gemDesc.frame, relativeTo: nextTo, horizontalAnchor: .left, verticalAlign: .bottom, verticalPadding: Style.Padding.more, translatedToBounds: true)
         gemDesc.zPosition = Precedence.menu.rawValue
         return gemDesc
@@ -216,7 +216,7 @@ class TileDetailView: SKNode {
             return
         }
         
-        let subTitleNode = ParagraphNode(text: "Complete to unlock\noffers between levels", paragraphWidth: detailViewTemplate.frame.width, fontSize: UIFont.largeSize)
+        let subTitleNode = ParagraphNode(text: "Complete to unlock\noffers between levels", paragraphWidth: detailViewTemplate.frame.width, fontSize: .fontLargeSize)
         
         subTitleNode.position = CGPoint.position(subTitleNode.frame, inside: detailViewTemplate.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.less)
         
@@ -244,7 +244,7 @@ class TileDetailView: SKNode {
             detailViewTemplate.addChild(colonNode)
             detailViewTemplate.addChild(circleNode)
             
-            let descriptionLabel = ParagraphNode(text: "\(goal.description())", paragraphWidth: detailViewTemplate.frame.maxX - sprite.frame.maxX, fontSize: UIFont.mediumSize)
+            let descriptionLabel = ParagraphNode(text: "\(goal.description())", paragraphWidth: detailViewTemplate.frame.maxX - sprite.frame.maxX, fontSize: .fontMediumSize)
             
             descriptionLabel.position = CGPoint.alignVertically(descriptionLabel.frame, relativeTo: sprite.frame, horizontalAnchor: .right, verticalAlign: .center, verticalPadding: Style.Padding.less, horizontalPadding: Style.Padding.most,  translatedToBounds: true)
             
@@ -252,7 +252,7 @@ class TileDetailView: SKNode {
     
             
             // Progress label  
-            let progressLabel = ParagraphNode(text: goal.progressDescription, paragraphWidth: detailViewTemplate.frame.maxX - sprite.frame.maxX, fontSize: UIFont.mediumSize)
+            let progressLabel = ParagraphNode(text: goal.progressDescription, paragraphWidth: detailViewTemplate.frame.maxX - sprite.frame.maxX, fontSize: .fontMediumSize)
             let x = CGPoint.position(progressLabel.frame, inside: detailViewTemplate.frame, verticalAlign: .center, horizontalAnchor: .right, xOffset: Style.Padding.most*3).x
             let y = CGPoint.alignVertically(progressLabel.frame, relativeTo: descriptionLabel.frame, horizontalAnchor: .right, verticalAlign: .center, translatedToBounds: true).y
             progressLabel.position = CGPoint(x:x, y: y)

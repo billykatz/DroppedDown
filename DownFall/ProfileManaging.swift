@@ -10,18 +10,28 @@ import GameKit
 import Foundation
 import Combine
 
-struct Profile: Codable {
+struct Profile: Codable, Equatable {
+    static var zero = Profile(name: "zero", progress: 0, player: .zero, currentRun: nil, deepestDepth: 0)
+    
     let name: String
     let progress: Int
     let player: EntityModel
     var currentRun: RunModel?
     
+    let deepestDepth: Int
+    
     func updatePlayer(_ entityModel: EntityModel) -> Profile {
-        return Profile(name: name, progress: progress + 1, player: entityModel, currentRun: currentRun)
+        return Profile(name: name, progress: progress + 1, player: entityModel, currentRun: currentRun, deepestDepth: deepestDepth)
     }
     
     func updateRunModel(_ currentRun: RunModel?) -> Profile {
-        return Profile(name: name, progress: progress + 1, player: player, currentRun: currentRun)
+        return Profile(name: name, progress: progress + 1, player: player, currentRun: currentRun, deepestDepth: deepestDepth)
+    }
+    
+    func updateDepth(_ depth: Int) -> Profile {
+        let newDepth = depth > deepestDepth ? depth : deepestDepth
+        return Profile(name: name, progress: progress + 1, player: player, currentRun: currentRun, deepestDepth: newDepth)
+
     }
         
 }
@@ -170,14 +180,20 @@ class ProfileViewModel: ProfileManaging {
         /// Writes to loadedProfileSubject on success
         resolveProfileConflict
             .print("Resolving profile conflicts")
-            .tryFlatMap { [weak self] (profile) -> Future<Profile, Error> in
-                guard let self = self else { throw ProfileError.profileLoadCancelled }
-                return self.saveProfileLocally(profile)
+            .flatMap { profile -> AnyPublisher<(Profile, Profile), Error> in
+                let combined = Publishers.CombineLatest(self.saveProfileLocally(profile).catch( { _ in Just(Profile.zero) }).setFailureType(to: Error.self),
+                                                        self.saveProfileRemotely(profile).catch( { _ in Just(Profile.zero) }).setFailureType(to: Error.self)
+                ).eraseToAnyPublisher()
+                return combined
             }
-            .tryFlatMap { [weak self] (profile) -> Future<Profile, Error> in
-                guard let self = self else { throw ProfileError.profileLoadCancelled }
-                return self.saveProfileRemotely(profile)
-            }
+//            .tryFlatMap { [weak self] (profile) -> Future<Profile, Error> in
+//                guard let self = self else { throw ProfileError.profileLoadCancelled }
+//                return self.saveProfileLocally(profile)
+//            }
+//            .tryFlatMap { [weak self] (profile) -> Future<Profile, Error> in
+//                guard let self = self else { throw ProfileError.profileLoadCancelled }
+//                return self.saveProfileRemotely(profile)
+//            }
             .subscribe(on: backgroundQueue)
             .receive(on: RunLoop.main)
             .sink(receiveCompletion: { completion in
@@ -187,8 +203,11 @@ class ProfileViewModel: ProfileManaging {
                 case .finished:
                     print("Successfully created and sync local and remote profiles")
                 }
-            }, receiveValue: { [weak self] profile in
-                self?.loadedProfileSubject.send(profile)
+            }, receiveValue: { [weak self] localProfile, remoteProfile in
+                if localProfile == Profile.zero && remoteProfile == .zero {
+                    preconditionFailure("Both profiles failed to load")
+                }
+                self?.loadedProfileSubject.send(localProfile)
             })
             .store(in: &disposables)
         
@@ -396,7 +415,7 @@ class ProfileViewModel: ProfileManaging {
                 let profile = try JSONDecoder().decode(Profile.self, from: newPlayerProfile)
                 /// save the profile with the uuid as the name
                 /// copy all other defaults
-                let newProfile = Profile(name: uuid, progress: profile.progress, player: profile.player)
+                let newProfile = Profile(name: uuid, progress: profile.progress, player: profile.player, deepestDepth: profile.deepestDepth)
                 
                 /// encode the new profile into data
                 let jsonData = try JSONEncoder().encode(newProfile)

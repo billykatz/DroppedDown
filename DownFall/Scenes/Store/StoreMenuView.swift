@@ -110,13 +110,13 @@ class StoreMenuView: SKSpriteNode, ButtonDelegate {
             
             addChild(newRuneSprite)
             
-            let replaceText = ParagraphNode(text: "Replace", paragraphWidth: oldOutline.frame.width, fontSize: UIFont.largeSize)
+            let replaceText = ParagraphNode(text: "Replace", paragraphWidth: oldOutline.frame.width, fontSize: .fontLargeSize)
             replaceText.position = CGPoint.alignHorizontally(replaceText.frame, relativeTo: oldOutline.frame, horizontalAnchor: .left, verticalAlign: .bottom, translatedToBounds: true)
             
             addChild(replaceText)
             
             let spaceBetweenBoxes = newOutline.frame.minX - oldOutline.frame.maxX
-            let withText = ParagraphNode(text: "with", paragraphWidth: oldOutline.frame.width, fontSize: UIFont.largeSize)
+            let withText = ParagraphNode(text: "with", paragraphWidth: oldOutline.frame.width, fontSize: .fontLargeSize)
             withText.position = CGPoint.alignVertically(withText.frame, relativeTo: oldOutline.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: (spaceBetweenBoxes - withText.frame.width)/2, translatedToBounds: true)
             
             addChild(withText)
@@ -133,13 +133,13 @@ class StoreMenuView: SKSpriteNode, ButtonDelegate {
         
         /// title
         let widthCoefficient = CGFloat(0.9)
-        let titleNode = ParagraphNode.labelNode(text: viewModel.title, paragraphWidth: size.width * widthCoefficient,fontSize: UIFont.extraLargeSize)
+        let titleNode = ParagraphNode.labelNode(text: viewModel.title, paragraphWidth: size.width * widthCoefficient,fontSize: .fontExtraLargeSize)
 
         titleNode.position = CGPoint.position(titleNode.frame, inside: contentView.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most)
         titleNode.zPosition = Precedence.foreground.rawValue
         
         /// Body
-        let bodyNode = ParagraphNode(text: viewModel.body, paragraphWidth: size.width * widthCoefficient, fontSize: UIFont.largeSize)
+        let bodyNode = ParagraphNode(text: viewModel.body, paragraphWidth: size.width * widthCoefficient, fontSize: .fontLargeSize)
         bodyNode.position = CGPoint.alignHorizontally(bodyNode.frame, relativeTo: titleNode.frame, horizontalAnchor: .center, verticalAlign: .bottom, translatedToBounds: true)
         bodyNode.zPosition = Precedence.foreground.rawValue
         

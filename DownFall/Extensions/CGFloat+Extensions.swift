@@ -9,6 +9,18 @@
 import CoreGraphics
 
 extension CGFloat {
+    
+    /// Font sizes
+    static let fontExtraSmallSize: CGFloat = 35.0
+    static let fontSmallSize: CGFloat = 45.0
+    static let fontMediumSize: CGFloat = 55.0
+    static let fontLargeSize: CGFloat = 80.0
+    static let fontExtraLargeSize: CGFloat = 96.0
+    static let fontGiantSize: CGFloat = 200.0
+
+    
+    static let safeAreaHeight = CGFloat(75.0)
+    
     static func progressAngle(progress: Int, total: Int) -> CGFloat {
         let ratio = CGFloat(progress)/CGFloat(total)
         return 2 * .pi * ratio
@@ -26,6 +38,7 @@ extension CGFloat {
     static func isPositive(_ float: CGFloat) -> Bool {
         return float > 0
     }
+    
     static func rotateAngle(startAngle: CGFloat, targetAngle: CGFloat, xDistance: CGFloat, yDistance: CGFloat) -> CGFloat {
         let extraRotate = .pi*2 - startAngle
         switch (isPositive(xDistance), isPositive(yDistance)) {

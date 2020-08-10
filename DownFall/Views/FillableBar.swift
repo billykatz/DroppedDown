@@ -85,7 +85,7 @@ class FillableBar: SKSpriteNode {
     }()
     
     private lazy var text: ParagraphNode = {
-        let paragraph = ParagraphNode(text: viewModel.text ?? "", paragraphWidth: contentView.size.width, fontSize: UIFont.mediumSize, fontColor: .black)
+        let paragraph = ParagraphNode(text: viewModel.text ?? "", paragraphWidth: contentView.size.width, fontSize: .fontMediumSize, fontColor: .black)
         paragraph.position = .zero
         return paragraph
     }()

@@ -44,10 +44,10 @@ class MenuSpriteNode: SKSpriteNode {
             """
             You passed \(level.humanReadableDepth) depth.
             
-            Your personal best is: _
+            Your personal best is: \(RunScope.deepestDepth)
             """
             let paragraphNode = ParagraphNode.labelNode(text: text, paragraphWidth: menuSizeWidth * 0.95,
-                fontSize: UIFont.largeSize)
+                fontSize: .fontLargeSize)
 
             paragraphNode.position = CGPoint.position(paragraphNode.frame, inside: self.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most)
             paragraphNode.zPosition = precedence.rawValue
@@ -62,7 +62,7 @@ class MenuSpriteNode: SKSpriteNode {
             This is the \(level.humanReadableDepth) depth
             """
             let paragraphNode = ParagraphNode.labelNode(text: text, paragraphWidth: menuSizeWidth * 0.95,
-                fontSize: UIFont.largeSize)
+                fontSize: .fontLargeSize)
 
             paragraphNode.position = CGPoint.position(paragraphNode.frame, inside: self.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most)
             paragraphNode.zPosition = precedence.rawValue
@@ -74,7 +74,7 @@ class MenuSpriteNode: SKSpriteNode {
                                 delegate: self,
                                 identifier: .mainMenu,
                                 precedence: precedence,
-                                fontSize: UIFont.largeSize,
+                                fontSize: .fontLargeSize,
                                 fontColor: .clayRed,
                                 backgroundColor: .eggshellWhite)
             mainMenuButton.position = CGPoint.position(this: mainMenuButton.frame, centeredInBottomOf: self.frame, verticalPadding: Style.Padding.most*2 + buttonSize.height)
@@ -83,13 +83,13 @@ class MenuSpriteNode: SKSpriteNode {
         } else if menuType == .gameLose {
             let text =
                 """
-                    You ran of of health.
-                            😞
+                    Game Over.
 
-                    Thanks for playing!!
+                    You made it to \(level.humanReadableDepth) depth.
+                    Your personal best is: \(RunScope.deepestDepth)
                 """
             let paragraphNode = ParagraphNode.labelNode(text: text, paragraphWidth: menuSizeWidth * 0.95,
-                fontSize: UIFont.largeSize)
+                fontSize: .fontLargeSize)
 
             paragraphNode.position = CGPoint.position(paragraphNode.frame, inside: self.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most)
             paragraphNode.zPosition = precedence.rawValue
@@ -105,7 +105,7 @@ class MenuSpriteNode: SKSpriteNode {
                             delegate: self,
                             identifier: menuType.buttonIdentifer,
                             precedence: precedence,
-                            fontSize: UIFont.largeSize,
+                            fontSize: .fontLargeSize,
                             fontColor: .black,
                             backgroundColor: .clayRed)
         button.position = CGPoint.position(this: button.frame, centeredInBottomOf: self.frame, verticalPadding: Style.Padding.most)

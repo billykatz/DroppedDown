@@ -31,7 +31,7 @@ class LevelCoordinator: LevelCoordinating {
     let view: SKView
     
     /// Set default so we dont have to deal with optionality
-    var runModel: RunModel = RunModel(player: .zero, depth: 0, seed: 0)
+    var runModel: RunModel = RunModel(player: .zero, seed: 0)
         
     init(gameSceneNode: GameScene, entities: EntitiesModel, levelIndex: Int, view: SKView) {
         self.gameSceneNode = gameSceneNode
@@ -83,9 +83,10 @@ class LevelCoordinator: LevelCoordinating {
     /// Creates a run and loads it if no current run is available
     func loadRun(_ runModel: RunModel?, profile: Profile) {
         let seed = UInt64.random(in: .min ... .max)
-        let freshRunModel = RunModel(player: profile.player, depth: 0, seed: seed)
+        let freshRunModel = RunModel(player: profile.player, seed: seed)
         
         self.runModel = runModel ?? freshRunModel
+        RunScope.deepestDepth = profile.deepestDepth
         presentCurrentArea(profile.player)
     }
     
@@ -96,8 +97,21 @@ class LevelCoordinator: LevelCoordinating {
         case .level(let level):
             presentNextLevel(level, playerData: entityData)
         case .store(let offers):
-            presentStoreOffers(offers, depth: nextArea.depth, levelGoalProgress: runModel.goalTracking, playerData: entityData)
+            presentStoreOffers(offers,
+                               depth: nextArea.depth,
+                               levelGoalProgress: runModel.goalTracking,
+                               playerData: addRuneSlotIfNeeded(entityData, nextArea: nextArea))
         }
+    }
+    
+    func addRuneSlotIfNeeded(_ entityData: EntityModel, nextArea: Area) -> EntityModel {
+        var newEntityData = entityData
+        let currentRuneSlots = entityData.runeSlots ?? 0
+        if (currentRuneSlots * 2 - 1) <= nextArea.depth && nextArea.depth % 2 == 0 {
+            newEntityData = entityData.addRuneSlot()
+        }
+        return newEntityData
+
     }
     
     /// This should be used most of the the time.  When ever you want to proceed in the run, you should call this function.
@@ -107,7 +121,10 @@ class LevelCoordinator: LevelCoordinating {
         case .level(let level):
             presentNextLevel(level, playerData: entityData)
         case .store(let offers):
-            presentStoreOffers(offers, depth: nextArea.depth, levelGoalProgress: runModel.goalTracking, playerData: entityData)
+            presentStoreOffers(offers,
+                               depth: nextArea.depth,
+                               levelGoalProgress: runModel.goalTracking,
+                               playerData: addRuneSlotIfNeeded(entityData, nextArea: nextArea))
         }
 
     }

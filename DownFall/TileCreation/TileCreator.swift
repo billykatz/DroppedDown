@@ -14,7 +14,7 @@ class TileCreator: TileStrategy {
     let difficulty: Difficulty
     var updatedEntity: EntityModel?
     let boardSize: Int
-    var level: Level?
+    var level: Level
     var specialRocks = 0
     var specialGems = 0
     var goldVariance = 2
@@ -24,18 +24,18 @@ class TileCreator: TileStrategy {
     required init(_ entities: EntitiesModel,
                   difficulty: Difficulty,
                   updatedEntity: EntityModel? = nil,
-                  level: Level?,
+                  level: Level,
                   randomSource: GKLinearCongruentialRandomSource) {
         self.entities = entities
         self.difficulty = difficulty
         self.updatedEntity = updatedEntity
         self.level = level
         self.randomSource = randomSource
-        self.boardSize = level?.boardSize ?? 0
+        self.boardSize = level.boardSize
     }
     
     private func randomTile(given: Int, neighbors: [Tile]) -> TileType {
-        guard level?.spawnsMonsters ?? true else { return randomRock() }
+        guard level.spawnsMonsters else { return randomRock() }
         let weight = 97
         let index = abs(given) % (TileType.randomCases.count + weight)
         
@@ -58,8 +58,6 @@ class TileCreator: TileStrategy {
     }
     
     func randomMonster() -> TileType {
-        
-        guard let level = level else { fatalError("You need to init with a level") }
         let totalNumber = level.monsterTypeRatio.values.max { (first, second) -> Bool in
             return first.upper < second.upper
         }
@@ -88,7 +86,6 @@ class TileCreator: TileStrategy {
     }
     
     private func randomCoord(notIn set: Set<TileCoord>) -> TileCoord {
-        guard let level = level else { preconditionFailure("We need a level to work") }
         let upperbound = level.boardSize
         
         var tileCoord = TileCoord(row: Int.random(upperbound), column: Int.random(upperbound))
@@ -99,7 +96,6 @@ class TileCreator: TileStrategy {
     }
     
     func randomRock(_ neighbors: [Tile] = []) -> TileType {
-        guard let level = level else { fatalError("You need to init with a level") }
         var tileTypeChances = level.tileTypeChances
         if !neighbors.isEmpty {
             tileTypeChances = tileTypeChances.increaseChances(basedOn: neighbors
@@ -122,7 +118,6 @@ class TileCreator: TileStrategy {
     }
     
     func gemDropped(from rock: TileType, groupSize: Int, playerData: EntityModel) -> Tile {
-        guard let level = level else { return .empty }
         let extraGemsBasedOnLuck = playerData.luck / 5
         let extraChanceBasedOnLuck = extraGemsBasedOnLuck * 2
         guard specialGems < level.maxSpawnGems + extraGemsBasedOnLuck else { return .empty }
@@ -152,7 +147,6 @@ class TileCreator: TileStrategy {
     }
     
     private func randomTile(_ neighbors: [Tile], noMoreMonsters: Bool) -> Tile {
-        guard let level = level else { preconditionFailure("We need a level to create tiles") }
         var nextTile = Tile(type: randomTile(given: randomSource.nextInt(), neighbors: neighbors))
         
         var validTile = false
@@ -192,7 +186,7 @@ class TileCreator: TileStrategy {
         // copy the given array to keep track of where we need tiles
         var newTiles: [[Tile]] = tiles
         
-        let maxMonsters = Int(Double(tiles.count * tiles.count) * (level?.maxMonsterOnBoardRatio ?? maxMonsterRatio))
+        let maxMonsters = Int(Double(tiles.count * tiles.count) * level.maxMonsterOnBoardRatio)
         numberOfTilesSinceLastGemDropped += typeCount(for: tiles, of: .empty).count
         var currMonsterCount = typeCount(for: tiles, of: .monster(.zero)).count
         
@@ -264,7 +258,6 @@ class TileCreator: TileStrategy {
      */
     
     func board(difficulty: Difficulty) -> [[Tile]] {
-        guard let level = level else { preconditionFailure("Can;t build a build without a level") }
         var newTiles: [Tile] = []
         
         //just add a bunchhhhhhh of rocks
@@ -318,8 +311,8 @@ class TileCreator: TileStrategy {
         guard level.hasExit else { return tiles }
         //place the exit on the opposite side of the grid
         #warning ("make sure this is set properly for release")
-        let exitQuadrant = playerQuadrant.opposite
-//        let exitQuadrant = playerQuadrant
+//        let exitQuadrant = playerQuadrant.opposite
+        let exitQuadrant = playerQuadrant
         let exitPosition = exitQuadrant.randomCoord(for: boardSize, notIn: reservedSet)
         reservedSet.insert(exitPosition)
         
@@ -329,16 +322,6 @@ class TileCreator: TileStrategy {
     }
     
     var playerEntityData: EntityModel? {
-        guard updatedEntity == nil else {
-            return updatedEntity
-        }
-        switch difficulty {
-        case .easy:
-            return entities.easyPlayer
-        case .normal:
-            return entities.normalPlayer
-        case .hard:
-            return entities.hardPlayer
-        }
+        return updatedEntity
     }
 }

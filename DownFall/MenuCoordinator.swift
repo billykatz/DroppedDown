@@ -31,7 +31,7 @@ protocol MenuCoordinating: class {
 }
 
 
-class MenuCoordinator: MenuCoordinating, MainMenuDelegate, OptionsSceneDelegate {
+class MenuCoordinator: MenuCoordinating, MainMenuDelegate, OptionsSceneDelegate, MenuStoreSceneDelegate {
     
     
     var view: SKView
@@ -88,9 +88,15 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate, OptionsSceneDelegate 
         /// the player's gems
         guard let profile = profile else { fatalError("We need a profile to continue") }
         let currentRun: RunModel? = updatedPlayerData.isDead ? nil : currentRun
+        /// update run
         let profileWithCurrentRun = profile.updateRunModel(currentRun)
-        let profileUpdateWithGems = profileWithCurrentRun.player.updateCarry(carry: updatedPlayerData.carry)
-        self.profile = profileWithCurrentRun.updatePlayer(profileUpdateWithGems)
+        /// update player gem carry
+        let playerUpdateWithGems = profileWithCurrentRun.player.updateCarry(carry: updatedPlayerData.carry)
+        /// update profile with new player
+        let profileWithUpdatedPlayer = profileWithCurrentRun.updatePlayer(playerUpdateWithGems)
+        
+        //update profile with current depth
+        self.profile = profileWithUpdatedPlayer.updateDepth(currentRun?.depth ?? 0)
         
         GameScope.shared.profileManager.saveProfile(self.profile!)
         
@@ -104,6 +110,23 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate, OptionsSceneDelegate 
     
     func backSelected() {
         presentMainMenu(transition: SKTransition.push(with: .right, duration: 0.5))
+    }
+    
+    func menuStore() {
+        guard let profile = profile else { return }
+        let storeScene = MenuStoreScene(size: .universalSize,
+                                        playerData: profile.player,
+                                        coordinatorDelegate: self)
+        
+        storeScene.scaleMode = .aspectFill
+        view.presentScene(storeScene, transition: SKTransition.push(with: .right, duration: 0.5))
+    }
+    
+    func mainMenuTapped(updatedPlayerData: EntityModel) {
+        guard let profile = profile else { return }
+        self.profile = profile.updatePlayer(updatedPlayerData)
+        GameScope.shared.profileManager.saveProfile(self.profile!)
+        presentMainMenu(transition: SKTransition.push(with: .left, duration: 0.5))
     }
 
 }

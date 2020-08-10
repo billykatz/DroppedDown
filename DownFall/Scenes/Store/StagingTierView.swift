@@ -103,7 +103,7 @@ class StagingTierView: SKSpriteNode {
         
         let runeSprite = SKSpriteNode(texture: SKTexture(imageNamed: rune.textureName), size: .oneFifty)
         
-        let replaceText = ParagraphNode(text: "Replaced", paragraphWidth: runeSprite.frame.width*2, fontSize: UIFont.largeSize)
+        let replaceText = ParagraphNode(text: "Replaced", paragraphWidth: runeSprite.frame.width*2, fontSize: .fontLargeSize)
         replaceText.position = CGPoint.alignHorizontally(replaceText.frame, relativeTo: runeSprite.frame, horizontalAnchor: .center, verticalAlign: .bottom, translatedToBounds: true)
         
         
@@ -200,7 +200,7 @@ class StagingTierView: SKSpriteNode {
             :
         "Complete \(viewModel.tier) goal\(viewModel.tier > 1 ? "s" : "") to unlock."
         
-        let text = ParagraphNode(text: textString, paragraphWidth: contentView.frame.width, fontSize: UIFont.largeSize)
+        let text = ParagraphNode(text: textString, paragraphWidth: contentView.frame.width, fontSize: .fontLargeSize)
         text.position = CGPoint.position(text.frame, inside: contentView.frame, verticalAlign: .top, horizontalAnchor: .center)
         
         contentView.addChild(text)

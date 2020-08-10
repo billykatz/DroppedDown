@@ -83,7 +83,7 @@ extension CGPoint {
         case .top:
             y = that.height/2 - this.height/2 - yOffset
         case .center:
-            y = 0.0
+            y = 0.0 + yOffset
         case .bottom:
             y = -that.height/2 + this.height/2 + yOffset
         }

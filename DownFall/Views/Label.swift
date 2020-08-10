@@ -23,7 +23,7 @@ class Label: ParagraphNode {
          delegate: LabelDelegate?,
          precedence: Precedence,
          identifier: ButtonIdentifier,
-         fontSize: CGFloat = UIFont.largeSize,
+         fontSize: CGFloat = .fontLargeSize,
          fontColor: UIColor = .black) {
         
         super.init(text: text, paragraphWidth: width, fontSize: fontSize, fontColor: fontColor)

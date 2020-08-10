@@ -9,8 +9,8 @@
 import Foundation
 import GameKit
 
-struct Area: Codable {
-    enum AreaType: Codable {
+struct Area: Codable, Equatable {
+    enum AreaType: Codable, Equatable {
         case level(Level)
         case store([StoreOffer])
         
@@ -60,22 +60,26 @@ struct Area: Codable {
         
 }
 
-class RunModel: Codable {
+class RunModel: Codable, Equatable {
+    static func == (lhs: RunModel, rhs: RunModel) -> Bool {
+        return lhs.seed == rhs.seed
+    }
+    
     let seed: UInt64
     let player: EntityModel
-    var depth: Int
+    
     lazy var randomSource: GKLinearCongruentialRandomSource = {
         return GKLinearCongruentialRandomSource(seed: seed)
     }()
     
-    init(player: EntityModel, depth: Int, seed: UInt64) {
+    var depth: Int {
+        return areas.last?.depth ?? 0
+    }
+    
+    init(player: EntityModel, seed: UInt64) {
         self.player = player
-        self.depth = depth
         self.seed = seed
     }
- 
-    /// Keep track of levels
-    private var levels: [Level] = []
     
     /// Keep track of areas
     private var areas: [Area] = []

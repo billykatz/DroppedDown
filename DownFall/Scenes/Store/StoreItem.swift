@@ -37,7 +37,7 @@ class StoreItem: SKSpriteNode {
          delegate: StoreItemDelegate,
          identifier: ButtonIdentifier,
          precedence: Precedence,
-         fontSize: CGFloat = UIFont.extraSmallSize) {
+         fontSize: CGFloat = .fontExtraSmallSize) {
         
         self.offer = storeOffer
         

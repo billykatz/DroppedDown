@@ -73,7 +73,7 @@ class StagingSelectionAreaView: SKSpriteNode {
     }
     
     func setupTextView() {
-        let text = ParagraphNode(text: "Drag unlocked offers here", paragraphWidth: contentView.frame.width, fontSize: UIFont.mediumSize, fontColor: .eggshellWhite)
+        let text = ParagraphNode(text: "Drag unlocked offers here", paragraphWidth: contentView.frame.width, fontSize: .fontMediumSize, fontColor: .eggshellWhite)
         text.position = CGPoint.position(text.frame, inside: contentView.frame, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: Style.Padding.normal)
         text.zPosition = Precedence.foreground.rawValue
         contentView.addChild(text)

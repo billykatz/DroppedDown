@@ -9,6 +9,23 @@
 import Foundation
 import SpriteKit
 
+extension SKSpriteNode {
+
+    func aspectFillToSize(fillSize: CGSize) {
+
+        guard let texture = texture else { return }
+        self.size = texture.size()
+
+        let verticalRatio = fillSize.height / texture.size().height
+        let horizontalRatio = fillSize.width /  texture.size().width
+
+        let scaleRatio = horizontalRatio > verticalRatio ? horizontalRatio : verticalRatio
+
+        self.setScale(scaleRatio)
+    }
+
+}
+
 protocol ButtonDelegate: class {
     func buttonTapped(_ button: Button)
 }
@@ -48,6 +65,7 @@ class Button: SKShapeNode {
         view.alpha = 0.0
         view.zPosition = Precedence.underground.rawValue
         view.isUserInteractionEnabled = true
+        
         return view
     }()
     
@@ -72,7 +90,8 @@ class Button: SKShapeNode {
          shape: ButtonShape,
          precedence: Precedence = Precedence.aboveMenu,
          showSelection: Bool = true,
-         disable: Bool = false) {
+         disable: Bool = false,
+         addTextLabel: Bool = false) {
         self.buttonType = .image
         self.delegate = delegate
         self.identifier = identifier
@@ -84,49 +103,57 @@ class Button: SKShapeNode {
         /// create the rectangle the image will live in
         let rectangle = CGRect(x: -size.width/2, y: -size.height/2, width: size.width, height: size.height)
         
-        /// create the shadow of the rectangle
-        let shadowRect = CGRect(x: -size.width/2, y: -size.height/2 - dropShadowOffset, width: size.width, height: size.height)
-        
         /// The shared cornder radius
         let cornerRadius = CGFloat(5.0)
-        let shadowShape: SKShapeNode
         switch shape {
         case .rectangle:
             /// create the path
             let path = CGPath(roundedRect: rectangle, cornerWidth: cornerRadius, cornerHeight: cornerRadius, transform: nil)
             
-            /// create the shadow shape we may use later
-            let shadowPath = CGPath(roundedRect: shadowRect, cornerWidth: cornerRadius, cornerHeight: cornerRadius, transform: nil)
-            shadowShape = SKShapeNode(path: shadowPath)
-            
             self.buttonView = SKShapeNode(path: path)
+            self.buttonView?.color = .clear
             self.path = path
             
         case .circle:
             /// create the path
             let path = CGPath(ellipseIn: rectangle, transform: nil)
             
-            /// create the shadow path we may use later
-            let shadowPath = CGPath(ellipseIn: shadowRect, transform: nil)
-            shadowShape = SKShapeNode(path: shadowPath)
-            
             /// set our properties
             self.buttonView = SKShapeNode(path: path)
+            self.buttonView?.color = .clear
             self.path = path
         }
         
+        if addTextLabel {
+            //Create Label
+            let label = Label(text: identifier.title,
+                              width: self.frame.width,
+                              delegate: self,
+                              precedence: precedence,
+                              identifier: identifier,
+                              fontSize: .fontLargeSize,
+                              fontColor: .brown)
+            label.position = self.frame.center
+            label.zPosition = Precedence.menu.rawValue
+            
+            // Add Label
+            buttonView?.addChild(label)
+        }
+
+        
         // add the image
         image.zPosition = 0
+        image.aspectFillToSize(fillSize: size)
         addChildSafely(image)
         
         /// add the path
         addChildSafely(buttonView)
         
         /// add the drop shadow and keep a reference to it
-        shadowShape.color = .storeBlack
-        shadowShape.zPosition = -1
-        self.dropShadow = shadowShape
-        addChild(shadowShape)
+//        shadowShape.color = .storeBlack
+//        shadowShape.zPosition = -1
+//        self.dropShadow = shadowShape
+//        addChild(shadowShape)
         
         //enable/disable
         self.isDisabled = disable
@@ -153,7 +180,7 @@ class Button: SKShapeNode {
          delegate: ButtonDelegate,
          identifier: ButtonIdentifier,
          precedence: Precedence = .aboveMenu,
-         fontSize: CGFloat = UIFont.largeSize,
+         fontSize: CGFloat = .fontLargeSize,
          fontColor: UIColor = UIColor.eggshellWhite,
          backgroundColor: UIColor = .clayRed,
          showSelection: Bool = true,
@@ -262,6 +289,7 @@ class Button: SKShapeNode {
     /// Creates the shadow if necessary
     ///
     private func setupShadow() {
+        guard buttonType != .image else { return }
         if dropShadow == nil {
             let shadowPath = CGPath(roundedRect: CGRect(x: -frame.size.width/2, y: -frame.size.height/2 - dropShadowOffset, width: frame.size.width, height: frame.size.height), cornerWidth: 5.0, cornerHeight: 5.0, transform: nil)
             let shadowShape = SKShapeNode(path: shadowPath)
@@ -278,7 +306,7 @@ class Button: SKShapeNode {
     /// Unpresses the button
     private func buttonTapWasCancelled() {
         guard !isDisabled else { return }
-        if showSelection {
+        if showSelection && buttonType != .image {
             buttonView?.color = originalBackground
         }
         unpress()
@@ -290,7 +318,7 @@ class Button: SKShapeNode {
     /// Informs the delegate that the button was tapped
     private func buttonWasTapped() {
         guard !isDisabled else { return }
-        if showSelection {
+        if showSelection && buttonType != .image {
             buttonView?.color = originalBackground
         }
         delegate?.buttonTapped(self)
@@ -301,7 +329,7 @@ class Button: SKShapeNode {
     /// Changes the color and calls depress
     private func buttonTapBegan() {
         guard !isDisabled else { return }
-        if showSelection {
+        if showSelection && buttonType != .image {
             buttonView?.color = .lightGray
         }
         depress()

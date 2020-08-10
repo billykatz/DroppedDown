@@ -45,7 +45,8 @@ class OptionsScene: SKScene, ButtonDelegate {
         
         foreground.addChildSafely(resetDataButton)
         
-        backButton.position = .position(backButton.frame, inside: foreground.frame, verticalAlign: .top, horizontalAnchor: .left)
+        backButton.position = .position(backButton.frame, inside: foreground.frame, verticalAlign: .top, horizontalAnchor: .left, yOffset: .safeAreaHeight)
+        
         
         foreground.addChildSafely(backButton)
     }

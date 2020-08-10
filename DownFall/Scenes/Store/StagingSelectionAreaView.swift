@@ -62,7 +62,8 @@ class StagingSelectionAreaView: SKSpriteNode {
     }
     
     func offerWasSelected(_ storeOffer: StoreOffer) {
-        stagingSelectedOfferViews[storeOffer.tierIndex].update(with: storeOffer)
+        let offerView = stagingSelectedOfferViews.optionalElement(at: storeOffer.tierIndex)
+        offerView?.update(with: storeOffer)
     }
     
     

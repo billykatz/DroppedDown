@@ -278,6 +278,42 @@ class Board: Equatable {
         
     }
     
+    private func bubbleUp(_ first: TileCoord, input: Input) -> Transformation {
+        let tilesAbove = tiles.count - first.row - 1
+        let tileCoords = (0..<tilesAbove).reduce([first], { prevArray, offset in
+            var array = prevArray
+            if let last = array.last {
+                array.append(last.rowAbove)
+            }
+            return array
+        })
+        
+        guard tileCoords.count > 1, let first = tileCoords.first, let last = tileCoords.last else {
+            return .zero
+        }
+        
+        var newTiles = self.tiles
+        var transformation = [TileTransformation(first, last)]
+        let playerTile = newTiles[first]
+        
+        /// Skip the first index because we primed that loop
+        for coordIndex in 1..<tileCoords.count {
+            transformation.append(TileTransformation(tileCoords[coordIndex], tileCoords[coordIndex-1]))
+            
+            let currentCoord = tileCoords[coordIndex]
+            let targetCoord = tileCoords[coordIndex-1]
+            newTiles[targetCoord.row][targetCoord.column] = tiles[currentCoord]
+            
+            /// for the last coord, set the tile to be the player
+            if coordIndex == tileCoords.count - 1 {
+                newTiles[currentCoord.row][currentCoord.column] = playerTile
+            }
+        }
+        
+        self.tiles = newTiles
+        return Transformation(transformation: [transformation], inputType: input.type, endTiles: newTiles)
+    }
+    
     private func transmogrify(_ target: TileCoord, input: Input) -> Transformation {
         if case let TileType.monster(data) = tiles[target].type {
             let newMonster = tileCreator.randomMonster(not: data.type)
@@ -286,6 +322,41 @@ class Board: Equatable {
         } else {
             preconditionFailure("We should never hit this code path")
         }
+    }
+    
+    private func vortex(tiles:  [[Tile]], targets: [TileCoord], input: Input) -> Transformation {
+        var newTiles = tiles
+        for coord in targets {
+            switch tiles[coord].type {
+            case .rock:
+                let newMonster = tileCreator.randomMonster()
+                newTiles[coord.row][coord.column] = Tile(type: newMonster)
+            case .monster:
+                let newRock = tileCreator.randomRock([])
+                newTiles[coord.row][coord.column] = Tile(type: newRock)
+            default:
+                break
+            }
+        }
+        
+        self.tiles = newTiles
+        return Transformation(transformation: [[TileTransformation(.zero, .zero)]], inputType: input.type, endTiles: newTiles)
+    }
+    
+    private func flameWall(tiles:  [[Tile]], targets: [TileCoord], input: Input) -> Transformation {
+        var newTiles = tiles
+        for monster in targets {
+            if case TileType.monster(let data) = tiles[monster].type {
+                newTiles[monster.row][monster.column] = Tile(type: .monster(data.wasAttacked(for: 1, from: .east)))
+            }
+        }
+    
+        self.tiles = newTiles
+        
+        /// create a "dummy" transformation because apparent;y we ignore things unless there is a
+        return Transformation(transformation: [[TileTransformation(.zero, .zero)]], inputType: input.type, endTiles: newTiles)
+
+    
     }
 }
 
@@ -320,6 +391,19 @@ extension Board {
             
         case .transformRock:
             return transform(targets, into: TileType.rock(.purple), input: input)
+        case .bubbleUp:
+            return bubbleUp(targets.first!, input: input)
+        case .flameWall:
+            let monsterCoords = targets.compactMap { coord -> TileCoord? in
+                if case TileType.monster = tiles[coord].type {
+                    return coord
+                } else {
+                    return nil
+                }
+            }
+            return flameWall(tiles: tiles, targets: monsterCoords, input: input)
+        case .vortex:
+            return vortex(tiles: tiles, targets: targets, input: input)
         }
         
     }
@@ -558,7 +642,6 @@ extension Board {
                               endTiles: intermediateTiles
         )
     }
-    
     
     func removeAndReplaces(from tiles: [[Tile]],
                            specificCoord: [TileCoord],

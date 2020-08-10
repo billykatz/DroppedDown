@@ -13,7 +13,6 @@ import GameplayKit
 protocol LevelCoordinating: StoreSceneDelegate, GameSceneCoordinatingDelegate {
     var gameSceneNode: GameScene? { get set }
     var entities: EntitiesModel? { get set }
-    var randomSource: GKLinearCongruentialRandomSource? { get }
     var delegate: MenuCoordinating? { get set }
     
     func presentStoreOffers(_ storeOffers: [StoreOffer], depth: Int, levelGoalProgress: [GoalTracking], playerData: EntityModel)
@@ -30,14 +29,14 @@ class LevelCoordinator: LevelCoordinating {
     var gameSceneNode: GameScene?
     var entities: EntitiesModel?
     let view: SKView
-    var randomSource: GKLinearCongruentialRandomSource?
-    var runModel: RunModel = RunModel(player: .zero, depth: 0)
+    
+    /// Set default so we dont have to deal with optionality
+    var runModel: RunModel = RunModel(player: .zero, depth: 0, seed: 0)
         
-    init(gameSceneNode: GameScene, entities: EntitiesModel, levelIndex: Int, view: SKView, randomSource: GKLinearCongruentialRandomSource) {
+    init(gameSceneNode: GameScene, entities: EntitiesModel, levelIndex: Int, view: SKView) {
         self.gameSceneNode = gameSceneNode
         self.entities = entities
         self.view = view
-        self.randomSource = randomSource
         
     }
     
@@ -67,7 +66,7 @@ class LevelCoordinator: LevelCoordinating {
                                       difficulty: GameScope.shared.difficulty,
                                       updatedEntity: playerData,
                                       level: level,
-                                      randomSource: randomSource)
+                                      randomSource: runModel.randomSource)
             
             view.presentScene(gameSceneNode)
             view.ignoresSiblingOrder = true
@@ -81,9 +80,10 @@ class LevelCoordinator: LevelCoordinating {
         }
     }
     
-    /// Loads up a model or creates a new one
+    /// Creates a run and loads it if no current run is available
     func loadRun(_ runModel: RunModel?, profile: Profile) {
-        let freshRunModel = RunModel(player: profile.player, depth: 0)
+        let seed = UInt64.random(in: .min ... .max)
+        let freshRunModel = RunModel(player: profile.player, depth: 0, seed: seed)
         
         self.runModel = runModel ?? freshRunModel
         presentCurrentArea(profile.player)

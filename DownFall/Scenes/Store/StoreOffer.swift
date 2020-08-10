@@ -243,7 +243,10 @@ struct StoreOffer: Codable, Hashable {
             let getSwifty = StoreOffer.offer(type: .rune(Rune.rune(for: .getSwifty)), tier: 1)
             let rainEmbers = StoreOffer.offer(type: .rune(Rune.rune(for: .rainEmbers)), tier: 1)
             let transform = StoreOffer.offer(type: .rune(Rune.rune(for: .transformRock)), tier: 1)
-            return [getSwifty, rainEmbers, transform]
+            let vortex = StoreOffer.offer(type: .rune(Rune.rune(for: .vortex)), tier: 2)
+            let bubbleUp = StoreOffer.offer(type: .rune(Rune.rune(for: .bubbleUp)), tier: 2)
+            let flameWall = StoreOffer.offer(type: .rune(Rune.rune(for: .flameWall)), tier: 2)
+            return [getSwifty, rainEmbers, transform, vortex, bubbleUp, flameWall]
         case 1:
             // two goals
             ()

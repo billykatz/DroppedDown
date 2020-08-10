@@ -109,9 +109,67 @@ struct Animator {
             }
             animate(spriteActions) { completion?() }
 
+        case .bubbleUp:
+            var spriteActions: [SpriteAction] = []
+            
+            let bubbleSprite = SKSpriteNode(imageNamed: "bubble")
+            #warning("refactor this to avoid !")
+            let originalPlayerPosition = affectedTiles.first!
+            let playerSprite = sprites[originalPlayerPosition]
+            
+            // player is taller than wide, so use the player's height as width and height of bubble
+            bubbleSprite.size = CGSize(width: playerSprite.size.height, height: playerSprite.size.height)
+            bubbleSprite.alpha  = 0.25
+            playerSprite.addChild(bubbleSprite)
+            
+
+            if let targetPlayerCoord = getTilePosition(.player(.playerZero), tiles: transformations.first!.endTiles!) {
+                let position = sprites[targetPlayerCoord].position
+                let floatUpAction = SKAction.move(to: position, duration: 1.0)
+                
+                spriteActions.append(SpriteAction(sprite: playerSprite, action: floatUpAction))
+                
+            }
+            
+            animate(spriteActions) { completion?() }
+        case .flameWall:
+            var spriteActions: [SpriteAction] = []
+            for coord in affectedTiles {
+                let tileSprite = sprites[coord]
+                
+                let emptySprite = SKSpriteNode(imageNamed: "empty")
+                emptySprite.size = tileSprite.size
+                emptySprite.position = tileSprite.position
+                emptySprite.zPosition = tileSprite.zPosition + 1
+                
+                /// add the sprite to the scene
+                spriteForeground.addChild(emptySprite)
+                
+                /// do the animation
+                let runeAnimationAction = SKAction.animate(with: runeAnimation.animationFrames(), timePerFrame: 0.07)
+                
+                // remove the sprite from the scene
+                let removeAction = SKAction.removeFromParent()
+                let sequence = SKAction.sequence([runeAnimationAction, runeAnimationAction.reversed(), removeAction])
+                
+                let spriteAction = SpriteAction(sprite: emptySprite, action: sequence)
+                spriteActions.append(spriteAction)
+            }
+            animate(spriteActions) { completion?() }
+        case .vortex:
+            var spriteActions: [SpriteAction] = []
+            for tileCoord in affectedTiles {
+                let runeAnimationAction = SKAction.animate(with: runeAnimation.animationFrames(), timePerFrame: 0.07)
+                
+                let spriteAction = SpriteAction(sprite: sprites[tileCoord], action: runeAnimationAction)
+                spriteActions.append(spriteAction)
+            }
+            animate(spriteActions) { completion?() }
+
             
         }
     }
+    
     
     public func smokeAnimation() -> SKAction {
         let smokeTexture = SpriteSheet(texture: SKTexture(imageNamed: "smokeAnimation"), rows: 1, columns: 6).animationFrames()

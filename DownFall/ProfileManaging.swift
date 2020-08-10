@@ -161,7 +161,7 @@ class ProfileViewModel: ProfileManaging {
                     }
                 })
                 .catch( { error in
-                    return createAndSavePlayerProfile
+                    return (createAndSavePlayerProfile)
                 })
                 .eraseToAnyPublisher()
         

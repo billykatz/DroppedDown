@@ -12,26 +12,6 @@ struct RangeModel: Codable, Hashable {
     let lower: Int
     let upper: Int
     
-//    /**
-//     Use this to divide a range into different sized sub-ranges
-//
-//     - Parameters:
-//        - subRangeRatios: An array with the ratios to split up the range into.  The sum of the elements of the subRangeRatios must equal 1
-//
-//     */
-//
-//    func dividedIntoSubRanges(_ subRangeRatios: [Float]) -> [RangeModel] {
-//        guard subRangeRatios.reduce(0, +) == 1 else { fatalError("The sub ranges must add up to 1") }
-//
-//        var subRangeModels: [RangeModel] = []
-//
-//        // keep track of the lower bound as we iterate over the sub ranges
-//        var currLower = self.lower
-//
-//        var currUpper = 0
-//
-//    }
-    
     
     /// This is not guaranteed to create even distribution
     /// For ranges where the total is not divisible by the number of subranges, then rounding occurs

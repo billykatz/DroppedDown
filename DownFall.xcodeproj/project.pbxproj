@@ -25,7 +25,6 @@
 		3D30A4292216899E00AFA1E1 /* BoardMocker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D30A4232216892A00AFA1E1 /* BoardMocker.swift */; };
 		3D30A42B2217F63500AFA1E1 /* TileCoord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D30A42A2217F63500AFA1E1 /* TileCoord.swift */; };
 		3D3D31EC23ABEFA8002B87EE /* LevelConstructor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D3D31EB23ABEFA8002B87EE /* LevelConstructor.swift */; };
-		3D4A470F23B3D33B000165FB /* LevelType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4A470E23B3D33B000165FB /* LevelType.swift */; };
 		3D4A471123B3D34F000165FB /* LevelModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4A471023B3D34F000165FB /* LevelModel.swift */; };
 		3D4A471323B3DCB7000165FB /* RangeModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4A471223B3DCB7000165FB /* RangeModelTests.swift */; };
 		3D4F569222B2D087003695D8 /* SpriteSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4F569122B2D087003695D8 /* SpriteSheet.swift */; };
@@ -194,7 +193,6 @@
 		3D30A42A2217F63500AFA1E1 /* TileCoord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileCoord.swift; sourceTree = "<group>"; };
 		3D3D31EB23ABEFA8002B87EE /* LevelConstructor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelConstructor.swift; sourceTree = "<group>"; };
 		3D4A470C23B3CEFC000165FB /* RandomTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomTests.swift; sourceTree = "<group>"; };
-		3D4A470E23B3D33B000165FB /* LevelType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelType.swift; sourceTree = "<group>"; };
 		3D4A471023B3D34F000165FB /* LevelModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelModel.swift; sourceTree = "<group>"; };
 		3D4A471223B3DCB7000165FB /* RangeModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangeModelTests.swift; sourceTree = "<group>"; };
 		3D4F569122B2D087003695D8 /* SpriteSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteSheet.swift; sourceTree = "<group>"; };
@@ -456,7 +454,6 @@
 			isa = PBXGroup;
 			children = (
 				3D4A471023B3D34F000165FB /* LevelModel.swift */,
-				3D4A470E23B3D33B000165FB /* LevelType.swift */,
 				3D3D31EB23ABEFA8002B87EE /* LevelConstructor.swift */,
 			);
 			name = Level;
@@ -1070,7 +1067,6 @@
 				5867A591242B0CD1005BFD10 /* TileDetailView.swift in Sources */,
 				3D7D8B332253E5BC0016FE4C /* HUD.swift in Sources */,
 				582CF3F02442553000AA2A95 /* FillableCircle.swift in Sources */,
-				3D4A470F23B3D33B000165FB /* LevelType.swift in Sources */,
 				3DD5AA0D2398025400FB63F4 /* Styling.swift in Sources */,
 				5893899F245E7D0E00350A2E /* StoreOffer.swift in Sources */,
 				58B39BD723D21C9600915858 /* BackpackView.swift in Sources */,

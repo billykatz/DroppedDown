@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import GameKit
 
 struct Area: Codable {
     enum AreaType: Codable {
@@ -60,12 +61,17 @@ struct Area: Codable {
 }
 
 class RunModel: Codable {
+    let seed: UInt64
     let player: EntityModel
     var depth: Int
+    lazy var randomSource: GKLinearCongruentialRandomSource = {
+        return GKLinearCongruentialRandomSource(seed: seed)
+    }()
     
-    init(player: EntityModel, depth: Int) {
+    init(player: EntityModel, depth: Int, seed: UInt64) {
         self.player = player
         self.depth = depth
+        self.seed = seed
     }
  
     /// Keep track of levels
@@ -105,7 +111,7 @@ class RunModel: Codable {
                 return newArea
             case .store(_):
                 let sameDepth = lastArea.depth
-                let newLevel = LevelConstructor.buildLevel(depth: sameDepth)
+                let newLevel = LevelConstructor.buildLevel(depth: sameDepth, randomSource: randomSource)
                 let newArea = Area(depth: sameDepth, type: .level(newLevel))
                 areas.append(newArea)
                 return newArea

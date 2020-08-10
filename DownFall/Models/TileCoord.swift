@@ -234,4 +234,12 @@ struct TileCoord: Codable, Hashable {
         }
         return newTileCoord
     }
+    
+    static func random(_ size: Int, notInReservedCoords reservedCoords: [TileCoord]) -> TileCoord {
+        var newTileCoord = random(size)
+        while (reservedCoords.contains(newTileCoord)) {
+            newTileCoord = random(size)
+        }
+        return newTileCoord
+    }
 }

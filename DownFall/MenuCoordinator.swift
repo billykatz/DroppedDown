@@ -38,6 +38,7 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate, OptionsSceneDelegate 
     var profile: Profile?
     var levelCoordinator: LevelCoordinating
     
+    
     private lazy var mainMenuScene: MainMenu? = {
         guard let scene = GKScene(fileNamed: Identifiers.mainMenuScene)?.rootNode as? MainMenu else { return nil }
         scene.mainMenuDelegate = self

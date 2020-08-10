@@ -9,7 +9,7 @@
 import Foundation
 
 
-struct AttackSlope: Equatable, Codable {
+struct AttackSlope: Hashable, Codable {
     let over: Int
     let up: Int
     
@@ -19,6 +19,19 @@ struct AttackSlope: Equatable, Codable {
             AttackSlope(over: 0, up: 1),
             AttackSlope(over: 0, up: -1),
             AttackSlope(over: 1, up: 0)
+        ]
+    }
+    
+    static var allDirections: [AttackSlope] {
+        return [
+            AttackSlope(over: -1, up: 0),
+            AttackSlope(over: 0, up: 1),
+            AttackSlope(over: 0, up: -1),
+            AttackSlope(over: 1, up: 0),
+            AttackSlope(over: -1, up: -1),
+            AttackSlope(over: -1, up: 1),
+            AttackSlope(over: 1, up: -1),
+            AttackSlope(over: 1, up: 1)
         ]
     }
     

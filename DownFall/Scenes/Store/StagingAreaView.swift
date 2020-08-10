@@ -98,17 +98,18 @@ class StagingAreaView: SKSpriteNode {
         let tier = 2
         let tierIndex = 1
         guard viewModel.storeOffers.filter({$0.tier == tier }).count > 0,
-            let tierOneFrame = self.tierOneArea?.frame,
-            tierIndex < viewModel.goalProgress.count
+            let tierOneFrame = self.tierOneArea?.frame
+//            tierIndex < viewModel.goalProgress.count
             else { return nil }
+        let goalProgress = viewModel.goalProgress.optionalElement(at: tierIndex)
         let offer = viewModel.storeOffers.filter { $0.tier == tier }
         let vm = StagingTierViewModel(offers: offer,
                                       tier: tier,
-                                      unlocked: tierIsUnlocked(tier: tier, goalProgress: viewModel.goalProgress),
+                                      unlocked: tierIsUnlocked(tier: tier, goalProgress: viewModel.goalProgress) || viewModel.isBeforeLevelOne,
                                       touchDelegate: self,
                                       offerThatWasSelected: self.offerWasSelected,
                                       offerWasTappedForInformation: storeOfferWasTappedForInformation,
-                                      goalTracker: viewModel.goalProgress[tierIndex])
+                                      goalTracker: goalProgress)
         let tierTwoArea = StagingTierView(viewModel: vm, size: CGSize(width: size.width, height: Constants.stagingTierHeight))
         tierTwoArea.zPosition = Precedence.foreground.rawValue
         tierTwoArea.position = CGPoint.alignHorizontally(tierTwoArea.frame, relativeTo: tierOneFrame, horizontalAnchor: .center, verticalAlign: .bottom, translatedToBounds: true)

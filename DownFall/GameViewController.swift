@@ -11,13 +11,9 @@ import SpriteKit
 import GameplayKit
 
 class GameViewController: UIViewController {
-    
-    var randomSource: GKLinearCongruentialRandomSource?
 
     internal var gameSceneNode: GameScene?
     internal var entities: EntitiesModel?
-    internal var levelIndex: Int = 1
-    internal var levels: [Level]?
     var loadingSceneNode: LoadingScene?
     
     /// coordinators
@@ -52,9 +48,6 @@ class GameViewController: UIViewController {
         do {
             guard let entityData = try Data.data(from: "entities") else { fatalError("Crashing here is okay because we failed to parse our entity json file") }
             entities = try JSONDecoder().decode(EntitiesModel.self, from: entityData)
-            
-            //TODO: add the actual seed to this source
-            randomSource = GKLinearCongruentialRandomSource()
         }
         catch(let error) {
             fatalError("Crashing due to \(error) while trying to parse json entity file")
@@ -62,11 +55,10 @@ class GameViewController: UIViewController {
         
         /// Init the coordinators
         guard let gameScene = GKScene(fileNamed: "GameScene")?.rootNode as? GameScene, let entities = entities,
-            let randomSource = randomSource,
             let view = self.view as? SKView
         else { fatalError() }
         
-        let levelCoordinator = LevelCoordinator.init(gameSceneNode: gameScene, entities: entities, levelIndex: 0, view: view, randomSource: randomSource)
+        let levelCoordinator = LevelCoordinator(gameSceneNode: gameScene, entities: entities, levelIndex: 0, view: view)
         self.menuCoordinator = MenuCoordinator(levelCoordinator: levelCoordinator, view: view)
         self.levelCoordinator = levelCoordinator
         self.levelCoordinator?.delegate = menuCoordinator
@@ -86,13 +78,6 @@ class GameViewController: UIViewController {
 
     override var prefersStatusBarHidden: Bool {
         return true
-    }
-    
-    func setFrame() {
-        view.frame = CGRect(x: view.frame.origin.x,
-                            y: view.frame.origin.y,
-                            width: self.view.frame.width,
-                            height: self.view.safeAreaLayoutGuide.layoutFrame.height)
     }
     
     // save the current run if there is one

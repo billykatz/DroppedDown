@@ -98,7 +98,7 @@ class TileCreator: TileStrategy {
         return tileCoord
     }
     
-    private func randomRock(_ neighbors: [Tile] = []) -> TileType {
+    func randomRock(_ neighbors: [Tile] = []) -> TileType {
         guard let level = level else { fatalError("You need to init with a level") }
         var tileTypeChances = level.tileTypeChances
         if !neighbors.isEmpty {

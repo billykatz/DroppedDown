@@ -50,7 +50,7 @@
                 ]
             },
             "pickaxe": {
-                "runeSlots" : 1,
+                "runeSlots" : 3,
                 "runes" : []
             },
             "abilities": [],

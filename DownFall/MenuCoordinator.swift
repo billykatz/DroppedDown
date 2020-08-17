@@ -91,9 +91,11 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate, OptionsSceneDelegate,
         /// update run
         let profileWithCurrentRun = profile.updateRunModel(currentRun)
         /// update player gem carry
-        let playerUpdateWithGems = profileWithCurrentRun.player.updateCarry(carry: updatedPlayerData.carry)
+        let playerUpdated = profileWithCurrentRun.player.updateCarry(carry: updatedPlayerData.carry).update(pickaxe: updatedPlayerData.pickaxe)
+        
+        
         /// update profile with new player
-        let profileWithUpdatedPlayer = profileWithCurrentRun.updatePlayer(playerUpdateWithGems)
+        let profileWithUpdatedPlayer = profileWithCurrentRun.updatePlayer(playerUpdated)
         
         //update profile with current depth
         self.profile = profileWithUpdatedPlayer.updateDepth(currentRun?.depth ?? 0)

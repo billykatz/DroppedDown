@@ -13,6 +13,10 @@ class StagingSelectionAreaViewModel {
     var selectedOffers: [StoreOffer]
     var touchDelegate: SKNode? = nil
     
+    var hasChosenAllOffers: Bool {
+        return selectedOffers.count == unlockedGoals
+    }
+    
     // input from outside
     var offerWasSelected: (StoreOffer) -> () = { _ in }
     var offerWasDeselected: (StoreOffer) -> () = { _ in }

@@ -66,7 +66,7 @@ class RunModel: Codable, Equatable {
     }
     
     let seed: UInt64
-    let player: EntityModel
+    var player: EntityModel
     
     lazy var randomSource: GKLinearCongruentialRandomSource = {
         return GKLinearCongruentialRandomSource(seed: seed)

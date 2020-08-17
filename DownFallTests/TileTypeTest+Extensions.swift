@@ -48,7 +48,9 @@ extension TileType {
                                             type: .rat,
                                             carry: .zero,
                                             animations: [],
-                                            abilities: [])
+                                            effects: [],
+                                            dodge:0,
+                                            luck: 0)
         )
     }
     
@@ -82,8 +84,7 @@ extension TileType {
                                                                 attackSlope: AttackSlope.sideways),
                               type: EntityModel.EntityType = .rat,
                               carry: CarryModel = .zero,
-                              animations: [AnimationModel] = [],
-                              abilities: [AnyAbility] = []) -> TileType {
+                              animations: [AnimationModel] = []) -> TileType {
         return TileType.monster(EntityModel(originalHp: originalHp,
                                             hp: hp,
                                             name: name,
@@ -91,7 +92,10 @@ extension TileType {
                                             type: type,
                                             carry: carry,
                                             animations: animations,
-                                            abilities: abilities))
+                                            effects: [],
+                                            dodge:0,
+                                            luck: 0
+                                            ))
     }
     
     static func createPlayer(originalHp: Int = 1,
@@ -100,8 +104,7 @@ extension TileType {
                              attack: AttackModel = AttackModel.pickaxe,
                              type: EntityModel.EntityType = .player,
                              carry: CarryModel = .zero,
-                             animations: [AnimationModel] = [],
-                             abilities: [AnyAbility] = []) -> TileType {
+                             animations: [AnimationModel] = []) -> TileType {
         return TileType.player(EntityModel(originalHp: originalHp,
                                            hp: hp,
                                            name: name,
@@ -109,8 +112,10 @@ extension TileType {
                                            type: type,
                                            carry: carry,
                                            animations: animations,
-                                           abilities: abilities,
-                                           pickaxe: Pickaxe(runeSlots: 0, runes: [])))
+                                           pickaxe: Pickaxe(runeSlots: 0, runes: []),
+                                           effects: [],
+                                           dodge:0,
+                                           luck: 0))
         
     }
     

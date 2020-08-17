@@ -1,9 +1,9 @@
 {
     "entities": [
-        { "name": "player2",
+        { "name": "player3",
             "type": "player",
-            "originalHp": 8,
-            "hp": 8,
+            "originalHp": 3,
+            "hp": 3,
             "attack": {
                 "type": "targets",
                 "frequency" : 1,
@@ -52,12 +52,15 @@
                     }
                 ]
             },
-            "abilities": []
+            "abilities": [],
+            "effects": [],
+            "dodge": 0,
+            "luck": 0
         },
-        { "name": "player2",
+        { "name": "player3",
             "type": "player",
-            "originalHp": 2,
-            "hp": 2,
+            "originalHp": 3,
+            "hp": 3,
             "attack": {
                 "type": "targets",
                 "frequency" : 1,
@@ -106,12 +109,15 @@
                 }
                 ]
             },
-            "abilities": []
+            "abilities": [],
+            "effects": [],
+            "dodge": 0,
+            "luck": 0
         },
-        { "name": "player2",
+        { "name": "player3",
             "type": "player",
-            "originalHp": 1,
-            "hp": 1,
+            "originalHp": 3,
+            "hp": 3,
             "attack": {
                 "type": "targets",
                 "frequency" : 1,
@@ -160,7 +166,14 @@
                 }
                 ]
             },
-            "abilities": []
+            "abilities": [],
+            "pickaxe": {
+                "runeSlots" : 1,
+                "runes" : []
+            },
+            "effects": [],
+            "dodge": 0,
+            "luck": 0
         },
         { "name": "dragon",
             "type": "dragon",
@@ -193,13 +206,13 @@
                     "animationFilename": "fireballStart",
                     "numberOfFrames": 6,
                     "animationType": "projectileStart",
-                    "keyframe": 4
+                    "keyframe": 3
                 },
                 {
                     "animationFilename": "fireballMid",
                     "numberOfFrames": 5,
                     "animationType": "projectileMid",
-                    "keyframe": 2
+                    "keyframe": 1
                 }
             ],
             "carry": {
@@ -209,7 +222,10 @@
                 }]
                 
             },
-            "abilities": []
+            "abilities": [],
+            "effects": [],
+            "dodge": 0,
+            "luck": 0
         },
         { "name": "rat",
             "type": "rat",
@@ -264,7 +280,10 @@
                     "amount": 15
                 }]
             },
-            "abilities": []
+            "abilities": [],
+            "effects": [],
+            "dodge": 0,
+            "luck": 0
         },
         { "name": "bat",
             "type": "bat",
@@ -326,7 +345,10 @@
                     "amount": 15
                 }]
             },
-            "abilities": []
+            "abilities": [],
+            "effects": [],
+            "dodge": 0,
+            "luck": 0
         },
         { "name": "alamo",
             "type": "alamo",
@@ -373,7 +395,10 @@
                     "amount": 15
                 }]
             },
-            "abilities": []
+            "abilities": [],
+            "effects": [],
+            "dodge": 0,
+            "luck": 0
         },
         { "name": "sally",
             "type": "sally",
@@ -429,7 +454,10 @@
                     "amount": 15
                 }]
             },
-            "abilities": []
+            "abilities": [],
+            "effects": [],
+            "dodge": 0,
+            "luck": 0
         }
     ]
 }

@@ -20,6 +20,10 @@ struct Profile: Codable, Equatable {
     
     let deepestDepth: Int
     
+    var runPlayer: EntityModel {
+        return player.update(pickaxe: Pickaxe(runeSlots: 0, runes: []))
+    }
+    
     func updatePlayer(_ entityModel: EntityModel) -> Profile {
         return Profile(name: name, progress: progress + 1, player: entityModel, currentRun: currentRun, deepestDepth: deepestDepth)
     }
@@ -38,7 +42,7 @@ struct Profile: Codable, Equatable {
 
 protocol ProfileManaging {
     /// Call this when the app is loaded into memory
-    func start(_ presenter: UIViewController)
+    func start(_ presenter: UIViewController, showGCSignIn: Bool)
     
     /// Resets user defaults. Only do this when resetting the player's data
     func resetUserDefaults()
@@ -98,7 +102,7 @@ class ProfileViewModel: ProfileManaging {
     }
     
     /// Defines all business logic and kickoffs the pipeline by attempting to authenicate with GameCenter
-    func start(_ presenter: UIViewController) {
+    func start(_ presenter: UIViewController, showGCSignIn: Bool = false) {
         
         /// Load the remote save file into data
         let loadRemoteData =
@@ -152,6 +156,7 @@ class ProfileViewModel: ProfileManaging {
         
         let resolveProfileConflict: AnyPublisher<Profile, Error> =
             loadedProfilesZip
+                .print("resolve profile conflict")
                 .eraseToAnyPublisher()
                 .tryMap ({ (saveFiles)  in
                     let (remote, local) = saveFiles
@@ -186,14 +191,6 @@ class ProfileViewModel: ProfileManaging {
                 ).eraseToAnyPublisher()
                 return combined
             }
-//            .tryFlatMap { [weak self] (profile) -> Future<Profile, Error> in
-//                guard let self = self else { throw ProfileError.profileLoadCancelled }
-//                return self.saveProfileLocally(profile)
-//            }
-//            .tryFlatMap { [weak self] (profile) -> Future<Profile, Error> in
-//                guard let self = self else { throw ProfileError.profileLoadCancelled }
-//                return self.saveProfileRemotely(profile)
-//            }
             .subscribe(on: backgroundQueue)
             .receive(on: RunLoop.main)
             .sink(receiveCompletion: { completion in
@@ -215,7 +212,7 @@ class ProfileViewModel: ProfileManaging {
         print("Starting to authenticate with game center")
         localPlayer.authenticateHandler = { [weak self] viewController, error in
             print("Authenitcation handler. Authenticated: \(String(describing: self?.localPlayer.isAuthenticated))")
-            if let vc = viewController {
+            if let vc = viewController, showGCSignIn {
                 presenter.present(vc, animated: true)
             } else {
                 self?.authenicatedSubject.send(self?.localPlayer.isAuthenticated ?? false)

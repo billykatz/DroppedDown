@@ -120,7 +120,7 @@ class RefereeTests: XCTestCase {
         var expectedOutput = Input(.attack(attackType: .targets ,
                                            attacker: TileCoord(1, 1),
                                            defender: TileCoord(0, 1),
-                                           affectedTiles: [TileCoord(0,1)]))
+                                           affectedTiles: [TileCoord(0,1)], dodged: false))
         let actualOutput = Referee.enforceRules(tiles)
         XCTAssertEqual(expectedOutput, actualOutput)
         
@@ -130,7 +130,7 @@ class RefereeTests: XCTestCase {
         expectedOutput = Input(.attack(attackType: .targets ,
                       attacker: TileCoord(2, 2),
                       defender: TileCoord(1, 2),
-                      affectedTiles: [TileCoord(1,2)]))
+                      affectedTiles: [TileCoord(1,2)], dodged: false))
         let actualOutput2 = Referee.enforceRules(tiles)
         XCTAssertEqual(expectedOutput, actualOutput2)
 
@@ -143,7 +143,7 @@ class RefereeTests: XCTestCase {
         var expectedOutput = Input(.attack(attackType: .targets ,
                       attacker: TileCoord(1, 0),
                       defender: TileCoord(0, 0),
-                      affectedTiles: [TileCoord(0, 0)]))
+                      affectedTiles: [TileCoord(0, 0)], dodged: false))
 
         var actualOutput = Referee.enforceRules(tiles)
         XCTAssertEqual(expectedOutput, actualOutput, "Pick axe monsters attack down")
@@ -154,7 +154,7 @@ class RefereeTests: XCTestCase {
         expectedOutput = Input(.attack(attackType: .targets ,
                                            attacker: TileCoord(2, 2),
                                            defender: TileCoord(1, 2),
-                                           affectedTiles: [TileCoord(1, 2)]))
+                                           affectedTiles: [TileCoord(1, 2)], dodged: false))
 
         actualOutput = Referee.enforceRules(tiles)
         XCTAssertEqual(expectedOutput, actualOutput, "Pick axe monsters attack down")
@@ -165,7 +165,7 @@ class RefereeTests: XCTestCase {
         expectedOutput = Input(.attack(attackType: .targets ,
                                        attacker: TileCoord(1, 0),
                                        defender: TileCoord(1, 1),
-                                       affectedTiles: [TileCoord(1, 1)]))
+                                       affectedTiles: [TileCoord(1, 1)], dodged: false))
         actualOutput = Referee.enforceRules(tiles)
         XCTAssertEqual(expectedOutput, actualOutput, "Mouthy monsters attacked things on it's sides")
         
@@ -175,7 +175,7 @@ class RefereeTests: XCTestCase {
         expectedOutput = Input(.attack(attackType: .targets ,
                                        attacker: TileCoord(2, 1),
                                        defender: TileCoord(2, 0),
-                                       affectedTiles: [TileCoord(2, 0), TileCoord(2, 2)]))
+                                       affectedTiles: [TileCoord(2, 0), TileCoord(2, 2)], dodged: false))
         actualOutput = Referee.enforceRules(tiles)
         XCTAssertEqual(expectedOutput, actualOutput, "Mouthy monsters attacked things on it's sides")
 
@@ -187,7 +187,7 @@ class RefereeTests: XCTestCase {
         expectedOutput = Input(.attack(attackType: .targets ,
                                        attacker: TileCoord(1, 0),
                                        defender: TileCoord(0, 0),
-                                       affectedTiles: [TileCoord(0, 0)]))
+                                       affectedTiles: [TileCoord(0, 0)], dodged: false))
         actualOutput = Referee.enforceRules(tiles)
         XCTAssertNotEqual(expectedOutput, actualOutput, "Mouthy monsters attacked things on it's sides")
 
@@ -197,7 +197,7 @@ class RefereeTests: XCTestCase {
         expectedOutput = Input(.attack(attackType: .targets ,
                                        attacker: TileCoord(2, 2),
                                        defender: TileCoord(1, 2),
-                                       affectedTiles: [TileCoord(1, 2)]))
+                                       affectedTiles: [TileCoord(1, 2)], dodged: false))
         actualOutput = Referee.enforceRules(tiles)
         XCTAssertNotEqual(expectedOutput, actualOutput, "Mouthy monsters attacked things on it's sides")
     }

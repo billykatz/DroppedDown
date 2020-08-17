@@ -29,7 +29,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }.store(in: &disposables)
         
         // Start the authentication process
-        GameScope.shared.profileManager.start(gameViewController)
+        GameScope.shared.profileManager.start(gameViewController, showGCSignIn: false)
         
         // window
         window!.rootViewController = gameViewController

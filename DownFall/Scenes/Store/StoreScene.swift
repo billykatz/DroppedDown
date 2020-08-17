@@ -152,13 +152,34 @@ class StoreScene: SKScene {
         guard let first = effects.first else { return }
         storeHUDViewModel.remove(effect: first)
     }
+    
+    func showLeaveStoreConfirmation() {
+        let areYouSureMenu = MenuSpriteNode(.confirmation, playableRect: playableRect, precedence: .flying, level: .zero, buttonDelegate: self)
+        areYouSureMenu.name = "areYouSureMenu"
+        addChild(areYouSureMenu)
+    }
 }
 
 extension StoreScene: ButtonDelegate {
     func buttonTapped(_ button: Button) {
         switch button.identifier {
         case .leaveStore:
-            storeSceneDelegate?.leave(self, updatedPlayerData: storeHUDViewModel.previewPlayerData)
+            if stagingArea.hasSelectedAllOffers {
+                /// allow player to move to next level
+                storeSceneDelegate?.leave(self, updatedPlayerData: storeHUDViewModel.previewPlayerData)
+            } else if childNode(withName: "areYouSureMenu") != nil {
+                ///  the player has selected confirm with the menu on the screen
+                storeSceneDelegate?.leave(self, updatedPlayerData: storeHUDViewModel.previewPlayerData)
+                
+            } else {
+                /// show menu to ask the player if they are sure that they want to continue without selecting all the offers
+                showLeaveStoreConfirmation()
+                
+            }
+            
+        case .backpackCancel:
+            removeChild(with: "areYouSureMenu")
+            
         default:
             fatalError("You must add a case for added buttons here")
         }

@@ -8,11 +8,11 @@
 
 import SpriteKit
 
-class MenuSpriteNode: SKSpriteNode {
+class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
 
     //TODO: Generally, we need to capture all the constants and move them to our Style struct.
     
-    init(_ menuType: MenuType, playableRect: CGRect, precedence: Precedence, level: Level) {
+    init(_ menuType: MenuType, playableRect: CGRect, precedence: Precedence, level: Level, buttonDelegate: ButtonDelegate? = nil) {
         
         let menuSizeWidth = playableRect.size.width * menuType.widthCoefficient
         let menuSizeHeight = playableRect.size.height * menuType.heightCoefficient
@@ -30,13 +30,15 @@ class MenuSpriteNode: SKSpriteNode {
         addChild(border)
         
         zPosition = precedence.rawValue
-        setupButtons(menuType, playableRect, precedence: precedence, level)
+        setupButtons(menuType, playableRect, precedence: precedence, level, buttonDelegate: buttonDelegate)
         
     }
     
-    private func setupButtons(_ menuType: MenuType, _ playableRect: CGRect, precedence: Precedence, _ level: Level) {
+    private func setupButtons(_ menuType: MenuType, _ playableRect: CGRect, precedence: Precedence, _ level: Level, buttonDelegate: ButtonDelegate? = nil) {
         let menuSizeWidth = playableRect.size.width * menuType.widthCoefficient
         let buttonSize = CGSize(width: menuSizeWidth * 0.4, height: 120)
+        
+        var hasSecondaryButton: Bool = false
         
         if menuType == .gameWin {
             
@@ -69,15 +71,15 @@ class MenuSpriteNode: SKSpriteNode {
             
             addChild(paragraphNode)
             
-            
+            hasSecondaryButton = true
             let mainMenuButton = Button(size: buttonSize,
-                                delegate: self,
+                                delegate: buttonDelegate ?? self,
                                 identifier: .mainMenu,
                                 precedence: precedence,
                                 fontSize: .fontLargeSize,
                                 fontColor: .clayRed,
                                 backgroundColor: .eggshellWhite)
-            mainMenuButton.position = CGPoint.position(this: mainMenuButton.frame, centeredInBottomOf: self.frame, verticalPadding: Style.Padding.most*2 + buttonSize.height)
+            mainMenuButton.position = CGPoint.position(mainMenuButton.frame, inside: self.frame, verticalAlign: .bottom, horizontalAnchor: .left, xOffset: Style.Padding.most, yOffset: Style.Padding.most)
             addChild(mainMenuButton)
 
         } else if menuType == .gameLose {
@@ -97,18 +99,40 @@ class MenuSpriteNode: SKSpriteNode {
             addChild(paragraphNode)
             
 
+        } else if menuType == .confirmation {
+            let text =
+            """
+                You have unredeemed offers.
+
+                Are you sure you want to leave the store?
+            """
+            let paragraphNode = ParagraphNode.labelNode(text: text, paragraphWidth: menuSizeWidth * 0.95, fontSize: .fontLargeSize)
+            
+            paragraphNode.position = CGPoint.position(paragraphNode.frame, inside: self.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most)
+            paragraphNode.zPosition = precedence.rawValue
+            
+            addChild(paragraphNode)
+            
+            if let secondaryButtonIdentifier = menuType.secondaryButtonIdentifier {
+                let secondaryButton = Button(size: buttonSize, delegate: buttonDelegate ?? self, identifier: secondaryButtonIdentifier, precedence: precedence, fontSize: .fontLargeSize, fontColor: .black)
+                secondaryButton.position = CGPoint.position(secondaryButton.frame, inside: self.frame, verticalAlign: .bottom, horizontalAnchor: .left, xOffset: Style.Padding.most, yOffset: Style.Padding.most)
+                addChild(secondaryButton)
+                hasSecondaryButton = true
+                
+            }
+            
         }
         
         // Add the default button
         // This button is added no matter what
         let button = Button(size: buttonSize,
-                            delegate: self,
+                            delegate: buttonDelegate ?? self,
                             identifier: menuType.buttonIdentifer,
                             precedence: precedence,
                             fontSize: .fontLargeSize,
                             fontColor: .black,
                             backgroundColor: .clayRed)
-        button.position = CGPoint.position(this: button.frame, centeredInBottomOf: self.frame, verticalPadding: Style.Padding.most)
+        button.position = CGPoint.position(button.frame, inside: self.frame, verticalAlign: .bottom, horizontalAnchor: hasSecondaryButton ? .right : .center, xOffset: Style.Padding.most, yOffset: Style.Padding.most)
         addChild(button)
     }
     
@@ -191,11 +215,7 @@ class MenuSpriteNode: SKSpriteNode {
         
         addChild(paragraphNode)
     }
-}
-
-//MARK:- ButtonDelegate
-
-extension MenuSpriteNode: ButtonDelegate {
+    
     func buttonPressBegan(_ button: Button) { }
     
     func buttonTapped(_ button: Button) {

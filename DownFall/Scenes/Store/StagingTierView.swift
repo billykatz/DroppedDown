@@ -196,7 +196,7 @@ class StagingTierView: SKSpriteNode {
     
     func setupTextView() {
         let textString = viewModel.unlocked ?
-            "Choose one."
+            "Choose one. (Drag up to top)"
             :
         "Complete \(viewModel.tier) goal\(viewModel.tier > 1 ? "s" : "") to unlock."
         

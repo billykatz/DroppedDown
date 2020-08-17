@@ -220,9 +220,6 @@ struct StoreOffer: Codable, Hashable {
             StoreOffer.offer(type: .plusTwoMaxHealth, tier: 1)
         ]
         
-        // Rune slot
-        let runeSlotOffer = StoreOffer.offer(type: .runeSlot, tier: 3)
-        
         /// some tier two offers
         let dodgeUp = StoreOffer.offer(type: .dodge, tier: 2)
         let luckUp = StoreOffer.offer(type: .luck, tier: 2)
@@ -235,19 +232,7 @@ struct StoreOffer: Codable, Hashable {
         let vortex = StoreOffer.offer(type: .rune(Rune.rune(for: .vortex)), tier: 3)
         let bubbleUp = StoreOffer.offer(type: .rune(Rune.rune(for: .bubbleUp)), tier: 3)
         let flameWall = StoreOffer.offer(type: .rune(Rune.rune(for: .flameWall)), tier: 3)
-        
-        let runeOffers = [
-            getSwifty,
-            rainEmbers,
-            transform,
-            vortex,
-            bubbleUp,
-            flameWall
-        ]
-            
-        storeOffers.append(contentsOf: [dodgeUp, luckUp, gemsOffer])
 
-        
         switch depth {
             /// 1 Rune Slot
         case 0:
@@ -258,36 +243,44 @@ struct StoreOffer: Codable, Hashable {
             return [getSwifty, rainEmbers, transform]
         case 1:
             // two goals
-            ()
+            storeOffers.append(contentsOf: [dodgeUp, luckUp, gemsOffer])
             
         case 2:
             // Two Rune Slots
             /// two goals
+            let getSwifty = StoreOffer.offer(type: .rune(Rune.rune(for: .getSwifty)), tier: 2)
+            let rainEmbers = StoreOffer.offer(type: .rune(Rune.rune(for: .rainEmbers)), tier: 2)
+            let transform = StoreOffer.offer(type: .rune(Rune.rune(for: .transformRock)), tier: 2)
             storeOffers.append(contentsOf: [getSwifty, rainEmbers, transform])
         case 3:
             /// offer a rune slot or gems
+            storeOffers.append(contentsOf: [dodgeUp, luckUp, gemsOffer])
             let gemOffer = StoreOffer.offer(type: .gems(amount: 5), tier: 3)
-            storeOffers.append(contentsOf: [runeSlotOffer, gemOffer])
+            storeOffers.append(contentsOf: [getSwifty, rainEmbers, transform, vortex, bubbleUp, flameWall, gemOffer])
             
         case 4:
             /// Three Rune Slots
             /// give the player chance to fill their last rune slot or just gems
-            storeOffers.append(contentsOf: [getSwifty, rainEmbers, transform])
+            storeOffers.append(contentsOf: [dodgeUp, luckUp, gemsOffer])
+            storeOffers.append(contentsOf: [getSwifty, rainEmbers, transform, transform, vortex, bubbleUp, flameWall])
         case 5:
             /// give the player a chance at the rune slot
+            storeOffers.append(contentsOf: [dodgeUp, luckUp, gemsOffer])
             let gemOffer = StoreOffer.offer(type: .gems(amount: 10), tier: 3)
-            storeOffers.append(contentsOf: [runeSlotOffer, gemOffer])
+            storeOffers.append(contentsOf: [getSwifty, rainEmbers, transform, transform, vortex, bubbleUp, flameWall, gemOffer])
             
         case 6:
             /// Four Rune Slots
             /// give the player a chance to fill their last rune slot or just gems
+            storeOffers.append(contentsOf: [dodgeUp, luckUp, gemsOffer])
             let gemOffer = StoreOffer.offer(type: .gems(amount: 10), tier: 3)
-            storeOffers.append(contentsOf: [getSwifty, rainEmbers, transform, gemOffer])
+            storeOffers.append(contentsOf: [getSwifty, rainEmbers, transform, transform, vortex, bubbleUp, flameWall, gemOffer])
             
         case (7...Int.max):
             /// give the player a chance to fill their last rune slot or just gems
-            let gemOffer = StoreOffer.offer(type: .gems(amount: 10), tier: 3)
-            storeOffers.append(gemOffer)
+            storeOffers.append(contentsOf: [dodgeUp, luckUp, gemsOffer])
+            let gemOffer = StoreOffer.offer(type: .gems(amount: 12), tier: 3)
+            storeOffers.append(contentsOf: [getSwifty, rainEmbers, transform, transform, vortex, bubbleUp, flameWall, gemOffer])
         default:
             fatalError("Depth must be postitive Int")
         }

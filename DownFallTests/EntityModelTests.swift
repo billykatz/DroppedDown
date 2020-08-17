@@ -19,7 +19,9 @@ extension EntityModel {
                              type: EntityModel.EntityType = .player,
                              carry: CarryModel = .zero,
                              animations: [AnimationModel] = [],
-                             abilities: [AnyAbility] = []) -> EntityModel {
+                             effects: [EffectModel] = [],
+                             dodge: Int = 0,
+                             luck: Int = 0) -> EntityModel {
         return EntityModel(originalHp: originalHp,
                            hp: hp,
                            name: name,
@@ -27,7 +29,9 @@ extension EntityModel {
                            type: type,
                            carry: carry,
                            animations: animations,
-                           abilities: abilities)
+                           effects: effects,
+                           dodge: dodge,
+                           luck: luck)
     }
     
     static func createMonster(originalHp: Int = 3,
@@ -37,7 +41,9 @@ extension EntityModel {
                               type: EntityModel.EntityType = .rat,
                               carry: CarryModel = .zero,
                               animations: [AnimationModel] = [],
-                              abilities: [AnyAbility] = []) -> EntityModel {
+                              effects: [EffectModel] = [],
+                              dodge: Int = 0,
+                              luck: Int = 0) -> EntityModel {
         return EntityModel(originalHp: originalHp,
                            hp: hp,
                            name: name,
@@ -45,7 +51,9 @@ extension EntityModel {
                            type: type,
                            carry: carry,
                            animations: animations,
-                           abilities: abilities)
+                           effects: effects,
+                           dodge: dodge,
+                           luck: luck)
     }
 
 }
@@ -85,7 +93,7 @@ class EntityModelTests: XCTestCase {
         return player.canAttack
             && player.attack.attacksThisTurn == 0
             && player.attack.attacksPerTurn == 1
-            && player.abilities.isEmpty
+            && player.effects.isEmpty
     }
     
     func testEntityAttacks() {
@@ -115,30 +123,10 @@ class EntityModelTests: XCTestCase {
         let player = EntityModel.createPlayer()
         XCTAssertTrue(assertBasePlayerStats(player), "A base player has not yet attacked. A base player can attack at most once a turn.  A base player does not have any abilities")
         
-        let doubleAttack = DoubleAttack()
-        let playerGetsAbility = player.add(doubleAttack)
+        let buffHealth = EffectModel(kind: .buff, stat: .maxHealth, amount: 2, duration: 1, offerTier: 1)
+        let playerGetsAbility = player.addEffect(buffHealth)
         
-        XCTAssertTrue(playerGetsAbility.abilities.contains(where: { $0.textureName == doubleAttack.textureName}), "After gaining an ability, it exists within the player's abilities array")
-    }
-    
-    func testEntityDoubleAttackAbility() {
-        let player = EntityModel.createPlayer(abilities: [AnyAbility(DoubleAttack())])
-        XCTAssertTrue(player.abilities.contains(where: { $0.textureName == DoubleAttack().textureName}), "After gaining an ability, it exists within the player's abilities array")
-        
-        //Player attacks
-        let playerAttacksOnce = player.didAttack()
-        
-        XCTAssertTrue(playerAttacksOnce.canAttack, "A player with the double attack ability can attack once more than their defined attackersPerTurn")
-        XCTAssertEqual(playerAttacksOnce.attack.attacksThisTurn, 1, "A player can attack once a turn")
-        XCTAssertEqual(playerAttacksOnce.attack.attacksPerTurn, 1, "A player can attack once a turn")
-        
-        //Player attacks
-        let playerAttackedTwice = playerAttacksOnce.didAttack()
-        
-        XCTAssertFalse(playerAttackedTwice.canAttack, "A player with the double attack ability can attack once more than their defined attackersPerTurn")
-        XCTAssertEqual(playerAttackedTwice.attack.attacksThisTurn, 2, "A player with the double attack ability can attack once a turn")
-        XCTAssertEqual(playerAttackedTwice.attack.attacksPerTurn, 1, "A player with the double attack ability still thinks it can only attack once a turn????")
-        
+        XCTAssertTrue(playerGetsAbility.effects.contains(where: { $0 == buffHealth }), "After gaining an ability, it exists within the player's abilities array")
     }
     
     func testPlayerReceivesDamager() {
@@ -158,13 +146,14 @@ class EntityModelTests: XCTestCase {
     }
     
     func testEntityRemovesAbility() {
-        let doubleAttack = AnyAbility(DoubleAttack())
-        let player = EntityModel.createPlayer(abilities:[doubleAttack])
+         let buffHealth = EffectModel(kind: .buff, stat: .maxHealth, amount: 2, duration: 1, offerTier: 1)
+              
+        let player = EntityModel.createPlayer(effects:[buffHealth])
         
-        XCTAssertTrue(player.abilities.contains(doubleAttack), "Player has ability double attack")
+        XCTAssertTrue(player.effects.contains(buffHealth), "Player has buff health effect")
         
-        let updatedPlayer = player.remove(DoubleAttack())
-        XCTAssertFalse(updatedPlayer.abilities.contains(doubleAttack), "Player no longer has ability double attack")
+        let updatedPlayer = player.removeEffect(buffHealth)
+        XCTAssertFalse(updatedPlayer.effects.contains(buffHealth), "Player no longer has ability double attack")
     }
 
 

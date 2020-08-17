@@ -55,6 +55,7 @@ class StagingAreaView: SKSpriteNode {
         static let selectionAreaToTierOnePadding = CGFloat(200)
         static let dragThreshold = CGFloat(15.0)
         static let stagingTierHeight = CGFloat(350)
+        static let menuNodeName = "menuNode"
     }
     
     var stagingTierViewModels: [StagingTierViewModel] = []
@@ -70,6 +71,11 @@ class StagingAreaView: SKSpriteNode {
     /// Touch property
     private var spriteToMove: SKSpriteNode?
     private var selectedSpritesOriginalPosition: CGPoint? = nil
+    
+    var hasSelectedAllOffers: Bool {
+        let completed = viewModel.isBeforeLevelOne ? 1 : viewModel.goalProgress.filter({ $0.isCompleted }).count
+        return selectedOffers ==  completed
+   }
     
     func tierIsUnlocked(tier: Int, goalProgress: [GoalTracking]) -> Bool {
         /// TODO: reset when done testing
@@ -185,9 +191,14 @@ class StagingAreaView: SKSpriteNode {
         stagingTierViewModels[offer.tierIndex].runeReplacedChanged(rune, offer)
     }
     
+    var selectedOffers: Int = 0
     func offerWasSelected(offer: StoreOffer, deselected: StoreOffer?) {
         stagingSelectionAreaViewModel.offerWasSelected(offer)
         viewModel.offerWasStaged?(offer, deselected)
+        
+        if deselected == nil {
+            selectedOffers += 1
+        }
     }
     
     func offerWasUnselected(_ offer: StoreOffer) {
@@ -199,12 +210,17 @@ class StagingAreaView: SKSpriteNode {
         
         // tell out parente
         viewModel.offerWasUnstagedByXButton?(offer)
+        
+        //decrement our count of selected offers
+        selectedOffers -= 1
     }
     
     func storeOfferWasTappedForInformation(_ offer: StoreOffer) {
         let storeMenuViewModel = StoreMenuViewModel(title: offer.title, body: offer.description, backgroundColor: .lightBarPurple, mode: .offerDescription, buttonAction: ButtonAction(button: .okay, action: closeInformationalPopup))
         let storeMenu = StoreMenuView(viewModel: storeMenuViewModel, size: CGSize(width: self.contentView.frame.width * 0.9, height: 600.0))
         storeMenu.zPosition = Precedence.flying.rawValue
+        storeMenu.name = Constants.menuNodeName
+        contentView.removeChild(with: Constants.menuNodeName)
         contentView.addChild(storeMenu)
         
     }

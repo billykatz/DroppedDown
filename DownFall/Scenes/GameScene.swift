@@ -11,7 +11,6 @@ import UIKit
 import GameplayKit
 
 protocol GameSceneCoordinatingDelegate: class {
-    func reset(_ scene: SKScene, playerData: EntityModel)
     func navigateToMainMenu(_ scene: SKScene, playerData: EntityModel)
 //    func lostGame(_ scene: SKScene, playerData: EntityModel)
     

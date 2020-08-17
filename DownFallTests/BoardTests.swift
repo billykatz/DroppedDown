@@ -280,7 +280,7 @@ class BoardTests: XCTestCase {
         var actualBoard = Board(tiles: givenTiles).attack(Input(.attack(attackType: .targets,
                                                                         attacker: TileCoord(2, 0),
                                                                         defender: TileCoord(1, 0),
-                                                                        affectedTiles: [TileCoord(1, 0)]))).endTiles
+                                                                        affectedTiles: [TileCoord(1, 0)], dodged: false))).endTiles
         XCTAssertEqual(expectedTiles, actualBoard, "Board removes HP from tiles beneath the player equal to the palyer attack damage.")
 
         givenTiles = [[.blueRock, .exit, .blueRock],
@@ -295,7 +295,7 @@ class BoardTests: XCTestCase {
             .attack(Input(.attack(attackType: .targets,
                                                                     attacker: TileCoord(2, 0),
                                                                     defender: TileCoord(1, 0),
-                                                                    affectedTiles: [TileCoord(1, 0)]))).endTiles
+                                                                    affectedTiles: [TileCoord(1, 0)], dodged: false))).endTiles
         XCTAssertEqual(expectedTiles, actualBoard, "Board removes HP from tiles beneath the palyer equal to the palyer attack damage.")
 
 
@@ -310,7 +310,7 @@ class BoardTests: XCTestCase {
         actualBoard = Board(tiles: givenTiles).attack(Input(.attack(attackType: .targets,
                                                                     attacker: TileCoord(2, 0),
                                                                     defender: TileCoord(1, 0),
-                                                                    affectedTiles: [TileCoord(1, 0)]))).endTiles
+                                                                    affectedTiles: [TileCoord(1, 0)], dodged: false))).endTiles
         XCTAssertEqual(expectedTiles, actualBoard, "Board subtracts HP from tile's hp located beneath the player equal to the player attack damage.")
 
 
@@ -325,7 +325,7 @@ class BoardTests: XCTestCase {
         actualBoard = Board(tiles: givenTiles).attack(Input(.attack(attackType: .targets,
                                                                     attacker: TileCoord(2, 0),
                                                                     defender: TileCoord(1, 0),
-                                                                    affectedTiles: [TileCoord(1, 0)]))).endTiles
+                                                                    affectedTiles: [TileCoord(1, 0)], dodged: false))).endTiles
         XCTAssertEqual(expectedTiles, actualBoard, "Board subtracts HP from tile's hp located beneath the player equal to the player attack damage.")
     }
     
@@ -340,7 +340,7 @@ class BoardTests: XCTestCase {
         let actualBoard = Board(tiles: givenTiles).attack(Input(.attack(attackType: .targets,
                                                                         attacker: TileCoord(0, 1),
                                                                         defender: TileCoord(0, 0),
-                                                                        affectedTiles: [TileCoord(0, 0)]))).endTiles
+                                                                        affectedTiles: [TileCoord(0, 0)], dodged: false))).endTiles
         XCTAssertEqual(expectedTiles, actualBoard, "Board applies Monster's attack damage to Player's hp.")
         
     }

@@ -180,8 +180,12 @@ extension StoreScene: ButtonDelegate {
         case .backpackCancel:
             removeChild(with: "areYouSureMenu")
             
+        case .backpackConfirm:
+            /// allow player to move to next level
+            storeSceneDelegate?.leave(self, updatedPlayerData: storeHUDViewModel.previewPlayerData)
+            
         default:
-            fatalError("You must add a case for added buttons here")
+            break
         }
     }
 }

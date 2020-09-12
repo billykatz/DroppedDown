@@ -193,31 +193,45 @@ class DFTileSpriteNode: SKSpriteNode {
     func sparkle() -> SKAction? {
         var animationFrames: [SKTexture] = []
         switch self.type {
-        case .rock(.red, _):
+        case .rock(.red, let withGem):
+            guard withGem else { return nil }
             animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.redRockWithGem), rows: 1, columns: 11).animationFrames()
-        case .rock(.blue, _):
+        case .rock(.blue, let withGem):
+            guard withGem else { return nil }
             animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.blueRockWithGem), rows: 1, columns: 13).animationFrames()
-        case .rock(.purple, _):
+        case .rock(.purple, let withGem):
+            guard withGem else { return nil }
             animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.purpleRockWithGem), rows: 1, columns: 10).animationFrames()
         default:
             return nil
         }
         
+        /// Add the empty sprite
         let emptySprite = SKSpriteNode(color: .clear, size: size)
         emptySprite.name = "child"
         let addSprite = SKAction.run { [weak self] in
             self?.addChildSafely(emptySprite)
         }
+        
+        /// Wait for a random amount of time
         let waitAction = SKAction.wait(forDuration: TimeInterval(Int.random(lower: 2, upper: 10)),
                                        withRange: TimeInterval(Int.random(lower: 2, upper: 10)))
+        
+        /// Animate the sparkle
         let animateAction = SKAction.animate(with: animationFrames, timePerFrame: 0.08)
+        
+        /// Remove the sprite
         let removeSprite = SKAction.run { [weak self] in
             self?.removeChild(with: "child")
         }
+        
+        /// Sequence it all up
         let sequence = SKAction.sequence([waitAction, addSprite, animateAction, removeSprite])
+        
+        /// Repeat forever
         let repeatForever = SKAction.repeatForever(sequence)
+        
         return repeatForever
-
     }
     
 }

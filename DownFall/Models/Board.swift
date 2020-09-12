@@ -325,6 +325,7 @@ class Board: Equatable {
     }
     
     private func vortex(tiles:  [[Tile]], targets: [TileCoord], input: Input) -> Transformation {
+        guard let playerData = playerData(in: tiles) else { return .zero }
         var newTiles = tiles
         for coord in targets {
             switch tiles[coord].type {
@@ -332,7 +333,7 @@ class Board: Equatable {
                 let newMonster = tileCreator.randomMonster()
                 newTiles[coord.row][coord.column] = Tile(type: newMonster)
             case .monster:
-                let newRock = tileCreator.randomRock([])
+                let newRock = tileCreator.randomRock([], playerData: playerData)
                 newTiles[coord.row][coord.column] = Tile(type: newRock)
             default:
                 break
@@ -582,22 +583,14 @@ extension Board {
         // set the tiles to be removed as Empty placeholder
         var intermediateTiles = tiles
         let removedCount = selectedTiles.count
-        /// only potentially spawn 1 gem per group
-        var spawnedGem = false
         
         var finalSelectedTiles: [TileCoord] = []
         for coord in selectedTiles {
             // turn the tile into a gem or into an empty
-            if !spawnedGem,
-                let pp = getTilePosition(.player(.playerZero), tiles: tiles),
-                case let TileType.player(data) = tiles[pp.row][pp.column].type {
-                let newTile = tileCreator.gemDropped(from: intermediateTiles[coord.x][coord.y].type, groupSize: removedCount, playerData: data)
-                intermediateTiles[coord.x][coord.y] = newTile
-                if newTile.type == TileType.item(.gem) {
-                    spawnedGem = true
-                } else {
-                    finalSelectedTiles.append(coord)
-                }
+            if case TileType.rock(color: let color, holdsGem: let holdsGem) = tiles[coord].type,
+                holdsGem {
+                let gemTile = Tile(type: .item(Item(type: .gem, amount: 1, color: color)))
+                intermediateTiles[coord.x][coord.y] = gemTile
             } else {
                 intermediateTiles[coord.x][coord.y] = .empty
                 /// keep track of the emptied tiles

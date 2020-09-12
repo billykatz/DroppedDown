@@ -390,7 +390,7 @@ extension Board {
             return swap(firstTarget, with: targets.last!, input: input)
             
         case .transformRock:
-            return transform(targets, into: TileType.rock(.purple), input: input)
+            return transform(targets, into: TileType.rock(color: .purple, holdsGem: false), input: input)
         case .bubbleUp:
             return bubbleUp(targets.first!, input: input)
         case .flameWall:
@@ -510,7 +510,7 @@ extension Board {
         var selectedCoords: [TileCoord] = []
         for row in 0..<tiles.count {
             for col in 0..<tiles.count {
-                if case TileType.rock(let tileColor) = tiles[row][col].type,
+                if case TileType.rock(let tileColor, _) = tiles[row][col].type,
                     tileColor == color {
                     selectedCoords.append(TileCoord(row: row, column: col))
                 }

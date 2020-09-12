@@ -107,8 +107,8 @@ class TileCreator: TileStrategy {
         var lowerBound = 0
         for (key, value) in tileTypeChances.chances {
             let minValue = max(1, value)
-            if (lowerBound..<lowerBound+minValue).contains(randomNumber) {
-                return key
+            if let color = key.color, (lowerBound..<lowerBound+minValue).contains(randomNumber) {
+                return TileType.rock(color: color, holdsGem: true)
             } else {
                 lowerBound = lowerBound + minValue
             }
@@ -156,7 +156,7 @@ class TileCreator: TileStrategy {
             switch nextTile.type {
             case .monster:
                 validTile = !neighbors.contains {  $0.type == .monster(.zero) || $0.type == .player(.zero) } && !noMoreMonsters
-            case .rock(.red), .rock(.purple), .rock(.blue), .rock(.brown):
+            case .rock(.red, _), .rock(.purple, _), .rock(.blue, _), .rock(.brown, _):
                 validTile = true
             case .item:
                 if !neighbors.contains(where: {  $0.type == TileType.item(.gem) }),
@@ -164,7 +164,7 @@ class TileCreator: TileStrategy {
                     specialGems += 1
                     validTile = true
                 }
-            case .exit, .player, .rock(.green), .empty, .pillar, .dynamite:
+            case .exit, .player, .rock(.green, _), .empty, .pillar, .dynamite:
                 validTile = false
             }
         }

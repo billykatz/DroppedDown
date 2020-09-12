@@ -137,24 +137,6 @@ class DFTileSpriteNode: SKSpriteNode {
         
     }
     
-    func tutorialHighlight(){
-        if TileType.rockCases.contains(type) {
-            let whiteSprite = SKSpriteNode(color: .white, size: size)
-            whiteSprite.zPosition = Precedence.background.rawValue
-            whiteSprite.alpha = 0.75
-            self.addChild(whiteSprite)
-            
-        } else {
-            let border = SKShapeNode(circleOfRadius: Style.TutorialHighlight.radius)
-            border.strokeColor = .highlightGold
-            border.lineWidth = Style.TutorialHighlight.lineWidth
-            border.position = .zero
-            border.zPosition = Precedence.menu.rawValue
-            
-            self.addChild(border)
-        }
-    }
-    
     func showFinger() {
         let finger = SKSpriteNode(imageNamed: "finger")
         finger.position = CGPoint.position(this: finger.frame,
@@ -190,13 +172,13 @@ class DFTileSpriteNode: SKSpriteNode {
     func crumble() -> (SKSpriteNode, SKAction)? {
         var animationFrames: [SKTexture] = []
         switch self.type {
-        case .rock(.brown):
+        case .rock(.brown, _):
             animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.brownRockCrumble), rows: 1, columns: 4).animationFrames()
-        case .rock(.red):
+        case .rock(.red, _):
             animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.redRockCrumble), rows: 1, columns: 4).animationFrames()
-        case .rock(.blue):
+        case .rock(.blue, _):
             animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.blueRockCrumble), rows: 1, columns: 4).animationFrames()
-        case .rock(.purple):
+        case .rock(.purple, _):
             animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.purpleRockCrumble), rows: 1, columns: 4).animationFrames()
         default:
             return nil
@@ -206,6 +188,36 @@ class DFTileSpriteNode: SKSpriteNode {
         let removeFromParent = SKAction.removeFromParent()
         let sequence = SKAction.sequence([animateCrumble, removeFromParent])
         return (self, sequence)
+    }
+    
+    func sparkle() -> SKAction? {
+        var animationFrames: [SKTexture] = []
+        switch self.type {
+        case .rock(.red, _):
+            animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.redRockWithGem), rows: 1, columns: 11).animationFrames()
+        case .rock(.blue, _):
+            animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.blueRockWithGem), rows: 1, columns: 13).animationFrames()
+        case .rock(.purple, _):
+            animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.purpleRockWithGem), rows: 1, columns: 10).animationFrames()
+        default:
+            return nil
+        }
+        
+        let emptySprite = SKSpriteNode(color: .clear, size: size)
+        emptySprite.name = "child"
+        let addSprite = SKAction.run { [weak self] in
+            self?.addChildSafely(emptySprite)
+        }
+        let waitAction = SKAction.wait(forDuration: TimeInterval(Int.random(lower: 2, upper: 10)),
+                                       withRange: TimeInterval(Int.random(lower: 2, upper: 10)))
+        let animateAction = SKAction.animate(with: animationFrames, timePerFrame: 0.08)
+        let removeSprite = SKAction.run { [weak self] in
+            self?.removeChild(with: "child")
+        }
+        let sequence = SKAction.sequence([waitAction, addSprite, animateAction, removeSprite])
+        let repeatForever = SKAction.repeatForever(sequence)
+        return repeatForever
+
     }
     
 }

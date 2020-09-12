@@ -298,6 +298,8 @@ class Renderer: SKSpriteNode {
                 if let (glow, spin) = sprite.glow() {
                     sprite.addChild(glow)
                     glow.run(spin)
+                } else if let sparkle = sprite.sparkle() {
+                    sprite.run(sparkle)
                 }
             }
         }

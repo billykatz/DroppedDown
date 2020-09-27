@@ -175,6 +175,8 @@ class Renderer: SKSpriteNode {
                 refillEmptyTiles(with: trans)
             case .shuffleBoard:
                 computeNewBoard(for: trans)
+            case .goalCompleted(let goals):
+                animationsFinished(endTiles: trans.endTiles)
             case .rotatePreviewFinish(let spriteActions, let trans):
                 if let trans = trans {
                     animator.animate(spriteActions) { [weak self] in
@@ -453,14 +455,11 @@ extension Renderer {
                 let currentSprite = sprites[tileTrans.end.x][tileTrans.end.y]
                 
                 if case TileType.rock(color: let color, holdsGem: let holdsGem) = currentSprite.type, holdsGem {
-                    let (startRow, startCol) = tileTrans.initial.tuple
                     
                     /// we need to add the gem to the board, or else shit is weird
                     let sprite = DFTileSpriteNode(type: .item(Item(type: .gem, amount: 1, color: color)), height: currentSprite.size.height, width: currentSprite.size.width)
                     
-                    // plave the gem on the board where the rock was
-//                    let x = ( CGFloat(startRow) * tileSize ) + bottomLeft.x
-//                    let y = tileSize * CGFloat(startCol) + bottomLeft.y
+                    // place the gem on the board where the rock was
                     sprite.position = currentSprite.position
                     
                     /// add the gem sprite our data store

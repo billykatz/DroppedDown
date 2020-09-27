@@ -17,7 +17,7 @@ struct PlayState: GameState {
         case .gameWin,. gameLose, .pause,
              .attack, .transformation,
              .touch, .monsterDies, .rotateCounterClockwise, .rotateClockwise,
-             .boardBuilt, .touchBegan, .itemUseSelected, .shuffleBoard, .unlockExit, .levelGoalDetail, .goalProgressRecord, .runeProgressRecord:
+             .boardBuilt, .touchBegan, .itemUseSelected, .shuffleBoard, .unlockExit, .levelGoalDetail, .runeProgressRecord, .goalCompleted:
             return true
         case .animationsFinished, .play,
              .reffingFinished, .playAgain, .collectItem,
@@ -37,9 +37,9 @@ struct PlayState: GameState {
             return AnyGameState(PauseState())
         case .attack, .touch, .monsterDies,
              .rotateCounterClockwise, .rotateClockwise, .collectItem,
-             .touchBegan, .shuffleBoard, .unlockExit, .runeProgressRecord:
+             .touchBegan, .shuffleBoard, .unlockExit, .runeProgressRecord, .goalCompleted:
             return AnyGameState(ComputingState())
-        case .boardBuilt, .goalProgressRecord:
+        case .boardBuilt:
             return AnyGameState(PlayState())
         case .itemUseSelected:
             return AnyGameState(TargetingState())

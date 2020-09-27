@@ -12,17 +12,14 @@ import GameKit
 struct Area: Codable, Equatable {
     enum AreaType: Codable, Equatable {
         case level(Level)
-        case store([StoreOffer])
         
         enum CodingKeys: String, CodingKey {
             case base
             case levelData
-            case storeOffers
         }
         
         private enum Base: String, Codable {
             case level
-            case store
         }
         
         init(from decoder: Decoder) throws {
@@ -33,9 +30,6 @@ struct Area: Codable, Equatable {
             case  .level:
                 let data = try container.decode(Level.self, forKey: .levelData)
                 self = .level(data)
-            case .store:
-                let data = try container.decode([StoreOffer].self, forKey: .storeOffers)
-                self = .store(data)
             }
         }
         
@@ -46,9 +40,6 @@ struct Area: Codable, Equatable {
             case .level(let levelData):
                 try container.encode(Base.level, forKey: .base)
                 try container.encode(levelData, forKey: .levelData)
-            case .store(let offers):
-                try container.encode(Base.store, forKey: .base)
-                try container.encode(offers, forKey: .storeOffers)
             }
         }
 
@@ -109,22 +100,16 @@ class RunModel: Codable, Equatable {
             switch lastArea.type {
             case .level(_):
                 let newDepth = lastArea.depth + 1
-                let newOffers = StoreOffer.storeOffer(depth: newDepth)
-                let newArea = Area(depth: newDepth, type: .store(newOffers))
-                areas.append(newArea)
-                return newArea
-            case .store(_):
-                let sameDepth = lastArea.depth
-                let newLevel = LevelConstructor.buildLevel(depth: sameDepth, randomSource: randomSource)
-                let newArea = Area(depth: sameDepth, type: .level(newLevel))
+                let newLevel = LevelConstructor.buildLevel(depth: newDepth, randomSource: randomSource)
+                let newArea = Area(depth: newDepth, type: .level(newLevel))
                 areas.append(newArea)
                 return newArea
             }
         } else {
             /// Fresh run!
             let newDepth = 0
-            let newOffers = StoreOffer.storeOffer(depth: newDepth)
-            let newArea = Area(depth: newDepth, type: .store(newOffers))
+            let newLevel = LevelConstructor.buildLevel(depth: newDepth, randomSource: randomSource)
+            let newArea = Area(depth: newDepth, type: .level(newLevel))
             areas.append(newArea)
             return newArea
         }

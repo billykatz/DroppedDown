@@ -124,10 +124,14 @@ class Board: Equatable {
         case .unlockExit:
             InputQueue.append(Input(.transformation([unlockExit(inputType: input.type)])))
         case .runeProgressRecord(let runeProgress):
+            
+            /// This is the last input on any given level.  We make sure to record the progress on player's pickaxe and then we move on to the next level
             guard let pp = playerPosition,
                 case let .player(data) = tiles[pp].type else { return }
             tiles[pp.row][pp.column] = Tile(type: .player(data.recordRuneProgress(runeProgress)))
             transformation = playerDataUpdated(inputType: input.type)
+        case .goalCompleted(let completedGoals):
+            transformation = self.completedGoals(completedGoals, inputType: input.type)
         case .gameLose(_),
              .play,
              .pause,
@@ -137,12 +141,44 @@ class Board: Equatable {
              .selectLevel,
              .newTurn,
              .visitStore,
-             .itemUseCanceled, .itemCanBeUsed, .rotatePreview, .tileDetail, .levelGoalDetail, .goalProgressRecord:
+             .itemUseCanceled, .itemCanBeUsed, .rotatePreview, .tileDetail, .levelGoalDetail:
             transformation = nil
         }
         
         guard let trans = transformation else { return }
         InputQueue.append(Input(.transformation([trans])))
+    }
+    
+    private var reservedCoords: Set<TileCoord> {
+        var reservedCoords = Set<TileCoord>()
+        reservedCoords.insert(playerPosition!)
+        reservedCoords.formUnion(tiles(of: .exit(blocked: false)))
+        reservedCoords.formUnion(tiles(of: .pillar(PillarData(color: .blue, health: 3))))
+        reservedCoords.formUnion(tiles(of: .monster(.zero)))
+        reservedCoords.formUnion(tiles(of: .item(.zero)))
+        return reservedCoords
+    }
+    
+    private func completedGoals(_ goals: [GoalTracking], inputType: InputType) -> Transformation {
+        guard let pp = playerPosition else { return .zero }
+        let playerQuadrant = Quadrant.quadrant(of: pp, in: boardSize)
+        var transformedTiles: [TileTransformation] = []
+        var reservedCoords = self.reservedCoords
+        for _ in goals {
+            // get a random coord not in the reserved set
+            let randomCoordInAnotherQuadrant = playerQuadrant.opposite.randomCoord(for: boardSize, notIn: reservedCoords)
+            
+            /// dont overwrite this coord in the future
+            reservedCoords.insert(randomCoordInAnotherQuadrant)
+            
+            /// record this tiles we are transforming
+            transformedTiles.append(TileTransformation(randomCoordInAnotherQuadrant, randomCoordInAnotherQuadrant))
+            
+            /// transform the tile
+            tiles[randomCoordInAnotherQuadrant.row][randomCoordInAnotherQuadrant.column] = Tile(type: .item(Item(type: .gem, amount: 1, color: .blue)))
+        }
+        
+        return Transformation(transformation: [transformedTiles], inputType: inputType, endTiles: tiles)
     }
     
     private func playerDataUpdated(inputType: InputType) -> Transformation {

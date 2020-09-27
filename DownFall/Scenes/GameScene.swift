@@ -119,18 +119,19 @@ class GameScene: SKScene {
                     self.swipeRecognizerView?.removeFromSuperview()
                     self.gameSceneDelegate?.navigateToMainMenu(self, playerData: data)
                 }
-
-            } else if case let InputType.goalProgressRecord(progress) = input.type {
-                guard let self = self,
-                    let playerIndex = tileIndices(of: .player(.zero), in: self.board.tiles).first
-                    else { return }
-                
-                self.foreground.removeAllChildren()
-                if case let TileType.player(data) = self.board.tiles[playerIndex].type {
-                    self.removeFromParent()
-                    self.swipeRecognizerView?.removeFromSuperview()
-                    self.gameSceneDelegate?.visitStore(data, progress)
-                
+            } else if case InputType.transformation(let trans) = input.type, let firstInputType = trans.first?.inputType {
+                if case InputType.runeProgressRecord(_) = firstInputType {
+                    guard let self = self,
+                        let playerIndex = tileIndices(of: .player(.zero), in: self.board.tiles).first
+                        else { return }
+                    
+                    self.foreground.removeAllChildren()
+                    if case let TileType.player(data) = self.board.tiles[playerIndex].type {
+                        self.removeFromParent()
+                        self.swipeRecognizerView?.removeFromSuperview()
+                        self.gameSceneDelegate?.visitStore(data, [])
+                    
+                    }
                 }
             }
         }

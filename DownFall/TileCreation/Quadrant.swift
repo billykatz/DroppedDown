@@ -38,7 +38,24 @@ enum Quadrant: CaseIterable {
         }
     }
     
-    func randomCoord(for boardSize: Int) -> TileCoord {
+    static func quadrant(of coord: TileCoord, in boardSize: Int) -> Quadrant {
+        guard boardSize > 1 else { preconditionFailure("The board must be at least 2x2 to use Quadrant") }
+        if coord.x < boardSize/2 {
+            if coord.y < boardSize/2 {
+                return .southWest
+            } else {
+                return .northWest
+            }
+        } else {
+            if coord.y < boardSize/2 {
+                return .southEast
+            } else {
+                return .northEast
+            }
+        }
+    }
+    
+    private func randomCoord(for boardSize: Int) -> TileCoord {
         switch self {
         case .northEast:
             return TileCoord(Int.random(in: 2*boardSize/3..<boardSize),
@@ -64,4 +81,6 @@ enum Quadrant: CaseIterable {
         }
         return tileCoord
     }
+    
+    
 }

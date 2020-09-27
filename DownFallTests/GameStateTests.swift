@@ -50,7 +50,7 @@ class GameStateTests: XCTestCase {
             case .playAgain, .selectLevel:
                 XCTAssertEqual(AnyGameState(PlayState()),
                                gameState.transitionState(given: Input(input)))
-            case .goalProgressRecord, .runeProgressRecord, .visitStore:
+            case .runeProgressRecord, .visitStore:
                 XCTAssertEqual(AnyGameState(WinState()),
                 gameState.transitionState(given: Input(input)))
             case .animationsFinished, .gameLose, .gameWin, .attack,
@@ -74,7 +74,7 @@ class GameStateTests: XCTestCase {
                  .monsterDies, .pause, .play, .touch, .rotateClockwise,
                  .rotateCounterClockwise, .transformation, .reffingFinished,
                  .boardBuilt, .collectItem,. newTurn, .touchBegan,
-                 .itemUseSelected, .itemUseCanceled, .itemCanBeUsed, .itemUsed, .decrementDynamites(_), .rotatePreview(_, _), .rotatePreviewFinish(_, _), .refillEmpty, .tileDetail(_, _) , .shuffleBoard, .levelGoalDetail, .unlockExit, .visitStore, .goalProgressRecord, .runeProgressRecord:
+                 .itemUseSelected, .itemUseCanceled, .itemCanBeUsed, .itemUsed, .decrementDynamites(_), .rotatePreview(_, _), .rotatePreviewFinish(_, _), .refillEmpty, .tileDetail(_, _) , .shuffleBoard, .levelGoalDetail, .unlockExit, .visitStore, .runeProgressRecord:
                 XCTAssertNil(gameState.transitionState(given: Input(input)))
                 
             }
@@ -96,7 +96,7 @@ class GameStateTests: XCTestCase {
                  .rotateCounterClockwise, .attack, .transformation, .reffingFinished,
                  .collectItem, .selectLevel, .newTurn, .touchBegan,
                  .visitStore, .itemUseSelected, .itemUseCanceled, .itemCanBeUsed,
-                 .itemUsed, .decrementDynamites(_), .refillEmpty, .tileDetail(_, _) , .shuffleBoard, .levelGoalDetail, .unlockExit, .goalProgressRecord, .runeProgressRecord:
+                 .itemUsed, .decrementDynamites(_), .refillEmpty, .tileDetail(_, _) , .shuffleBoard, .levelGoalDetail, .unlockExit, .runeProgressRecord:
                 XCTAssertNil(gameState.transitionState(given: Input(input)), "\(gameState.state) should not transition to \(input)")
             }
         }
@@ -114,7 +114,7 @@ class GameStateTests: XCTestCase {
                  .rotateCounterClockwise, .attack, .pause, .transformation,
                  .reffingFinished, .collectItem, .newTurn, .touchBegan,
                  .visitStore, .itemUseSelected, .itemUseCanceled, .itemCanBeUsed, .itemUsed,
-                .decrementDynamites(_), .rotatePreview(_, _), .rotatePreviewFinish(_, _), .refillEmpty, .shuffleBoard, .tileDetail, .levelGoalDetail, .unlockExit, .goalProgressRecord, .runeProgressRecord:
+                .decrementDynamites(_), .rotatePreview(_, _), .rotatePreviewFinish(_, _), .refillEmpty, .shuffleBoard, .tileDetail, .levelGoalDetail, .unlockExit, .runeProgressRecord:
                 XCTAssertNil(gameState.transitionState(given: Input(input)))
             }
         }
@@ -169,7 +169,7 @@ class GameStateTests: XCTestCase {
                  .rotateCounterClockwise, .pause, .play, .reffingFinished,
                  .collectItem, .selectLevel,. touchBegan,
                  .visitStore, .itemUseSelected, .itemUseCanceled, .itemCanBeUsed, .itemUsed,
-                 .decrementDynamites(_), .rotatePreviewFinish(_, _), .refillEmpty, .shuffleBoard, .rotatePreview, .levelGoalDetail, .unlockExit, .goalProgressRecord, .runeProgressRecord:
+                 .decrementDynamites(_), .rotatePreviewFinish(_, _), .refillEmpty, .shuffleBoard, .rotatePreview, .levelGoalDetail, .unlockExit, .runeProgressRecord:
                 XCTAssertNil(gameState.transitionState(given: Input(input)))
             }
         }
@@ -195,7 +195,7 @@ class GameStateTests: XCTestCase {
                                gameState.transitionState(given: Input(input)))
             case .touch, .rotateCounterClockwise, .rotateClockwise, .play, .pause, .animationsFinished, .playAgain, .transformation, .boardBuilt, .selectLevel, .newTurn, .touchBegan,
                  .visitStore, .itemUseSelected, .itemUseCanceled, .itemCanBeUsed, .itemUsed,
-                .rotatePreview(_, _), .rotatePreviewFinish(_, _), .tileDetail(_, _) , .shuffleBoard, .levelGoalDetail, .unlockExit, .goalProgressRecord, .runeProgressRecord:
+                .rotatePreview(_, _), .rotatePreviewFinish(_, _), .tileDetail(_, _) , .shuffleBoard, .levelGoalDetail, .unlockExit, .runeProgressRecord:
                 XCTAssertNil(gameState.transitionState(given: Input(input)))
             }
         }
@@ -215,7 +215,7 @@ class GameStateTests: XCTestCase {
                 gameState.transitionState(given: Input(input)))
             case .touch, .rotateCounterClockwise, .rotateClockwise, .play, .pause, .animationsFinished, .playAgain, .transformation, .boardBuilt, .selectLevel, .newTurn, .touchBegan,
                  .visitStore, .itemUseSelected, .reffingFinished, .attack, .monsterDies, .collectItem, .gameWin, .gameLose,
-                .decrementDynamites(_), .rotatePreview(_, _), .rotatePreviewFinish(_, _), .refillEmpty, .tileDetail(_, _) , .shuffleBoard, .levelGoalDetail, .unlockExit, .goalProgressRecord, .runeProgressRecord:
+                .decrementDynamites(_), .rotatePreview(_, _), .rotatePreviewFinish(_, _), .refillEmpty, .tileDetail(_, _) , .shuffleBoard, .levelGoalDetail, .unlockExit, .runeProgressRecord:
                 XCTAssertNil(gameState.transitionState(given: Input(input)))
             }
         }
@@ -249,7 +249,7 @@ class GameStateTests: XCTestCase {
     func testWinStateShouldAppend(_ gameState: AnyGameState) {
          for input in InputType.allCases {
             switch input {
-            case .playAgain, .selectLevel, .visitStore, .runeProgressRecord, .goalProgressRecord:
+            case .playAgain, .selectLevel, .visitStore, .runeProgressRecord:
                 XCTAssertTrue(gameState.shouldAppend(Input(input)))
             default:
                 XCTAssertFalse(gameState.shouldAppend(Input(input)))
@@ -274,7 +274,7 @@ class GameStateTests: XCTestCase {
             case .attack, .monsterDies, .gameLose, .touchBegan,
                  .gameWin, .pause, .rotateCounterClockwise,
                  .rotateClockwise, .touch, .itemUseSelected,
-                 .boardBuilt, .unlockExit,. levelGoalDetail, .goalProgressRecord, .runeProgressRecord:
+                 .boardBuilt, .unlockExit,. levelGoalDetail, .runeProgressRecord:
                 XCTAssertTrue(gameState.shouldAppend(Input(input)), "\(gameState.state) ought to append \(input)")
             default:
                 XCTAssertFalse(gameState.shouldAppend(Input(input)),  "\(gameState.state) ought not to append \(input)")

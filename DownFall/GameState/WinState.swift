@@ -14,12 +14,12 @@ struct WinState: GameState {
     
     func shouldAppend(_ input: Input) -> Bool {
         switch input.type {
-        case .playAgain, .selectLevel, .visitStore, .runeProgressRecord, .goalProgressRecord:
+        case .playAgain, .selectLevel, .visitStore, .runeProgressRecord:
             return true
         case .transformation(let trans):
             guard let inputType = trans.first?.inputType else { return false }
             switch inputType {
-            case .gameWin:
+            case .gameWin, .runeProgressRecord:
                 return true
             default:
                 return false
@@ -33,11 +33,11 @@ struct WinState: GameState {
         switch input.type {
         case .playAgain, .selectLevel:
             return AnyGameState(PlayState())
-        case .visitStore, .runeProgressRecord, .goalProgressRecord:
+        case .visitStore, .runeProgressRecord:
             return AnyGameState(WinState())
         case .transformation(let trans):
             switch trans.first?.inputType! {
-            case .gameWin:
+            case .gameWin, .runeProgressRecord:
                 return AnyGameState(WinState())
             default:
                 return nil

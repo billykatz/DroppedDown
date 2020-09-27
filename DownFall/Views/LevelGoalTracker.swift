@@ -47,9 +47,6 @@ class LevelGoalTracker: LevelGoalTracking {
             goalUpdated?(goalProgress)
             countPillars(in: input.endTilesStruct ?? [])
             InputQueue.append(Input(.levelGoalDetail(goalProgress)))
-        case .runeProgressRecord:
-            checkForCompletedGoals()
-            InputQueue.append(.init(.goalProgressRecord(goalProgress)))
         case .itemUsed:
             advanceRuneUseGoal()
         default:
@@ -58,11 +55,16 @@ class LevelGoalTracker: LevelGoalTracking {
     }
     
     private func checkForCompletedGoals() {
+        var completedUnAwardedGoals: [GoalTracking] = []
         for (idx, goal) in goalProgress.enumerated(){
             if goal.isCompleted && !goal.hasBeenRewarded {
                 goalProgress[idx] = goal.isAwarded()
+                completedUnAwardedGoals.append(goal)
             }
         }
+        
+        guard !completedUnAwardedGoals.isEmpty else { return }
+        InputQueue.append(Input(.goalCompleted(completedUnAwardedGoals)))
     }
     
     var pillarColor =  Set<Color>(Color.allCases)

@@ -25,6 +25,7 @@ protocol LevelCoordinating: StoreSceneDelegate, GameSceneCoordinatingDelegate {
 
 class LevelCoordinator: LevelCoordinating {
     
+    
     weak var delegate: MenuCoordinating?
     var gameSceneNode: GameScene?
     var entities: EntitiesModel?
@@ -32,7 +33,7 @@ class LevelCoordinator: LevelCoordinating {
     
     /// Set default so we dont have to deal with optionality
     var runModel: RunModel = RunModel(player: .zero, seed: 0)
-        
+    
     init(gameSceneNode: GameScene, entities: EntitiesModel, levelIndex: Int, view: SKView) {
         self.gameSceneNode = gameSceneNode
         self.entities = entities
@@ -48,7 +49,7 @@ class LevelCoordinator: LevelCoordinating {
                                     storeOffers: storeOffers,
                                     levelDepth: depth,
                                     viewModel: StoreSceneViewModel(offers: storeOffers, goalTracking: levelGoalProgress))
-
+        
         storeScene.scaleMode = .aspectFill
         storeScene.storeSceneDelegate = self
         view.presentScene(storeScene)
@@ -57,7 +58,7 @@ class LevelCoordinator: LevelCoordinating {
     func presentNextLevel(_ level: Level, playerData: EntityModel?) {
         gameSceneNode?.prepareForReuse()
         if let scene = GKScene(fileNamed: "GameScene")?.rootNode as? GameScene,
-            let entities = entities {
+           let entities = entities {
             gameSceneNode = scene
             gameSceneNode!.scaleMode = .aspectFill
             gameSceneNode!.gameSceneDelegate = self
@@ -76,7 +77,7 @@ class LevelCoordinator: LevelCoordinating {
             view.showsFPS = true
             view.showsNodeCount = true
             #endif
-                
+            
         }
     }
     
@@ -96,11 +97,6 @@ class LevelCoordinator: LevelCoordinating {
         switch nextArea.type {
         case .level(let level):
             presentNextLevel(level, playerData: runModel.player)
-        case .store(let offers):
-            presentStoreOffers(offers,
-                               depth: nextArea.depth,
-                               levelGoalProgress: runModel.goalTracking,
-                               playerData: addRuneSlotIfNeeded(runModel.player, nextArea: nextArea))
         }
     }
     
@@ -114,7 +110,7 @@ class LevelCoordinator: LevelCoordinating {
         runModel.player = newEntityData
         
         return newEntityData
-
+        
     }
     
     /// This should be used most of the the time.  When ever you want to proceed in the run, you should call this function.
@@ -123,13 +119,7 @@ class LevelCoordinator: LevelCoordinating {
         switch nextArea.type {
         case .level(let level):
             presentNextLevel(level, playerData: runModel.player)
-        case .store(let offers):
-            presentStoreOffers(offers,
-                               depth: nextArea.depth,
-                               levelGoalProgress: runModel.goalTracking,
-                               playerData: addRuneSlotIfNeeded(runModel.player, nextArea: nextArea))
         }
-
     }
     
     
@@ -149,7 +139,7 @@ class LevelCoordinator: LevelCoordinating {
             guard let self = self else { return }
             self.delegate?.finishGame(playerData: playerData, currentRun: self.runModel)
         }
-
+        
     }
     
     func visitStore(_ playerData: EntityModel, _ goalTracking: [GoalTracking]) {
@@ -160,5 +150,4 @@ class LevelCoordinator: LevelCoordinating {
         presentNextArea()
     }
 }
-
 

@@ -660,14 +660,14 @@ struct Animator {
                            reverse: Bool = false) -> SKAction? {
         
         var animationFrames: [SKTexture]?
-        // get the attack animation
+        // get the animation for the animation type
         if let position = position {
             if case let TileType.monster(monsterData) = tiles[position].type,
-                let attackAnimation = monsterData.animation(of: animationType) {
-                animationFrames = attackAnimation
+                let animation = monsterData.animation(of: animationType) {
+                animationFrames = animation
             } else if case let TileType.player(playerData) = tiles[position].type,
-                let attackAnimation = playerData.animation(of: animationType) {
-                animationFrames = attackAnimation
+                let animation = playerData.animation(of: animationType) {
+                animationFrames = animation
             }
         }
         

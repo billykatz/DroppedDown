@@ -452,7 +452,7 @@ extension Renderer {
         }
         
         
-        //add new tiles "newTiles"
+        // add new tiles "newTiles"
         for trans in newTiles {
             let (startRow, startCol) = trans.initial.tuple
             let (endRow, endCol) = trans.end.tuple

@@ -169,7 +169,9 @@ class TileCreator: TileStrategy {
     }
     
     private func randomTile(_ neighbors: [Tile], noMoreMonsters: Bool, playerData: EntityModel) -> Tile {
-        var nextTile = Tile(type: randomTile(given: randomSource.nextInt(), neighbors: neighbors, playerData: playerData))
+        
+        /// This 100% gets set in the while loop
+        var nextTile: Tile!
         
         var validTile = false
         while !validTile {
@@ -195,12 +197,13 @@ class TileCreator: TileStrategy {
     
     private func neighbors(of coord: TileCoord, in tiles: [[Tile]]) -> [Tile] {
         
-        return [coord.colLeft, coord.colRight, coord.rowAbove, coord.rowBelow]
+        return
+            [coord.colLeft, coord.colRight, coord.rowAbove, coord.rowBelow]
             .filter {
                 return isWithinBounds($0, within: tiles)
-        }.map {
-            tiles[$0]
-        }
+            }.map {
+                tiles[$0]
+            }
     }
     
     func tiles(for tiles: [[Tile]]) -> [[Tile]] {

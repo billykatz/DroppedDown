@@ -578,11 +578,10 @@ extension Board {
             }
         }
         
-        
+        var newTiles : [TileTransformation] = []
         
         // set the tiles to be removed as Empty placeholder
         var intermediateTiles = tiles
-        let removedCount = selectedTiles.count
         
         var finalSelectedTiles: [TileCoord] = []
         for coord in selectedTiles {
@@ -591,6 +590,8 @@ extension Board {
                 holdsGem {
                 let gemTile = Tile(type: .item(Item(type: .gem, amount: 1, color: color)))
                 intermediateTiles[coord.x][coord.y] = gemTile
+                finalSelectedTiles.append(coord)
+                newTiles.append(TileTransformation(coord, coord))
             } else {
                 intermediateTiles[coord.x][coord.y] = .empty
                 /// keep track of the emptied tiles
@@ -612,7 +613,7 @@ extension Board {
         }
         
         // store tile transforamtions and shift information
-        var newTiles : [TileTransformation] = []
+
         var (shiftDown, shiftIndices) = calculateShiftIndices(for: &intermediateTiles)
         
         //add new tiles

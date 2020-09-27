@@ -187,6 +187,7 @@ class DFTileSpriteNode: SKSpriteNode {
         let animateCrumble = SKAction.animate(with: animationFrames, timePerFrame: 0.08)
         let removeFromParent = SKAction.removeFromParent()
         let sequence = SKAction.sequence([animateCrumble, removeFromParent])
+        
         return (self, sequence)
     }
     
@@ -206,13 +207,6 @@ class DFTileSpriteNode: SKSpriteNode {
             return nil
         }
         
-        /// Add the empty sprite
-        let emptySprite = SKSpriteNode(color: .clear, size: size)
-        emptySprite.name = "child"
-        let addSprite = SKAction.run { [weak self] in
-            self?.addChildSafely(emptySprite)
-        }
-        
         /// Wait for a random amount of time
         let waitAction = SKAction.wait(forDuration: TimeInterval(Int.random(lower: 2, upper: 10)),
                                        withRange: TimeInterval(Int.random(lower: 2, upper: 10)))
@@ -220,13 +214,7 @@ class DFTileSpriteNode: SKSpriteNode {
         /// Animate the sparkle
         let animateAction = SKAction.animate(with: animationFrames, timePerFrame: 0.08)
         
-        /// Remove the sprite
-        let removeSprite = SKAction.run { [weak self] in
-            self?.removeChild(with: "child")
-        }
-        
-        /// Sequence it all up
-        let sequence = SKAction.sequence([waitAction, addSprite, animateAction, removeSprite])
+        let sequence = SKAction.sequence([waitAction, animateAction])
         
         /// Repeat forever
         let repeatForever = SKAction.repeatForever(sequence)

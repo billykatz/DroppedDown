@@ -130,8 +130,8 @@ enum TileType: Hashable, CaseIterable, Codable {
             return lhsItem.type == rhsItem.type
         case let (.pillar(leftData), .pillar(rightData)):
             return leftData.color == rightData.color
-        case let (.rock(leftColor, _), .rock(rightColor, _)):
-            return leftColor == rightColor
+        case let (.rock(leftColor, leftHoldsGem), .rock(rightColor, rightHoldsGem)):
+            return leftColor == rightColor && leftHoldsGem == rightHoldsGem
         case let (.dynamite(lhsFuse), .dynamite(rhsFuse)):
             return lhsFuse.hasBeenDecremented == rhsFuse.hasBeenDecremented
         default:
@@ -156,6 +156,7 @@ enum TileType: Hashable, CaseIterable, Codable {
         case player
         case monster
         case empty
+        case emptyGem
         case exit
         case item
         case pillar
@@ -172,6 +173,9 @@ enum TileType: Hashable, CaseIterable, Codable {
         switch base {
         case .empty:
             self = .empty
+        case .emptyGem:
+            let data = try container.decode(Color.self, forKey: .color)
+            self = .emptyGem(data)
         case .player:
             let data = try container.decode(EntityModel.self, forKey: .entityData)
             self = .player(data)
@@ -209,6 +213,9 @@ enum TileType: Hashable, CaseIterable, Codable {
             try container.encode(data, forKey: .entityData)
         case .empty:
             try container.encode(Base.empty, forKey: .base)
+        case .emptyGem(let color):
+            try container.encode(Base.emptyGem, forKey: .base)
+            try container.encode(color, forKey: .color)
         case .exit(blocked: let blocked):
             try container.encode(Base.exit, forKey: .base)
             try container.encode(blocked, forKey: .exitBlocked)
@@ -232,6 +239,7 @@ enum TileType: Hashable, CaseIterable, Codable {
     case player(EntityModel)
     case monster(EntityModel)
     case empty
+    case emptyGem(Color)
     case exit(blocked: Bool)
     case item(Item)
     case pillar(PillarData)
@@ -297,7 +305,7 @@ enum TileType: Hashable, CaseIterable, Codable {
         return TileType.item(.gold)
     }
     
-    var textureName: String {
+    private var textureName: String {
         switch self {
         case .rock(let color, let withGem):
             let withGemSuffix = withGem ? "WithGem" : ""
@@ -337,7 +345,7 @@ enum TileType: Hashable, CaseIterable, Codable {
         switch self {
         case .player:
             return TextureName.player.rawValue
-        case .empty:
+        case .empty, .emptyGem:
             return TextureName.empty.rawValue
         case .exit(let blocked):
             return blocked ? "blockedExit" : "mineshaft"

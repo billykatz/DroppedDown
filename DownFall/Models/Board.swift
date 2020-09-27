@@ -216,7 +216,7 @@ class Board: Equatable {
                             tiles[neighborCoord.row][neighborCoord.column] = Tile(type: .player(playerData.wasAttacked(for: 1, from: neighborCoord.direction(relative: coord) ?? .east)))
                         case .rock, .pillar:
                             removedRocksAndPillars.append(neighborCoord)
-                        case .empty, .exit, .monster, .gem, .gold:
+                        case .empty, .exit, .monster, .gem, .gold, .emptyGem:
                             () // purposefully left blank
                         case .item:
                             ()
@@ -586,12 +586,9 @@ extension Board {
         var finalSelectedTiles: [TileCoord] = []
         for coord in selectedTiles {
             // turn the tile into a gem or into an empty
-            if case TileType.rock(color: let color, holdsGem: let holdsGem) = tiles[coord].type,
-                holdsGem {
-                let gemTile = Tile(type: .item(Item(type: .gem, amount: 1, color: color)))
-                intermediateTiles[coord.x][coord.y] = gemTile
+            if case TileType.rock(let color, let holdsGem) = tiles[coord].type, holdsGem {
+                intermediateTiles[coord.x][coord.y] = Tile(type: .emptyGem(color))
                 finalSelectedTiles.append(coord)
-                newTiles.append(TileTransformation(coord, coord))
             } else {
                 intermediateTiles[coord.x][coord.y] = .empty
                 /// keep track of the emptied tiles
@@ -604,7 +601,7 @@ extension Board {
             if case let .pillar(data) = intermediateTiles[pillarCoord.x][pillarCoord.y].type {
                 if data.health == 1 {
                     // remove the pillar from the board
-                    intermediateTiles[pillarCoord.x][pillarCoord.y] = Tile.empty
+                    intermediateTiles[pillarCoord.x][pillarCoord.y] = .empty
                 } else {
                     //decrement the pillar's health
                     intermediateTiles[pillarCoord.x][pillarCoord.y] = Tile(type: .pillar(PillarData(color: data.color, health: data.health-1)))

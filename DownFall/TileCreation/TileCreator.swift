@@ -139,35 +139,6 @@ class TileCreator: TileStrategy {
 
     }
     
-    func gemDropped(from rock: TileType, groupSize: Int, playerData: EntityModel) -> Tile {
-        let extraGemsBasedOnLuck = playerData.luck / 5
-        let extraChanceBasedOnLuck = extraGemsBasedOnLuck * 2
-        guard specialGems < level.maxSpawnGems + extraGemsBasedOnLuck else { return .empty }
-        let weight = 100
-        let index = randomSource.nextInt() % weight
-        let baseChance = 2
-        let extraChance = extraChanceBasedOnLuck
-        let moreChanceBasedOnLastTimeAGemDropped = numberOfTilesSinceLastGemDropped / 10
-        let totalChance = baseChance + extraChance + moreChanceBasedOnLastTimeAGemDropped
-        if (0..<totalChance).contains(index) {
-            numberOfTilesSinceLastGemDropped = 0
-            let item = Item(type: .gem, amount: 1, color: rock.color)
-            specialGems += 1
-            return Tile(type: TileType.item(item)) 
-        } else {
-            return .empty
-        }
-        
-    }
-    
-    func goldDropped(from monster: EntityModel) -> Int {
-        if let goldItem = monster.carry.items.first(where: { $0.type == .gold }) {
-            let medianAmount = goldItem.amount
-            return Int.random(lower: max(1, medianAmount-goldVariance), upper: medianAmount+goldVariance)
-        }
-        return 0
-    }
-    
     private func randomTile(_ neighbors: [Tile], noMoreMonsters: Bool, playerData: EntityModel) -> Tile {
         
         /// This 100% gets set in the while loop
@@ -188,7 +159,7 @@ class TileCreator: TileStrategy {
                     specialGems += 1
                     validTile = true
                 }
-            case .exit, .player, .rock(.green, _), .empty, .pillar, .dynamite:
+            case .exit, .player, .rock(.green, _), .empty, .pillar, .dynamite, .emptyGem:
                 validTile = false
             }
         }
@@ -218,7 +189,6 @@ class TileCreator: TileStrategy {
         
         for row in 0..<newTiles.count {
             for col in 0..<newTiles[row].count {
-                
                 //check the old array for empties
                 if tiles[row][col].type == .empty {
                     // update the new array and check for neighbors in new array as well.
@@ -238,6 +208,8 @@ class TileCreator: TileStrategy {
                         }
                         newTiles[row][col] = newTile
                     }
+                } else if case TileType.emptyGem(let color) = tiles[row][col].type {
+                    newTiles[row][col] = Tile(type: .item(Item(type: .gem, amount: 1, color: color)))
                 }
             }
         }
@@ -295,7 +267,7 @@ class TileCreator: TileStrategy {
             switch nextTile.type {
             case .rock:
                 newTiles.append(nextTile)
-            case .exit, .player, .monster, .item, .empty, .pillar, .dynamite:
+            case .exit, .player, .monster, .item, .empty, .pillar, .dynamite, .emptyGem:
                 assertionFailure("randomRock should only create rocks")
             }
         }
@@ -321,7 +293,7 @@ class TileCreator: TileStrategy {
         let playerPosition = playerQuadrant.randomCoord(for: boardSize, notIn: pillarCoordinates)
         
         
-//        guard let playerData = playerEntityData else { fatalError("We must get a playerData or else we cannot continue") }
+        //
         tiles[playerPosition.x][playerPosition.y] = Tile(type: .player(playerData))
         
         
@@ -339,8 +311,8 @@ class TileCreator: TileStrategy {
         guard level.hasExit else { return tiles }
         //place the exit on the opposite side of the grid
         #warning ("make sure this is set properly for release")
-//        let exitQuadrant = playerQuadrant.opposite
-        let exitQuadrant = playerQuadrant
+        let exitQuadrant = playerQuadrant.opposite
+//        let exitQuadrant = playerQuadrant
         let exitPosition = exitQuadrant.randomCoord(for: boardSize, notIn: reservedSet)
         reservedSet.insert(exitPosition)
         

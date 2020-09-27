@@ -444,13 +444,34 @@ extension Renderer {
                 // set the position way in the background so that new nodes come in over
                 sprites[tileTrans.end.x][tileTrans.end.y].zPosition = Precedence.underground.rawValue
                 
-                let crumbleAnimations: [SKAction] = [crumble.1]
-
-                let newCrumble = (sprites[tileTrans.end.x][tileTrans.end.y], SKAction.sequence(crumbleAnimations))
-                removedAnimations.append(newCrumble)
+                removedAnimations.append(crumble)
+                
+                
+                /// Add the gem if needed
+                /// Grab the current rock on the board.
+                /// If this rock contains a gem, then add it to the board
+                let currentSprite = sprites[tileTrans.end.x][tileTrans.end.y]
+                
+                if case TileType.rock(color: let color, holdsGem: let holdsGem) = currentSprite.type, holdsGem {
+                    let (startRow, startCol) = tileTrans.initial.tuple
+                    
+                    /// we need to add the gem to the board, or else shit is weird
+                    let sprite = DFTileSpriteNode(type: .item(Item(type: .gem, amount: 1, color: color)), height: currentSprite.size.height, width: currentSprite.size.width)
+                    
+                    // plave the gem on the board where the rock was
+//                    let x = ( CGFloat(startRow) * tileSize ) + bottomLeft.x
+//                    let y = tileSize * CGFloat(startCol) + bottomLeft.y
+                    sprite.position = currentSprite.position
+                    
+                    /// add the gem sprite our data store
+                    sprites[tileTrans.end.x][tileTrans.end.y] = sprite
+                    
+                    /// add the gem sprite to the foreground
+                    spriteForeground.addChild(sprite)
+                }
+            
             }
         }
-        
         
         // add new tiles "newTiles"
         for trans in newTiles {

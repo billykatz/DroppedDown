@@ -169,6 +169,23 @@ class DFTileSpriteNode: SKSpriteNode {
         return (gemGlow, SKAction.group([shrinkGrowForever, spinIndefinitelyAction]))
     }
     
+    func showGem() -> (SKSpriteNode, SKAction)? {
+        guard case TileType.rock(color: let color, holdsGem: let holdsGem) = self.type,
+              holdsGem
+//              let crumble = self.crumble()
+        else { return nil }
+        let gem = TileType.item(Item(type: .gem, amount: 1, color: color))
+        let gemSprite = SKSpriteNode(texture: SKTexture(imageNamed: gem.textureString()), size: self.size)
+        let addGemAction = SKAction.run { [weak self] in
+            self?.addChild(gemSprite)
+        }
+        
+        // Sorta hacky.  But lets show the crumble after adding the gem
+//        let sequence = SKAction.sequence([addGemAction, crumble.1])
+        
+        return (self, addGemAction)
+    }
+    
     func crumble() -> (SKSpriteNode, SKAction)? {
         var animationFrames: [SKTexture] = []
         switch self.type {

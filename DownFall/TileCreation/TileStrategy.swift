@@ -24,11 +24,9 @@ protocol TileStrategy {
     
     func tiles(for tiles: [[Tile]]) -> [[Tile]]
     func board(difficulty: Difficulty) -> [[Tile]]
-    func goldDropped(from monster: EntityModel) -> Int
     func randomMonster() -> TileType
     func randomMonster(not: EntityModel.EntityType) -> Tile
     func shuffle(tiles: [[Tile]]) -> [[Tile]]
-    func gemDropped(from rock: TileType, groupSize: Int, playerData: EntityModel) -> Tile
     func randomRock(_ neighbors: [Tile], playerData: EntityModel) -> TileType
 
 }

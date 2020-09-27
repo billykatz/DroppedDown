@@ -39,7 +39,7 @@ struct GoalTracking: Codable, Hashable {
                 case .unlockExit:
                     switch tileType {
                     case .rock:
-                        return tileType.textureName
+                        return tileType.textureString()
                     case .monster:
                         return "skullAndCrossbones"
                     case .gem:

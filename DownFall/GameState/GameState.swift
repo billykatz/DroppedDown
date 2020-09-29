@@ -22,14 +22,12 @@ enum State: CaseIterable, Equatable {
 protocol GameState: Equatable {
     var state: State { get }
     func transitionState(given input: Input) -> AnyGameState?
-    func shouldAppend(_ input: Input) -> Bool
     func enter(_ input: Input)
 }
 
 final class AnyGameState: GameState {
     private var _state: State
     private let _transitionState: (Input) -> AnyGameState?
-    private let _shouldAppend: (Input) -> Bool
     private let _enter: (Input) -> ()
     var state: State {
         get {
@@ -43,7 +41,6 @@ final class AnyGameState: GameState {
     init<T>(_ state: T) where T: GameState {
         _state = state.state
         _transitionState = state.transitionState
-        _shouldAppend = state.shouldAppend
         _enter = state.enter
     }
     
@@ -52,7 +49,7 @@ final class AnyGameState: GameState {
     }
     
     func shouldAppend(_ input: Input) -> Bool {
-        return _shouldAppend(input)
+        return _transitionState(input) != nil
     }
     
     func enter(_ input: Input) {

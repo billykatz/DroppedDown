@@ -14,8 +14,6 @@ protocol LevelCoordinating: StoreSceneDelegate, GameSceneCoordinatingDelegate {
     var gameSceneNode: GameScene? { get set }
     var entities: EntitiesModel? { get set }
     var delegate: MenuCoordinating? { get set }
-    
-    func presentStoreOffers(_ storeOffers: [StoreOffer], depth: Int, levelGoalProgress: [GoalTracking], playerData: EntityModel)
     func presentNextLevel(_ level: Level, playerData: EntityModel?)
     func loadRun(_ runModel: RunModel?, profile: Profile)
     
@@ -39,20 +37,6 @@ class LevelCoordinator: LevelCoordinating {
         self.entities = entities
         self.view = view
         
-    }
-    
-    func presentStoreOffers(_ storeOffers: [StoreOffer], depth: Int, levelGoalProgress: [GoalTracking], playerData: EntityModel) {
-        view.presentScene(nil)
-        let storeScene = StoreScene(size: .universalSize,
-                                    playerData: playerData,
-                                    levelGoalProgress: levelGoalProgress,
-                                    storeOffers: storeOffers,
-                                    levelDepth: depth,
-                                    viewModel: StoreSceneViewModel(offers: storeOffers, goalTracking: levelGoalProgress))
-        
-        storeScene.scaleMode = .aspectFill
-        storeScene.storeSceneDelegate = self
-        view.presentScene(storeScene)
     }
     
     func presentNextLevel(_ level: Level, playerData: EntityModel?) {

@@ -34,7 +34,7 @@ enum StoreOfferType: Codable, Hashable {
         case base
         case runeModel
         case gemAmount
-
+        
     }
     
     private enum Base: String, Codable {
@@ -98,7 +98,7 @@ enum StoreOfferType: Codable, Hashable {
             try container.encode(Base.fullHeal, forKey: .base)
         }
     }
-
+    
 }
 
 typealias StoreOfferTier = Int
@@ -232,9 +232,9 @@ struct StoreOffer: Codable, Hashable {
         let vortex = StoreOffer.offer(type: .rune(Rune.rune(for: .vortex)), tier: 3)
         let bubbleUp = StoreOffer.offer(type: .rune(Rune.rune(for: .bubbleUp)), tier: 3)
         let flameWall = StoreOffer.offer(type: .rune(Rune.rune(for: .flameWall)), tier: 3)
-
+        
         switch depth {
-            /// 1 Rune Slot
+        /// 1 Rune Slot
         case 0:
             /// This is a special case where we want to start our play testers with a rune
             let getSwifty = StoreOffer.offer(type: .rune(Rune.rune(for: .getSwifty)), tier: 1)
@@ -287,6 +287,36 @@ struct StoreOffer: Codable, Hashable {
         
         return storeOffers
     }
-
+    
+    var effect: EffectModel {
+        switch self.type {
+        case .fullHeal:
+            let effect = EffectModel(kind: .refill, stat: .health, amount: 0, duration: 0, offerTier: tier)
+            return effect
+        case .plusTwoMaxHealth:
+            let effect = EffectModel(kind: .buff, stat: .maxHealth, amount: 2, duration: Int.max, offerTier: tier)
+            return effect
+        case .rune(let rune):
+            let effect = EffectModel(kind: .rune, stat: .pickaxe, amount: 0, duration: 0, rune: rune, offerTier: tier)
+            
+            return effect
+        case .gems(let amount):
+            let effect = EffectModel(kind: .buff, stat: .gems, amount: amount, duration: 0, offerTier: tier)
+            return effect
+        case .runeUpgrade:
+            let effect = EffectModel(kind: .buff, stat: .pickaxe, amount: 10, duration: 0, offerTier: tier)
+            return effect
+        case .runeSlot:
+            let effect = EffectModel(kind: .buff, stat: .runeSlot, amount: 1, duration: 0, offerTier: tier)
+            return effect
+        case .dodge:
+            let effect = EffectModel(kind: .buff, stat: .dodge, amount: 5, duration: 0, offerTier: tier)
+            return effect
+        case .luck:
+            let effect = EffectModel(kind: .buff, stat: .luck, amount: 5, duration: 0, offerTier: tier)
+            return effect
+            
+        }
+    }
 }
 

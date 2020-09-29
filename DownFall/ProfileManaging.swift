@@ -21,7 +21,7 @@ struct Profile: Codable, Equatable {
     let deepestDepth: Int
     
     var runPlayer: EntityModel {
-        return player.update(pickaxe: Pickaxe(runeSlots: 0, runes: []))
+        return player.update(pickaxe: Pickaxe(runeSlots: 1, runes: []))
     }
     
     func updatePlayer(_ entityModel: EntityModel) -> Profile {

@@ -167,6 +167,8 @@ class Renderer: SKSpriteNode {
                 animationsFinished(endTiles: trans.endTiles)
             case .itemUsed(let ability, let targets):
                 animateRuneUsed(input: inputType, transformations: transformations, rune: ability, targets: targets)
+            case .collectOffer:
+                computeNewBoard(for: trans)
             case .collectItem:
                 computeNewBoard(for: trans)
             case .decrementDynamites:

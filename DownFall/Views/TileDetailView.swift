@@ -167,6 +167,21 @@ class TileDetailView: SKNode {
         return gemDesc
         
     }
+    
+    private func playerDescription(tileType: TileType, nextTo: CGRect) -> ParagraphNode? {
+        guard case TileType.player(let data) = tileType  else { return nil }
+        let text =
+        """
+        \u{2022} Dodge: \(data.dodge)
+        \u{2022} Luck:  \(data.luck)
+        """
+        let playerDesc = ParagraphNode(text: text, paragraphWidth: detailViewTemplate.frame.width - Style.DetailView.spriteSize.width - Style.Padding.more, fontSize: .fontMediumSize)
+        playerDesc.position = CGPoint.alignHorizontally(playerDesc.frame, relativeTo: nextTo, horizontalAnchor: .left, verticalAlign: .bottom, verticalPadding: Style.Padding.more, translatedToBounds: true)
+        playerDesc.zPosition = Precedence.menu.rawValue
+        return playerDesc
+        
+    }
+
 
     
     
@@ -197,6 +212,8 @@ class TileDetailView: SKNode {
             detailViewTemplate.addChild(pillarDesc)
         } else if let gemDesc = gemDescription(tileType: tileType, nextTo: title.frame) {
             detailViewTemplate.addChild(gemDesc)
+        } else if let playerDescription = playerDescription(tileType: tileType, nextTo: title.frame) {
+            detailViewTemplate.addChild(playerDescription)
         }
         
         // add the border

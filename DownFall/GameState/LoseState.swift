@@ -12,15 +12,6 @@ struct LoseState: GameState {
     
     func enter(_ input: Input) {}
     
-    func shouldAppend(_ input: Input) -> Bool {
-        switch input.type {
-        case .playAgain, .selectLevel:
-            return true
-        default:
-            return false
-        }
-    }
-    
     func transitionState(given input: Input) -> AnyGameState? {
         switch input.type {
         case .playAgain, .selectLevel:

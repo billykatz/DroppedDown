@@ -331,6 +331,16 @@ class Referee {
             return Input(.collectItem(playerPosition.rowBelow, item, playerData.carry.total(in: item.type.currencyType)), tiles)
         }
         
+        func playerCollectsOffer() -> Input? {
+            guard let playerPosition = playerPosition,
+                case TileType.player(_) = tiles[playerPosition].type,
+                isWithinBounds(playerPosition.rowBelow),
+                case TileType.offer(let storeOffer) = tiles[playerPosition.rowBelow].type
+                else { return nil }
+            return Input(.collectOffer(playerPosition.rowBelow, storeOffer))
+        }
+
+        
         func decrementDynamiteFuses() -> Input? {
             guard let dynamitePos = dynamitePositions else { return nil }
             return Input(.decrementDynamites(dynamitePos))
@@ -416,6 +426,10 @@ class Referee {
         
         if let collectItem = playerCollectsItem() {
             return collectItem
+        }
+        
+        if let collectOffer = playerCollectsOffer() {
+            return collectOffer
         }
         
         if let refill = refillEmptyTiles() {

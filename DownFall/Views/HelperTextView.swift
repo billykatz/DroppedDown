@@ -70,6 +70,8 @@ class HelperTextView: SKSpriteNode {
                 descriptionText = "How in the hell did you tap on an empty tile? BECAUSE WE ADDED Pillars, BOOOM"
             case .item(let item):
                 descriptionText = "That's \(item.textureName), cool!"
+            case .offer(let storeOffer):
+                descriptionText = "That's \(storeOffer.textureName), cool!"
             case .dynamite:
                 descriptionText = "Dynamite!"
             case .pillar:

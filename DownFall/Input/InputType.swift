@@ -79,6 +79,7 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
     case reffingFinished(newTurn: Bool)
     case boardBuilt
     case collectItem(TileCoord, Item, Int)
+    case collectOffer(TileCoord, StoreOffer)
     case selectLevel
     case newTurn
     case visitStore
@@ -165,6 +166,8 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
             return "Record rune progres"
         case .goalCompleted:
             return "Goal was completed"
+        case .collectOffer(_, let offer):
+            return "Player collects \(offer.textureName)"
             
         }
     }

@@ -60,6 +60,7 @@ struct Level: Codable, Hashable {
     let goals: [LevelGoal]
     let maxSpawnGems: Int
     var goalProgress: [GoalTracking]
+    let potentialItems: [StoreOffer]
     
     var hasExit: Bool {
         return true
@@ -73,5 +74,5 @@ struct Level: Codable, Hashable {
         return "\(depth + 1)"
     }
         
-    static let zero = Level(depth: 0, monsterTypeRatio: [:], monsterCountStart: 0, maxMonsterOnBoardRatio: 0.0, boardSize: 0, tileTypeChances: TileTypeChanceModel(chances: [.empty: 1]), pillarCoordinates: [], goals: [LevelGoal(type: .unlockExit, tileType: .empty, targetAmount: 0, minimumGroupSize: 0, grouped: false)], maxSpawnGems: 0, goalProgress: [])
+    static let zero = Level(depth: 0, monsterTypeRatio: [:], monsterCountStart: 0, maxMonsterOnBoardRatio: 0.0, boardSize: 0, tileTypeChances: TileTypeChanceModel(chances: [.empty: 1]), pillarCoordinates: [], goals: [LevelGoal(type: .unlockExit, tileType: .empty, targetAmount: 0, minimumGroupSize: 0, grouped: false)], maxSpawnGems: 0, goalProgress: [], potentialItems: [])
 }

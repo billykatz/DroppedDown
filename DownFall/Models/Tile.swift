@@ -148,6 +148,7 @@ enum TileType: Hashable, CaseIterable, Codable {
         case dynamiteFuse
         case pillarData
         case holdsGem
+        case storeOffer
 
     }
     
@@ -162,6 +163,7 @@ enum TileType: Hashable, CaseIterable, Codable {
         case pillar
         case rock
         case dynamite
+        case offer
     }
     
     /// This implementation is written about in https://medium.com/@hllmandel/codable-enum-with-associated-values-swift-4-e7d75d6f4370
@@ -198,6 +200,9 @@ enum TileType: Hashable, CaseIterable, Codable {
         case .item:
             let item = try container.decode(Item.self, forKey: .item)
             self = .item(item)
+        case .offer:
+            let offerData = try container.decode(StoreOffer.self, forKey: .storeOffer)
+            self = .offer(offerData)
         }
     }
     
@@ -232,6 +237,9 @@ enum TileType: Hashable, CaseIterable, Codable {
         case .dynamite(let fuseCount):
             try container.encode(Base.dynamite, forKey: .base)
             try container.encode(fuseCount, forKey: .dynamiteFuse)
+        case .offer(let storeOffer):
+            try container.encode(Base.offer, forKey: .base)
+            try container.encode(storeOffer, forKey: .storeOffer)
         }
     }
 
@@ -242,6 +250,7 @@ enum TileType: Hashable, CaseIterable, Codable {
     case emptyGem(Color)
     case exit(blocked: Bool)
     case item(Item)
+    case offer(StoreOffer)
     case pillar(PillarData)
     case rock(color: Color, holdsGem: Bool)
     case dynamite(DynamiteFuse)
@@ -357,6 +366,8 @@ enum TileType: Hashable, CaseIterable, Codable {
             return self.textureName
         case .dynamite:
             return TextureName.dynamite.rawValue
+        case .offer(let storeOffer):
+            return storeOffer.textureName
         }
     }
     

@@ -118,6 +118,7 @@ class BackpackView: SKSpriteNode {
     private func runeSlotsUpdated(_ runeSlots: Int, _ runes: [Rune]) {
         /// TODO: we only ever want to do this once!!!
         /// Add an update method to the RuneContainer so if you get a rune mid-level or whatever, it will updated accordinly
+        
         let viewModel = RuneContainerViewModel(runes: runes,
                                                numberOfRuneSlots: runeSlots,
                                                runeWasTapped: runeWasTapped,
@@ -127,11 +128,14 @@ class BackpackView: SKSpriteNode {
                                               mode: .inventory,
                                               size: CGSize(width: playableRect.width, height: Style.Backpack.runeInventorySize))
         
+        runeContainer.name = "runeContainer"
+        
         runeContainer.position = CGPoint.position(runeContainer.frame, inside: playableRect, verticalAnchor: .bottom, horizontalAnchor: .center, padding: Style.Padding.most*3)
         runeContainer.zPosition = Precedence.aboveMenu.rawValue
         
+        self.removeChild(with: "runeContainer")
         runeInventoryContainer = runeContainer
-        addChild(runeContainer)
+        addChildSafely(runeContainer)
     }
     
     private func runeUseWasCanceled() {

@@ -31,15 +31,6 @@ struct ComputingState: GameState {
             return nil
         }
     }
-    
-    func shouldAppend(_ input: Input) -> Bool {
-        switch input.type {
-        case .transformation, .newTurn, .tileDetail:
-            return true
-        default:
-            return false
-        }
-    }
 }
 
 

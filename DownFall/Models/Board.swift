@@ -12,7 +12,7 @@ class Board: Equatable {
     }
     
     private(set) var tiles: [[Tile]]
-    private let level: Level
+    private var level: Level
     var tileCreator: TileStrategy
     
     private var playerPosition : TileCoord? {
@@ -62,7 +62,7 @@ class Board: Equatable {
                                             endTiles: tiles)
         case .touch(let tileCoord, let type):
             switch type {
-            case .monster(let data):
+            case .monster(let data), .player(let data):
                 let attacks = calculateAttacks(for: data, from: tileCoord)
                 InputQueue.append(Input(.tileDetail(type, attacks)))
                 return
@@ -132,6 +132,8 @@ class Board: Equatable {
             transformation = playerDataUpdated(inputType: input.type)
         case .goalCompleted(let completedGoals):
             transformation = self.completedGoals(completedGoals, inputType: input.type)
+        case let .collectOffer(offerCoord, storeOffer):
+            transformation = self.collect(offer: storeOffer, at: offerCoord, input: input)
         case .gameLose(_),
              .play,
              .pause,
@@ -149,6 +151,38 @@ class Board: Equatable {
         InputQueue.append(Input(.transformation([trans])))
     }
     
+    private func collect(offer: StoreOffer, at offerCoord: TileCoord, input: Input) -> Transformation {
+        let selectedTile = tiles[offerCoord]
+        
+        //remove and replace the single item tile
+        let transformation = removeAndReplace(from: tiles, tileCoord: offerCoord, singleTile: true, input: input)
+        
+        //save the item
+        guard case let TileType.offer(storeOffer) = selectedTile.type,
+            var updatedTiles = transformation.endTiles,
+            let pp = playerPosition,
+            case let .player(data) = updatedTiles[pp].type
+            else { return Transformation.zero }
+        
+        let effect = storeOffer.effect
+        
+        // we have to reset attack here because the player has moved but the turn may not be over
+        // Eg: it is possible that there could be monster, item, monster in a row and the player should be able to kill the second monster after collecting the offer
+        let playerData = data.update(attack: data.attack.resetAttack()).applyEffect(effect)
+        
+        
+        updatedTiles[pp.x][pp.y] = Tile(type: .player(playerData))
+        
+        tiles = updatedTiles
+        
+        return Transformation(transformation: transformation.tileTransformation,
+                              inputType: input.type,
+                              endTiles: updatedTiles)
+
+
+        
+    }
+    
     private var reservedCoords: Set<TileCoord> {
         var reservedCoords = Set<TileCoord>()
         reservedCoords.insert(playerPosition!)
@@ -159,12 +193,28 @@ class Board: Equatable {
         return reservedCoords
     }
     
+    var spawnedItems: [StoreOffer] = []
+    
+    private func randomItem(in tier: Int) -> StoreOffer {
+        let offersInTier = self.level.potentialItems.filter { $0.tierIndex == tier }
+        let randomNumber = Int.random(abs(tileCreator.randomSource.nextInt())) % offersInTier.count
+        return offersInTier[randomNumber]
+    }
+    
     private func completedGoals(_ goals: [GoalTracking], inputType: InputType) -> Transformation {
+        
+        /// keep track of how many goals we have awarded so far.
+        let awardedGoalsCount = self.level.goalProgress.count
+        
+        // Lets keep track of the completed goals before we do anything else
+        self.level.goalProgress.append(contentsOf: goals)
+        
+        // Create a transformation based on how many goals are compelted and where the player is in the mine
         guard let pp = playerPosition else { return .zero }
         let playerQuadrant = Quadrant.quadrant(of: pp, in: boardSize)
         var transformedTiles: [TileTransformation] = []
         var reservedCoords = self.reservedCoords
-        for _ in goals {
+        for (idx, _) in goals.enumerated() {
             // get a random coord not in the reserved set
             let randomCoordInAnotherQuadrant = playerQuadrant.opposite.randomCoord(for: boardSize, notIn: reservedCoords)
             
@@ -174,8 +224,13 @@ class Board: Equatable {
             /// record this tiles we are transforming
             transformedTiles.append(TileTransformation(randomCoordInAnotherQuadrant, randomCoordInAnotherQuadrant))
             
+            /// get a random offer
+            let tier = awardedGoalsCount + idx
+            let randomOffer = randomItem(in: tier)
+            spawnedItems.append(randomOffer)
+            
             /// transform the tile
-            tiles[randomCoordInAnotherQuadrant.row][randomCoordInAnotherQuadrant.column] = Tile(type: .item(Item(type: .gem, amount: 1, color: .blue)))
+            tiles[randomCoordInAnotherQuadrant.row][randomCoordInAnotherQuadrant.column] = Tile(type: .offer(randomOffer))
         }
         
         return Transformation(transformation: [transformedTiles], inputType: inputType, endTiles: tiles)
@@ -254,7 +309,7 @@ class Board: Equatable {
                             removedRocksAndPillars.append(neighborCoord)
                         case .empty, .exit, .monster, .gem, .gold, .emptyGem:
                             () // purposefully left blank
-                        case .item:
+                        case .item, .offer:
                             ()
                         }
                     }

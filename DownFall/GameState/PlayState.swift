@@ -12,21 +12,6 @@ struct PlayState: GameState {
     
     func enter(_ input: Input) {}
     
-    func shouldAppend(_ input: Input) -> Bool {
-        switch input.type {
-        case .gameWin,. gameLose, .pause,
-             .attack, .transformation,
-             .touch, .monsterDies, .rotateCounterClockwise, .rotateClockwise,
-             .boardBuilt, .touchBegan, .itemUseSelected, .shuffleBoard, .unlockExit, .levelGoalDetail, .runeProgressRecord, .goalCompleted:
-            return true
-        case .animationsFinished, .play,
-             .reffingFinished, .playAgain, .collectItem,
-             .selectLevel, .newTurn,
-             .visitStore, .itemUseCanceled, .itemCanBeUsed, .itemUsed, .decrementDynamites, .rotatePreview, .rotatePreviewFinish, .refillEmpty, .tileDetail:
-            return false
-        }
-    }
-    
     func transitionState(given input: Input) -> AnyGameState? {
         switch input.type {
         case .gameWin:
@@ -43,7 +28,8 @@ struct PlayState: GameState {
             return AnyGameState(PlayState())
         case .itemUseSelected:
             return AnyGameState(TargetingState())
-        case .animationsFinished, .play, .transformation, .reffingFinished, .playAgain,. selectLevel, .newTurn, .visitStore, .itemUseCanceled, .itemCanBeUsed, .itemUsed, .decrementDynamites, .rotatePreview, .rotatePreviewFinish, .refillEmpty, .tileDetail:
+        case .animationsFinished, .play, .transformation, .reffingFinished, .playAgain,. selectLevel, .newTurn, .visitStore, .itemUseCanceled, .itemCanBeUsed, .itemUsed, .decrementDynamites, .rotatePreview, .rotatePreviewFinish, .refillEmpty, .tileDetail,
+             .collectOffer:
             return nil
         }
         

@@ -84,6 +84,22 @@ class TargetingViewModel: Targeting {
                 let endTiles = trans.first?.endTiles
             {
                 tiles = endTiles
+            } else if let inputType = trans.first?.inputType,
+                  case InputType.collectOffer(_, let offer) = inputType
+                {
+                    if case let StoreOfferType.rune(rune) = offer.type {
+                        if inventory.count >= runeSlots {
+                            inventory.removeLast()
+                            inventory.append(rune)
+                        } else {
+                            inventory.append(rune)
+                        }
+                        runeSlotsUpdated?(runeSlots, inventory)
+                    } else if case StoreOfferType.runeSlot = offer.type {
+                        runeSlots += 1
+                        runeSlotsUpdated?(runeSlots, inventory)
+                    }
+                    
             }
             else {
                 /// clear out targets after any transformation

@@ -81,7 +81,7 @@ class Board: Equatable {
                 
                 guard let playerData = playerEntityData,
                       let pp = playerPosition,
-                      let count =  transformation?.tileTransformation?.first?.count else {
+                      let count =  transformation?.removed?.count else {
                     /// no update for the player is needed
                     break
                 }
@@ -189,7 +189,10 @@ class Board: Equatable {
         
         return Transformation(transformation: transformation.tileTransformation,
                               inputType: input.type,
-                              endTiles: updatedTiles)
+                              endTiles: updatedTiles,
+                              removed: transformation.removed,
+                              newTiles: transformation.newTiles,
+                              shiftDown: transformation.shiftDown)
 
 
         
@@ -245,7 +248,7 @@ class Board: Equatable {
             tiles[randomCoordInAnotherQuadrant.row][randomCoordInAnotherQuadrant.column] = Tile(type: .offer(randomOffer))
         }
         
-        return Transformation(transformation: [transformedTiles], inputType: inputType, endTiles: tiles)
+        return Transformation(transformation: transformedTiles, inputType: inputType, endTiles: tiles)
     }
     
     private func playerDataUpdated(inputType: InputType) -> Transformation {
@@ -290,9 +293,12 @@ class Board: Equatable {
             
             // return our new board
             
-            allTransformations.append(Transformation(transformation: [newTiles, shiftDown],
+            //TODO this might break
+            allTransformations.append(Transformation(transformation: newTiles,
                                                      inputType: input.type,
-                                                     endTiles: intermediateTiles))
+                                                     endTiles: intermediateTiles,
+                                                     newTiles: newTiles,
+                                                     shiftDown: shiftDown))
         }
         
         return allTransformations
@@ -366,7 +372,7 @@ class Board: Equatable {
             tileTransform.append(TileTransformation(tile, tile))
         }
         
-        return Transformation(transformation: [tileTransform], inputType: input.type, endTiles: tiles)
+        return Transformation(transformation: tileTransform, inputType: input.type, endTiles: tiles)
         
     }
     
@@ -377,7 +383,7 @@ class Board: Equatable {
         tiles[first.row][first.column] = tiles[second.row][second.column]
         tiles[second.row][second.column] = tempTile
         let tileTransformation = [TileTransformation(first, second), TileTransformation(second, first)]
-        return Transformation(transformation: [tileTransformation], inputType: input.type, endTiles: tiles)
+        return Transformation(transformation: tileTransformation, inputType: input.type, endTiles: tiles)
         
     }
     
@@ -414,7 +420,7 @@ class Board: Equatable {
         }
         
         self.tiles = newTiles
-        return Transformation(transformation: [transformation], inputType: input.type, endTiles: newTiles)
+        return Transformation(transformation: transformation, inputType: input.type, endTiles: newTiles)
     }
     
     private func transmogrify(_ target: TileCoord, input: Input) -> Transformation {
@@ -444,7 +450,7 @@ class Board: Equatable {
         }
         
         self.tiles = newTiles
-        return Transformation(transformation: [[TileTransformation(.zero, .zero)]], inputType: input.type, endTiles: newTiles)
+        return Transformation(transformation: [TileTransformation(.zero, .zero)], inputType: input.type, endTiles: newTiles)
     }
     
     private func flameWall(tiles:  [[Tile]], targets: [TileCoord], input: Input) -> Transformation {
@@ -457,8 +463,8 @@ class Board: Equatable {
     
         self.tiles = newTiles
         
-        /// create a "dummy" transformation because apparent;y we ignore things unless there is a
-        return Transformation(transformation: [[TileTransformation(.zero, .zero)]], inputType: input.type, endTiles: newTiles)
+        /// create a "dummy" transformation because apparently we ignore things unless there is a
+        return Transformation(transformation: [TileTransformation(.zero, .zero)], inputType: input.type, endTiles: newTiles)
 
     
     }
@@ -657,11 +663,13 @@ extension Board {
         self.tiles = intermediateTiles
         
         // return our new board
-        return Transformation(transformation: [selectedTilesTransformation,
-                                               newTiles,
-                                               shiftDown],
+        return Transformation(transformation: selectedTilesTransformation,
                               inputType: input.type,
-                              endTiles: intermediateTiles)
+                              endTiles: intermediateTiles,
+                              removed: selectedTilesTransformation,
+                              newTiles: newTiles,
+                              shiftDown: shiftDown
+                              )
     }
     
     /*
@@ -738,11 +746,12 @@ extension Board {
         self.tiles = intermediateTiles
         
         // return our new board
-        return Transformation(transformation: [selectedTilesTransformation,
-                                               newTiles,
-                                               shiftDown],
+        return Transformation(transformation: selectedTilesTransformation,
                               inputType: input.type,
-                              endTiles: intermediateTiles
+                              endTiles: intermediateTiles,
+                              removed: selectedTilesTransformation,
+                              newTiles: newTiles,
+                              shiftDown: shiftDown
         )
     }
     
@@ -792,11 +801,12 @@ extension Board {
         self.tiles = intermediateTiles
         
         // return our new board
-        return Transformation(transformation: [selectedTilesTransformation,
-                                               newTiles,
-                                               shiftDown],
+        return Transformation(transformation: selectedTilesTransformation,
                               inputType: input.type,
-                              endTiles: intermediateTiles
+                              endTiles: intermediateTiles,
+                              removed: selectedTilesTransformation,
+                              newTiles: newTiles,
+                              shiftDown: shiftDown
         )
     }
     
@@ -857,7 +867,10 @@ extension Board {
         
         return Transformation(transformation: transformation.tileTransformation,
                               inputType: .collectItem(coord, item, playerData.carry.total(in: item.type.currencyType)),
-                              endTiles: updatedTiles)
+                              endTiles: updatedTiles,
+                              removed: transformation.tileTransformation,
+                              newTiles: transformation.newTiles,
+                              shiftDown: transformation.shiftDown)
     }
     
     
@@ -984,9 +997,11 @@ extension Board {
             
             // return our new board
             self.tiles = intermediateTiles
-            return Transformation(transformation: [newTiles, shiftDown],
+            return Transformation(transformation: newTiles,
                                   inputType: inputType,
-                                  endTiles: intermediateTiles)
+                                  endTiles: intermediateTiles,
+                                  newTiles: newTiles,
+                                  shiftDown: shiftDown)
         }
         return Transformation(transformation: nil, inputType: .refillEmpty, endTiles: self.tiles)
     }
@@ -1031,7 +1046,7 @@ extension Board {
             inputType = .rotateClockwise(preview: preview)
         }
         
-        allTransformations.append(Transformation(transformation: [transformation],
+        allTransformations.append(Transformation(transformation: transformation,
                                                  inputType: inputType,
                                                  endTiles: intermediateTiles))
         
@@ -1050,9 +1065,11 @@ extension Board {
             
             // return our new board
             
-            allTransformations.append(Transformation(transformation: [newTiles, shiftDown],
+            allTransformations.append(Transformation(transformation: newTiles,
                                                      inputType: inputType,
-                                                     endTiles: intermediateTiles))
+                                                     endTiles: intermediateTiles,
+                                                     newTiles: newTiles,
+                                                     shiftDown: shiftDown))
         }
         
         /// We support previewing the rotate transformation.  In that case, dont update our tiles to the rotated tiles just yet.  Wait for rotatePreviewFinish to do that.
@@ -1086,7 +1103,7 @@ extension Board {
                 return Transformation(transformation: [], inputType: .gameWin)
         }
         
-        return Transformation(transformation: [[TileTransformation(playerPosition, playerPosition.rowBelow)]],
+        return Transformation(transformation: [TileTransformation(playerPosition, playerPosition.rowBelow)],
                               inputType: .gameWin,
                               endTiles: tiles)
     }

@@ -8,16 +8,27 @@
 
 
 struct Transformation: Hashable {
-    var tileTransformation: [[TileTransformation]]?
+    var tileTransformation: [TileTransformation]?
     var inputType: InputType? = nil
     var endTiles: [[Tile]]?
     
-    init(transformation tileTransformation: [[TileTransformation]]? = nil,
+    var removed: [TileTransformation]?
+    var newTiles: [TileTransformation]?
+    var shiftDown: [TileTransformation]?
+    
+    init(transformation tileTransformation: [TileTransformation]? = nil,
          inputType: InputType? = nil,
-         endTiles: [[Tile]]? = nil) {
+         endTiles: [[Tile]]? = nil,
+         removed: [TileTransformation]? = nil,
+         newTiles: [TileTransformation]? = nil,
+         shiftDown: [TileTransformation]? = nil
+    ) {
         self.tileTransformation = tileTransformation
         self.inputType = inputType
         self.endTiles = endTiles
+        self.removed =  removed
+        self.newTiles = newTiles
+        self.shiftDown = shiftDown
     }
     
     static var zero : Transformation {

@@ -97,7 +97,7 @@ class LevelGoalTracker: LevelGoalTracking {
         if let inputType = trans.first?.inputType {
             switch inputType {
             case InputType.touch(_, let type):
-                if let count = trans.first?.tileTransformation?.first?.count {
+                if let count = trans.first?.removed?.count {
                     advanceGoal(for: type, units: count)
                 }
                 countPillars(in: trans.first?.endTiles ?? [])

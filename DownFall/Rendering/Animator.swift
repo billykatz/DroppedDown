@@ -24,7 +24,7 @@ struct Animator {
             return
         }
         
-        guard let tileTransformation = transformations.first?.tileTransformation?.first else {
+        guard let tileTransformation = transformations.first?.tileTransformation else {
             completion?()
             return
         }
@@ -237,7 +237,7 @@ struct Animator {
                  sprites: [[DFTileSpriteNode]],
                  completion: (() -> Void)? = nil) {
         guard let transformation = transformation,
-            let playerWinTransformation = transformation.tileTransformation?.first?.first else {
+            let playerWinTransformation = transformation.tileTransformation?.first else {
                 completion?()
                 return
         }
@@ -287,6 +287,7 @@ struct Animator {
         }
         animate(animations)
     }
+    
     func animate(_ spriteActions: [SpriteAction], completion: (() -> Void)? = nil) {
         if spriteActions.count == 0 { completion?() }
         var numActions = spriteActions.count
@@ -299,6 +300,14 @@ struct Animator {
                 }
             }
         }
+    }
+    
+    func animateCompletedGoals(_ goals: [GoalTracking],
+                               transformations: [Transformation],
+                               completion: (() -> Void)) {
+        guard !goals.isEmpty else { completion(); return }
+        guard !transformations.isEmpty else { completion(); return }
+    
     }
     
     func animate(_ transformation: [TileTransformation]?,

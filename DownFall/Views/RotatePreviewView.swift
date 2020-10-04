@@ -38,7 +38,7 @@ class RotatePreviewView {
     private func preview(sprites: [[DFTileSpriteNode]], rotateTransformation: Transformation) {
         self.sprites = sprites
         self.originalInput = rotateTransformation
-        self.tileTransformation = rotateTransformation.tileTransformation?.first ?? []
+        self.tileTransformation = rotateTransformation.tileTransformation ?? []
         self.rotateInputType = rotateTransformation.inputType
         for spriteRow in 0..<sprites.count {
             originalPosition.append([])

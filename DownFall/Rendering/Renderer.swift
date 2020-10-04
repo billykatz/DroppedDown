@@ -131,7 +131,7 @@ class Renderer: SKSpriteNode {
                 self?.renderTransformation(trans)
             case .boardBuilt:
                 guard let self = self,
-                    let tiles = input.endTilesStruct else { return }
+                      let tiles = input.endTilesStruct else { return }
                 self.sprites = self.createSprites(from: tiles)
                 self.add(sprites: self.sprites, tiles: tiles)
                 
@@ -149,7 +149,7 @@ class Renderer: SKSpriteNode {
                 rotatePreview(for: transformations)
             case .touch:
                 //TODO: sometimes remove and replace has a monster for the touch(_, type).  not sure why
-                if let _ = trans.tileTransformation {
+                if trans.newTiles != nil {
                     computeNewBoard(for: trans)
                 } else {
                     animationsFinished(endTiles: trans.endTiles,
@@ -158,7 +158,7 @@ class Renderer: SKSpriteNode {
             case .attack:
                 animateAttack(attackInput: inputType, endTiles: trans.endTiles)
             case .gameWin:
-                animate(trans.tileTransformation?.first) { [weak self] in
+                animate(trans.tileTransformation) { [weak self] in
                     self?.gameWin(transformation: trans)
                 }
             case .monsterDies:
@@ -228,7 +228,7 @@ class Renderer: SKSpriteNode {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func animateGoalCompletion(goals: [GoalTracking], input: InputType, transformations: [Transformation]) {
+    private func animateCompletedGoals(_ goals: [GoalTracking], input: InputType, transformations: [Transformation]) {
         
     }
     
@@ -250,8 +250,8 @@ class Renderer: SKSpriteNode {
                          tiles: tiles,
                          sprites: sprites,
                          positions: positionsInForeground) { [weak self] in
-                            guard let strongSelf = self else { return }
-                            strongSelf.animationsFinished(endTiles: tiles)
+            guard let strongSelf = self else { return }
+            strongSelf.animationsFinished(endTiles: tiles)
         }
         
     }
@@ -262,7 +262,7 @@ class Renderer: SKSpriteNode {
         for (row, innerSprites) in sprites.enumerated() {
             for (col, sprite) in innerSprites.enumerated() {
                 if let turns = tiles[row][col].type.turnsUntilAttack(),
-                    let frequency = tiles[row][col].type.attackFrequency() {
+                   let frequency = tiles[row][col].type.attackFrequency() {
                     sprite.showAttackTiming(frequency, turns)
                 }
                 spriteForeground.addChild(sprite)
@@ -324,16 +324,16 @@ class Renderer: SKSpriteNode {
     }
     
     private func refillEmptyTiles(with transformation: Transformation, completion: (() -> ())? = nil) {
-        guard let shiftDown = transformation.tileTransformation?[1],
-            let finalTiles = transformation.endTiles else {
-                preconditionFailure("All these conditions must be met to refill empty tiles")
+        guard let shiftDown = transformation.shiftDown,
+              let finalTiles = transformation.endTiles else {
+            preconditionFailure("All these conditions must be met to refill empty tiles")
         }
         
         /// It is possible to create shift down without new tiles. Consider the scenario where there is one column with two pillars with at least one tile separating them. A player could destory the lower pillar and expect the tiles above it to fall down.
         /// [pillar]                  [pillar]
         /// [rock]        ->          [empty]
         /// [pillar]  (destroyed)     [rock]
-        let newTiles = transformation.tileTransformation?.first ?? []
+        let newTiles = transformation.newTiles ?? []
         
         // START THE SHIFT DOWN ANIMATION
         
@@ -431,17 +431,16 @@ extension Renderer {
         }
         
         guard let transformation = transformation,
-            let transformations = transformation.tileTransformation,
-            let inputType = transformation.inputType else {
-                completion?() ?? animationsFinished(endTiles: endTiles)
-                return
+              let inputType = transformation.inputType else {
+            completion?() ?? animationsFinished(endTiles: endTiles)
+            return
         }
         
         let spriteNodes = createSprites(from: endTiles)
         // TODO: don't hardcode this
-        let removed = transformations[0]
-        let newTiles = transformations[1]
-        let shiftDown = transformations[2]
+        guard let removed = transformation.removed,
+              let newTiles = transformation.newTiles,
+              let shiftDown = transformation.shiftDown else { preconditionFailure("We need these specific translations to do this.") }
         
         // remove "removed" tiles from sprite storage
         var removedAnimations: [SpriteAction] = []
@@ -475,7 +474,7 @@ extension Renderer {
                     /// add the gem sprite to the foreground
                     spriteForeground.addChild(sprite)
                 }
-            
+                
             }
         }
         
@@ -601,8 +600,8 @@ extension Renderer {
                         
                         // Check to see if where out touch ends is where it began
                         guard let lastTouchInput = InputQueue.lastTouchInput(),
-                            case let InputType.touchBegan(lastTileCoord, _) = lastTouchInput.type,
-                            newTileCoord == lastTileCoord else { return }
+                              case let InputType.touchBegan(lastTileCoord, _) = lastTouchInput.type,
+                              newTileCoord == lastTileCoord else { return }
                         
                         InputQueue.append(
                             Input(.touch(TileCoord(row, col),

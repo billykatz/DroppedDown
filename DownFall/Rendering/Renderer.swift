@@ -228,6 +228,10 @@ class Renderer: SKSpriteNode {
         fatalError("init(coder:) has not been implemented")
     }
     
+    private func animateGoalCompletion(goals: [GoalTracking], input: InputType, transformations: [Transformation]) {
+        
+    }
+    
     private func animateRuneUsed(input: InputType, transformations: [Transformation], rune: Rune, targets: [TileCoord]) {
         animator.animateRune(rune, transformations: transformations, affectedTiles: targets, sprites: sprites, spriteForeground: spriteForeground) { [weak self] in
             self?.animationsFinished(endTiles: transformations.first?.endTiles)
@@ -252,6 +256,7 @@ class Renderer: SKSpriteNode {
         
     }
     
+    /// Removes all the sprites in the mine and then readds them based on the input array of Tiles
     private func add(sprites: [[DFTileSpriteNode]], tiles: [[Tile]]) {
         spriteForeground.removeAllChildren()
         for (row, innerSprites) in sprites.enumerated() {
@@ -439,11 +444,11 @@ extension Renderer {
         let shiftDown = transformations[2]
         
         // remove "removed" tiles from sprite storage
-        var removedAnimations: [(SKSpriteNode, SKAction)] = []
+        var removedAnimations: [SpriteAction] = []
         for tileTrans in removed {
             if InputType.fuzzyEqual(.decrementDynamites(Set<TileCoord>()), inputType) {
                 let sequence = SKAction.sequence([animator.explodeAnimation(), animator.smokeAnimation()])
-                removedAnimations.append((sprites[tileTrans.end.x][tileTrans.end.y], sequence))
+                removedAnimations.append(SpriteAction(sprite: sprites[tileTrans.end.x][tileTrans.end.y], action: sequence))
             } else if let crumble = sprites[tileTrans.end.x][tileTrans.end.y].crumble() {
                 // set the position way in the background so that new nodes come in over
                 sprites[tileTrans.end.x][tileTrans.end.y].zPosition = Precedence.underground.rawValue
@@ -494,7 +499,7 @@ extension Renderer {
         
         /// map the shift down tile transformation array to [SKSpriteNode, SKAction)] to work Animator world
         
-        var shiftDownActions: [(SKSpriteNode, SKAction)] = []
+        var shiftDownActions: [SpriteAction] = []
         for trans in shiftDown {
             
             let (startRow, startCol) = trans.initial.tuple
@@ -511,7 +516,7 @@ extension Renderer {
                                         y: tileSize * CGFloat(trans.end.row) + bottomLeft.y)
             let animation = SKAction.move(to: endPoint, duration: AnimationSettings.fallSpeed)
             let wait = SKAction.wait(forDuration: 0.33)
-            shiftDownActions.append((sprite, SKAction.sequence([wait, animation])))
+            shiftDownActions.append(SpriteAction(sprite: sprite, action: SKAction.sequence([wait, animation])))
         }
         
         if case let InputType.collectItem(coord, item, amount) = inputType {
@@ -531,8 +536,6 @@ extension Renderer {
                 let endPosition = CGPoint.alignHorizontally(addedSprites.first?.frame, relativeTo: self.hud.frame, horizontalAnchor: .left, verticalAlign: .top, translatedToBounds: true)
                 animator.animateGold(goldSprites: addedSprites, gained: amount, from: startPoint, to: endPosition)
             }
-            
-            
         }
         
         

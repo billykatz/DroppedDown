@@ -155,7 +155,7 @@ class HUD: SKSpriteNode {
             let oldPosition = currencyLabel.position
             currencyLabel.removeFromParent()
             
-            var animations: [(SKSpriteNode, SKAction)] = []
+            var animations: [SpriteAction] = []
             let goldGained = total-localCurrenTotal
             for gain in 1..<goldGained+1 {
                 let newCurrencyLabel = ParagraphNode(text: "\(localCurrenTotal + gain)", paragraphWidth: Style.HUD.labelParagraphWidth, fontSize: .fontExtraLargeSize, fontColor: .lightText)
@@ -178,7 +178,7 @@ class HUD: SKSpriteNode {
                     actions.append(SKAction.removeFromParent())
                 }
                 
-                animations.append((newCurrencyLabel, SKAction.sequence(actions)))
+                animations.append(SpriteAction(sprite: newCurrencyLabel, action: SKAction.sequence(actions)))
             }
             
             // show exaclty how much gold was gained as well

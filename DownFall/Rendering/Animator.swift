@@ -274,7 +274,7 @@ struct Animator {
     
     func animateGold(goldSprites: [SKSpriteNode], gained: Int, from startPosition: CGPoint, to endPosition: CGPoint) { 
         var index = 0
-        let animations: [(SKSpriteNode, SKAction)] = goldSprites.map { sprite in
+        let animations: [SpriteAction] = goldSprites.map { sprite in
             let wait = SKAction.wait(forDuration: Double(index) * AnimationSettings.Board.goldWaitTime)
             let moveAction = SKAction.move(to: endPosition, duration: AnimationSettings.Board.goldGainSpeedEnd)
             let scaleAction = SKAction.scale(to: Style.Board.goldGainSizeEnd, duration: AnimationSettings.Board.goldGainSpeedEnd)
@@ -283,29 +283,23 @@ struct Animator {
             
             index += 1
             
-            return (sprite, SKAction.sequence([wait, moveAndScale, SKAction.removeFromParent()]))
+            return SpriteAction(sprite: sprite, action: SKAction.sequence([wait, moveAndScale, SKAction.removeFromParent()]))
         }
         animate(animations)
     }
     func animate(_ spriteActions: [SpriteAction], completion: (() -> Void)? = nil) {
-        let spriteActionTuple = spriteActions.map { ($0.sprite, $0.action) }
-        self.animate(spriteActionTuple, completion: completion)
-    }
-    
-    func animate(_ spriteActions: [(SKSpriteNode, SKAction)], completion: (() -> Void)? = nil) {
         if spriteActions.count == 0 { completion?() }
         var numActions = spriteActions.count
         // tell each child to run it's action
-        for (child, action) in spriteActions {
-            child.run(action) {
+        for spriteAction in spriteActions {
+            spriteAction.sprite.run(spriteAction.action) {
                 numActions -= 1
                 if numActions == 0 {
-                    completion?()                    
+                    completion?()
                 }
             }
         }
     }
-    
     
     func animate(_ transformation: [TileTransformation]?,
                  boardSize: CGFloat,

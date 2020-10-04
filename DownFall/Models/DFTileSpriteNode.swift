@@ -186,7 +186,7 @@ class DFTileSpriteNode: SKSpriteNode {
         return (self, addGemAction)
     }
     
-    func crumble() -> (SKSpriteNode, SKAction)? {
+    func crumble() -> (SpriteAction)? {
         var animationFrames: [SKTexture] = []
         switch self.type {
         case .rock(.brown, _):
@@ -205,7 +205,7 @@ class DFTileSpriteNode: SKSpriteNode {
         let removeFromParent = SKAction.removeFromParent()
         let sequence = SKAction.sequence([animateCrumble, removeFromParent])
         
-        return (self, sequence)
+        return SpriteAction(sprite: self, action: sequence)
     }
     
     func sparkle() -> SKAction? {

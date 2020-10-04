@@ -51,6 +51,7 @@ struct Rune: Hashable, Codable {
     var cooldown: Int
     var rechargeType: [TileType]
     var rechargeMinimum: Int
+    var rechargeCurrent: Int
     var progressColor: Color
     var maxDistanceBetweenTargets: Int
     var recordedProgress: CGFloat? = 0
@@ -75,7 +76,57 @@ struct Rune: Hashable, Codable {
         return ""
     }
     
-    static let zero = Rune(type: .getSwifty, textureName: "", cost: 0, currency: .gem, description: "", flavorText: "", targets: 0, targetTypes: [], affectSlopes: [], affectRange: 0, heal: 0, cooldown: 0, rechargeType: [], rechargeMinimum: 0, progressColor: .red, maxDistanceBetweenTargets: 0, animationTextureName: "", animationColumns: 0)
+    func update(type: RuneType? = nil,
+                textureName: String? = nil,
+                cost: Int? = nil,
+                currency: Currency? = nil,
+                description: String? = nil,
+                flavorText: String? = nil,
+                targets: Int? = nil,
+                targetTypes: [TileType]? = nil,
+                affectSlopes: [AttackSlope]? = nil,
+                affectRange: Int? = nil,
+                cooldown: Int? = nil,
+                rechargeType: [TileType]? = nil,
+                rechargeMinimum: Int? = nil,
+                rechargeCurrent: Int? = nil,
+                progressColor: Color? = nil,
+                maxDistanceBetweenTargets: Int? = nil,
+                animationTextureName: String? = nil,
+                animationColumns: Int? = nil) -> Rune {
+        return Rune(type: type ?? self.type,
+                    textureName: textureName ?? self.textureName,
+                    cost: cost ?? self.cost,
+                    currency: currency ?? self.currency,
+                    description: description ?? self.description,
+                    flavorText: flavorText ?? self.flavorText,
+                    targets: targets ?? self.targets,
+                    targetTypes: targetTypes ?? self.targetTypes,
+                    affectSlopes: affectSlopes ?? self.affectSlopes,
+                    affectRange: affectRange ?? self.affectRange,
+                    heal: heal ?? self.heal,
+                    cooldown: cooldown ?? self.cooldown,
+                    rechargeType: rechargeType ?? self.rechargeType,
+                    rechargeMinimum: rechargeMinimum ?? self.rechargeMinimum,
+                    rechargeCurrent: rechargeCurrent ?? self.rechargeCurrent,
+                    progressColor: progressColor ?? self.progressColor,
+                    maxDistanceBetweenTargets: maxDistanceBetweenTargets ?? self.maxDistanceBetweenTargets,
+                    recordedProgress: recordedProgress ?? self.recordedProgress,
+                    animationTextureName: animationTextureName ?? self.animationTextureName,
+                    animationColumns: animationColumns ?? self.animationColumns)
+        
+    }
+    
+    func resetProgress() -> Rune {
+        return update(rechargeCurrent: 0)
+    }
+
+    
+    func progress(_ units: Int) -> Rune {
+        return update(rechargeCurrent: min(rechargeCurrent+units, cooldown))
+    }
+    
+    static let zero = Rune(type: .getSwifty, textureName: "", cost: 0, currency: .gem, description: "", flavorText: "", targets: 0, targetTypes: [], affectSlopes: [], affectRange: 0, heal: 0, cooldown: 0, rechargeType: [], rechargeMinimum: 0, rechargeCurrent: 0, progressColor: .red, maxDistanceBetweenTargets: 0, animationTextureName: "", animationColumns: 0)
     
     static func rune(for type: RuneType) -> Rune {
         switch type {
@@ -97,6 +148,7 @@ struct Rune: Hashable, Codable {
                         cooldown: 25,
                         rechargeType: [TileType.rock(color: .blue, holdsGem: false)],
                         rechargeMinimum: 1,
+                        rechargeCurrent: 0,
                         progressColor: .blue,
                         maxDistanceBetweenTargets: 1,
                         animationTextureName: "getSwiftySpriteSheet",
@@ -117,6 +169,7 @@ struct Rune: Hashable, Codable {
                         cooldown: 25,
                         rechargeType: [TileType.rock(color: .purple, holdsGem: false)],
                         rechargeMinimum: 1,
+                        rechargeCurrent: 0,
                         progressColor: .purple,
                         maxDistanceBetweenTargets: Int.max,
                         animationTextureName: "transformRockSpriteSheet",
@@ -137,6 +190,7 @@ struct Rune: Hashable, Codable {
                         cooldown: 25,
                         rechargeType: [TileType.rock(color: .red, holdsGem: false)],
                         rechargeMinimum: 1,
+                        rechargeCurrent: 0,
                         progressColor: .red,
                         maxDistanceBetweenTargets: Int.max,
                         animationTextureName: "rainEmbersSpriteSheet",
@@ -158,6 +212,7 @@ struct Rune: Hashable, Codable {
                 cooldown: 10,
                 rechargeType: [TileType.rock(color: .red, holdsGem: false)],
                 rechargeMinimum: 1,
+                rechargeCurrent: 0,
                 progressColor: .red,
                 maxDistanceBetweenTargets: Int.max,
                 animationTextureName: "flameWallSpriteSheet",
@@ -180,6 +235,7 @@ struct Rune: Hashable, Codable {
                 cooldown: 10,
                 rechargeType: [TileType.rock(color: .blue, holdsGem: false)],
                 rechargeMinimum: 1,
+                rechargeCurrent: 0,
                 progressColor: .blue,
                 maxDistanceBetweenTargets: Int.max,
                 animationTextureName: "rainEmbersSpriteSheet",
@@ -205,6 +261,7 @@ struct Rune: Hashable, Codable {
                 cooldown: 10,
                 rechargeType: [TileType.rock(color: .purple, holdsGem: false)],
                 rechargeMinimum: 1,
+                rechargeCurrent: 0,
                 progressColor: .purple,
                 maxDistanceBetweenTargets: Int.max,
                 animationTextureName: "vortexSpriteSheet",

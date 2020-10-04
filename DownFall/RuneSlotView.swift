@@ -26,8 +26,6 @@ class RuneSlotView: SKSpriteNode {
         
         isUserInteractionEnabled = true
         
-        viewModel.charged = displayProgress
-        
         setupView()
     }
     
@@ -61,9 +59,10 @@ class RuneSlotView: SKSpriteNode {
     }
     
     private var progress: SKShapeNode? {
-        guard viewModel.progressRatio > 0 else { return nil }
+        guard let cooldown = viewModel.rune?.cooldown, cooldown > 0 else { return nil }
+        let progressRatio = CGFloat(viewModel.current) / CGFloat(cooldown)
         let size = outline.frame.size.scale(by: Constants.backgroundScale)
-        let height = size.height * viewModel.progressRatio
+        let height = size.height * progressRatio
         let width = size.width
         let progress = SKShapeNode(rectOf: CGSize(width: width, height: height))
         
@@ -91,6 +90,9 @@ class RuneSlotView: SKSpriteNode {
         addChildSafely(background)
         addChildSafely(runeSprite)
         addChildSafely(progress)
+        
+        /// show progress
+        displayProgress(progress: viewModel.current, cooldown: viewModel.rune?.cooldown ?? 0)
         
     }
     

@@ -16,11 +16,11 @@ struct WinState: GameState {
         switch input.type {
         case .playAgain, .selectLevel:
             return AnyGameState(PlayState())
-        case .visitStore, .runeProgressRecord:
+        case .visitStore:
             return AnyGameState(WinState())
         case .transformation(let trans):
             switch trans.first?.inputType! {
-            case .gameWin, .runeProgressRecord:
+            case .gameWin:
                 return AnyGameState(WinState())
             default:
                 return nil

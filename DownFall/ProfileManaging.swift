@@ -218,6 +218,7 @@ class ProfileViewModel: ProfileManaging {
                 self?.authenicatedSubject.send(self?.localPlayer.isAuthenticated ?? false)
             }
         }
+//        self.authenicatedSubject.send(true)
     }
     
     /// Saves a profile locally and remotely if the file has progressed further than current loaded profile

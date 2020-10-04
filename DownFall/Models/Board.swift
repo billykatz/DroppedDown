@@ -15,6 +15,12 @@ class Board: Equatable {
     private var level: Level
     var tileCreator: TileStrategy
     
+    private var playerEntityData: EntityModel? {
+        guard let playerPosition = playerPosition,
+              case let TileType.player(data) = tiles[playerPosition].type else { return nil }
+        return data
+    }
+    
     private var playerPosition : TileCoord? {
         return getTileStructPosition(.player(.zero))
     }
@@ -70,7 +76,19 @@ class Board: Equatable {
                 InputQueue.append(Input(.tileDetail(type, [])))
                 return
             default:
+                /// create the transformation for tapping on something.
                 transformation = removeAndReplace(from: tiles, tileCoord: tileCoord, input: input)
+                
+                guard let playerData = playerEntityData,
+                      let pp = playerPosition,
+                      let count =  transformation?.tileTransformation?.first?.count else {
+                    /// no update for the player is needed
+                    break
+                }
+                
+                /// by doing this we have recorded the progress of the runes.
+                let updatedPlayer = playerData.progressRunes(tileType: type, count: count)
+                tiles[pp.row][pp.column] = Tile(type: .player(updatedPlayer))
                 
             }
         case .attack:
@@ -108,7 +126,8 @@ class Board: Equatable {
                 Input(
                     InputType.transformation(
                         [trans]
-                    )
+                    ),
+                    tiles
                 )
             )
         case .decrementDynamites(let dynamiteCoords):
@@ -123,13 +142,6 @@ class Board: Equatable {
             InputQueue.append(Input(.transformation([shuffleBoard(inputType: .shuffleBoard)])))
         case .unlockExit:
             InputQueue.append(Input(.transformation([unlockExit(inputType: input.type)])))
-        case .runeProgressRecord(let runeProgress):
-            
-            /// This is the last input on any given level.  We make sure to record the progress on player's pickaxe and then we move on to the next level
-            guard let pp = playerPosition,
-                case let .player(data) = tiles[pp].type else { return }
-            tiles[pp.row][pp.column] = Tile(type: .player(data.recordRuneProgress(runeProgress)))
-            transformation = playerDataUpdated(inputType: input.type)
         case .goalCompleted(let completedGoals):
             transformation = self.completedGoals(completedGoals, inputType: input.type)
         case let .collectOffer(offerCoord, storeOffer):
@@ -380,7 +392,7 @@ class Board: Equatable {
         })
         
         guard tileCoords.count > 1, let first = tileCoords.first, let last = tileCoords.last else {
-            return .zero
+            return Transformation(transformation: nil, inputType: input.type, endTiles: tiles)
         }
         
         var newTiles = self.tiles
@@ -416,7 +428,7 @@ class Board: Equatable {
     }
     
     private func vortex(tiles:  [[Tile]], targets: [TileCoord], input: Input) -> Transformation {
-        guard let playerData = playerData(in: tiles) else { return .zero }
+        guard let playerData = playerData(in: tiles) else { return Transformation(transformation: nil, inputType: input.type, endTiles: tiles) }
         var newTiles = tiles
         for coord in targets {
             switch tiles[coord].type {
@@ -469,15 +481,24 @@ extension Board {
 extension Board {
     
     private func useRune(_ rune: Rune, on targets: [TileCoord], input: Input) -> Transformation {
+        guard let playerData = playerEntityData,
+              let pp = playerPosition else {
+            /// no update for the player is needed
+            preconditionFailure("Failed")
+        }
+        
+        /// by doing this we have recorded the progress of the runes.
+        let updatedPlayer = playerData.useRune(rune)
+        tiles[pp.row][pp.column] = Tile(type: .player(updatedPlayer))
+
+        
         switch rune.type {
         case .rainEmbers:
-            //TODO: we have to rethink how we keep track of rune's progress.  Right now it is not part of the entity's model which mean we will lose the progress between levels-- I think that would feel bad
-            //            use(ability)
             return removeAndReplaces(from: tiles, specificCoord: targets, input: input)
             
         case .getSwifty:
             guard let firstTarget = targets.first, targets.count == 2 else {
-                return .zero
+                return Transformation(transformation: nil, inputType: input.type, endTiles: tiles)
             }
             return swap(firstTarget, with: targets.last!, input: input)
             
@@ -853,7 +874,6 @@ extension Board {
         var newTiles = tiles
         newTiles[pp.row][pp.column] = Tile(type: .player(data.update(attack: data.attack.resetAttack())))
         return removeAndReplace(from: newTiles, tileCoord: coord, singleTile: true, input: input)
-        //        }
         
     }
     

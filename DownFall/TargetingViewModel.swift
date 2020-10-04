@@ -80,30 +80,32 @@ class TargetingViewModel: Targeting {
         switch input.type {
         case .transformation(let trans):
             if let inputType = trans.first?.inputType,
-                case InputType.itemUseSelected(_) = inputType,
-                let endTiles = trans.first?.endTiles
-            {
-                tiles = endTiles
-            } else if let inputType = trans.first?.inputType,
-                  case InputType.collectOffer(_, let offer) = inputType
-                {
-                    if case let StoreOfferType.rune(rune) = offer.type {
-                        if inventory.count >= runeSlots {
-                            inventory.removeLast()
-                            inventory.append(rune)
-                        } else {
-                            inventory.append(rune)
-                        }
-                        runeSlotsUpdated?(runeSlots, inventory)
-                    } else if case StoreOfferType.runeSlot = offer.type {
-                        runeSlots += 1
-                        runeSlotsUpdated?(runeSlots, inventory)
-                    }
-                    
+                case InputType.itemUsed = inputType,
+                let endTiles = trans.first?.endTiles {
+                if let playerData = playerData(in: endTiles),
+                   let runes = playerData.runes {
+                    let runeSlots = playerData.runeSlots ?? 0
+                    self.runeSlots = runeSlots
+                    inventory = playerData.runes ?? []
+                    runeSlotsUpdated?(runeSlots, runes)
+                }
+
             }
             else {
                 /// clear out targets after any transformation
                 currentTargets = AllTarget(targets: [], areLegal: false)
+            }
+            
+        case .newTurn:
+            guard let tiles = input.endTilesStruct else { return }
+            self.tiles = tiles
+            
+            if let playerData = playerData(in: tiles),
+               let runes = playerData.runes {
+                let runeSlots = playerData.runeSlots ?? 0
+                self.runeSlots = runeSlots
+                inventory = playerData.runes ?? []
+                runeSlotsUpdated?(runeSlots, runes)
             }
             
         case .boardBuilt:
@@ -112,7 +114,7 @@ class TargetingViewModel: Targeting {
             boardSize = tiles.count
             
             if let playerData = playerData(in: tiles),
-                let runes = playerData.runes {
+               let runes = playerData.runes {
                 let runeSlots = playerData.runeSlots ?? 0
                 self.runeSlots = runeSlots
                 inventory = playerData.runes ?? []
@@ -123,9 +125,9 @@ class TargetingViewModel: Targeting {
         default:
             ()
         }
-
+        
     }
-
+    
     var rune: Rune? {
         didSet {
             currentTargets = AllTarget(targets: [], areLegal: false)
@@ -192,7 +194,6 @@ class TargetingViewModel: Targeting {
         didSet {
             updateCallback?()
             targetsUpdated?()
-            InputQueue.append(Input(InputType.itemCanBeUsed(legallyTargeted)))
         }
     }
     
@@ -201,7 +202,7 @@ class TargetingViewModel: Targeting {
         return self.currentTargets.targets.allSatisfy({
             return $0.isLegal
         }) && self.currentTargets.targets.count == self.numberOfTargets
-            && self.currentTargets.areLegal
+        && self.currentTargets.areLegal
     }
     
     
@@ -249,7 +250,7 @@ class TargetingViewModel: Targeting {
         return !results.contains(false)
         
     }
-
+    
     private func isTargetLegal(_ coord: TileCoord) -> Bool {
         guard let tiles = tiles else { return false }
         if typesOfTargets.isEmpty || typesOfTargets.contains(tiles[coord].type) {
@@ -283,7 +284,7 @@ class TargetingViewModel: Targeting {
             tileRow < boardSize && // upper bound
             tileCol < boardSize
     }
-
+    
     
     /**
      Toggles targeted-ness of a tile.  If a tile is not targeted it becomes targeted.  The opposite is true.
@@ -309,7 +310,19 @@ class TargetingViewModel: Targeting {
                     //update the list of targets
                     currentTargets = AllTarget(targets: newTargets, areLegal: areTargetsLegal(newTargets.map { $0.coord }))
                 }
-            } else if currentTargets.targets.count < self.numberOfTargets {
+            } else {
+                /// remove the illegally placed target if need
+                if currentTargets.targets.count >= self.numberOfTargets {
+                    // remove the first if they are illegally placed
+                    currentTargets.targets.removeFirst(where: { !$0.isLegal })
+                }
+                
+                // remove the target placed first if needed
+                if currentTargets.targets.count >= self.numberOfTargets {
+                    // remove the first if they are illegally placed
+                    currentTargets.targets.removeFirst()
+                }
+                
                 /// grab the existing targets
                 var targets = currentTargets.targets
                 
@@ -328,24 +341,6 @@ class TargetingViewModel: Targeting {
                 currentTargets = AllTarget(targets: targets, areLegal: areLegal)
                 
             }
-//            else {
-//                // move the most recently placed unless there is one that is "illegal" then move that one.
-//                let count = currentTargets.targets.count
-//                // remove the first if they are illegally placed
-//                currentTargets.targets.removeFirst(where: { !$0.isLegal })
-//
-//                // if nothing has been removed then remove the first one placed
-//                if !currentTargets.targets.isEmpty,
-//                    currentTargets.targets.count == count {
-//                    currentTargets.targets.removeFirst()
-//                }
-//                //add the new target
-//                currentTargets.targets.append(Target(coord: coord, associatedCoord: [], isLegal: isTargetLegal(coord)))
-//                let areLegal = areTargetsLegal(currentTargets.targets.map { $0.coord })
-//                currentTargets = AllTarget(targets: currentTargets.targets, areLegal: areLegal)
-//            }
-
-            
         } else {
             if currentTargets.targets.contains(where: { return $0.coord == coord } ) {
                 // remove the targeting
@@ -367,7 +362,7 @@ class TargetingViewModel: Targeting {
                 
                 // if nothing has been removed then remove the first one placed
                 if !currentTargets.targets.isEmpty,
-                    currentTargets.targets.count == count {
+                   currentTargets.targets.count == count {
                     currentTargets.targets.removeFirst()
                 }
                 //add the new target
@@ -410,21 +405,6 @@ class TargetingViewModel: Targeting {
             let targets = targetCoords.map { Target(coord: $0, associatedCoord: [], isLegal: true) }
             let areLegal = areTargetsLegal(targets.map { $0.coord })
             currentTargets = AllTarget(targets: targets, areLegal: areLegal)
-        }
-    }
-}
-
-extension Array {
-    mutating func removeFirst(where predicate: (Element) -> Bool) {
-        var indexToRemove: Int?
-        for (index, el) in self.enumerated() {
-            if predicate(el) {
-                indexToRemove = index
-                break
-            }
-        }
-        if indexToRemove != nil {
-            self.remove(at: indexToRemove!)
         }
     }
 }

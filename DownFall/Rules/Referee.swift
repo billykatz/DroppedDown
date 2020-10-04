@@ -446,7 +446,7 @@ class Referee {
         
         
         let newTurn = TurnWatcher.shared.getNewTurnAndReset()
-        return Input(.reffingFinished(newTurn: newTurn), tiles, nil)
+        return Input(.reffingFinished(newTurn: newTurn), tiles)
     }
 
 

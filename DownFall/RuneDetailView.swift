@@ -87,9 +87,7 @@ class RuneDetailView: SKSpriteNode, ButtonDelegate {
             size = .oneFifty
         }
         
-        let viewModel = RuneSlotViewModel(rune: self.viewModel.rune,
-                                          registerForUpdates: false,
-                                          progress: Int(self.viewModel.progress))
+        let viewModel = RuneSlotViewModel(rune: self.viewModel.rune)
         let runeSlotView = RuneSlotView(viewModel: viewModel,
                                         size: size)
         runeSlotView.position = CGPoint.position(runeSlotView.frame, inside: frame, verticalAlign: .center, horizontalAnchor: .left)

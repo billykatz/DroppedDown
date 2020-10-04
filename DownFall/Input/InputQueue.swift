@@ -11,15 +11,18 @@ import SpriteKit
 
 struct Input: Hashable, CustomDebugStringConvertible {
     let type: InputType
-    let endTilesStruct: [[Tile]]?
-    let transformation: Transformation?
+    let _endTileStruct: [[Tile]]?
+    var endTilesStruct: [[Tile]]? {
+        if case InputType.transformation(let tranformations) = self.type {
+            return _endTileStruct ?? tranformations.first?.endTiles
+        }
+        return _endTileStruct
+    }
 
     init(_ type: InputType,
-         _ endTilesStruct: [[Tile]]? = [],
-         _ transformation: Transformation? = .zero) {
+         _ endTilesStruct: [[Tile]]? = []) {
         self.type = type
-        self.transformation = transformation
-        self.endTilesStruct = endTilesStruct
+        self._endTileStruct = endTilesStruct
     }
     
     var debugDescription: String {

@@ -56,10 +56,6 @@ class HUD: SKSpriteNode {
     var delegate: SettingsDelegate?
     var level: Level?
     
-    private var threatIndicator: SKSpriteNode? {
-        return nil
-    }
-    
     //Mark: - Instance Methods
     
     private func showAttack(attackInput: Input, endTiles: [[Tile]]?) {
@@ -88,7 +84,7 @@ class HUD: SKSpriteNode {
                 showAttack(attackInput: input, endTiles: trans.first!.endTiles)
             case .collectItem(_, let item, let total):
                 incrementCurrencyCounter(item, total: total)
-            case .itemUsed, .decrementDynamites, .shuffleBoard:
+            case .itemUsed, .decrementDynamites, .shuffleBoard, .collectOffer:
                 if let tiles = trans.first?.endTiles,
                     let playerCoord = getTilePosition(.player(.zero), tiles: tiles),
                     case TileType.player(let data) = tiles[playerCoord].type {
@@ -102,22 +98,9 @@ class HUD: SKSpriteNode {
                 let playerPosition = getTilePosition(.player(.zero), tiles: tiles),
                 case let TileType.player(data) = tiles[playerPosition].type else { return }
             show(data)
-            updateThreatIndicator()
-        case .newTurn:
-            updateThreatIndicator()
         default:
             ()
         }
-    }
-    
-    func updateThreatIndicator() {
-        for child in children {
-            if child.name == Constants.threatIndicator {
-                child.removeFromParent()
-            }
-        }
-        
-        addChildSafely(threatIndicator)
     }
     
     func show(_ data: EntityModel) {

@@ -317,6 +317,31 @@ struct EntityModel: Equatable, Codable {
         return effects.filter( { $0 == effect }).count
     }
     
+    /// Record the runes progress if there is one
+    func progressRunes(tileType: TileType, count: Int) -> EntityModel {
+        var newRunes: [Rune] = []
+        for rune in self.runes ?? [] {
+            var newRune = rune
+            if rune.rechargeType.contains(tileType) {
+                newRune = rune.progress(count)
+            }
+            newRunes.append(newRune)
+        }
+        return self.update(pickaxe: Pickaxe(runeSlots: pickaxe?.runeSlots ?? 0, runes: newRunes))
+    }
+    
+    func useRune(_ rune: Rune) -> EntityModel {
+        var newRunes: [Rune] = []
+        for currRune in self.runes ?? [] {
+            var newRune = rune
+            if rune == currRune {
+                newRune = rune.resetProgress()
+            }
+            newRunes.append(newRune)
+        }
+        return self.update(pickaxe: Pickaxe(runeSlots: pickaxe?.runeSlots ?? 0, runes: newRunes))
+    }
+    
 }
 
 extension EntityModel: ResetsAttacks {

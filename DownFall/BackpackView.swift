@@ -126,7 +126,8 @@ class BackpackView: SKSpriteNode {
                                                runeUseWasCanceled: runeUseWasCanceled)
         let runeContainer = RuneContainerView(viewModel: viewModel,
                                               mode: .inventory,
-                                              size: CGSize(width: playableRect.width, height: Style.Backpack.runeInventorySize))
+                                              size: CGSize(width: playableRect.width,
+                                                           height: Style.Backpack.runeInventorySize))
         
         runeContainer.name = "runeContainer"
         

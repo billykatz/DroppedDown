@@ -55,21 +55,6 @@ class RuneContainerView: SKSpriteNode {
         isUserInteractionEnabled = true
         
         setupView()
-        
-        Dispatch.shared.register { [weak self] (input) in
-            if input.type == .visitStore {
-                guard let self = self else { return }
-                
-                var runeDict: [Rune: CGFloat] = [:]
-                for vm in self.runeSlotViewModels {
-                    if let rune = vm.rune {
-                        runeDict[rune] = vm.progressRatio
-                    }
-                }
-                InputQueue.append(.init(.runeProgressRecord(runeDict)))
-                
-            }
-        }
 
     }
     

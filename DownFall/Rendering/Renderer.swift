@@ -163,7 +163,7 @@ class Renderer: SKSpriteNode {
                 }
             case .monsterDies:
                 computeNewBoard(for: trans)
-            case .newTurn, .unlockExit, .runeProgressRecord:
+            case .newTurn, .unlockExit:
                 animationsFinished(endTiles: trans.endTiles)
             case .itemUsed(let ability, let targets):
                 animateRuneUsed(input: inputType, transformations: transformations, rune: ability, targets: targets)

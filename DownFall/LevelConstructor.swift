@@ -34,15 +34,15 @@ struct LevelConstructor {
     static func potentialItems(depth: Depth) -> [StoreOffer] {
         let offers =
             [
-                StoreOffer.offer(type: .luck, tier: 1),
-                StoreOffer.offer(type: .dodge, tier: 1),
-                StoreOffer.offer(type: .plusTwoMaxHealth, tier: 1),
-                StoreOffer.offer(type: .rune(Rune.rune(for: .bubbleUp)), tier: 2),
-                StoreOffer.offer(type: .rune(Rune.rune(for: .flameWall)), tier: 2),
-                StoreOffer.offer(type: .rune(Rune.rune(for: .vortex)), tier: 2),
-                StoreOffer.offer(type: .rune(Rune.rune(for: .rainEmbers)), tier: 2),
-                StoreOffer.offer(type: .rune(Rune.rune(for: .getSwifty)), tier: 2),
-                StoreOffer.offer(type: .rune(Rune.rune(for: .transformRock)), tier: 2),
+                StoreOffer.offer(type: .luck, tier: 2),
+                StoreOffer.offer(type: .dodge, tier: 2),
+                StoreOffer.offer(type: .plusTwoMaxHealth, tier: 2),
+                StoreOffer.offer(type: .rune(Rune.rune(for: .bubbleUp)), tier: 1),
+                StoreOffer.offer(type: .rune(Rune.rune(for: .flameWall)), tier: 1),
+                StoreOffer.offer(type: .rune(Rune.rune(for: .vortex)), tier: 1),
+                StoreOffer.offer(type: .rune(Rune.rune(for: .rainEmbers)), tier: 1),
+                StoreOffer.offer(type: .rune(Rune.rune(for: .getSwifty)), tier: 1),
+                StoreOffer.offer(type: .rune(Rune.rune(for: .transformRock)), tier: 1),
                 StoreOffer.offer(type: .runeSlot, tier: 3)
             ]
         

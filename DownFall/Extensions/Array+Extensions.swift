@@ -53,5 +53,19 @@ extension Array where Element: Hashable {
         }
         return arrayToRemoveFrom
     }
-    
+}
+
+extension Array {
+    mutating func removeFirst(where predicate: (Element) -> Bool) {
+        var indexToRemove: Int?
+        for (index, el) in self.enumerated() {
+            if predicate(el) {
+                indexToRemove = index
+                break
+            }
+        }
+        if indexToRemove != nil {
+            self.remove(at: indexToRemove!)
+        }
+    }
 }

@@ -208,17 +208,17 @@ class StagingTierView: SKSpriteNode {
     
     func setupGoalView() {
         guard let goalTrack = viewModel.goalTracker else { return }
-        let goalCircleViewModel = FillableCircleViewModel(horiztonal: false,
-                                                          radius: 100.0,
-                                                          total: goalTrack.target,
-                                                          progress: goalTrack.current,
-                                                          fillColor: goalTrack.fillBarColor.0,
-                                                          darkFillColor: goalTrack.fillBarColor.1,
-                                                          text: nil,
-                                                          backgroundColor: .storeBlack)
-        let goalCircleSprite = FillableCircleBar(size: .oneFifty, viewModel: goalCircleViewModel)
-        goalCircleSprite.position = goalCircleSprite.position.translateVertically(-10.0)
-        contentView.addChild(goalCircleSprite)
+//        let goalCircleViewModel = FillableCircleViewModel(horiztonal: false,
+//                                                          radius: 100.0,
+//                                                          total: goalTrack.target,
+//                                                          progress: goalTrack.current,
+//                                                          fillColor: goalTrack.fillBarColor.0,
+//                                                          darkFillColor: goalTrack.fillBarColor.1,
+//                                                          text: nil,
+//                                                          backgroundColor: .storeBlack)
+//        let goalCircleSprite = FillableCircleBar(size: .oneFifty, viewModel: goalCircleViewModel)
+//        goalCircleSprite.position = goalCircleSprite.position.translateVertically(-10.0)
+//        contentView.addChild(goalCircleSprite)
     }
     
     // MARK: Touch Events

@@ -20,7 +20,7 @@ func animate(parentNode: SKNode, animator: Animator = Animator(), paragraphNode:
 
     // show exaclty how much gold was gained as well
     let differencePrefix = difference < 0 ? "" : "+"
-    let color: UIColor = difference < 0 ? .lightBarRed : .highlightGold
+    let color: UIColor = difference < 0 ? .lightBarRed : .goldOutlineBright
     let gainedGoldLabel = ParagraphNode(text: "\(differencePrefix)\(difference)", paragraphWidth: Style.HUD.labelParagraphWidth, fontName: UIFont.pixelFontName, fontSize: .fontExtraLargeSize, fontColor: color)
     gainedGoldLabel.position = oldPosition.translateVertically(40.0)
     parentNode.addChildSafely(gainedGoldLabel)

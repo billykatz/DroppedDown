@@ -14,7 +14,6 @@ protocol FillableCircleViewModelable {
 }
 
 struct FillableCircleViewModel: FillableCircleViewModelable & FillableBarViewModelable {
-    var horiztonal: Bool
     var radius: CGFloat
     var total: Int
     var progress: Int
@@ -22,6 +21,7 @@ struct FillableCircleViewModel: FillableCircleViewModelable & FillableBarViewMod
     var darkFillColor: UIColor
     var text: String?
     var backgroundColor: UIColor?
+    var direction: BarDirection
 }
 
 class FillableCircleBar: SKSpriteNode {
@@ -177,6 +177,24 @@ class FillableCircleBar: SKSpriteNode {
         path.addCurve(to: endPoint, control1: midPoint, control2: midPoint2)
         
         return path
+    }
+    
+    func flash() {
+        
+        let originalColor = outline.color
+        
+        let blinkOff = SKAction.run { [weak outline] in
+            outline?.color = .white
+            outline?.alpha = 0.0
+        }
+        
+        let fadeIn = SKAction.fadeIn(withDuration: 1.25)
+        
+        let originalColorAction = SKAction.run { [weak outline] in
+            outline?.color = originalColor
+        }
+        let fadeOut = SKAction.fadeAlpha(by: 1.0, duration: 0.25)
+        outline.run(SKAction.sequence([blinkOff, fadeIn, fadeOut, originalColorAction]))
     }
     
     private func addCircle(radius: CGFloat, position: CGPoint, addCheckmark: Bool = false) {

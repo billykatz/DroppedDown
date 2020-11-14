@@ -9,6 +9,7 @@
 import Foundation
 import CoreGraphics
 import UIKit
+import Combine
 
 protocol RuneSlotViewModelInputs {
     func wasTapped()
@@ -17,15 +18,16 @@ protocol RuneSlotViewModelInputs {
 protocol RuneSlotViewModelOutputs {
     var textureName: String? { get }
     var isCharged: Bool { get }
-    var runeWasTapped: ((Rune?, Int) -> ())? { get }
+    var runeWasTapped: AnyPublisher<(Rune?, Int), Never> { get }
     var progressColor: UIColor? { get }
     var rune: Rune? { get }
 }
 
 class RuneSlotViewModel: RuneSlotViewModelOutputs, RuneSlotViewModelInputs {
     
-    // Output
-    var runeWasTapped: ((Rune?, Int) -> ())? = nil
+    private lazy var runeWasTappedSubject = CurrentValueSubject<(Rune?, Int), Never>((nil, 0))
+    var runeWasTapped: AnyPublisher<(Rune?, Int), Never> { runeWasTappedSubject.eraseToAnyPublisher()
+    }
     
     var progressColor: UIColor? {
         guard let rune = rune else { return nil }
@@ -52,6 +54,6 @@ class RuneSlotViewModel: RuneSlotViewModelOutputs, RuneSlotViewModelInputs {
     }
     
     func wasTapped() {
-        runeWasTapped?(rune, current)
+        runeWasTappedSubject.send((rune, current))
     }
 }

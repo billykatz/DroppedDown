@@ -70,7 +70,7 @@ class Renderer: SKSpriteNode {
     private lazy var levelGoalView: LevelGoalView = {
         let levelGoalView = LevelGoalView(viewModel: LevelGoalTracker(level: level),
                                           size: CGSize(width: playableRect.width/2,
-                                                       height: Style.HUD.height))
+                                                       height: Style.LevelGoalView.height))
         levelGoalView.position = CGPoint.alignHorizontally(levelGoalView.frame,
                                                            relativeTo: safeArea.frame,
                                                            horizontalAnchor: .left,
@@ -78,7 +78,7 @@ class Renderer: SKSpriteNode {
                                                            verticalPadding: Style.Padding.more*6,
                                                            horizontalPadding: -Style.Padding.more,
                                                            translatedToBounds: true)
-        levelGoalView.zPosition = Precedence.foreground.rawValue
+        levelGoalView.zPosition = Precedence.flying.rawValue
         return levelGoalView
     }()
     
@@ -116,6 +116,7 @@ class Renderer: SKSpriteNode {
         
         // tile detail view
         self.tileDetailView = TileDetailView(foreground: foreground, playableRect: playableRect, alignedTo: hud.frame, levelSize: level.boardSize)
+        tileDetailView?.zPosition = Precedence.flying.rawValue
         
         self.isUserInteractionEnabled = true
         
@@ -178,7 +179,7 @@ class Renderer: SKSpriteNode {
             case .shuffleBoard:
                 computeNewBoard(for: trans)
             case .goalCompleted(let goals):
-                animationsFinished(endTiles: trans.endTiles)
+                animateCompletedGoals(goals, input: inputType, transformation: trans)
             case .rotatePreviewFinish(let spriteActions, let trans):
                 if let trans = trans {
                     animator.animate(spriteActions) { [weak self] in
@@ -228,7 +229,15 @@ class Renderer: SKSpriteNode {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func animateCompletedGoals(_ goals: [GoalTracking], input: InputType, transformations: [Transformation]) {
+    private func animateCompletedGoals(_ goals: [GoalTracking], input: InputType, transformation: Transformation) {
+        animator.animateCompletedGoals(goals,
+                                       transformation: transformation,
+                                       sprites: sprites,
+                                       foreground: spriteForeground,
+                                       levelGoalOrigin: self.levelGoalView.frame.origin.translate(xOffset: self.levelGoalView.frame.width/2, yOffset: -20.0)
+                                       ) { [weak self] in
+            self?.animationsFinished(endTiles: transformation.endTiles)
+        }
         
     }
     

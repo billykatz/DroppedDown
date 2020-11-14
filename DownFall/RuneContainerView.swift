@@ -7,8 +7,9 @@
 //
 
 import SpriteKit
+import Combine
 
-protocol RuneContainerViewModelable {
+protocol RuneContainerViewModelable: class {
     var runeWasTapped: ((Rune) -> ())? { get }
     var runeWasUsed: ((Rune) -> ())? { get }
     var runeUseWasCanceled: (() -> ())? { get }
@@ -17,7 +18,7 @@ protocol RuneContainerViewModelable {
     var numberOfRuneSlots: Int { get }
 }
 
-struct RuneContainerViewModel: RuneContainerViewModelable {
+class RuneContainerViewModel: RuneContainerViewModelable {
     let runeWasTapped: ((Rune) -> ())?
     let runeWasUsed: ((Rune) -> ())?
     let runeUseWasCanceled: (() -> ())?
@@ -42,6 +43,7 @@ class RuneContainerView: SKSpriteNode {
     let viewModel: RuneContainerViewModelable
     let mode: ViewMode
     var runeSlotViewModels: [RuneSlotViewModel] = []
+    var disposables = Set<AnyCancellable>()
     
     struct Constants {
         static let runeName = "rune"
@@ -154,7 +156,12 @@ class RuneContainerView: SKSpriteNode {
             runeSlotView.name = Constants.runeName
             addChild(runeSlotView)
             
-            viewModel.runeWasTapped = runeWasTapped
+            viewModel.runeWasTapped.sink(receiveValue: { [weak self] (value) in
+                guard let rune = value.0, let self = self else { return }
+                self.runeWasTapped(rune: rune, progress: value.1)
+                print(rune)
+            }).store(in: &disposables)
+
         }
     }
 }

@@ -285,29 +285,32 @@ struct Animator {
             
             return SpriteAction(sprite: sprite, action: SKAction.sequence([wait, moveAndScale, SKAction.removeFromParent()]))
         }
-        animate(animations)
+        animate(animations) { }
     }
     
-    func animate(_ spriteActions: [SpriteAction], completion: (() -> Void)? = nil) {
-        if spriteActions.count == 0 { completion?() }
+    func animate(_ spriteActions: [SpriteAction], completion: @escaping () -> Void) {
+        if spriteActions.count == 0 { completion() }
         var numActions = spriteActions.count
         // tell each child to run it's action
         for spriteAction in spriteActions {
             spriteAction.sprite.run(spriteAction.action) {
                 numActions -= 1
                 if numActions == 0 {
-                    completion?()
+                    completion()
                 }
             }
         }
     }
     
-    func animateCompletedGoals(_ goals: [GoalTracking],
-                               transformations: [Transformation],
-                               completion: (() -> Void)) {
-        guard !goals.isEmpty else { completion(); return }
-        guard !transformations.isEmpty else { completion(); return }
-    
+    // Recursively animates the sprite actions array from the start of the array at index 0/
+    // Returns when there are no more sprites to animate.
+    func animateSequentially(_ spriteActions: [SpriteAction], completion: @escaping () -> Void) {
+        if spriteActions.count == 0 { completion() }
+        // tell each child to run it's action
+        guard let firstAction = spriteActions.first else { completion(); return }
+        firstAction.sprite.run(firstAction.action) {
+            animateSequentially(Array(spriteActions.dropFirst()), completion: completion)
+        }
     }
     
     func animate(_ transformation: [TileTransformation]?,
@@ -354,6 +357,51 @@ struct Animator {
             }
         }
     }
+    
+    // MARK: - Goal Completion
+    
+    func animateCompletedGoals(_ goals: [GoalTracking],
+                               transformation: Transformation,
+                               sprites: [[DFTileSpriteNode]],
+                               foreground: SKNode,
+                               levelGoalOrigin: CGPoint,
+                               completion: @escaping () -> Void) {
+        guard !goals.isEmpty, !sprites.isEmpty else { completion(); return }
+        
+        var spriteActions: [SpriteAction] = []
+        
+        // rock explode animation
+        guard let rockCoord = transformation.tileTransformation?.first, let crumble = sprites[rockCoord.end].crumble(false) else { completion(); return }
+        let sprite = sprites[rockCoord.end]
+        
+        // smoke animation
+        let smoke = self.smokeAnimation()
+        
+        // create the crumble smoke sequence
+        spriteActions.append(SpriteAction(sprite: sprite, action: SKAction.sequence([crumble.action, smoke])))
+        
+        // put the item there
+        if let newItem = transformation.endTiles?[rockCoord.end] {
+            let startPosition = levelGoalOrigin
+            let endPosition = sprite.position
+            let itemSprite = DFTileSpriteNode(type: newItem.type, height: sprite.size.height, width: sprite.size.width)
+            itemSprite.position = startPosition
+            itemSprite.setScale(0.5)
+            foreground.addChild(itemSprite)
+            
+            let movement = SKAction.move(to: endPosition, duration: 1.0)
+            let scale = SKAction.scale(to: 1.0, duration: 1.0)
+
+            spriteActions.append(SpriteAction(sprite: itemSprite, action: SKAction.group([movement, scale])))
+        }
+        
+        /// animate the sprite actions and call out completion
+        animate(spriteActions, completion: completion)
+        
+        
+    }
+    
+    // MARK: - Combat
     
     func animate(attackInputType: InputType,
                  foreground: SKNode,

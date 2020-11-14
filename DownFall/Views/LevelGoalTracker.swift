@@ -6,14 +6,23 @@
 //  Copyright © 2020 William Katz LLC. All rights reserved.
 //
 
+import Combine
+
 protocol LevelGoalTrackingOutputs {
     var goalUpdated: (([GoalTracking]) -> ())? { get set }
     var goalProgress: [GoalTracking] { get }
+    
+    /// Emits the a value when there is a goal that has been completed
+    var goalCompleted: AnyPublisher<[GoalTracking], Error> { get }
 }
 
 protocol LevelGoalTracking: LevelGoalTrackingOutputs {}
 
 class LevelGoalTracker: LevelGoalTracking {
+    
+    private lazy var goalCompletedSubject = PassthroughSubject<[GoalTracking], Error>()
+    lazy var goalCompleted: AnyPublisher<[GoalTracking], Error> = goalCompletedSubject.eraseToAnyPublisher()
+    
     
     public var goalUpdated: (([GoalTracking]) -> ())? = nil
     public var goalProgress: [GoalTracking] = []
@@ -47,8 +56,13 @@ class LevelGoalTracker: LevelGoalTracking {
             goalUpdated?(goalProgress)
             countPillars(in: input.endTilesStruct ?? [])
             InputQueue.append(Input(.levelGoalDetail(goalProgress)))
+            
         case .itemUsed:
             advanceRuneUseGoal()
+            
+        case .goalCompleted(let completedGoals):
+            goalCompletedSubject.send(completedGoals)
+            
         default:
             return
         }

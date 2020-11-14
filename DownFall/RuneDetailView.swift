@@ -7,6 +7,7 @@
 //
 
 import SpriteKit
+import Combine
 
 protocol RuneDetailViewModelable {
     var rune: Rune? { get }
@@ -19,12 +20,20 @@ protocol RuneDetailViewModelable {
     
 }
 
-struct RuneDetailViewModel: RuneDetailViewModelable {
+class RuneDetailViewModel: RuneDetailViewModelable {
     var rune: Rune?
     var progress: CGFloat
     var confirmed: ((Rune) -> ())?
     var canceled: (() -> ())?
     var mode: ViewMode
+    
+    init(rune: Rune?, progress: CGFloat, confirmed: ((Rune) -> ())?, canceled: (() -> ())?, mode: ViewMode) {
+        self.rune = rune
+        self.progress = progress
+        self.confirmed = confirmed
+        self.canceled = canceled
+        self.mode = mode
+    }
     
     /// returns true is we have completed the charging of a rune
     var isCharged: Bool {
@@ -56,6 +65,10 @@ struct RuneDetailViewModel: RuneDetailViewModelable {
 }
 
 class RuneDetailView: SKSpriteNode, ButtonDelegate {
+    
+    /// The dispose bag
+    private var disposables = Set<AnyCancellable>()
+    
     let viewModel: RuneDetailViewModelable
     
     struct Constants {
@@ -92,7 +105,11 @@ class RuneDetailView: SKSpriteNode, ButtonDelegate {
                                         size: size)
         runeSlotView.position = CGPoint.position(runeSlotView.frame, inside: frame, verticalAlign: .center, horizontalAnchor: .left)
         runeSlotView.zPosition = Precedence.foreground.rawValue
-        viewModel.runeWasTapped = { [weak self] (_,_) in self?.viewModel.canceled?() }
+        viewModel
+            .runeWasTapped
+            .sink(receiveValue: { [weak self] (_) in
+//                self?.viewModel.canceled?()
+            }).store(in: &disposables)
         addChild(runeSlotView)
     }
     

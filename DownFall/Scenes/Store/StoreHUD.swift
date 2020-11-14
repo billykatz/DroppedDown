@@ -228,7 +228,7 @@ class StoreHUD: SKSpriteNode {
     func redrawHealthBarNode(_ healthBar: SKSpriteNode, currentHealth: Int, totalHealth: Int) {
         let oldPosition = healthBar.position
         healthBar.removeFromParent()
-        let newHealthBar = FillableBar(size: quarterSize.scale(by: 0.25), viewModel: FillableBarViewModel(total: totalHealth, progress: currentHealth, fillColor: .red, backgroundColor: nil, text: nil, horiztonal: true))
+        let newHealthBar = FillableBar(size: quarterSize.scale(by: 0.25), viewModel: FillableBarViewModel(total: totalHealth, progress: currentHealth, fillColor: .red, backgroundColor: nil, text: nil, direction: .leftToRight))
         newHealthBar.position = oldPosition
         newHealthBar.zPosition = Precedence.menu.rawValue
         newHealthBar.name = Constants.healthBarName
@@ -241,7 +241,7 @@ class StoreHUD: SKSpriteNode {
         let heartNode = SKSpriteNode(texture: SKTexture(imageNamed: Identifiers.fullHeart), size: .fifty)
         heartNode.position = CGPoint.position(heartNode.frame, inside: healthBarContainer?.frame, verticalAlign: .center, horizontalAnchor: .left)
         
-        let healthBar = FillableBar(size: quarterSize.scale(by: 0.25), viewModel: FillableBarViewModel(total: viewModel.totalHealth, progress: viewModel.baseHealth, fillColor: .red, backgroundColor: nil, text: nil, horiztonal: true))
+        let healthBar = FillableBar(size: quarterSize.scale(by: 0.25), viewModel: FillableBarViewModel(total: viewModel.totalHealth, progress: viewModel.baseHealth, fillColor: .red, backgroundColor: nil, text: nil, direction: .leftToRight))
         healthBar.position = CGPoint.alignVertically(healthBar.frame, relativeTo: heartNode.frame, horizontalAnchor: .right, verticalAlign: .center, translatedToBounds: true)
         healthBar.zPosition = Precedence.menu.rawValue
         healthBar.name = Constants.healthBarName

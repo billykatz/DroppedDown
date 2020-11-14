@@ -126,6 +126,10 @@ struct Style {
         static let touchzone = CGFloat(12)
     }
     
+    struct LevelGoalView {
+        static let height = CGFloat(400.0)
+    }
+    
     struct HUD {
         static let height: CGFloat = 300.0
         static let heartSize = CGSize(width: 100.0, height: 100.0)

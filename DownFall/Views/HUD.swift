@@ -35,8 +35,8 @@ class HUD: SKSpriteNode {
         
         header.level = level
         
-        Dispatch.shared.register {
-            header.handle($0)
+        Dispatch.shared.register { [weak header] in
+            header?.handle($0)
         }
         
         return header
@@ -121,7 +121,7 @@ class HUD: SKSpriteNode {
                                              fillColor: .red,
                                              backgroundColor: .clayRed,
                                              text: "",
-                                             horiztonal: true)
+                                             direction: .leftToRight)
         let healthBar = FillableBar(size: CGSize(width: self.size.width * Style.HUD.healthBarWidthRatio, height: Style.HUD.healthBarHeight), viewModel: viewModel)
         healthBar.position = CGPoint.position(healthBar.frame, inside: frame, verticalAlign: .bottom, horizontalAnchor: .left, xOffset: heartNode.frame.width + Style.Padding.normal, yOffset: heartNode.frame.height/2 - Style.HUD.healthBarHeight/2)
         
@@ -182,7 +182,7 @@ class HUD: SKSpriteNode {
             }
             
             // show exaclty how much gold was gained as well
-            let gainedGoldLabel = ParagraphNode(text: "+\(goldGained)", paragraphWidth: Style.HUD.labelParagraphWidth, fontSize: .fontExtraLargeSize, fontColor: .highlightGold)
+            let gainedGoldLabel = ParagraphNode(text: "+\(goldGained)", paragraphWidth: Style.HUD.labelParagraphWidth, fontSize: .fontExtraLargeSize, fontColor: .goldOutlineBright)
             gainedGoldLabel.position = oldPosition.translateVertically(40.0)
             addChildSafely(gainedGoldLabel)
             let moveUp = SKAction.move(by: CGVector(dx: 0, dy: 50), duration: AnimationSettings.HUD.goldGainedTime)
@@ -191,7 +191,7 @@ class HUD: SKSpriteNode {
             
             
             // animate everything we just created
-            animator.animate(animations)
+            animator.animate(animations) { }
             
             // update our current total
             currentTotalGem = total

@@ -29,7 +29,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
         border.lineWidth = Style.Menu.borderWidth
         addChild(border)
         
-        zPosition = precedence.rawValue
+        zPosition = 20_000
         setupButtons(menuType, playableRect, precedence: precedence, level, buttonDelegate: buttonDelegate)
         
     }

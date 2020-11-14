@@ -8,7 +8,7 @@
 
 import SpriteKit
 
-class TileDetailView: SKNode {
+class TileDetailView: SKSpriteNode {
     
     struct Constants {
         static let maxHeight = CGFloat(350)
@@ -81,16 +81,18 @@ class TileDetailView: SKNode {
         detailView.zPosition = Precedence.flying.rawValue
         self.detailViewTemplate = detailView
         
+        
+        
+        super.init(texture: nil, color: .clear, size: playableRect.size)
+
         /// Add nodes to the foreground
+        self.foreground.addChild(self)
+        self.addChild(contentView)
         contentView.addChild(targetingArea)
-        self.foreground.addChild(contentView)
-        
-        
-        super.init()
         
         // set out own z position
-        self.zPosition = Precedence.flying.rawValue
-        
+        self.zPosition = 100_000
+        contentView.zPosition = 100_000
         
         // default interaction is false
         isUserInteractionEnabled = false
@@ -101,9 +103,11 @@ class TileDetailView: SKNode {
                 self?.tileType = tileType
                 self?.tileAttacks = attacks
                 self?.isUserInteractionEnabled = true
+                self?.addChildSafely(self?.contentView)
             case .levelGoalDetail(let updatedGoals):
                 self?.levelGoals = updatedGoals
                 self?.isUserInteractionEnabled = true
+                self?.addChildSafely(self?.contentView)
             default:
                 break
             }
@@ -219,7 +223,8 @@ class TileDetailView: SKNode {
         // add the border
         addBorder()
         
-        contentView.zPosition = Precedence.aboveMenu.rawValue
+        
+        detailViewTemplate.position = CGPoint.position(this: detailViewTemplate.frame, centeredInBottomOf: self.contentView.frame, verticalPadding: 150.0)
         
         /// Add it to the view
         contentView.addChild(detailViewTemplate)
@@ -229,15 +234,14 @@ class TileDetailView: SKNode {
         guard let updatedGoals = levelGoals else {
             detailViewTemplate.removeAllChildren()
             detailViewTemplate.removeFromParent()
-            contentView.removeChild(with: Constants.borderName)
             return
         }
         
-        let subTitleNode = ParagraphNode(text: "Complete to unlock\noffers between levels", paragraphWidth: detailViewTemplate.frame.width, fontSize: .fontLargeSize)
+        let subTitleNode = ParagraphNode(text: "Level Goals", paragraphWidth: detailViewTemplate.frame.width, fontSize: .fontLargeSize)
         
         subTitleNode.position = CGPoint.position(subTitleNode.frame, inside: detailViewTemplate.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.less)
         
-        detailViewTemplate.addChild(subTitleNode)
+        detailViewTemplate.addChildSafely(subTitleNode)
         
         let textHeight = subTitleNode.frame.height + Style.Padding.more
         
@@ -257,15 +261,15 @@ class TileDetailView: SKNode {
             sprite.position = CGPoint.alignVertically(sprite.frame, relativeTo: circleNode.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: 2*Style.Padding.most, translatedToBounds: true)
             
             
-            detailViewTemplate.addChild(sprite)
-            detailViewTemplate.addChild(colonNode)
-            detailViewTemplate.addChild(circleNode)
+            detailViewTemplate.addChildSafely(sprite)
+            detailViewTemplate.addChildSafely(colonNode)
+            detailViewTemplate.addChildSafely(circleNode)
             
             let descriptionLabel = ParagraphNode(text: "\(goal.description())", paragraphWidth: detailViewTemplate.frame.maxX - sprite.frame.maxX, fontSize: .fontMediumSize)
             
             descriptionLabel.position = CGPoint.alignVertically(descriptionLabel.frame, relativeTo: sprite.frame, horizontalAnchor: .right, verticalAlign: .center, verticalPadding: Style.Padding.less, horizontalPadding: Style.Padding.most,  translatedToBounds: true)
             
-            detailViewTemplate.addChild(descriptionLabel)
+            detailViewTemplate.addChildSafely(descriptionLabel)
     
             
             // Progress label  
@@ -275,13 +279,12 @@ class TileDetailView: SKNode {
             progressLabel.position = CGPoint(x:x, y: y)
                 
             
-            detailViewTemplate.addChild(progressLabel)
+            detailViewTemplate.addChildSafely(progressLabel)
         
         }
         
-        
-        contentView.zPosition = Precedence.aboveMenu.rawValue
-        contentView.addChild(detailViewTemplate)
+        detailViewTemplate.position = CGPoint.position(detailViewTemplate.frame, inside: self.contentView.frame, verticalAlign: .center, horizontalAnchor: .center)
+        contentView.addChildSafely(detailViewTemplate)
         
         addBorder()
     }
@@ -292,10 +295,10 @@ class TileDetailView: SKNode {
         let border = SKShapeNode(rect: detailViewTemplate.frame)
         border.strokeColor = UIColor.darkGray
         border.lineWidth = Style.Menu.borderWidth
-        border.zPosition = Precedence.menu.rawValue + 100
+        border.zPosition = self.zPosition + 100
         border.position = .zero
         border.name = Constants.borderName
-        contentView.addChild(border)
+        detailViewTemplate.addChild(border)
     }
     
     private func updateTargetReticles() {
@@ -336,6 +339,7 @@ extension TileDetailView {
             levelGoals = nil
             InputQueue.append(Input(.play))
             isUserInteractionEnabled = false
+            contentView.removeFromParent()
         }
     }
 }

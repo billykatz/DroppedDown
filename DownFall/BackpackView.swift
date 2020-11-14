@@ -129,7 +129,6 @@ class BackpackView: SKSpriteNode {
         runeContainer.name = "runeContainer"
         
         runeContainer.position = CGPoint.position(runeContainer.frame, inside: playableRect, verticalAnchor: .bottom, horizontalAnchor: .center, padding: Style.Padding.most*3)
-//        runeContainer.zPosition = Precedence.aboveMenu.rawValue
         runeContainer.zPosition = 10_000
         
         self.removeChild(with: "runeContainer")

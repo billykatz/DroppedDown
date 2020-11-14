@@ -53,7 +53,7 @@ class HUD: SKSpriteNode {
     var currentTotalGem: Int = 0
     let animator = Animator()
     
-    var delegate: SettingsDelegate?
+    weak var delegate: SettingsDelegate?
     var level: Level?
     
     //Mark: - Instance Methods

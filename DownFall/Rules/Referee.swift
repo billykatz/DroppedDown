@@ -333,11 +333,20 @@ class Referee {
         
         func playerCollectsOffer() -> Input? {
             guard let playerPosition = playerPosition,
-                case TileType.player(_) = tiles[playerPosition].type,
+                case TileType.player(let data) = tiles[playerPosition].type,
                 isWithinBounds(playerPosition.rowBelow),
                 case TileType.offer(let storeOffer) = tiles[playerPosition.rowBelow].type
                 else { return nil }
-            return Input(.collectOffer(playerPosition.rowBelow, storeOffer))
+            
+            /// The player can only collect a rune offer if they have an empty slot.
+            /// If they dont have an empty slot then we enter the rune replacement flow
+            if case let StoreOfferType.rune(rune) = storeOffer.type,
+               let pickaxe = data.pickaxe,
+               pickaxe.runeSlots >= pickaxe.runes.count {
+                return Input(.runeReplacement(pickaxe, rune))
+            } else {
+                return Input(.collectOffer(playerPosition.rowBelow, storeOffer))
+            }
         }
 
         

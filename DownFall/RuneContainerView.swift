@@ -64,6 +64,11 @@ class RuneContainerView: SKSpriteNode {
         fatalError("init(coder:) has not been implemented")
     }
     
+    
+    public func enableButton(_ enabled: Bool) {
+        runeDetailView?.enableButton(enabled)
+    }
+    
     private func runeWasTapped(rune: Rune?, progress: Int) {
         /// They have tapped on a rune slot, it maybe empty or have a rune
         if let rune = rune {
@@ -86,11 +91,6 @@ class RuneContainerView: SKSpriteNode {
         removeChild(with: Constants.runeDetailViewName)
         toggleRuneSlots()
     }
-    
-    public func enableButton(_ enabled: Bool) {
-        runeDetailView?.enableButton(enabled)
-    }
-    
     var runeDetailView: RuneDetailView?
     
     private func setupRuneDetailView(rune: Rune?, progress: Int) {
@@ -143,7 +143,7 @@ class RuneContainerView: SKSpriteNode {
         //TODO: get rune slots from the player data
         for index in 0..<4 {
             guard index < viewModel.numberOfRuneSlots else { return }
-            let size: CGSize = mode == .storeHUD ? CGSize.oneFifty.scale(by: 0.5) : .oneFifty
+            let size: CGSize = .oneFifty
             let rune = viewModel.runes.optionalElement(at: index)
             let viewModel = RuneSlotViewModel(rune: rune)
             let runeSlotView = RuneSlotView(viewModel: viewModel, size: size)

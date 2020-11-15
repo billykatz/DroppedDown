@@ -25,7 +25,7 @@ protocol RuneSlotViewModelOutputs {
 
 class RuneSlotViewModel: RuneSlotViewModelOutputs, RuneSlotViewModelInputs {
     
-    private lazy var runeWasTappedSubject = CurrentValueSubject<(Rune?, Int), Never>((nil, 0))
+    private lazy var runeWasTappedSubject = PassthroughSubject<(Rune?, Int), Never>()
     var runeWasTapped: AnyPublisher<(Rune?, Int), Never> { runeWasTappedSubject.eraseToAnyPublisher()
     }
     

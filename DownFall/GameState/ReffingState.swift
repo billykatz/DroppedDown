@@ -24,6 +24,8 @@ struct ReffingState: GameState {
             return AnyGameState(PlayState())
         case .attack, .monsterDies, .collectItem, .decrementDynamites, .refillEmpty, .collectOffer:
             return AnyGameState(ComputingState())
+        case .runeReplacement:
+            return AnyGameState(PauseState())
         case .gameWin:
             return AnyGameState(WinState())
         case .gameLose:

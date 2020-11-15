@@ -146,7 +146,7 @@ class Board: Equatable {
             transformation = self.completedGoals(completedGoals, inputType: input.type)
         case let .collectOffer(offerCoord, storeOffer):
             transformation = self.collect(offer: storeOffer, at: offerCoord, input: input)
-        case .gameLose(_),
+        case .gameLose,
              .play,
              .pause,
              .animationsFinished,
@@ -155,7 +155,7 @@ class Board: Equatable {
              .selectLevel,
              .newTurn,
              .visitStore,
-             .itemUseCanceled, .itemCanBeUsed, .rotatePreview, .tileDetail, .levelGoalDetail:
+             .itemUseCanceled, .itemCanBeUsed, .rotatePreview, .tileDetail, .levelGoalDetail, .runeReplacement:
             transformation = nil
         }
         
@@ -163,6 +163,7 @@ class Board: Equatable {
         InputQueue.append(Input(.transformation([trans])))
     }
     
+    /// This is for collecting runes or other things like max health
     private func collect(offer: StoreOffer, at offerCoord: TileCoord, input: Input) -> Transformation {
         let selectedTile = tiles[offerCoord]
         
@@ -842,6 +843,7 @@ extension Board {
         
     }
     
+    /// This is for collectin gems
     private func collectItem(at coord: TileCoord, input: Input) -> Transformation {
         let selectedTile = tiles[coord]
         

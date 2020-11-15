@@ -56,7 +56,8 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
                                         .boardBuilt,
                                         .unlockExit,
                                         .levelGoalDetail([]),
-                                        .goalCompleted([])
+                                        .goalCompleted([]),
+                                        .runeReplacement(Pickaxe(runeSlots: 0, runes: []), .zero)
                                                                  
     ]
     
@@ -95,6 +96,7 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
     case unlockExit
     case levelGoalDetail([GoalTracking])
     case goalCompleted([GoalTracking])
+    case runeReplacement(Pickaxe, Rune)
     
     var debugDescription: String {
         switch self {
@@ -164,7 +166,8 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
             return "Goal was completed"
         case .collectOffer(_, let offer):
             return "Player collects \(offer.textureName)"
-            
+        case .runeReplacement(_, _):
+            return "Rune Replacement flow"
         }
     }
 }

@@ -8,6 +8,12 @@
 
 import SpriteKit
 
+extension StoreOffer: Equatable {
+    static func ==(lhsOffer: StoreOffer, rhsOffer: StoreOffer) -> Bool {
+        return lhsOffer.type == rhsOffer.type
+    }
+}
+
 enum StoreOfferType: Codable, Hashable {
     static func ==(lhs: StoreOfferType, rhs: StoreOfferType) -> Bool {
         switch (lhs, rhs) {

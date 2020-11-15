@@ -13,7 +13,7 @@ protocol ResetsAttacks {
     func resetAttacks() -> EntityModel
 }
 
-struct Pickaxe: Equatable, Codable {
+struct Pickaxe: Equatable, Codable, Hashable {
     var runeSlots: Int
     var runes: [Rune]
     

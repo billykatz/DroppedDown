@@ -7,12 +7,11 @@
 //
 
 import Foundation
+import Combine
 
 enum ViewMode {
     case inventory
     case itemDetail
-    case storeHUD
-    case storeHUDExpanded
 }
 
 struct Target {
@@ -43,6 +42,7 @@ protocol TargetingOutputs {
     var currentTargets: AllTarget { get }
     var legallyTargeted: Bool { get }
     var inventory: [Rune] { get }
+    var runeReplacementPublisher: AnyPublisher<(Pickaxe, Rune), Never> { get }
 }
 
 protocol TargetingInputs {
@@ -70,6 +70,12 @@ class TargetingViewModel: Targeting {
     var inventory: [Rune] = []
     var boardSize: Int = 0
     
+    /// publishers
+    var runeReplacementSubject = PassthroughSubject<(Pickaxe, Rune), Never>()
+    var runeReplacementPublisher: AnyPublisher<(Pickaxe, Rune), Never> {
+        return runeReplacementSubject.eraseToAnyPublisher()
+    }
+    
     init() {
         Dispatch.shared.register { [weak self] (input) in
             self?.handle(input)
@@ -78,6 +84,8 @@ class TargetingViewModel: Targeting {
     
     func handle(_ input: Input) {
         switch input.type {
+        case .runeReplacement(let pickaxe, let rune):
+            runeReplacementSubject.send((pickaxe, rune))
         case .transformation(let trans):
             if let inputType = trans.first?.inputType,
                 case InputType.itemUsed = inputType,
@@ -385,6 +393,11 @@ class TargetingViewModel: Targeting {
         self.rune = nil
         currentTargets = AllTarget(targets: [], areLegal: false)
         
+    }
+    
+    func didDeselect() {
+        self.rune = nil
+        currentTargets = AllTarget(targets: [], areLegal: false)
     }
     
     func didSelect(_ rune: Rune?) {

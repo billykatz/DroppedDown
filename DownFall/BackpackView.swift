@@ -8,6 +8,7 @@
 
 import Foundation
 import SpriteKit
+import Combine
 
 /**
  The view containing the player's items
@@ -43,6 +44,9 @@ class BackpackView: SKSpriteNode {
     
     //rune inventory container
     private var runeInventoryContainer: RuneContainerView?
+    
+    // dispose bag
+    private var disposables = Set<AnyCancellable>()
     
     init(playableRect: CGRect, viewModel: TargetingViewModel, levelSize: Int) {
         self.playableRect = playableRect
@@ -82,20 +86,25 @@ class BackpackView: SKSpriteNode {
         super.init(texture: nil, color: .clear, size: CGSize(width: playableRect.width, height: height))
         
         // "bind" to to the view model
-        self.viewModel.updateCallback = { [weak self] in self?.updated() }
-        self.viewModel.runeSlotsUpdated = runeSlotsUpdated
+        viewModel.updateCallback = { [weak self] in self?.updated() }
+        
+        /// bind the rune container view to the targeting view model
+        viewModel.runeSlotsUpdated = runeSlotsUpdated
         
         // add children to view container
         viewContainer.addChild(self.background)
         
         // add out viewcontainter
-        self.addChild(viewContainer)
-        
+        addChild(viewContainer)
         
         // enable user interaction
-        self.isUserInteractionEnabled = true
+        isUserInteractionEnabled = true
         
-        
+        /// bind to view model
+        viewModel.runeReplacementPublisher.sink { (value) in
+            let (pickaxe, rune) = value
+            
+        }.store(in: &disposables)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -104,62 +113,29 @@ class BackpackView: SKSpriteNode {
     
     //MARK: - public update function
     
-    /**
-     Passed into our viewModel as a callback function to "bind" everything together
-     */
+    
+    /// Passed into our targeting viewModel as a callback function to "bind" everything together
     func updated() {
-        updateTargetArea()
         updateReticles()
     }
     
-    //MARK: - private functions
-    // TODO: should this be updated?
-    private let maxRuneSlots = 4
-    private func runeSlotsUpdated(_ runeSlots: Int, _ runes: [Rune]) {
-        let viewModel = RuneContainerViewModel(runes: runes,
-                                               numberOfRuneSlots: runeSlots,
-                                               runeWasTapped: runeWasTapped,
-                                               runeWasUsed: self.viewModel.didUse,
-                                               runeUseWasCanceled: runeUseWasCanceled)
-        let runeContainer = RuneContainerView(viewModel: viewModel,
-                                              mode: .inventory,
-                                              size: CGSize(width: playableRect.width,
-                                                           height: Style.Backpack.runeInventorySize))
-        
-        runeContainer.name = "runeContainer"
-        
-        runeContainer.position = CGPoint.position(runeContainer.frame, inside: playableRect, verticalAnchor: .bottom, horizontalAnchor: .center, padding: Style.Padding.most*3)
-        runeContainer.zPosition = 10_000
-        
-        self.removeChild(with: "runeContainer")
-        runeInventoryContainer = runeContainer
-        addChildSafely(runeContainer)
-    }
-    
-    private func runeUseWasCanceled() {
-        viewModel.didSelect(nil)
-    }
-    
-    private func runeWasTapped(rune: Rune?) {
-        viewModel.didSelect(rune)
-    }
-    
-    private func updateTargetArea() {
+    private func updateReticles() {
+        /// removes or adds the targeting area based on the nullality of the view model rune
+        /// if there is no rune then remove the targeting area
+        /// else add the tareting area
         if viewModel.rune == nil {
             targetingArea.removeFromParent()
         } else {
             addChildSafely(targetingArea)
         }
-    }
-    
-    private func updateReticles() {
+        
         targetingArea.removeAllChildren()
         let areLegal = viewModel.currentTargets.areLegal
         for target in viewModel.currentTargets.targets {
             for coord in target.all {
                 let position = translateCoord(coord)
                 /// choose the reticle based on all targets legality and this individual target legality
-                let identifier: String = (target.isLegal && areLegal) ? Identifiers.Sprite.greenReticle : Identifiers.Sprite.redReticle
+                let identifier: String = (target.isLegal || areLegal) ? Identifiers.Sprite.greenReticle : Identifiers.Sprite.redReticle
                 let reticle = SKSpriteNode(texture: SKTexture(imageNamed: identifier), size: CGSize(width: tileSize, height: tileSize))
                 reticle.position = position
                 reticle.zPosition = Precedence.menu.rawValue
@@ -168,6 +144,42 @@ class BackpackView: SKSpriteNode {
         }
         
         runeInventoryContainer?.enableButton(areLegal)
+    }
+
+    
+    //MARK: - private functions
+    // TODO: should this be updated?
+    private func runeSlotsUpdated(_ runeSlots: Int, _ runes: [Rune]) {
+        
+        /// Routes Rune container outputs to TargetingViewModel input
+        let viewModel = RuneContainerViewModel(runes: runes,
+                                               numberOfRuneSlots: runeSlots,
+                                               runeWasTapped: self.viewModel.didSelect,
+                                               runeWasUsed: self.viewModel.didUse,
+                                               runeUseWasCanceled: self.viewModel.didDeselect)
+        
+        /// create the rune container view
+        let runeContainer = RuneContainerView(viewModel: viewModel,
+                                              mode: .inventory,
+                                              size: CGSize(width: playableRect.width,
+                                                           height: Style.Backpack.runeInventorySize))
+        
+        /// name it so we can remove it later
+        runeContainer.name = "runeContainer"
+        
+        runeContainer.position = CGPoint.position(runeContainer.frame, inside: playableRect, verticalAnchor: .bottom, horizontalAnchor: .center, padding: Style.Padding.most*3)
+        
+        /// position it high up to catch user interaction
+        runeContainer.zPosition = 10_000
+        
+        /// remove the old rune container
+        self.removeChild(with: "runeContainer")
+        
+        /// update our variable
+        runeInventoryContainer = runeContainer
+        
+        /// finally add it to the screen
+        addChildSafely(runeContainer)
     }
     
     private func translateCoord(_ coord: TileCoord) -> CGPoint {

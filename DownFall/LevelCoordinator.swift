@@ -10,7 +10,7 @@ import UIKit
 import SpriteKit
 import GameplayKit
 
-protocol LevelCoordinating: StoreSceneDelegate, GameSceneCoordinatingDelegate {
+protocol LevelCoordinating: GameSceneCoordinatingDelegate {
     var gameSceneNode: GameScene? { get set }
     var entities: EntitiesModel? { get set }
     var delegate: MenuCoordinating? { get set }
@@ -104,15 +104,6 @@ class LevelCoordinator: LevelCoordinating {
         case .level(let level):
             presentNextLevel(level, playerData: runModel.player)
         }
-    }
-    
-    
-    // MARK: - StoreSceneDelegate
-    
-    func leave(_ storeScene: StoreScene, updatedPlayerData: EntityModel) {
-        view.presentScene(nil)
-        runModel.player = updatedPlayerData
-        presentNextArea()
     }
     
     // MARK: - GameSceneCoordinatingDelegate

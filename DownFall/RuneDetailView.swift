@@ -17,7 +17,6 @@ protocol RuneDetailViewModelable {
     var isCharged: Bool { get }
     var chargeDescription: String? { get }
     var mode: ViewMode { get }
-    
 }
 
 class RuneDetailViewModel: RuneDetailViewModelable {
@@ -69,7 +68,9 @@ class RuneDetailView: SKSpriteNode, ButtonDelegate {
     /// The dispose bag
     private var disposables = Set<AnyCancellable>()
     
-    let viewModel: RuneDetailViewModelable
+    private let viewModel: RuneDetailViewModelable
+    
+    private var confirmButton: Button?
     
     struct Constants {
         static let detailBackgroundScale = CGFloat(0.6)
@@ -86,34 +87,37 @@ class RuneDetailView: SKSpriteNode, ButtonDelegate {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func setupView() {
+    
+    
+    public func enableButton(_ enable: Bool) {
+        confirmButton?.enable(enable && viewModel.isCharged)
+    }
+    
+    private func setupView() {
         setupRuneView()
         setupDetailView()
         setupButtons()
     }
     
-    func setupRuneView() {
-        let size: CGSize
-        if viewModel.mode == .storeHUD {
-            size = CGSize.oneFifty.scale(by: 0.5)
-        }else {
-            size = .oneFifty
-        }
+    private func setupRuneView() {
+        let size = CGSize.oneFifty
         
         let viewModel = RuneSlotViewModel(rune: self.viewModel.rune)
         let runeSlotView = RuneSlotView(viewModel: viewModel,
                                         size: size)
         runeSlotView.position = CGPoint.position(runeSlotView.frame, inside: frame, verticalAlign: .center, horizontalAnchor: .left)
         runeSlotView.zPosition = Precedence.foreground.rawValue
+        
+        /// listen for updates from the rune slot.  tapping on the rune slot in the rune detail view toggles the view back to the All Runes view (non-detail non-targeting)
         viewModel
             .runeWasTapped
             .sink(receiveValue: { [weak self] (_) in
-//                self?.viewModel.canceled?()
+                self?.viewModel.canceled?()
             }).store(in: &disposables)
         addChild(runeSlotView)
     }
     
-    func setupDetailView() {
+    private func setupDetailView() {
         let detailView = SKShapeNode(rectOf: size.scale(by: Constants.detailBackgroundScale))
         detailView.color = .runeDetailColor
         detailView.zPosition = Precedence.background.rawValue
@@ -122,7 +126,7 @@ class RuneDetailView: SKSpriteNode, ButtonDelegate {
         
         let textOffset = Style.Padding.less
         
-        let titleColumnWidth = viewModel.mode == .storeHUD ? 0.0 : CGFloat(180.0)
+        let titleColumnWidth = CGFloat(180.0)
         let titleContainer = SKSpriteNode(color: .clear, size: CGSize(width: titleColumnWidth, height: detailView.frame.height))
         titleContainer.position = CGPoint.position(titleContainer.frame, inside: detailView.frame, verticalAlign: .center, horizontalAnchor: .left)
         
@@ -136,12 +140,10 @@ class RuneDetailView: SKSpriteNode, ButtonDelegate {
         chargeTitle.position = CGPoint.position(chargeTitle.frame, inside: titleContainer.frame, verticalAlign: .center, horizontalAnchor: .right)
         effectTitle.position = CGPoint.position(effectTitle.frame, inside: titleContainer.frame, verticalAlign: .top, horizontalAnchor: .right, yOffset: textOffset)
         
-        
-        if viewModel.mode != .storeHUD {
-            titleContainer.addChild(effectTitle)
-            titleContainer.addChild(progressTitle)
-            titleContainer.addChild(chargeTitle)
-        }
+    
+        titleContainer.addChild(effectTitle)
+        titleContainer.addChild(progressTitle)
+        titleContainer.addChild(chargeTitle)
         
         
         // description container
@@ -162,17 +164,10 @@ class RuneDetailView: SKSpriteNode, ButtonDelegate {
         
         descriptionContainer.addChild(effectDescription)
         
-        if viewModel.mode != .storeHUD {
-            if let ability = viewModel.rune {
-                let progressDescription = ParagraphNode(text: "\(Int(viewModel.progress))/\( ability.cooldown)", paragraphWidth: descriptionWidth, fontSize: descriptionFontSize)
-                progressDescription.position = CGPoint.position(progressDescription.frame, inside: descriptionContainer.frame, verticalAlign: .bottom, horizontalAnchor: .left, yOffset: descriptionOffset)
-                descriptionContainer.addChild(progressDescription)
-            }
-            
-            
-            
-            descriptionContainer.addChild(chargeDescription)
-            
+        if let ability = viewModel.rune {
+            let progressDescription = ParagraphNode(text: "\(Int(viewModel.progress))/\( ability.cooldown)", paragraphWidth: descriptionWidth, fontSize: descriptionFontSize)
+            progressDescription.position = CGPoint.position(progressDescription.frame, inside: descriptionContainer.frame, verticalAlign: .bottom, horizontalAnchor: .left, yOffset: descriptionOffset)
+            descriptionContainer.addChild(progressDescription)
         }
         
         detailView.addChild(descriptionContainer)
@@ -180,37 +175,25 @@ class RuneDetailView: SKSpriteNode, ButtonDelegate {
         
     }
     
-    var confirmButton: Button?
-    
-    func enableButton(_ enable: Bool) {
-        confirmButton?.enable(enable && viewModel.isCharged)
-    }
-    
-    func setupButtons() {
-        switch viewModel.mode {
-        case .itemDetail, .inventory:
-            if viewModel.rune != nil {
-                
-                let confirmSprite = SKSpriteNode(texture: SKTexture(imageNamed: "buttonAffirmitive"), size: .oneHundred)
-                let confirmButton = Button(size: .oneHundred, delegate: self, identifier: .backpackConfirm, image: confirmSprite, shape: .circle, showSelection: true, disable: !viewModel.isCharged)
-                confirmButton.position = CGPoint.position(confirmButton.frame, inside: self.frame, verticalAlign: .center, horizontalAnchor: .right, xOffset: Style.Padding.more)
-                addChild(confirmButton)
-                
-                self.confirmButton = confirmButton
-            }
+    private func setupButtons() {
+        
+        /// there is a rune in the rune model
+        if viewModel.rune != nil {
             
-            let cancelSprite = SKSpriteNode(texture: SKTexture(imageNamed: "buttonNegative"), size: .oneHundred)
-            let cancelButton = Button(size: .oneHundred, delegate: self, identifier: .backpackCancel, image: cancelSprite, shape: .circle, showSelection: true)
-            cancelButton.position = CGPoint.alignHorizontally(cancelButton.frame, relativeTo: frame, horizontalAnchor: .right, verticalAlign: .top, verticalPadding: Style.Padding.more, horizontalPadding: Style.Padding.more)
+            let confirmSprite = SKSpriteNode(texture: SKTexture(imageNamed: "buttonAffirmitive"), size: .oneHundred)
+            let confirmButton = Button(size: .oneHundred, delegate: self, identifier: .backpackConfirm, image: confirmSprite, shape: .circle, showSelection: true, disable: !viewModel.isCharged)
+            confirmButton.position = CGPoint.position(confirmButton.frame, inside: self.frame, verticalAlign: .center, horizontalAnchor: .right, xOffset: Style.Padding.more)
+            addChild(confirmButton)
             
-            addChild(cancelButton)
-        case .storeHUD, .storeHUDExpanded:
-            let cancelSprite = SKSpriteNode(texture: SKTexture(imageNamed: "buttonNegative"), size: .oneHundred)
-            let cancelButton = Button(size: .oneHundred, delegate: self, identifier: .backpackCancel, image: cancelSprite, shape: .circle, showSelection: true)
-            cancelButton.position = CGPoint.position(cancelButton.frame, inside: self.frame, verticalAlign: .center, horizontalAnchor: .right, xOffset: Style.Padding.more)
-            
-            addChild(cancelButton)
+            self.confirmButton = confirmButton
         }
+        
+        /// Cancel button is added everytime because a empty rune slot can be viewed and the player needs a way to get back to normal mode
+        let cancelSprite = SKSpriteNode(texture: SKTexture(imageNamed: "buttonNegative"), size: .oneHundred)
+        let cancelButton = Button(size: .oneHundred, delegate: self, identifier: .backpackCancel, image: cancelSprite, shape: .circle, showSelection: true)
+        cancelButton.position = CGPoint.alignHorizontally(cancelButton.frame, relativeTo: frame, horizontalAnchor: .right, verticalAlign: .top, verticalPadding: Style.Padding.more, horizontalPadding: Style.Padding.more)
+        
+        addChild(cancelButton)
     }
     
     /// MARK: ButtonDelegate

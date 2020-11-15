@@ -63,7 +63,7 @@ enum ButtonIdentifier: String {
         case .rotate:
             return "Got it! 👍"
         case .visitStore:
-            return "Visit Store"
+            return "Continue"
         case .newGame:
             return "New Game"
         case .back:

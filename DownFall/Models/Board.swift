@@ -250,7 +250,12 @@ class Board: Equatable {
         return offersInTier[randomNumber]
     }
     
+    private var earnedGoals: Int = 0
+    
     private func completedGoals(_ goals: [GoalTracking], inputType: InputType) -> Transformation {
+        
+        // keep track of this state for game win
+        earnedGoals += goals.count
         
         /// keep track of how many goals we have awarded so far.
         let awardedGoalsCount = self.level.goalProgress.count
@@ -258,7 +263,7 @@ class Board: Equatable {
         // Lets keep track of the completed goals before we do anything else
         self.level.goalProgress.append(contentsOf: goals)
         
-        // Create a transformation based on how many goals are compelted and where the player is in the mine
+        // Create a transformation based on how many goals are completed and where the player is in the mine
         guard let pp = playerPosition else { return .zero }
         let playerQuadrant = Quadrant.quadrant(of: pp, in: boardSize)
         var transformedTiles: [TileTransformation] = []
@@ -1136,13 +1141,21 @@ extension Board : CustomDebugStringConvertible {
 extension Board {
     func gameWin() -> Transformation {
         guard let playerPosition = getTileStructPosition(TileType.player(.zero)),
-            isWithinBounds(playerPosition.rowBelow) else {
-                return Transformation(transformation: [], inputType: .gameWin)
+              isWithinBounds(playerPosition.rowBelow), case TileType.player(let data) = tiles[playerPosition].type else {
+                return Transformation(transformation: [], inputType: .gameWin(0))
         }
         
+        let playerEarnsHealthForCompletedGoals = data.heal(for: self.earnedGoals)
+        
+        var newTiles = tiles
+        newTiles[playerPosition.row][playerPosition.column] = Tile(type: .player(playerEarnsHealthForCompletedGoals))
+        
+        self.tiles = newTiles
+        
+        
         return Transformation(transformation: [TileTransformation(playerPosition, playerPosition.rowBelow)],
-                              inputType: .gameWin,
-                              endTiles: tiles)
+                              inputType: .gameWin(self.earnedGoals),
+                              endTiles: newTiles)
     }
 }
 

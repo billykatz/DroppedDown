@@ -635,13 +635,14 @@ extension Renderer {
 
 extension Renderer {
     private func gameWin(transformation: Transformation?) {
+        guard case let InputType.gameWin(completedGoals)? = transformation?.inputType else { fatalError("Should we crash?") }
         animator.gameWin(transformation: transformation, sprites: sprites) { [weak self] in
             
-            guard let strongSelf = self else { return }
-            strongSelf.menuForeground.removeAllChildren()
-            let gameWinMenu = strongSelf.gameWinSpriteNode
-            strongSelf.menuForeground.addChild(gameWinMenu)
-            strongSelf.foreground.addChildSafely(strongSelf.menuForeground)
+            guard let self = self else { return }
+            self.menuForeground.removeAllChildren()
+            let gameWinMenu = MenuSpriteNode(.gameWin, playableRect: self.playableRect, precedence: .menu, level: self.level, completedGoals: completedGoals)
+            self.menuForeground.addChild(gameWinMenu)
+            self.foreground.addChildSafely(self.menuForeground)
         }
     }
 }

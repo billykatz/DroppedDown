@@ -12,7 +12,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
 
     //TODO: Generally, we need to capture all the constants and move them to our Style struct.
     
-    init(_ menuType: MenuType, playableRect: CGRect, precedence: Precedence, level: Level, buttonDelegate: ButtonDelegate? = nil) {
+    init(_ menuType: MenuType, playableRect: CGRect, precedence: Precedence, level: Level, completedGoals: Int = 0, buttonDelegate: ButtonDelegate? = nil) {
         
         let menuSizeWidth = playableRect.size.width * menuType.widthCoefficient
         let menuSizeHeight = playableRect.size.height * menuType.heightCoefficient
@@ -30,11 +30,11 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
         addChild(border)
         
         zPosition = 20_000
-        setupButtons(menuType, playableRect, precedence: precedence, level, buttonDelegate: buttonDelegate)
+        setupButtons(menuType, playableRect, precedence: precedence, level, completedGoals: completedGoals, buttonDelegate: buttonDelegate)
         
     }
     
-    private func setupButtons(_ menuType: MenuType, _ playableRect: CGRect, precedence: Precedence, _ level: Level, buttonDelegate: ButtonDelegate? = nil) {
+    private func setupButtons(_ menuType: MenuType, _ playableRect: CGRect, precedence: Precedence, _ level: Level, completedGoals: Int = 0, buttonDelegate: ButtonDelegate? = nil) {
         let menuSizeWidth = playableRect.size.width * menuType.widthCoefficient
         let buttonSize = CGSize(width: menuSizeWidth * 0.4, height: 120)
         
@@ -42,11 +42,21 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
         
         if menuType == .gameWin {
             
+            let heartText: String
+            if completedGoals > 0 {
+                heartText = "+ \(String(repeating: "♥️", count: completedGoals))"
+            } else {
+                heartText = "+0 ♥️"
+            }
+            
             let text =
             """
-            You passed \(level.humanReadableDepth) depth.
-            
-            Your personal best is: \(RunScope.deepestDepth)
+
+                    You survived 😅
+
+            + 1 HP per completed goal
+
+                \(heartText)
             """
             let paragraphNode = ParagraphNode.labelNode(text: text, paragraphWidth: menuSizeWidth * 0.95,
                 fontSize: .fontLargeSize)

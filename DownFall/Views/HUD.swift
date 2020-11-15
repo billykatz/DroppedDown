@@ -84,12 +84,13 @@ class HUD: SKSpriteNode {
                 showAttack(attackInput: input, endTiles: trans.first!.endTiles)
             case .collectItem(_, let item, let total):
                 incrementCurrencyCounter(item, total: total)
-            case .itemUsed, .decrementDynamites, .shuffleBoard, .collectOffer:
+            case .itemUsed, .decrementDynamites, .shuffleBoard, .collectOffer, .gameWin:
                 if let tiles = trans.first?.endTiles,
                     let playerCoord = getTilePosition(.player(.zero), tiles: tiles),
                     case TileType.player(let data) = tiles[playerCoord].type {
                     show(data)
                 }
+                
             default:
                 ()
             }
@@ -98,6 +99,7 @@ class HUD: SKSpriteNode {
                 let playerPosition = getTilePosition(.player(.zero), tiles: tiles),
                 case let TileType.player(data) = tiles[playerPosition].type else { return }
             show(data)
+
         default:
             ()
         }

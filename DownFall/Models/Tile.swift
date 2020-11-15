@@ -134,6 +134,8 @@ enum TileType: Hashable, CaseIterable, Codable {
             return leftColor == rightColor && leftHoldsGem == rightHoldsGem
         case let (.dynamite(lhsFuse), .dynamite(rhsFuse)):
             return lhsFuse.hasBeenDecremented == rhsFuse.hasBeenDecremented
+        case let (.offer(lhsOffer), .offer(rhsOffer)):
+            return lhsOffer == rhsOffer
         default:
             return false
         }
@@ -304,6 +306,15 @@ enum TileType: Hashable, CaseIterable, Codable {
             return data.attack.frequency
         }
         return nil
+    }
+    
+    var offer: StoreOffer? {
+        switch self {
+        case .offer(let offer):
+            return offer
+        default:
+             return nil
+        }
     }
     
     static var gem: TileType {

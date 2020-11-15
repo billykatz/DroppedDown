@@ -36,6 +36,12 @@ enum RuneType: String, Codable, Hashable {
     }
 }
 
+extension Rune {
+    static func ==(_ lhsRune: Rune, _ rhsRune: Rune) -> Bool {
+        return lhsRune.type == rhsRune.type
+    }
+}
+
 struct Rune: Hashable, Codable {
     var type: RuneType
     var textureName: String

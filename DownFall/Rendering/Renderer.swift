@@ -178,6 +178,10 @@ class Renderer: SKSpriteNode {
                 refillEmptyTiles(with: trans)
             case .shuffleBoard:
                 computeNewBoard(for: trans)
+            case .runeReplaced:
+                animationsFinished(endTiles: trans.endTiles)
+            case .foundRuneDiscarded:
+                computeNewBoard(for: trans)
             case .goalCompleted(let goals):
                 animateCompletedGoals(goals, input: inputType, transformation: trans)
             case .rotatePreviewFinish(let spriteActions, let trans):
@@ -484,7 +488,12 @@ extension Renderer {
                     spriteForeground.addChild(sprite)
                 }
                 
+            } else if let poof = sprites[tileTrans.end.x][tileTrans.end.y].poof(), case InputType.foundRuneDiscarded? = transformation.inputType {
+                removedAnimations.append(poof)
+            } else if let collectAndMove = sprites[tileTrans.end.x][tileTrans.end.y].collectRune(moveTo: CGPoint(x: 0.0, y: -playableRect.height/2/4*3) ) {
+                removedAnimations.append(collectAndMove)
             }
+
         }
         
         // add new tiles "newTiles"

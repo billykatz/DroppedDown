@@ -15,6 +15,8 @@ struct PauseState: GameState {
         switch input.type {
         case .play, .selectLevel, .playAgain:
             return AnyGameState(PlayState())
+        case .runeReplaced, .foundRuneDiscarded:
+            return AnyGameState(ComputingState())
         default:
             return nil
         }

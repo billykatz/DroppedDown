@@ -101,8 +101,17 @@ class BackpackView: SKSpriteNode {
         isUserInteractionEnabled = true
         
         /// bind to view model
-        viewModel.runeReplacementPublisher.sink { (value) in
+        viewModel.runeReplacementPublisher.sink { [weak self, height] (value) in
             let (pickaxe, rune) = value
+            let viewModel = RuneReplacementViewModel(newRune: rune, pickaxe: pickaxe, runeToSwap: nil)
+            let view = RuneReplacementView(size: CGSize(width: playableRect.width, height: height),
+                                           playableRect: playableRect,
+                                           viewModel: viewModel)
+            view.zPosition = 20_000
+            view.position = .zero // centered 
+            view.name = "runeReplacement"
+            self?.removeChild(with: "runeReplacement")
+            self?.addChild(view)
             
         }.store(in: &disposables)
     }
@@ -145,7 +154,7 @@ class BackpackView: SKSpriteNode {
         
         runeInventoryContainer?.enableButton(areLegal)
     }
-
+    
     
     //MARK: - private functions
     // TODO: should this be updated?

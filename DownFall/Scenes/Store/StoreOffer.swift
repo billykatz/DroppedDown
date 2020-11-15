@@ -8,12 +8,6 @@
 
 import SpriteKit
 
-extension StoreOffer: Equatable {
-    static func ==(lhsOffer: StoreOffer, rhsOffer: StoreOffer) -> Bool {
-        return lhsOffer.type == rhsOffer.type
-    }
-}
-
 enum StoreOfferType: Codable, Hashable {
     static func ==(lhs: StoreOfferType, rhs: StoreOfferType) -> Bool {
         switch (lhs, rhs) {
@@ -21,8 +15,8 @@ enum StoreOfferType: Codable, Hashable {
         case (.plusTwoMaxHealth, .plusTwoMaxHealth): return true
         case (.runeUpgrade, .runeUpgrade): return true
         case (.gems(_), .gems(_)): return true
-        case (.rune, .rune):
-            return true
+        case let (.rune(lhsRune), .rune(rhsRune)):
+            return lhsRune == rhsRune
         default: return false
         }
     }
@@ -110,6 +104,11 @@ enum StoreOfferType: Codable, Hashable {
 typealias StoreOfferTier = Int
 
 struct StoreOffer: Codable, Hashable {
+    static func ==(_ lhsOffer: StoreOffer, _ rhsOffer: StoreOffer) -> Bool {
+        return lhsOffer.type == rhsOffer.type
+    }
+    
+    
     let type: StoreOfferType
     let tier: StoreOfferTier
     let textureName: String

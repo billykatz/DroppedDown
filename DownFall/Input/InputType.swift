@@ -57,7 +57,8 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
                                         .unlockExit,
                                         .levelGoalDetail([]),
                                         .goalCompleted([]),
-                                        .runeReplacement(Pickaxe(runeSlots: 0, runes: []), .zero)
+                                        .runeReplacement(Pickaxe(runeSlots: 0, runes: []), .zero),
+                                        .runeReplaced(Pickaxe(runeSlots: 0, runes: []), .zero)
                                                                  
     ]
     
@@ -97,6 +98,8 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
     case levelGoalDetail([GoalTracking])
     case goalCompleted([GoalTracking])
     case runeReplacement(Pickaxe, Rune)
+    case runeReplaced(Pickaxe, Rune)
+    case foundRuneDiscarded(Rune)
     
     var debugDescription: String {
         switch self {
@@ -168,6 +171,10 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
             return "Player collects \(offer.textureName)"
         case .runeReplacement(_, _):
             return "Rune Replacement flow"
+        case .runeReplaced(_):
+            return "Rune replaced"
+        case .foundRuneDiscarded(_):
+            return "Found rune discarded"
         }
     }
 }

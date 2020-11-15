@@ -16,6 +16,7 @@ protocol RuneContainerViewModelable: class {
     
     var runes: [Rune] { get }
     var numberOfRuneSlots: Int { get }
+    var disableDetailView: Bool { get }
 }
 
 class RuneContainerViewModel: RuneContainerViewModelable {
@@ -25,17 +26,20 @@ class RuneContainerViewModel: RuneContainerViewModelable {
     
     let runes: [Rune]
     let numberOfRuneSlots: Int
+    let disableDetailView: Bool
     
     init(runes: [Rune],
          numberOfRuneSlots: Int,
          runeWasTapped: ((Rune) -> ())?,
          runeWasUsed: ((Rune) -> ())?,
-         runeUseWasCanceled: (() -> ())?) {
+         runeUseWasCanceled: (() -> ())?,
+         disableDetailView: Bool = false) {
         self.runes = runes
         self.numberOfRuneSlots = numberOfRuneSlots
         self.runeWasTapped = runeWasTapped
         self.runeWasUsed = runeWasUsed
         self.runeUseWasCanceled = runeUseWasCanceled
+        self.disableDetailView = disableDetailView
     }
 }
 
@@ -75,6 +79,9 @@ class RuneContainerView: SKSpriteNode {
             // The player tapped on a full rune slot.  Let someone know that we should etner targeting move
             viewModel.runeWasTapped?(rune)
         }
+        
+        // TODO: I dont like that we have to set this flag.  Butttt, it is simple.  Potential refactor may be necessary
+        if viewModel.disableDetailView { return }
         
         setupRuneDetailView(rune: rune, progress: progress)
         toggleRuneSlots()

@@ -342,7 +342,7 @@ class Referee {
             /// If they dont have an empty slot then we enter the rune replacement flow
             if case let StoreOfferType.rune(rune) = storeOffer.type,
                let pickaxe = data.pickaxe,
-               pickaxe.runeSlots >= pickaxe.runes.count {
+               pickaxe.runeSlots < pickaxe.runes.count + 1 {
                 return Input(.runeReplacement(pickaxe, rune))
             } else {
                 return Input(.collectOffer(playerPosition.rowBelow, storeOffer))

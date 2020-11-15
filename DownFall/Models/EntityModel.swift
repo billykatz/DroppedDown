@@ -18,6 +18,12 @@ struct Pickaxe: Equatable, Codable, Hashable {
     var runes: [Rune]
     
     static let maxRuneSlots = 4
+    
+    func removeRune(_ rune: Rune) -> Pickaxe {
+        return Pickaxe(runeSlots: self.runeSlots, runes: self.runes.filter { (haveRune) -> Bool in
+            rune != haveRune
+        })
+    }
 }
 
 struct EntityModel: Equatable, Codable {
@@ -333,7 +339,7 @@ struct EntityModel: Equatable, Codable {
     func useRune(_ rune: Rune) -> EntityModel {
         var newRunes: [Rune] = []
         for currRune in self.runes ?? [] {
-            var newRune = rune
+            var newRune = currRune
             if rune == currRune {
                 newRune = rune.resetProgress()
             }

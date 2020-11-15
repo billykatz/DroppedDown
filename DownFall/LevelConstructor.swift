@@ -34,15 +34,22 @@ struct LevelConstructor {
     static func potentialItems(depth: Depth) -> [StoreOffer] {
         let offers =
             [
-                StoreOffer.offer(type: .luck, tier: 2),
-                StoreOffer.offer(type: .dodge, tier: 2),
-                StoreOffer.offer(type: .plusTwoMaxHealth, tier: 2),
+//                StoreOffer.offer(type: .luck, tier: 2),
+//                StoreOffer.offer(type: .dodge, tier: 2),
+//                StoreOffer.offer(type: .plusTwoMaxHealth, tier: 2),
                 StoreOffer.offer(type: .rune(Rune.rune(for: .bubbleUp)), tier: 1),
                 StoreOffer.offer(type: .rune(Rune.rune(for: .flameWall)), tier: 1),
                 StoreOffer.offer(type: .rune(Rune.rune(for: .vortex)), tier: 1),
                 StoreOffer.offer(type: .rune(Rune.rune(for: .rainEmbers)), tier: 1),
                 StoreOffer.offer(type: .rune(Rune.rune(for: .getSwifty)), tier: 1),
                 StoreOffer.offer(type: .rune(Rune.rune(for: .transformRock)), tier: 1),
+                StoreOffer.offer(type: .rune(Rune.rune(for: .bubbleUp)), tier: 2),
+                StoreOffer.offer(type: .rune(Rune.rune(for: .flameWall)), tier: 2),
+                StoreOffer.offer(type: .rune(Rune.rune(for: .vortex)), tier: 2),
+                StoreOffer.offer(type: .rune(Rune.rune(for: .rainEmbers)), tier: 2),
+                StoreOffer.offer(type: .rune(Rune.rune(for: .getSwifty)), tier: 2),
+                StoreOffer.offer(type: .rune(Rune.rune(for: .transformRock)), tier: 2),
+
                 StoreOffer.offer(type: .runeSlot, tier: 3)
             ]
         
@@ -68,14 +75,20 @@ struct LevelConstructor {
             let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 5, minimumGroupSize: 1)
             goals = [gemGoal, rockGoal]
         case 1:
-            let monsterGoal = LevelGoal.killMonsterGoal(amount: 3)
-            let gemGoal = LevelGoal.gemGoal(amount: 2)
-            let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 35, minimumGroupSize: 1)
+//            let monsterGoal = LevelGoal.killMonsterGoal(amount: 3)
+//            let gemGoal = LevelGoal.gemGoal(amount: 2)
+//            let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 35, minimumGroupSize: 1)
+            let monsterGoal = LevelGoal.killMonsterGoal(amount: 1)
+            let gemGoal = LevelGoal.gemGoal(amount: 1)
+            let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 5, minimumGroupSize: 1)
             goals = [gemGoal, rockGoal, monsterGoal]
         case 2:
-            let gemGoal = LevelGoal.gemGoal(amount: gemAtDepth)
-            let rockGoal = randomRockGoal([.red, .purple,. blue], amount: 5, minimumGroupSize: 4)
-            let monsterGoal = LevelGoal.killMonsterGoal(amount: 5)
+//            let gemGoal = LevelGoal.gemGoal(amount: gemAtDepth)
+//            let rockGoal = randomRockGoal([.red, .purple,. blue], amount: 5, minimumGroupSize: 4)
+//            let monsterGoal = LevelGoal.killMonsterGoal(amount: 5)
+            let monsterGoal = LevelGoal.killMonsterGoal(amount: 1)
+            let gemGoal = LevelGoal.gemGoal(amount: 1)
+            let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 5, minimumGroupSize: 1)
             goals = [gemGoal, rockGoal, monsterGoal]
         case 3:
             let gemGoal = LevelGoal.gemGoal(amount: gemAtDepth)

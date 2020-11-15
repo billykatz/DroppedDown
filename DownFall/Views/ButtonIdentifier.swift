@@ -47,6 +47,8 @@ enum ButtonIdentifier: String {
     case mainMenuOptions
     case mainMenuStore
     case continueRun
+    case discardFoundRune
+    case swapRunes
     
     var title: String {
         switch self {
@@ -104,6 +106,10 @@ enum ButtonIdentifier: String {
             return "Store"
         case .mainMenuOptions:
             return "Settings"
+        case .discardFoundRune:
+            return "Discard"
+        case .swapRunes:
+            return "Swap"
         case .wallet, .infoPopup, .storeItem, .backpack, .sellHealth, .buyHealth, .sellDodge, .buyDodge, .sellLuck, .buyLuck, .buyRuneSlot, .sellRuneSlot:
             return ""
         }

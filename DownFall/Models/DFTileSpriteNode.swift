@@ -182,6 +182,30 @@ class DFTileSpriteNode: SKSpriteNode {
         return (self, addGemAction)
     }
     
+    func collectRune(moveTo point: CGPoint, _ removeFromParent: Bool = true) -> (SpriteAction)? {
+        guard case StoreOfferType.rune? = self.type.offer?.type else { return nil }
+        
+        let moveAnimationX = SKAction.moveTo(x: point.x, duration: 0.75)
+        let moveAnimationY = SKAction.moveTo(y: point.y, duration: 0.75)
+        let remove = SKAction.removeFromParent()
+        let moveAnimations: [SKAction] = [moveAnimationX, moveAnimationY]
+        let group = SKAction.group(moveAnimations)
+        let sequence = SKAction.sequence([group, remove])
+        
+        return SpriteAction(sprite: self, action: sequence)
+    }
+    
+    func poof(_ removeFromParent: Bool = true) -> (SpriteAction)? {
+        guard case StoreOfferType.rune? = self.type.offer?.type else { return nil }
+        
+        let smokeAnimation = Animator().smokeAnimation()
+        let remove = SKAction.removeFromParent()
+        let sequencedActions: [SKAction] = [smokeAnimation, remove]
+        let sequence = SKAction.sequence(sequencedActions)
+        
+        return SpriteAction(sprite: self, action: sequence)
+    }
+    
     func crumble(_ removeFromParent: Bool = true) -> (SpriteAction)? {
         var animationFrames: [SKTexture] = []
         switch self.type {

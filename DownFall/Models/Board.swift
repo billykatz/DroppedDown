@@ -146,6 +146,10 @@ class Board: Equatable {
             transformation = self.completedGoals(completedGoals, inputType: input.type)
         case let .collectOffer(offerCoord, storeOffer):
             transformation = self.collect(offer: storeOffer, at: offerCoord, input: input)
+        case .runeReplaced(let pickaxe, let rune):
+            transformation = self.runeReplaced(rune, inputType: input.type)
+        case .foundRuneDiscarded(let rune):
+            transformation = self.foundRuneDiscarded(rune, input: input)
         case .gameLose,
              .play,
              .pause,
@@ -162,6 +166,35 @@ class Board: Equatable {
         guard let trans = transformation else { return }
         InputQueue.append(Input(.transformation([trans])))
     }
+    
+    private func foundRuneDiscarded(_ rune: Rune, input: Input) -> Transformation {
+        guard let specificCoord = tiles(of: TileType.offer(StoreOffer(type: .rune(rune), tier: 1, textureName: "", currency: .gem, title: "", body: "", startingPrice: 0))).first else { return .zero }
+        
+        let removeAndReplace = removeAndReplaces(from: tiles, specificCoord: [specificCoord], input: input)
+        
+        return removeAndReplace
+    }
+    
+    private func runeReplaced(_ rune: Rune, inputType: InputType) -> Transformation {
+        guard
+            let pp = playerPosition,
+            case let .player(data) = tiles[pp].type
+            else { return Transformation.zero }
+        
+        var newTiles = tiles
+        
+        let pickaxe = data.pickaxe?.removeRune(rune)
+        
+        let newPlayer = data.update(pickaxe: pickaxe)
+        
+        newTiles[pp.x][pp.y] = Tile(type: .player(newPlayer))
+        
+        tiles = newTiles
+        
+        return Transformation(transformation: nil, inputType: inputType, endTiles: newTiles)
+
+    }
+  
     
     /// This is for collecting runes or other things like max health
     private func collect(offer: StoreOffer, at offerCoord: TileCoord, input: Input) -> Transformation {
@@ -779,6 +812,8 @@ extension Board {
             case .rock:
                 intermediateTiles[coord.x][coord.y] = Tile.empty
             case .monster:
+                intermediateTiles[coord.x][coord.y] = Tile.empty
+            case .offer:
                 intermediateTiles[coord.x][coord.y] = Tile.empty
             default:
                 preconditionFailure("We should only use this for rocks, pillars and monsters")

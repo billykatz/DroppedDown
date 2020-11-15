@@ -84,6 +84,9 @@ class TargetingViewModel: Targeting {
     
     func handle(_ input: Input) {
         switch input.type {
+        case .runeReplaced(let pickaxe, let rune):
+            let runes = pickaxe.runes.filter { $0.type != rune.type }
+            runeSlotsUpdated?(pickaxe.runeSlots, runes)
         case .runeReplacement(let pickaxe, let rune):
             runeReplacementSubject.send((pickaxe, rune))
         case .transformation(let trans):
@@ -98,12 +101,20 @@ class TargetingViewModel: Targeting {
                     runeSlotsUpdated?(runeSlots, runes)
                 }
 
-            }
-            else {
+            } else {
                 /// clear out targets after any transformation
                 currentTargets = AllTarget(targets: [], areLegal: false)
             }
-            
+        case .animationsFinished:
+            if let endTiles = input.endTilesStruct {
+                if let playerData = playerData(in: endTiles),
+                    let runes = playerData.runes {
+                    let runeSlots = playerData.runeSlots ?? 0
+                    self.runeSlots = runeSlots
+                    inventory = playerData.runes ?? []
+                    runeSlotsUpdated?(runeSlots, runes)
+                }
+            }
         case .newTurn:
             guard let tiles = input.endTilesStruct else { return }
             self.tiles = tiles

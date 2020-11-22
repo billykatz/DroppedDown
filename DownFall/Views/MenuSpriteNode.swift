@@ -42,21 +42,13 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
         
         if menuType == .gameWin {
             
-            let heartText: String
-            if completedGoals > 0 {
-                heartText = "+ \(String(repeating: "♥️", count: completedGoals))"
-            } else {
-                heartText = "+0 ♥️"
-            }
-            
             let text =
             """
 
-                    You survived 😅
+            You survived depth: \(level.humanReadableDepth)
 
-            + 1 HP per completed goal
+            You healed \(completedGoals) HP for completing \(completedGoals) goal\(completedGoals > 1 ? "s" : "").
 
-                \(heartText)
             """
             let paragraphNode = ParagraphNode.labelNode(text: text, paragraphWidth: menuSizeWidth * 0.95,
                 fontSize: .fontLargeSize)

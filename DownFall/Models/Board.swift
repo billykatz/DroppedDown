@@ -76,7 +76,7 @@ class Board: Equatable {
                 InputQueue.append(Input(.tileDetail(type, attacks)))
                 return
                 
-            case .pillar, .item:
+            case .pillar, .item, .offer:
                 InputQueue.append(Input(.tileDetail(type, [])))
                 return
                 
@@ -225,10 +225,10 @@ class Board: Equatable {
     private func collect(offer: StoreOffer, at offerCoord: TileCoord, input: Input) -> [Transformation] {
         let selectedTile = tiles[offerCoord]
         
-        //remove and replace the single item tile
+        // remove and replace the single item tile
         let transformation = removeAndReplace(from: tiles, tileCoord: offerCoord, singleTile: true, input: input)
         
-        //save the item
+        // save the item
         guard case let TileType.offer(storeOffer) = selectedTile.type,
             var updatedTiles = transformation.endTiles,
             let pp = playerPosition,
@@ -265,42 +265,78 @@ class Board: Equatable {
         }
     }
     
+    private func randomTilecoord(ofType: TileType) -> TileCoord? {
+        for row in 0..<tiles.count {
+            for col in 0..<tiles.count {
+                if tiles[row][col].type == ofType {
+                    return TileCoord(row, col)
+                }
+            }
+        }
+        
+        return nil
+    }
+    
     private func useOneTimeUseEffect(_ effect: EffectModel, at offerCoord: TileCoord, input: Input, previousTransformation: Transformation) -> [Transformation] {
         
-        let trans: Transformation
+        var trans: Transformation?
         
         switch effect.kind {
         case .killMonster:
-            trans = .zero
+            if let randomMonsterCoord = randomTilecoord(ofType: .monster(.zero)) {
+                trans = removeAndReplace(from: tiles, tileCoord: randomMonsterCoord, singleTile: true, input: input)
+            }
         case .transmogrify:
-            trans = .zero
+            if let randomMonsterCoord = randomTilecoord(ofType: .monster(.zero)) {
+                trans = transmogrify(randomMonsterCoord, input: input)
+            }
         default:
             preconditionFailure("Currently only killMonster and transmogrify are set up for this code path")
         }
         
-        return [previousTransformation, trans]
+        return (trans != nil) ? [previousTransformation, trans!] : [previousTransformation]
     }
     
-    private var reservedCoords: Set<TileCoord> {
-        var reservedCoords = Set<TileCoord>()
-        reservedCoords.insert(playerPosition!)
-        reservedCoords.formUnion(tiles(of: .exit(blocked: false)))
-        reservedCoords.formUnion(tiles(of: .pillar(PillarData(color: .blue, health: 3))))
-        reservedCoords.formUnion(tiles(of: .monster(.zero)))
-        reservedCoords.formUnion(tiles(of: .item(.zero)))
-        reservedCoords.formUnion(tiles(of: .rock(color: .blue, holdsGem: true)))
-        reservedCoords.formUnion(tiles(of: .rock(color: .red, holdsGem: true)))
-        reservedCoords.formUnion(tiles(of: .rock(color: .purple, holdsGem: true)))
-        reservedCoords.formUnion(tiles(of: .rock(color: .brown, holdsGem: true)))
-        return reservedCoords
+    private func reservedCoords() -> Set<TileCoord> {
+        var tileCoords: [TileCoord] = []
+        for (i, _) in tiles.enumerated() {
+            for (j, _) in tiles[i].enumerated() {
+                switch tiles[i][j].type {
+                case .exit, .offer, .pillar, .monster, .item, .rock(color: _, holdsGem: true):
+                    tileCoords.append(TileCoord(i, j))
+                default:
+                    continue
+                }
+            }
+        }
+        return Set<TileCoord>(tileCoords)
     }
     
     var spawnedItems: [StoreOffer] = []
     
-    private func randomItem(in tier: Int) -> StoreOffer {
+    private func randomItem(in tier: Int, excludeRunesInPickaxe pickaxe: Pickaxe) -> StoreOffer {
         let offersInTier = self.level.potentialItems.filter { $0.tierIndex == tier }
         let randomNumber = Int.random(abs(tileCreator.randomSource.nextInt())) % offersInTier.count
-        return offersInTier[randomNumber]
+        let randomItem = offersInTier[randomNumber]
+        
+        if let rune = randomItem.rune, pickaxe.runes.contains(rune) {
+            // repeat until we get one that the current pickaxe doesnt contain.
+            return self.randomItem(in: tier, excludeRunesInPickaxe: pickaxe)
+        } else {
+            return randomItem
+        }
+    }
+    
+    private func contains(offer: StoreOffer) -> Bool  {
+        for row in 0..<tiles.count {
+            for col in 0..<tiles.count {
+                if case TileType.offer(let storeOffer) = tiles[row][col].type, storeOffer == offer {
+                    return true
+                }
+            }
+        }
+        
+        return false
     }
     
     private var earnedGoals: Int = 0
@@ -317,10 +353,10 @@ class Board: Equatable {
         self.level.goalProgress.append(contentsOf: goals)
         
         // Create a transformation based on how many goals are completed and where the player is in the mine
-        guard let pp = playerPosition else { return .zero }
+        guard let pp = playerPosition, case TileType.player(let data) = tiles[pp].type, let pickaxe = data.pickaxe else { return .zero }
         let playerQuadrant = Quadrant.quadrant(of: pp, in: boardSize)
         var transformedTiles: [TileTransformation] = []
-        var reservedCoords = self.reservedCoords
+        var reservedCoords = self.reservedCoords()
         for (idx, _) in goals.enumerated() {
             // get a random coord not in the reserved set
             let randomCoordInAnotherQuadrant = playerQuadrant.opposite.randomCoord(for: boardSize, notIn: reservedCoords)
@@ -333,7 +369,7 @@ class Board: Equatable {
             
             /// get a random offer
             let tier = awardedGoalsCount + idx
-            let randomOffer = randomItem(in: tier)
+            let randomOffer = randomItem(in: tier, excludeRunesInPickaxe: pickaxe)
             spawnedItems.append(randomOffer)
             
             /// transform the tile
@@ -519,7 +555,7 @@ class Board: Equatable {
         if case let TileType.monster(data) = tiles[target].type {
             let newMonster = tileCreator.randomMonster(not: data.type)
             tiles[target.row][target.column] = newMonster
-            return Transformation(transformation: nil, inputType: input.type, endTiles: tiles)
+            return Transformation(transformation: [TileTransformation(TileCoord(target.row, target.column), TileCoord(target.row, target.column))], inputType: input.type, endTiles: tiles)
         } else {
             preconditionFailure("We should never hit this code path")
         }

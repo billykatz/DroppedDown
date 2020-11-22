@@ -15,11 +15,9 @@ struct LevelConstructor {
     
     // ITEMS
     
-    static func tier1Items() -> [StoreOffer] {
+    static var tier1Items:  [StoreOffer] {
         [
-//            StoreOffer.offer(type: .luck(amount: 2), tier: 1),
-//            StoreOffer.offer(type: .dodge(amount: 2), tier: 1),
-//            StoreOffer.offer(type: .plusOneMaxHealth, tier: 1),
+            StoreOffer.offer(type: .plusOneMaxHealth, tier: 1),
             StoreOffer.offer(type: .killMonsterPotion, tier: 1),
             StoreOffer.offer(type: .transmogrifyPotion, tier: 1),
             StoreOffer.offer(type: .lesserHeal, tier: 1)
@@ -28,11 +26,9 @@ struct LevelConstructor {
     
     static var tier2Items: [StoreOffer] {
         [
-        StoreOffer.offer(type: .luck(amount: 3), tier: 2),
-        StoreOffer.offer(type: .dodge(amount: 3), tier: 2),
+        StoreOffer.offer(type: .luck(amount: 2), tier: 2),
+        StoreOffer.offer(type: .dodge(amount: 2), tier: 2),
         StoreOffer.offer(type: .plusTwoMaxHealth, tier: 2),
-        StoreOffer.offer(type: .killMonsterPotion, tier: 2),
-        StoreOffer.offer(type: .transmogrifyPotion, tier: 2),
         StoreOffer.offer(type: .greaterHeal, tier: 2)
         ]
     }
@@ -42,9 +38,26 @@ struct LevelConstructor {
         StoreOffer.offer(type: .luck(amount: 3), tier: 3),
         StoreOffer.offer(type: .dodge(amount: 3), tier: 3),
         StoreOffer.offer(type: .plusTwoMaxHealth, tier: 3),
-        StoreOffer.offer(type: .killMonsterPotion, tier: 3),
-        StoreOffer.offer(type: .transmogrifyPotion, tier: 3),
         StoreOffer.offer(type: .greaterHeal, tier: 3)
+        ]
+    }
+    
+    static var tier1Runes: [StoreOffer] {
+        [
+            StoreOffer.offer(type: .rune(Rune.rune(for: .bubbleUp)), tier: 1),
+            StoreOffer.offer(type: .rune(Rune.rune(for: .flameWall)), tier: 1),
+            StoreOffer.offer(type: .rune(Rune.rune(for: .vortex)), tier: 1),
+            StoreOffer.offer(type: .rune(Rune.rune(for: .rainEmbers)), tier: 1),
+            StoreOffer.offer(type: .rune(Rune.rune(for: .getSwifty)), tier: 1),
+            StoreOffer.offer(type: .rune(Rune.rune(for: .transformRock)), tier: 1)
+        ]
+    }
+    
+    static var basicRunes: [StoreOffer] {
+        [
+            StoreOffer.offer(type: .rune(Rune.rune(for: .rainEmbers)), tier: 2),
+            StoreOffer.offer(type: .rune(Rune.rune(for: .getSwifty)), tier: 2),
+            StoreOffer.offer(type: .rune(Rune.rune(for: .transformRock)), tier: 2)
         ]
     }
     
@@ -91,7 +104,9 @@ struct LevelConstructor {
     
     static func tier2items(depth: Depth) -> [StoreOffer] {
         switch depth {
-        case 1, 3:
+        case 1:
+            return basicRunes
+        case 3:
             return tier2Runes
         case 0, 2:
             return tier2Items
@@ -112,9 +127,9 @@ struct LevelConstructor {
     
     static func tier3items(depth: Depth) -> [StoreOffer] {
         switch depth {
-        case 0,1,2:
+        case 0,1:
             return []
-        case 3:
+        case 2,3:
             return tier3Items
         case 4, 9, 14:
             return tier3Runes
@@ -128,34 +143,11 @@ struct LevelConstructor {
     
     static func potentialItems(depth: Depth) -> [StoreOffer] {
         var offers = [StoreOffer]()
-        offers.append(contentsOf: tier1Items())
+        offers.append(contentsOf: tier1Items)
         offers.append(contentsOf: tier2items(depth: depth))
         offers.append(contentsOf: tier3items(depth: depth))
         
         return offers
-        
-//        let offers =
-//            [
-////                StoreOffer.offer(type: .luck, tier: 2),
-////                StoreOffer.offer(type: .dodge, tier: 2),
-////                StoreOffer.offer(type: .plusTwoMaxHealth, tier: 2),
-//                StoreOffer.offer(type: .rune(Rune.rune(for: .bubbleUp)), tier: 1),
-//                StoreOffer.offer(type: .rune(Rune.rune(for: .flameWall)), tier: 1),
-//                StoreOffer.offer(type: .rune(Rune.rune(for: .vortex)), tier: 1),
-//                StoreOffer.offer(type: .rune(Rune.rune(for: .rainEmbers)), tier: 1),
-//                StoreOffer.offer(type: .rune(Rune.rune(for: .getSwifty)), tier: 1),
-//                StoreOffer.offer(type: .rune(Rune.rune(for: .transformRock)), tier: 1),
-//                StoreOffer.offer(type: .rune(Rune.rune(for: .bubbleUp)), tier: 2),
-//                StoreOffer.offer(type: .rune(Rune.rune(for: .flameWall)), tier: 2),
-//                StoreOffer.offer(type: .rune(Rune.rune(for: .vortex)), tier: 2),
-//                StoreOffer.offer(type: .rune(Rune.rune(for: .rainEmbers)), tier: 2),
-//                StoreOffer.offer(type: .rune(Rune.rune(for: .getSwifty)), tier: 2),
-//                StoreOffer.offer(type: .rune(Rune.rune(for: .transformRock)), tier: 2),
-//
-//                StoreOffer.offer(type: .runeSlot, tier: 3)
-//            ]
-//
-//        return offers
     }
     
     static func depthDivided(_ depth: Depth) -> Int {
@@ -177,11 +169,9 @@ struct LevelConstructor {
         switch depth {
         case 0:
             let monsterGoal = LevelGoal.killMonsterGoal(amount: 1)
-//            let gemGoal = LevelGoal.gemGoal(amount: 1)
-//            let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 5, minimumGroupSize: 3)
-            
             let gemGoal = LevelGoal.gemGoal(amount: 1)
-            let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 1, minimumGroupSize: 3)
+            let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 5, minimumGroupSize: 3)
+            
             goals = [gemGoal, rockGoal, monsterGoal]
         case 1:
             let monsterGoal = LevelGoal.killMonsterGoal(amount: 3)
@@ -193,15 +183,22 @@ struct LevelConstructor {
             let rockAmount = Int.random(lower: 20, upper: 35) / minGroupSize
             let monsterAmount = Int(Double(boardSize(depth: depth)) * Double(boardSize(depth: depth)) * maxMonsterOnBoardRatio(depth: depth))
             let gemAmount = gemAtDepth * Int.random(lower: 50, upper: 75) / 100
-            let pillarAmount = pillars.count * 3 * Int.random(lower: 33, upper: 66) / 100
-            let useRuneAmount = depthDivided(depth) + (abs(randomSource.nextInt() * 100) % 3)
+            let pillarAmount = pillars.count * 3 * Int.random(lower: 50, upper: 75) / 100
+            let useRuneAmount = depthDivided(depth) + (abs(randomSource.nextInt() * 100) % 3) + 1
             
             let gemGoal = LevelGoal.gemGoal(amount: gemAmount)
             let rockGoal = randomRockGoal([.red, .purple, .blue], amount: rockAmount, minimumGroupSize: minGroupSize)
             let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
             let pillarGoal = LevelGoal.pillarGoal(amount: pillarAmount)
             let useRuneGoal = LevelGoal.useRuneGoal(amount: useRuneAmount)
-            goals = [gemGoal, rockGoal, monsterGoal, pillarGoal, useRuneGoal]
+            
+            goals = [gemGoal, rockGoal, monsterGoal]
+            
+            if pillarAmount > 0 {
+                goals.append(pillarGoal)
+            } else if useRuneAmount > 0 {
+                goals.append(useRuneGoal)
+            }
         default:
             goals = []
         }
@@ -216,7 +213,7 @@ struct LevelConstructor {
     
     static func boardSize(depth: Depth) -> Int {
         switch depth {
-        case 0, 1, 3, 4:
+        case 0, 1, 2, 3, 4:
             return 7
         case 5...Int.max:
             return 8
@@ -272,9 +269,17 @@ struct LevelConstructor {
         }
         
         
-        /// =FLOOR( MIN(M3, B3/3 * (MOD(RAND() * 10, 3)) ) )
         
-        let numberPillars = min(boardSize(depth: depth), (depth / 3) * (abs(randomSource.nextInt()) % 3))
+//        =FLOOR( MIN(M3 - (2 - MOD(RAND() * 10, 2)),  (AD3 + RANDBETWEEN(-1,1) ) ))
+        /// no pillars in first 5 levels
+        let depthDivided = self.depthDivided(depth)
+        let numPillarsBasedOnDepth =
+            depthDivided == 0 ?
+                0
+                :
+            depthDivided + (randomSource.positiveNextInt % 2 == 0 ? -1 : 1)
+        
+        let numberPillars = min(boardSize(depth: depth) - (2 - randomSource.positiveNextInt % 2), numPillarsBasedOnDepth)
         
         var coord: [TileCoord] = []
         var pillars: [PillarCoorindates] = []

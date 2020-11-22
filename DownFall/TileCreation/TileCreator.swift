@@ -106,7 +106,7 @@ class TileCreator: TileStrategy {
         for (key, value) in tileTypeChances.chances {
             let minValue = max(1, value)
             if let color = key.color, (lowerBound..<lowerBound+minValue).contains(randomNumber) {
-                return TileType.rock(color: color, holdsGem: shouldRockHoldGem(playerData: playerData))
+                return TileType.rock(color: color, holdsGem: shouldRockHoldGem(playerData: playerData, rockColor: color))
             } else {
                 lowerBound = lowerBound + minValue
             }
@@ -115,7 +115,7 @@ class TileCreator: TileStrategy {
         fatalError("The randomNumber should between 0 and \(randomNumber-1) should map to a TileType.")
     }
     
-    func shouldRockHoldGem(playerData: EntityModel) -> Bool {
+    func shouldRockHoldGem(playerData: EntityModel, rockColor: Color) -> Bool {
         let extraGemsBasedOnLuck = playerData.luck / 5
         let extraChanceBasedOnLuck = extraGemsBasedOnLuck * 2
         guard specialGems < level.maxSpawnGems + extraGemsBasedOnLuck else { return false }
@@ -129,7 +129,7 @@ class TileCreator: TileStrategy {
         if (0..<totalChance).contains(index) {
             numberOfTilesSinceLastGemDropped = 0
             specialGems += 1
-            return true
+            return rockColor != .brown
         } else {
             return false
         }
@@ -303,8 +303,8 @@ class TileCreator: TileStrategy {
         guard level.hasExit else { return tiles }
         //place the exit on the opposite side of the grid
         #warning ("make sure this is set properly for release")
-//        let exitQuadrant = playerQuadrant.opposite
-        let exitQuadrant = playerQuadrant
+        let exitQuadrant = playerQuadrant.opposite
+//        let exitQuadrant = playerQuadrant
         let exitPosition = exitQuadrant.randomCoord(for: boardSize, notIn: reservedSet)
         reservedSet.insert(exitPosition)
         

@@ -120,7 +120,7 @@ class TileDetailView: SKSpriteNode {
     
     private func titleNode(tileType: TileType, nextTo: CGRect) -> ParagraphNode {
         let string = tileType.humanReadable
-        let title = ParagraphNode(text: string, paragraphWidth: detailViewTemplate.frame.width, fontSize: .fontLargeSize)
+        let title = ParagraphNode(text: string, paragraphWidth: detailViewTemplate.frame.width - nextTo.width, fontSize: .fontLargeSize)
         title.position = CGPoint.alignVertically(title.frame, relativeTo: nextTo, horizontalAnchor: .right, verticalAlign: .top, horizontalPadding: Style.Padding.most, translatedToBounds: true)
         title.zPosition = Precedence.menu.rawValue
         return title
@@ -131,6 +131,19 @@ class TileDetailView: SKSpriteNode {
         sprite.position = CGPoint.position(sprite.frame, inside: detailViewTemplate.frame, verticalAlign: .top, horizontalAnchor: .left, xOffset: Style.Padding.normal)
         sprite.zPosition = Precedence.menu.rawValue
         return sprite
+    }
+    
+    private func animatedSprite(offer: StoreOffer) -> SKSpriteNode {
+        let potionAnimationFrames = SpriteSheet(texture: SKTexture(imageNamed: offer.textureName),
+                                                rows: 1,
+                                                columns: offer.spriteSheetColumns!)
+        
+        let placeholderSprite = SKSpriteNode(color: .clear, size: CGSize(width: tileSize, height: tileSize))
+        placeholderSprite.run(SKAction.repeatForever(SKAction.animate(with: potionAnimationFrames.animationFrames(), timePerFrame: 0.2)))
+
+        placeholderSprite.position = CGPoint.position(placeholderSprite.frame, inside: detailViewTemplate.frame, verticalAlign: .top, horizontalAnchor: .left, xOffset: Style.Padding.normal)
+        placeholderSprite.zPosition = Precedence.menu.rawValue
+        return placeholderSprite
     }
     
     private func attackDescription(tileType: TileType, nextTo: CGRect) -> ParagraphNode? {
@@ -186,8 +199,25 @@ class TileDetailView: SKSpriteNode {
         
     }
 
-
+    private func offerDescription(tileType: TileType, nextTo: CGRect) -> ParagraphNode? {
+        guard case TileType.offer(let offer) = tileType  else { return nil }
+        let text: String
+        if offer.effect.stat == .oneTimeUse {
+            text = "Targets chosen randomly. Effects applied immediately."
+        } else if offer.effect.kind == .rune {
+            text = "Collect to add to your Pickaxe."
+        } else {
+            text = "Effects applied immediately."
+        }
     
+        let offerDesc = ParagraphNode(text: text, paragraphWidth: detailViewTemplate.frame.width - Style.DetailView.spriteSize.width - Style.Padding.more, fontSize: .fontMediumSize)
+        offerDesc.position = CGPoint.alignHorizontally(offerDesc.frame, relativeTo: nextTo, horizontalAnchor: .left, verticalAlign: .bottom, verticalPadding: Style.Padding.more, translatedToBounds: true)
+        offerDesc.zPosition = Precedence.menu.rawValue
+        return offerDesc
+        
+    }
+
+
     
     func updateTileDetailView() {
         guard let tileType = tileType else {
@@ -202,7 +232,12 @@ class TileDetailView: SKSpriteNode {
         }
         
         /// add the sprite image
-        let sprite = spriteNode(tileType: tileType)
+        let sprite: SKSpriteNode
+        if case TileType.offer(let offer) = tileType, offer.hasSpriteSheet {
+            sprite = animatedSprite(offer: offer)
+        } else {
+            sprite = spriteNode(tileType: tileType)
+        }
         detailViewTemplate.addChild(sprite)
         
         /// add the title node
@@ -218,16 +253,22 @@ class TileDetailView: SKSpriteNode {
             detailViewTemplate.addChild(gemDesc)
         } else if let playerDescription = playerDescription(tileType: tileType, nextTo: title.frame) {
             detailViewTemplate.addChild(playerDescription)
+        } else if let offerDescription = offerDescription(tileType: tileType, nextTo: title.frame) {
+            detailViewTemplate.addChild(offerDescription)
         }
         
-        // add the border
-        addBorder()
-        
-        
         detailViewTemplate.position = CGPoint.position(this: detailViewTemplate.frame, centeredInBottomOf: self.contentView.frame, verticalPadding: 150.0)
-        
+
         /// Add it to the view
         contentView.addChild(detailViewTemplate)
+
+        // add the border
+        let border = SKShapeNode(rect: detailViewTemplate.frame)
+        border.strokeColor = UIColor.darkGray
+        border.lineWidth = 10.0
+        border.zPosition = self.zPosition + 100
+        border.position = .zero
+        contentView.addChild(border)
     }
     
     func updateLevelGoals() {
@@ -236,6 +277,12 @@ class TileDetailView: SKSpriteNode {
             detailViewTemplate.removeFromParent()
             return
         }
+        for child in contentView.children {
+            if child.name == Constants.borderName {
+                child.removeFromParent()
+            }
+        }
+
         
         let subTitleNode = ParagraphNode(text: "Level Goals", paragraphWidth: detailViewTemplate.frame.width, fontSize: .fontLargeSize)
         
@@ -255,8 +302,8 @@ class TileDetailView: SKSpriteNode {
                                                    inside: detailViewTemplate.frame,
                                                    verticalAlign: .top,
                                                    horizontalAnchor: .left,
-                                                   xOffset: Style.Padding.most*3,
-                                                   yOffset: (CGFloat(count)*Style.LevelGoalKey.keyTextureSize.height) + textHeight + Style.Padding.more*2)
+                                                   xOffset: Style.Padding.most,
+                                                   yOffset: (CGFloat(count)*Style.LevelGoalKey.keyTextureSize.height) + (CGFloat(count) * 5) + textHeight + Style.Padding.more*2)
             colonNode.position = CGPoint.alignVertically(colonNode.frame, relativeTo: circleNode.frame, horizontalAnchor: .right, verticalAlign: .center, verticalPadding: Style.Padding.more, horizontalPadding: Style.Padding.more, translatedToBounds: true)
             sprite.position = CGPoint.alignVertically(sprite.frame, relativeTo: circleNode.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: 2*Style.Padding.most, translatedToBounds: true)
             
@@ -265,7 +312,7 @@ class TileDetailView: SKSpriteNode {
             detailViewTemplate.addChildSafely(colonNode)
             detailViewTemplate.addChildSafely(circleNode)
             
-            let descriptionLabel = ParagraphNode(text: "\(goal.description())", paragraphWidth: detailViewTemplate.frame.maxX - sprite.frame.maxX, fontSize: .fontMediumSize)
+            let descriptionLabel = ParagraphNode(text: "\(goal.description())", paragraphWidth: detailViewTemplate.frame.maxX - sprite.frame.maxX, fontSize: .fontLargeSize)
             
             descriptionLabel.position = CGPoint.alignVertically(descriptionLabel.frame, relativeTo: sprite.frame, horizontalAnchor: .right, verticalAlign: .center, verticalPadding: Style.Padding.less, horizontalPadding: Style.Padding.most,  translatedToBounds: true)
             
@@ -274,7 +321,7 @@ class TileDetailView: SKSpriteNode {
             
             // Progress label  
             let progressLabel = ParagraphNode(text: goal.progressDescription, paragraphWidth: detailViewTemplate.frame.maxX - sprite.frame.maxX, fontSize: .fontMediumSize)
-            let x = CGPoint.position(progressLabel.frame, inside: detailViewTemplate.frame, verticalAlign: .center, horizontalAnchor: .right, xOffset: Style.Padding.most*3).x
+            let x = CGPoint.position(progressLabel.frame, inside: detailViewTemplate.frame, verticalAlign: .center, horizontalAnchor: .right, xOffset: Style.Padding.most).x
             let y = CGPoint.alignVertically(progressLabel.frame, relativeTo: descriptionLabel.frame, horizontalAnchor: .right, verticalAlign: .center, translatedToBounds: true).y
             progressLabel.position = CGPoint(x:x, y: y)
                 
@@ -294,7 +341,7 @@ class TileDetailView: SKSpriteNode {
         // add the border
         let border = SKShapeNode(rect: detailViewTemplate.frame)
         border.strokeColor = UIColor.darkGray
-        border.lineWidth = Style.Menu.borderWidth
+        border.lineWidth = 10.0
         border.zPosition = self.zPosition + 100
         border.position = .zero
         border.name = Constants.borderName

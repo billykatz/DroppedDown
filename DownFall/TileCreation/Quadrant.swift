@@ -44,11 +44,11 @@ enum Quadrant: CaseIterable {
             if coord.y < boardSize/2 {
                 return .southWest
             } else {
-                return .northWest
+                return .southEast
             }
         } else {
             if coord.y < boardSize/2 {
-                return .southEast
+                return .northWest
             } else {
                 return .northEast
             }

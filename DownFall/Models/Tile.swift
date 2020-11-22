@@ -415,6 +415,8 @@ extension TileType {
             return "gold"
         case .dynamite:
             return "dynamite"
+        case .offer(let offer):
+            return offer.description
         default:
             preconditionFailure("We probably shouldnt be here. Investigate")
         }

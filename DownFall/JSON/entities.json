@@ -71,7 +71,7 @@
                 "damage": 1,
                 "range": {
                     "lower": 1,
-                    "upper": 5
+                    "upper": 4
                 },
                 "attacksPerTurn": 1,
                 "attackSlope": [
@@ -246,7 +246,7 @@
                 "damage": 1,
                 "range": {
                     "lower": 1,
-                    "upper": 5
+                    "upper": 4
                 },
                 "attacksPerTurn": 1,
                 "attackSlope": [

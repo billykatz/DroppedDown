@@ -168,8 +168,8 @@ class Renderer: SKSpriteNode {
                 animationsFinished(endTiles: trans.endTiles)
             case .itemUsed(let ability, let targets):
                 animateRuneUsed(input: inputType, transformations: transformations, rune: ability, targets: targets)
-            case .collectOffer:
-                computeNewBoard(for: trans)
+            case .collectOffer(let tileCoord, let offer):
+                collectOffer(transformations, offer: offer, atTilecoord: tileCoord)
             case .collectItem:
                 computeNewBoard(for: trans)
             case .decrementDynamites:
@@ -278,30 +278,19 @@ class Renderer: SKSpriteNode {
                    let frequency = tiles[row][col].type.attackFrequency() {
                     sprite.showAttackTiming(frequency, turns)
                 }
-//                else if case TileType.offer(let offer) = tiles[row][col].type,
-//                          offer.hasSpriteSheet, let columns = offer.spriteSheetColumns {
-//                    let spriteSheet = SpriteSheet(texture: SKTexture(imageNamed: offer.textureName), rows: 1, columns: columns)
-//                    let animation = SKAction.animate(with: spriteSheet.animationFrames(), timePerFrame: 0.1)
-//                    let repeatAction = SKAction.repeatForever(animation)
-//                    sprite.run(repeatAction)
-//                }
                 spriteForeground.addChild(sprite)
             }
         }
     }
     
-    
     private func positionsInForeground(at coords: [TileCoord]) -> [CGPoint] {
-        var x : CGFloat = 0
-        var y : CGFloat = 0
-        var points: [CGPoint] = []
-        for coordinate in coords {
-            x = CGFloat(coordinate.y) * tileSize + bottomLeft.x
-            y = CGFloat(coordinate.x) * tileSize + bottomLeft.y
-            points.append(CGPoint(x: x, y: y))
-        }
-        
-        return points
+        return coords.map { positionInForeground(at: $0) }
+    }
+    
+    private func positionInForeground(at coord: TileCoord) -> CGPoint {
+        let x = CGFloat(coord.y) * tileSize + bottomLeft.x
+        let y = CGFloat(coord.x) * tileSize + bottomLeft.y
+        return CGPoint(x: x, y: y)
     }
     
     private func createSprites(from tiles: [[Tile]]?) -> [[DFTileSpriteNode]] {
@@ -429,6 +418,78 @@ class Renderer: SKSpriteNode {
 }
 
 extension Renderer {
+    
+    /// Renders and delegates animation of collecting store offers
+    private func collectOffer(_ trans: [Transformation], offer: StoreOffer, atTilecoord: TileCoord) {
+        guard trans.count > 1 else {
+            computeNewBoard(for: trans.first) { [weak self] in self?.animationsFinished(endTiles: trans.first?.endTiles) }
+            return
+        }
+        guard trans.count < 3 else {
+            preconditionFailure("This method is not set up to handle more than 2 transformations")
+        }
+        let first = trans.first!
+        let second = trans.last!
+        
+        let potionAnimationFrames = SpriteSheet(texture: SKTexture(imageNamed: offer.textureName),
+                                                rows: 1,
+                                                columns: offer.spriteSheetColumns!)
+        
+        let placeholderSprite = SKSpriteNode(color: .clear, size: CGSize(width: tileSize, height: tileSize))
+        placeholderSprite.run(SKAction.repeatForever(SKAction.animate(with: potionAnimationFrames.animationFrames(), timePerFrame: 0.2)))
+        
+        computeNewBoard(for: first) { [weak self] in
+            guard let self = self else {
+                preconditionFailure("this is bad")
+            }
+            /// add sprites from first one
+            let sprites = self.createSprites(from: first.endTiles)
+            self.add(sprites: sprites, tiles: first.endTiles!)
+            
+            
+            /// add potion sprite to board
+            let position = self.positionInForeground(at: atTilecoord)
+            placeholderSprite.size = CGSize(width: self.tileSize/2, height: self.tileSize/2)
+            placeholderSprite.position = position
+            placeholderSprite.zPosition = Precedence.floating.rawValue
+            self.spriteForeground.addChild(placeholderSprite)
+            
+            /// animate it moving to the affected tile
+            if let affectedTile = second.tileTransformation?.first {
+                /// move it to the target
+                let position = self.positionInForeground(at: affectedTile.initial)
+                let moveAction = SKAction.move(to: position, duration: 1.0)
+                
+                /// grow animation
+                let growAction = SKAction.scale(by: 4, duration: 0.5)
+                let shrinkAction = SKAction.scale(by: 0.25, duration: 0.5)
+                let growSkrinkSequence = SKAction.sequence([growAction, shrinkAction])
+                
+                let moveGrowShrink = SKAction.group([moveAction, growSkrinkSequence])
+                
+                /// smoke animation
+                let increaseSize = SKAction.scale(to: CGSize(width: self.tileSize, height: self.tileSize), duration: 0)
+                let smokeAnimation = self.animator.smokeAnimation()
+                let increaseSmoke = SKAction.sequence([increaseSize, smokeAnimation])
+                
+                /// remove it
+                let removeAnimation = SKAction.removeFromParent()
+                
+                /// finish the animations
+                let finishAnimations = SKAction.run { [weak self] in
+                    self?.animationsFinished(endTiles: second.endTiles)
+                }
+                
+                let sequence = SKAction.sequence([moveGrowShrink, increaseSmoke, removeAnimation, finishAnimations])
+                
+                placeholderSprite.run(sequence)
+                
+            }
+            
+
+            
+        }
+    }
     
     /// Recursive wrapper for chaining animated transformations
     private func computeNewBoard(for transformations: [Transformation]) {

@@ -49,7 +49,7 @@ class RuneDetailViewModel: RuneDetailViewModelable {
             case .rock:
                 let grouped = rune.rechargeMinimum > 1
                 if grouped {
-                    strings.append("Mine \(rune.cooldown) groups of \(rune.rechargeMinimum) or more.")
+                    strings.append("Mine \(rune.cooldown) groups of \(rune.rechargeMinimum)+")
                 } else {
                     strings.append("Mine \(rune.cooldown) rocks.")
                 }

@@ -101,7 +101,11 @@ class TargetingViewModel: Targeting {
                     runeSlotsUpdated?(runeSlots, runes)
                 }
 
-            } else {
+            } else if let inputType = trans.first?.inputType,
+                 case InputType.itemUseSelected = inputType {
+                // skip these as well
+            }
+            else {
                 /// clear out targets after any transformation
                 currentTargets = AllTarget(targets: [], areLegal: false)
             }

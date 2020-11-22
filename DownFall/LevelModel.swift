@@ -55,7 +55,6 @@ struct Level: Codable, Hashable {
     let maxMonsterOnBoardRatio: Double
     let boardSize: Int
     let tileTypeChances: TileTypeChanceModel
-    let maxSpecialRocks = 5
     let pillarCoordinates: [PillarCoorindates]
     let goals: [LevelGoal]
     let maxSpawnGems: Int

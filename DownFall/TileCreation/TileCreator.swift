@@ -40,13 +40,11 @@ class TileCreator: TileStrategy {
         let index = abs(given) % (TileType.randomCases.count + weight)
         
          
-        /// 9% of the time we will try to create a monster
-        /// 1% of a time we will spawn a gem
-        /// 90% of the time we will create a rock.
+        /// 8% of the time we will try to create a monster
+        /// 92 % of the time we will create a rock.
         /// This should probably vary based on the level
         /// This is worth to think about more
         
-//        let upperGemChanceRange = 10
         switch index {
         case 0..<9:
             return randomMonster()
@@ -305,8 +303,8 @@ class TileCreator: TileStrategy {
         guard level.hasExit else { return tiles }
         //place the exit on the opposite side of the grid
         #warning ("make sure this is set properly for release")
-        let exitQuadrant = playerQuadrant.opposite
-//        let exitQuadrant = playerQuadrant
+//        let exitQuadrant = playerQuadrant.opposite
+        let exitQuadrant = playerQuadrant
         let exitPosition = exitQuadrant.randomCoord(for: boardSize, notIn: reservedSet)
         reservedSet.insert(exitPosition)
         

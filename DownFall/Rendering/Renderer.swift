@@ -278,6 +278,13 @@ class Renderer: SKSpriteNode {
                    let frequency = tiles[row][col].type.attackFrequency() {
                     sprite.showAttackTiming(frequency, turns)
                 }
+//                else if case TileType.offer(let offer) = tiles[row][col].type,
+//                          offer.hasSpriteSheet, let columns = offer.spriteSheetColumns {
+//                    let spriteSheet = SpriteSheet(texture: SKTexture(imageNamed: offer.textureName), rows: 1, columns: columns)
+//                    let animation = SKAction.animate(with: spriteSheet.animationFrames(), timePerFrame: 0.1)
+//                    let repeatAction = SKAction.repeatForever(animation)
+//                    sprite.run(repeatAction)
+//                }
                 spriteForeground.addChild(sprite)
             }
         }

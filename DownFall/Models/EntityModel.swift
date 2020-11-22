@@ -297,6 +297,8 @@ struct EntityModel: Equatable, Codable {
         switch (effect.kind, effect.stat) {
         case (.refill, .health):
             return update(hp: originalHp)
+        case (.buff, .health):
+            return heal(for: effect.amount)
         case (.buff, .maxHealth):
             return update(originalHp: originalHp + effect.amount)
         case (.buff, .gems):
@@ -314,6 +316,8 @@ struct EntityModel: Equatable, Codable {
             return update(luck: luck + effect.amount)
         case (.buff, .dodge):
             return update(dodge: dodge + effect.amount)
+        case (.killMonster, _), (.transmogrify, _):
+            return self
         default:
             preconditionFailure("Youll want to implement future cases here")
         }

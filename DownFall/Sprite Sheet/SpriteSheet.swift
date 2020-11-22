@@ -66,5 +66,18 @@ class SpriteSheet {
         }
         return textures
     }
+    
+    func firstTexture() -> SKTexture? {
+        let frames = animationFrames()
+        guard frames.count > 0, let texture = textureForColumn(column: 1, row: 1) else { return nil }
+        return texture
+    }
+
+    
+    func firstFrame() -> SKSpriteNode? {
+        let frames = animationFrames()
+        guard frames.count > 0 else { return nil }
+        return SKSpriteNode(texture: frames.first)
+    }
 }
 

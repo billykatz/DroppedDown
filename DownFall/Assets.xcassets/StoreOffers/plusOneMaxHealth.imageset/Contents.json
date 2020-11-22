@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "Greater healing potion.png",
+      "filename" : "plusOneMaxHealth.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "Greater healing potion copy@2x.png",
+      "filename" : "plusOneMaxHealth@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "Greater healing potion copy@3x.png",
+      "filename" : "plusOneMaxHealth@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

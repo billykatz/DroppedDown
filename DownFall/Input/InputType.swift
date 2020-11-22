@@ -171,9 +171,9 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
             return "Player collects \(offer.textureName)"
         case .runeReplacement(_, _):
             return "Rune Replacement flow"
-        case .runeReplaced(_):
+        case .runeReplaced:
             return "Rune replaced"
-        case .foundRuneDiscarded(_):
+        case .foundRuneDiscarded:
             return "Found rune discarded"
         }
     }

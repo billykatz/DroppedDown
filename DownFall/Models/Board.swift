@@ -59,22 +59,27 @@ class Board: Equatable {
         case .rotateCounterClockwise(let preview):
             InputQueue.append(Input(.transformation(rotate(.counterClockwise, preview: preview))))
             return
+            
         case .rotateClockwise(let preview):
             InputQueue.append(Input(.transformation(rotate(.clockwise, preview: preview))))
             return
+            
         case .touchBegan:
             transformation = Transformation(transformation: nil,
                                             inputType: input.type,
                                             endTiles: tiles)
+            
         case .touch(let tileCoord, let type):
             switch type {
             case .monster(let data), .player(let data):
                 let attacks = calculateAttacks(for: data, from: tileCoord)
                 InputQueue.append(Input(.tileDetail(type, attacks)))
                 return
+                
             case .pillar, .item:
                 InputQueue.append(Input(.tileDetail(type, [])))
                 return
+                
             default:
                 /// create the transformation for tapping on something.
                 transformation = removeAndReplace(from: tiles, tileCoord: tileCoord, input: input)
@@ -91,17 +96,23 @@ class Board: Equatable {
                 tiles[pp.row][pp.column] = Tile(type: .player(updatedPlayer))
                 
             }
+            
         case .attack:
             transformation = attack(input)
+            
         case .monsterDies(let tileCoord, _):
             //only remove a single tile when a monster dies
             transformation = monsterDied(at: tileCoord, input: input)
+            
         case .gameWin:
             transformation = gameWin()
+            
         case .collectItem(let tileCoord, _, _):
             transformation = collectItem(at: tileCoord, input: input)
+            
         case .reffingFinished(let newTurn):
             transformation = resetAttacks(newTurn: newTurn)
+            
         case .transformation(let trans):
             if let inputType = trans.first?.inputType,
                 case .reffingFinished(_) = inputType,
@@ -110,6 +121,7 @@ class Board: Equatable {
                 InputQueue.append(input)
                 transformation = nil
             }
+            
         case .itemUseSelected(let ability):
             InputQueue.append(
                 Input(
@@ -130,23 +142,35 @@ class Board: Equatable {
                     tiles
                 )
             )
+            
         case .decrementDynamites(let dynamiteCoords):
             let trans = decrementDynamites(input: input, dynamiteCoords: dynamiteCoords)
             InputQueue.append(Input(.transformation(trans)))
+            
         case .rotatePreviewFinish:
             let transformation = rotatePreviewFinish(input: input)
             InputQueue.append(Input(.transformation(transformation)))
+            
         case .refillEmpty:
             InputQueue.append(Input(.transformation([refillEmpty(inputType: .refillEmpty)])))
+            
         case .shuffleBoard:
             InputQueue.append(Input(.transformation([shuffleBoard(inputType: .shuffleBoard)])))
+            
         case .unlockExit:
             InputQueue.append(Input(.transformation([unlockExit(inputType: input.type)])))
+            
         case .goalCompleted(let completedGoals):
             transformation = self.completedGoals(completedGoals, inputType: input.type)
+            
         case let .collectOffer(offerCoord, storeOffer):
-            transformation = self.collect(offer: storeOffer, at: offerCoord, input: input)
-        case .runeReplaced(let pickaxe, let rune):
+            
+            /// return early here because this function returns an array of transformations
+            let trans = self.collect(offer: storeOffer, at: offerCoord, input: input)
+            InputQueue.append(Input(.transformation(trans)))
+            return
+            
+        case .runeReplaced(_, let rune):
             transformation = self.runeReplaced(rune, inputType: input.type)
         case .foundRuneDiscarded(let rune):
             transformation = self.foundRuneDiscarded(rune, input: input)
@@ -196,8 +220,9 @@ class Board: Equatable {
     }
   
     
+    
     /// This is for collecting runes or other things like max health
-    private func collect(offer: StoreOffer, at offerCoord: TileCoord, input: Input) -> Transformation {
+    private func collect(offer: StoreOffer, at offerCoord: TileCoord, input: Input) -> [Transformation] {
         let selectedTile = tiles[offerCoord]
         
         //remove and replace the single item tile
@@ -208,7 +233,8 @@ class Board: Equatable {
             var updatedTiles = transformation.endTiles,
             let pp = playerPosition,
             case let .player(data) = updatedTiles[pp].type
-            else { return Transformation.zero }
+            else { return [Transformation.zero] }
+        
         
         let effect = storeOffer.effect
         
@@ -221,15 +247,38 @@ class Board: Equatable {
         
         tiles = updatedTiles
         
-        return Transformation(transformation: transformation.tileTransformation,
+        let trans = Transformation(transformation: transformation.tileTransformation,
                               inputType: input.type,
                               endTiles: updatedTiles,
                               removed: transformation.removed,
                               newTiles: transformation.newTiles,
                               shiftDown: transformation.shiftDown)
-
-
         
+
+        /// If this is a one time use potion then we will tack on that trackformation after the remove and replace
+        if effect.stat == .oneTimeUse {
+            return useOneTimeUseEffect(effect, at: offerCoord, input: input, previousTransformation: trans)
+        }
+        /// otherwise just return the tranformation for remove and replace with the updated player
+        else {
+            return [trans]
+        }
+    }
+    
+    private func useOneTimeUseEffect(_ effect: EffectModel, at offerCoord: TileCoord, input: Input, previousTransformation: Transformation) -> [Transformation] {
+        
+        let trans: Transformation
+        
+        switch effect.kind {
+        case .killMonster:
+            trans = .zero
+        case .transmogrify:
+            trans = .zero
+        default:
+            preconditionFailure("Currently only killMonster and transmogrify are set up for this code path")
+        }
+        
+        return [previousTransformation, trans]
     }
     
     private var reservedCoords: Set<TileCoord> {
@@ -239,6 +288,10 @@ class Board: Equatable {
         reservedCoords.formUnion(tiles(of: .pillar(PillarData(color: .blue, health: 3))))
         reservedCoords.formUnion(tiles(of: .monster(.zero)))
         reservedCoords.formUnion(tiles(of: .item(.zero)))
+        reservedCoords.formUnion(tiles(of: .rock(color: .blue, holdsGem: true)))
+        reservedCoords.formUnion(tiles(of: .rock(color: .red, holdsGem: true)))
+        reservedCoords.formUnion(tiles(of: .rock(color: .purple, holdsGem: true)))
+        reservedCoords.formUnion(tiles(of: .rock(color: .brown, holdsGem: true)))
         return reservedCoords
     }
     

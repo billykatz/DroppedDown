@@ -11,7 +11,6 @@ import SpriteKit
 enum StoreOfferType: Codable, Hashable {
     static func ==(lhs: StoreOfferType, rhs: StoreOfferType) -> Bool {
         switch (lhs, rhs) {
-        case (.fullHeal, .fullHeal): return true
         case (.plusTwoMaxHealth, .plusTwoMaxHealth): return true
         case (.runeUpgrade, .runeUpgrade): return true
         case (.gems(_), .gems(_)): return true
@@ -21,24 +20,28 @@ enum StoreOfferType: Codable, Hashable {
         }
     }
     
-    case fullHeal
     case plusTwoMaxHealth
+    case plusOneMaxHealth
     case rune(Rune)
     case runeUpgrade
     case runeSlot
     case gems(amount: Int)
-    case dodge
-    case luck
+    case dodge(amount: Int)
+    case luck(amount: Int)
+    case lesserHeal
+    case greaterHeal
+    case killMonsterPotion
+    case transmogrifyPotion
     
     enum CodingKeys: String, CodingKey {
         case base
         case runeModel
         case gemAmount
-        
+        case dodgeAmount
+        case luckAmount
     }
     
     private enum Base: String, Codable {
-        case fullHeal
         case plusTwoMaxHealth
         case rune
         case runeUpgrade
@@ -46,6 +49,11 @@ enum StoreOfferType: Codable, Hashable {
         case gems
         case dodge
         case luck
+        case plusOneMaxHealth
+        case lesserHeal
+        case greaterHeal
+        case killMonsterPotion
+        case transmogrifyPotion
     }
     
     init(from decoder: Decoder) throws {
@@ -53,8 +61,6 @@ enum StoreOfferType: Codable, Hashable {
         let base = try container.decode(Base.self, forKey: .base)
         
         switch base {
-        case .fullHeal:
-            self = .fullHeal
         case .plusTwoMaxHealth:
             self = .plusTwoMaxHealth
         case .rune:
@@ -68,9 +74,21 @@ enum StoreOfferType: Codable, Hashable {
             let amount = try container.decode(Int.self, forKey: .gemAmount)
             self = .gems(amount: amount)
         case .dodge:
-            self = .dodge
+            let amount = try container.decode(Int.self, forKey: .dodgeAmount)
+            self = .dodge(amount: amount)
         case .luck:
-            self = .luck
+            let amount = try container.decode(Int.self, forKey: .luckAmount)
+            self = .luck(amount: amount)
+        case .plusOneMaxHealth:
+            self = .plusOneMaxHealth
+        case .lesserHeal:
+            self = .lesserHeal
+        case .greaterHeal:
+            self = .greaterHeal
+        case .transmogrifyPotion:
+            self = .transmogrifyPotion
+        case .killMonsterPotion:
+            self = .killMonsterPotion
         }
     }
     
@@ -90,12 +108,22 @@ enum StoreOfferType: Codable, Hashable {
         case .gems(let amount):
             try container.encode(Base.gems, forKey: .base)
             try container.encode(amount, forKey: .gemAmount)
-        case .dodge:
+        case .dodge(let amount):
             try container.encode(Base.dodge, forKey: .base)
-        case .luck:
+            try container.encode(amount, forKey: .dodgeAmount)
+        case .luck(let amount):
             try container.encode(Base.luck, forKey: .base)
-        case .fullHeal:
-            try container.encode(Base.fullHeal, forKey: .base)
+            try container.encode(amount, forKey: .luckAmount)
+        case .lesserHeal:
+            try container.encode(Base.lesserHeal, forKey: .base)
+        case .greaterHeal:
+            try container.encode(Base.greaterHeal, forKey: .base)
+        case .plusOneMaxHealth:
+            try container.encode(Base.plusOneMaxHealth, forKey: .base)
+        case .killMonsterPotion:
+            try container.encode(Base.killMonsterPotion, forKey: .base)
+        case .transmogrifyPotion:
+            try container.encode(Base.transmogrifyPotion, forKey: .base)
         }
     }
     
@@ -115,9 +143,17 @@ struct StoreOffer: Codable, Hashable {
     let currency: Currency
     let title: String
     let body: String
+    
     var sprite: SKSpriteNode {
-        return SKSpriteNode(texture: SKTexture(imageNamed: self.textureName))
+        if hasSpriteSheet {
+            let fallbackSprite = SKSpriteNode(texture: SKTexture(imageNamed: self.textureName))
+            guard let columns = spriteSheetColumns else { return fallbackSprite }
+            return SpriteSheet(texture: SKTexture(imageNamed: textureName), rows: 1, columns: columns).firstFrame() ?? fallbackSprite
+        } else {
+            return SKSpriteNode(texture: SKTexture(imageNamed: self.textureName))
+        }
     }
+    
     let startingPrice: Int
     
     var description: String {
@@ -179,14 +215,10 @@ struct StoreOffer: Codable, Hashable {
         let body: String
         let textureName: String
         switch type {
-        case .dodge:
+        case .dodge(let amount):
             textureName = "dodgeUp"
             title = "Increase Dodge Chance"
-            body = "Increase your chance to dodge an enemy's attack by 5%"
-        case .fullHeal:
-            title = "Greater Healing Potion"
-            body = "Fully heals you."
-            textureName = "greaterHealingPotion"
+            body = "Increase your chance to dodge an enemy's attack by \(amount)"
         case .gems(let amount):
             title = "Gems"
             body = "Gain \(amount) gems."
@@ -211,99 +243,69 @@ struct StoreOffer: Codable, Hashable {
             title = "Rune Upgrade"
             body = "Your runes will be better"
             textureName = "trustMe"
+        case .plusOneMaxHealth:
+            title = "Increase Max Health"
+            body = "Add 1 max health."
+            textureName = "twoMaxHealth"
+        case .lesserHeal:
+            title = "Lesser Healing Potion"
+            body = "Heals 1 HP."
+            textureName = "lesserHealingPotionSpriteSheet"
+        case .greaterHeal:
+            title = "Greater Healing Potion"
+            body = "Heals 2 HP."
+            textureName = "greaterHealingPotionSpriteSheet"
+        case .killMonsterPotion:
+            title = "Death Potion"
+            body = "Instantly kills a random monster"
+            textureName = "killMonsterPotionSpriteSheet"
+        case .transmogrifyPotion:
+            title = "Transmogrify Potion"
+            body = "Instantly transform a random monster into another random monster"
+            textureName = "transmogrificationPotionSpriteSheet"
         }
         
         return StoreOffer(type: type, tier: tier, textureName: textureName, currency: .gem, title: title, body: body, startingPrice: 0)
     }
     
-    
-    static func storeOffer(depth: Depth) -> [StoreOffer] {
-        
-        /// Baseline offers for every level after the first
-        var storeOffers: [StoreOffer] = [
-            StoreOffer.offer(type: .fullHeal, tier: 1),
-            StoreOffer.offer(type: .plusTwoMaxHealth, tier: 1)
-        ]
-        
-        /// some tier two offers
-        let dodgeUp = StoreOffer.offer(type: .dodge, tier: 2)
-        let luckUp = StoreOffer.offer(type: .luck, tier: 2)
-        let gemsOffer = StoreOffer.offer(type: .gems(amount: 3), tier: 2)
-        
-        /// rune offerings
-        let getSwifty = StoreOffer.offer(type: .rune(Rune.rune(for: .getSwifty)), tier: 3)
-        let rainEmbers = StoreOffer.offer(type: .rune(Rune.rune(for: .rainEmbers)), tier: 3)
-        let transform = StoreOffer.offer(type: .rune(Rune.rune(for: .transformRock)), tier: 3)
-        let vortex = StoreOffer.offer(type: .rune(Rune.rune(for: .vortex)), tier: 3)
-        let bubbleUp = StoreOffer.offer(type: .rune(Rune.rune(for: .bubbleUp)), tier: 3)
-        let flameWall = StoreOffer.offer(type: .rune(Rune.rune(for: .flameWall)), tier: 3)
-        
-        switch depth {
-        /// 1 Rune Slot
-        case 0:
-            /// This is a special case where we want to start our play testers with a rune
-            let getSwifty = StoreOffer.offer(type: .rune(Rune.rune(for: .getSwifty)), tier: 1)
-            let rainEmbers = StoreOffer.offer(type: .rune(Rune.rune(for: .rainEmbers)), tier: 1)
-            let transform = StoreOffer.offer(type: .rune(Rune.rune(for: .transformRock)), tier: 1)
-            return [getSwifty, rainEmbers, transform]
-        case 1:
-            // two goals
-            storeOffers.append(contentsOf: [dodgeUp, luckUp, gemsOffer])
-            
-        case 2:
-            // Two Rune Slots
-            /// two goals
-            let getSwifty = StoreOffer.offer(type: .rune(Rune.rune(for: .getSwifty)), tier: 2)
-            let rainEmbers = StoreOffer.offer(type: .rune(Rune.rune(for: .rainEmbers)), tier: 2)
-            let transform = StoreOffer.offer(type: .rune(Rune.rune(for: .transformRock)), tier: 2)
-            storeOffers.append(contentsOf: [getSwifty, rainEmbers, transform])
-        case 3:
-            /// offer a rune slot or gems
-            storeOffers.append(contentsOf: [dodgeUp, luckUp, gemsOffer])
-            let gemOffer = StoreOffer.offer(type: .gems(amount: 5), tier: 3)
-            storeOffers.append(contentsOf: [getSwifty, rainEmbers, transform, vortex, bubbleUp, flameWall, gemOffer])
-            
-        case 4:
-            /// Three Rune Slots
-            /// give the player chance to fill their last rune slot or just gems
-            storeOffers.append(contentsOf: [dodgeUp, luckUp, gemsOffer])
-            storeOffers.append(contentsOf: [getSwifty, rainEmbers, transform, transform, vortex, bubbleUp, flameWall])
-        case 5:
-            /// give the player a chance at the rune slot
-            storeOffers.append(contentsOf: [dodgeUp, luckUp, gemsOffer])
-            let gemOffer = StoreOffer.offer(type: .gems(amount: 10), tier: 3)
-            storeOffers.append(contentsOf: [getSwifty, rainEmbers, transform, transform, vortex, bubbleUp, flameWall, gemOffer])
-            
-        case 6:
-            /// Four Rune Slots
-            /// give the player a chance to fill their last rune slot or just gems
-            storeOffers.append(contentsOf: [dodgeUp, luckUp, gemsOffer])
-            let gemOffer = StoreOffer.offer(type: .gems(amount: 10), tier: 3)
-            storeOffers.append(contentsOf: [getSwifty, rainEmbers, transform, transform, vortex, bubbleUp, flameWall, gemOffer])
-            
-        case (7...Int.max):
-            /// give the player a chance to fill their last rune slot or just gems
-            storeOffers.append(contentsOf: [dodgeUp, luckUp, gemsOffer])
-            let gemOffer = StoreOffer.offer(type: .gems(amount: 12), tier: 3)
-            storeOffers.append(contentsOf: [getSwifty, rainEmbers, transform, transform, vortex, bubbleUp, flameWall, gemOffer])
+    var hasSpriteSheet: Bool {
+        switch self.type {
+        case .killMonsterPotion, .transmogrifyPotion, .lesserHeal, .greaterHeal:
+            return true
         default:
-            fatalError("Depth must be postitive Int")
+            return false
         }
-        
-        return storeOffers
+    }
+    
+    var spriteSheetColumns: Int? {
+        switch self.type {
+        case .killMonsterPotion:
+            return 7
+        case .transmogrifyPotion:
+            return 6
+        case .lesserHeal, .greaterHeal:
+            return 5
+        default:
+            return nil
+        }
     }
     
     var effect: EffectModel {
         switch self.type {
-        case .fullHeal:
-            let effect = EffectModel(kind: .refill, stat: .health, amount: 0, duration: 0, offerTier: tier)
+        case .lesserHeal:
+            let effect = EffectModel(kind: .buff, stat: .health, amount: 1, duration: Int.max, offerTier: tier)
+            return effect
+        case .greaterHeal:
+            let effect = EffectModel(kind: .buff, stat: .health, amount: 2, duration: Int.max, offerTier: tier)
+            return effect
+        case .plusOneMaxHealth:
+            let effect = EffectModel(kind: .buff, stat: .maxHealth, amount: 1, duration: Int.max, offerTier: tier)
             return effect
         case .plusTwoMaxHealth:
             let effect = EffectModel(kind: .buff, stat: .maxHealth, amount: 2, duration: Int.max, offerTier: tier)
             return effect
         case .rune(let rune):
             let effect = EffectModel(kind: .rune, stat: .pickaxe, amount: 0, duration: 0, rune: rune, offerTier: tier)
-            
             return effect
         case .gems(let amount):
             let effect = EffectModel(kind: .buff, stat: .gems, amount: amount, duration: 0, offerTier: tier)
@@ -314,11 +316,17 @@ struct StoreOffer: Codable, Hashable {
         case .runeSlot:
             let effect = EffectModel(kind: .buff, stat: .runeSlot, amount: 1, duration: 0, offerTier: tier)
             return effect
-        case .dodge:
-            let effect = EffectModel(kind: .buff, stat: .dodge, amount: 5, duration: 0, offerTier: tier)
+        case .dodge(let amount):
+            let effect = EffectModel(kind: .buff, stat: .dodge, amount: amount, duration: 0, offerTier: tier)
             return effect
-        case .luck:
-            let effect = EffectModel(kind: .buff, stat: .luck, amount: 5, duration: 0, offerTier: tier)
+        case .luck(let amount):
+            let effect = EffectModel(kind: .buff, stat: .luck, amount: amount, duration: 0, offerTier: tier)
+            return effect
+        case .killMonsterPotion:
+            let effect = EffectModel(kind: .killMonster, stat: .oneTimeUse, amount: Int.max, duration: 0, offerTier: tier)
+            return effect
+        case .transmogrifyPotion:
+            let effect = EffectModel(kind: .transmogrify, stat: .oneTimeUse, amount: Int.max, duration: 0, offerTier: tier)
             return effect
             
         }

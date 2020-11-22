@@ -13,6 +13,8 @@ enum EffectType: String, Hashable, Codable {
     case debuff
     case refill
     case rune
+    case killMonster
+    case transmogrify
 }
 
 enum StatType: String, Hashable, Codable {
@@ -23,6 +25,7 @@ enum StatType: String, Hashable, Codable {
     case runeSlot
     case dodge
     case luck
+    case oneTimeUse
 }
 
 struct EffectModel: Equatable, Hashable, Codable {

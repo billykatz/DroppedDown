@@ -99,7 +99,7 @@ class LevelGoalView: SKSpriteNode {
 
 
     private func bindToViewModel() {
-        viewModel.goalUpdated = updateGoal
+        viewModel.goalUpdated = { [weak self] updatedGoals in self?.updateGoal(updatedGoals) }
         
         viewModel
             .goalCompleted

@@ -43,7 +43,7 @@ struct InputQueue {
             return
         }
         
-        print("\(input.type) Being ignored.")
+        print("\(input.type) is being ignored. Current game state is \(gameState.state). The last input was \(history.first!)")
         
     }
     
@@ -66,6 +66,9 @@ struct InputQueue {
                 history.insert(input, at: history.startIndex)
                 gameState.enter(input)
                 print("Entering \(gameState.state) with \(input)")
+                if case let InputType.transformation(trans) = input.type {
+                    print("The transformation is \(trans.first?.inputType)")
+                }
             }
         }
         

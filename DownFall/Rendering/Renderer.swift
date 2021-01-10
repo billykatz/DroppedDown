@@ -143,10 +143,24 @@ class Renderer: SKSpriteNode {
     }
     
     private func renderTransformation(_ transformations: [Transformation]) {
-        
+        print("Renderer will render a transformation. \(transformations.first?.inputType)")
         if let trans = transformations.first, let inputType = trans.inputType {
             switch inputType {
-            case .rotateCounterClockwise, .rotateClockwise:
+            case .rotateCounterClockwise(let preview), .rotateClockwise(let preview):
+                if !preview {
+                    let tileTrans = trans.tileTransformation!
+                    var spriteActions: [SpriteAction] = []
+                    for tileTran in tileTrans {
+                        let position = sprites[tileTran.end.row][tileTran.end.column].position
+                        spriteActions.append(SpriteAction(sprite: sprites[tileTran.initial.row][tileTran.initial.column], action: SKAction.move(to: position, duration: AnimationSettings.RotatePreview.finishQuickRotateSpeed)))
+                    }
+                    animator.animate(spriteActions) { [weak self] in
+                        guard let self = self else { return }
+                        self.animationsFinished(endTiles: trans.endTiles, ref: true)
+                    }
+                    
+                    return
+                }
                 rotatePreview(for: transformations)
             case .touch:
                 //TODO: sometimes remove and replace has a monster for the touch(_, type).  not sure why
@@ -185,24 +199,29 @@ class Renderer: SKSpriteNode {
             case .goalCompleted(let goals):
                 animateCompletedGoals(goals, input: inputType, transformation: trans)
             case .rotatePreviewFinish(let spriteActions, let trans):
+                /// We ARE rotating
                 if let trans = trans {
                     animator.animate(spriteActions) { [weak self] in
                         guard let self = self else { return }
                         self.animationsFinished(endTiles: trans.endTiles, ref: true)
                     }
-                } else {
+                }
+                /// We ARE NOT Rotating
+                else {
                     animator.animate(spriteActions) { [weak self] in
                         guard let self = self else { return }
-                        self.animationsFinished(endTiles: nil, ref: false)
+                        self.animationsFinished(endTiles: trans?.endTiles, ref: false)
                     }
                 }
             case .reffingFinished, .touchBegan, .itemUseSelected:
                 () // Purposely left blank.
+
             default:
                 // Transformation assoc value should ony exist for certain inputs
                 fatalError()
             }
         } else {
+            print("No transformation so we are here")
             animationsFinished(endTiles: transformations.first?.endTiles)
         }
         
@@ -223,7 +242,8 @@ class Renderer: SKSpriteNode {
         case .playAgain:
             menuForeground.removeFromParent()
         case .newTurn:
-            animationsFinished(endTiles: input.endTilesStruct, ref: false)
+            ()
+//            animationsFinished(endTiles: input.endTilesStruct, ref: false)
         default:
             ()
         }
@@ -399,8 +419,10 @@ class Renderer: SKSpriteNode {
         if let endTiles = endTiles {
             sprites = createSprites(from: endTiles)
             add(sprites: sprites, tiles: endTiles)
+            print("Renderer is calling animations finished")
             InputQueue.append(Input(.animationsFinished(ref: ref), endTiles))
         } else {
+            print("Renderer is calling animations finished, no reffing")
             InputQueue.append(Input(.animationsFinished(ref: false), endTiles))
         }
         

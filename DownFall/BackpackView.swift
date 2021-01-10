@@ -89,7 +89,7 @@ class BackpackView: SKSpriteNode {
         viewModel.updateCallback = { [weak self] in self?.updated() }
         
         /// bind the rune container view to the targeting view model
-        viewModel.runeSlotsUpdated = runeSlotsUpdated
+        viewModel.runeSlotsUpdated = { [weak self] number, rune in self?.runeSlotsUpdated(number, rune) }
         
         // add children to view container
         viewContainer.addChild(self.background)

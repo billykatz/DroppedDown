@@ -408,6 +408,8 @@ class Board: Equatable {
         var allTransformations = [Transformation(transformation: nil, inputType: .rotatePreviewFinish(spriteAction, trans), endTiles: tiles)]
         
         if typeCount(for: self.tiles, of: .empty).count > 0 {
+            print("There are empty tiles after rotating preview is finished.")
+            
             // store tile transforamtions and shift information
             var newTiles : [TileTransformation] = []
             var intermediateTiles = self.tiles
@@ -419,9 +421,7 @@ class Board: Equatable {
                         newTiles: &newTiles,
                         intermediateTiles: &intermediateTiles)
             
-            // return our new board
-            
-            //TODO this might break
+            // append the add new tiles so we add new tiles following the rotate
             allTransformations.append(Transformation(transformation: newTiles,
                                                      inputType: input.type,
                                                      endTiles: intermediateTiles,

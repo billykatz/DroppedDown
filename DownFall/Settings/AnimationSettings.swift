@@ -14,6 +14,7 @@ struct AnimationSettings {
     
     struct RotatePreview {
         static let finishRotateSpeed = 0.07
+        static let finishQuickRotateSpeed = 0.25
     }
     
     struct WinSprite {

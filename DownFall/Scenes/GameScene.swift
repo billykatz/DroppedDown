@@ -9,6 +9,7 @@
 import SpriteKit
 import UIKit
 import GameplayKit
+import Foundation
 
 protocol GameSceneCoordinatingDelegate: class {
     func navigateToMainMenu(_ scene: SKScene, playerData: EntityModel)
@@ -22,7 +23,7 @@ class GameScene: SKScene {
     
     struct Constants {
         static let swipeDistanceThreshold = CGFloat(25.0)
-        static let quickSwipeDistanceThreshold = CGFloat(100.0)
+        static let quickSwipeDistanceThreshold = CGFloat(75.0)
     }
     
     // only strong reference to the Board
@@ -169,20 +170,38 @@ extension GameScene {
         guard let touch = touches.first else { return }
         let currentPosition = touch.location(in: self.foreground)
         
-        // set the lastPosition once until we have detected a swipe
+        // set the lastPosition once until we have detected a touch
         if lastPosition == nil {
             lastPosition = currentPosition
         }
-        guard let lastPosition = lastPosition, (abs(currentPosition.x - lastPosition.x) > Constants.swipeDistanceThreshold || abs(currentPosition.y - lastPosition.y) > Constants.swipeDistanceThreshold || touchWasSwipe) else {
+        
+        
+        guard let lastPosition = lastPosition,
+              (
+                abs(currentPosition.x - lastPosition.x) > Constants.swipeDistanceThreshold
+                ||
+                abs(currentPosition.y - lastPosition.y) > Constants.swipeDistanceThreshold
+                ||
+                touchWasSwipe
+              ) else {
             touchWasSwipe = false
             return
         }
+        
         touchWasSwipe = true
+        
+        //determine if the swipe was fast
+        let preview = abs(currentPosition.y - lastPosition.y) > Constants.quickSwipeDistanceThreshold ? false : true
+        
+    
+        print("Preview?: \(preview) - \(abs(currentPosition.y - lastPosition.y))")
         
         // deteremine the vector of the swipe
         let vector = currentPosition - lastPosition
+        
         // set the swipe for the duration of this swipe gesture
         let touchIsOnRight = (view?.isOnRight(currentPosition) ?? false)
+        
         if self.swipeDirection == nil {
             let swipeDirection = SwipeDirection(from: vector)
             
@@ -195,9 +214,9 @@ extension GameScene {
             /// call functions that send rotate input
             switch rotateDir {
             case .clockwise:
-                rotateClockwise(preview: true)
+                rotateClockwise(preview: preview)
             case .counterClockwise:
-                rotateCounterClockwise(preview: true)
+                rotateCounterClockwise(preview: preview)
             }
         }
         
@@ -224,14 +243,13 @@ extension GameScene {
             self.swipeDirection = nil
             self.touchWasSwipe = false
         }
-        
-        if !touchWasSwipe {
-            guard !touchWasCanceled else {
-                touchWasCanceled = false
-                return
-            }
-        } else {
+
+        if touchWasSwipe {
             self.rotatePreview?.touchesEnded()
+        }
+        
+        if touchWasCanceled && !touchWasSwipe {
+            touchWasCanceled = false
         }
     }
 }

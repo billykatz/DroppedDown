@@ -89,8 +89,6 @@ class LevelGoalView: SKSpriteNode {
         bar.position = CGPoint.alignHorizontally(bar.frame, relativeTo: infoSprite.frame, horizontalAnchor: .left, verticalAlign: .bottom, verticalPadding:  (CGFloat(index) * bar.size.height) + (barPadding) + (CGFloat(index) * barPadding), translatedToBounds: true)
         
         
-//        bar.position = CGPoint.position(bar.frame, inside: contentView.frame, verticalAlign: .top, horizontalAnchor: .left, xOffset: infoSprite.frame.width + Style.Padding.normal, yOffset: (CGFloat(index) * bar.size.height) + barPadding + (CGFloat(index+1) * barPadding))
-        
         contentView.addChild(bar)
         if flash || updatedGoal.isCompleted {
             let mockCircle = SKSpriteNode(color: .clear, size: .fifty)

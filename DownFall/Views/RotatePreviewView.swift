@@ -65,7 +65,10 @@ class RotatePreviewView {
             totalDistance = 300.0
         }
         
-        distancedMoved += distance
+        print("Distance \(distance)")
+        let isNegative = distance < 0 ? -1 : 1
+        let cappedDistance = min(75.0, abs(distance))
+        distancedMoved += cappedDistance * CGFloat(isNegative)
         self.distanceTraveledRatio = max(min(distancedMoved/totalDistance, 1.0), 0.0)
         for spriteRow in 0..<sprites.count {
             for spriteCol in 0..<sprites.count {

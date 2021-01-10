@@ -403,8 +403,12 @@ extension TileType {
             return "\(data.color.humanReadable) pillar"
         case .player(let data):
             return data.type.humanReadable
-        case .exit:
-            return "mineshaft"
+        case .exit(let blocked):
+            if blocked {
+                return "Blocked Mineshaft"
+            } else {
+                return "Mineshaft"
+            }
         case .item(let item):
             return item.humanReadable
         case .monster(let data):

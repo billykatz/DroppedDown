@@ -178,8 +178,11 @@ class Renderer: SKSpriteNode {
                 }
             case .monsterDies:
                 computeNewBoard(for: trans)
-            case .newTurn, .unlockExit:
+            case .newTurn:
                 animationsFinished(endTiles: trans.endTiles)
+            case .unlockExit:
+                animationsFinished(endTiles: trans.endTiles)
+
             case .itemUsed(let ability, let targets):
                 animateRuneUsed(input: inputType, transformations: transformations, rune: ability, targets: targets)
             case .collectOffer(let tileCoord, let offer):
@@ -196,8 +199,12 @@ class Renderer: SKSpriteNode {
                 animationsFinished(endTiles: trans.endTiles)
             case .foundRuneDiscarded:
                 computeNewBoard(for: trans)
-            case .goalCompleted(let goals):
-                animateCompletedGoals(goals, input: inputType, transformation: trans)
+            case .goalCompleted(let goals, allGoalsCompleted: let allGoalsCompleted):
+                var unlockTransformation: Transformation?
+                if allGoalsCompleted {
+                    unlockTransformation = transformations.last
+                }
+                animateCompletedGoals(goals, input: inputType, transformation: trans, unlockExitTransformation: unlockTransformation)
             case .rotatePreviewFinish(let spriteActions, let trans):
                 /// We ARE rotating
                 if let trans = trans {
@@ -253,14 +260,15 @@ class Renderer: SKSpriteNode {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func animateCompletedGoals(_ goals: [GoalTracking], input: InputType, transformation: Transformation) {
+    private func animateCompletedGoals(_ goals: [GoalTracking], input: InputType, transformation: Transformation, unlockExitTransformation: Transformation?) {
         animator.animateCompletedGoals(goals,
                                        transformation: transformation,
+                                       unlockExitTransformation: unlockExitTransformation,
                                        sprites: sprites,
                                        foreground: spriteForeground,
                                        levelGoalOrigin: self.levelGoalView.frame.origin.translate(xOffset: self.levelGoalView.frame.width/2, yOffset: -20.0)
                                        ) { [weak self] in
-            self?.animationsFinished(endTiles: transformation.endTiles)
+            self?.animationsFinished(endTiles: unlockExitTransformation?.endTiles ?? transformation.endTiles)
         }
         
     }

@@ -216,6 +216,23 @@ class TileDetailView: SKSpriteNode {
         return offerDesc
         
     }
+    
+    private func exitDescription(tileType: TileType, nextTo: CGRect) -> ParagraphNode? {
+        guard case TileType.exit(let blocked) = tileType  else { return nil }
+        let text: String
+        if blocked {
+            text = "Blocked until all level goals are completed."
+        } else {
+            text = "Unblocked."
+        }
+    
+        let exitDescription = ParagraphNode(text: text, paragraphWidth: detailViewTemplate.frame.width - Style.DetailView.spriteSize.width - Style.Padding.more, fontSize: .fontMediumSize)
+        exitDescription.position = CGPoint.alignHorizontally(exitDescription.frame, relativeTo: nextTo, horizontalAnchor: .left, verticalAlign: .bottom, verticalPadding: Style.Padding.more, translatedToBounds: true)
+        exitDescription.zPosition = Precedence.menu.rawValue
+        return exitDescription
+        
+    }
+
 
 
     
@@ -255,6 +272,8 @@ class TileDetailView: SKSpriteNode {
             detailViewTemplate.addChild(playerDescription)
         } else if let offerDescription = offerDescription(tileType: tileType, nextTo: title.frame) {
             detailViewTemplate.addChild(offerDescription)
+        } else if let exitDescription = exitDescription(tileType: tileType, nextTo: title.frame) {
+            detailViewTemplate.addChild(exitDescription)
         }
         
         detailViewTemplate.position = CGPoint.position(this: detailViewTemplate.frame, centeredInBottomOf: self.contentView.frame, verticalPadding: 150.0)

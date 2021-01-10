@@ -56,7 +56,7 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
                                         .boardBuilt,
                                         .unlockExit,
                                         .levelGoalDetail([]),
-                                        .goalCompleted([]),
+                                        .goalCompleted([], allGoalsCompleted: false),
                                         .runeReplacement(Pickaxe(runeSlots: 0, runes: []), .zero),
                                         .runeReplaced(Pickaxe(runeSlots: 0, runes: []), .zero)
                                                                  
@@ -96,7 +96,7 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
     case shuffleBoard
     case unlockExit
     case levelGoalDetail([GoalTracking])
-    case goalCompleted([GoalTracking])
+    case goalCompleted([GoalTracking], allGoalsCompleted: Bool)
     case runeReplacement(Pickaxe, Rune)
     case runeReplaced(Pickaxe, Rune)
     case foundRuneDiscarded(Rune)

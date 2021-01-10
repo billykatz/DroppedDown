@@ -60,7 +60,7 @@ class LevelGoalTracker: LevelGoalTracking {
         case .itemUsed:
             advanceRuneUseGoal()
             
-        case .goalCompleted(let completedGoals):
+        case .goalCompleted(let completedGoals, _):
             goalCompletedSubject.send(completedGoals)
             
         default:
@@ -70,15 +70,21 @@ class LevelGoalTracker: LevelGoalTracking {
     
     private func checkForCompletedGoals() {
         var completedUnAwardedGoals: [GoalTracking] = []
+        var allGoalsCompleted = true
         for (idx, goal) in goalProgress.enumerated(){
             if goal.isCompleted && !goal.hasBeenRewarded {
                 goalProgress[idx] = goal.isAwarded()
                 completedUnAwardedGoals.append(goal)
             }
+            
+            if !goal.isCompleted {
+                allGoalsCompleted = false
+            }
         }
         
         guard !completedUnAwardedGoals.isEmpty else { return }
-        InputQueue.append(Input(.goalCompleted(completedUnAwardedGoals)))
+        
+        InputQueue.append(Input(.goalCompleted(completedUnAwardedGoals, allGoalsCompleted: allGoalsCompleted)))
     }
     
     var pillarColor =  Set<Color>(Color.allCases)

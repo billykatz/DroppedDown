@@ -362,6 +362,7 @@ struct Animator {
     
     func animateCompletedGoals(_ goals: [GoalTracking],
                                transformation: Transformation,
+                               unlockExitTransformation: Transformation?,
                                sprites: [[DFTileSpriteNode]],
                                foreground: SKNode,
                                levelGoalOrigin: CGPoint,
@@ -393,6 +394,16 @@ struct Animator {
             let scale = SKAction.scale(to: 1.0, duration: 1.0)
 
             spriteActions.append(SpriteAction(sprite: itemSprite, action: SKAction.group([movement, scale])))
+        }
+        
+        if let unlockTrans = unlockExitTransformation,
+           let exitCoord = unlockTrans.tileTransformation?.first?.initial {
+            // smoke animation
+            let smoke = self.smokeAnimation()
+            
+            let sprite = sprites[exitCoord.row][exitCoord.column]
+            
+            spriteActions.append(SpriteAction(sprite: sprite, action: smoke))
         }
         
         /// animate the sprite actions and call out completion

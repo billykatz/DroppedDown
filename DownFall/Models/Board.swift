@@ -76,7 +76,7 @@ class Board: Equatable {
                 InputQueue.append(Input(.tileDetail(type, attacks)))
                 return
                 
-            case .pillar, .item, .offer:
+            case .pillar, .item, .offer, .exit:
                 InputQueue.append(Input(.tileDetail(type, [])))
                 return
                 
@@ -146,22 +146,38 @@ class Board: Equatable {
         case .decrementDynamites(let dynamiteCoords):
             let trans = decrementDynamites(input: input, dynamiteCoords: dynamiteCoords)
             InputQueue.append(Input(.transformation(trans)))
+            return
             
         case .rotatePreviewFinish:
             let transformation = rotatePreviewFinish(input: input)
             InputQueue.append(Input(.transformation(transformation)))
+            return
             
         case .refillEmpty:
             InputQueue.append(Input(.transformation([refillEmpty(inputType: .refillEmpty)])))
+            return
             
         case .shuffleBoard:
             InputQueue.append(Input(.transformation([shuffleBoard(inputType: .shuffleBoard)])))
+            return
             
         case .unlockExit:
             InputQueue.append(Input(.transformation([unlockExit(inputType: input.type)])))
+            return
             
-        case .goalCompleted(let completedGoals):
-            transformation = self.completedGoals(completedGoals, inputType: input.type)
+        case let .goalCompleted(completedGoals, allGoalsCompleted: allGoalsCompleted):
+            let completedGoals = self.completedGoals(completedGoals, inputType: input.type)
+            let transformations: [Transformation]
+            if allGoalsCompleted {
+                let unlockExit = self.unlockExit(inputType: InputType.unlockExit)
+                transformations = [completedGoals, unlockExit]
+            } else {
+                transformations = [completedGoals]
+            }
+            InputQueue.append(Input(.transformation(transformations)))
+            return
+
+            
             
         case let .collectOffer(offerCoord, storeOffer):
             
@@ -386,13 +402,15 @@ class Board: Equatable {
     private func unlockExit(inputType: InputType) -> Transformation {
         var newTiles = tiles
         
-        if let exitCoord = typeCount(for: tiles, of: .exit(blocked: true)).first {
-            newTiles[exitCoord.row][exitCoord.column] = Tile(type: .exit(blocked: false))
+        guard let exitCoord = typeCount(for: tiles, of: .exit(blocked: true)).first else {
+            return Transformation(transformation: nil, inputType: inputType, endTiles: self.tiles)
         }
+        
+        newTiles[exitCoord.row][exitCoord.column] = Tile(type: .exit(blocked: false))
         
         self.tiles = newTiles
         
-        return Transformation(transformation: nil, inputType: inputType, endTiles: newTiles)
+        return Transformation(transformation: [TileTransformation(exitCoord, exitCoord)], inputType: inputType, endTiles: newTiles)
     }
     
     private func rotatePreviewFinish(input: Input) -> [Transformation] {

@@ -50,6 +50,9 @@ class GameScene: SKScene {
     //level
     private var level: Level?
     
+    // audio listener
+    private var audioListener: AudioEventListener?
+    
     //touch state
     private var touchWasSwipe = false
     private var touchWasCanceled = false
@@ -90,6 +93,10 @@ class GameScene: SKScene {
         
         // create haptic generator
         generator = HapticGenerator()
+        
+        // create the audio listener
+        let audioManager = AudioManager(sceneNode: foreground)
+        audioListener = AudioEventListener(audioManager: audioManager)
         
     }
     
@@ -146,6 +153,7 @@ class GameScene: SKScene {
         gameSceneDelegate = nil
         generator = nil
         rotatePreview = nil
+        audioListener = nil
         swipeRecognizerView?.removeFromSuperview()
         InputQueue.reset()
         Dispatch.shared.reset()

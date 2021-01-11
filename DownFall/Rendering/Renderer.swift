@@ -167,8 +167,16 @@ class Renderer: SKSpriteNode {
                 if trans.newTiles != nil {
                     computeNewBoard(for: trans)
                 } else {
-                    animationsFinished(endTiles: trans.endTiles,
-                                       ref: false)
+                    var sprites: [DFTileSpriteNode] = []
+                    if let tiles = trans.tileTransformation {
+                        for coord in tiles {
+                            sprites.append(self.sprites[coord.initial.row][coord.initial.column])
+                        }
+                    }
+                    animator.animateCannotMineRock(sprites: sprites) { [weak self] in
+                        self?.animationsFinished(endTiles: trans.endTiles,
+                                           ref: false)
+                    }
                 }
             case .attack:
                 animateAttack(attackInput: inputType, endTiles: trans.endTiles)
@@ -584,6 +592,7 @@ extension Renderer {
                     
                     /// add the gem sprite to the foreground
                     spriteForeground.addChild(sprite)
+                    
                 }
                 
             } else if let poof = sprites[tileTrans.end.x][tileTrans.end.y].poof(), case InputType.foundRuneDiscarded? = transformation.inputType {

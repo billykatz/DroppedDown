@@ -63,6 +63,7 @@ class HUD: SKSpriteNode {
                                  _,
                                  let defenderPosition,
                                  _,
+                                 _,
                                  _) = attackInput.type {
             print("Defender position \(String(describing: defenderPosition))")
         }

@@ -288,6 +288,22 @@ struct Animator {
         animate(animations) { }
     }
     
+    func animateCannotMineRock(sprites: [SKSpriteNode], completion: @escaping () -> Void) {
+        
+        var actions: [SpriteAction] = []
+        for sprite in sprites {
+            let rotateCounterClockwise = SKAction.rotate(toAngle: -1/4 * .pi, duration: AnimationSettings.wiggleSpeed)
+            let rotateClockwise = SKAction.rotate(toAngle: 1/4 * .pi, duration: AnimationSettings.wiggleSpeed)
+            
+            let wiggle = SKAction.sequence([rotateCounterClockwise, rotateClockwise])
+            let wiggleFourTimes = SKAction.repeat(wiggle, count: 3)
+            
+            actions.append(SpriteAction(sprite: sprite, action: wiggleFourTimes))
+        }
+        
+        animate(actions, completion: completion)
+    }
+    
     func animate(_ spriteActions: [SpriteAction], completion: @escaping () -> Void) {
         if spriteActions.count == 0 { completion() }
         var numActions = spriteActions.count
@@ -396,18 +412,24 @@ struct Animator {
             spriteActions.append(SpriteAction(sprite: itemSprite, action: SKAction.group([movement, scale])))
         }
         
-        if let unlockTrans = unlockExitTransformation,
-           let exitCoord = unlockTrans.tileTransformation?.first?.initial {
-            // smoke animation
-            let smoke = self.smokeAnimation()
-            
-            let sprite = sprites[exitCoord.row][exitCoord.column]
-            
-            spriteActions.append(SpriteAction(sprite: sprite, action: smoke))
-        }
+        
         
         /// animate the sprite actions and call out completion
-        animate(spriteActions, completion: completion)
+        animate(spriteActions) {
+            /// show the exit unlocking if all goals are completed
+            if let unlockTrans = unlockExitTransformation,
+               let exitCoord = unlockTrans.tileTransformation?.first?.initial {
+                // smoke animation
+                let smoke = self.smokeAnimation()
+                
+                let sprite = sprites[exitCoord.row][exitCoord.column]
+                
+                let spriteActions = [SpriteAction(sprite: sprite, action: smoke)]
+                animate(spriteActions, completion: completion)
+            } else {
+                completion()
+            }
+        }
         
         
     }
@@ -424,7 +446,8 @@ struct Animator {
                                     let attackerPosition,
                                     let defenderPosition,
                                     let affectedTiles,
-                                    let defenderDodged
+                                    let defenderDodged,
+                                    _
             ) = attackInputType else { return }
         
         /*

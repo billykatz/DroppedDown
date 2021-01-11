@@ -231,7 +231,7 @@ class Referee {
                                          attacker: playerPosition,
                                          defender: attackedTile,
                                          affectedTiles: attackedTileArray,
-                                         dodged: false))
+                                         dodged: false, attackerIsPlayer: true))
                 }
             }
             return nil
@@ -269,7 +269,7 @@ class Referee {
                                                  attacker: potentialMonsterPosition,
                                                  defender: attackedTile,
                                                  affectedTiles: nonBlockedAttackedTiles,
-                                                 dodged: false))
+                                                 dodged: false, attackerIsPlayer: false))
                         } else if case TileType.pillar = tiles[attackedTile].type,
                             allAttackedTileArray.contains(where: { (coord) -> Bool in
                                 if case TileType.player = tiles[coord].type {
@@ -282,7 +282,7 @@ class Referee {
                                                  attacker: potentialMonsterPosition,
                                                  defender: attackedTile,
                                                  affectedTiles: nonBlockedAttackedTiles,
-                                                 dodged: false
+                                                 dodged: false, attackerIsPlayer: false
                                 ))
                         }
                     }
@@ -295,7 +295,7 @@ class Referee {
                                              attacker: potentialMonsterPosition,
                                              defender: nil,
                                              affectedTiles: nonBlockedAttackedTiles,
-                                             dodged: false))
+                                             dodged: false, attackerIsPlayer: false))
                     }
                     
                 }

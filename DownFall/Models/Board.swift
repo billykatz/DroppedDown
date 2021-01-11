@@ -838,7 +838,7 @@ extension Board {
         if !singleTile {
             (selectedTiles, selectedPillars) = findNeighbors(tileCoord, killMonsters: killMonsters)
             if selectedTiles.count < 3 {
-                return Transformation(transformation: nil,
+                return Transformation(transformation: selectedTiles.map { TileTransformation($0, $0) },
                                       inputType: input.type,
                                       endTiles: tiles)
             }
@@ -850,11 +850,13 @@ extension Board {
         var intermediateTiles = tiles
         
         var finalSelectedTiles: [TileCoord] = []
+        var removedTilesContainGem = false
         for coord in selectedTiles {
             // turn the tile into a gem or into an empty
             if case TileType.rock(let color, let holdsGem) = tiles[coord].type, holdsGem {
                 intermediateTiles[coord.x][coord.y] = Tile(type: .emptyGem(color))
                 finalSelectedTiles.append(coord)
+                removedTilesContainGem = holdsGem
             } else {
                 intermediateTiles[coord.x][coord.y] = .empty
                 /// keep track of the emptied tiles
@@ -897,7 +899,8 @@ extension Board {
                               endTiles: intermediateTiles,
                               removed: selectedTilesTransformation,
                               newTiles: newTiles,
-                              shiftDown: shiftDown
+                              shiftDown: shiftDown,
+                              removedTilesContainGem: removedTilesContainGem
         )
     }
     
@@ -910,6 +913,7 @@ extension Board {
         
         // set the tiles to be removed as Empty placeholder
         var intermediateTiles = tiles
+        var removedTilesContainGem = false
         for coord in selectedTiles {
             switch tiles[coord].type {
             case let .pillar(data):
@@ -921,8 +925,11 @@ extension Board {
                     intermediateTiles[coord.x][coord.y] = Tile(type: .pillar(PillarData(color: data.color, health: data.health-1)))
                 }
                 
-            case .rock:
+            case .rock(color: _, holdsGem: let holdsGem):
                 intermediateTiles[coord.x][coord.y] = Tile.empty
+                if !removedTilesContainGem {
+                    removedTilesContainGem = holdsGem
+                }
             case .monster:
                 intermediateTiles[coord.x][coord.y] = Tile.empty
             case .offer:
@@ -945,6 +952,7 @@ extension Board {
         //create selectedTilesTransformation array
         let selectedTilesTransformation = selectedTiles.map { TileTransformation($0, $0) }
         
+        
         //update our store of tilesftiles
         self.tiles = intermediateTiles
         
@@ -954,7 +962,8 @@ extension Board {
                               endTiles: intermediateTiles,
                               removed: selectedTilesTransformation,
                               newTiles: newTiles,
-                              shiftDown: shiftDown
+                              shiftDown: shiftDown,
+                              removedTilesContainGem: removedTilesContainGem
         )
     }
     
@@ -1289,12 +1298,13 @@ extension Board {
                                     let attackerPosition,
                                     let defenderPostion,
                                     let affectedTiles,
-                                    _) = input.type else {
+                                    _, _) = input.type else {
                                         return Transformation.zero
         }
         var attacker: EntityModel
         var defender: EntityModel
         var dodged = false
+        var attackerIsPlayer = false
         
         
         //TODO: DRY, extract and shorten this code
@@ -1314,6 +1324,7 @@ extension Board {
             tiles[defenderPosition.x][defenderPosition.y] = Tile(type: TileType.monster(newDefenderData))
             
             dodged = defenderDodged
+            attackerIsPlayer = true
             
         } else if let defenderPosition = defenderPostion,
             case let .player(playerModel) = tiles[defenderPosition].type,
@@ -1358,7 +1369,9 @@ extension Board {
                                                           attacker: attackerPosition,
                                                           defender: defenderPostion,
                                                           affectedTiles: affectedTiles,
-                                                          dodged: dodged),
+                                                          dodged: dodged,
+                                                          attackerIsPlayer: attackerIsPlayer
+                                                          ),
                               endTiles: tiles)
     }
 }

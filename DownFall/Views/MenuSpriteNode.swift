@@ -83,6 +83,18 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
                                 backgroundColor: .eggshellWhite)
             mainMenuButton.position = CGPoint.position(mainMenuButton.frame, inside: self.frame, verticalAlign: .bottom, horizontalAnchor: .left, xOffset: Style.Padding.most, yOffset: Style.Padding.most)
             addChild(mainMenuButton)
+            
+            
+            let soundButton = Button(size: buttonSize,
+                                delegate: buttonDelegate ?? self,
+                                identifier: .toggleSound,
+                                precedence: precedence,
+                                fontSize: .fontLargeSize,
+                                fontColor: .clayRed,
+                                backgroundColor: .eggshellWhite)
+            soundButton.position = CGPoint.position(soundButton.frame, inside: self.frame, verticalAlign: .center, horizontalAnchor: .center, yOffset: -2*Style.Padding.most)
+            addChild(soundButton)
+
 
         } else if menuType == .gameLose {
             let text =
@@ -234,6 +246,11 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             InputQueue.append(Input(.visitStore))
         case .mainMenu:
             InputQueue.append(Input(.playAgain))
+        case .toggleSound:
+            let muted = UserDefaults.standard.bool(forKey: "muteSound")
+            UserDefaults.standard.setValue(!muted, forKey: "muteSound")
+            InputQueue.append(Input(.play))
+            
         default:
             fatalError("These buttons dont appear in game")
         }

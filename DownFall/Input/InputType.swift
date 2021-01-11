@@ -34,7 +34,9 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
                                                 attacker: TileCoord(0,0),
                                                 defender: TileCoord(0,0),
                                                 affectedTiles: [],
-                                                dodged: false),
+                                                dodged: false,
+                                                attackerIsPlayer: false
+                                        ),
                                         .monsterDies(TileCoord(0,0), .wizard),
                                         .gameWin(0),
                                         .gameLose(""),
@@ -69,7 +71,7 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
     case rotateCounterClockwise(preview: Bool)
     case rotateClockwise(preview: Bool)
     case monsterDies(TileCoord, EntityModel.EntityType)
-    case attack(attackType: AttackType, attacker: TileCoord, defender: TileCoord?, affectedTiles: [TileCoord], dodged: Bool)
+    case attack(attackType: AttackType, attacker: TileCoord, defender: TileCoord?, affectedTiles: [TileCoord], dodged: Bool, attackerIsPlayer: Bool)
     case gameWin(_ goalsCompleted: Int)
     case gameLose(String)
     case play
@@ -127,7 +129,7 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
             return "Play Again"
         case .reffingFinished:
             return "Reffing Finished"
-        case .attack(_, let attacker, let defender, _, _):
+        case .attack(_, let attacker, let defender, _, _, _):
             return "Attacked from \(attacker) to \(String(describing: defender))"
         case .boardBuilt:
             return "Board has been built"

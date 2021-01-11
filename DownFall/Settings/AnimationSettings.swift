@@ -11,6 +11,7 @@ import CoreGraphics
 struct AnimationSettings {
     static let rotateSpeed = 0.4
     static let fallSpeed = 0.2
+    static let wiggleSpeed = 0.1
     
     struct RotatePreview {
         static let finishRotateSpeed = 0.07

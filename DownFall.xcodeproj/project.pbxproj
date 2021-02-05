@@ -166,6 +166,7 @@
 		58AD9282243C283300B5B1EC /* LevelGoalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58AD9281243C283300B5B1EC /* LevelGoalView.swift */; };
 		58B39BD723D21C9600915858 /* BackpackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58B39BD623D21C9600915858 /* BackpackView.swift */; };
 		58C37F2425AB94ED00F6D164 /* pickaxe.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 58C37F2325AB94ED00F6D164 /* pickaxe.mp3 */; };
+		58C551E725AC073300081AB8 /* TestShader.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 58C551E625AC073300081AB8 /* TestShader.fsh */; };
 		58C9735124969CA100288133 /* ProfileManaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C9735024969CA100288133 /* ProfileManaging.swift */; };
 		58D56B4F25AB90DB002D1337 /* AudioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58D56B4E25AB90DB002D1337 /* AudioManager.swift */; };
 		58DCC9842451FBC700DC7AD8 /* RuneContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58DCC9832451FBC700DC7AD8 /* RuneContainerView.swift */; };
@@ -346,6 +347,7 @@
 		58AD9281243C283300B5B1EC /* LevelGoalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelGoalView.swift; sourceTree = "<group>"; };
 		58B39BD623D21C9600915858 /* BackpackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackpackView.swift; sourceTree = "<group>"; };
 		58C37F2325AB94ED00F6D164 /* pickaxe.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = pickaxe.mp3; sourceTree = "<group>"; };
+		58C551E625AC073300081AB8 /* TestShader.fsh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = TestShader.fsh; sourceTree = "<group>"; };
 		58C9735024969CA100288133 /* ProfileManaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileManaging.swift; sourceTree = "<group>"; };
 		58D56B4E25AB90DB002D1337 /* AudioManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioManager.swift; sourceTree = "<group>"; };
 		58DCC9832451FBC700DC7AD8 /* RuneContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneContainerView.swift; sourceTree = "<group>"; };
@@ -675,6 +677,7 @@
 		3DF2924C20A37FEE006671AC /* DownFall */ = {
 			isa = PBXGroup;
 			children = (
+				58C551E525AC070600081AB8 /* Shaders */,
 				58D56B5425AB91F8002D1337 /* Sound */,
 				586319C024C1FF530090CD6D /* Defaults */,
 				5802613024AFC1BE00D7CF20 /* Shift Shaft.entitlements */,
@@ -854,6 +857,14 @@
 			name = LevelGoalTracker;
 			sourceTree = "<group>";
 		};
+		58C551E525AC070600081AB8 /* Shaders */ = {
+			isa = PBXGroup;
+			children = (
+				58C551E625AC073300081AB8 /* TestShader.fsh */,
+			);
+			name = Shaders;
+			sourceTree = "<group>";
+		};
 		58C9734F24969C8D00288133 /* Save */ = {
 			isa = PBXGroup;
 			children = (
@@ -998,6 +1009,7 @@
 				3D528FDF2155BD7300EF65CA /* Assets.xcassets in Resources */,
 				3DB270A522ADBD0100D9BF8B /* player.png in Resources */,
 				589E156E25ABA324004A6D46 /* collectGem.mp3 in Resources */,
+				58C551E725AC073300081AB8 /* TestShader.fsh in Resources */,
 				589E159F25ABC909004A6D46 /* levelComplete.mp3 in Resources */,
 				589E159325ABC3D1004A6D46 /* enemyHitsPlayer.mp3 in Resources */,
 				589E156225AB9BE7004A6D46 /* mineRocks.wav in Resources */,

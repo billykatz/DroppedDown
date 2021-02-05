@@ -51,6 +51,11 @@ enum ButtonIdentifier: String {
     case swapRunes
     case toggleSound
     
+    case increaseGreen
+    case increaseBlue
+    case increaseRed
+    case increaseAlpha
+    
     var title: String {
         switch self {
         case .resume:
@@ -113,6 +118,14 @@ enum ButtonIdentifier: String {
             return "Swap"
         case .toggleSound:
             return "Toggle Sound"
+        case .increaseGreen:
+            return "+ 50 Green"
+        case .increaseBlue:
+            return "+ 50 Blue"
+        case .increaseRed:
+            return "+ 50 Red"
+        case .increaseAlpha:
+            return "+ 50 Alpha"
         case .wallet, .infoPopup, .storeItem, .backpack, .sellHealth, .buyHealth, .sellDodge, .buyDodge, .sellLuck, .buyLuck, .buyRuneSlot, .sellRuneSlot:
             return ""
         }

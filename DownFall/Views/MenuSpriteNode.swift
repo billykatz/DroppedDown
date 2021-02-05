@@ -41,12 +41,24 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
     func setup(_ menuType: MenuType, playableRect: CGRect, precedence: Precedence, level: Level, completedGoals: Int = 0, buttonDelegate: ButtonDelegate? = nil) {
         removeAllChildren()
         
+        // set up the background
+        let overlay = SKShapeNode(rect: playableRect)
+        overlay.color = .white
+        overlay.alpha = 0.25
+        overlay.zPosition = -1
+        addChild(overlay)
+        
+        // set up the border
         let border = SKShapeNode(rect: self.frame)
         border.strokeColor = UIColor.darkGray
         border.lineWidth = Style.Menu.borderWidth
         addChild(border)
         
+        
+        // make it fly!
         zPosition = 20_000
+        
+        // set up the buttons
         setupButtons(menuType, playableRect, precedence: precedence, level, completedGoals: completedGoals, buttonDelegate: buttonDelegate)
 
     }
@@ -156,6 +168,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             }
                 
         }
+        // TODO: Remove DEBUG code
         else if menuType == .debug {
             let viewPauseMenu = Button.init(size: buttonSize, delegate: self, identifier: .debugPause)
             
@@ -188,8 +201,8 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
         button.position = CGPoint.position(button.frame, inside: self.frame, verticalAlign: .bottom, horizontalAnchor: hasSecondaryButton ? .right : .center, xOffset: Style.Padding.most, yOffset: Style.Padding.most)
         addChild(button)
         
-        
-        let xOutButton = Button(size: .fifty, delegate: self, identifier: .backpackCancel, image: SKSpriteNode(imageNamed: "buttonNegativeWhiteX"), shape: .circle)
+        // TODO: Remove DEBUG code
+        let xOutButton = Button(size: .oneHundred, delegate: self, identifier: .backpackCancel, image: SKSpriteNode(imageNamed: "buttonNegativeWhiteX"), shape: .circle)
         
         xOutButton.position = CGPoint.position(xOutButton.frame, inside: self.frame, verticalAlign: .top, horizontalAnchor: .left)
         
@@ -235,6 +248,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             UserDefaults.standard.setValue(!muted, forKey: "muteSound")
             InputQueue.append(Input(.play))
             
+        // TODO: Remove DEBUG code
         case .debugPause:
             setup(.pause, playableRect: self.playableRect, precedence: self.precedence, level: self.level, completedGoals: 2, buttonDelegate: self.buttonDelegate)
         case .debugWin:

@@ -16,6 +16,7 @@ enum MenuType {
     case tutorial2Win
     case gameLose
     case confirmation
+    case debug
     
     struct Constants {
         static let resume = "Resume"
@@ -40,6 +41,8 @@ enum MenuType {
             return ButtonIdentifier.playAgain
         case .confirmation:
             return ButtonIdentifier.backpackConfirm
+        case .debug:
+            return .resume
         }
         
     }

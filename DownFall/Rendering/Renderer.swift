@@ -30,6 +30,10 @@ class Renderer: SKSpriteNode {
     //Animator
     private let animator = Animator()
     
+    func debugMenu() -> MenuSpriteNode {
+        return MenuSpriteNode(.debug, playableRect: self.playableRect, precedence: .menu, level: self.level)
+    }
+    
     private lazy var menuSpriteNode: MenuSpriteNode = {
         return MenuSpriteNode(.pause, playableRect: self.playableRect, precedence: .menu, level: self.level)
     }()
@@ -247,10 +251,11 @@ class Renderer: SKSpriteNode {
         case .play:
             // remove the menu
             menuForeground.removeFromParent()
+            menuForeground.removeAllChildren()
         case .pause:
             // show the menu
             foreground.addChild(menuForeground)
-            menuForeground.addChildSafely(menuSpriteNode)
+            menuForeground.addChildSafely(debugMenu())
         case .gameLose:
             menuForeground.addChild(gameLoseSpriteNode)
             foreground.addChildSafely(menuForeground)

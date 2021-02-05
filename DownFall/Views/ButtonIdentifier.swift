@@ -51,6 +51,9 @@ enum ButtonIdentifier: String {
     case swapRunes
     case toggleSound
     case givePlayerRune
+    case debugPause
+    case debugWin
+    case debugLose
     
     var title: String {
         switch self {
@@ -116,6 +119,13 @@ enum ButtonIdentifier: String {
             return "Toggle Sound"
         case .givePlayerRune:
             return "Give Player Random Rune"
+        case .debugPause:
+            return "Debug Pause"
+        case .debugWin:
+            return "Debug Win"
+        case .debugLose:
+            return "Debug Lose"
+        
         case .wallet, .infoPopup, .storeItem, .backpack, .sellHealth, .buyHealth, .sellDodge, .buyDodge, .sellLuck, .buyLuck, .buyRuneSlot, .sellRuneSlot:
             return ""
         }

@@ -10,12 +10,13 @@ import SpriteKit
 
 protocol OptionsSceneDelegate: class {
     func backSelected()
+    func addRandomRune()
 }
 
 class OptionsScene: SKScene, ButtonDelegate {
     
     private var foreground: SKSpriteNode!
-    weak var myDelegate: OptionsSceneDelegate?
+    weak var optionsDelegate: OptionsSceneDelegate?
     
     private lazy var resetDataButton: Button = {
         
@@ -33,9 +34,16 @@ class OptionsScene: SKScene, ButtonDelegate {
                             delegate: self,
                             identifier: .back)
         return button
-        
-        
     }()
+    
+    private lazy var addPlayerRune: Button = {
+        
+        let button = Button(size: .buttonExtralarge,
+                            delegate: self,
+                            identifier: .givePlayerRune)
+        return button
+    }()
+
     
     override func didMove(to view: SKView) {
     
@@ -43,12 +51,20 @@ class OptionsScene: SKScene, ButtonDelegate {
         self.foreground = foreground
         addChildSafely(foreground)
         
+        resetDataButton.position = .position(resetDataButton.frame, inside: foreground.frame, verticalAlign: .top, horizontalAnchor: .right, yOffset: .safeAreaHeight)
+        
         foreground.addChildSafely(resetDataButton)
+        
         
         backButton.position = .position(backButton.frame, inside: foreground.frame, verticalAlign: .top, horizontalAnchor: .left, yOffset: .safeAreaHeight)
         
         
         foreground.addChildSafely(backButton)
+        
+        
+        addPlayerRune.position = .zero
+        
+        foreground.addChildSafely(addPlayerRune)
     }
     
     func buttonTapped(_ button: Button) {
@@ -59,9 +75,11 @@ class OptionsScene: SKScene, ButtonDelegate {
                 GameScope.shared.profileManager.deleteAllRemoteProfile()
                 GameScope.shared.profileManager.resetUserDefaults()
         case .back:
-            myDelegate?.backSelected()
-            default:
-                break
+            optionsDelegate?.backSelected()
+        case .givePlayerRune:
+            optionsDelegate?.addRandomRune()
+        default:
+            break
         }
     }
 }

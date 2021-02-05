@@ -33,7 +33,6 @@ protocol MenuCoordinating: class {
 
 class MenuCoordinator: MenuCoordinating, MainMenuDelegate, OptionsSceneDelegate, MenuStoreSceneDelegate {
     
-    
     var view: SKView
     var profile: Profile?
     var levelCoordinator: LevelCoordinating
@@ -48,7 +47,7 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate, OptionsSceneDelegate,
     
     private lazy var optionsScene: OptionsScene? = {
         guard let scene = GKScene(fileNamed: Identifiers.optionsScene)?.rootNode as? OptionsScene else { return nil }
-        scene.myDelegate = self
+        scene.optionsDelegate = self
         scene.scaleMode = .aspectFill
         return scene
     }()
@@ -112,6 +111,10 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate, OptionsSceneDelegate,
     
     func backSelected() {
         presentMainMenu(transition: SKTransition.push(with: .right, duration: 0.5))
+    }
+    
+    func addRandomRune() {
+        profile?.givePlayerARandomRune()
     }
     
     func menuStore() {

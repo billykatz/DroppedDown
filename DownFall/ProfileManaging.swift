@@ -17,11 +17,15 @@ struct Profile: Codable, Equatable {
     let progress: Int
     let player: EntityModel
     var currentRun: RunModel?
+    var randomRune: Rune?
     
     let deepestDepth: Int
     
     var runPlayer: EntityModel {
-        return player.update(pickaxe: Pickaxe(runeSlots: 1, runes: [Rune.rune(for: .bubbleUp)]))
+        guard let rune = randomRune else {
+            return player.update(pickaxe: Pickaxe(runeSlots: 1, runes: []))
+        }
+        return player.update(pickaxe: Pickaxe(runeSlots: 1, runes: [rune]))
     }
     
     func updatePlayer(_ entityModel: EntityModel) -> Profile {
@@ -36,6 +40,12 @@ struct Profile: Codable, Equatable {
         let newDepth = depth > deepestDepth ? depth : deepestDepth
         return Profile(name: name, progress: progress + 1, player: player, currentRun: currentRun, deepestDepth: newDepth)
 
+    }
+    
+    // just for debug purposes
+    public mutating func givePlayerARandomRune() {
+        let runeType = RuneType.allCases.randomElement()!
+        randomRune = Rune.rune(for: runeType)
     }
         
 }
@@ -94,7 +104,7 @@ class ProfileViewModel: ProfileManaging {
     private var disposables = Set<AnyCancellable>()
     
     /// Background Queue
-    private var backgroundQueue = DispatchQueue.init(label: "profile-saving-thread", qos: .userInitiated, attributes: .concurrent)
+    private var backgroundQueue = DispatchQueue(label: "profile-saving-thread", qos: .userInitiated, attributes: .concurrent)
     
     private let localPlayer: GKLocalPlayer
     init(localPlayer: GKLocalPlayer = GKLocalPlayer.local) {

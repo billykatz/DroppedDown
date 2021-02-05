@@ -10,7 +10,7 @@ import Foundation
 import CoreGraphics
 import SpriteKit
 
-enum RuneType: String, Codable, Hashable {
+enum RuneType: String, Codable, Hashable, CaseIterable {
     case rainEmbers
     case getSwifty
     case transformRock

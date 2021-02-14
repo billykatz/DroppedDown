@@ -131,6 +131,7 @@
 		5866B3DA244D2A4600DF36E0 /* GoalTracking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5866B3D9244D2A4600DF36E0 /* GoalTracking.swift */; };
 		5866B3DC244D2D2300DF36E0 /* RuneDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5866B3DB244D2D2300DF36E0 /* RuneDetailView.swift */; };
 		5867A591242B0CD1005BFD10 /* TileDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5867A590242B0CD1005BFD10 /* TileDetailView.swift */; };
+		5867DF0C25D23CD700CCA702 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5867DF0B25D23CD700CCA702 /* Logger.swift */; };
 		586AE77723CF91AA00302347 /* AttackModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 586AE77623CF91AA00302347 /* AttackModelTests.swift */; };
 		5881DBF4244FEE440053A690 /* RuneSlotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5881DBF3244FEE440053A690 /* RuneSlotView.swift */; };
 		5881DBF6244FEE630053A690 /* RuneSlotViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5881DBF5244FEE630053A690 /* RuneSlotViewModel.swift */; };
@@ -312,6 +313,7 @@
 		5866B3D9244D2A4600DF36E0 /* GoalTracking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalTracking.swift; sourceTree = "<group>"; };
 		5866B3DB244D2D2300DF36E0 /* RuneDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneDetailView.swift; sourceTree = "<group>"; };
 		5867A590242B0CD1005BFD10 /* TileDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileDetailView.swift; sourceTree = "<group>"; };
+		5867DF0B25D23CD700CCA702 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		586AE77623CF91AA00302347 /* AttackModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttackModelTests.swift; sourceTree = "<group>"; };
 		5881DBF3244FEE440053A690 /* RuneSlotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneSlotView.swift; sourceTree = "<group>"; };
 		5881DBF5244FEE630053A690 /* RuneSlotViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneSlotViewModel.swift; sourceTree = "<group>"; };
@@ -509,6 +511,7 @@
 			isa = PBXGroup;
 			children = (
 				3DB0CEE8239DB072002A8FF3 /* GameScope.swift */,
+				5867DF0B25D23CD700CCA702 /* Logger.swift */,
 				580EF0FF24E0F083003D312B /* RunScope.swift */,
 				3DC9CA1221D1DDD4004D05D5 /* Difficulty.swift */,
 			);
@@ -1046,6 +1049,7 @@
 				5894B178245FE61B003B86F1 /* StoreHUDViewModel.swift in Sources */,
 				3DF2928520A76242006671AC /* Board.swift in Sources */,
 				581A64CD24CE99D100B92EA6 /* OptionsScene.swift in Sources */,
+				5867DF0C25D23CD700CCA702 /* Logger.swift in Sources */,
 				58153460243993F400483481 /* LevelGoalTracker.swift in Sources */,
 				3D7D8B37225422440016FE4C /* TilesHelper.swift in Sources */,
 				5866B3DA244D2A4600DF36E0 /* GoalTracking.swift in Sources */,
@@ -1311,7 +1315,7 @@
 				CODE_SIGN_ENTITLEMENTS = "DownFall/Shift Shaft.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = G6N5X5RF9Q;
 				INFOPLIST_FILE = DownFall/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
@@ -1335,7 +1339,7 @@
 				CODE_SIGN_ENTITLEMENTS = "DownFall/Shift Shaft.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = G6N5X5RF9Q;
 				INFOPLIST_FILE = DownFall/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;

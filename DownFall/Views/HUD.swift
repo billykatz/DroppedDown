@@ -26,7 +26,7 @@ class HUD: SKSpriteNode {
                                             inside: header.frame,
                                             verticalAlign: .top,
                                             horizontalAnchor: .right)
-        setting.zPosition = Precedence.foreground.rawValue
+        setting.zPosition = 1_000_000
         
         header.addChild(setting)
         

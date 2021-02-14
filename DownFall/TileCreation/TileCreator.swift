@@ -15,6 +15,7 @@ class TileCreator: TileStrategy {
     var updatedEntity: EntityModel?
     let boardSize: Int
     var level: Level
+    var loadedTiles: [[Tile]]?
     var specialRocks = 0
     var specialGems = 0
     var goldVariance = 2
@@ -25,13 +26,17 @@ class TileCreator: TileStrategy {
                   difficulty: Difficulty,
                   updatedEntity: EntityModel? = nil,
                   level: Level,
-                  randomSource: GKLinearCongruentialRandomSource) {
+                  randomSource: GKLinearCongruentialRandomSource,
+                  loadedTiles: [[Tile]]? = []) {
         self.entities = entities
         self.difficulty = difficulty
         self.updatedEntity = updatedEntity
         self.level = level
         self.randomSource = randomSource
         self.boardSize = level.boardSize
+        
+        print("loadedTiles is not nil \(loadedTiles != nil)")
+        self.loadedTiles = loadedTiles
     }
     
     private func randomTile(given: Int, neighbors: [Tile], playerData: EntityModel) -> TileType {
@@ -250,6 +255,14 @@ class TileCreator: TileStrategy {
     
     func board(difficulty: Difficulty) -> [[Tile]] {
         guard let playerData = updatedEntity else { preconditionFailure("Unable to create a board without a player") }
+        
+        // early return to load the load tiles we have loaded
+        if let loadedTiles = self.loadedTiles, loadedTiles.count > 0 {
+            print("we have a saved game to return")
+            self.loadedTiles = nil
+            return loadedTiles
+        }
+        
         var newTiles: [Tile] = []
         
         //just add a bunchhhhhhh of rocks

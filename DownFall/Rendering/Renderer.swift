@@ -71,8 +71,9 @@ class Renderer: SKSpriteNode {
         return hud
     }()
     
+    private var levelGoalTracker: LevelGoalTracker
     private lazy var levelGoalView: LevelGoalView = {
-        let levelGoalView = LevelGoalView(viewModel: LevelGoalTracker(level: level),
+        let levelGoalView = LevelGoalView(viewModel: levelGoalTracker,
                                           size: CGSize(width: playableRect.width/2,
                                                        height: Style.LevelGoalView.height))
         levelGoalView.position = CGPoint.alignHorizontally(levelGoalView.frame,
@@ -92,12 +93,14 @@ class Renderer: SKSpriteNode {
          foreground givenForeground: SKNode,
          boardSize theBoardSize: Int,
          precedence: Precedence,
-         level: Level) {
+         level: Level,
+         levelGoalTracker: LevelGoalTracker) {
         
         self.precedence = precedence
         self.playableRect = playableRect
         self.boardSize = CGFloat(theBoardSize)
         self.level = level
+        self.levelGoalTracker = levelGoalTracker
         
         self.tileSize = GameScope.boardSizeCoefficient * (playableRect.width / boardSize)
         
@@ -147,7 +150,7 @@ class Renderer: SKSpriteNode {
     }
     
     private func renderTransformation(_ transformations: [Transformation]) {
-        print("Renderer will render a transformation. \(transformations.first?.inputType)")
+        print("Renderer will render a transformation. \(String(describing: transformations.first?.inputType))")
         if let trans = transformations.first, let inputType = trans.inputType {
             switch inputType {
             case .rotateCounterClockwise(let preview), .rotateClockwise(let preview):
@@ -758,35 +761,6 @@ extension Renderer {
         }
     }
 }
-
-#if DEBUG
-//MARK: Debug
-extension Renderer {
-    
-    private func debugDrawPlayableArea() {
-        let shape = SKShapeNode()
-        let path = CGMutablePath()
-        path.addRect(playableRect)
-        shape.path = path
-        shape.strokeColor = SKColor.red
-        shape.lineWidth = 4.0
-        shape.zPosition = precedence.rawValue
-        foreground.addChild(shape)
-    }
-    
-    private func debugBoardSprites() -> String {
-        var outs = "\nTop of Sprites"
-        for (i, _) in sprites.enumerated().reversed() {
-            outs += "\n"
-            for (j, _) in sprites[i].enumerated() {
-                outs += "\t\(sprites[i][j].type)"
-            }
-        }
-        outs += "\nbottom of Sprites"
-        return outs
-    }
-}
-#endif
 
 extension Renderer: SettingsDelegate {
     func settingsTapped() {

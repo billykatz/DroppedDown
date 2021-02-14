@@ -113,8 +113,11 @@ struct Animator {
             var spriteActions: [SpriteAction] = []
             
             let bubbleSprite = SKSpriteNode(imageNamed: "bubble")
-            #warning("refactor this to avoid !")
-            let originalPlayerPosition = affectedTiles.first!
+            
+            guard let originalPlayerPosition = affectedTiles.first else {
+                completion?()
+                return
+            }
             let playerSprite = sprites[originalPlayerPosition]
             
             // player is taller than wide, so use the player's height as width and height of bubble

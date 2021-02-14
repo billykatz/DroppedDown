@@ -9,12 +9,6 @@
 import Foundation
 
 class Referee {
-    static var level: Level = .zero
-
-    static func injectLevel(_ level: Level) {
-        Referee.level = level
-    }
-    
     static func enterRules(_ tiles: [[Tile]]?) {
         InputQueue.append(Referee.enforceRules(tiles))
     }

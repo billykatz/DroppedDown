@@ -31,13 +31,22 @@ class LevelGoalTracker: LevelGoalTracking {
     
     init(level: Level) {
         self.level = level
-        var goalProgress: [GoalTracking] = []
-        var count = 0
-        for goal in level.goals {
-            goalProgress.append(GoalTracking(tileType: goal.tileType, current: 0, target: goal.targetAmount, levelGoalType: goal.type, minimumAmount: goal.minimumGroupSize, grouped: goal.grouped, hasBeenRewarded: false))
-            count += 1
+        
+        // grab the current progress because the level could be saved
+        self.goalProgress = level.goalProgress
+        
+        /// there may be goals in the level that we havent progress in yet, we need to add those
+        if self.goalProgress.count != level.goals.count {
+            /// add any other goals where the goal type and goal tile type are the same
+            for goal in level.goals {
+                /// if we do not have any saved progress for a goal, then we must add it
+                if !self.goalProgress.contains(where: { innerGoal in
+                    return (innerGoal.levelGoalType, innerGoal.tileType) == (goal.type, goal.tileType)
+                }) {
+                    self.goalProgress.append(GoalTracking(tileType: goal.tileType, current: 0, target: goal.targetAmount, levelGoalType: goal.type, minimumAmount: goal.minimumGroupSize, grouped: goal.grouped, hasBeenRewarded: false))
+                }
+            }
         }
-        self.goalProgress = goalProgress
         
         Dispatch.shared.register { [weak self] (input) in
             self?.handle(input: input)

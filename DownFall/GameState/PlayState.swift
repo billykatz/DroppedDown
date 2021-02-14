@@ -25,7 +25,8 @@ struct PlayState: GameState {
              .touchBegan, .shuffleBoard, .unlockExit, .goalCompleted:
             return AnyGameState(ComputingState())
         case .boardBuilt:
-            return AnyGameState(PlayState())
+            // TODO: I dont know the full consequences of changing this from return PlayState to Reffing State.  But basically when we load a game we need to check to see if there is anything to Ref, like if the player is 1 tile above an open exit.
+            return AnyGameState(ReffingState())
         case .itemUseSelected:
             return AnyGameState(TargetingState())
         case .animationsFinished, .play, .transformation, .reffingFinished, .playAgain,. selectLevel, .newTurn, .visitStore, .itemUseCanceled, .itemCanBeUsed, .itemUsed, .decrementDynamites, .rotatePreview, .rotatePreviewFinish, .refillEmpty, .tileDetail, .runeReplacement,

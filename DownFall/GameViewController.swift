@@ -11,8 +11,11 @@ import SpriteKit
 import GameplayKit
 
 class GameViewController: UIViewController {
-
-    internal var gameSceneNode: GameScene?
+    
+    struct Constants {
+        static let tag = String(describing: GameViewController.self)
+    }
+    
     internal var entities: EntitiesModel?
     var loadingSceneNode: LoadingScene?
     
@@ -26,13 +29,12 @@ class GameViewController: UIViewController {
             loadingSceneNode?.fadeOut {
                 self.menuCoordinator?.loadedProfile(profile)
             }
-            
-            
         }
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        GameLogger.shared.log(prefix: Constants.tag, message: "View did load start")
         
         /// Needed when we stopped using a storyboard
         view = SKView(frame: view.bounds)
@@ -45,23 +47,33 @@ class GameViewController: UIViewController {
            loadingSceneNode = loadingScene
         }
         
+        // create the entities array from the local json file
         do {
-            guard let entityData = try Data.data(from: "entities") else { fatalError("Crashing here is okay because we failed to parse our entity json file") }
+            guard let entityData = try Data.data(from: "entities") else {
+                return GameLogger.shared.fatalLog(prefix: Constants.tag, message: "Crashing here is okay because we failed to parse our entity json file")
+            }
             entities = try JSONDecoder().decode(EntitiesModel.self, from: entityData)
         }
         catch(let error) {
-            fatalError("Crashing due to \(error) while trying to parse json entity file")
+            return GameLogger.shared.fatalLog(prefix: Constants.tag, message: "Crashing due to \(error) while trying to parse json entity file")
         }
         
         /// Init the coordinators
-        guard let gameScene = GKScene(fileNamed: "GameScene")?.rootNode as? GameScene, let entities = entities,
-            let view = self.view as? SKView
-        else { fatalError() }
+        guard let gameScene = GKScene(fileNamed: "GameScene")?.rootNode as? GameScene,
+              let entities = entities,
+              let view = self.view as? SKView
+        else {
+            return GameLogger.shared.fatalLog(prefix: Constants.tag, message: "Lack of necessary information to init coordinators")
+        }
         
+        
+        /// setup the coordinator
         let levelCoordinator = LevelCoordinator(gameSceneNode: gameScene, entities: entities, levelIndex: 0, view: view)
         self.menuCoordinator = MenuCoordinator(levelCoordinator: levelCoordinator, view: view)
         self.levelCoordinator = levelCoordinator
         self.levelCoordinator?.delegate = menuCoordinator
+        
+        GameLogger.shared.log(prefix: Constants.tag, message: "View did load finished")
     }
     
     override var shouldAutorotate: Bool {
@@ -83,13 +95,23 @@ class GameViewController: UIViewController {
     // save the current run if there is one
     // add it to the profile then returns the profile
     func applicationDidEnterBackground() -> Profile {
+        GameLogger.shared.log(prefix: Constants.tag, message: "Saving the profile")
+        
         guard var profile = menuCoordinator?.profile else {
-            fatalError("Cannot continue without the profile")
+            GameLogger.shared.fatalLog(prefix: Constants.tag, message: "Cannot continue without the profile")
+            fatalError()
         }
-        if let runModel = levelCoordinator?.runModel {
+
+        
+        
+        /// If we are able to update the run model, then update our profile
+        if let runModel = levelCoordinator?.saveAllState() {
+            GameLogger.shared.log(prefix: Constants.tag, message: "Run model updated")
             profile = profile.updateRunModel(runModel)
         }
         
+        
+        GameLogger.shared.log(prefix: Constants.tag, message: "Returning profile")
         return profile
     }
 }

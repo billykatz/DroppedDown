@@ -58,6 +58,13 @@ class RunModel: Codable, Equatable {
     
     let seed: UInt64
     var player: EntityModel
+    // save the tiles
+    var savedTiles: [[Tile]]?
+    
+    /// Keep track of areas
+    var areas: [Area] = []
+    
+    var goalTracking: [GoalTracking] = []
     
     lazy var randomSource: GKLinearCongruentialRandomSource = {
         return GKLinearCongruentialRandomSource(seed: seed)
@@ -67,18 +74,34 @@ class RunModel: Codable, Equatable {
         return areas.last?.depth ?? 0
     }
     
-    init(player: EntityModel, seed: UInt64) {
+    
+    init(player: EntityModel, seed: UInt64, savedTiles: [[Tile]]?, areas: [Area], goalTracking: [GoalTracking]) {
         self.player = player
         self.seed = seed
+        self.savedTiles = savedTiles
+        self.areas = areas
+        self.goalTracking = goalTracking
     }
-    
-    /// Keep track of areas
-    private var areas: [Area] = []
-    
-    var goalTracking: [GoalTracking] = []
     
     func saveGoalTracking(_ goalTracking: [GoalTracking]) {
         self.goalTracking = goalTracking
+        
+        /// update the last area with the goal tracking
+        if let lastArea = areas.last,
+           case var Area.AreaType.level(level) = lastArea.type {
+            
+            /// save the goal progress
+            level.goalProgress = goalTracking
+            
+            // wrap it in a AreaType
+            let newAreaType = Area.AreaType.level(level)
+            
+            /// get rid of the last area
+            _ = areas.dropLast()
+            
+            /// replace it with one with saved goal tracking
+            areas.append(Area(depth: lastArea.depth, type: newAreaType))
+        }
     }
     
     /// Return the level that corresponds with the depth
@@ -92,8 +115,7 @@ class RunModel: Codable, Equatable {
     
     
     /// Creates a new area and appends to the internal array of Areas
-    /// If the last area was a level, it returns a store, and we increment the depth
-    /// Else if the last level was a store, it returns a level
+    /// There is no more store so this always returns a level
     /// If there was no last level, it is a fresh run, so we return a store, for now.
     func nextArea() -> Area {
         if let lastArea = areas.last {

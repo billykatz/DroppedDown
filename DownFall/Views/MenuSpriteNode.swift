@@ -31,9 +31,11 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
         self.level = level
         self.buttonDelegate = buttonDelegate
         
+        
         super.init(texture: nil,
                    color: .menuPurple,
                    size: CGSize(width: menuSizeWidth, height: menuSizeHeight))
+        self.zPosition = precedence.rawValue
         
         setup(menuType, playableRect: playableRect, precedence: precedence, level: level, completedGoals: completedGoals, buttonDelegate: buttonDelegate)
     }
@@ -41,12 +43,6 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
     func setup(_ menuType: MenuType, playableRect: CGRect, precedence: Precedence, level: Level, completedGoals: Int = 0, buttonDelegate: ButtonDelegate? = nil) {
         removeAllChildren()
         
-        // set up the background
-        let overlay = SKShapeNode(rect: playableRect)
-        overlay.color = .white
-        overlay.alpha = 0.25
-        overlay.zPosition = -1
-        addChild(overlay)
         
         // set up the border
         let border = SKShapeNode(rect: self.frame)
@@ -56,7 +52,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
         
         
         // make it fly!
-        zPosition = 20_000
+//        zPosition = 100_000
         
         // set up the buttons
         setupButtons(menuType, playableRect, precedence: precedence, level, completedGoals: completedGoals, buttonDelegate: buttonDelegate)
@@ -74,9 +70,9 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             let text =
                 """
 
-            You survived depth: \(level.humanReadableDepth)
+            You beat depth: \(level.humanReadableDepth)
 
-            You healed \(completedGoals) HP for completing \(completedGoals) goal\(completedGoals > 1 ? "s" : "").
+            Your progress is saved
 
             """
             let paragraphNode = ParagraphNode.labelNode(text: text, paragraphWidth: menuSizeWidth * 0.95,
@@ -199,6 +195,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
                             fontColor: .black,
                             backgroundColor: .clayRed)
         button.position = CGPoint.position(button.frame, inside: self.frame, verticalAlign: .bottom, horizontalAnchor: hasSecondaryButton ? .right : .center, xOffset: Style.Padding.most, yOffset: Style.Padding.most)
+        button.zPosition = 1_000_000
         addChild(button)
         
         // TODO: Remove DEBUG code
@@ -206,7 +203,19 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
         
         xOutButton.position = CGPoint.position(xOutButton.frame, inside: self.frame, verticalAlign: .top, horizontalAnchor: .left)
         
+        
         addChildSafely(xOutButton)
+        
+        for child in children {
+            child.zPosition = 1_000_000
+        }
+        
+        // set up the background
+        let overlay = SKShapeNode(rect: playableRect)
+        overlay.color = .white
+        overlay.alpha = 0.25
+        overlay.zPosition = -1
+        addChild(overlay)
     }
     
     private func showRotate(_ frames: [SKTexture]) {

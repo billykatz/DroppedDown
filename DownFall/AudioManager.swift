@@ -122,7 +122,7 @@ class AudioEventListener {
                     audioManager.playSound(.goalCompleted)
                 }
                 
-            case .attack(attackType: _, attacker: _, defender: _, affectedTiles: _, dodged: let dodged, attackerIsPlayer: let attackerIsPlayer):
+            case .attack(attackType: _, attacker: _, defender: _, affectedTiles: _, dodged: _, attackerIsPlayer: let attackerIsPlayer):
                 if attackerIsPlayer {
                     audioManager.playSound(.playerHitsEnemy)
                 } else {

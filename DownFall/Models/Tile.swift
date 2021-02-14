@@ -47,7 +47,7 @@ enum Color: String, Codable, CaseIterable, Hashable {
     }
 }
 
-struct Tile: Hashable {
+struct Tile: Hashable, Codable {
     let type: TileType
     var tutorialHighlight: Bool
     

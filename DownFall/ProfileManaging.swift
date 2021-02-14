@@ -112,7 +112,7 @@ class ProfileViewModel: ProfileManaging {
     }
     
     /// Defines all business logic and kickoffs the pipeline by attempting to authenicate with GameCenter
-    func start(_ presenter: UIViewController, showGCSignIn: Bool = false) {
+    func start(_ presenter: UIViewController, showGCSignIn: Bool = true) {
         
         /// Load the remote save file into data
         let loadRemoteData =
@@ -155,14 +155,18 @@ class ProfileViewModel: ProfileManaging {
         let createAndSavePlayerProfile =
             self.createLocalProfile()
                 .eraseToAnyPublisher()
-                .print("Create new and save player profile")
-                .tryFlatMap( { [weak self] nameData -> Future<Profile, Error> in
-                    guard let self = self else {
-                        throw ProfileError.profileLoadCancelled
-                    }
-                    return self.saveProfileRemotely(nameData)
-                })
-                .eraseToAnyPublisher()
+//                .print("Create new and save player profile")
+//                .tryFlatMap( { [weak self] nameData -> AnyPublisher<Profile, Error> in
+//                    guard let self = self else {
+//                        throw ProfileError.profileLoadCancelled
+//                    }
+//                    return self.saveProfileRemotely(nameData)
+//                        .catch { (_) -> Future<Profile, Error> in
+//                            return Future<Profile, Error> { promise in
+//                                promise(.success(nameData))
+//                            }
+//                        }.eraseToAnyPublisher()
+//                })
         
         let resolveProfileConflict: AnyPublisher<Profile, Error> =
             loadedProfilesZip
@@ -185,9 +189,9 @@ class ProfileViewModel: ProfileManaging {
                         throw ProfileError.failedToResolveProfiles
                     }
                 })
-                .catch( { error in
+                .catch { _ in
                     return (createAndSavePlayerProfile)
-                })
+                }
                 .eraseToAnyPublisher()
         
         /// Resolves the profile conflict
@@ -195,28 +199,22 @@ class ProfileViewModel: ProfileManaging {
         /// Writes to loadedProfileSubject on success
         resolveProfileConflict
             .print("Resolving profile conflicts")
-            .flatMap { profile -> AnyPublisher<(Profile, Profile), Error> in
-                let combined = Publishers.CombineLatest(self.saveProfileLocally(profile).catch( { _ in Just(Profile.zero) }).setFailureType(to: Error.self),
-                                                        self.saveProfileRemotely(profile).catch( { _ in Just(Profile.zero) }).setFailureType(to: Error.self)
-                ).eraseToAnyPublisher()
-                return combined
+            .flatMap { profile -> AnyPublisher<Profile, Error> in
+                return self.saveProfileLocally(profile).eraseToAnyPublisher()
             }
-            .subscribe(on: backgroundQueue)
+            .combineLatest(authenicated)
+            .print("testing")
+            .subscribe(on: self.backgroundQueue)
             .receive(on: RunLoop.main)
-            .sink(receiveCompletion: { completion in
-                switch completion {
-                case .failure(let err):
-                    print("Error saving local or remote \(err)")
-                case .finished:
-                    print("Successfully created and sync local and remote profiles")
-                }
-            }, receiveValue: { [weak self] localProfile, remoteProfile in
-                if localProfile == Profile.zero && remoteProfile == .zero {
-                    preconditionFailure("Both profiles failed to load")
+            .sink(receiveCompletion: { _ in },
+                  receiveValue: {  [weak self] value   in
+                let (localProfile, _) = value
+                if localProfile == Profile.zero {
+                    preconditionFailure("Local profilee failed to load")
                 }
                 self?.loadedProfileSubject.send(localProfile)
             })
-            .store(in: &disposables)
+            .store(in: &self.disposables)
         
         /// Start the authenicated process
         print("Starting to authenticate with game center")
@@ -226,9 +224,9 @@ class ProfileViewModel: ProfileManaging {
                 presenter.present(vc, animated: true)
             } else {
                 self?.authenicatedSubject.send(self?.localPlayer.isAuthenticated ?? false)
+                
             }
         }
-//        self.authenicatedSubject.send(true)
     }
     
     /// Saves a profile locally and remotely if the file has progressed further than current loaded profile
@@ -447,25 +445,30 @@ class ProfileViewModel: ProfileManaging {
     /// Saves the profile remotely
     /// Uses a JSON encoder to save the data
     private func saveProfileRemotely(_ profile: Profile) -> Future<Profile, Error> {
-        return Future { [weak self] promise in
-            print("Saving profile to GameCenter")
+        return Future { promise in
             
-            let name = profile.name
-            do {
-                let data = try JSONEncoder().encode(profile)
-                self?.localPlayer.saveGameData(data, withName: name) { (savedGame, error) in
-                    if let error = error {
-                        print("Error saving game file in Game Center with name \(name)")
-                        promise(.failure(ProfileError.failureToSaveRemoteProfile(error)))
-                    } else {
-                        print("Successfully save game file with name \(name)")
-                        promise(.success(profile))
-                    }
-                }
-            } catch {
-                print("Failed to encode profile")
-                promise(.failure(ProfileError.failureToSaveRemoteProfile(error)))
-            }
+            // early return to ignore game center stuff right now
+            promise(.success(profile))
+            return
+//
+//            print("Saving profile to GameCenter")
+//
+//            let name = profile.name
+//            do {
+//                let data = try JSONEncoder().encode(profile)
+//                self?.localPlayer.saveGameData(data, withName: name) { (savedGame, error) in
+//                    if let error = error {
+//                        print("Error saving game file in Game Center with name \(name)")
+//                        promise(.failure(ProfileError.failureToSaveRemoteProfile(error)))
+//                    } else {
+//                        print("Successfully save game file with name \(name)")
+//                        promise(.success(profile))
+//                    }
+//                }
+//            } catch {
+//                print("Failed to encode profile")
+//                promise(.failure(ProfileError.failureToSaveRemoteProfile(error)))
+//            }
         }
     }
     

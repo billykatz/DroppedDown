@@ -106,7 +106,7 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
     var debugDescription: String {
         switch self {
         case .transformation(let trans):
-            return "Transformation \(trans.first?.inputType)"
+            return "Transformation \(String(describing: trans.first?.inputType))"
         case .touch:
             return "Touch"
         case .rotateCounterClockwise:

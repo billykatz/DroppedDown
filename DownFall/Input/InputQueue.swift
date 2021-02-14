@@ -67,7 +67,7 @@ struct InputQueue {
                 gameState.enter(input)
                 print("Entering \(gameState.state) with \(input)")
                 if case let InputType.transformation(trans) = input.type {
-                    print("The transformation is \(trans.first?.inputType)")
+                    print("The transformation is \(String(describing: trans.first?.inputType))")
                 }
             }
         }

@@ -12,7 +12,7 @@ class Board: Equatable {
     }
     
     private(set) var tiles: [[Tile]]
-    private var level: Level
+    private(set) var level: Level
     var tileCreator: TileStrategy
     
     private var playerEntityData: EntityModel? {
@@ -363,7 +363,7 @@ class Board: Equatable {
         earnedGoals += goals.count
         
         /// keep track of how many goals we have awarded so far.
-        let awardedGoalsCount = self.level.goalProgress.count
+        let awardedGoalsCount = self.level.goalProgress.filter({ $0.hasBeenRewarded} ).count
         
         // Lets keep track of the completed goals before we do anything else
         self.level.goalProgress.append(contentsOf: goals)
@@ -1270,7 +1270,7 @@ extension Board {
         
         
         return Transformation(transformation: [TileTransformation(playerPosition, playerPosition.rowBelow)],
-                              inputType: .gameWin(self.earnedGoals),
+                              inputType: .gameWin(self.level.goalProgress.count),
                               endTiles: newTiles)
     }
 }

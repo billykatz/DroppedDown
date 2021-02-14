@@ -14,8 +14,9 @@ protocol LevelCoordinating: GameSceneCoordinatingDelegate {
     var gameSceneNode: GameScene? { get set }
     var entities: EntitiesModel? { get set }
     var delegate: MenuCoordinating? { get set }
-    func presentNextLevel(_ level: Level, playerData: EntityModel?)
+    func presentNextLevel(_ level: Level, playerData: EntityModel?, savedTiles: [[Tile]]?)
     func loadRun(_ runModel: RunModel?, profile: Profile)
+    func saveAllState() -> RunModel
     
     // Exposed so that we can save the current run
     var runModel: RunModel { get }
@@ -23,14 +24,17 @@ protocol LevelCoordinating: GameSceneCoordinatingDelegate {
 
 class LevelCoordinator: LevelCoordinating {
     
-    
+    struct Constants {
+        static let tag = String(describing: LevelCoordinator.self)
+    }
+
     weak var delegate: MenuCoordinating?
     var gameSceneNode: GameScene?
     var entities: EntitiesModel?
     let view: SKView
     
     /// Set default so we dont have to deal with optionality
-    var runModel: RunModel = RunModel(player: .zero, seed: 0)
+    var runModel: RunModel = RunModel(player: .zero, seed: 0, savedTiles: [], areas: [], goalTracking: [])
     
     init(gameSceneNode: GameScene, entities: EntitiesModel, levelIndex: Int, view: SKView) {
         self.gameSceneNode = gameSceneNode
@@ -39,7 +43,7 @@ class LevelCoordinator: LevelCoordinating {
         
     }
     
-    func presentNextLevel(_ level: Level, playerData: EntityModel?) {
+    func presentNextLevel(_ level: Level, playerData: EntityModel?, savedTiles: [[Tile]]? = []) {
         gameSceneNode?.prepareForReuse()
         if let scene = GKScene(fileNamed: "GameScene")?.rootNode as? GameScene,
            let entities = entities {
@@ -51,7 +55,8 @@ class LevelCoordinator: LevelCoordinating {
                                       difficulty: GameScope.shared.difficulty,
                                       updatedEntity: playerData,
                                       level: level,
-                                      randomSource: runModel.randomSource)
+                                      randomSource: runModel.randomSource,
+                                      loadedTiles: savedTiles)
             
             view.presentScene(gameSceneNode)
             view.ignoresSiblingOrder = true
@@ -68,7 +73,9 @@ class LevelCoordinator: LevelCoordinating {
     /// Creates a run and loads it if no current run is available
     func loadRun(_ runModel: RunModel?, profile: Profile) {
         let seed = UInt64.random(in: .min ... .max)
-        let freshRunModel = RunModel(player: profile.runPlayer, seed: seed)
+        
+        // no saved tiles for fresh run
+        let freshRunModel = RunModel(player: profile.runPlayer, seed: seed, savedTiles: nil, areas: [], goalTracking: [])
         
         self.runModel = runModel ?? freshRunModel
         RunScope.deepestDepth = profile.deepestDepth
@@ -80,7 +87,7 @@ class LevelCoordinator: LevelCoordinating {
         let nextArea = runModel.currentArea()
         switch nextArea.type {
         case .level(let level):
-            presentNextLevel(level, playerData: runModel.player)
+            presentNextLevel(level, playerData: runModel.player, savedTiles: runModel.savedTiles)
         }
     }
     
@@ -117,12 +124,38 @@ class LevelCoordinator: LevelCoordinating {
         
     }
     
-    func visitStore(_ playerData: EntityModel, _ goalTracking: [GoalTracking]) {
+    // removes the current game scene and then triggers presentation of the next area
+    func goToNextArea() {
         view.presentScene(nil)
         gameSceneNode?.removeFromParent()
-        runModel.saveGoalTracking(goalTracking)
-        runModel.player = playerData
         presentNextArea()
     }
+    
+    func saveState() {
+        _ = self.saveAllState()
+    }
+    
+    // MARK: Saving game state
+    
+    func saveAllState() -> RunModel {
+        guard let (data, goalTracking, tiles) = self.gameSceneNode?.saveAllState() else {
+            GameLogger.shared.log(prefix: Constants.tag, message: "Unable to save all state")
+            fatalError()
+        }
+        
+        runModel.saveGoalTracking(goalTracking)
+        runModel.player = data
+        runModel = saveTiles(tiles)
+        
+        return runModel
+    }
+    
+    
+    // MARK: Utility functions
+    private func saveTiles(_ savedTiles: [[Tile]]) -> RunModel {
+        return RunModel(player: runModel.player, seed: runModel.seed, savedTiles: savedTiles, areas: runModel.areas, goalTracking: runModel.goalTracking)
+    }
+    
+    
 }
 

@@ -15,11 +15,11 @@ protocol TileStrategy {
     var updatedEntity: EntityModel? { get }
     var level: Level { get }
     
-    init(_ entities: EntitiesModel,
-         difficulty: Difficulty,
-         updatedEntity: EntityModel?,
-         level: Level,
-         randomSource: GKLinearCongruentialRandomSource)
+//    init(_ entities: EntitiesModel,
+//         difficulty: Difficulty,
+//         updatedEntity: EntityModel?,
+//         level: Level,
+//         randomSource: GKLinearCongruentialRandomSource)
     
     
     func tiles(for tiles: [[Tile]]) -> [[Tile]]

@@ -13,9 +13,8 @@ import Foundation
 
 protocol GameSceneCoordinatingDelegate: class {
     func navigateToMainMenu(_ scene: SKScene, playerData: EntityModel)
-//    func lostGame(_ scene: SKScene, playerData: EntityModel)
-    
-    func visitStore(_ playerData: EntityModel, _ goalProgress: [GoalTracking])
+    func goToNextArea()
+    func saveState()
 }
 
 
@@ -24,10 +23,12 @@ class GameScene: SKScene {
     struct Constants {
         static let swipeDistanceThreshold = CGFloat(25.0)
         static let quickSwipeDistanceThreshold = CGFloat(75.0)
+        
+        static let tag = String(describing: GameScene.self)
     }
     
     // only strong reference to the Board
-    private var board: Board!
+    private var board: Board?
     
     // the board size
     private var boardSize: Int!
@@ -49,6 +50,7 @@ class GameScene: SKScene {
     
     //level
     private var level: Level?
+    private var levelGoalTracker: LevelGoalTracker?
     
     // audio listener
     private var audioListener: AudioEventListener?
@@ -70,10 +72,11 @@ class GameScene: SKScene {
                            difficulty: Difficulty = .normal,
                            updatedEntity: EntityModel? = nil,
                            level: Level,
-                           randomSource: GKLinearCongruentialRandomSource?) {
+                           randomSource: GKLinearCongruentialRandomSource?,
+                           loadedTiles: [[Tile]]? = []) {
         // init our level
         self.level = level
-        Referee.injectLevel(level)
+        self.levelGoalTracker = LevelGoalTracker(level: level)
         
         //create the foreground node
         foreground = SKNode()
@@ -85,7 +88,8 @@ class GameScene: SKScene {
                                       difficulty: difficulty,
                                       updatedEntity: updatedEntity,
                                       level: level,
-                                      randomSource: randomSource ?? GKLinearCongruentialRandomSource())
+                                      randomSource: randomSource ?? GKLinearCongruentialRandomSource(),
+                                      loadedTiles: loadedTiles)
         
         //board
         board = Board.build(tileCreator: tileCreator, difficulty: difficulty, level: level)
@@ -110,35 +114,35 @@ class GameScene: SKScene {
                                  foreground: foreground,
                                  boardSize: boardSize,
                                  precedence: Precedence.foreground,
-                                 level: level!
-        )
+                                 level: level!,
+                                 levelGoalTracker: levelGoalTracker!)
         
         
         // Register for inputs we care about
         Dispatch.shared.register { [weak self] input in
             if input.type == .playAgain {
                 guard let self = self,
-                let playerIndex = tileIndices(of: .player(.zero), in: self.board.tiles).first
+                      let board = self.board,
+                let playerIndex = tileIndices(of: .player(.zero), in: board.tiles).first
                 else { return }
                 
                 self.foreground.removeAllChildren()
-                if case let TileType.player(data) = self.board.tiles[playerIndex].type {
+                if case let TileType.player(data) = board.tiles[playerIndex].type {
                     self.removeFromParent()
                     self.swipeRecognizerView?.removeFromSuperview()
                     self.gameSceneDelegate?.navigateToMainMenu(self, playerData: data)
                 }
             } else if case InputType.visitStore = input.type {
-                guard let self = self,
-                    let playerIndex = tileIndices(of: .player(.zero), in: self.board.tiles).first
-                    else { return }
                 
+                guard let self = self else { return }
                 self.foreground.removeAllChildren()
-                if case let TileType.player(data) = self.board.tiles[playerIndex].type {
-                    self.removeFromParent()
-                    self.swipeRecognizerView?.removeFromSuperview()
-                    self.gameSceneDelegate?.visitStore(data, [])
-                
-                }
+                self.removeFromParent()
+                self.swipeRecognizerView?.removeFromSuperview()
+                self.gameSceneDelegate?.goToNextArea()
+            
+            } else if case InputType.gameWin(_) = input.type {
+                guard let self = self else { return }
+                self.gameSceneDelegate?.saveState()
             }
         }
 
@@ -158,6 +162,20 @@ class GameScene: SKScene {
         InputQueue.reset()
         Dispatch.shared.reset()
         print("deiniting")
+    }
+    
+    // public function that exposes all the data necessary to save the exact game state
+    public func saveAllState() -> (EntityModel, [GoalTracking], [[Tile]]) {
+        guard let board = self.board,
+              let playerIndex = tileIndices(of: .player(.zero), in: board.tiles).first,
+              case let TileType.player(data) = board.tiles[playerIndex].type,
+              let levelGoalTracking = self.levelGoalTracker?.goalProgress
+              else {
+            GameLogger.shared.fatalLog(prefix: Constants.tag, message: "Failure to gather all information to save the game")
+            fatalError()
+        }
+        
+        return (data, levelGoalTracking, board.tiles)
     }
 }
 

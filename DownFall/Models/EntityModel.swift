@@ -274,7 +274,6 @@ struct EntityModel: Equatable, Codable {
         return update(pickaxe: pickaxe)
     }
     
-    
     func updateCarry(carry: CarryModel) -> EntityModel {
         return self.update(carry: carry)
     }

@@ -255,7 +255,7 @@ class Board: Equatable {
         let effect = storeOffer.effect
         
         // we have to reset attack here because the player has moved but the turn may not be over
-        // Eg: it is possible that there could be monster, item, monster in a row and the player should be able to kill the second monster after collecting the offer
+        // Eg: it is possible that there could be monster, item, monster in a row below the player and the player should be able to kill the second monster after collecting the offer/effect
         let playerData = data.update(attack: data.attack.resetAttack()).applyEffect(effect)
         
         

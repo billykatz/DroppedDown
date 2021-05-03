@@ -81,6 +81,7 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
     case transformation([Transformation])
     case reffingFinished(newTurn: Bool)
     case boardBuilt
+    case boardLoaded
     case collectItem(TileCoord, Item, Int)
     case collectOffer(TileCoord, StoreOffer)
     case selectLevel
@@ -133,6 +134,8 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
             return "Attacked from \(attacker) to \(String(describing: defender))"
         case .boardBuilt:
             return "Board has been built"
+        case .boardLoaded:
+            return "Board has been loaded"
         case .collectItem:
             return "Player collects an item"
         case .selectLevel:

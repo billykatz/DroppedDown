@@ -8,7 +8,7 @@
 
 import SpriteKit
 
-protocol OptionsSceneDelegate: class {
+protocol OptionsSceneDelegate: AnyObject {
     func backSelected()
     func addRandomRune()
 }

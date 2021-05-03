@@ -8,7 +8,7 @@
 
 import SpriteKit
 
-protocol LabelDelegate: class {
+protocol LabelDelegate: AnyObject {
     func labelPressed(_ label: Label)
     func labelPressBegan(_ label: Label)
     func labelPressCancelled(_ label: Label)

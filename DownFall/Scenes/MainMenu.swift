@@ -8,7 +8,7 @@
 
 import SpriteKit
 
-protocol MainMenuDelegate: class {
+protocol MainMenuDelegate: AnyObject {
     func newGame(_ playerModel: EntityModel?)
     func optionsSelected()
     func continueRun()

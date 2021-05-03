@@ -26,7 +26,7 @@ extension SKSpriteNode {
 
 }
 
-protocol ButtonDelegate: class {
+protocol ButtonDelegate: AnyObject {
     func buttonTapped(_ button: Button)
 }
 

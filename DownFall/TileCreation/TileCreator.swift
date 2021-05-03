@@ -253,14 +253,14 @@ class TileCreator: TileStrategy {
      
      */
     
-    func board(difficulty: Difficulty) -> [[Tile]] {
+    func board(difficulty: Difficulty) -> ([[Tile]], newLevel: Bool) {
         guard let playerData = updatedEntity else { preconditionFailure("Unable to create a board without a player") }
         
         // early return to load the load tiles we have loaded
         if let loadedTiles = self.loadedTiles, loadedTiles.count > 0 {
             print("we have a saved game to return")
             self.loadedTiles = nil
-            return loadedTiles
+            return (loadedTiles, false)
         }
         
         var newTiles: [Tile] = []
@@ -313,7 +313,7 @@ class TileCreator: TileStrategy {
             tiles[randomRow][randomCol] = Tile(type: randomMonster())
         }
         
-        guard level.hasExit else { return tiles }
+        guard level.hasExit else { return (tiles, false) }
         //place the exit on the opposite side of the grid
         #warning ("make sure this is set properly for release")
         let exitQuadrant = playerQuadrant.opposite
@@ -323,7 +323,7 @@ class TileCreator: TileStrategy {
         
         tiles[exitPosition.x][exitPosition.y] = Tile(type: .exit(blocked: true))
         
-        return tiles
+        return (tiles, true)
     }
     
     var playerEntityData: EntityModel? {

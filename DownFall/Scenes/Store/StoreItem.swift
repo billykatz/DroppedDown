@@ -10,7 +10,7 @@ import SpriteKit
 
 let highlightString = "highlight"
 
-protocol StoreItemDelegate: class {
+protocol StoreItemDelegate: AnyObject {
     func storeItemTapped(_ storeItem: StoreItem, offer: StoreOffer)
     func wasTransactedOn(_ storeItem: StoreItem)
 }

@@ -15,15 +15,8 @@ protocol TileStrategy {
     var updatedEntity: EntityModel? { get }
     var level: Level { get }
     
-//    init(_ entities: EntitiesModel,
-//         difficulty: Difficulty,
-//         updatedEntity: EntityModel?,
-//         level: Level,
-//         randomSource: GKLinearCongruentialRandomSource)
-    
-    
     func tiles(for tiles: [[Tile]]) -> [[Tile]]
-    func board(difficulty: Difficulty) -> [[Tile]]
+    func board(difficulty: Difficulty) -> ([[Tile]], newLevel: Bool)
     func randomMonster() -> TileType
     func randomMonster(not: EntityModel.EntityType) -> Tile
     func shuffle(tiles: [[Tile]]) -> [[Tile]]

@@ -9,7 +9,7 @@
 import SpriteKit
 import Combine
 
-protocol RuneContainerViewModelable: class {
+protocol RuneContainerViewModelable: AnyObject {
     var runeWasTapped: ((Rune) -> ())? { get }
     var runeWasUsed: ((Rune) -> ())? { get }
     var runeUseWasCanceled: (() -> ())? { get }

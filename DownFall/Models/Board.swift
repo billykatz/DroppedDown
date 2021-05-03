@@ -196,6 +196,7 @@ class Board: Equatable {
              .animationsFinished,
              .playAgain,
              .boardBuilt,
+             .boardLoaded,
              .selectLevel,
              .newTurn,
              .visitStore,
@@ -1120,13 +1121,18 @@ extension Board {
                       difficulty: Difficulty,
                       level: Level) -> Board {
         //create a boardful of tiles
-        let tilesStruct: [[Tile]] = tileCreator.board(difficulty: difficulty)
+        let (tiles, newLevel) = tileCreator.board(difficulty: difficulty)
         
-        //let the world know we built the board
-        InputQueue.append(Input(.boardBuilt, tilesStruct))
+        if (newLevel) {
+            //let the world know we built the board
+            InputQueue.append(.init(.boardBuilt, tiles))
+        } else {
+            // let the world know we loaded the board from a save
+            InputQueue.append(.init(.boardLoaded, tiles))
+        }
         
         //init new board
-        return Board(tileCreator: tileCreator, tiles: tilesStruct, level: level)
+        return Board(tileCreator: tileCreator, tiles: tiles, level: level)
     }
 }
 

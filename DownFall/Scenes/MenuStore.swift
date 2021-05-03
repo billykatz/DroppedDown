@@ -8,7 +8,7 @@
 
 import SpriteKit
 
-protocol MenuStoreSceneDelegate: class {
+protocol MenuStoreSceneDelegate: AnyObject {
     func mainMenuTapped(updatedPlayerData: EntityModel)
 }
 

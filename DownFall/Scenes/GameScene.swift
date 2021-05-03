@@ -11,7 +11,7 @@ import UIKit
 import GameplayKit
 import Foundation
 
-protocol GameSceneCoordinatingDelegate: class {
+protocol GameSceneCoordinatingDelegate: AnyObject {
     func navigateToMainMenu(_ scene: SKScene, playerData: EntityModel)
     func goToNextArea()
     func saveState()

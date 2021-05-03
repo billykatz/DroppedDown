@@ -8,7 +8,7 @@
 
 import SpriteKit
 
-protocol SettingsDelegate: class {
+protocol SettingsDelegate: AnyObject {
     func settingsTapped()
 }
 

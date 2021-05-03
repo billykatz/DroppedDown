@@ -20,7 +20,7 @@ extension SKView {
     
 }
 
-protocol MenuCoordinating: class {
+protocol MenuCoordinating: AnyObject {
     var levelCoordinator: LevelCoordinating { get }
     
     func finishGame(playerData updatedPlayerData: EntityModel, currentRun: RunModel)

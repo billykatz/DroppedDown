@@ -11,13 +11,15 @@ import SpriteKit
 class TileDetailView: SKSpriteNode {
     
     struct Constants {
-        static let maxHeight = CGFloat(350)
+        static let maxHeight = CGFloat(450)
         static let maxWidth = CGFloat(200)
         static let heightCoefficient = CGFloat(0.33)
         static let widthCoefficient = CGFloat(0.9)
         static let tileSize = CGFloat(75.0)
         static let boardSize = CGFloat(6)
         static let borderName = "border"
+        static let borderColor = UIColor(rgb: 0x92A3BE)
+        static let overlayName = "overlay"
     }
     
     private let foreground: SKNode
@@ -27,6 +29,7 @@ class TileDetailView: SKSpriteNode {
     private let bottomLeft: CGPoint
     private let detailViewTemplate: SKSpriteNode
     private let alignedToHUDFrame: CGRect
+    private let playableRect: CGRect
     
     private var tileType: TileType? {
         didSet {
@@ -82,6 +85,7 @@ class TileDetailView: SKSpriteNode {
         self.detailViewTemplate = detailView
         
         
+        self.playableRect = playableRect
         
         super.init(texture: nil, color: .clear, size: playableRect.size)
 
@@ -93,6 +97,7 @@ class TileDetailView: SKSpriteNode {
         // set out own z position
         self.zPosition = 100_000
         contentView.zPosition = 100_000
+        
         
         // default interaction is false
         isUserInteractionEnabled = false
@@ -241,7 +246,7 @@ class TileDetailView: SKSpriteNode {
             detailViewTemplate.removeAllChildren()
             detailViewTemplate.removeFromParent()
             for child in contentView.children {
-                if child.name == Constants.borderName {
+                if child.name == Constants.borderName || child.name == Constants.overlayName {
                     child.removeFromParent()
                 }
             }
@@ -282,12 +287,10 @@ class TileDetailView: SKSpriteNode {
         contentView.addChild(detailViewTemplate)
 
         // add the border
-        let border = SKShapeNode(rect: detailViewTemplate.frame)
-        border.strokeColor = UIColor.darkGray
-        border.lineWidth = 10.0
-        border.zPosition = self.zPosition + 100
-        border.position = .zero
-        contentView.addChild(border)
+        addBorder(toView: contentView)
+        
+        // add the background overlay
+        addBackgroundOverlay()
     }
     
     func updateLevelGoals() {
@@ -297,52 +300,47 @@ class TileDetailView: SKSpriteNode {
             return
         }
         for child in contentView.children {
-            if child.name == Constants.borderName {
+            if child.name == Constants.borderName || child.name == Constants.overlayName {
                 child.removeFromParent()
             }
         }
 
         
-        let subTitleNode = ParagraphNode(text: "Level Goals", paragraphWidth: detailViewTemplate.frame.width, fontSize: .fontLargeSize)
+        let subTitleNode = ParagraphNode(text: "Level Goals", paragraphWidth: detailViewTemplate.frame.width, fontSize: .fontExtraLargeSize)
         
-        subTitleNode.position = CGPoint.position(subTitleNode.frame, inside: detailViewTemplate.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.less)
+        subTitleNode.position = CGPoint.position(subTitleNode.frame, inside: detailViewTemplate.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most)
         
         detailViewTemplate.addChildSafely(subTitleNode)
         
         let textHeight = subTitleNode.frame.height + Style.Padding.more
         
         for (count, goal) in updatedGoals.enumerated() {
-            let sprite = SKSpriteNode(texture: SKTexture(imageNamed: goal.textureName()), size: Style.LevelGoalKey.keyTextureSize)
             let circleNode = SKShapeNode(circleOfRadius: Style.LevelGoalKey.keyCircleRadius)
             circleNode.color = goal.fillBarColor.1
-            let colonNode = ParagraphNode(text: ":", paragraphWidth: 10.0)
             
             circleNode.position = CGPoint.position(circleNode.frame,
                                                    inside: detailViewTemplate.frame,
                                                    verticalAlign: .top,
                                                    horizontalAnchor: .left,
-                                                   xOffset: Style.Padding.most,
-                                                   yOffset: (CGFloat(count)*Style.LevelGoalKey.keyTextureSize.height) + (CGFloat(count) * 5) + textHeight + Style.Padding.more*2)
-            colonNode.position = CGPoint.alignVertically(colonNode.frame, relativeTo: circleNode.frame, horizontalAnchor: .right, verticalAlign: .center, verticalPadding: Style.Padding.more, horizontalPadding: Style.Padding.more, translatedToBounds: true)
-            sprite.position = CGPoint.alignVertically(sprite.frame, relativeTo: circleNode.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: 2*Style.Padding.most, translatedToBounds: true)
-            
-            
-            detailViewTemplate.addChildSafely(sprite)
-            detailViewTemplate.addChildSafely(colonNode)
+                                                   xOffset: Style.Padding.most*2,
+                                                   yOffset: (CGFloat(count) * Style.LevelGoalKey.keyCircleRadius * 2) + (CGFloat(count) * 15) + textHeight + Style.Padding.more*3)
+
             detailViewTemplate.addChildSafely(circleNode)
             
-            let descriptionLabel = ParagraphNode(text: "\(goal.description())", paragraphWidth: detailViewTemplate.frame.maxX - sprite.frame.maxX, fontSize: .fontLargeSize)
             
-            descriptionLabel.position = CGPoint.alignVertically(descriptionLabel.frame, relativeTo: sprite.frame, horizontalAnchor: .right, verticalAlign: .center, verticalPadding: Style.Padding.less, horizontalPadding: Style.Padding.most,  translatedToBounds: true)
+            // create the goal description
+            let descriptionLabel = ParagraphNode(text: "\(goal.description())", paragraphWidth: detailViewTemplate.frame.maxX - circleNode.frame.maxX, fontSize: .fontLargeSize)
+            
+            descriptionLabel.position = CGPoint.alignVertically(descriptionLabel.frame, relativeTo: circleNode.frame, horizontalAnchor: .right, verticalAlign: .center, verticalPadding: Style.Padding.less, horizontalPadding: 100.0,  translatedToBounds: true)
             
             detailViewTemplate.addChildSafely(descriptionLabel)
     
             
             // Progress label  
-            let progressLabel = ParagraphNode(text: goal.progressDescription, paragraphWidth: detailViewTemplate.frame.maxX - sprite.frame.maxX, fontSize: .fontMediumSize)
+            let progressLabel = ParagraphNode(text: goal.progressDescription, paragraphWidth: detailViewTemplate.frame.maxX - circleNode.frame.maxX, fontSize: .fontLargeSize)
             let x = CGPoint.position(progressLabel.frame, inside: detailViewTemplate.frame, verticalAlign: .center, horizontalAnchor: .right, xOffset: Style.Padding.most).x
             let y = CGPoint.alignVertically(progressLabel.frame, relativeTo: descriptionLabel.frame, horizontalAnchor: .right, verticalAlign: .center, translatedToBounds: true).y
-            progressLabel.position = CGPoint(x:x, y: y)
+            progressLabel.position = CGPoint(x: x, y: y)
                 
             
             detailViewTemplate.addChildSafely(progressLabel)
@@ -352,19 +350,42 @@ class TileDetailView: SKSpriteNode {
         detailViewTemplate.position = CGPoint.position(detailViewTemplate.frame, inside: self.contentView.frame, verticalAlign: .center, horizontalAnchor: .center)
         contentView.addChildSafely(detailViewTemplate)
         
-        addBorder()
+        // add tap anywhere to continue
+        let tapHelpText = "[Tap anywhere to continue]"
+        let tapHelpNode = ParagraphNode(text: tapHelpText, paragraphWidth: detailViewTemplate.frame.width, fontSize: .fontMediumSize)
+        tapHelpNode.position = CGPoint.position(tapHelpNode.frame, inside: detailViewTemplate.frame, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: 20, translatedToBounds: true)
+        detailViewTemplate.addChildSafely(tapHelpNode)
+        
+        // add the border
+        addBorder(toView: detailViewTemplate)
+        
+        
+        // add the background overlay
+        addBackgroundOverlay()
     }
     
     
-    func addBorder() {
+    func addBorder(toView: SKSpriteNode) {
         // add the border
         let border = SKShapeNode(rect: detailViewTemplate.frame)
-        border.strokeColor = UIColor.darkGray
-        border.lineWidth = 10.0
+        border.lineWidth = 20.0
         border.zPosition = self.zPosition + 100
         border.position = .zero
         border.name = Constants.borderName
-        detailViewTemplate.addChild(border)
+        border.strokeColor = Constants.borderColor
+        toView.addChild(border)
+    }
+    
+    func addBackgroundOverlay() {
+        // set up the background
+        let overlay = SKShapeNode(rect: playableRect)
+        overlay.color = UIColor.white
+        overlay.alpha = 0.25
+        overlay.zPosition = -1
+        overlay.position = .zero
+        overlay.name = Constants.overlayName
+        contentView.addChild(overlay)
+
     }
     
     private func updateTargetReticles() {

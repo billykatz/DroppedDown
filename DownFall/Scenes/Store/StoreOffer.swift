@@ -246,7 +246,7 @@ struct StoreOffer: Codable, Hashable {
         case .plusOneMaxHealth:
             title = "Increase Max Health"
             body = "Add 1 max health."
-            textureName = "plusOneMaxHealth"
+            textureName = "plusOneHeart"
         case .lesserHeal:
             title = "Lesser Healing Potion"
             body = "Heals 1 HP."

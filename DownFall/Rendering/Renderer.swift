@@ -321,6 +321,8 @@ class Renderer: SKSpriteNode {
                 if let turns = tiles[row][col].type.turnsUntilAttack(),
                    let frequency = tiles[row][col].type.attackFrequency() {
                     sprite.showAttackTiming(frequency, turns)
+                } else if case let TileType.offer(offer) = tiles[row][col].type {
+                    sprite.showOfferTier(offer)
                 }
                 spriteForeground.addChild(sprite)
             }

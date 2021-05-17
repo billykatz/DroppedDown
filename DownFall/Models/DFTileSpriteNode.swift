@@ -152,6 +152,14 @@ class DFTileSpriteNode: SKSpriteNode {
         
     }
     
+    func showOfferTier(_ offer: StoreOffer) {
+        let sprite = SKSpriteNode(imageNamed: "Reward\(offer.tier)Border")
+        sprite.position = .zero
+        sprite.size = self.size
+        
+        addChild(sprite)
+    }
+    
     func showFinger() {
         let finger = SKSpriteNode(imageNamed: "finger")
         finger.position = CGPoint.position(this: finger.frame,

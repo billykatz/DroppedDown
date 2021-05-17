@@ -18,9 +18,9 @@ struct LevelConstructor {
     static var tier1Items:  [StoreOffer] {
         [
             StoreOffer.offer(type: .plusOneMaxHealth, tier: 1),
-            StoreOffer.offer(type: .killMonsterPotion, tier: 1),
-            StoreOffer.offer(type: .transmogrifyPotion, tier: 1),
-            StoreOffer.offer(type: .lesserHeal, tier: 1)
+//            StoreOffer.offer(type: .killMonsterPotion, tier: 1),
+//            StoreOffer.offer(type: .transmogrifyPotion, tier: 1),
+            StoreOffer.offer(type: .greaterHeal, tier: 1)
         ]
     }
     
@@ -143,7 +143,7 @@ struct LevelConstructor {
     
     static func potentialItems(depth: Depth) -> [StoreOffer] {
         var offers = [StoreOffer]()
-        offers.append(contentsOf: tier1Runes)
+        offers.append(contentsOf: tier1Items)
         offers.append(contentsOf: tier2items(depth: depth))
         offers.append(contentsOf: tier3items(depth: depth))
         

@@ -14,12 +14,14 @@ class LevelGoalView: SKSpriteNode {
     struct Constants {
         static let keyView = "keyView"
         static let radius = CGFloat(50)
+        static let barPadding: CGFloat = 25.0
+        static let barSize: CGSize = CGSize(width: 225, height: 75)
     }
     
-    let fillableCircleCenter: CGPoint
-    let viewModel: LevelGoalTracker
-    var updatedGoals: [GoalTracking]?
-    let infoSprite: SKSpriteNode
+    private let fillableCircleCenter: CGPoint
+    private let viewModel: LevelGoalTracker
+    private let infoSprite: SKSpriteNode
+    private var disposables = Set<AnyCancellable>()
     
     lazy var contentView: SKSpriteNode = {
         return SKSpriteNode(color: .clear, size: adjustedFrame.size)
@@ -32,8 +34,9 @@ class LevelGoalView: SKSpriteNode {
         return frame
     }()
     
-    /// The dispose bag
-    private var disposables = Set<AnyCancellable>()
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     init(viewModel: LevelGoalTracker, size: CGSize) {
         self.viewModel = viewModel
@@ -57,12 +60,27 @@ class LevelGoalView: SKSpriteNode {
         
     }
     
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    private func bindToViewModel() {
+        
+        viewModel
+            .goalIsUpdated
+            .sink { (completion) in
+            } receiveValue: { [weak self] (goalTracking) in
+                self?.updateGoal(goalTracking)
+            }.store(in: &disposables)
+
+        
+        viewModel
+            .goalCompleted
+            .sink { (completion) in
+                
+            } receiveValue: { [weak self] (event) in
+                let (goals) = event
+                self?.completedGoal(goals)
+            }
+            .store(in: &disposables)
+
     }
-    
-    private let barPadding: CGFloat = 25.0
-    private lazy var barSize: CGSize = CGSize(width: 225, height: 75)
     
     private func addBorder() {
         
@@ -74,48 +92,10 @@ class LevelGoalView: SKSpriteNode {
         self.addChildSafely(border)
         
     }
-    
-    private func createFillableBar(_ updatedGoals: [GoalTracking]) {
-        for (index, goalTrack) in updatedGoals.enumerated() {
-            createFillableCircle(for: goalTrack, at: index)
-        }
-    }
-    
-    private func createFillableCircle(for updatedGoal: GoalTracking, at index: Int, flash: Bool = false) {
-        let (lightFill, darkFill) = updatedGoal.fillBarColor
-        let bar = FillableBar(size: barSize, viewModel: FillableBarViewModel(total: updatedGoal.target, progress: updatedGoal.current, fillColor: lightFill, backgroundColor: darkFill, text: "", direction: .leftToRight))
-       
-        // Position the bar relative to the content view and other bars
-        bar.position = CGPoint.alignHorizontally(bar.frame, relativeTo: infoSprite.frame, horizontalAnchor: .left, verticalAlign: .bottom, verticalPadding:  (CGFloat(index) * bar.size.height) + (barPadding) + (CGFloat(index) * barPadding), translatedToBounds: true)
         
-        
-        contentView.addChild(bar)
-        if flash || updatedGoal.isCompleted {
-            let mockCircle = SKSpriteNode(color: .clear, size: .fifty)
-            bar.addCheckmark(radius: bar.frame.height/2.0*0.8, position: CGPoint.position(mockCircle.frame, inside: self.frame, verticalAlign: .center, horizontalAnchor: .right))
-        }
-        
-    }
-
-
-    private func bindToViewModel() {
-        viewModel.goalUpdated = { [weak self] updatedGoals in self?.updateGoal(updatedGoals) }
-        
-        viewModel
-            .goalCompleted
-            .sink { (completion) in
-                
-            } receiveValue: { [weak self] (goals) in
-                self?.completedGoal(goals)
-            }
-            .store(in: &disposables)
-
-    }
-    
     private func completedGoal(_ updatedGoals: [GoalTracking]) {
-        for (index, goal) in updatedGoals.enumerated() {
-            let computedIndex = self.updatedGoals?.firstIndex(of: goal) ?? index
-            createFillableCircle(for: goal, at: computedIndex, flash: true)
+        for goal in updatedGoals {
+            createFillableBar(for: goal, at: goal.index, orderCompleted: goal.orderCompleted)
         }
 
     }
@@ -123,17 +103,49 @@ class LevelGoalView: SKSpriteNode {
     private func updateGoal(_ updatedGoals: [GoalTracking]) {
         contentView.removeAllChildren()
         createFillableBar(updatedGoals)
-        self.updatedGoals = updatedGoals
     }
+    
+    
+    private func createFillableBar(_ updatedGoals: [GoalTracking]) {
+        for (index, goalTrack) in updatedGoals.enumerated() {
+            createFillableBar(for: goalTrack, at: index)
+        }
+    }
+    
+    private func createFillableBar(for updatedGoal: GoalTracking, at index: Int, orderCompleted: Int = 0) {
+        let (lightFill, darkFill) = updatedGoal.fillBarColor
+        let bar = FillableBar(size: Constants.barSize, viewModel: FillableBarViewModel(total: updatedGoal.target, progress: updatedGoal.current, fillColor: lightFill, backgroundColor: darkFill, text: "", direction: .leftToRight))
+       
+        // Position the bar relative to the content view and other bars
+        bar.position = CGPoint.alignHorizontally(bar.frame, relativeTo: infoSprite.frame, horizontalAnchor: .left, verticalAlign: .bottom, verticalPadding:  (CGFloat(index) * bar.size.height) + (Constants.barPadding) + (CGFloat(index) * Constants.barPadding), translatedToBounds: true)
+        
+        
+        contentView.addChild(bar)
+        if updatedGoal.isCompleted && updatedGoal.hasBeenRewarded {
+            let mockCircle = SKSpriteNode(color: .clear, size: .fifty)
+            bar.addCheckmark(radius: bar.frame.height/2.0*0.8, position: CGPoint.position(mockCircle.frame, inside: self.frame, verticalAlign: .center, horizontalAnchor: .right))
+            
+            let sprite = SKSpriteNode(imageNamed: "Reward\(updatedGoal.orderCompleted)Border")
+            sprite.size = bar.size
+            sprite.position = CGPoint.position(sprite.frame, inside: bar.frame, verticalAlign: .center, horizontalAnchor: .center)
+            
+            bar.addChild(sprite)
+
+        }
+        
+    }
+
+
+
 }
 
 
 extension LevelGoalView {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard let touch = touches.first, let updatedGoals = updatedGoals else { return }
+        guard let touch = touches.first else { return }
         let position = touch.location(in: self)
         if self.contentView.contains(position) {
-            InputQueue.append(Input(.levelGoalDetail(updatedGoals)))
+            viewModel.viewWasTapped()
         }
         
     }

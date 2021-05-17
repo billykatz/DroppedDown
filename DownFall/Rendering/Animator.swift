@@ -391,28 +391,30 @@ struct Animator {
         var spriteActions: [SpriteAction] = []
         
         // rock explode animation
-        guard let rockCoord = transformation.tileTransformation?.first, let crumble = sprites[rockCoord.end].crumble(false) else { completion(); return }
-        let sprite = sprites[rockCoord.end]
-        
-        // smoke animation
-        let smoke = self.smokeAnimation()
-        
-        // create the crumble smoke sequence
-        spriteActions.append(SpriteAction(sprite: sprite, action: SKAction.sequence([crumble.action, smoke])))
-        
-        // put the item there
-        if let newItem = transformation.endTiles?[rockCoord.end] {
-            let startPosition = levelGoalOrigin
-            let endPosition = sprite.position
-            let itemSprite = DFTileSpriteNode(type: newItem.type, height: sprite.size.height, width: sprite.size.width)
-            itemSprite.position = startPosition
-            itemSprite.setScale(0.5)
-            foreground.addChild(itemSprite)
+        for idx in 0..<(transformation.tileTransformation?.count ?? 0) {
+            guard let rockCoord = transformation.tileTransformation?[idx], let crumble = sprites[rockCoord.end].crumble(false) else { completion(); return }
+            let sprite = sprites[rockCoord.end]
             
-            let movement = SKAction.move(to: endPosition, duration: 1.0)
-            let scale = SKAction.scale(to: 1.0, duration: 1.0)
+            // smoke animation
+            let smoke = self.smokeAnimation()
+            
+            // create the crumble smoke sequence
+            spriteActions.append(SpriteAction(sprite: sprite, action: SKAction.sequence([crumble.action, smoke])))
+            
+            // put the item there
+            if let newItem = transformation.endTiles?[rockCoord.end] {
+                let startPosition = levelGoalOrigin
+                let endPosition = sprite.position
+                let itemSprite = DFTileSpriteNode(type: newItem.type, height: sprite.size.height, width: sprite.size.width)
+                itemSprite.position = startPosition
+                itemSprite.setScale(0.5)
+                foreground.addChild(itemSprite)
+                
+                let movement = SKAction.move(to: endPosition, duration: 1.0)
+                let scale = SKAction.scale(to: 1.0, duration: 1.0)
 
-            spriteActions.append(SpriteAction(sprite: itemSprite, action: SKAction.group([movement, scale])))
+                spriteActions.append(SpriteAction(sprite: itemSprite, action: SKAction.group([movement, scale])))
+            }
         }
         
         

@@ -130,7 +130,7 @@ class Referee {
                 return false
             }
             
-            /// deteremine if the pillar stops attacks and remove those tile coord.
+            /// determine if the pillar stops attacks and remove those tile coord.
             var attackedTilesWithPillarsBlocking: [TileCoord] = []
             for tileCoord in attackedTiles {
                 var blockedByPillar = false

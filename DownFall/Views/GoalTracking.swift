@@ -16,6 +16,8 @@ struct GoalTracking: Codable, Hashable {
     let minimumAmount: Int
     let grouped: Bool
     let hasBeenRewarded: Bool
+    let orderCompleted: Int
+    let index: Int
     
     func update(with units: Int) -> GoalTracking {
         var updatedInitial = current
@@ -26,11 +28,11 @@ struct GoalTracking: Codable, Hashable {
                 updatedInitial = min(target, current+units)
             }
         }
-        return GoalTracking(tileType: tileType, current: updatedInitial, target: target, levelGoalType: levelGoalType, minimumAmount: minimumAmount, grouped: grouped, hasBeenRewarded: hasBeenRewarded)
+        return GoalTracking(tileType: tileType, current: updatedInitial, target: target, levelGoalType: levelGoalType, minimumAmount: minimumAmount, grouped: grouped, hasBeenRewarded: hasBeenRewarded, orderCompleted: orderCompleted, index: index)
     }
     
-    func isAwarded() -> GoalTracking {
-        return GoalTracking(tileType: tileType, current: current, target: target, levelGoalType: levelGoalType, minimumAmount: minimumAmount, grouped: grouped, hasBeenRewarded: true)
+    func isAwarded(orderCompleted: Int) -> GoalTracking {
+        return GoalTracking(tileType: tileType, current: current, target: target, levelGoalType: levelGoalType, minimumAmount: minimumAmount, grouped: grouped, hasBeenRewarded: true, orderCompleted: orderCompleted, index: index)
     }
     
     func textureName() -> String {

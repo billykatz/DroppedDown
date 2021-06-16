@@ -275,20 +275,40 @@ struct Animator {
         }
     }
     
-    func animateGold(goldSprites: [SKSpriteNode], gained: Int, from startPosition: CGPoint, to endPosition: CGPoint) { 
+    func animateGold(goldSprites: [SKSpriteNode], gained: Int, from startPosition: CGPoint, to hud: HUD, completion: @escaping () -> Void) {
         var index = 0
+        
+        var hasShownTotalGain = false
+        
         let animations: [SpriteAction] = goldSprites.map { sprite in
             let wait = SKAction.wait(forDuration: Double(index) * AnimationSettings.Board.goldWaitTime)
-            let moveAction = SKAction.move(to: endPosition, duration: AnimationSettings.Board.goldGainSpeedEnd)
+            let toPosition = sprite.frame.center.translate(xOffset: CGFloat.random(in: AnimationSettings.Gem.randomXOffsetRange), yOffset: CGFloat.random(in: AnimationSettings.Gem.randomYOffsetRange))
+            
+            let moveAwayAction = SKAction.move(to: toPosition, duration: 0.25)
+            let targetPosition = CGPoint.alignHorizontally(CGRect.one, relativeTo: hud.frame, horizontalAnchor: .left, verticalAlign: .center, horizontalPadding: 40.0, translatedToBounds: true)
+            let moveToAction = SKAction.move(to: targetPosition, duration: AnimationSettings.Board.goldGainSpeedEnd)
             let scaleAction = SKAction.scale(to: Style.Board.goldGainSizeEnd, duration: AnimationSettings.Board.goldGainSpeedEnd)
             
-            let moveAndScale = SKAction.group([moveAction, scaleAction])
+            let moveToAndScale = SKAction.group([moveToAction, scaleAction])
+            let moveAwayMoveToScale = SKAction.sequence([moveAwayAction, moveToAndScale])
+            
+            moveAwayMoveToScale.timingMode = .easeOut
+            
+            let tickUpHudCounter = SKAction.run {
+                hud.incrementCurrencyCountByOne()
+                
+                if !hasShownTotalGain {
+                    hasShownTotalGain = true
+                    hud.showTotalGemGain(goldSprites.count)
+                }
+            }
             
             index += 1
             
-            return SpriteAction(sprite: sprite, action: SKAction.sequence([wait, moveAndScale, SKAction.removeFromParent()]))
+            return SpriteAction(sprite: sprite, action: SKAction.sequence([wait, moveAwayMoveToScale, tickUpHudCounter, SKAction.removeFromParent()]))
         }
-        animate(animations) { }
+        
+        animate(animations, completion: completion)
     }
     
     func animateCannotMineRock(sprites: [SKSpriteNode], completion: @escaping () -> Void) {

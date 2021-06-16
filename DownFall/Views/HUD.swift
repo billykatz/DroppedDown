@@ -83,8 +83,8 @@ class HUD: SKSpriteNode {
             switch inputType {
             case .attack:
                 showAttack(attackInput: input, endTiles: trans.first!.endTiles)
-            case .collectItem(_, let item, let total):
-                incrementCurrencyCounter(item, total: total)
+//            case .collectItem(_, let item, let total):
+////                incrementCurrencyCounter(item, total: total)
             case .itemUsed, .decrementDynamites, .shuffleBoard, .collectOffer, .gameWin:
                 if let tiles = trans.first?.endTiles,
                     let playerCoord = getTilePosition(.player(.zero), tiles: tiles),
@@ -105,6 +105,8 @@ class HUD: SKSpriteNode {
             ()
         }
     }
+    
+    var gemSpriteNode: SKSpriteNode?
     
     func show(_ data: EntityModel) {
         // Remove all the hearts so that we can redraw
@@ -138,6 +140,7 @@ class HUD: SKSpriteNode {
         // the sprite of the coin
         let gemNode = SKSpriteNode(texture: SKTexture(imageNamed: Identifiers.gem), size: Style.HUD.heartSize)
         gemNode.position = CGPoint.alignHorizontally(gemNode.frame, relativeTo: heartNode.frame, horizontalAnchor: .center, verticalAlign: .top, translatedToBounds: true)
+        gemSpriteNode = gemNode
         self.addChild(gemNode)
         
         // the label with the palyer's amount of gold
@@ -146,7 +149,44 @@ class HUD: SKSpriteNode {
         gemLabel.name = Identifiers.gemSpriteLabel
         self.addChild(gemLabel)
         
-        // save this data for later        currentTotalGem = data.carry.total(in: .gem)
+        // save this data for later
+        currentTotalGem = data.carry.total(in: .gem)
+    }
+    
+    func incrementCurrencyCountByOne() {
+        let currencyLabelIdentifier = Identifiers.gemSpriteLabel
+        
+        let localCurrenTotal = currentTotalGem
+        
+        if let currencyLabel = self.childNode(withName: currencyLabelIdentifier) as? ParagraphNode {
+            // get the position and save it
+            let oldPosition = currencyLabel.position
+            // remove it
+            currencyLabel.removeFromParent()
+            
+            let newCurrencyLabel = ParagraphNode(text: "\(localCurrenTotal + 1)", paragraphWidth: Style.HUD.labelParagraphWidth, fontSize: .fontExtraLargeSize, fontColor: .lightText)
+            newCurrencyLabel.position = oldPosition
+            newCurrencyLabel.name = currencyLabelIdentifier
+            addChildSafely(newCurrencyLabel)
+
+        }
+        
+        currentTotalGem += 1
+    }
+    
+    func showTotalGemGain(_ totalGained: Int) {
+        if let currencyLabel = self.childNode(withName: Identifiers.gemSpriteLabel) as? ParagraphNode {
+            let oldPosition = currencyLabel.position
+
+            // show exaclty how much gold was gained as well
+            let gainedGoldLabel = ParagraphNode(text: "+\(totalGained)", paragraphWidth: Style.HUD.labelParagraphWidth, fontSize: .fontExtraLargeSize, fontColor: .goldOutlineBright)
+            gainedGoldLabel.position = oldPosition.translateVertically(40.0)
+            addChildSafely(gainedGoldLabel)
+            let moveUp = SKAction.move(by: CGVector(dx: 0, dy: 100), duration: AnimationSettings.HUD.goldGainedTime)
+            let moveAndFade = SKAction.group([moveUp, SKAction.fadeOut(withDuration: AnimationSettings.HUD.gemCountFadeTime)])
+            let sequence = SKAction.sequence([moveAndFade, SKAction.removeFromParent()])
+            gainedGoldLabel.run(sequence)
+        }
     }
     
     func incrementCurrencyCounter(_ item: Item, total: Int) {

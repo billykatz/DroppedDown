@@ -22,6 +22,9 @@ class TileCreator: TileStrategy {
     let maxMonsterRatio: Double = 0.15
     var numberOfTilesSinceLastGemDropped = 0
     
+    // debug help to get at least one gem per board
+    var spawnAtleastOneGem = true;
+    
     required init(_ entities: EntitiesModel,
                   difficulty: Difficulty,
                   updatedEntity: EntityModel? = nil,
@@ -111,7 +114,7 @@ class TileCreator: TileStrategy {
         for (key, value) in tileTypeChances.chances {
             let minValue = max(1, value)
             if let color = key.color, (lowerBound..<lowerBound+minValue).contains(randomNumber) {
-                return TileType.rock(color: color, holdsGem: shouldRockHoldGem(playerData: playerData, rockColor: color))
+                return TileType.rock(color: color, holdsGem: shouldRockHoldGem(playerData: playerData, rockColor: color, shouldSpawnAtleastOneGem: spawnAtleastOneGem))
             } else {
                 lowerBound = lowerBound + minValue
             }
@@ -120,7 +123,7 @@ class TileCreator: TileStrategy {
         fatalError("The randomNumber should between 0 and \(randomNumber-1) should map to a TileType.")
     }
     
-    func shouldRockHoldGem(playerData: EntityModel, rockColor: Color) -> Bool {
+    func shouldRockHoldGem(playerData: EntityModel, rockColor: Color, shouldSpawnAtleastOneGem: Bool) -> Bool {
         let extraGemsBasedOnLuck = playerData.luck / 5
         let extraChanceBasedOnLuck = extraGemsBasedOnLuck * 2
         guard specialGems < level.maxSpawnGems + extraGemsBasedOnLuck else { return false }
@@ -136,7 +139,9 @@ class TileCreator: TileStrategy {
             specialGems += 1
             return rockColor != .brown
         } else {
-            return false
+            let shouldSpawn = spawnAtleastOneGem
+            spawnAtleastOneGem = false
+            return false || shouldSpawn
         }
 
 
@@ -206,7 +211,7 @@ class TileCreator: TileStrategy {
                         newTiles[row][col] = newTile
                     }
                 } else if case TileType.emptyGem(let color) = tiles[row][col].type {
-                    newTiles[row][col] = Tile(type: .item(Item(type: .gem, amount: 1, color: color)))
+                    newTiles[row][col] = Tile(type: .item(Item(type: .gem, amount: 10, color: color)))
                 }
             }
         }

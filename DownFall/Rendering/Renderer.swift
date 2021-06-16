@@ -202,6 +202,8 @@ class Renderer: SKSpriteNode {
                 animateRuneUsed(input: inputType, transformations: transformations, rune: ability, targets: targets)
             case .collectOffer(let tileCoord, let offer):
                 collectOffer(transformations, offer: offer, atTilecoord: tileCoord)
+            case .collectItem:
+                collectItem(for: trans, inputType: inputType)
             case .decrementDynamites:
                 computeNewBoard(for: transformations)
             case .refillEmpty:
@@ -504,7 +506,8 @@ extension Renderer {
             
             /// animate it moving to the affected tile
             if let affectedTile = second.tileTransformation?.first {
-                /// move it to the target
+                
+                /// determine target position
                 let position = self.positionInForeground(at: affectedTile.initial)
                 
                 self.animator.animateMoveGrowShrinkExplode(sprite: placeholderSprite, to: position, tileSize: self.tileSize) {
@@ -514,6 +517,41 @@ extension Renderer {
             }
             
         }
+    }
+    
+    private func collectItem(for transformation: Transformation, inputType: InputType) {
+        computeNewBoard(for: transformation) { [weak self] in
+            guard let self = self, let endTiles = transformation.endTiles  else {
+                self?.animationsFinished(endTiles: transformation.endTiles)
+                return
+            }
+            
+            // by recreating sprites we effectively remove the gem from the board.
+            self.sprites = self.createSprites(from: endTiles)
+            self.add(sprites: self.sprites, tiles: endTiles)
+            
+            if case let InputType.collectItem(coord, item, amount) = inputType {
+                // add a bunch of gold sprites to the board
+                if let startPoint = self.positionsInForeground(at: [coord]).first {
+                    var addedSprites: [SKSpriteNode] = []
+                    for _ in 0..<item.amount {
+                        let identifier: String = item.type == .gold ? Identifiers.gold : item.textureName
+                        let sprite = SKSpriteNode(texture: SKTexture(imageNamed: identifier),
+                                                  color: .clear,
+                                                  size: Style.Board.goldGainSize)
+                        sprite.position = startPoint
+                        sprite.zPosition = 10_000
+                        self.spriteForeground.addChild(sprite)
+                        addedSprites.append(sprite)
+                    }
+                    let endPosition = CGPoint.alignHorizontally(addedSprites.first?.frame, relativeTo: self.hud.frame, horizontalAnchor: .left, verticalAlign: .center, translatedToBounds: true)
+                    self.animator.animateGold(goldSprites: addedSprites, gained: amount, from: startPoint, to: self.hud) { [weak self] in self?.animationsFinished(endTiles: transformation.endTiles) }
+                }
+            } else {
+                self.animationsFinished(endTiles: transformation.endTiles)
+            }
+        }
+
     }
     
     /// Recursive wrapper for chaining animated transformations
@@ -536,8 +574,7 @@ extension Renderer {
             fatalError("We should always be passing through end tiles")
         }
         
-        guard let transformation = transformation,
-              let inputType = transformation.inputType else {
+        guard let transformation = transformation else {
             completion?() ?? animationsFinished(endTiles: endTiles)
             return
         }
@@ -568,8 +605,8 @@ extension Renderer {
                 if case TileType.rock(color: let color, holdsGem: let holdsGem) = currentSprite.type,
                    holdsGem {
                     
-                    /// we need to add the gem to the board, or else shit is weird
-                    let sprite = DFTileSpriteNode(type: .item(Item(type: .gem, amount: 1, color: color)), height: currentSprite.size.height, width: currentSprite.size.width)
+                    /// we need to add the gem to the board or else shit is weird
+                    let sprite = DFTileSpriteNode(type: .item(Item(type: .gem, amount: 10, color: color)), height: currentSprite.size.height, width: currentSprite.size.width)
                     
                     // place the gem on the board where the rock was
                     sprite.position = currentSprite.position

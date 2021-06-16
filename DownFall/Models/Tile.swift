@@ -94,7 +94,7 @@ struct Tile: Hashable, Codable {
     }
     
     static var gem: Tile {
-        let gem = TileType.item(Item(type: .gem, amount: 1))
+        let gem = TileType.item(Item(type: .gem, amount: 10))
         return Tile(type: gem)
     }
     

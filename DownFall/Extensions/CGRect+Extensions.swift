@@ -35,4 +35,8 @@ extension CGRect {
             height: height + yAmount
         )
     }
+    
+    static var one: CGRect {
+        return CGRect(x: 1, y: 1, width: 1, height: 1)
+    }
 }

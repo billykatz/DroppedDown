@@ -83,8 +83,6 @@ class HUD: SKSpriteNode {
             switch inputType {
             case .attack:
                 showAttack(attackInput: input, endTiles: trans.first!.endTiles)
-//            case .collectItem(_, let item, let total):
-////                incrementCurrencyCounter(item, total: total)
             case .itemUsed, .decrementDynamites, .shuffleBoard, .collectOffer, .gameWin:
                 if let tiles = trans.first?.endTiles,
                     let playerCoord = getTilePosition(.player(.zero), tiles: tiles),
@@ -186,58 +184,6 @@ class HUD: SKSpriteNode {
             let moveAndFade = SKAction.group([moveUp, SKAction.fadeOut(withDuration: AnimationSettings.HUD.gemCountFadeTime)])
             let sequence = SKAction.sequence([moveAndFade, SKAction.removeFromParent()])
             gainedGoldLabel.run(sequence)
-        }
-    }
-    
-    func incrementCurrencyCounter(_ item: Item, total: Int) {
-        let currencyLabelIdentifier = item.type == .gold ? Identifiers.goldSpriteLabel : Identifiers.gemSpriteLabel
-        
-        let localCurrenTotal = currentTotalGem
-        
-        if let currencyLabel = self.childNode(withName: currencyLabelIdentifier) as? ParagraphNode {
-            let oldPosition = currencyLabel.position
-            currencyLabel.removeFromParent()
-            
-            var animations: [SpriteAction] = []
-            let goldGained = total-localCurrenTotal
-            for gain in 1..<goldGained+1 {
-                let newCurrencyLabel = ParagraphNode(text: "\(localCurrenTotal + gain)", paragraphWidth: Style.HUD.labelParagraphWidth, fontSize: .fontExtraLargeSize, fontColor: .lightText)
-                newCurrencyLabel.position = oldPosition
-                newCurrencyLabel.name = currencyLabelIdentifier
-                newCurrencyLabel.isHidden = true
-                addChildSafely(newCurrencyLabel)
-                // construct the ticker animation
-                
-                var actions: [SKAction] = []
-                // wait before adding it
-                let waitTime = AnimationSettings.Board.goldWaitTime
-                actions.append(SKAction.wait(forDuration: Double(gain) * waitTime))
-                // actually add it
-                actions.append(SKAction.unhide())
-                if gain < goldGained {
-                    // wait before removing it
-                    actions.append(SKAction.wait(forDuration: waitTime))
-                    //remove all but the last one
-                    actions.append(SKAction.removeFromParent())
-                }
-                
-                animations.append(SpriteAction(sprite: newCurrencyLabel, action: SKAction.sequence(actions)))
-            }
-            
-            // show exaclty how much gold was gained as well
-            let gainedGoldLabel = ParagraphNode(text: "+\(goldGained)", paragraphWidth: Style.HUD.labelParagraphWidth, fontSize: .fontExtraLargeSize, fontColor: .goldOutlineBright)
-            gainedGoldLabel.position = oldPosition.translateVertically(40.0)
-            addChildSafely(gainedGoldLabel)
-            let moveUp = SKAction.move(by: CGVector(dx: 0, dy: 50), duration: AnimationSettings.HUD.goldGainedTime)
-            let sequence = SKAction.sequence([moveUp, SKAction.removeFromParent()])
-            gainedGoldLabel.run(sequence)
-            
-            
-            // animate everything we just created
-            animator.animate(animations) { }
-            
-            // update our current total
-            currentTotalGem = total
         }
     }
     

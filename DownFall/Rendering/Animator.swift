@@ -296,7 +296,7 @@ struct Animator {
             
             let tickUpHudCounter = SKAction.run {
                 hud.incrementCurrencyCountByOne()
-                
+                 
                 if !hasShownTotalGain {
                     hasShownTotalGain = true
                     hud.showTotalGemGain(goldSprites.count)

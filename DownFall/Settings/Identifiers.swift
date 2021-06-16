@@ -19,6 +19,8 @@ struct Identifiers {
     static let gem = "crystals"
     static let gemSpriteLabel = "gemSpriteLabel"
     static let goldSpriteLabel = "goldSpriteLabel"
+    static let dodgeSprite = "dodge"
+    static let luckSprite = "luck"
     
     static let emptyPickaxeHandle = "handle"
     static let runePickaxeHandle = "runeHandle"

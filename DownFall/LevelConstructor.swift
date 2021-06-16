@@ -17,10 +17,10 @@ struct LevelConstructor {
     
     static var tier1Items:  [StoreOffer] {
         [
-//            StoreOffer.offer(type: .plusOneMaxHealth, tier: 1),
-            StoreOffer.offer(type: .killMonsterPotion, tier: 1),
-            StoreOffer.offer(type: .transmogrifyPotion, tier: 1),
-//            StoreOffer.offer(type: .greaterHeal, tier: 1)
+            StoreOffer.offer(type: .plusOneMaxHealth, tier: 1),
+//            StoreOffer.offer(type: .killMonsterPotion, tier: 1),
+//            StoreOffer.offer(type: .transmogrifyPotion, tier: 1),
+            StoreOffer.offer(type: .greaterHeal, tier: 1)
         ]
     }
     
@@ -203,12 +203,14 @@ struct LevelConstructor {
             goals = []
         }
         
-        switch depth {
-        case 0, 1:
-            return goals.compactMap { $0 }.choose(random: 2)
-        default:
-            return goals.compactMap { $0 }.choose(random: 3)
-        }
+        return goals.compactMap { $0 }.choose(random: 2)
+//        
+//        switch depth {
+//        case 0, 1:
+//            return goals.compactMap { $0 }.choose(random: 2)
+//        default:
+//            return goals.compactMap { $0 }.choose(random: 3)
+//        }
     }
     
     static func boardSize(depth: Depth) -> Int {

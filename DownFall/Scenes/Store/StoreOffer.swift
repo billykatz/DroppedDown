@@ -161,6 +161,8 @@ struct StoreOffer: Codable, Hashable {
         return lhsOffer.type == rhsOffer.type
     }
     
+    static let zero = StoreOffer(type: .greaterHeal, tier: 0, textureName: "zero", currency: .gem, title: "zero", body: "zero", startingPrice: 0)
+    
     
     let type: StoreOfferType
     let tier: StoreOfferTier

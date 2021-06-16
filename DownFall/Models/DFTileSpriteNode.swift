@@ -219,7 +219,7 @@ class DFTileSpriteNode: SKSpriteNode {
     }
     
     func poof(_ removeFromParent: Bool = true) -> (SpriteAction)? {
-        guard case StoreOfferType.rune? = self.type.offer?.type else { return nil }
+//        guard case StoreOfferType.rune? = self.type.offer?.type else { return nil }
         
         let smokeAnimation = Animator().smokeAnimation()
         let remove = SKAction.removeFromParent()

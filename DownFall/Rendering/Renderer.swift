@@ -200,8 +200,8 @@ class Renderer: SKSpriteNode {
 
             case .itemUsed(let ability, let targets):
                 animateRuneUsed(input: inputType, transformations: transformations, rune: ability, targets: targets)
-            case .collectOffer(let tileCoord, let offer):
-                collectOffer(transformations, offer: offer, atTilecoord: tileCoord)
+            case .collectOffer(let tileCoord, let offer, let discardedCoord, let discardedOffer):
+                collectOffer(transformations, offer: offer, atTilecoord: tileCoord, discardOffer: discardedOffer, discardedOfferTileCoord: discardedCoord)
             case .collectItem:
                 collectItem(for: trans, inputType: inputType)
             case .decrementDynamites:
@@ -468,9 +468,18 @@ class Renderer: SKSpriteNode {
 extension Renderer {
     
     /// Renders and delegates animation of collecting store offers
-    private func collectOffer(_ trans: [Transformation], offer: StoreOffer, atTilecoord: TileCoord) {
+    private func collectOffer(_ trans: [Transformation], offer: StoreOffer, atTilecoord: TileCoord, discardOffer: StoreOffer, discardedOfferTileCoord: TileCoord) {
         guard trans.count > 1 else {
-            computeNewBoard(for: trans.first) { [weak self] in self?.animationsFinished(endTiles: trans.first?.endTiles) }
+            
+            // in this case we have collected a upgrade for the run
+            
+            // animate received the health, dodge or luck and then compute the new board
+            let targetSprite = hud.targetSprite(for: offer.type)
+            let targetPoint = targetSprite?.convert(hud.gemSpriteNode?.frame.center ?? .zero, to: foreground) ?? .zero
+            let sprite = sprites[atTilecoord.x][atTilecoord.y]
+            animator.animateCollectOffer(offerType: offer.type, offerSprite: sprite, targetPosition: targetPoint, to: hud) { [weak self] in
+                self?.computeNewBoard(for: trans.first) { [weak self] in self?.animationsFinished(endTiles: trans.first?.endTiles) }
+            }
             return
         }
         
@@ -544,8 +553,7 @@ extension Renderer {
                         self.spriteForeground.addChild(sprite)
                         addedSprites.append(sprite)
                     }
-                    let endPosition = CGPoint.alignHorizontally(addedSprites.first?.frame, relativeTo: self.hud.frame, horizontalAnchor: .left, verticalAlign: .center, translatedToBounds: true)
-                    self.animator.animateGold(goldSprites: addedSprites, gained: amount, from: startPoint, to: self.hud) { [weak self] in self?.animationsFinished(endTiles: transformation.endTiles) }
+                    self.animator.animateGold(goldSprites: addedSprites, gained: amount, from: startPoint, to: self.hud, in: self.foreground) { [weak self] in self?.animationsFinished(endTiles: transformation.endTiles) }
                 }
             } else {
                 self.animationsFinished(endTiles: transformation.endTiles)
@@ -623,6 +631,11 @@ extension Renderer {
                 removedAnimations.append(poof)
             } else if let collectAndMove = sprites[tileTrans.end.x][tileTrans.end.y].collectRune(moveTo: CGPoint(x: 0.0, y: -playableRect.height/2/4*3) ) {
                 removedAnimations.append(collectAndMove)
+            }
+            // case for poofing the discarded store offer
+            else if case InputType.collectOffer(_, _, let disardedCoord, _)? = transformation.inputType,
+                      let poof = sprites[disardedCoord.x][disardedCoord.y].poof() {
+                removedAnimations.append(poof)
             }
 
         }

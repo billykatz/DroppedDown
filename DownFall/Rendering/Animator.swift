@@ -275,7 +275,30 @@ struct Animator {
         }
     }
     
-    func animateGold(goldSprites: [SKSpriteNode], gained: Int, from startPosition: CGPoint, to hud: HUD, completion: @escaping () -> Void) {
+    func animateCollectOffer(offerType: StoreOfferType,  offerSprite: SKSpriteNode, targetPosition: CGPoint, to hud: HUD, completion: @escaping () -> Void) {
+        
+        
+        let moveToAction = SKAction.move(to: targetPosition, duration: AnimationSettings.Board.goldGainSpeedEnd)
+        let scaleAction = SKAction.scale(to: Style.Board.goldGainSizeEnd, duration: AnimationSettings.Board.goldGainSpeedEnd)
+        let toPosition = offerSprite.frame.center.translate(xOffset: CGFloat.random(in: AnimationSettings.Gem.randomXOffsetRange), yOffset: CGFloat.random(in: AnimationSettings.Gem.randomYOffsetRange))
+        let moveAwayAction = SKAction.move(to: toPosition, duration: 0.25)
+        let moveToAndScale = SKAction.group([moveToAction, scaleAction])
+        let moveAwayMoveToScale = SKAction.sequence([moveAwayAction, moveToAndScale])
+        
+        moveAwayMoveToScale.timingMode = .easeOut
+        
+        let hudAction = SKAction.run {
+            hud.incrementStat(offer: offerType)
+        }
+        
+        let hudActionRemoveFromparent = SKAction.group([hudAction, .removeFromParent()])
+        
+        let finalizedAction = SKAction.sequence([moveAwayMoveToScale, hudActionRemoveFromparent])
+        
+        animate([SpriteAction(sprite: offerSprite, action: finalizedAction)], completion: completion)
+    }
+    
+    func animateGold(goldSprites: [SKSpriteNode], gained: Int, from startPosition: CGPoint, to hud: HUD, in foreground: SKNode, completion: @escaping () -> Void) {
         var index = 0
         
         var hasShownTotalGain = false
@@ -285,7 +308,8 @@ struct Animator {
             let toPosition = sprite.frame.center.translate(xOffset: CGFloat.random(in: AnimationSettings.Gem.randomXOffsetRange), yOffset: CGFloat.random(in: AnimationSettings.Gem.randomYOffsetRange))
             
             let moveAwayAction = SKAction.move(to: toPosition, duration: 0.25)
-            let targetPosition = CGPoint.alignHorizontally(CGRect.one, relativeTo: hud.frame, horizontalAnchor: .left, verticalAlign: .center, horizontalPadding: 40.0, translatedToBounds: true)
+            
+            let targetPosition = hud.gemSpriteNode?.convert(hud.gemSpriteNode?.frame.center ?? .zero, to: foreground) ?? .zero
             let moveToAction = SKAction.move(to: targetPosition, duration: AnimationSettings.Board.goldGainSpeedEnd)
             let scaleAction = SKAction.scale(to: Style.Board.goldGainSizeEnd, duration: AnimationSettings.Board.goldGainSpeedEnd)
             

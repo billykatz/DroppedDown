@@ -179,7 +179,7 @@ class Board: Equatable {
 
             
             
-        case let .collectOffer(offerCoord, storeOffer):
+        case let .collectOffer(offerCoord, storeOffer, _, _):
             
             /// return early here because this function returns an array of transformations
             let trans = self.collect(offer: storeOffer, at: offerCoord, input: input)
@@ -242,18 +242,22 @@ class Board: Equatable {
         
         // find the other offer if it exist
         var otherOfferTile: TileCoord?
+        var otherOffer: StoreOffer?
         for (i, _) in tiles.enumerated() {
             for (j, _) in tiles[i].enumerated() {
                 if case TileType.offer(let tileOffer) = tiles[i][j].type, tileOffer != offer, tileOffer.tier == offer.tier {
                     otherOfferTile = TileCoord(i, j)
+                    otherOffer = tileOffer
                 }
             }
         }
         
         // if it does exists then remove both the collected offer and the other offer from the board
         let transformation: Transformation
-        if let otherOfferTile = otherOfferTile {
-            transformation = removeAndReplaces(from: tiles, specificCoord: [offerCoord, otherOfferTile], input: input)
+        if let otherOfferTile = otherOfferTile,
+           let otherOffer = otherOffer,
+           case InputType.collectOffer(let collectedCoord, let collectedStoreOffer, _, _) = input.type {
+            transformation = removeAndReplaces(from: tiles, specificCoord: [offerCoord, otherOfferTile], input: Input(.collectOffer(collectedCoord: collectedCoord, collectedOffer: collectedStoreOffer, discardedCoord: otherOfferTile, discardedOffer: otherOffer)))
         } else {
             // remove and replace the single item tile
             transformation = removeAndReplace(from: tiles, tileCoord: offerCoord, singleTile: true, input: input)
@@ -279,11 +283,11 @@ class Board: Equatable {
         tiles = updatedTiles
         
         let trans = Transformation(transformation: transformation.tileTransformation,
-                              inputType: input.type,
-                              endTiles: updatedTiles,
-                              removed: transformation.removed,
-                              newTiles: transformation.newTiles,
-                              shiftDown: transformation.shiftDown)
+                                   inputType: transformation.inputType,
+                                   endTiles: updatedTiles,
+                                   removed: transformation.removed,
+                                   newTiles: transformation.newTiles,
+                                   shiftDown: transformation.shiftDown)
         
 
         /// If this is a one time use potion then we will tack on that trackformation after the remove and replace

@@ -46,6 +46,7 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
                                         .playAgain,
                                         .reffingFinished(newTurn: false),
                                         .collectItem(TileCoord(0,0), .zero, 0),
+                                        .collectOffer(collectedCoord: .zero, collectedOffer: .zero, discardedCoord: .zero, discardedOffer: .zero),
                                         .itemUseCanceled,
                                         .itemUseSelected(.zero),
                                         .itemCanBeUsed(false),
@@ -83,7 +84,7 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
     case boardBuilt
     case boardLoaded
     case collectItem(TileCoord, Item, Int)
-    case collectOffer(TileCoord, StoreOffer)
+    case collectOffer(collectedCoord: TileCoord, collectedOffer: StoreOffer, discardedCoord: TileCoord, discardedOffer: StoreOffer)
     case selectLevel
     case newTurn
     case visitStore
@@ -172,7 +173,7 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
             return "Level Goal Detail"
         case .goalCompleted:
             return "Goal was completed"
-        case .collectOffer(_, let offer):
+        case .collectOffer(_, let offer, _, _):
             return "Player collects \(offer.textureName)"
         case .runeReplacement(_, _):
             return "Rune Replacement flow"

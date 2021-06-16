@@ -339,7 +339,7 @@ class Referee {
                pickaxe.runeSlots < pickaxe.runes.count + 1 {
                 return Input(.runeReplacement(pickaxe, rune))
             } else {
-                return Input(.collectOffer(playerPosition.rowBelow, storeOffer))
+                return Input(.collectOffer(collectedCoord: playerPosition.rowBelow, collectedOffer: storeOffer, discardedCoord: .zero, discardedOffer: .zero))
             }
         }
 

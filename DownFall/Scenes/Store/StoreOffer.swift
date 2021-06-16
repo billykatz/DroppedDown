@@ -11,12 +11,37 @@ import SpriteKit
 enum StoreOfferType: Codable, Hashable {
     static func ==(lhs: StoreOfferType, rhs: StoreOfferType) -> Bool {
         switch (lhs, rhs) {
+        case (.plusOneMaxHealth, .plusOneMaxHealth): return true
         case (.plusTwoMaxHealth, .plusTwoMaxHealth): return true
+            
         case (.runeUpgrade, .runeUpgrade): return true
+        case (.runeSlot, .runeSlot): return true
+        case (.rune(let lhsRune), .rune(let rhsRune)): return lhsRune == rhsRune
+            
         case (.gems(_), .gems(_)): return true
-        case let (.rune(lhsRune), .rune(rhsRune)):
-            return lhsRune == rhsRune
-        default: return false
+        case (.dodge(_), .dodge(_)): return true
+        case (.luck(_), .luck(_)): return true
+            
+        case (.greaterHeal, .greaterHeal): return true
+        case (.lesserHeal, .lesserHeal): return true
+            
+        case (.killMonsterPotion, killMonsterPotion): return true
+        case (.transmogrifyPotion, .transmogrifyPotion): return true
+            
+        // default cases to catch and return false for any other comparisons
+        case (.plusOneMaxHealth, _): return false
+        case (.plusTwoMaxHealth, _): return false
+        case (.runeUpgrade, _): return false
+        case (.runeSlot, _): return false
+        case (.rune(_), _): return false
+        case (.gems(_), _): return false
+        case (.dodge(_), _): return false
+        case (.luck(_), _): return false
+        case (.greaterHeal, _): return false
+        case (.lesserHeal, _): return false
+        case (.killMonsterPotion,_): return false
+        case (.transmogrifyPotion, _): return false
+    
         }
     }
     

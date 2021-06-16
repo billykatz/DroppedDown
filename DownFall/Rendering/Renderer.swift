@@ -202,8 +202,6 @@ class Renderer: SKSpriteNode {
                 animateRuneUsed(input: inputType, transformations: transformations, rune: ability, targets: targets)
             case .collectOffer(let tileCoord, let offer):
                 collectOffer(transformations, offer: offer, atTilecoord: tileCoord)
-            case .collectItem:
-                computeNewBoard(for: trans)
             case .decrementDynamites:
                 computeNewBoard(for: transformations)
             case .refillEmpty:
@@ -473,6 +471,8 @@ extension Renderer {
             computeNewBoard(for: trans.first) { [weak self] in self?.animationsFinished(endTiles: trans.first?.endTiles) }
             return
         }
+        
+        
         guard trans.count < 3 else {
             preconditionFailure("This method is not set up to handle more than 2 transformations")
         }
@@ -506,35 +506,12 @@ extension Renderer {
             if let affectedTile = second.tileTransformation?.first {
                 /// move it to the target
                 let position = self.positionInForeground(at: affectedTile.initial)
-                let moveAction = SKAction.move(to: position, duration: 1.0)
                 
-                /// grow animation
-                let growAction = SKAction.scale(by: 4, duration: 0.5)
-                let shrinkAction = SKAction.scale(by: 0.25, duration: 0.5)
-                let growSkrinkSequence = SKAction.sequence([growAction, shrinkAction])
-                
-                let moveGrowShrink = SKAction.group([moveAction, growSkrinkSequence])
-                
-                /// smoke animation
-                let increaseSize = SKAction.scale(to: CGSize(width: self.tileSize, height: self.tileSize), duration: 0)
-                let smokeAnimation = self.animator.smokeAnimation()
-                let increaseSmoke = SKAction.sequence([increaseSize, smokeAnimation])
-                
-                /// remove it
-                let removeAnimation = SKAction.removeFromParent()
-                
-                /// finish the animations
-                let finishAnimations = SKAction.run { [weak self] in
+                self.animator.animateMoveGrowShrinkExplode(sprite: placeholderSprite, to: position, tileSize: self.tileSize) {
+                    [weak self] in
                     self?.animationsFinished(endTiles: second.endTiles)
                 }
-                
-                let sequence = SKAction.sequence([moveGrowShrink, increaseSmoke, removeAnimation, finishAnimations])
-                
-                placeholderSprite.run(sequence)
-                
             }
-            
-
             
         }
     }
@@ -653,26 +630,6 @@ extension Renderer {
             shiftDownActions.append(SpriteAction(sprite: sprite, action: SKAction.sequence([wait, animation])))
         }
         
-        if case let InputType.collectItem(coord, item, amount) = inputType {
-            // add a bunch of gold sprites to the board
-            if let startPoint = positionsInForeground(at: [coord]).first {
-                var addedSprites: [SKSpriteNode] = []
-                for _ in 0..<item.amount {
-                    let identifier: String = item.type == .gold ? Identifiers.gold : item.textureName
-                    let sprite = SKSpriteNode(texture: SKTexture(imageNamed: identifier),
-                                              color: .clear,
-                                              size: Style.Board.goldGainSize)
-                    sprite.position = startPoint
-                    sprite.zPosition = Precedence.menu.rawValue
-                    spriteForeground.addChild(sprite)
-                    addedSprites.append(sprite)
-                }
-                let endPosition = CGPoint.alignHorizontally(addedSprites.first?.frame, relativeTo: self.hud.frame, horizontalAnchor: .left, verticalAlign: .top, translatedToBounds: true)
-                animator.animateGold(goldSprites: addedSprites, gained: amount, from: startPoint, to: endPosition)
-            }
-        }
-        
-        
         // animate the removal of rocks and rocks falling at the same time
         // they are quasi-sequenced because the faling rocks wait x seconds before falling
         // TODO: figure out if there is a better way to sequence animations
@@ -680,6 +637,7 @@ extension Renderer {
         removedAnimations.append(contentsOf: shiftDownActions)
         animator.animate(removedAnimations) {  [weak self] in
             guard let strongSelf = self else { return }
+            print("Done with computeNewBoard")
             completion?() ?? strongSelf.animationsFinished(endTiles: endTiles)
             
         }

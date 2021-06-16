@@ -235,15 +235,29 @@ class Board: Equatable {
         return Transformation(transformation: nil, inputType: inputType, endTiles: newTiles)
 
     }
-  
-    
     
     /// This is for collecting runes or other things like max health
     private func collect(offer: StoreOffer, at offerCoord: TileCoord, input: Input) -> [Transformation] {
         let selectedTile = tiles[offerCoord]
         
-        // remove and replace the single item tile
-        let transformation = removeAndReplace(from: tiles, tileCoord: offerCoord, singleTile: true, input: input)
+        // find the other offer if it exist
+        var otherOfferTile: TileCoord?
+        for (i, _) in tiles.enumerated() {
+            for (j, _) in tiles[i].enumerated() {
+                if case TileType.offer(let tileOffer) = tiles[i][j].type, tileOffer != offer, tileOffer.tier == offer.tier {
+                    otherOfferTile = TileCoord(i, j)
+                }
+            }
+        }
+        
+        // if it does exists then remove both the collected offer and the other offer from the board
+        let transformation: Transformation
+        if let otherOfferTile = otherOfferTile {
+            transformation = removeAndReplaces(from: tiles, specificCoord: [offerCoord, otherOfferTile], input: input)
+        } else {
+            // remove and replace the single item tile
+            transformation = removeAndReplace(from: tiles, tileCoord: offerCoord, singleTile: true, input: input)
+        }
         
         // save the item
         guard case let TileType.offer(storeOffer) = selectedTile.type,
@@ -947,7 +961,7 @@ extension Board {
                            specificCoord: [TileCoord],
                            singleTile: Bool = false,
                            input: Input) -> Transformation {
-        // Check that the tile group at row, col has more than 3 tiles
+        
         let selectedTiles: [TileCoord] = specificCoord
         
         // set the tiles to be removed as Empty placeholder

@@ -307,6 +307,32 @@ struct Animator {
         animate(actions, completion: completion)
     }
     
+    func animateMoveGrowShrinkExplode(sprite: SKSpriteNode, to target: CGPoint, tileSize: CGFloat, completion: @escaping () -> Void) {
+        
+        let moveAction = SKAction.move(to: target, duration: 1.0)
+        
+        /// grow animation
+        let growAction = SKAction.scale(by: 4, duration: 0.5)
+        let shrinkAction = SKAction.scale(by: 0.25, duration: 0.5)
+        let growSkrinkSequence = SKAction.sequence([growAction, shrinkAction])
+        
+        let moveGrowShrink = SKAction.group([moveAction, growSkrinkSequence])
+        
+        /// smoke animation
+        let increaseSize = SKAction.scale(to: CGSize(width: tileSize, height: tileSize), duration: 0)
+        let smokeAnimation = smokeAnimation()
+        let increaseSmoke = SKAction.sequence([increaseSize, smokeAnimation])
+        
+        /// remove it
+        let removeAnimation = SKAction.removeFromParent()
+        
+        // run it in sequence
+        let sequence = SKAction.sequence([moveGrowShrink, increaseSmoke, removeAnimation])
+        
+        animate([SpriteAction(sprite: sprite, action: sequence)], completion: completion)
+    }
+
+    
     func animate(_ spriteActions: [SpriteAction], completion: @escaping () -> Void) {
         if spriteActions.count == 0 { completion() }
         var numActions = spriteActions.count

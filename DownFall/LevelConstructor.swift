@@ -204,7 +204,7 @@ struct LevelConstructor {
         }
         
         return goals.compactMap { $0 }.choose(random: 2)
-//        
+//
 //        switch depth {
 //        case 0, 1:
 //            return goals.compactMap { $0 }.choose(random: 2)
@@ -216,9 +216,9 @@ struct LevelConstructor {
     static func boardSize(depth: Depth) -> Int {
         switch depth {
         case 0, 1, 2, 3, 4:
-            return 7
-        case 5...Int.max:
             return 8
+        case 5...Int.max:
+            return 9
         default:
             fatalError()
         }

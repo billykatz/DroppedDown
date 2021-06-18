@@ -8,32 +8,45 @@
 
 import Combine
 
+protocol LevelGoalTrackingInputs {
+    func viewWasTapped()
+}
+
 protocol LevelGoalTrackingOutputs {
-    var goalUpdated: (([GoalTracking]) -> ())? { get set }
+//    var goalUpdated: (([GoalTracking]) -> ())? { get set }
     var goalProgress: [GoalTracking] { get }
     
     /// Emits the a value when there is a goal that has been completed
-    var goalCompleted: AnyPublisher<[GoalTracking], Error> { get }
+    var goalCompleted: AnyPublisher<([GoalTracking]), Error> { get }
+    
+    /// Emits a value when a goal is updated
+    var goalIsUpdated: AnyPublisher<[GoalTracking], Error> { get }
 }
 
-protocol LevelGoalTracking: LevelGoalTrackingOutputs {}
+protocol LevelGoalTracking: LevelGoalTrackingOutputs, LevelGoalTrackingInputs {}
 
 class LevelGoalTracker: LevelGoalTracking {
+
+    public lazy var goalCompleted: AnyPublisher<([GoalTracking]), Error> = goalCompletedSubject.eraseToAnyPublisher()
+    private lazy var goalCompletedSubject = PassthroughSubject<([GoalTracking]), Error>()
     
-    private lazy var goalCompletedSubject = PassthroughSubject<[GoalTracking], Error>()
-    lazy var goalCompleted: AnyPublisher<[GoalTracking], Error> = goalCompletedSubject.eraseToAnyPublisher()
+    public lazy var goalIsUpdated: AnyPublisher<[GoalTracking], Error> = goalIsUpdatedSubject.eraseToAnyPublisher()
+    private lazy var goalIsUpdatedSubject = PassthroughSubject<[GoalTracking], Error>()
     
-    
-    public var goalUpdated: (([GoalTracking]) -> ())? = nil
     public var goalProgress: [GoalTracking] = []
     
     private let level: Level
+    private var pillarColor =  Set<Color>(Color.allCases)
+    private var numberOfIndividualPillars: Int = 0
+    private var numberOfGoalsCompleted = 0
     
     init(level: Level) {
         self.level = level
         
         // grab the current progress because the level could be saved
         self.goalProgress = level.goalProgress
+        
+        var index = self.goalProgress.count
         
         /// there may be goals in the level that we havent progress in yet, we need to add those
         if self.goalProgress.count != level.goals.count {
@@ -43,26 +56,34 @@ class LevelGoalTracker: LevelGoalTracking {
                 if !self.goalProgress.contains(where: { innerGoal in
                     return (innerGoal.levelGoalType, innerGoal.tileType) == (goal.type, goal.tileType)
                 }) {
-                    self.goalProgress.append(GoalTracking(tileType: goal.tileType, current: 0, target: goal.targetAmount, levelGoalType: goal.type, minimumAmount: goal.minimumGroupSize, grouped: goal.grouped, hasBeenRewarded: false))
+                    self.goalProgress.append(GoalTracking(tileType: goal.tileType, current: 0, target: goal.targetAmount, levelGoalType: goal.type, minimumAmount: goal.minimumGroupSize, grouped: goal.grouped, hasBeenRewarded: false, orderCompleted: 0, index: index))
+                    index += 1;
                 }
             }
         }
+        
+        numberOfGoalsCompleted = self.goalProgress.map { $0.orderCompleted }.max() ?? 0
         
         Dispatch.shared.register { [weak self] (input) in
             self?.handle(input: input)
         }
     }
     
+    func viewWasTapped() {
+        InputQueue.append(Input(.levelGoalDetail(goalProgress)))
+    }
+    
+    
     private func handle(input: Input) {
         switch input.type {
         case .transformation(let trans):
             trackLevelGoal(with: trans)
-            return
+            
         case .newTurn:
             checkForCompletedGoals()
             
         case .boardBuilt:
-            goalUpdated?(goalProgress)
+            goalIsUpdatedSubject.send(goalProgress)
             countPillars(in: input.endTilesStruct ?? [])
             InputQueue.append(Input(.levelGoalDetail(goalProgress)))
             
@@ -82,8 +103,14 @@ class LevelGoalTracker: LevelGoalTracking {
         var allGoalsCompleted = true
         for (idx, goal) in goalProgress.enumerated(){
             if goal.isCompleted && !goal.hasBeenRewarded {
-                goalProgress[idx] = goal.isAwarded()
-                completedUnAwardedGoals.append(goal)
+                
+                numberOfGoalsCompleted += 1
+                
+                // update the data model
+                goalProgress[idx] = goal.isAwarded(orderCompleted: numberOfGoalsCompleted)
+                
+                // keep track to send in input later
+                completedUnAwardedGoals.append(goalProgress[idx])
             }
             
             if !goal.isCompleted {
@@ -93,11 +120,9 @@ class LevelGoalTracker: LevelGoalTracking {
         
         guard !completedUnAwardedGoals.isEmpty else { return }
         
+        // send input saying that goals were completed
         InputQueue.append(Input(.goalCompleted(completedUnAwardedGoals, allGoalsCompleted: allGoalsCompleted)))
     }
-    
-    var pillarColor =  Set<Color>(Color.allCases)
-    var numberOfIndividualPillars: Int = 0
     
     private func countPillars(in tiles: [[Tile]]) {
         var positions = Set<TileCoord>()
@@ -152,7 +177,7 @@ class LevelGoalTracker: LevelGoalTracking {
         }
         if newGoalProgess != goalProgress {
             goalProgress = newGoalProgess
-            goalUpdated?(goalProgress)
+            goalIsUpdatedSubject.send(goalProgress)
         }
 
     }
@@ -169,7 +194,7 @@ class LevelGoalTracker: LevelGoalTracking {
         }
         if newGoalProgess != goalProgress {
             goalProgress = newGoalProgess
-            goalUpdated?(goalProgress)
+            goalIsUpdatedSubject.send(goalProgress)
         }
     }
 }

@@ -179,7 +179,7 @@ class Board: Equatable {
 
             
             
-        case let .collectOffer(offerCoord, storeOffer):
+        case let .collectOffer(offerCoord, storeOffer, _, _):
             
             /// return early here because this function returns an array of transformations
             let trans = self.collect(offer: storeOffer, at: offerCoord, input: input)
@@ -235,15 +235,33 @@ class Board: Equatable {
         return Transformation(transformation: nil, inputType: inputType, endTiles: newTiles)
 
     }
-  
-    
     
     /// This is for collecting runes or other things like max health
     private func collect(offer: StoreOffer, at offerCoord: TileCoord, input: Input) -> [Transformation] {
         let selectedTile = tiles[offerCoord]
         
-        // remove and replace the single item tile
-        let transformation = removeAndReplace(from: tiles, tileCoord: offerCoord, singleTile: true, input: input)
+        // find the other offer if it exist
+        var otherOfferTile: TileCoord?
+        var otherOffer: StoreOffer?
+        for (i, _) in tiles.enumerated() {
+            for (j, _) in tiles[i].enumerated() {
+                if case TileType.offer(let tileOffer) = tiles[i][j].type, tileOffer != offer, tileOffer.tier == offer.tier {
+                    otherOfferTile = TileCoord(i, j)
+                    otherOffer = tileOffer
+                }
+            }
+        }
+        
+        // if it does exists then remove both the collected offer and the other offer from the board
+        let transformation: Transformation
+        if let otherOfferTile = otherOfferTile,
+           let otherOffer = otherOffer,
+           case InputType.collectOffer(let collectedCoord, let collectedStoreOffer, _, _) = input.type {
+            transformation = removeAndReplaces(from: tiles, specificCoord: [offerCoord, otherOfferTile], input: Input(.collectOffer(collectedCoord: collectedCoord, collectedOffer: collectedStoreOffer, discardedCoord: otherOfferTile, discardedOffer: otherOffer)))
+        } else {
+            // remove and replace the single item tile
+            transformation = removeAndReplace(from: tiles, tileCoord: offerCoord, singleTile: true, input: input)
+        }
         
         // save the item
         guard case let TileType.offer(storeOffer) = selectedTile.type,
@@ -265,11 +283,11 @@ class Board: Equatable {
         tiles = updatedTiles
         
         let trans = Transformation(transformation: transformation.tileTransformation,
-                              inputType: input.type,
-                              endTiles: updatedTiles,
-                              removed: transformation.removed,
-                              newTiles: transformation.newTiles,
-                              shiftDown: transformation.shiftDown)
+                                   inputType: transformation.inputType,
+                                   endTiles: updatedTiles,
+                                   removed: transformation.removed,
+                                   newTiles: transformation.newTiles,
+                                   shiftDown: transformation.shiftDown)
         
 
         /// If this is a one time use potion then we will tack on that trackformation after the remove and replace
@@ -329,8 +347,6 @@ class Board: Equatable {
         return Set<TileCoord>(tileCoords)
     }
     
-    var spawnedItems: [StoreOffer] = []
-    
     private func randomItem(in tier: Int, excludeRunesInPickaxe pickaxe: Pickaxe) -> StoreOffer {
         let offersInTier = self.level.potentialItems.filter { $0.tierIndex == tier }
         let randomNumber = Int.random(abs(tileCreator.randomSource.nextInt())) % offersInTier.count
@@ -344,6 +360,39 @@ class Board: Equatable {
         }
     }
     
+    private func randomTwoItem(in tier: Int, excludeRunesInPickaxe pickaxe: Pickaxe) -> [StoreOffer] {
+        let offersInTier = self.level.potentialItems.filter { $0.tierIndex == tier }
+        
+        // store two unique random items
+        var randomNumbers = Set<Int>()
+        
+        // grab two unique random numbers
+        while randomNumbers.count < 2 {
+            let randomNumber = Int.random(abs(tileCreator.randomSource.nextInt())) % offersInTier.count
+            randomNumbers.insert(randomNumber)
+        }
+        
+        // store two random items
+        var randomItems : [StoreOffer] = []
+        
+        // get two random items
+        for number in randomNumbers {
+            randomItems.append(offersInTier[number])
+        }
+        
+        // if we picked a rune that the player already has then re-do this whole thing
+        for item in randomItems {
+            if let rune = item.rune, pickaxe.runes.contains(rune) {
+                // repeat until we get one that the current pickaxe doesnt contain.
+                return self.randomTwoItem(in: tier, excludeRunesInPickaxe: pickaxe)
+            }
+        }
+        
+        // finally return the random items.
+        return randomItems
+    }
+
+    
     private func contains(offer: StoreOffer) -> Bool  {
         for row in 0..<tiles.count {
             for col in 0..<tiles.count {
@@ -356,12 +405,8 @@ class Board: Equatable {
         return false
     }
     
-    private var earnedGoals: Int = 0
     
     private func completedGoals(_ goals: [GoalTracking], inputType: InputType) -> Transformation {
-        
-        // keep track of this state for game win
-        earnedGoals += goals.count
         
         /// keep track of how many goals we have awarded so far.
         let awardedGoalsCount = self.level.goalProgress.filter({ $0.hasBeenRewarded} ).count
@@ -381,16 +426,27 @@ class Board: Equatable {
             /// dont overwrite this coord in the future
             reservedCoords.insert(randomCoordInAnotherQuadrant)
             
-            /// record this tiles we are transforming
+            // get another random coord not in the reserved set
+            let anotherRandomCoordInAnotherQuadrant = playerQuadrant.opposite.randomCoord(for: boardSize, notIn: reservedCoords)
+            
+            /// dont overwrite this coord in the future
+            reservedCoords.insert(anotherRandomCoordInAnotherQuadrant)
+            
+
+            /// record these tiles we are transforming
             transformedTiles.append(TileTransformation(randomCoordInAnotherQuadrant, randomCoordInAnotherQuadrant))
+            
+            transformedTiles.append(TileTransformation(anotherRandomCoordInAnotherQuadrant, anotherRandomCoordInAnotherQuadrant))
+            
             
             /// get a random offer
             let tier = awardedGoalsCount + idx
-            let randomOffer = randomItem(in: tier, excludeRunesInPickaxe: pickaxe)
-            spawnedItems.append(randomOffer)
+            let randomOffers = randomTwoItem(in: tier, excludeRunesInPickaxe: pickaxe)
             
             /// transform the tile
-            tiles[randomCoordInAnotherQuadrant.row][randomCoordInAnotherQuadrant.column] = Tile(type: .offer(randomOffer))
+            tiles[randomCoordInAnotherQuadrant.row][randomCoordInAnotherQuadrant.column] = Tile(type: .offer(randomOffers[0]))
+            
+            tiles[anotherRandomCoordInAnotherQuadrant.row][anotherRandomCoordInAnotherQuadrant.column] = Tile(type: .offer(randomOffers[1]))
         }
         
         return Transformation(transformation: transformedTiles, inputType: inputType, endTiles: tiles)
@@ -909,7 +965,7 @@ extension Board {
                            specificCoord: [TileCoord],
                            singleTile: Bool = false,
                            input: Input) -> Transformation {
-        // Check that the tile group at row, col has more than 3 tiles
+        
         let selectedTiles: [TileCoord] = specificCoord
         
         // set the tiles to be removed as Empty placeholder
@@ -1266,11 +1322,9 @@ extension Board {
               isWithinBounds(playerPosition.rowBelow), case TileType.player(let data) = tiles[playerPosition].type else {
                 return Transformation(transformation: [], inputType: .gameWin(0))
         }
-        
-        let playerEarnsHealthForCompletedGoals = data.heal(for: self.earnedGoals)
-        
+                
         var newTiles = tiles
-        newTiles[playerPosition.row][playerPosition.column] = Tile(type: .player(playerEarnsHealthForCompletedGoals))
+        newTiles[playerPosition.row][playerPosition.column] = Tile(type: .player(data))
         
         self.tiles = newTiles
         

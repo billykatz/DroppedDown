@@ -34,14 +34,21 @@ struct AnimationSettings {
     struct Board {
         static let goldGainSpeedStart = Double(0.15)
         static let goldGainSpeedEnd = Double(0.65)
-        static let goldWaitTime = Double(0.05)
+        static let goldWaitTime = Double(0.025)
+        static let offerCollectDuration = Double(0.75)
     }
     
     struct HUD {
-        static let goldGainedTime = Double(1.0)
+        static let goldGainedTime = Double(2.0)
+        static let gemCountFadeTime = Double(1.5)
     }
     
     struct Renderer {
         static let glowSpinSpeed = Double(2)
+    }
+    
+    struct Gem {
+        static let randomXOffsetRange: Range<CGFloat> = -100.0..<100.0
+        static let randomYOffsetRange: Range<CGFloat> = -100.0..<100.0
     }
 }

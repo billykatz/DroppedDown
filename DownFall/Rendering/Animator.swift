@@ -275,20 +275,64 @@ struct Animator {
         }
     }
     
-    func animateGold(goldSprites: [SKSpriteNode], gained: Int, from startPosition: CGPoint, to endPosition: CGPoint) { 
+    func animateCollectOffer(offerType: StoreOfferType,  offerSprite: SKSpriteNode, targetPosition: CGPoint, to hud: HUD, completion: @escaping () -> Void) {
+        
+        
+        let moveToAction = SKAction.move(to: targetPosition, duration: AnimationSettings.Board.goldGainSpeedEnd)
+        let scaleAction = SKAction.scale(to: Style.Board.goldGainSizeEnd, duration: AnimationSettings.Board.goldGainSpeedEnd)
+        let toPosition = offerSprite.frame.center.translate(xOffset: CGFloat.random(in: AnimationSettings.Gem.randomXOffsetRange), yOffset: CGFloat.random(in: AnimationSettings.Gem.randomYOffsetRange))
+        let moveAwayAction = SKAction.move(to: toPosition, duration: 0.25)
+        let moveToAndScale = SKAction.group([moveToAction, scaleAction])
+        let moveAwayMoveToScale = SKAction.sequence([moveAwayAction, moveToAndScale])
+        
+        moveAwayMoveToScale.timingMode = .easeOut
+        
+        let hudAction = SKAction.run {
+            hud.incrementStat(offer: offerType)
+        }
+        
+        let hudActionRemoveFromparent = SKAction.group([hudAction, .removeFromParent()])
+        
+        let finalizedAction = SKAction.sequence([moveAwayMoveToScale, hudActionRemoveFromparent])
+        
+        animate([SpriteAction(sprite: offerSprite, action: finalizedAction)], completion: completion)
+    }
+    
+    func animateGold(goldSprites: [SKSpriteNode], gained: Int, from startPosition: CGPoint, to hud: HUD, in foreground: SKNode, completion: @escaping () -> Void) {
         var index = 0
+        
+        var hasShownTotalGain = false
+        
         let animations: [SpriteAction] = goldSprites.map { sprite in
             let wait = SKAction.wait(forDuration: Double(index) * AnimationSettings.Board.goldWaitTime)
-            let moveAction = SKAction.move(to: endPosition, duration: AnimationSettings.Board.goldGainSpeedEnd)
+            let toPosition = sprite.frame.center.translate(xOffset: CGFloat.random(in: AnimationSettings.Gem.randomXOffsetRange), yOffset: CGFloat.random(in: AnimationSettings.Gem.randomYOffsetRange))
+            
+            let moveAwayAction = SKAction.move(to: toPosition, duration: 0.25)
+            
+            let targetPosition = hud.gemSpriteNode?.convert(hud.gemSpriteNode?.frame.center ?? .zero, to: foreground) ?? .zero
+            let moveToAction = SKAction.move(to: targetPosition, duration: AnimationSettings.Board.goldGainSpeedEnd)
             let scaleAction = SKAction.scale(to: Style.Board.goldGainSizeEnd, duration: AnimationSettings.Board.goldGainSpeedEnd)
             
-            let moveAndScale = SKAction.group([moveAction, scaleAction])
+            let moveToAndScale = SKAction.group([moveToAction, scaleAction])
+            let moveAwayMoveToScale = SKAction.sequence([moveAwayAction, moveToAndScale])
+            
+            moveAwayMoveToScale.timingMode = .easeOut
+            
+            let tickUpHudCounter = SKAction.run {
+                hud.incrementCurrencyCountByOne()
+                 
+                if !hasShownTotalGain {
+                    hasShownTotalGain = true
+                    hud.showTotalGemGain(goldSprites.count)
+                }
+            }
             
             index += 1
             
-            return SpriteAction(sprite: sprite, action: SKAction.sequence([wait, moveAndScale, SKAction.removeFromParent()]))
+            return SpriteAction(sprite: sprite, action: SKAction.sequence([wait, moveAwayMoveToScale, tickUpHudCounter, SKAction.removeFromParent()]))
         }
-        animate(animations) { }
+        
+        animate(animations, completion: completion)
     }
     
     func animateCannotMineRock(sprites: [SKSpriteNode], completion: @escaping () -> Void) {
@@ -306,6 +350,32 @@ struct Animator {
         
         animate(actions, completion: completion)
     }
+    
+    func animateMoveGrowShrinkExplode(sprite: SKSpriteNode, to target: CGPoint, tileSize: CGFloat, completion: @escaping () -> Void) {
+        
+        let moveAction = SKAction.move(to: target, duration: 1.0)
+        
+        /// grow animation
+        let growAction = SKAction.scale(by: 4, duration: 0.5)
+        let shrinkAction = SKAction.scale(by: 0.25, duration: 0.5)
+        let growSkrinkSequence = SKAction.sequence([growAction, shrinkAction])
+        
+        let moveGrowShrink = SKAction.group([moveAction, growSkrinkSequence])
+        
+        /// smoke animation
+        let increaseSize = SKAction.scale(to: CGSize(width: tileSize, height: tileSize), duration: 0)
+        let smokeAnimation = smokeAnimation()
+        let increaseSmoke = SKAction.sequence([increaseSize, smokeAnimation])
+        
+        /// remove it
+        let removeAnimation = SKAction.removeFromParent()
+        
+        // run it in sequence
+        let sequence = SKAction.sequence([moveGrowShrink, increaseSmoke, removeAnimation])
+        
+        animate([SpriteAction(sprite: sprite, action: sequence)], completion: completion)
+    }
+
     
     func animate(_ spriteActions: [SpriteAction], completion: @escaping () -> Void) {
         if spriteActions.count == 0 { completion() }
@@ -391,28 +461,30 @@ struct Animator {
         var spriteActions: [SpriteAction] = []
         
         // rock explode animation
-        guard let rockCoord = transformation.tileTransformation?.first, let crumble = sprites[rockCoord.end].crumble(false) else { completion(); return }
-        let sprite = sprites[rockCoord.end]
-        
-        // smoke animation
-        let smoke = self.smokeAnimation()
-        
-        // create the crumble smoke sequence
-        spriteActions.append(SpriteAction(sprite: sprite, action: SKAction.sequence([crumble.action, smoke])))
-        
-        // put the item there
-        if let newItem = transformation.endTiles?[rockCoord.end] {
-            let startPosition = levelGoalOrigin
-            let endPosition = sprite.position
-            let itemSprite = DFTileSpriteNode(type: newItem.type, height: sprite.size.height, width: sprite.size.width)
-            itemSprite.position = startPosition
-            itemSprite.setScale(0.5)
-            foreground.addChild(itemSprite)
+        for idx in 0..<(transformation.tileTransformation?.count ?? 0) {
+            guard let rockCoord = transformation.tileTransformation?[idx], let crumble = sprites[rockCoord.end].crumble(false) else { completion(); return }
+            let sprite = sprites[rockCoord.end]
             
-            let movement = SKAction.move(to: endPosition, duration: 1.0)
-            let scale = SKAction.scale(to: 1.0, duration: 1.0)
+            // smoke animation
+            let smoke = self.smokeAnimation()
+            
+            // create the crumble smoke sequence
+            spriteActions.append(SpriteAction(sprite: sprite, action: SKAction.sequence([crumble.action, smoke])))
+            
+            // put the item there
+            if let newItem = transformation.endTiles?[rockCoord.end] {
+                let startPosition = levelGoalOrigin
+                let endPosition = sprite.position
+                let itemSprite = DFTileSpriteNode(type: newItem.type, height: sprite.size.height, width: sprite.size.width)
+                itemSprite.position = startPosition
+                itemSprite.setScale(0.5)
+                foreground.addChild(itemSprite)
+                
+                let movement = SKAction.move(to: endPosition, duration: 1.0)
+                let scale = SKAction.scale(to: 1.0, duration: 1.0)
 
-            spriteActions.append(SpriteAction(sprite: itemSprite, action: SKAction.group([movement, scale])))
+                spriteActions.append(SpriteAction(sprite: itemSprite, action: SKAction.group([movement, scale])))
+            }
         }
         
         

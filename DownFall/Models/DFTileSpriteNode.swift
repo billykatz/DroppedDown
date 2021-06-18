@@ -152,6 +152,14 @@ class DFTileSpriteNode: SKSpriteNode {
         
     }
     
+    func showOfferTier(_ offer: StoreOffer) {
+        let sprite = SKSpriteNode(imageNamed: "Reward\(offer.tier)Border")
+        sprite.position = .zero
+        sprite.size = self.size
+        
+        addChild(sprite)
+    }
+    
     func showFinger() {
         let finger = SKSpriteNode(imageNamed: "finger")
         finger.position = CGPoint.position(this: finger.frame,
@@ -211,7 +219,7 @@ class DFTileSpriteNode: SKSpriteNode {
     }
     
     func poof(_ removeFromParent: Bool = true) -> (SpriteAction)? {
-        guard case StoreOfferType.rune? = self.type.offer?.type else { return nil }
+//        guard case StoreOfferType.rune? = self.type.offer?.type else { return nil }
         
         let smokeAnimation = Animator().smokeAnimation()
         let remove = SKAction.removeFromParent()

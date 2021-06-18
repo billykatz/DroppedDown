@@ -143,7 +143,7 @@ struct LevelConstructor {
     
     static func potentialItems(depth: Depth) -> [StoreOffer] {
         var offers = [StoreOffer]()
-        offers.append(contentsOf: tier1Items)
+        offers.append(contentsOf: tier1Runes)
         offers.append(contentsOf: tier2items(depth: depth))
         offers.append(contentsOf: tier3items(depth: depth))
         

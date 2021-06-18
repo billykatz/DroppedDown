@@ -47,6 +47,7 @@ class RuneContainerView: SKSpriteNode {
     let viewModel: RuneContainerViewModelable
     let mode: ViewMode
     var runeSlotViewModels: [RuneSlotViewModel] = []
+    private var runeSlotViews:  [RuneSlotView] = []
     var disposables = Set<AnyCancellable>()
     
     struct Constants {
@@ -66,6 +67,13 @@ class RuneContainerView: SKSpriteNode {
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    public func firstEmptyRuneSlotNode() -> RuneSlotView? {
+        let runeSlotView = runeSlotViews.first { runeSlotView in
+            return runeSlotView.viewModel.rune == nil
+        }
+        return runeSlotView
     }
     
     
@@ -162,6 +170,7 @@ class RuneContainerView: SKSpriteNode {
             runeSlotView.zPosition = Precedence.menu.rawValue
             runeSlotView.name = Constants.runeName
             addChild(runeSlotView)
+            runeSlotViews.append(runeSlotView)
             
             viewModel.runeWasTapped.sink(receiveValue: { [weak self] (value) in
                 guard let rune = value.0, let self = self else { return }

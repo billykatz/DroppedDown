@@ -80,8 +80,7 @@ class Renderer: SKSpriteNode {
                                                            relativeTo: safeArea.frame,
                                                            horizontalAnchor: .left,
                                                            verticalAlign: .bottom,
-                                                           verticalPadding: Style.Padding.more*6,
-                                                           horizontalPadding: -Style.Padding.more,
+                                                           horizontalPadding: Style.Padding.more*2,
                                                            translatedToBounds: true)
         levelGoalView.zPosition = Precedence.flying.rawValue
         return levelGoalView
@@ -113,6 +112,7 @@ class Renderer: SKSpriteNode {
         
         foreground = givenForeground
         
+        
         // backpack view
         self.backpackView = BackpackView(playableRect: playableRect,
                                          viewModel: TargetingViewModel(),
@@ -120,6 +120,15 @@ class Renderer: SKSpriteNode {
         
         
         super.init(texture: nil, color: .clear, size: CGSize.zero)
+        
+        let testBackground = SKSpriteNode(texture: SKTexture(imageNamed: "test-background"), size: CGSize(width: playableRect.size.width, height: playableRect.size.width*2.1))
+        testBackground.position = CGPoint.alignHorizontally(testBackground.frame,
+                                                            relativeTo: safeArea.frame,
+                                                            horizontalAnchor: .right,
+                                                            verticalAlign: .bottom,
+                                                            translatedToBounds: true)
+        testBackground.zPosition = 0
+        foreground.addChild(testBackground)
         
         // tile detail view
         self.tileDetailView = TileDetailView(foreground: foreground, playableRect: playableRect, alignedTo: hud.frame, levelSize: level.boardSize)
@@ -473,12 +482,25 @@ extension Renderer {
             
             // in this case we have collected a upgrade for the run
             
-            // animate received the health, dodge or luck and then compute the new board
-            let targetSprite = hud.targetSprite(for: offer.type)
-            let targetPoint = targetSprite?.convert(hud.gemSpriteNode?.frame.center ?? .zero, to: foreground) ?? .zero
-            let sprite = sprites[atTilecoord.x][atTilecoord.y]
-            animator.animateCollectOffer(offerType: offer.type, offerSprite: sprite, targetPosition: targetPoint, to: hud) { [weak self] in
-                self?.computeNewBoard(for: trans.first) { [weak self] in self?.animationsFinished(endTiles: trans.first?.endTiles) }
+            if case StoreOfferType.rune = offer.type {
+                // get the target area to move the rune.
+                let runeSlotView = backpackView.runeInventoryContainer?.firstEmptyRuneSlotNode()
+                let targetPoint = runeSlotView?.convert(backpackView.frame.center, to: foreground) ?? .zero
+                let sprite = sprites[atTilecoord.x][atTilecoord.y]
+                
+                animator.animateCollectRune(runeSprite: sprite, targetPosition: targetPoint) { [weak self] in
+                    self?.computeNewBoard(for: trans.first) { [weak self] in self?.animationsFinished(endTiles: trans.first?.endTiles) }
+                }
+            }
+            
+            else {
+                // animate received the health, dodge or luck and then compute the new board
+                let targetSprite = hud.targetSprite(for: offer.type)
+                let targetPoint = targetSprite?.convert(hud.gemSpriteNode?.frame.center ?? .zero, to: foreground) ?? .zero
+                let sprite = sprites[atTilecoord.x][atTilecoord.y]
+                animator.animateCollectOffer(offerType: offer.type, offerSprite: sprite, targetPosition: targetPoint, to: hud) { [weak self] in
+                    self?.computeNewBoard(for: trans.first) { [weak self] in self?.animationsFinished(endTiles: trans.first?.endTiles) }
+                }
             }
             return
         }
@@ -629,8 +651,6 @@ extension Renderer {
                 
             } else if let poof = sprites[tileTrans.end.x][tileTrans.end.y].poof(), case InputType.foundRuneDiscarded? = transformation.inputType {
                 removedAnimations.append(poof)
-            } else if let collectAndMove = sprites[tileTrans.end.x][tileTrans.end.y].collectRune(moveTo: CGPoint(x: 0.0, y: -playableRect.height/2/4*3) ) {
-                removedAnimations.append(collectAndMove)
             }
             // case for poofing the discarded store offer
             else if case InputType.collectOffer(_, _, let disardedCoord, _)? = transformation.inputType,

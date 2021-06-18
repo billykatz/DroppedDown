@@ -16,6 +16,9 @@ import Combine
 
 class BackpackView: SKSpriteNode {
     
+    //rune inventory container
+    private(set) var runeInventoryContainer: RuneContainerView?
+    
     private struct Constants {
         static let tag = String(describing: BackpackView.self)
     }
@@ -41,9 +44,6 @@ class BackpackView: SKSpriteNode {
     
     // targeting area
     private var targetingArea: SKSpriteNode
-    
-    //rune inventory container
-    private var runeInventoryContainer: RuneContainerView?
     
     // dispose bag
     private var disposables = Set<AnyCancellable>()

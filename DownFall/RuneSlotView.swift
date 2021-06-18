@@ -33,6 +33,10 @@ class RuneSlotView: SKSpriteNode {
         fatalError("init(coder:) has not been implemented")
     }
     
+    public func unhideRune() {
+        runeSprite?.isHidden = false
+    }
+    
     private func displayProgress(progress: Int, cooldown: Int) {
         removeChild(with: Constants.progressName)
         addChildSafely(self.progress)

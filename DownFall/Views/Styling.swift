@@ -73,6 +73,7 @@ struct Style {
     struct Board {
         static let goldGainSize = CGSize(width: 100, height: 100)
         static let goldGainSizeEnd = CGSize(width: 50, height: 50)
+        static let runeGainSizeEnd = CGSize(width: 120, height: 120)
     }
     
         

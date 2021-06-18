@@ -52,7 +52,8 @@ class LevelGoalView: SKSpriteNode {
         
         addChild(contentView)
         addChild(infoSprite)
-        addBorder()
+        // removing for test background purposes
+//        addBorder()
         
         isUserInteractionEnabled = true
         

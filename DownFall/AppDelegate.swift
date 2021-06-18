@@ -50,7 +50,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
     
-    func applicationDidEnterBackground(_ application: UIApplication) {
+    func applicationWillResignActive(_ application: UIApplication) {
         guard let profile = gameViewController?.applicationDidEnterBackground() else {
             GameLogger.shared.log(prefix: Constants.tag, message: "Failed to retrieve profile from GameViewController")
             return
@@ -60,7 +60,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         GameScope.shared.profileManager.saveProfile(profile)
         
-        GameLogger.shared.log(prefix: Constants.tag, message: "applicationDidEnterBackground exit")
+        GameLogger.shared.log(prefix: Constants.tag, message: "applicationWillResignActive exit")
+    }
+    
+    func applicationDidEnterBackground(_ application: UIApplication) {
     }
 }
 

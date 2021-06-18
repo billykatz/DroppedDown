@@ -98,7 +98,7 @@ class ProfileViewModel: ProfileManaging {
     
     /// Gets sent the authenication status of the GKLocalPlayer
     private lazy var authenicatedSubject = PassthroughSubject<Bool, Error>()
-    private lazy var authenicated = authenicatedSubject.eraseToAnyPublisher()
+    private lazy var authenicated = authenicatedSubject.eraseToAnyPublisher().print("authenicated subject:")
     
     /// The dispose bag
     private var disposables = Set<AnyCancellable>()

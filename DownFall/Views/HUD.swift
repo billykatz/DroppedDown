@@ -185,12 +185,6 @@ class HUD: SKSpriteNode {
         luckAmountNode.name = Constants.luckAmountLabelName
         self.addChild(luckAmountNode)
         
-        let debugBackground = SKShapeNode(rectOf: self.size)
-        debugBackground.position = CGPoint.zero
-        debugBackground.color = .blue
-        debugBackground.alpha = 0.25
-        debugBackground.zPosition = 10_000_000
-        self.addChild(debugBackground)
     }
     
     func targetSprite(for offerType: StoreOfferType) -> SKSpriteNode? {

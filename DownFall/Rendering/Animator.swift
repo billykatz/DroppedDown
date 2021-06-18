@@ -275,6 +275,26 @@ struct Animator {
         }
     }
     
+    func animateCollectRune(runeSprite: SKSpriteNode, targetPosition: CGPoint, completion: @escaping () -> Void) {
+        
+        
+        runeSprite.zPosition = 10_000_000
+        
+        let moveToAction = SKAction.move(to: targetPosition, duration: AnimationSettings.Board.runeGainSpeed)
+        let scaleAction = SKAction.scale(to: Style.Board.runeGainSizeEnd, duration: AnimationSettings.Board.runeGainSpeed)
+        let toPosition = runeSprite.frame.center.translate(xOffset: CGFloat.random(in: AnimationSettings.Gem.randomXOffsetRange), yOffset: CGFloat.random(in: AnimationSettings.Gem.randomYOffsetRange))
+        let moveAwayAction = SKAction.move(to: toPosition, duration: 0.25)
+        let moveToAndScale = SKAction.group([moveToAction, scaleAction])
+        let moveAwayMoveToScale = SKAction.sequence([moveAwayAction, moveToAndScale])
+        
+        moveAwayMoveToScale.timingMode = .easeOut
+        
+        let finalizedAction = SKAction.sequence([moveAwayMoveToScale, .removeFromParent()])
+        
+        animate([SpriteAction(sprite: runeSprite, action: finalizedAction)], completion: completion)
+    }
+
+    
     func animateCollectOffer(offerType: StoreOfferType,  offerSprite: SKSpriteNode, targetPosition: CGPoint, to hud: HUD, completion: @escaping () -> Void) {
         
         

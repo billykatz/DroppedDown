@@ -82,7 +82,7 @@ class LevelGoalTracker: LevelGoalTracking {
         case .newTurn:
             checkForCompletedGoals()
             
-        case .boardBuilt:
+        case .boardBuilt, .boardLoaded:
             goalIsUpdatedSubject.send(goalProgress)
             countPillars(in: input.endTilesStruct ?? [])
             InputQueue.append(Input(.levelGoalDetail(goalProgress)))

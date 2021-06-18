@@ -146,7 +146,7 @@ class Renderer: SKSpriteNode {
             switch input.type {
             case .transformation(let trans):
                 self?.renderTransformation(trans)
-            case .boardBuilt:
+            case .boardBuilt, .boardLoaded:
                 guard let self = self,
                       let tiles = input.endTilesStruct else { return }
                 self.sprites = self.createSprites(from: tiles)

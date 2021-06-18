@@ -29,7 +29,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let gameViewController = GameViewController(nibName: nil, bundle: nil)
         self.gameViewController = gameViewController
         
-        GameScope.shared
+        GameScope
+            .shared
             .profileManager
             .loadedProfile
             .sink(receiveCompletion: { _ in }) { (profile) in

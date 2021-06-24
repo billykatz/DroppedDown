@@ -198,7 +198,7 @@ class ProfileViewModel: ProfileManaging {
         )
         .print("Save Profile")
         .tryFlatMap { [localPlayer, userDefaultClient] (loadedProfile, newProfile, isAuthenticated) -> AnyPublisher<Profile, Error> in
-            if loadedProfile?.progress ?? 0 < newProfile.progress {
+            if loadedProfile?.progress ?? 0 <= newProfile.progress {
                 GameLogger.shared.log(prefix: Constants.tag, message: "saving new profile")
                 return saveProfileLocallyAndRemotely(newProfile, localPlayer: localPlayer, uuidKey: Constants.playerUUIDKey, userDefaultsClient: userDefaultClient, isAuthenticated: isAuthenticated)
             } else {

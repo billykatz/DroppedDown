@@ -103,7 +103,6 @@ class GameViewController: UIViewController {
         }
 
         
-        
         /// If we are able to update the run model, then update our profile
         if let runModel = levelCoordinator?.saveAllState() {
             GameLogger.shared.log(prefix: Constants.tag, message: "Run model updated")

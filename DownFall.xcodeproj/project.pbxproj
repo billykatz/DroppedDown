@@ -3,10 +3,13 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		280831FC2683A3F600EFAEC3 /* ProfileModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 280831FB2683A3F600EFAEC3 /* ProfileModel.swift */; };
+		280831FE2683A7B000EFAEC3 /* UserDefaults+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 280831FD2683A7B000EFAEC3 /* UserDefaults+Extensions.swift */; };
+		280832012683B11D00EFAEC3 /* CombineSchedulers in Frameworks */ = {isa = PBXBuildFile; productRef = 280832002683B11D00EFAEC3 /* CombineSchedulers */; };
 		3D00A0F923AAC813007E2D8B /* Identifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D00A0F823AAC813007E2D8B /* Identifiers.swift */; };
 		3D06390122EEB4FB00C4D5E9 /* PauseState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D06390022EEB4FB00C4D5E9 /* PauseState.swift */; };
 		3D06390322EEB50C00C4D5E9 /* PlayState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D06390222EEB50C00C4D5E9 /* PlayState.swift */; };
@@ -184,6 +187,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		280831FB2683A3F600EFAEC3 /* ProfileModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileModel.swift; sourceTree = "<group>"; };
+		280831FD2683A7B000EFAEC3 /* UserDefaults+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Extensions.swift"; sourceTree = "<group>"; };
 		3D00A0F823AAC813007E2D8B /* Identifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identifiers.swift; sourceTree = "<group>"; };
 		3D06390022EEB4FB00C4D5E9 /* PauseState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PauseState.swift; sourceTree = "<group>"; };
 		3D06390222EEB50C00C4D5E9 /* PlayState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayState.swift; sourceTree = "<group>"; };
@@ -361,6 +366,7 @@
 			files = (
 				5802612F24AFB78B00D7CF20 /* GameKit.framework in Frameworks */,
 				5802613224AFC23300D7CF20 /* CloudKit.framework in Frameworks */,
+				280832012683B11D00EFAEC3 /* CombineSchedulers in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -566,6 +572,7 @@
 			isa = PBXGroup;
 			children = (
 				3D6AACD7222A324D00C77B24 /* CGRect+Extensions.swift */,
+				280831FD2683A7B000EFAEC3 /* UserDefaults+Extensions.swift */,
 				5827539A256B000A0065B49F /* GKLinearCongruentialRandomSource+Extensions.swift */,
 				5894A44924C36AFA00FBF839 /* GKLocalPlayer+Extensions.swift */,
 				5894A44B24C36B4600FBF839 /* Publishers+Extensions.swift */,
@@ -861,6 +868,7 @@
 			isa = PBXGroup;
 			children = (
 				58C9735024969CA100288133 /* ProfileManaging.swift */,
+				280831FB2683A3F600EFAEC3 /* ProfileModel.swift */,
 				5811160E24D61E91000CFF12 /* RunManaging.swift */,
 			);
 			name = Save;
@@ -909,6 +917,9 @@
 			dependencies = (
 			);
 			name = DownFall;
+			packageProductDependencies = (
+				280832002683B11D00EFAEC3 /* CombineSchedulers */,
+			);
 			productName = DownFall;
 			productReference = 3DF2924A20A37FEE006671AC /* Shift Shaft.app */;
 			productType = "com.apple.product-type.application";
@@ -966,6 +977,9 @@
 				Base,
 			);
 			mainGroup = 3DF2924120A37FEE006671AC;
+			packageReferences = (
+				280831FF2683B11D00EFAEC3 /* XCRemoteSwiftPackageReference "combine-schedulers" */,
+			);
 			productRefGroup = 3DF2924B20A37FEE006671AC /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -1039,6 +1053,7 @@
 				3D7EF45C21D18D9000A2D9E8 /* Transformation.swift in Sources */,
 				3D6AACE4222CD38E00C77B24 /* Controls.swift in Sources */,
 				583FC00A24679EDC002E354E /* HealthContainerView.swift in Sources */,
+				280831FC2683A3F600EFAEC3 /* ProfileModel.swift in Sources */,
 				3D4F569622B88A90003695D8 /* HapticGenerator.swift in Sources */,
 				3D3D31EC23ABEFA8002B87EE /* LevelConstructor.swift in Sources */,
 				3D7EF45E21D18DAB00A2D9E8 /* TileTransformation.swift in Sources */,
@@ -1130,6 +1145,7 @@
 				5893899F245E7D0E00350A2E /* StoreOffer.swift in Sources */,
 				58B39BD723D21C9600915858 /* BackpackView.swift in Sources */,
 				3DD72593239DC47F005933B2 /* IndexPath+Extensions.swift in Sources */,
+				280831FE2683A7B000EFAEC3 /* UserDefaults+Extensions.swift in Sources */,
 				5853CD552463206500B5D89A /* RuneModel.swift in Sources */,
 				3D2C757522C854F8009ABD36 /* ItemModel.swift in Sources */,
 				3D18A39D224D68D300343C29 /* Dispatch.swift in Sources */,
@@ -1431,6 +1447,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		280831FF2683B11D00EFAEC3 /* XCRemoteSwiftPackageReference "combine-schedulers" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/combine-schedulers";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.5.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		280832002683B11D00EFAEC3 /* CombineSchedulers */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 280831FF2683B11D00EFAEC3 /* XCRemoteSwiftPackageReference "combine-schedulers" */;
+			productName = CombineSchedulers;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 3DF2924220A37FEE006671AC /* Project object */;
 }

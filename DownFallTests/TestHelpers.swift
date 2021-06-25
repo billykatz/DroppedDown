@@ -28,6 +28,6 @@ func toTileStructs(tileTypes: [[TileType]]) -> [[Tile]] {
 extension Level {
     static var test: Level {
         
-        return Level(depth: 0, monsterTypeRatio: LevelConstructor.monsterTypes(depth: 0), monsterCountStart: 2, maxMonsterOnBoardRatio: 0.7, boardSize: 4, tileTypeChances: TileTypeChanceModel(chances: [.rock(.blue):5, .rock(.red): 5]), pillarCoordinates: [], goals: [], maxSpawnGems: 0, goalProgress: [])
+        return Level(depth: 0, monsterTypeRatio: LevelConstructor.monsterTypes(depth: 0), monsterCountStart: 2, maxMonsterOnBoardRatio: 0.7, boardSize: 4, tileTypeChances: TileTypeChanceModel(chances: [.rock(color: .blue, holdsGem: false):5, .rock(color: .red, holdsGem: false): 5]), pillarCoordinates: [], goals: [], maxSpawnGems: 0, goalProgress: [], potentialItems: [.zero, .zero, .zero])
     }
 }

@@ -56,6 +56,8 @@ class RunModel: Codable, Equatable {
         return lhs.seed == rhs.seed
     }
     
+    static let zero = RunModel(player: .zero, seed: 0, savedTiles: nil, areas: [], goalTracking: [])
+    
     let seed: UInt64
     var player: EntityModel
     // save the tiles

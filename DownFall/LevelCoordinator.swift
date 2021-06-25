@@ -34,9 +34,9 @@ class LevelCoordinator: LevelCoordinating {
     let view: SKView
     
     /// Set default so we dont have to deal with optionality
-    var runModel: RunModel = RunModel(player: .zero, seed: 0, savedTiles: [], areas: [], goalTracking: [])
+    private(set) var runModel: RunModel = .zero
     
-    init(gameSceneNode: GameScene, entities: EntitiesModel, levelIndex: Int, view: SKView) {
+    init(gameSceneNode: GameScene, entities: EntitiesModel, view: SKView) {
         self.gameSceneNode = gameSceneNode
         self.entities = entities
         self.view = view
@@ -140,7 +140,7 @@ class LevelCoordinator: LevelCoordinating {
     func saveAllState() -> RunModel {
         guard let (data, goalTracking, tiles) = self.gameSceneNode?.saveAllState() else {
             GameLogger.shared.log(prefix: Constants.tag, message: "Unable to save all state")
-            fatalError()
+            return self.runModel
         }
         
         runModel.saveGoalTracking(goalTracking)

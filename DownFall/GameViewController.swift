@@ -16,12 +16,12 @@ class GameViewController: UIViewController {
         static let tag = String(describing: GameViewController.self)
     }
     
-    internal var entities: EntitiesModel?
-    var loadingSceneNode: LoadingScene?
+    private var entities: EntitiesModel?
+    private var loadingSceneNode: LoadingScene!
     
     /// coordinators
-    var levelCoordinator: LevelCoordinating?
-    var menuCoordinator: MenuCoordinating?
+    private var levelCoordinator: LevelCoordinating?
+    private var menuCoordinator: MenuCoordinating?
     
     public var profile: Profile? = nil {
         didSet {
@@ -40,12 +40,10 @@ class GameViewController: UIViewController {
         view = SKView(frame: view.bounds)
         
         /// Show the loading screeen
-        if let view = view as? SKView,
-           let loadingScene = GKScene(fileNamed: "LoadingScene")?.rootNode as? LoadingScene {
-           loadingScene.scaleMode = .aspectFill
-           view.presentScene(loadingScene)
-           loadingSceneNode = loadingScene
-        }
+        let view = view as! SKView
+        loadingSceneNode = GKScene(fileNamed: "LoadingScene")!.rootNode as? LoadingScene
+        loadingSceneNode.scaleMode = .aspectFill
+        view.presentScene(loadingSceneNode)
         
         // create the entities array from the local json file
         do {
@@ -68,7 +66,7 @@ class GameViewController: UIViewController {
         
         
         /// setup the coordinator
-        let levelCoordinator = LevelCoordinator(gameSceneNode: gameScene, entities: entities, levelIndex: 0, view: view)
+        let levelCoordinator = LevelCoordinator(gameSceneNode: gameScene, entities: entities, view: view)
         self.menuCoordinator = MenuCoordinator(levelCoordinator: levelCoordinator, view: view)
         self.levelCoordinator = levelCoordinator
         self.levelCoordinator?.delegate = menuCoordinator

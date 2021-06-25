@@ -58,14 +58,15 @@ class ProfileViewModel: ProfileManaging {
     
     /// Public interface with the loaded profile
     public lazy var loadedProfile = loadedProfileSubject.eraseToAnyPublisher()
-    private lazy var loadedProfileSubject = CurrentValueSubject<Profile?, Error>(nil)
+    private lazy var loadedProfileSubject = PassthroughSubject<Profile?, Error>()
     
     /// Gets sent the authenication status of the GKLocalPlayer
-    private lazy var authenicatedSubject = CurrentValueSubject<Bool, Error>(false)
-    private lazy var authenicated = authenicatedSubject.eraseToAnyPublisher().print("authenicated subject:")
+    private lazy var authenicatedSubject = PassthroughSubject<Bool, Error>()
+    private lazy var authenicated = authenicatedSubject.eraseToAnyPublisher()
     
     private let userDefaultClient: UserDefaultClient
     private var localPlayer: PlayerClient
+    private let fileManagerClient: FileManagerClient
     private let scheduler: AnySchedulerOf<DispatchQueue>
     private let mainQueue: AnySchedulerOf<DispatchQueue>
     
@@ -73,10 +74,12 @@ class ProfileViewModel: ProfileManaging {
     
     init(localPlayer: PlayerClient = .live,
          userDefaultClient: UserDefaultClient = .live,
+         fileManagerClient: FileManagerClient = .live,
          scheduler: AnySchedulerOf<DispatchQueue> = DispatchQueue(label: "profile-saving-thread", qos: .userInitiated).eraseToAnyScheduler(),
          mainQueue: AnySchedulerOf<DispatchQueue> = DispatchQueue.main.eraseToAnyScheduler()) {
         self.localPlayer = localPlayer
         self.userDefaultClient = userDefaultClient
+        self.fileManagerClient = fileManagerClient
         self.scheduler = scheduler
         self.mainQueue = mainQueue
     }
@@ -88,7 +91,7 @@ class ProfileViewModel: ProfileManaging {
         let loadRemoteData =
             authenicated
                 .map { _ in }
-                .print("load remote data")
+                .print("\(Constants.tag): Load remote data publisher", to: GameLogger.shared)
                 .flatMap { [localPlayer] in localPlayer.fetchGCSavedGames() }
                 .compactMap { savedGames in return savedGames.first }
                 .flatMap(loadSavedGame)
@@ -98,9 +101,9 @@ class ProfileViewModel: ProfileManaging {
         let loadLocalProfilePublisher =
             userDefaultClient
                 .fetchPlayerUUID(Constants.playerUUIDKey)
-                .print("fetch local game files")
-                .flatMap { (uuid) -> Future<Profile?, Error> in
-                    return loadLocalProfile(pathPrefix: Constants.saveFilePath, name: uuid)
+                .print("\(Constants.tag): fetch local game files", to: GameLogger.shared)
+                .flatMap { [fileManagerClient] (uuid) -> Future<Profile?, Error> in
+                    return loadLocalProfile(pathPrefix: Constants.saveFilePath, name: uuid, fileManagerClient: fileManagerClient)
                 }
                 .eraseToAnyPublisher()
         
@@ -116,12 +119,12 @@ class ProfileViewModel: ProfileManaging {
         
         /// Creates a new player profile locally and then saves it remotely
         let createAndSavePlayerProfile =
-            createLocalProfile(playerUUIDKey: Constants.playerUUIDKey, userDefaultClient: userDefaultClient)
+            createLocalProfile(playerUUIDKey: Constants.playerUUIDKey, userDefaultClient: userDefaultClient, fileManagerClient: fileManagerClient)
             .eraseToAnyPublisher()
         
         let resolveProfileConflict: AnyPublisher<Profile, Error> =
             loadedProfilesZip
-                .print("resolve profile conflict")
+                .print("\(Constants.tag): Resolve profile conflict", to: GameLogger.shared)
                 .eraseToAnyPublisher()
                 .tryMap ({ (saveFiles)  in
                     let (remote, local) = saveFiles
@@ -154,8 +157,8 @@ class ProfileViewModel: ProfileManaging {
         /// re-saves the profiles locally and remotely
         /// Writes to loadedProfileSubject on success
         Publishers.CombineLatest(
-            resolveProfileConflict.flatMap { [userDefaultClient] profile -> AnyPublisher<Profile, Error> in
-                return saveProfileLocally(profile, uuidKey: Constants.playerUUIDKey, userDefaultsClient: userDefaultClient).eraseToAnyPublisher()
+            resolveProfileConflict.flatMap { [userDefaultClient, fileManagerClient] profile -> AnyPublisher<Profile, Error> in
+                return saveProfileLocally(profile, uuidKey: Constants.playerUUIDKey, userDefaultsClient: userDefaultClient, fileManagerClient: fileManagerClient).eraseToAnyPublisher()
             },
             authenicated.map { _ in })
             .subscribe(on: scheduler)
@@ -165,22 +168,22 @@ class ProfileViewModel: ProfileManaging {
                     {  [loadedProfileSubject] value  in
                         let (localProfile, _) = value
                         if localProfile == Profile.zero {
-                            preconditionFailure("Local profile failed to load")
+                            GameLogger.shared.fatalLog(prefix: Constants.tag, message: "Local profile failed to load")
                         }
-                        GameLogger.shared.log(prefix: Constants.tag, message: "Loaded localprofile with name: \(localProfile.name)")
+                        GameLogger.shared.log(prefix: Constants.tag, message: "Loaded local profile with name: \(localProfile.name)")
                         loadedProfileSubject.send(localProfile)
                     })
             .store(in: &self.disposables)
         
         /// Start the authenicated process
-        print("Starting to authenticate with game center")
+        GameLogger.shared.log(prefix: Constants.tag, message: "Starting to authenticate with game center")
         localPlayer.authenticationHandler(
             { [authenicatedSubject, localPlayer] viewController, error in
-                print("Authenitcation handler. Authenticated: \(String(describing: localPlayer.isAuthenticated()))")
                 if let vc = viewController, showGCSignIn {
+                    GameLogger.shared.log(prefix: Constants.tag, message: "Showing GameCenter Log in view controller.")
                     presenter.present(vc, animated: true)
                 } else {
-                    print(localPlayer.isAuthenticated())
+                    GameLogger.shared.log(prefix: Constants.tag, message: "Player is authenticated with GameCenter \(localPlayer.isAuthenticated())")
                     authenicatedSubject.send(localPlayer.isAuthenticated())
                     
                 }
@@ -192,15 +195,15 @@ class ProfileViewModel: ProfileManaging {
     /// Sends the updated profile after saving completes
     public func saveProfile(_ profile: Profile) {
         Publishers.CombineLatest3(
-            Just(loadedProfileSubject.value).setFailureType(to: Error.self),
+            loadedProfile.last(),
             Just(profile).setFailureType(to: Error.self),
             authenicated
         )
-        .print("Save Profile")
-        .tryFlatMap { [localPlayer, userDefaultClient] (loadedProfile, newProfile, isAuthenticated) -> AnyPublisher<Profile, Error> in
+        .print("\(Constants.tag) Save Profile", to: GameLogger.shared)
+        .tryFlatMap { [localPlayer, userDefaultClient, fileManagerClient] (loadedProfile, newProfile, isAuthenticated) -> AnyPublisher<Profile, Error> in
             if loadedProfile?.progress ?? 0 <= newProfile.progress {
                 GameLogger.shared.log(prefix: Constants.tag, message: "saving new profile")
-                return saveProfileLocallyAndRemotely(newProfile, localPlayer: localPlayer, uuidKey: Constants.playerUUIDKey, userDefaultsClient: userDefaultClient, isAuthenticated: isAuthenticated)
+                return saveProfileLocallyAndRemotely(newProfile, localPlayer: localPlayer, uuidKey: Constants.playerUUIDKey, userDefaultsClient: userDefaultClient, isAuthenticated: isAuthenticated, fileManagerClient: fileManagerClient)
             } else {
                 GameLogger.shared.log(prefix: Constants.tag, message: "not saving profile because remote is further")
                 throw ProfileError.localProfileHasNotProgressedFurtherThanRemoteProfile
@@ -211,9 +214,9 @@ class ProfileViewModel: ProfileManaging {
         .sink(receiveCompletion: { completion in
             switch completion {
             case .failure(let err):
-                print("Error saving local or remote \(err)")
+                GameLogger.shared.log(prefix: Constants.tag, message: "Error saving local or remote \(err)")
             case .finished:
-                print("Successfully created and sync local and remote profiles")
+                GameLogger.shared.log(prefix: Constants.tag, message: "Successfully created and sync local and remote profiles")
             }
         }, receiveValue: { [loadedProfileSubject] profile in
             loadedProfileSubject.send(profile)
@@ -222,7 +225,7 @@ class ProfileViewModel: ProfileManaging {
     
     /// Reset user defaults
     public func resetUserDefaults() {
-        UserDefaults.standard.set(nil, forKey: Constants.playerUUIDKey)
+        userDefaultClient.set(nil, Constants.playerUUIDKey)
     }
     
     /// Delete the local profile
@@ -230,16 +233,16 @@ class ProfileViewModel: ProfileManaging {
         userDefaultClient
             .fetchPlayerUUID(Constants.playerUUIDKey)
             .eraseToAnyPublisher()
-            .print("Delete Local Profile")
-            .flatMap( { uuid -> Future<Void, Error> in
+            .print("\(Constants.tag): Delete Local Profile", to: GameLogger.shared)
+            .flatMap( { [fileManagerClient] uuid -> Future<Void, Error> in
                 return Future { promise in
-                    guard let domain =  FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+                    guard let domain =  fileManagerClient.urls(.documentDirectory, .userDomainMask).first else {
                         promise(.failure(ProfileError.failedToDeleteLocalProfile))
                         return
                     }
                     let pathURL = domain.appendingPathComponent(uuid)
                     do {
-                        try FileManager.default.removeItem(at: pathURL)
+                        try fileManagerClient.removeItem(pathURL)
                         promise(.success(()))
                     }
                     catch {
@@ -257,7 +260,7 @@ class ProfileViewModel: ProfileManaging {
     public func deleteAllRemoteProfile() {
         localPlayer
             .fetchGCSavedGames()
-            .print("Deleting Saved Games")
+            .print("\(Constants.tag) Deleting Saved Games", to: GameLogger.shared)
             .flatMap({ games in
                 return games
                     .publisher /// Turns array of objects into publisher.
@@ -276,7 +279,7 @@ class ProfileViewModel: ProfileManaging {
     
 }
 
-func saveProfileLocallyAndRemotely(_ profile: Profile, localPlayer: PlayerClient, uuidKey: String, userDefaultsClient: UserDefaultClient, isAuthenticated: Bool) -> AnyPublisher<Profile, Error> {
+func saveProfileLocallyAndRemotely(_ profile: Profile, localPlayer: PlayerClient, uuidKey: String, userDefaultsClient: UserDefaultClient, isAuthenticated: Bool, fileManagerClient: FileManagerClient) -> AnyPublisher<Profile, Error> {
         
     let ignoreUnauthenicatedGameCenter = saveProfileRemotely(profile, localPlayer: localPlayer).catch {
         error in
@@ -288,7 +291,7 @@ func saveProfileLocallyAndRemotely(_ profile: Profile, localPlayer: PlayerClient
 
     return
         Publishers.Merge(
-            saveProfileLocally(profile, uuidKey: uuidKey, userDefaultsClient: userDefaultsClient),
+            saveProfileLocally(profile, uuidKey: uuidKey, userDefaultsClient: userDefaultsClient, fileManagerClient: fileManagerClient),
             ignoreUnauthenicatedGameCenter
         )
         .eraseToAnyPublisher()
@@ -298,22 +301,22 @@ func saveProfileLocallyAndRemotely(_ profile: Profile, localPlayer: PlayerClient
 /// Uses a JSON encoder to save the data
 func saveProfileRemotely(_ profile: Profile, localPlayer: PlayerClient) -> Future<Profile, Error> {
     return Future { promise in
-        print("Saving profile to GameCenter")
+        GameLogger.shared.log(prefix: ProfileViewModel.Constants.tag, message: "Saving profile to GameCenter")
         
         let name = profile.name
         do {
             let data = try JSONEncoder().encode(profile)
             localPlayer.saveGameData(data, name) { (savedGame, error) in
                 if let error = error {
-                    print("Error saving game file in Game Center with name \(name)")
+                    GameLogger.shared.log(prefix: ProfileViewModel.Constants.tag, message: "Error saving game file in Game Center with name \(name) due to error \(error)")
                     promise(.failure(ProfileError.failureToSaveRemoteProfile(error)))
                 } else {
-                    print("Successfully save game file with name \(name)")
+                    GameLogger.shared.log(prefix: ProfileViewModel.Constants.tag, message: "Successfully save game file with name \(name)")
                     promise(.success(profile))
                 }
             }
         } catch {
-            print("Failed to encode profile")
+            GameLogger.shared.log(prefix: ProfileViewModel.Constants.tag, message: "Failed to encode profile with error: \(error)")
             promise(.failure(ProfileError.failureToSaveRemoteProfile(error)))
         }
     }
@@ -336,25 +339,23 @@ func loadSavedGame(_ savedGame: GKSavedGame) -> Future<Profile?, Error> {
     }
 }
 
-func loadLocalProfile(pathPrefix: String, name: String) -> Future<Profile?, Error> {
-    let path = "\(pathPrefix)\(name)"
-    print("Creation of Future to load file at \(path)")
+func loadLocalProfile(pathPrefix: String, name: String, fileManagerClient: FileManagerClient) -> Future<Profile?, Error> {
     return Future { promise in
-        guard let domain =  FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
-            promise(.failure(ProfileError.failedToSaveLocalProfile(nil)))
+        guard let domain =  fileManagerClient.urls(.documentDirectory, .userDomainMask).first else {
+            promise(.failure(ProfileError.failedToAccessLocalDirectory))
             return
         }
         let pathURL = domain.appendingPathComponent(name)
-        print("Attempt to load file at \(pathURL)")
+        GameLogger.shared.log(prefix: ProfileViewModel.Constants.tag, message: "Attempt to load file at \(pathURL)")
         
         do {
             let data = try Data(contentsOf: pathURL)
             let profile = try JSONDecoder().decode(Profile.self, from: data)
-            print("Successfully loaded local file \(profile)")
+            GameLogger.shared.log(prefix: ProfileViewModel.Constants.tag, message: "Successfully loaded local file \(profile)")
             promise(.success(profile))
         }
         catch let err {
-            print("Failed to load local profile \(err)")
+            GameLogger.shared.log(prefix: ProfileViewModel.Constants.tag, message: "Failed to load local profile \(err)")
             promise(.failure(ProfileError.failedToLoadProfile))
         }
     }
@@ -364,15 +365,16 @@ func loadLocalProfile(pathPrefix: String, name: String) -> Future<Profile?, Erro
 
 /// Create a data file from the local tempate file called "newProfile"
 /// Also is responsible for saving the UUID in User Defaults
-func createLocalProfile(playerUUIDKey: String, userDefaultClient: UserDefaultClient) -> Future<Profile, Error> {
+func createLocalProfile(playerUUIDKey: String, userDefaultClient: UserDefaultClient, fileManagerClient: FileManagerClient) -> Future<Profile, Error> {
     return Future { promise in
         let uuid = UUID().uuidString
-        guard let domain =  FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+        guard let domain =  fileManagerClient.urls(.documentDirectory, .userDomainMask).first else {
             promise(.failure(ProfileError.failedToAccessLocalDirectory))
             return
         }
         let pathURL = domain.appendingPathComponent(uuid)
-        print("Attempt to save file path string at \(pathURL.path)")
+        
+        GameLogger.shared.log(prefix: ProfileViewModel.Constants.tag, message: "Attempt to save file path string at \(pathURL.path)")
         
         /// The file doesnt exist, so let's create one
         do {
@@ -390,14 +392,14 @@ func createLocalProfile(playerUUIDKey: String, userDefaultClient: UserDefaultCli
             
             /// write that data to file
             try jsonData.write(to: pathURL)
-            print("Successfully saved file at path \(pathURL.path)")
+            GameLogger.shared.log(prefix: ProfileViewModel.Constants.tag, message: "Successfully saved file at path \(pathURL.path)")
             
             /// make sure we set this to the user defaults
             userDefaultClient.set(uuid, playerUUIDKey)
             
             promise(.success(newProfile))
         } catch let err {
-            print("Failed to save file at path \(pathURL)")
+            GameLogger.shared.log(prefix: ProfileViewModel.Constants.tag, message: "Failed to save file at path \(pathURL)")
             promise(.failure(ProfileError.failedToSaveLocalProfile(err)))
         }
     }
@@ -405,27 +407,27 @@ func createLocalProfile(playerUUIDKey: String, userDefaultClient: UserDefaultCli
 
 /// Takes a Profile and saves it locally.
 /// Also overwrites the UserDefaults key
-func saveProfileLocally(_ profile: Profile, uuidKey: String, userDefaultsClient: UserDefaultClient) -> Future<Profile, Error> {
+func saveProfileLocally(_ profile: Profile, uuidKey: String, userDefaultsClient: UserDefaultClient, fileManagerClient: FileManagerClient) -> Future<Profile, Error> {
     return Future { promise in
         let uuid = profile.name
-        guard let domain = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+        guard let domain = fileManagerClient.urls(.documentDirectory, .userDomainMask).first else {
             promise(.failure(ProfileError.failedToAccessLocalDirectory))
             return
         }
         let pathURL = domain.appendingPathComponent(uuid)
-        print("Attempt to save file locally at path \(pathURL.path)")
+        GameLogger.shared.log(prefix: ProfileViewModel.Constants.tag, message: "Attempt to save file locally at path \(pathURL.path)")
         
         do {
             let data = try JSONEncoder().encode(profile)
             try data.write(to: pathURL)
-            print("Successfully saved file locally at path \(pathURL.path)")
+            GameLogger.shared.log(prefix: ProfileViewModel.Constants.tag, message: "Successfully saved file locally at path \(pathURL.path)")
             
             /// make sure we set this to the user defaults
             userDefaultsClient.set(uuid, uuidKey)
             
             promise(.success(profile))
         } catch let err {
-            print("Failed to save file locallt at path \(pathURL)")
+            GameLogger.shared.log(prefix: ProfileViewModel.Constants.tag, message: "Failed to save file locally at path \(pathURL)")
             promise(.failure(ProfileError.failedToSaveLocalProfile(err)))
         }
     }

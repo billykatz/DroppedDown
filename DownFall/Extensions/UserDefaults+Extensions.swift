@@ -11,23 +11,25 @@ import Combine
 
 struct UserDefaultClient {
     var fetchPlayerUUID: (String) -> Future<String, Error>
-    var set: (String, String) -> ()
+    var set: (String?, String) -> ()
 }
 
 extension UserDefaultClient {
     static var live = Self(
         fetchPlayerUUID: { UserDefaults.fetchPlayerUUID(uuidKey: $0) },
-        set: { name, key in
-            return UserDefaults.standard.set(name, forKey: key)
-            
-        }
+        set: { name, key in return UserDefaults.standard.set(name, forKey: key) }
     )
     static var noUserDefaults = Self(
         fetchPlayerUUID: { _ in
-            return Future { promise in promise(.failure(ProfileError.noUserDefaultsValue))
-            }
+            return Future { promise in promise(.failure(ProfileError.noUserDefaultsValue)) }
         },
         set: { _,_ in }
+    )
+    
+    static let testUserDefaults = Self(
+        fetchPlayerUUID: { _ in
+            return Future { promise in promise(.success("test-uuid")) }
+        }, set: { _, _ in }
     )
 }
 

@@ -10,6 +10,9 @@
 		280831FC2683A3F600EFAEC3 /* ProfileModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 280831FB2683A3F600EFAEC3 /* ProfileModel.swift */; };
 		280831FE2683A7B000EFAEC3 /* UserDefaults+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 280831FD2683A7B000EFAEC3 /* UserDefaults+Extensions.swift */; };
 		280832012683B11D00EFAEC3 /* CombineSchedulers in Frameworks */ = {isa = PBXBuildFile; productRef = 280832002683B11D00EFAEC3 /* CombineSchedulers */; };
+		2811271A26850E1B00F96043 /* ProfileViewModelTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2811271926850E1B00F96043 /* ProfileViewModelTest.swift */; };
+		2811271D26855FE200F96043 /* CombineExt in Frameworks */ = {isa = PBXBuildFile; productRef = 2811271C26855FE200F96043 /* CombineExt */; };
+		2811271F26863A4500F96043 /* FileManagerClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2811271E26863A4500F96043 /* FileManagerClient.swift */; };
 		3D00A0F923AAC813007E2D8B /* Identifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D00A0F823AAC813007E2D8B /* Identifiers.swift */; };
 		3D06390122EEB4FB00C4D5E9 /* PauseState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D06390022EEB4FB00C4D5E9 /* PauseState.swift */; };
 		3D06390322EEB50C00C4D5E9 /* PlayState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D06390222EEB50C00C4D5E9 /* PlayState.swift */; };
@@ -189,6 +192,8 @@
 /* Begin PBXFileReference section */
 		280831FB2683A3F600EFAEC3 /* ProfileModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileModel.swift; sourceTree = "<group>"; };
 		280831FD2683A7B000EFAEC3 /* UserDefaults+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Extensions.swift"; sourceTree = "<group>"; };
+		2811271926850E1B00F96043 /* ProfileViewModelTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModelTest.swift; sourceTree = "<group>"; };
+		2811271E26863A4500F96043 /* FileManagerClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagerClient.swift; sourceTree = "<group>"; };
 		3D00A0F823AAC813007E2D8B /* Identifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identifiers.swift; sourceTree = "<group>"; };
 		3D06390022EEB4FB00C4D5E9 /* PauseState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PauseState.swift; sourceTree = "<group>"; };
 		3D06390222EEB50C00C4D5E9 /* PlayState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayState.swift; sourceTree = "<group>"; };
@@ -364,6 +369,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2811271D26855FE200F96043 /* CombineExt in Frameworks */,
 				5802612F24AFB78B00D7CF20 /* GameKit.framework in Frameworks */,
 				5802613224AFC23300D7CF20 /* CloudKit.framework in Frameworks */,
 				280832012683B11D00EFAEC3 /* CombineSchedulers in Frameworks */,
@@ -572,6 +578,7 @@
 			isa = PBXGroup;
 			children = (
 				3D6AACD7222A324D00C77B24 /* CGRect+Extensions.swift */,
+				2811271E26863A4500F96043 /* FileManagerClient.swift */,
 				280831FD2683A7B000EFAEC3 /* UserDefaults+Extensions.swift */,
 				5827539A256B000A0065B49F /* GKLinearCongruentialRandomSource+Extensions.swift */,
 				5894A44924C36AFA00FBF839 /* GKLocalPlayer+Extensions.swift */,
@@ -727,6 +734,7 @@
 				3D4A470C23B3CEFC000165FB /* RandomTests.swift */,
 				3D508DEB23B3EDB60067F53A /* Test Extensions */,
 				3DF2926820A37FF0006671AC /* BoardTests.swift */,
+				2811271926850E1B00F96043 /* ProfileViewModelTest.swift */,
 				3DCB38AA232DCE88001D148F /* TileCoordTests.swift */,
 				3D90AACF21D8854300C7428A /* RefereeTests.swift */,
 				3DE87C95224068FA00D750CF /* GameStateTests.swift */,
@@ -919,6 +927,7 @@
 			name = DownFall;
 			packageProductDependencies = (
 				280832002683B11D00EFAEC3 /* CombineSchedulers */,
+				2811271C26855FE200F96043 /* CombineExt */,
 			);
 			productName = DownFall;
 			productReference = 3DF2924A20A37FEE006671AC /* Shift Shaft.app */;
@@ -979,6 +988,7 @@
 			mainGroup = 3DF2924120A37FEE006671AC;
 			packageReferences = (
 				280831FF2683B11D00EFAEC3 /* XCRemoteSwiftPackageReference "combine-schedulers" */,
+				2811271B26855FE200F96043 /* XCRemoteSwiftPackageReference "CombineExt" */,
 			);
 			productRefGroup = 3DF2924B20A37FEE006671AC /* Products */;
 			projectDirPath = "";
@@ -1092,6 +1102,7 @@
 				5843F4542426747100C03612 /* RotatePreviewView.swift in Sources */,
 				3DC072C123748D100046F224 /* Quadrant.swift in Sources */,
 				3D635E8F22E20CDA0090C99C /* AnimationModel.swift in Sources */,
+				2811271F26863A4500F96043 /* FileManagerClient.swift in Sources */,
 				3DE87C94223D691100D750CF /* GameState.swift in Sources */,
 				3D674C9122C9BFDB0003AEB4 /* UIColor+Extensions.swift in Sources */,
 				3DA4E883228E5D2F006E90D1 /* SKSpriteNode+Extensions.swift in Sources */,
@@ -1174,6 +1185,7 @@
 				3DF2926920A37FF0006671AC /* BoardTests.swift in Sources */,
 				3DD36ECD21E5BD9100AC4873 /* TileStrategyTests.swift in Sources */,
 				589A27D623D9210900174DE7 /* TargetingViewModelTests.swift in Sources */,
+				2811271A26850E1B00F96043 /* ProfileViewModelTest.swift in Sources */,
 				3DA4E8992290AC82006E90D1 /* EntityModelTests.swift in Sources */,
 				3DB270A922B00E0D00D9BF8B /* TileTypeTest+Extensions.swift in Sources */,
 				3D90AAD021D8854300C7428A /* RefereeTests.swift in Sources */,
@@ -1457,6 +1469,14 @@
 				minimumVersion = 0.5.0;
 			};
 		};
+		2811271B26855FE200F96043 /* XCRemoteSwiftPackageReference "CombineExt" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/CombineCommunity/CombineExt.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.3.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1464,6 +1484,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 280831FF2683B11D00EFAEC3 /* XCRemoteSwiftPackageReference "combine-schedulers" */;
 			productName = CombineSchedulers;
+		};
+		2811271C26855FE200F96043 /* CombineExt */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2811271B26855FE200F96043 /* XCRemoteSwiftPackageReference "CombineExt" */;
+			productName = CombineExt;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

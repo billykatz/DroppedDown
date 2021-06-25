@@ -60,7 +60,7 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate, OptionsSceneDelegate,
     private func presentMainMenu(transition: SKTransition? = nil) {
         guard let mainMenu = mainMenuScene else { fatalError("Unable to unwrap the main menu scene")}
         mainMenu.playerModel = profile?.player
-        mainMenu.hasRunToContinue = profile?.currentRun != nil
+        mainMenu.hasRunToContinue = (profile?.currentRun != nil && profile?.currentRun != .zero)
 
         view.presentScene(mainMenu, transition: transition)
         view.ignoresSiblingOrder = true

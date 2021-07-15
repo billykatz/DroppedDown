@@ -20,8 +20,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     private var disposables = Set<AnyCancellable>()
     private var gameViewController: GameViewController?
 
+    let testAreRunning = UserDefaults.standard.bool(forKey: "isTest")
+
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        guard !testAreRunning else { return true }
         GameLogger.shared.log(prefix: Constants.tag, message: "Application did finish launching with options start")
         
         window = UIWindow(frame: UIScreen.main.bounds)

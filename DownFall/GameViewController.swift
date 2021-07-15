@@ -25,7 +25,9 @@ class GameViewController: UIViewController {
     
     public var profile: Profile? = nil {
         didSet {
-            guard let profile = profile else { return }
+            guard let profile = profile else {
+                return
+            }
             loadingSceneNode?.fadeOut {
                 self.menuCoordinator?.loadedProfile(profile)
             }

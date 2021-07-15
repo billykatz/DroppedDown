@@ -29,24 +29,6 @@ extension PlayerClient {
         },
         isAuthenticated: { GKLocalPlayer.local.isAuthenticated }
     )
-    
-    static let success = Self(
-        fetchGCSavedGames: {
-            return Future { promise in
-                promise(.success([GKSavedGame()]))
-            }
-        },
-        saveGameData: { _, _, _ in },
-        deleteGame: { _ in
-            return Future { promise in
-                promise(.success(true))
-            }
-        },
-        authenticationHandler: { _ in
-            return { }()
-        },
-        isAuthenticated: { return true }
-    )
 }
 
 extension GKLocalPlayer {

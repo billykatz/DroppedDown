@@ -13,6 +13,9 @@
 		2811271A26850E1B00F96043 /* ProfileViewModelTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2811271926850E1B00F96043 /* ProfileViewModelTest.swift */; };
 		2811271D26855FE200F96043 /* CombineExt in Frameworks */ = {isa = PBXBuildFile; productRef = 2811271C26855FE200F96043 /* CombineExt */; };
 		2811271F26863A4500F96043 /* FileManagerClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2811271E26863A4500F96043 /* FileManagerClient.swift */; };
+		2811272126863E4A00F96043 /* PlayerClientExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2811272026863E4A00F96043 /* PlayerClientExtensions.swift */; };
+		28A836C4268FE57F00D96C48 /* JSONCoding+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A836C3268FE57F00D96C48 /* JSONCoding+Extensions.swift */; };
+		28A836C6268FE97B00D96C48 /* ProfileCodingClient+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A836C5268FE97B00D96C48 /* ProfileCodingClient+Extensions.swift */; };
 		3D00A0F923AAC813007E2D8B /* Identifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D00A0F823AAC813007E2D8B /* Identifiers.swift */; };
 		3D06390122EEB4FB00C4D5E9 /* PauseState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D06390022EEB4FB00C4D5E9 /* PauseState.swift */; };
 		3D06390322EEB50C00C4D5E9 /* PlayState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D06390222EEB50C00C4D5E9 /* PlayState.swift */; };
@@ -194,6 +197,9 @@
 		280831FD2683A7B000EFAEC3 /* UserDefaults+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Extensions.swift"; sourceTree = "<group>"; };
 		2811271926850E1B00F96043 /* ProfileViewModelTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModelTest.swift; sourceTree = "<group>"; };
 		2811271E26863A4500F96043 /* FileManagerClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagerClient.swift; sourceTree = "<group>"; };
+		2811272026863E4A00F96043 /* PlayerClientExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerClientExtensions.swift; sourceTree = "<group>"; };
+		28A836C3268FE57F00D96C48 /* JSONCoding+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "JSONCoding+Extensions.swift"; sourceTree = "<group>"; };
+		28A836C5268FE97B00D96C48 /* ProfileCodingClient+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileCodingClient+Extensions.swift"; sourceTree = "<group>"; };
 		3D00A0F823AAC813007E2D8B /* Identifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identifiers.swift; sourceTree = "<group>"; };
 		3D06390022EEB4FB00C4D5E9 /* PauseState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PauseState.swift; sourceTree = "<group>"; };
 		3D06390222EEB50C00C4D5E9 /* PlayState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayState.swift; sourceTree = "<group>"; };
@@ -496,6 +502,8 @@
 			children = (
 				3DB270A822B00E0D00D9BF8B /* TileTypeTest+Extensions.swift */,
 				3D508DE923B3EDA10067F53A /* AttackModel+Extensions.swift */,
+				2811272026863E4A00F96043 /* PlayerClientExtensions.swift */,
+				28A836C5268FE97B00D96C48 /* ProfileCodingClient+Extensions.swift */,
 			);
 			name = "Test Extensions";
 			sourceTree = "<group>";
@@ -585,6 +593,7 @@
 				5894A44B24C36B4600FBF839 /* Publishers+Extensions.swift */,
 				58383642242D7A6E004CA026 /* Array+Extensions.swift */,
 				3DB270A622AE065300D9BF8B /* Data+Extensions.swift */,
+				28A836C3268FE57F00D96C48 /* JSONCoding+Extensions.swift */,
 				3DA4E88A228FC156006E90D1 /* Util.swift */,
 				589A27CE23D8EA1C00174DE7 /* SKShapeNode+Extensions.swift */,
 				3DE657CC20B0AFD2003492DA /* Int+Extensions.swift */,
@@ -1164,6 +1173,7 @@
 				3D7D8B2D2252857E0016FE4C /* CombatSimulator.swift in Sources */,
 				3DA4E8972290A88C006E90D1 /* EntityModel.swift in Sources */,
 				3D06390722EEB53C00C4D5E9 /* ComputingState.swift in Sources */,
+				28A836C4268FE57F00D96C48 /* JSONCoding+Extensions.swift in Sources */,
 				3D674C9522C9D6640003AEB4 /* MainMenu.swift in Sources */,
 				58A4B91D2472E5620011624A /* ChanceModel.swift in Sources */,
 				5881DBF4244FEE440053A690 /* RuneSlotView.swift in Sources */,
@@ -1191,9 +1201,11 @@
 				3D90AAD021D8854300C7428A /* RefereeTests.swift in Sources */,
 				3D508DED23B3EE7C0067F53A /* CarryModelTests.swift in Sources */,
 				5849826724DE159700B67D99 /* ProfileManagerTests.swift in Sources */,
+				28A836C6268FE97B00D96C48 /* ProfileCodingClient+Extensions.swift in Sources */,
 				586AE77723CF91AA00302347 /* AttackModelTests.swift in Sources */,
 				58AD4883243581FC00F90A87 /* RandomTests.swift in Sources */,
 				3DE87C96224068FA00D750CF /* GameStateTests.swift in Sources */,
+				2811272126863E4A00F96043 /* PlayerClientExtensions.swift in Sources */,
 				3DCB38AB232DCE88001D148F /* TileCoordTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

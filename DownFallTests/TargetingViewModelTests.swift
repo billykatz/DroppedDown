@@ -18,6 +18,7 @@ class TargetingViewModelTests: XCTestCase {
     
     var playerCoord: TileCoord?
     
+    @discardableResult
     func sendTiles(_ numMonsters: Int = 1) -> [[Tile]] {
         var customTiles = [Tile(type: .player(.zero))]
         customTiles.append(contentsOf: Array.init(repeating: Tile(type: .monster(.zero)), count: numMonsters))
@@ -115,6 +116,8 @@ class TargetingViewModelTests: XCTestCase {
                                    inputType: .itemUseSelected(Rune.rune(for: .bubbleUp)),
                                    endTiles: tiles)
         
+        Dispatch.shared.send(Input(InputType.newTurn, tiles))
+        
         Dispatch.shared.send(Input(InputType.transformation([trans])))
         
         vm.didSelect(Rune.rune(for: .bubbleUp))
@@ -138,6 +141,8 @@ class TargetingViewModelTests: XCTestCase {
         let trans = Transformation(transformation: nil,
                                    inputType: .itemUseSelected(Rune.rune(for: .bubbleUp)),
                                    endTiles: tiles)
+        
+        Dispatch.shared.send(Input(InputType.newTurn, tiles))
         
         Dispatch.shared.send(Input(InputType.transformation([trans])))
         

@@ -50,12 +50,11 @@ class TileStrategyTests: XCTestCase {
     func testTileStrategyAddsCorrectNumberOfMonstersForDifferentDifficulties() {
         for _ in 0..<3 { //repeat these test so can be more confident that not too many monsters are being added
             [Difficulty.easy, .normal, .hard].forEach { difficulty in
-                let newTiles = TileCreator(entities(),
-                                           difficulty: difficulty,
-                                           level: .test, randomSource: GKLinearCongruentialRandomSource())
-                    .tiles(for: emptyButOnePlayer(board).tiles).reduce([], +)
+                let tc = TileCreator.init(entities(), difficulty: difficulty, updatedEntity: .playerZero, level: .test, randomSource: GKLinearCongruentialRandomSource())
+                
+                let newTiles = tc.board(difficulty: difficulty).0.reduce([], +)
                 let monsterCount = newTiles.filter { $0 == Tile(type: .monster(.zero)) }.count
-                let maxExpectedMonsters = 10
+                let maxExpectedMonsters = LevelConstructor.monsterCountStart(depth: Level.test.depth)
                 XCTAssertTrue(monsterCount <= maxExpectedMonsters, "Difficulty \(difficulty) - Tile God added \(monsterCount), we expected at most \(maxExpectedMonsters)")
             }
         }

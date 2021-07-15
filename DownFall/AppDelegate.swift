@@ -20,8 +20,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     private var disposables = Set<AnyCancellable>()
     private var gameViewController: GameViewController?
 
+    let testAreRunning = UserDefaults.standard.bool(forKey: "isTest")
+
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        guard !testAreRunning else { return true }
         GameLogger.shared.log(prefix: Constants.tag, message: "Application did finish launching with options start")
         
         window = UIWindow(frame: UIScreen.main.bounds)
@@ -29,7 +32,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let gameViewController = GameViewController(nibName: nil, bundle: nil)
         self.gameViewController = gameViewController
         
-        GameScope.shared
+        GameScope
+            .shared
             .profileManager
             .loadedProfile
             .sink(receiveCompletion: { _ in }) { (profile) in
@@ -49,6 +53,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
     
+    
     func applicationDidEnterBackground(_ application: UIApplication) {
         guard let profile = gameViewController?.applicationDidEnterBackground() else {
             GameLogger.shared.log(prefix: Constants.tag, message: "Failed to retrieve profile from GameViewController")
@@ -59,7 +64,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         GameScope.shared.profileManager.saveProfile(profile)
         
-        GameLogger.shared.log(prefix: Constants.tag, message: "applicationDidEnterBackground exit")
+        GameLogger.shared.log(prefix: Constants.tag, message: "applicationWillResignActive exit")
     }
+    
 }
 

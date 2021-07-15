@@ -43,7 +43,7 @@ struct InputQueue {
             return
         }
         
-        print("\(input.type) is being ignored. Current game state is \(gameState.state). The last input was \(history.first!)")
+        print("\(input.type) is being ignored. Current game state is \(gameState.state). The last input was \(String(describing: history.first))")
         
     }
     

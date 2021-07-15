@@ -65,6 +65,7 @@ struct EntityModel: Equatable, Codable {
     static let playerCases: [EntityType] = [.player]
     
     static let zero: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .rat, carry: .zero, animations: [], effects: [], dodge: 0, luck: 0)
+    
     static let playerZero: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .player, carry: .zero, animations: [], pickaxe: Pickaxe(runeSlots: 0, runes: []), effects: [], dodge: 0, luck: 0)
     
     static func zeroedEntity(type: EntityType) -> EntityModel {

@@ -131,7 +131,7 @@ class TargetingViewModel: Targeting {
                 runeSlotsUpdated?(runeSlots, runes)
             }
             
-        case .boardBuilt:
+        case .boardBuilt, .boardLoaded:
             guard let tiles = input.endTilesStruct else { return }
             
             boardSize = tiles.count

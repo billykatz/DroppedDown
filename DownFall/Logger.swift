@@ -16,7 +16,11 @@ extension OSLog {
     static let shiftShaft = OSLog(subsystem: subsystem, category: "ShiftShaft")
 }
 
-class GameLogger {
+class GameLogger: TextOutputStream {
+    func write(_ string: String) {
+        os_log("%s", log: OSLog.shiftShaft, string)
+    }
+    
     
     static let shared = GameLogger()
 

@@ -159,7 +159,7 @@ struct LevelConstructor {
     }
     
     static func levelGoal(depth: Depth, pillars: [PillarCoorindates], gemAtDepth: Int, randomSource: GKLinearCongruentialRandomSource = GKLinearCongruentialRandomSource()) -> [LevelGoal] {
-        func randomRockGoal(_ colors: [Color], amount: Int, minimumGroupSize: Int) -> LevelGoal? {
+        func randomRockGoal(_ colors: [ShiftShaft_Color], amount: Int, minimumGroupSize: Int) -> LevelGoal? {
             guard let randomColor = colors.randomElement() else { return nil }
             return LevelGoal(type: .unlockExit, tileType: .rock(color: randomColor, holdsGem: false), targetAmount: amount, minimumGroupSize: minimumGroupSize, grouped: minimumGroupSize > 1)
         }
@@ -258,10 +258,10 @@ struct LevelConstructor {
     /// Randomly creates 0 up to a max of boardsize/8 pillar coordinates
     static func pillars(depth: Depth, randomSource: GKLinearCongruentialRandomSource = GKLinearCongruentialRandomSource()) -> [PillarCoorindates] {
         
-        func randomPillar(notIn set: Set<Color>) -> TileType {
-            var color = Color.allCases.randomElement()!
+        func randomPillar(notIn set: Set<ShiftShaft_Color>) -> TileType {
+            var color = ShiftShaft_Color.allCases.randomElement()!
             while set.contains(color) {
-                color = Color.allCases.randomElement()!
+                color = ShiftShaft_Color.allCases.randomElement()!
             }
             return TileType.pillar(PillarData(color: color, health: 3))
         }

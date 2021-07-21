@@ -23,6 +23,9 @@ class GameViewController: UIViewController {
     private var levelCoordinator: LevelCoordinating?
     private var menuCoordinator: MenuCoordinating?
     
+    // navigation contoller
+//    var navigationController: UINavigationController?
+    
     public var profile: Profile? = nil {
         didSet {
             guard let profile = profile else {
@@ -32,6 +35,10 @@ class GameViewController: UIViewController {
                 self.menuCoordinator?.loadedProfile(profile)
             }
         }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        self.navigationController?.setNavigationBarHidden(true, animated: false)
     }
     
     override func viewDidLoad() {
@@ -69,7 +76,8 @@ class GameViewController: UIViewController {
         
         /// setup the coordinator
         let levelCoordinator = LevelCoordinator(gameSceneNode: gameScene, entities: entities, view: view)
-        self.menuCoordinator = MenuCoordinator(levelCoordinator: levelCoordinator, view: view)
+        let codexCoordinator = CodexCoordinator(viewController: self.navigationController!)
+        self.menuCoordinator = MenuCoordinator(levelCoordinator: levelCoordinator, codexCoordinator: codexCoordinator, view: view)
         self.levelCoordinator = levelCoordinator
         self.levelCoordinator?.delegate = menuCoordinator
         

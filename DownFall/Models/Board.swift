@@ -828,7 +828,7 @@ extension Board {
         return (queue, Array(pillars))
     }
     
-    func massMine(tiles: [[Tile]], color: Color, input: Input) -> Transformation {
+    func massMine(tiles: [[Tile]], color: ShiftShaft_Color, input: Input) -> Transformation {
         var selectedCoords: [TileCoord] = []
         for row in 0..<tiles.count {
             for col in 0..<tiles.count {

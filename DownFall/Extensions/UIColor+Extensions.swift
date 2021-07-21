@@ -61,4 +61,8 @@ extension UIColor {
     /// Confirmation button
     static let confirmButtonColor = UIColor(rgb: 0x177a31)
     
+    // Codex
+    static let codexItemBackgroundBlue = UIColor(rgb: 0x314768)
+    static let codexItemStrokeBlue = UIColor(rgb: 0x8091AB)
+    
 }

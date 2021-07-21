@@ -36,6 +36,7 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate, OptionsSceneDelegate,
     var view: SKView
     var profile: Profile?
     var levelCoordinator: LevelCoordinating
+    var codexCoordinator: CodexCoordinator
     
     
     private lazy var mainMenuScene: MainMenu? = {
@@ -52,8 +53,9 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate, OptionsSceneDelegate,
         return scene
     }()
     
-    init(levelCoordinator: LevelCoordinating, view: SKView) {
+    init(levelCoordinator: LevelCoordinating, codexCoordinator: CodexCoordinator, view: SKView) {
         self.levelCoordinator = levelCoordinator
+        self.codexCoordinator = codexCoordinator
         self.view = view
     }
     
@@ -118,13 +120,16 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate, OptionsSceneDelegate,
     }
     
     func menuStore() {
-        guard let profile = profile else { return }
-        let storeScene = MenuStoreScene(size: .universalSize,
-                                        playerData: profile.player,
-                                        coordinatorDelegate: self)
-        
-        storeScene.scaleMode = .aspectFill
-        view.presentScene(storeScene, transition: SKTransition.push(with: .right, duration: 0.5))
+        codexCoordinator.presentCodexView()
+//
+//        guard let profile = profile else { return }
+//        let storeScene = MenuStoreScene(size: .universalSize,
+//                                        playerData: profile.player,
+//                                        coordinatorDelegate: self)
+//
+//        storeScene.scaleMode = .aspectFill
+//
+//        view.presentScene(storeScene, transition: SKTransition.push(with: .right, duration: 0.5))
     }
     
     func mainMenuTapped(updatedPlayerData: EntityModel) {

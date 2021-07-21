@@ -8,7 +8,7 @@
 
 struct ReffingState: GameState {
     
-    var state: State = .reffing
+    var state: ShiftShaft_State = .reffing
     
     func enter(_ input: Input) {
         Referee.enterRules(input.endTilesStruct)

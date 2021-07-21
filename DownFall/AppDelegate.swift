@@ -29,8 +29,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         window = UIWindow(frame: UIScreen.main.bounds)
         
+        // game view controller
         let gameViewController = GameViewController(nibName: nil, bundle: nil)
         self.gameViewController = gameViewController
+        
+        // nav controller
+        let navController = UINavigationController(rootViewController: gameViewController)
+        
         
         GameScope
             .shared
@@ -46,7 +51,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         GameScope.shared.profileManager.start(gameViewController, showGCSignIn: false)
         
         // window
-        window!.rootViewController = gameViewController
+        window!.rootViewController = navController
         window!.makeKeyAndVisible()
         
         GameLogger.shared.log(prefix: Constants.tag, message: "Application did finish launching with options exit")

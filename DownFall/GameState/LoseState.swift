@@ -8,7 +8,7 @@
 
 struct LoseState: GameState {
     
-    var state: State = .gameLose
+    var state: ShiftShaft_State = .gameLose
     
     func enter(_ input: Input) {}
     

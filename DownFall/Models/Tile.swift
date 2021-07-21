@@ -14,11 +14,11 @@ struct DynamiteFuse: Codable, Hashable {
 }
 
 struct PillarData: Codable, Hashable {
-    let color: Color
+    let color: ShiftShaft_Color
     let health: Int
 }
 
-enum Color: String, Codable, CaseIterable, Hashable {
+enum ShiftShaft_Color: String, Codable, CaseIterable, Hashable {
     case blue
     case brown
     case purple
@@ -178,7 +178,7 @@ enum TileType: Hashable, CaseIterable, Codable {
         case .empty:
             self = .empty
         case .emptyGem:
-            let data = try container.decode(Color.self, forKey: .color)
+            let data = try container.decode(ShiftShaft_Color.self, forKey: .color)
             self = .emptyGem(data)
         case .player:
             let data = try container.decode(EntityModel.self, forKey: .entityData)
@@ -193,7 +193,7 @@ enum TileType: Hashable, CaseIterable, Codable {
             let blocked = try container.decode(Bool.self, forKey: .exitBlocked)
             self = .exit(blocked: blocked)
         case .rock:
-            let color = try container.decode(Color.self, forKey: .color)
+            let color = try container.decode(ShiftShaft_Color.self, forKey: .color)
             let holdsGem = try container.decode(Bool.self, forKey: .holdsGem)
             self = .rock(color: color, holdsGem: holdsGem)
         case .pillar:
@@ -249,12 +249,12 @@ enum TileType: Hashable, CaseIterable, Codable {
     case player(EntityModel)
     case monster(EntityModel)
     case empty
-    case emptyGem(Color)
+    case emptyGem(ShiftShaft_Color)
     case exit(blocked: Bool)
     case item(Item)
     case offer(StoreOffer)
     case pillar(PillarData)
-    case rock(color: Color, holdsGem: Bool)
+    case rock(color: ShiftShaft_Color, holdsGem: Bool)
     case dynamite(DynamiteFuse)
     
     var isARock: Bool {
@@ -276,7 +276,7 @@ enum TileType: Hashable, CaseIterable, Codable {
         return isARock || isAPillar
     }
     
-    var color: Color? {
+    var color: ShiftShaft_Color? {
         if case TileType.rock(let color, _) = self {
             return color
         } else if case TileType.pillar(let data) = self {

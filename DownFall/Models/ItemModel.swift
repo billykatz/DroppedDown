@@ -24,7 +24,7 @@ struct Item: Codable, Hashable {
     
     let type: ItemType
     let amount: Int
-    var color: Color?
+    var color: ShiftShaft_Color?
     
     var humanReadable: String {
         switch type {

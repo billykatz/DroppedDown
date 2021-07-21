@@ -7,7 +7,7 @@
 //
 
 struct PauseState: GameState {
-    var state: State = .paused
+    var state: ShiftShaft_State = .paused
     
     func enter(_ input: Input) {}
     

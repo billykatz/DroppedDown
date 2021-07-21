@@ -10,7 +10,10 @@ import UIKit
 import CoreGraphics
 
 extension UIFont {
-        static let pixel = UIFont(name: UIFont.pixelFontName, size: .fontExtraSmallSize)
+    static let pixel = UIFont(name: UIFont.pixelFontName, size: .fontExtraSmallSize)
     static let storeItemDescription = UIFont(name: UIFont.pixelFontName, size: .fontExtraSmallSize)!
     static let pixelFontName = "Alterebro-Pixel-Font"
+    
+    static let codexFont = UIFont(name: UIFont.pixelFontName, size: 30.0)!
+    static let titleCodexFont = UIFont(name: UIFont.pixelFontName, size: 45.0)!
 }

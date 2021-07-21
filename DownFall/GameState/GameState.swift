@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum State: CaseIterable, Equatable {
+enum ShiftShaft_State: CaseIterable, Equatable {
     case playing
     case paused
     case animating
@@ -20,16 +20,16 @@ enum State: CaseIterable, Equatable {
 }
 
 protocol GameState: Equatable {
-    var state: State { get }
+    var state: ShiftShaft_State { get }
     func transitionState(given input: Input) -> AnyGameState?
     func enter(_ input: Input)
 }
 
 final class AnyGameState: GameState {
-    private var _state: State
+    private var _state: ShiftShaft_State
     private let _transitionState: (Input) -> AnyGameState?
     private let _enter: (Input) -> ()
-    var state: State {
+    var state: ShiftShaft_State {
         get {
             return _state
         }

@@ -58,7 +58,7 @@ struct Rune: Hashable, Codable {
     var rechargeType: [TileType]
     var rechargeMinimum: Int
     var rechargeCurrent: Int
-    var progressColor: Color
+    var progressColor: ShiftShaft_Color
     var maxDistanceBetweenTargets: Int
     var recordedProgress: CGFloat? = 0
     let animationTextureName: String
@@ -96,7 +96,7 @@ struct Rune: Hashable, Codable {
                 rechargeType: [TileType]? = nil,
                 rechargeMinimum: Int? = nil,
                 rechargeCurrent: Int? = nil,
-                progressColor: Color? = nil,
+                progressColor: ShiftShaft_Color? = nil,
                 maxDistanceBetweenTargets: Int? = nil,
                 animationTextureName: String? = nil,
                 animationColumns: Int? = nil) -> Rune {

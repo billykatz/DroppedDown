@@ -123,7 +123,7 @@ class TileCreator: TileStrategy {
         fatalError("The randomNumber should between 0 and \(randomNumber-1) should map to a TileType.")
     }
     
-    func shouldRockHoldGem(playerData: EntityModel, rockColor: Color, shouldSpawnAtleastOneGem: Bool) -> Bool {
+    func shouldRockHoldGem(playerData: EntityModel, rockColor: ShiftShaft_Color, shouldSpawnAtleastOneGem: Bool) -> Bool {
         let extraGemsBasedOnLuck = playerData.luck / 5
         let extraChanceBasedOnLuck = extraGemsBasedOnLuck * 2
         guard specialGems < level.maxSpawnGems + extraGemsBasedOnLuck else { return false }

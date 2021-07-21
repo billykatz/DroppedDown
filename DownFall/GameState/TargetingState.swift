@@ -8,7 +8,7 @@
 
 struct TargetingState: GameState {
 
-    var state: State = .targeting
+    var state: ShiftShaft_State = .targeting
 
     func enter(_ input: Input) {}
 

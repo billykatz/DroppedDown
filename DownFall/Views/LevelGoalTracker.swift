@@ -36,7 +36,7 @@ class LevelGoalTracker: LevelGoalTracking {
     public var goalProgress: [GoalTracking] = []
     
     private let level: Level
-    private var pillarColor =  Set<Color>(Color.allCases)
+    private var pillarColor =  Set<ShiftShaft_Color>(ShiftShaft_Color.allCases)
     private var numberOfIndividualPillars: Int = 0
     private var numberOfGoalsCompleted = 0
     
@@ -131,7 +131,7 @@ class LevelGoalTracker: LevelGoalTracking {
                 positions = positions.union(getTilePositions(.pillar(PillarData(color: color, health: health)), tiles: tiles) ?? Set<TileCoord>())
             }
         }
-        pillarColor = Set<Color>()
+        pillarColor = Set<ShiftShaft_Color>()
         var newNumberOfIndividualPillars = 0
         for position in positions {
             if case let TileType.pillar(data) = tiles[position].type {

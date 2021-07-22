@@ -169,7 +169,7 @@ struct Animator {
             }
             animate(spriteActions) { completion?() }
 
-            
+        default: break
         }
     }
     

@@ -726,6 +726,8 @@ extension Board {
             return flameWall(tiles: tiles, targets: monsterCoords, input: input)
         case .vortex:
             return vortex(tiles: tiles, targets: targets, input: input)
+            
+        default: fatalError()
         }
         
     }

@@ -55,6 +55,8 @@ struct Item: Codable, Hashable {
                 return "purpleCrystal"
             case .green:
                 return "greenCrystal"
+            case .blood:
+                return ""
             case .none:
                 return "crystals"
             }

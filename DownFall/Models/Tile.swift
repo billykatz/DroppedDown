@@ -24,6 +24,7 @@ enum ShiftShaft_Color: String, Codable, CaseIterable, Hashable {
     case purple
     case red
     case green
+    case blood
     
     var humanReadable: String{
         switch self {
@@ -32,6 +33,7 @@ enum ShiftShaft_Color: String, Codable, CaseIterable, Hashable {
         case .purple: return "Purple"
         case .red: return "Red"
         case .green: return "Green"
+        case .blood: return "Blood"
         }
     }
     
@@ -42,6 +44,7 @@ enum ShiftShaft_Color: String, Codable, CaseIterable, Hashable {
         case .purple: return .lightBarPurple
         case .red: return .lightBarRed
         case .green: return .lightBarGem
+        case .blood: return .lightBarBlood
         }
 
     }
@@ -340,6 +343,8 @@ enum TileType: Hashable, CaseIterable, Codable {
                 return "redRock\(withGemSuffix)"
             case .green:
                 return "greenRock\(withGemSuffix)"
+            case .blood:
+                fatalError()
             }
         case .pillar(let data):
             switch data.color {
@@ -353,6 +358,8 @@ enum TileType: Hashable, CaseIterable, Codable {
                 return "redPillar\(data.health)Health"
             case .green:
                 preconditionFailure("Shouldnt be here")
+            case .blood:
+                fatalError()
             }
             
         default:

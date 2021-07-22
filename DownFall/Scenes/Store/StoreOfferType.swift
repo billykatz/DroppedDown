@@ -7,7 +7,11 @@
 //
 
 enum StoreOfferType: Codable, Hashable, CaseIterable {
-    static var allCases: [StoreOfferType] = [
+    static var allCases: [StoreOfferType] = {
+        let runeCases = RuneType.allCases.map {
+            return StoreOfferType.rune(Rune.rune(for: $0))
+        }
+        var values: [StoreOfferType] = [
         .dodge(amount: 5),
         .gems(amount: 5),
         .greaterHeal,
@@ -19,8 +23,12 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
         .runeSlot,
         .runeUpgrade,
         .transmogrifyPotion,
-        .rune(.zero)
-    ]
+        ]
+        
+        values.append(contentsOf: runeCases)
+        
+        return values
+    }()
     
     static func ==(lhs: StoreOfferType, rhs: StoreOfferType) -> Bool {
         switch (lhs, rhs) {

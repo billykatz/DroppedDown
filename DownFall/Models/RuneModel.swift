@@ -17,6 +17,14 @@ enum RuneType: String, Codable, Hashable, CaseIterable {
     case flameWall
     case bubbleUp
     case vortex
+    case undo
+    case flameColumn
+    case fireball
+    case drillDown
+    case flipFlop
+    case gemification
+    case moveEarth
+    case phoenix
     
     var humanReadable: String {
         switch self {
@@ -25,13 +33,29 @@ enum RuneType: String, Codable, Hashable, CaseIterable {
         case .rainEmbers:
             return "Rain Embers"
         case .transformRock:
-            return "Transformer Rock"
+            return "Transform Rock"
         case .flameWall:
             return "Flame Wall"
         case .bubbleUp:
             return "Bubble Up"
         case .vortex:
             return "Vortex"
+        case .undo:
+            return "Undo"
+        case .flameColumn:
+            return "Flame Column"
+        case .fireball:
+            return "Fireball"
+        case .drillDown:
+            return "Drill Down"
+        case .flipFlop:
+            return "Flip Flop"
+        case .gemification:
+            return "Gemify"
+        case .moveEarth:
+            return "Move Earth"
+        case .phoenix:
+            return "Phoenix"
         }
     }
 }
@@ -126,7 +150,7 @@ struct Rune: Hashable, Codable {
     func resetProgress() -> Rune {
         return update(rechargeCurrent: 0)
     }
-
+    
     
     func progress(_ units: Int) -> Rune {
         return update(rechargeCurrent: min(rechargeCurrent+units, cooldown))
@@ -238,7 +262,7 @@ struct Rune: Hashable, Codable {
                 description: "Float to the top of the board",
                 flavorText: "You bumped into the ceiling which now has to be washed and sterilized, so you get nothing!",
                 targets: 1,
-                targetTypes: [TileType.player(.playerZero)],
+                targetTypes: [.player(.playerZero)],
                 affectSlopes: [],
                 affectRange: 0,
                 heal: 0,
@@ -259,7 +283,7 @@ struct Rune: Hashable, Codable {
                 currency: .gem,
                 description: "Turns each monster into a rock and each rock into a monster within a 3 by 3 area.",
                 flavorText:
-                """
+                    """
                 "Ah, I see my error-- it was only suppose to be a teaspoon of bat's wing" - Dunvain the Careless
                 """
                 ,
@@ -276,6 +300,192 @@ struct Rune: Hashable, Codable {
                 maxDistanceBetweenTargets: Int.max,
                 animationTextureName: "vortexSpriteSheet",
                 animationColumns: 5
+            )
+            
+        case .undo:
+            return Rune(
+                type: .undo,
+                textureName: "rune-reversereverse-on",
+                cost: 0,
+                currency: .gem,
+                description: "Undo your most recent move",
+                flavorText:
+                    """
+                "Oopsies! Let's see if this works in real life" - Cal the Mathematician
+                """
+                ,
+                targets: 0,
+                targetTypes: [],
+                affectSlopes: [],
+                affectRange: 1,
+                heal: 0,
+                cooldown: 5,
+                rechargeType: [.monster(.zero)],
+                rechargeMinimum: 1,
+                rechargeCurrent: 0,
+                progressColor: .blood,
+                maxDistanceBetweenTargets: Int.max,
+                animationTextureName: "",
+                animationColumns: 0
+            )
+        case .flameColumn:
+            return Rune(
+                type: .flameColumn,
+                textureName: "rune-flame-column-off",
+                cost: 0,
+                currency: .gem,
+                description: "Create a vertical flame wall",
+                flavorText: "Careful where you stand",
+                targets: 1,
+                targetTypes: [],
+                affectSlopes: [AttackSlope(over: 0, up: 1), AttackSlope(over: 0, up: -1)],
+                affectRange: Int.max,
+                heal: 0,
+                cooldown: 25,
+                rechargeType: [TileType.rock(color: .red, holdsGem: false)],
+                rechargeMinimum: 1,
+                rechargeCurrent: 0,
+                progressColor: .red,
+                maxDistanceBetweenTargets: Int.max,
+                animationTextureName: "flameWallSpriteSheet",
+                animationColumns: 5
+            )
+            
+        case .fireball:
+            return Rune(
+                type: .fireball,
+                textureName: "rune-fireball-off",
+                cost: 0,
+                currency: .gem,
+                description: "Fling a fireball at a monster.",
+                flavorText: "The only thing worse that fire is a pyro who loves fires.",
+                targets: 1,
+                targetTypes: [TileType.monster(.zero)],
+                affectSlopes: [],
+                affectRange: 0,
+                heal: 0,
+                cooldown: 25,
+                rechargeType: [TileType.rock(color: .red, holdsGem: false)],
+                rechargeMinimum: 1,
+                rechargeCurrent: 0,
+                progressColor: .red,
+                maxDistanceBetweenTargets: Int.max,
+                animationTextureName: "rainEmbersSpriteSheet",
+                animationColumns: 5
+            )
+            
+        case .drillDown:
+            return Rune(
+                type: .drillDown,
+                textureName: "rune-drilldown-off",
+                cost: 0,
+                currency: .gem,
+                description: "Move all the way to the bottom. Destroy all rocks, monsters and gems on the way.",
+                flavorText: "Look out belooooooooooooow. ",
+                targets: 1,
+                targetTypes: [.player(.playerZero)],
+                affectSlopes: [AttackSlope(over: 0, up: -1)],
+                affectRange: Int.max,
+                heal: 0,
+                cooldown: 25,
+                rechargeType: [TileType.rock(color: .red, holdsGem: false)],
+                rechargeMinimum: 1,
+                rechargeCurrent: 0,
+                progressColor: .red,
+                maxDistanceBetweenTargets: Int.max,
+                animationTextureName: "",
+                animationColumns: 0
+            )
+            
+        case .flipFlop:
+            return Rune(
+                type: .flipFlop,
+                textureName: "rune-flipflop-off",
+                cost: 0,
+                currency: .gem,
+                description: "Flip the board horizontally or vertically",
+                flavorText: "Hold my mead, I'm gonna try something crazy - Marv the Earthmover",
+                targets: 1,
+                targetTypes: [],
+                affectSlopes: [],
+                affectRange: Int.max,
+                heal: 0,
+                cooldown: 25,
+                rechargeType: [TileType.rock(color: .purple, holdsGem: false)],
+                rechargeMinimum: 1,
+                rechargeCurrent: 0,
+                progressColor: .purple,
+                maxDistanceBetweenTargets: Int.max,
+                animationTextureName: "",
+                animationColumns: 0
+            )
+
+        case .gemification:
+            return Rune(
+                type: .gemification,
+                textureName: "rune-gemification-off",
+                cost: 0,
+                currency: .gem,
+                description: "Infuse a rock with a gem.",
+                flavorText: "The dwarf queen, Emeralelda, bestowed the first rune of its kind to her first born daughter, Gemma.",
+                targets: 1,
+                targetTypes: TileType.rockCases,
+                affectSlopes: [],
+                affectRange: Int.max,
+                heal: 0,
+                cooldown: 25,
+                rechargeType: [TileType.rock(color: .purple, holdsGem: false)],
+                rechargeMinimum: 1,
+                rechargeCurrent: 0,
+                progressColor: .purple,
+                maxDistanceBetweenTargets: Int.max,
+                animationTextureName: "",
+                animationColumns: 0
+            )
+        case .moveEarth:
+            return Rune(
+                type: .moveEarth,
+                textureName: "rune-moveearth-off",
+                cost: 0,
+                currency: .gem,
+                description: "Swap your row with another.",
+                flavorText: "Marv the Earthmover loved mead so much that he created the world's first bar with the flick of his wrist.",
+                targets: 1,
+                targetTypes: TileType.rockCases,
+                affectSlopes: [],
+                affectRange: Int.max,
+                heal: 0,
+                cooldown: 25,
+                rechargeType: [TileType.rock(color: .purple, holdsGem: false)],
+                rechargeMinimum: 1,
+                rechargeCurrent: 0,
+                progressColor: .purple,
+                maxDistanceBetweenTargets: Int.max,
+                animationTextureName: "",
+                animationColumns: 0
+            )
+
+        case .phoenix:
+            return Rune(
+                type: .phoenix,
+                textureName: "rune-phoenix-off",
+                cost: 0,
+                currency: .gem,
+                description: "If you would die, instead destroy this rune and heal fully.",
+                flavorText: "Life and death are partners.",
+                targets: 1,
+                targetTypes: [.player(.playerZero)],
+                affectSlopes: [],
+                affectRange: Int.max,
+                heal: 0,
+                cooldown: 25,
+                rechargeType: [TileType.rock(color: .red, holdsGem: false)],
+                rechargeMinimum: 1,
+                rechargeCurrent: 0,
+                progressColor: .red,
+                maxDistanceBetweenTargets: Int.max,
+                animationTextureName: "",
+                animationColumns: 0
             )
 
         }

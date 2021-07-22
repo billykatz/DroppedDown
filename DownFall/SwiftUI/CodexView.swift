@@ -22,12 +22,6 @@ struct CodexView: View {
     
     @State var modalOpacity = 0.0
     
-    func toggleModal() {
-        modalOpacity = 0.0
-        showModal.toggle()
-        selectedOffer = nil
-    }
-    
     var body: some View {
         ZStack {
             ScrollView {
@@ -37,44 +31,35 @@ struct CodexView: View {
                             selectedOffer = storeOffer
                         }
                     }
-//                    ForEach(storeOffers) { storeOffer in CodexItemView(offer: storeOffer).onTapGesture {
-//                            showModal.toggle()
-//                            selectedOffer = storeOffer
-//                        }
-//                    }
 
                 }
             }
             .padding(.horizontal)
             
-            if (selectedOffer != nil) {
+            if (showModal) {
                 ZStack {
                     GeometryReader { geo in
                         Rectangle()
-                            .size(geo.size.scale(by: 2.0))
+                            .frame(width: geo.size.width, height: geo.size.height*2, alignment: .center)
                             .foregroundColor(.gray)
                             .opacity(modalOpacity/2)
-                            .offset(x: 0.0, y: -100)
-                            .onTapGesture(perform: toggleModal)
+                            .offset(x: 0.0, y: -100.0)
                     }
                     CodexItemModalView(offer: selectedOffer!)
                         .opacity(modalOpacity)
-                        .onAppear {
-                            withAnimation {
-                                modalOpacity = 1.0
-                            }
-                        }
-                        .onTapGesture(perform: toggleModal)
+                        
                 }
+                .onAppear {
+                    // needs to be a withAnimation block or else it animates our sprite sheet
+                    withAnimation { modalOpacity = 1.0 }
+                }
+                .onDisappear { showModal.toggle() }
+                .onTapGesture(perform: {
+                    withAnimation { modalOpacity = 0 }
+                })
                 
             }
         }
-        //        .sheet(isPresented: $showModal) {
-        //            if selectedOffer != nil {
-        //                CodexItemModalView(offer: selectedOffer!)
-        //                Text("Show modal")
-        //            }
-        //        }
     }
 }
 

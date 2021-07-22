@@ -128,7 +128,7 @@ struct StoreOffer: Codable, Hashable, Identifiable {
         case .runeUpgrade:
             title = "Rune Upgrade"
             body = "Your runes will be better"
-            textureName = "trustMe"
+            textureName = "blankRune"
         case .plusOneMaxHealth:
             title = "Increase Max Health"
             body = "Add 1 max health."

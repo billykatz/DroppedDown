@@ -161,7 +161,7 @@ class TileCreator: TileStrategy {
                 validTile = !neighbors.contains {  $0.type == .monster(.zero) || $0.type == .player(.zero) } && !noMoreMonsters
             case .rock(.red, _), .rock(.purple, _), .rock(.blue, _), .rock(.brown, _):
                 validTile = true
-            case .exit, .player, .rock(.green, _), .empty, .pillar, .dynamite, .emptyGem, .item, .offer:
+            case .exit, .player, .rock(.green, _), .empty, .pillar, .dynamite, .emptyGem, .item, .offer, .rock(color: .blood, _):
                 validTile = false
             }
         }

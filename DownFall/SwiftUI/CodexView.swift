@@ -31,7 +31,6 @@ struct CodexView: View {
                             selectedOffer = storeOffer
                         }
                     }
-
                 }
             }
             .padding(.horizontal)
@@ -40,7 +39,7 @@ struct CodexView: View {
                 ZStack {
                     GeometryReader { geo in
                         Rectangle()
-                            .frame(width: geo.size.width, height: geo.size.height*2, alignment: .center)
+                            .frame(width:  geo.size.width, height: geo.size.height*2, alignment: .center)
                             .foregroundColor(.gray)
                             .opacity(modalOpacity/2)
                             .offset(x: 0.0, y: -100.0)

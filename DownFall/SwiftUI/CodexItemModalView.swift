@@ -9,10 +9,16 @@
 import SwiftUI
 
 struct CodexItemModalView: View {
+    
+    struct Constants {
+        static let backgroundWidth: CGFloat = 300
+        static let backgroundHeight: CGFloat = 400
+    }
+    
     let offer: StoreOffer
     
     var body: some View {
-        CodexBackgroundView(width: 300, height: 350).overlay(
+        CodexBackgroundView(width: Constants.backgroundWidth, height: Constants.backgroundHeight).overlay(
             VStack(alignment: .center) {
                 Text("\(offer.title)")
                     .font(.titleCodexFont)
@@ -22,7 +28,7 @@ struct CodexItemModalView: View {
                     .padding(15.0)
                 Spacer().frame(height: 50.0)
                 CodexItemAnimatingView(storeOffer: offer).scaleEffect(4.0)
-                Spacer().frame(height: 60.0)
+                Spacer().frame(height: 65.0)
                 Text("\(offer.body)")
                     .font(.codexFont)
                     .foregroundColor(.white)
@@ -31,7 +37,7 @@ struct CodexItemModalView: View {
                     .fixedSize(horizontal: false, vertical: true)
                     .padding()
                 Spacer()
-                Text("Unlocked 250/200")
+                Text("Unlocked 200/200")
                     .font(.codexFont)
                     .foregroundColor(.white)
                     .padding()

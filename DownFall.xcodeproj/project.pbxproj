@@ -16,6 +16,7 @@
 		2811272126863E4A00F96043 /* PlayerClientExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2811272026863E4A00F96043 /* PlayerClientExtensions.swift */; };
 		283CBBD926A8A88E00B1F7C9 /* CodexItemModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 283CBBD826A8A88E00B1F7C9 /* CodexItemModalView.swift */; };
 		283CBBDB26A8A9E100B1F7C9 /* SwiftUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 283CBBDA26A8A9E100B1F7C9 /* SwiftUIView.swift */; };
+		283F21F926E30D5200108D4D /* Progressable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 283F21F826E30D5200108D4D /* Progressable.swift */; };
 		2842BABF26A0EC740021CD0B /* CodexItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2842BABE26A0EC740021CD0B /* CodexItemView.swift */; };
 		2842BAC126A0EEC10021CD0B /* StoreOfferType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2842BAC026A0EEC10021CD0B /* StoreOfferType.swift */; };
 		28A836C4268FE57F00D96C48 /* JSONCoding+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A836C3268FE57F00D96C48 /* JSONCoding+Extensions.swift */; };
@@ -208,6 +209,7 @@
 		2811272026863E4A00F96043 /* PlayerClientExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerClientExtensions.swift; sourceTree = "<group>"; };
 		283CBBD826A8A88E00B1F7C9 /* CodexItemModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexItemModalView.swift; sourceTree = "<group>"; };
 		283CBBDA26A8A9E100B1F7C9 /* SwiftUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIView.swift; sourceTree = "<group>"; };
+		283F21F826E30D5200108D4D /* Progressable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Progressable.swift; sourceTree = "<group>"; };
 		2842BABE26A0EC740021CD0B /* CodexItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexItemView.swift; sourceTree = "<group>"; };
 		2842BAC026A0EEC10021CD0B /* StoreOfferType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreOfferType.swift; sourceTree = "<group>"; };
 		28A836C3268FE57F00D96C48 /* JSONCoding+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "JSONCoding+Extensions.swift"; sourceTree = "<group>"; };
@@ -550,7 +552,6 @@
 				580EF10124E10C0F003D312B /* MenuStore.swift */,
 				580EF10324E10C30003D312B /* MenuStore.sks */,
 				58DFB63B24D5EC2D00EBB13F /* OptionsScene.sks */,
-				3DA0A3822303D62A0041EF34 /* Store */,
 			);
 			path = Scenes;
 			sourceTree = "<group>";
@@ -604,6 +605,7 @@
 				58946E3B2465D5D3003115D2 /* StoreHUD */,
 				589389A2245F4C9B00350A2E /* PickaxeView.swift */,
 				5893899E245E7D0E00350A2E /* StoreOffer.swift */,
+				283F21F826E30D5200108D4D /* Progressable.swift */,
 				2842BAC026A0EEC10021CD0B /* StoreOfferType.swift */,
 				5893899C245E7AB300350A2E /* CurrencyView.swift */,
 				3DA0A37722FFA6250041EF34 /* StoreItem.swift */,
@@ -751,6 +753,7 @@
 				3DA4E881228E5D1B006E90D1 /* Extensions */,
 				3D10609D2340400500ECE7E6 /* Settings */,
 				3D10609E2340404000ECE7E6 /* Input */,
+				3DA0A3822303D62A0041EF34 /* Store */,
 				3D528FDD2155B17200EF65CA /* Scenes */,
 				3D106099232E9A0B00ECE7E6 /* Rendering */,
 				3D1060A02340408100ECE7E6 /* TileCreation */,
@@ -1171,6 +1174,7 @@
 				3DA4E88B228FC156006E90D1 /* Util.swift in Sources */,
 				3DC072C6237545400046F224 /* Rule.swift in Sources */,
 				589389A5245F52BB00350A2E /* ParagraphNode+Extensions.swift in Sources */,
+				283F21F926E30D5200108D4D /* Progressable.swift in Sources */,
 				3DE87C8E2235D05300D750CF /* MenuSpriteNode.swift in Sources */,
 				28CAFA7B26A0F2F000151CA8 /* CodexItemAnimatingView.swift in Sources */,
 				3D6AACE1222C997800C77B24 /* Header.swift in Sources */,

@@ -114,37 +114,18 @@ extension Tile: Equatable {
 
 enum TileType: Hashable, CaseIterable, Codable {
     
-    static var rockCases: [TileType] = [.rock(color: .blue, holdsGem: false), .rock(color: .green, holdsGem: false), .rock(color: .red, holdsGem: false), .rock(color: .purple, holdsGem: false), .rock(color: .brown, holdsGem: false)]
-    static var allCases: [TileType] = [.player(.zero), .exit(blocked: false), .empty, .monster(.zero), .item(.zero), .rock(color: .red, holdsGem: false), .pillar(PillarData(color: .red, health: 3))]
-    static var randomCases = [TileType.monster(.zero), .rock(color: .red, holdsGem: false), .item(Item.gem)]
-    typealias AllCases = [TileType]
+    case player(EntityModel)
+    case monster(EntityModel)
+    case empty
+    case emptyGem(ShiftShaft_Color)
+    case exit(blocked: Bool)
+    case item(Item)
+    case offer(StoreOffer)
+    case pillar(PillarData)
+    case rock(color: ShiftShaft_Color, holdsGem: Bool)
+    case dynamite(DynamiteFuse)
     
-    static func == (lhs: TileType, rhs: TileType) -> Bool {
-        switch (lhs, rhs) {
-        case (.player, .player):
-            return true
-        case (.empty, .empty):
-            return true
-        case (.exit, .exit):
-            return true
-        case (.monster, .monster):
-            return true
-        case (.item(let lhsItem), .item(let rhsItem)):
-            return lhsItem.type == rhsItem.type
-        case let (.pillar(leftData), .pillar(rightData)):
-            return leftData.color == rightData.color
-        case let (.rock(leftColor, leftHoldsGem), .rock(rightColor, rightHoldsGem)):
-            return leftColor == rightColor && leftHoldsGem == rightHoldsGem
-        case let (.dynamite(lhsFuse), .dynamite(rhsFuse)):
-            return lhsFuse.hasBeenDecremented == rhsFuse.hasBeenDecremented
-        case let (.offer(lhsOffer), .offer(rhsOffer)):
-            return lhsOffer == rhsOffer
-        default:
-            return false
-        }
-    }
-    
-    enum CodingKeys: String, CodingKey {
+        enum CodingKeys: String, CodingKey {
         case base
         case entityData
         case exitBlocked
@@ -247,18 +228,6 @@ enum TileType: Hashable, CaseIterable, Codable {
             try container.encode(storeOffer, forKey: .storeOffer)
         }
     }
-
-    
-    case player(EntityModel)
-    case monster(EntityModel)
-    case empty
-    case emptyGem(ShiftShaft_Color)
-    case exit(blocked: Bool)
-    case item(Item)
-    case offer(StoreOffer)
-    case pillar(PillarData)
-    case rock(color: ShiftShaft_Color, holdsGem: Bool)
-    case dynamite(DynamiteFuse)
     
     var isARock: Bool {
         if case .rock = self {
@@ -432,4 +401,38 @@ extension TileType {
             preconditionFailure("We probably shouldnt be here. Investigate")
         }
     }
+}
+
+extension TileType {
+    static var rockCases: [TileType] = [.rock(color: .blue, holdsGem: false), .rock(color: .green, holdsGem: false), .rock(color: .red, holdsGem: false), .rock(color: .purple, holdsGem: false), .rock(color: .brown, holdsGem: false)]
+    static var allCases: [TileType] = [.player(.zero), .exit(blocked: false), .empty, .monster(.zero), .item(.zero), .rock(color: .red, holdsGem: false), .pillar(PillarData(color: .red, health: 3))]
+    static var randomCases = [TileType.monster(.zero), .rock(color: .red, holdsGem: false), .item(Item.gem)]
+    typealias AllCases = [TileType]
+    
+    static func == (lhs: TileType, rhs: TileType) -> Bool {
+        switch (lhs, rhs) {
+        case (.player, .player):
+            return true
+        case (.empty, .empty):
+            return true
+        case (.exit, .exit):
+            return true
+        case (.monster, .monster):
+            return true
+        case (.item(let lhsItem), .item(let rhsItem)):
+            return lhsItem.type == rhsItem.type
+        case let (.pillar(leftData), .pillar(rightData)):
+            return leftData.color == rightData.color
+        case let (.rock(leftColor, leftHoldsGem), .rock(rightColor, rightHoldsGem)):
+            return leftColor == rightColor && leftHoldsGem == rightHoldsGem
+        case let (.dynamite(lhsFuse), .dynamite(rhsFuse)):
+            return lhsFuse.hasBeenDecremented == rhsFuse.hasBeenDecremented
+        case let (.offer(lhsOffer), .offer(rhsOffer)):
+            return lhsOffer == rhsOffer
+        default:
+            return false
+        }
+    }
+    
+
 }

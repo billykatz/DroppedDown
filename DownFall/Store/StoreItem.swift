@@ -8,7 +8,6 @@
 
 import SpriteKit
 
-let highlightString = "highlight"
 
 protocol StoreItemDelegate: AnyObject {
     func storeItemTapped(_ storeItem: StoreItem, offer: StoreOffer)

@@ -44,6 +44,7 @@ struct Unlockable: Codable, Identifiable, Hashable {
     let stat: Statistics
     let item: StoreOffer
     let purchaseAmount: Int
+    var isPurchased: Bool
     
     var id: String {
         return "\(item.type)\(item.textureName)\(item.tier)"
@@ -56,7 +57,7 @@ struct ProgressableModel: Codable {
 
     
     init() {
-        unlockables = StoreOfferType.allCases.map { Unlockable(stat: .gemsCollected(.blue, 100), item: StoreOffer.offer(type: $0, tier: 1), purchaseAmount: 50) }
+        unlockables = StoreOfferType.allCases.map { Unlockable(stat: .gemsCollected(.blue, 100), item: StoreOffer.offer(type: $0, tier: 1), purchaseAmount: 50, isPurchased: false) }
     }
     
 }

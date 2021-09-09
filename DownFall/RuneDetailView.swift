@@ -70,7 +70,7 @@ class RuneDetailView: SKSpriteNode, ButtonDelegate {
     
     private let viewModel: RuneDetailViewModelable
     
-    private var confirmButton: Button?
+    private var confirmButton: ShiftShaft_Button?
     
     struct Constants {
         static let detailBackgroundScale = CGFloat(0.6)
@@ -181,7 +181,7 @@ class RuneDetailView: SKSpriteNode, ButtonDelegate {
         if viewModel.rune != nil {
             
             let confirmSprite = SKSpriteNode(texture: SKTexture(imageNamed: "buttonAffirmitive"), size: .oneHundred)
-            let confirmButton = Button(size: .oneHundred, delegate: self, identifier: .backpackConfirm, image: confirmSprite, shape: .circle, showSelection: true, disable: !viewModel.isCharged)
+            let confirmButton = ShiftShaft_Button(size: .oneHundred, delegate: self, identifier: .backpackConfirm, image: confirmSprite, shape: .circle, showSelection: true, disable: !viewModel.isCharged)
             confirmButton.position = CGPoint.position(confirmButton.frame, inside: self.frame, verticalAlign: .center, horizontalAnchor: .right, xOffset: Style.Padding.more)
             addChild(confirmButton)
             
@@ -190,14 +190,14 @@ class RuneDetailView: SKSpriteNode, ButtonDelegate {
         
         /// Cancel button is added everytime because a empty rune slot can be viewed and the player needs a way to get back to normal mode
         let cancelSprite = SKSpriteNode(texture: SKTexture(imageNamed: "buttonNegative"), size: .oneHundred)
-        let cancelButton = Button(size: .oneHundred, delegate: self, identifier: .backpackCancel, image: cancelSprite, shape: .circle, showSelection: true)
+        let cancelButton = ShiftShaft_Button(size: .oneHundred, delegate: self, identifier: .backpackCancel, image: cancelSprite, shape: .circle, showSelection: true)
         cancelButton.position = CGPoint.alignHorizontally(cancelButton.frame, relativeTo: frame, horizontalAnchor: .right, verticalAlign: .top, verticalPadding: Style.Padding.more, horizontalPadding: Style.Padding.more)
         
         addChild(cancelButton)
     }
     
     /// MARK: ButtonDelegate
-    func buttonTapped(_ button: Button) {
+    func buttonTapped(_ button: ShiftShaft_Button) {
         switch button.identifier {
         case .backpackCancel:
             viewModel.canceled?()

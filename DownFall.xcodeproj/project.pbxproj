@@ -108,7 +108,7 @@
 		3DD72595239DC4FE005933B2 /* MenuType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DD72594239DC4FE005933B2 /* MenuType.swift */; };
 		3DE657CD20B0AFD2003492DA /* Int+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE657CC20B0AFD2003492DA /* Int+Extensions.swift */; };
 		3DE87C8E2235D05300D750CF /* MenuSpriteNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE87C8D2235D05300D750CF /* MenuSpriteNode.swift */; };
-		3DE87C9022374C2C00D750CF /* Button.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE87C8F22374C2C00D750CF /* Button.swift */; };
+		3DE87C9022374C2C00D750CF /* ShiftShaft_Button.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE87C8F22374C2C00D750CF /* ShiftShaft_Button.swift */; };
 		3DE87C92223D555A00D750CF /* InputQueueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE87C91223D555A00D750CF /* InputQueueTests.swift */; };
 		3DE87C94223D691100D750CF /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE87C93223D691100D750CF /* GameState.swift */; };
 		3DE87C96224068FA00D750CF /* GameStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE87C95224068FA00D750CF /* GameStateTests.swift */; };
@@ -297,7 +297,7 @@
 		3DD72594239DC4FE005933B2 /* MenuType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuType.swift; sourceTree = "<group>"; };
 		3DE657CC20B0AFD2003492DA /* Int+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int+Extensions.swift"; sourceTree = "<group>"; };
 		3DE87C8D2235D05300D750CF /* MenuSpriteNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuSpriteNode.swift; sourceTree = "<group>"; };
-		3DE87C8F22374C2C00D750CF /* Button.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Button.swift; sourceTree = "<group>"; };
+		3DE87C8F22374C2C00D750CF /* ShiftShaft_Button.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftShaft_Button.swift; sourceTree = "<group>"; };
 		3DE87C91223D555A00D750CF /* InputQueueTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputQueueTests.swift; sourceTree = "<group>"; };
 		3DE87C93223D691100D750CF /* GameState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameState.swift; sourceTree = "<group>"; };
 		3DE87C95224068FA00D750CF /* GameStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameStateTests.swift; sourceTree = "<group>"; };
@@ -794,7 +794,7 @@
 		582635DB243168A700A944B6 /* Buttons */ = {
 			isa = PBXGroup;
 			children = (
-				3DE87C8F22374C2C00D750CF /* Button.swift */,
+				3DE87C8F22374C2C00D750CF /* ShiftShaft_Button.swift */,
 				582635DC243168B500A944B6 /* ButtonIdentifier.swift */,
 			);
 			name = Buttons;
@@ -1118,7 +1118,7 @@
 				3D58468822A6322900EDD845 /* RangeModel.swift in Sources */,
 				3D00A0F923AAC813007E2D8B /* Identifiers.swift in Sources */,
 				3DA0A37A22FFAECE0041EF34 /* UIFont+Extensions.swift in Sources */,
-				3DE87C9022374C2C00D750CF /* Button.swift in Sources */,
+				3DE87C9022374C2C00D750CF /* ShiftShaft_Button.swift in Sources */,
 				3D14C82123A83D93003E211D /* LevelCoordinator.swift in Sources */,
 				283CBBDB26A8A9E100B1F7C9 /* SwiftUIView.swift in Sources */,
 				3D4A471123B3D34F000165FB /* LevelModel.swift in Sources */,

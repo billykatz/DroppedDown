@@ -27,7 +27,7 @@ extension SKSpriteNode {
 }
 
 protocol ButtonDelegate: AnyObject {
-    func buttonTapped(_ button: Button)
+    func buttonTapped(_ button: ShiftShaft_Button)
 }
 
 enum ButtonShape {
@@ -40,7 +40,7 @@ enum ButtonType {
     case image
 }
 
-class Button: SKShapeNode {
+class ShiftShaft_Button: SKShapeNode {
     
     struct Constants {
         static let disabledBackgroundColor = UIColor.darkGray
@@ -353,7 +353,7 @@ class Button: SKShapeNode {
 
 //MARK:- Touch Events
 
-extension Button {
+extension ShiftShaft_Button {
     private func frameContains(_ p: CGPoint) -> Bool {
         let translatedPosition = CGPoint(x: self.frame.center.x + position.x, y: self.frame.center.y + position.y)
         return frame.contains(translatedPosition)
@@ -389,7 +389,7 @@ extension Button {
 
 //MARK:- LabelDelegate
 
-extension Button: LabelDelegate {
+extension ShiftShaft_Button: LabelDelegate {
     func labelPressed(_ label: Label) {
         buttonWasTapped()
     }

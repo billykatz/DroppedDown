@@ -100,7 +100,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             addChild(paragraphNode)
             
             hasSecondaryButton = true
-            let mainMenuButton = Button(size: buttonSize,
+            let mainMenuButton = ShiftShaft_Button(size: buttonSize,
                                         delegate: buttonDelegate ?? self,
                                         identifier: .mainMenu,
                                         precedence: precedence,
@@ -111,7 +111,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             addChild(mainMenuButton)
             
             
-            let soundButton = Button(size: buttonSize,
+            let soundButton = ShiftShaft_Button(size: buttonSize,
                                      delegate: buttonDelegate ?? self,
                                      identifier: .toggleSound,
                                      precedence: precedence,
@@ -156,7 +156,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             addChild(paragraphNode)
             
             if let secondaryButtonIdentifier = menuType.secondaryButtonIdentifier {
-                let secondaryButton = Button(size: buttonSize, delegate: buttonDelegate ?? self, identifier: secondaryButtonIdentifier, precedence: precedence, fontSize: .fontLargeSize, fontColor: .black)
+                let secondaryButton = ShiftShaft_Button(size: buttonSize, delegate: buttonDelegate ?? self, identifier: secondaryButtonIdentifier, precedence: precedence, fontSize: .fontLargeSize, fontColor: .black)
                 secondaryButton.position = CGPoint.position(secondaryButton.frame, inside: self.frame, verticalAlign: .bottom, horizontalAnchor: .left, xOffset: Style.Padding.most, yOffset: Style.Padding.most)
                 addChild(secondaryButton)
                 hasSecondaryButton = true
@@ -166,16 +166,16 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
         }
         // TODO: Remove DEBUG code
         else if menuType == .debug {
-            let viewPauseMenu = Button.init(size: buttonSize, delegate: self, identifier: .debugPause)
+            let viewPauseMenu = ShiftShaft_Button.init(size: buttonSize, delegate: self, identifier: .debugPause)
             
             viewPauseMenu.position = CGPoint.position(viewPauseMenu.frame, inside: self.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: 50.0)
             
             
-            let viewWinMenu = Button.init(size: buttonSize, delegate: self, identifier: .debugWin)
+            let viewWinMenu = ShiftShaft_Button.init(size: buttonSize, delegate: self, identifier: .debugWin)
             
             viewWinMenu.position = CGPoint.alignHorizontally(viewWinMenu.frame, relativeTo: viewPauseMenu.frame, horizontalAnchor: .center, verticalAlign: .bottom, translatedToBounds: true)
             
-            let viewLoseMenu = Button.init(size: buttonSize, delegate: self, identifier: .debugLose)
+            let viewLoseMenu = ShiftShaft_Button.init(size: buttonSize, delegate: self, identifier: .debugLose)
             
             viewLoseMenu.position = CGPoint.alignHorizontally(viewLoseMenu.frame, relativeTo: viewWinMenu.frame, horizontalAnchor: .center, verticalAlign: .bottom, translatedToBounds: true)
             
@@ -187,7 +187,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
         
         // Add the default button
         // This button is added no matter what
-        let button = Button(size: buttonSize,
+        let button = ShiftShaft_Button(size: buttonSize,
                             delegate: buttonDelegate ?? self,
                             identifier: menuType.buttonIdentifer,
                             precedence: precedence,
@@ -199,7 +199,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
         addChild(button)
         
         // TODO: Remove DEBUG code
-        let xOutButton = Button(size: .oneHundred, delegate: self, identifier: .backpackCancel, image: SKSpriteNode(imageNamed: "buttonNegativeWhiteX"), shape: .circle)
+        let xOutButton = ShiftShaft_Button(size: .oneHundred, delegate: self, identifier: .backpackCancel, image: SKSpriteNode(imageNamed: "buttonNegativeWhiteX"), shape: .circle)
         
         xOutButton.position = CGPoint.position(xOutButton.frame, inside: self.frame, verticalAlign: .top, horizontalAnchor: .left)
         
@@ -236,9 +236,9 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
     }
     
     
-    func buttonPressBegan(_ button: Button) { }
+    func buttonPressBegan(_ button: ShiftShaft_Button) { }
     
-    func buttonTapped(_ button: Button) {
+    func buttonTapped(_ button: ShiftShaft_Button) {
         guard let identifier = ButtonIdentifier(rawValue: button.name ?? "") else { return }
         
         switch identifier {

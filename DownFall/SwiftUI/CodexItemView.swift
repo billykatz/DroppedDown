@@ -47,7 +47,7 @@ struct CodexItemView: View {
 
 struct CodexItemView_Previews: PreviewProvider {
     static var previews: some View {
-        let unlockable = Unlockable(stat: .damageTaken(100), item: StoreOffer.offer(type: .transmogrifyPotion, tier: 1), purchaseAmount: 50)
+        let unlockable = Unlockable(stat: .damageTaken(100), item: StoreOffer.offer(type: .transmogrifyPotion, tier: 1), purchaseAmount: 50, isPurchased: false)
         
         CodexItemView(unlockable: unlockable)
     }

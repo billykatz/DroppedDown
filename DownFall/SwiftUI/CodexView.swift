@@ -48,8 +48,8 @@ struct CodexView: View {
                             .opacity(modalOpacity/2)
                             .offset(x: 0.0, y: -100.0)
                     }
-                    if (selectedUnlockable != nil) {
-                        CodexItemModalView(unlockable: selectedUnlockable!)
+                    if let unlockable = selectedUnlockable {
+                        CodexItemModalView(unlockable: unlockable, purchased: .constant(false))
                         .opacity(modalOpacity)
                     }
                         

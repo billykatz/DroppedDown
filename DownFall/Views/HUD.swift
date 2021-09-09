@@ -288,7 +288,7 @@ class HUD: SKSpriteNode {
 }
 
 extension HUD: ButtonDelegate {
-    func buttonTapped(_ button: Button) {
+    func buttonTapped(_ button: ShiftShaft_Button) {
         switch button.identifier {
         case .shuffleBoard:
             InputQueue.append(Input(.shuffleBoard))

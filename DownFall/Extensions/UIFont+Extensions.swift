@@ -15,5 +15,6 @@ extension UIFont {
     static let pixelFontName = "Alterebro-Pixel-Font"
     
     static let codexFont = UIFont(name: UIFont.pixelFontName, size: 30.0)!
+    static let buttonFont = UIFont(name: UIFont.pixelFontName, size: 40.0)!
     static let titleCodexFont = UIFont(name: UIFont.pixelFontName, size: 45.0)!
 }

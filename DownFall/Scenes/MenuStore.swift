@@ -24,9 +24,9 @@ class MenuStoreScene: SKScene, ButtonDelegate {
     private var playerModel: EntityModel
     private let playableRect: CGRect
     
-    private lazy var backButton: Button = {
+    private lazy var backButton: ShiftShaft_Button = {
         
-        let button = Button(size: .buttonExtralarge,
+        let button = ShiftShaft_Button(size: .buttonExtralarge,
                             delegate: self,
                             identifier: .back)
         return button
@@ -107,7 +107,7 @@ class MenuStoreScene: SKScene, ButtonDelegate {
         createDodgeOffer()
     }
     
-    func buttonTapped(_ button: Button) {
+    func buttonTapped(_ button: ShiftShaft_Button) {
         switch button.identifier {
         case .buyHealth:
             if gems >= healthCost && !disableHealthBuy {
@@ -200,7 +200,7 @@ class MenuStoreScene: SKScene, ButtonDelegate {
     func createHealthOffer() {
         healthOfferContainer?.removeAllChildren()
         let minusTexture = SKSpriteNode(texture: SKTexture(imageNamed: "minusButton"), size: .oneHundred)
-        let minusButton = Button(size: CGSize(width: 80, height: 80),
+        let minusButton = ShiftShaft_Button(size: CGSize(width: 80, height: 80),
                                  delegate: self,
                                  identifier: .sellHealth,
                                  image: minusTexture,
@@ -209,7 +209,7 @@ class MenuStoreScene: SKScene, ButtonDelegate {
         )
         
         let plusTexture = SKSpriteNode(texture: SKTexture(imageNamed: "plusButton"), size: .oneHundred)
-        let plusButton = Button(size: CGSize(width: 80, height: 80),
+        let plusButton = ShiftShaft_Button(size: CGSize(width: 80, height: 80),
                                 delegate: self,
                                 identifier: .buyHealth,
                                 image: plusTexture,
@@ -253,7 +253,7 @@ class MenuStoreScene: SKScene, ButtonDelegate {
     func createLuckOffer() {
         luckOfferContainer?.removeAllChildren()
         let minusTexture = SKSpriteNode(texture: SKTexture(imageNamed: "minusButton"), size: .oneHundred)
-        let minusButton = Button(size: CGSize(width: 80, height: 80),
+        let minusButton = ShiftShaft_Button(size: CGSize(width: 80, height: 80),
                                  delegate: self,
                                  identifier: .sellLuck,
                                  image: minusTexture,
@@ -262,7 +262,7 @@ class MenuStoreScene: SKScene, ButtonDelegate {
         )
         
         let plusTexture = SKSpriteNode(texture: SKTexture(imageNamed: "plusButton"), size: .oneHundred)
-        let plusButton = Button(size: CGSize(width: 80, height: 80),
+        let plusButton = ShiftShaft_Button(size: CGSize(width: 80, height: 80),
                                 delegate: self,
                                 identifier: .buyLuck,
                                 image: plusTexture,
@@ -307,7 +307,7 @@ class MenuStoreScene: SKScene, ButtonDelegate {
     func createDodgeOffer() {
         dodgeOfferContainer?.removeAllChildren()
         let minusTexture = SKSpriteNode(texture: SKTexture(imageNamed: "minusButton"), size: .oneHundred)
-        let minusButton = Button(size: CGSize(width: 80, height: 80),
+        let minusButton = ShiftShaft_Button(size: CGSize(width: 80, height: 80),
                                  delegate: self,
                                  identifier: .sellDodge,
                                  image: minusTexture,
@@ -316,7 +316,7 @@ class MenuStoreScene: SKScene, ButtonDelegate {
         )
         
         let plusTexture = SKSpriteNode(texture: SKTexture(imageNamed: "plusButton"), size: .oneHundred)
-        let plusButton = Button(size: CGSize(width: 80, height: 80),
+        let plusButton = ShiftShaft_Button(size: CGSize(width: 80, height: 80),
                                 delegate: self,
                                 identifier: .buyDodge,
                                 image: plusTexture,

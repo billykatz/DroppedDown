@@ -22,7 +22,7 @@ class MainMenu: SKScene {
     }
     
     private var background: SKSpriteNode!
-    private var continueRunButton: Button?
+    private var continueRunButton: ShiftShaft_Button?
     
     private lazy var logo: SKSpriteNode = {
         let ratio: CGFloat = 60.0/210.0
@@ -47,7 +47,7 @@ class MainMenu: SKScene {
         self.removeAllChildren(exclude: ["background"])
         
         
-        let startButton = Button(size: .buttonExtralarge, delegate: self, identifier: .newGame, image: SKSpriteNode(imageNamed: "blankButton"), shape: .rectangle, addTextLabel: true)
+        let startButton = ShiftShaft_Button(size: .buttonExtralarge, delegate: self, identifier: .newGame, image: SKSpriteNode(imageNamed: "blankButton"), shape: .rectangle, addTextLabel: true)
 
         
         startButton.position = CGPoint.position(startButton.frame,
@@ -66,7 +66,7 @@ class MainMenu: SKScene {
         addChild(logo)
         
         if hasRunToContinue ?? false {
-            let levelButton = Button(size: .buttonExtralarge, delegate: self, identifier: .continueRun, image: SKSpriteNode(imageNamed: "blankButton"), shape: .rectangle, addTextLabel: true)
+            let levelButton = ShiftShaft_Button(size: .buttonExtralarge, delegate: self, identifier: .continueRun, image: SKSpriteNode(imageNamed: "blankButton"), shape: .rectangle, addTextLabel: true)
 
             
             levelButton.position = CGPoint.alignHorizontally(levelButton.frame,
@@ -80,7 +80,7 @@ class MainMenu: SKScene {
             addChild(levelButton)
         }
         
-        let menuStoreButton = Button(size: .buttonExtralarge, delegate: self, identifier: .mainMenuStore, image: SKSpriteNode(imageNamed: "blankButton"), shape: .rectangle, addTextLabel: true)
+        let menuStoreButton = ShiftShaft_Button(size: .buttonExtralarge, delegate: self, identifier: .mainMenuStore, image: SKSpriteNode(imageNamed: "blankButton"), shape: .rectangle, addTextLabel: true)
         
         menuStoreButton.position = CGPoint.alignHorizontally(menuStoreButton.frame,
                                                            relativeTo: continueRunButton?.frame ?? startButton.frame,
@@ -92,7 +92,7 @@ class MainMenu: SKScene {
         addChild(menuStoreButton)
         
         
-        let optionsButton = Button(size: .buttonExtralarge, delegate: self, identifier: .mainMenuOptions, image: SKSpriteNode(imageNamed: "blankButton"), shape: .rectangle, addTextLabel: true)
+        let optionsButton = ShiftShaft_Button(size: .buttonExtralarge, delegate: self, identifier: .mainMenuOptions, image: SKSpriteNode(imageNamed: "blankButton"), shape: .rectangle, addTextLabel: true)
         
         optionsButton.position = CGPoint.alignHorizontally(optionsButton.frame,
                                                          relativeTo: menuStoreButton.frame,
@@ -108,7 +108,7 @@ class MainMenu: SKScene {
 }
 
 extension MainMenu: ButtonDelegate {
-    func buttonTapped(_ button: Button) {
+    func buttonTapped(_ button: ShiftShaft_Button) {
         guard let playerModel = self.playerModel else { return }
         switch button.identifier {
         case .newGame:

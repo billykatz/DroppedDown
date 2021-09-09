@@ -26,7 +26,7 @@ struct RuneReplacementViewModel {
 
 
 class RuneReplacementView: SKSpriteNode, ButtonDelegate {
-    func buttonTapped(_ button: Button) {
+    func buttonTapped(_ button: ShiftShaft_Button) {
         switch button.identifier {
         case .swapRunes:
             InputQueue.append(Input(.runeReplaced(viewModel.pickaxe, viewModel.runeToSwap!)))
@@ -63,7 +63,7 @@ class RuneReplacementView: SKSpriteNode, ButtonDelegate {
     }
     
     private let backgroundWidth = CGFloat(800.0)
-    private var swapButton: Button?
+    private var swapButton: ShiftShaft_Button?
     
     /// save these values to set up the swap rune view
     var secondVerticalLine: SKSpriteNode?
@@ -106,10 +106,10 @@ class RuneReplacementView: SKSpriteNode, ButtonDelegate {
         addChild(description)
         
         /// add some buttons
-        let discardButton = Button(size: .buttonExtralarge, delegate: self, identifier: .discardFoundRune)
+        let discardButton = ShiftShaft_Button(size: .buttonExtralarge, delegate: self, identifier: .discardFoundRune)
         discardButton.position = CGPoint.position(discardButton.frame, inside: background.frame, verticalAlign: .bottom, horizontalAnchor: .left)
         
-        let swapButton = Button(size: .buttonExtralarge, delegate: self, identifier: .swapRunes, disable: true)
+        let swapButton = ShiftShaft_Button(size: .buttonExtralarge, delegate: self, identifier: .swapRunes, disable: true)
         swapButton.position = CGPoint.position(swapButton.frame, inside: background.frame, verticalAlign: .bottom, horizontalAnchor: .right)
         self.swapButton = swapButton
         

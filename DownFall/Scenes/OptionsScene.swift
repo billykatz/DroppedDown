@@ -18,9 +18,9 @@ class OptionsScene: SKScene, ButtonDelegate {
     private var foreground: SKSpriteNode!
     weak var optionsDelegate: OptionsSceneDelegate?
     
-    private lazy var resetDataButton: Button = {
+    private lazy var resetDataButton: ShiftShaft_Button = {
         
-        let button = Button(size: .buttonExtralarge,
+        let button = ShiftShaft_Button(size: .buttonExtralarge,
                             delegate: self,
                             identifier: .resetData)
         return button
@@ -28,17 +28,17 @@ class OptionsScene: SKScene, ButtonDelegate {
         
     }()
     
-    private lazy var backButton: Button = {
+    private lazy var backButton: ShiftShaft_Button = {
         
-        let button = Button(size: .buttonExtralarge,
+        let button = ShiftShaft_Button(size: .buttonExtralarge,
                             delegate: self,
                             identifier: .back)
         return button
     }()
     
-    private lazy var addPlayerRune: Button = {
+    private lazy var addPlayerRune: ShiftShaft_Button = {
         
-        let button = Button(size: .buttonExtralarge,
+        let button = ShiftShaft_Button(size: .buttonExtralarge,
                             delegate: self,
                             identifier: .givePlayerRune)
         return button
@@ -67,7 +67,7 @@ class OptionsScene: SKScene, ButtonDelegate {
         foreground.addChildSafely(addPlayerRune)
     }
     
-    func buttonTapped(_ button: Button) {
+    func buttonTapped(_ button: ShiftShaft_Button) {
         switch button.identifier {
             case .resetData:
                 /// Order matters here

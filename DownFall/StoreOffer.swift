@@ -57,45 +57,6 @@ struct StoreOffer: Codable, Hashable, Identifiable {
         return tier - 1
     }
     
-    
-    /// All the offers in a given tier
-    static func offers(in tier: StoreOfferTier, from offers: [StoreOffer]) -> [StoreOffer] {
-        return offers.filter { $0.tier == tier }
-    }
-    
-    /// the number of tiers in all of the offers
-    static func numberOfTiers(in offers: [StoreOffer]) -> Int {
-        return offers.map { $0.tier }.removingDuplicates().count
-    }
-    
-    /// Remove any player runes from the offers so we dont offer the same rune
-    static func removePlayerRunes(storeOffers: [StoreOffer], playerData: EntityModel) -> [StoreOffer] {
-        guard let runes = playerData.runes else { return storeOffers }
-        let newOffers = storeOffers.filter { offer in
-            if case StoreOfferType.rune(let rune) = offer.type {
-                return !runes.contains(where: { $0.type == rune.type } )
-            }
-            return true
-        }
-        return newOffers
-    }
-    
-    /// Trim down the store offers so that we offer a maximum of two
-    static func trimStoreOffers(storeOffers: [StoreOffer], playerData: EntityModel) -> [StoreOffer] {
-        let maximumPerTier = 2
-        var newOffers: [StoreOffer] = []
-        for tier in 1..<numberOfTiers(in: storeOffers)+1 {
-            let tierOffers = offers(in: tier, from: storeOffers)
-            var tierOffersWithoutPlayerRunes = removePlayerRunes(storeOffers: tierOffers, playerData: playerData)
-            if tierOffersWithoutPlayerRunes.count > maximumPerTier {
-                tierOffersWithoutPlayerRunes = tierOffersWithoutPlayerRunes.choose(random: 2)
-            }
-            newOffers.append(contentsOf: tierOffersWithoutPlayerRunes)
-        }
-        
-        return newOffers
-    }
-    
     static func offer(type: StoreOfferType, tier: StoreOfferTier) -> StoreOffer {
         let title: String
         let body: String

@@ -15,7 +15,10 @@ struct CodexItemModalView: View {
         static let backgroundHeight: CGFloat = 400
     }
     
-    let offer: StoreOffer
+    var offer: StoreOffer {
+        return unlockable.item
+    }
+    let unlockable: Unlockable
     
     var body: some View {
         CodexBackgroundView(width: Constants.backgroundWidth, height: Constants.backgroundHeight).overlay(
@@ -48,6 +51,9 @@ struct CodexItemModalView: View {
 
 struct CodexItemModalView_Previews: PreviewProvider {
     static var previews: some View {
-        CodexItemModalView(offer: StoreOffer.offer(type: .transmogrifyPotion, tier: 1))
+        
+        let unlockable = Unlockable(stat: .damageTaken(100), item: StoreOffer.offer(type: .transmogrifyPotion, tier: 1), purchaseAmount: 50)
+
+        CodexItemModalView(unlockable: unlockable)
     }
 }

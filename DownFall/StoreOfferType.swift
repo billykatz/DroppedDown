@@ -12,17 +12,17 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
             return StoreOfferType.rune(Rune.rune(for: $0))
         }
         var values: [StoreOfferType] = [
-        .dodge(amount: 5),
-        .gems(amount: 5),
-        .greaterHeal,
-        .killMonsterPotion,
-        .lesserHeal,
-        .luck(amount: 5),
-        .plusOneMaxHealth,
-        .plusTwoMaxHealth,
-        .runeSlot,
-        .runeUpgrade,
-        .transmogrifyPotion,
+            .greaterHeal,
+            .plusOneMaxHealth,
+            .plusTwoMaxHealth,
+            .runeSlot,
+            .killMonsterPotion,
+            .luck(amount: 5),
+            .dodge(amount: 5),
+            .gems(amount: 5),
+            .runeUpgrade,
+            .transmogrifyPotion,
+            .lesserHeal,
         ]
         
         values.append(contentsOf: runeCases)

@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct CodexView: View {
-    let storeOffers: [StoreOffer]
+    let progress: ProgressableModel
     
     let columns = [
         GridItem(.flexible(minimum: 100)),
@@ -18,18 +18,22 @@ struct CodexView: View {
     ]
     
     @State var showModal: Bool = false
-    @State var selectedOffer: StoreOffer?
+    @State var selectedUnlockable: Unlockable?
     
     @State var modalOpacity = 0.0
     
     var body: some View {
         ZStack {
             ScrollView {
+                Spacer().frame(height: 10.0)
                 LazyVGrid(columns: columns, spacing: 20) {
-                    ForEach(storeOffers) { storeOffer in CodexItemView(offer: storeOffer).onTapGesture {
+                    ForEach(progress.unlockables) { unlockable in
+                        CodexItemView(unlockable: unlockable).onTapGesture {
+                            selectedUnlockable = unlockable
                             showModal.toggle()
-                            selectedOffer = storeOffer
+                            print("\(String(describing: selectedUnlockable!.id))")
                         }
+                        .contentShape(Rectangle())
                     }
                 }
             }
@@ -44,15 +48,19 @@ struct CodexView: View {
                             .opacity(modalOpacity/2)
                             .offset(x: 0.0, y: -100.0)
                     }
-                    CodexItemModalView(offer: selectedOffer!)
+                    if (selectedUnlockable != nil) {
+                        CodexItemModalView(unlockable: selectedUnlockable!)
                         .opacity(modalOpacity)
+                    }
                         
                 }
                 .onAppear {
                     // needs to be a withAnimation block or else it animates our sprite sheet
                     withAnimation { modalOpacity = 1.0 }
                 }
-                .onDisappear { showModal.toggle() }
+                .onDisappear {
+                    showModal.toggle()
+                }
                 .onTapGesture(perform: {
                     withAnimation { modalOpacity = 0 }
                 })
@@ -64,10 +72,9 @@ struct CodexView: View {
 
 struct CodexView_Previews: PreviewProvider {
     static var previews: some View {
-        let data: [StoreOffer] = StoreOfferType.allCases.map {
-            StoreOffer.offer(type: $0, tier: 1)
-        }
         
-        CodexView(storeOffers: data)
+        let data = ProgressableModel()
+        
+        CodexView(progress: data)
     }
 }

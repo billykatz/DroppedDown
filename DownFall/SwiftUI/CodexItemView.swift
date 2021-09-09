@@ -28,13 +28,14 @@ struct CodexItemTitleView: View {
 }
 
 struct CodexItemView: View {
-    let offer: StoreOffer
+    
+    let unlockable: Unlockable
     
     var itemAndTitle: some View {
-        CodexItemAnimatingView(storeOffer: offer)
+        CodexItemAnimatingView(storeOffer: unlockable.item)
             .scaleEffect(2.0)
             .overlay(
-                CodexItemTitleView(title: offer.title)
+                CodexItemTitleView(title: unlockable.item.title)
             ).padding(20.0)
 
     }
@@ -46,6 +47,8 @@ struct CodexItemView: View {
 
 struct CodexItemView_Previews: PreviewProvider {
     static var previews: some View {
-        CodexItemView(offer: StoreOffer.offer(type: .transmogrifyPotion, tier: 1))
+        let unlockable = Unlockable(stat: .damageTaken(100), item: StoreOffer.offer(type: .transmogrifyPotion, tier: 1), purchaseAmount: 50)
+        
+        CodexItemView(unlockable: unlockable)
     }
 }

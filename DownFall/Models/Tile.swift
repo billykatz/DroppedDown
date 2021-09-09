@@ -125,7 +125,7 @@ enum TileType: Hashable, CaseIterable, Codable {
     case rock(color: ShiftShaft_Color, holdsGem: Bool)
     case dynamite(DynamiteFuse)
     
-        enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey {
         case base
         case entityData
         case exitBlocked

@@ -23,6 +23,28 @@ struct PriceView: View {
     }
 }
 
+struct BuyButtonView: View {
+    let action: () -> ()
+    let price: Int
+    
+    var body: some View {
+        Button(action: action) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 10.0)
+                    .fill(Color(UIColor.eggshellWhite))
+                    .frame(width: 200, height: 75)
+                HStack(alignment: .center, spacing: 0) {
+                    Text("Buy - ")
+                        .font(.buttonFont)
+                        .foregroundColor(.black)
+                    PriceView(price: price)
+                }
+            }
+        }
+
+    }
+}
+
 struct CodexItemModalView: View {
     
     struct Constants {
@@ -33,8 +55,9 @@ struct CodexItemModalView: View {
     var offer: StoreOffer {
         return unlockable.item
     }
-    let unlockable: Unlockable
-    @Binding var purchased: Bool
+    
+    @State var hiddenTrigger: Bool = false
+    @Binding var unlockable: Unlockable
     
     var body: some View {
         CodexBackgroundView(width: Constants.backgroundWidth, height: Constants.backgroundHeight).overlay(
@@ -61,40 +84,35 @@ struct CodexItemModalView: View {
                     .foregroundColor(.white)
                     .padding()
                 Spacer()
-                if (!purchased) {
-                    Button(action: purchase) {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 10.0)
-                                .fill(Color(UIColor.eggshellWhite))
-                                .frame(width: 200, height: 75)
-                            HStack(alignment: .center, spacing: 0) {
-                                Text("Buy - ")
-                                    .font(.buttonFont)
-                                    .foregroundColor(.black)
-                                PriceView(price: unlockable.purchaseAmount)
-                            }
-                        }
-                    }.background(Color.clear)
-                    Spacer()
+                if (hiddenTrigger || !hiddenTrigger) {
+                    if (!unlockable.isUnlocked) {
+                        
+                    }
+                    else if (!unlockable.isPurchased) {
+                        BuyButtonView(action: purchase, price: unlockable.purchaseAmount)
+                        Spacer()
+                    }
+                    
                 }
+                
             }
         )
     }
     
     func purchase() {
-        purchased = true
+       hiddenTrigger.toggle()
+       unlockable.isPurchased = true
     }
 }
 
 #if DEBUG
 
 struct CodexItemModalView_Previews: PreviewProvider {
-    @State static var purchased = true
+    @State static var unlockable = Unlockable(stat: .damageTaken(100), item: StoreOffer.offer(type: .killMonsterPotion, tier: 1), purchaseAmount: 50, isPurchased: false, isUnlocked: false)
     
     static var previews: some View {
-        let unlockable = Unlockable(stat: .damageTaken(100), item: StoreOffer.offer(type: .transmogrifyPotion, tier: 1), purchaseAmount: 50, isPurchased: false)
 
-        CodexItemModalView(unlockable: unlockable, purchased: $purchased)
+        CodexItemModalView(unlockable: $unlockable)
     }
 }
 #endif

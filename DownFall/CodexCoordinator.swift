@@ -20,7 +20,8 @@ class CodexCoordinator {
     
     func presentCodexView() {
 //        let allOffers = StoreOfferType.allCases.map { StoreOffer.offer(type: $0, tier: 1) }
-        let codexView = CodexView(progress: ProgressableModel())
+        let model = ProgressableModel()
+        let codexView = CodexView(progress: ProgressableModel(), selectedUnlockable: model.unlockables.first!)
         
         let hostingViewController = UIHostingController(rootView: codexView)
         

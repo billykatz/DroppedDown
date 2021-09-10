@@ -18,7 +18,7 @@ struct CodexView: View {
     ]
     
     @State var showModal: Bool = false
-    @State var selectedUnlockable: Unlockable?
+    @State var selectedUnlockable: Unlockable
     
     @State var modalOpacity = 0.0
     
@@ -31,7 +31,7 @@ struct CodexView: View {
                         CodexItemView(unlockable: unlockable).onTapGesture {
                             selectedUnlockable = unlockable
                             showModal.toggle()
-                            print("\(String(describing: selectedUnlockable!.id))")
+                            print("\(String(describing: selectedUnlockable.id))")
                         }
                         .contentShape(Rectangle())
                     }
@@ -48,10 +48,8 @@ struct CodexView: View {
                             .opacity(modalOpacity/2)
                             .offset(x: 0.0, y: -100.0)
                     }
-                    if let unlockable = selectedUnlockable {
-                        CodexItemModalView(unlockable: unlockable, purchased: .constant(false))
-                        .opacity(modalOpacity)
-                    }
+                    CodexItemModalView(unlockable: $selectedUnlockable)
+                    .opacity(modalOpacity)
                         
                 }
                 .onAppear {
@@ -75,6 +73,6 @@ struct CodexView_Previews: PreviewProvider {
         
         let data = ProgressableModel()
         
-        CodexView(progress: data)
+        CodexView(progress: data, selectedUnlockable: data.unlockables.first!)
     }
 }

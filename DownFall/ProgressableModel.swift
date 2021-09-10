@@ -36,7 +36,7 @@ import Foundation
 
  */
 
-struct Unlockable: Codable, Identifiable, Hashable {
+class Unlockable: Codable, Identifiable, Equatable {
     static func == (lhs: Unlockable, rhs: Unlockable) -> Bool {
         return lhs.id == rhs.id
     }
@@ -45,19 +45,28 @@ struct Unlockable: Codable, Identifiable, Hashable {
     let item: StoreOffer
     let purchaseAmount: Int
     var isPurchased: Bool
+    var isUnlocked: Bool
     
     var id: String {
         return "\(item.type)\(item.textureName)\(item.tier)"
     }
     
+    init(stat: Statistics, item: StoreOffer, purchaseAmount: Int, isPurchased: Bool, isUnlocked: Bool) {
+        self.stat = stat
+        self.item = item
+        self.purchaseAmount = purchaseAmount
+        self.isPurchased = isPurchased
+        self.isUnlocked = isUnlocked
+    }
+    
 }
 
-struct ProgressableModel: Codable {
+class ProgressableModel: Codable {
     let unlockables: [Unlockable]
 
     
     init() {
-        unlockables = StoreOfferType.allCases.map { Unlockable(stat: .gemsCollected(.blue, 100), item: StoreOffer.offer(type: $0, tier: 1), purchaseAmount: 50, isPurchased: false) }
+        unlockables = StoreOfferType.allCases.map { Unlockable(stat: .gemsCollected(.blue, 100), item: StoreOffer.offer(type: $0, tier: 1), purchaseAmount: 50, isPurchased: false, isUnlocked: false) }
     }
     
 }

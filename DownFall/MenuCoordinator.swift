@@ -120,16 +120,7 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate, OptionsSceneDelegate,
     }
     
     func menuStore() {
-        codexCoordinator.presentCodexView()
-//
-//        guard let profile = profile else { return }
-//        let storeScene = MenuStoreScene(size: .universalSize,
-//                                        playerData: profile.player,
-//                                        coordinatorDelegate: self)
-//
-//        storeScene.scaleMode = .aspectFill
-//
-//        view.presentScene(storeScene, transition: SKTransition.push(with: .right, duration: 0.5))
+        codexCoordinator.presentCodexView(with: profile)
     }
     
     func mainMenuTapped(updatedPlayerData: EntityModel) {

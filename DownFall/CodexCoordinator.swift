@@ -13,19 +13,19 @@ import SwiftUI
 class CodexCoordinator {
     
     private let viewController: UINavigationController
+    var profile: Profile?
     
     init(viewController: UINavigationController) {
         self.viewController = viewController
     }
     
-    func presentCodexView() {
-//        let allOffers = StoreOfferType.allCases.map { StoreOffer.offer(type: $0, tier: 1) }
-        let model = ProgressableModel()
-        let codexView = CodexView(progress: model, selectedIndex: 0)
+    func presentCodexView(with profile: Profile?) {
+        guard let profile = profile else { fatalError("Cannot present CodexView without a profile") }
+        
+        self.profile = profile
+        let codexView = CodexView(progress: profile.progressModel, selectedIndex: 0)
         
         let hostingViewController = UIHostingController(rootView: codexView)
-        
-//        viewController.modalTransitionStyle = .flipHorizontal
         
         viewController.pushViewController(hostingViewController, animated: true)
     }

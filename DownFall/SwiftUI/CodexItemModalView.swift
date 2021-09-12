@@ -117,6 +117,7 @@ struct CodexItemModalView: View {
     @State var hiddenTrigger: Bool = false
     var viewModel: ProgressableModel
     @State var index: Int
+    
     var unlockable: Unlockable {
         return viewModel.unlockables[index]
     }
@@ -153,8 +154,6 @@ struct CodexItemModalView: View {
 struct CodexItemModalView_Previews: PreviewProvider {
     
     static var previews: some View {
-        let unlockable = Unlockable(stat: .damageTaken(100), item: StoreOffer.offer(type: .killMonsterPotion, tier: 1), purchaseAmount: 50, isPurchased: false, isUnlocked: true)
-        
         CodexItemModalView(viewModel: ProgressableModel(), index: 0)
     }
 }

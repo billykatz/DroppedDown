@@ -395,7 +395,8 @@ func createLocalProfile(playerUUIDKey: String, userDefaultClient: UserDefaultCli
             let profile = try profileCodingClient.decoder.decode(Profile.self, newPlayerProfile)
             /// save the profile with the uuid as the name
             /// copy all other defaults
-            let newProfile = Profile(name: uuid, progress: profile.progress, player: profile.player, deepestDepth: profile.deepestDepth)
+            // @TODO: Create a progressable model from a JSON file
+            let newProfile = Profile(name: uuid, progress: profile.progress, player: profile.player, deepestDepth: profile.deepestDepth, progressModel: ProgressableModel())
             
             /// encode the new profile into data
             let jsonData = try profileCodingClient.encoder.encode(newProfile)
@@ -409,7 +410,7 @@ func createLocalProfile(playerUUIDKey: String, userDefaultClient: UserDefaultCli
             
             promise(.success(newProfile))
         } catch let err {
-            GameLogger.shared.log(prefix: ProfileViewModel.Constants.tag, message: "Failed to save file at path \(pathURL)")
+            GameLogger.shared.log(prefix: ProfileViewModel.Constants.tag, message: "Failed to save file at path \(pathURL) with error: \(err)")
             promise(.failure(ProfileError.failedToSaveLocalProfile(err)))
         }
     }

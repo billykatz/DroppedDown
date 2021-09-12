@@ -97,7 +97,20 @@ struct Unlockable: Codable, Identifiable, Equatable {
 }
 
 class ProgressableModel: Codable, ObservableObject {
+    
     @Published var unlockables: [Unlockable] = []
+    
+    var progress: (Int, Int) {
+        var purchasedCount = 0
+        var unlockedCount = 0
+        
+        for unlockable in unlockables {
+            purchasedCount += unlockable.isPurchased ? 1 : 0
+            unlockedCount += unlockable.isUnlocked ? 1 : 0
+        }
+        
+        return (purchasedCount, unlockedCount)
+    }
     
     enum CodingKeys: CodingKey {
         case unlockables
@@ -130,3 +143,15 @@ class ProgressableModel: Codable, ObservableObject {
     
 }
 
+
+extension ProgressableModel: Equatable {
+    static func == (lhs: ProgressableModel, rhs: ProgressableModel) -> Bool {
+        for lhsUnlockable in lhs.unlockables {
+            if !rhs.unlockables.contains(lhsUnlockable) {
+                return true
+            }
+        }
+        return lhs.progress == rhs.progress
+    
+    }
+}

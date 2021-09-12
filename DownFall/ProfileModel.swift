@@ -10,15 +10,15 @@ import Foundation
 
 
 struct Profile: Codable, Equatable {
-    static var zero = Profile(name: "zero", progress: 0, player: .zero, currentRun: nil, deepestDepth: 0)
+    static var zero = Profile(name: "zero", progress: 0, player: .zero, currentRun: nil, deepestDepth: 0, progressModel: ProgressableModel())
     
     let name: String
     let progress: Int
     let player: EntityModel
     var currentRun: RunModel?
     var randomRune: Rune?
-    
     let deepestDepth: Int
+    let progressModel: ProgressableModel
     
     var runPlayer: EntityModel {
         guard let rune = randomRune else {
@@ -28,17 +28,20 @@ struct Profile: Codable, Equatable {
     }
     
     func updatePlayer(_ entityModel: EntityModel) -> Profile {
-        return Profile(name: name, progress: progress + 1, player: entityModel, currentRun: currentRun, deepestDepth: deepestDepth)
+        return Profile(name: name, progress: progress + 1, player: entityModel, currentRun: currentRun, deepestDepth: deepestDepth, progressModel: progressModel)
     }
     
     func updateRunModel(_ currentRun: RunModel?) -> Profile {
-        return Profile(name: name, progress: progress + 1, player: player, currentRun: currentRun, deepestDepth: deepestDepth)
+        return Profile(name: name, progress: progress + 1, player: player, currentRun: currentRun, deepestDepth: deepestDepth, progressModel: progressModel)
     }
     
     func updateDepth(_ depth: Int) -> Profile {
         let newDepth = depth > deepestDepth ? depth : deepestDepth
-        return Profile(name: name, progress: progress + 1, player: player, currentRun: currentRun, deepestDepth: newDepth)
-
+        return Profile(name: name, progress: progress + 1, player: player, currentRun: currentRun, deepestDepth: newDepth, progressModel: progressModel)
+    }
+    
+    func updateProgress(_ progress: ProgressableModel) -> Profile {
+        return Profile(name: name, progress: self.progress, player: player, currentRun: currentRun, deepestDepth: deepestDepth, progressModel: progress)
     }
     
     // just for debug purposes

@@ -27,26 +27,16 @@ struct CodexView: View {
     var body: some View {
         ZStack {
             ScrollView {
-                Text("\(lastUpdated)")
-                    .onReceive(progress.$unlockables, perform: { _ in
-                        lastUpdated += 1
-                        hiddenTrigger.toggle()
-                    })
                 Spacer().frame(height: 10.0)
-                if (hiddenTrigger || !hiddenTrigger) {
-                    LazyVGrid(columns: columns, spacing: 20) {
-                        ForEach(progress.unlockables) { unlockable in
-                            let index = progress.unlockables.firstIndex(of: unlockable)!
-                            let unlockable = progress.unlockables[index]
-                            CodexItemView(viewModel: progress, index: index).onTapGesture {
-                                selectedIndex = index
-                                showModal.toggle()
-                            }
-                            .contentShape(Rectangle())
+                LazyVGrid(columns: columns, spacing: 20) {
+                    ForEach(progress.unlockables) { unlockable in
+                        let index = progress.unlockables.firstIndex(of: unlockable)!
+                        CodexItemView(viewModel: progress, index: index).onTapGesture {
+                            selectedIndex = index
+                            showModal.toggle()
                         }
-                    }.onReceive(progress.$unlockables, perform: { _ in
-                        hiddenTrigger.toggle()
-                    })
+                        .contentShape(Rectangle())
+                    }
                 }
             }
             .padding(.horizontal)

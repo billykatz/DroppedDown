@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct CodexView: View {
-    let progress: ProgressableModel
+    @ObservedObject var progress: ProgressableModel
     
     let columns = [
         GridItem(.flexible(minimum: 100)),
@@ -18,23 +18,35 @@ struct CodexView: View {
     ]
     
     @State var showModal: Bool = false
-    @State var selectedUnlockable: Unlockable
+    @State var selectedIndex: Int
+    @State var hiddenTrigger: Bool = false
     
     @State var modalOpacity = 0.0
+    @State var lastUpdated: Int = 0
     
     var body: some View {
         ZStack {
             ScrollView {
+                Text("\(lastUpdated)")
+                    .onReceive(progress.$unlockables, perform: { _ in
+                        lastUpdated += 1
+                        hiddenTrigger.toggle()
+                    })
                 Spacer().frame(height: 10.0)
-                LazyVGrid(columns: columns, spacing: 20) {
-                    ForEach(progress.unlockables) { unlockable in
-                        CodexItemView(unlockable: unlockable).onTapGesture {
-                            selectedUnlockable = unlockable
-                            showModal.toggle()
-                            print("\(String(describing: selectedUnlockable.id))")
+                if (hiddenTrigger || !hiddenTrigger) {
+                    LazyVGrid(columns: columns, spacing: 20) {
+                        ForEach(progress.unlockables) { unlockable in
+                            let index = progress.unlockables.firstIndex(of: unlockable)!
+                            let unlockable = progress.unlockables[index]
+                            CodexItemView(viewModel: progress, index: index).onTapGesture {
+                                selectedIndex = index
+                                showModal.toggle()
+                            }
+                            .contentShape(Rectangle())
                         }
-                        .contentShape(Rectangle())
-                    }
+                    }.onReceive(progress.$unlockables, perform: { _ in
+                        hiddenTrigger.toggle()
+                    })
                 }
             }
             .padding(.horizontal)
@@ -48,7 +60,7 @@ struct CodexView: View {
                             .opacity(modalOpacity/2)
                             .offset(x: 0.0, y: -100.0)
                     }
-                    CodexItemModalView(unlockable: $selectedUnlockable)
+                    CodexItemModalView(viewModel: progress, index: selectedIndex)
                     .opacity(modalOpacity)
                         
                 }
@@ -73,6 +85,6 @@ struct CodexView_Previews: PreviewProvider {
         
         let data = ProgressableModel()
         
-        CodexView(progress: data, selectedUnlockable: data.unlockables.first!)
+        CodexView(progress: data, selectedIndex: 0)
     }
 }

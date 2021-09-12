@@ -27,28 +27,53 @@ struct CodexItemTitleView: View {
     }
 }
 
+extension Unlockable {
+    var backgroundColor: UIColor {
+        if isPurchased && isUnlocked {
+            return .codexItemBackgroundBlue
+        } else if isUnlocked && !isPurchased {
+            return .codexItemBackgroundLightGray
+        } else {
+            return .codexItemBackgroundBlack
+        }
+    }
+
+}
+
 struct CodexItemView: View {
     
-    let unlockable: Unlockable
-    
-    var itemAndTitle: some View {
-        CodexItemAnimatingView(storeOffer: unlockable.item)
-            .scaleEffect(2.0)
-            .overlay(
-                CodexItemTitleView(title: unlockable.item.title)
-            ).padding(20.0)
+    var viewModel: ProgressableModel
+    @State var index: Int
+    @State var hiddenTrigger: Bool = false
 
+    var unlockable: Unlockable {
+        return viewModel.unlockables[index]
     }
-    
+
     var body: some View {
-        CodexBackgroundView(width: 100, height: 125).overlay(itemAndTitle, alignment: .top)
+        if (hiddenTrigger || !hiddenTrigger) {
+            CodexBackgroundView(width: 100, height: 125, backgroundColor: unlockable.backgroundColor).overlay(
+                CodexItemAnimatingView(unlockable: unlockable)
+                    .scaleEffect(2.0)
+                    .overlay(
+                        CodexItemTitleView(title: unlockable.item.title)
+                    ).padding(20.0), alignment: .top).onReceive(viewModel.$unlockables, perform: { _ in
+                        hiddenTrigger.toggle()
+                    })
+        }
+            
     }
 }
 
 struct CodexItemView_Previews: PreviewProvider {
     static var previews: some View {
-        let unlockable = Unlockable(stat: .damageTaken(100), item: StoreOffer.offer(type: .transmogrifyPotion, tier: 1), purchaseAmount: 50, isPurchased: false, isUnlocked: false)
         
-        CodexItemView(unlockable: unlockable)
+        let data = ProgressableModel()
+        
+        VStack {
+            CodexItemView(viewModel: data, index: 0)
+            CodexItemView(viewModel: data, index: 1)
+            CodexItemView(viewModel: data, index: 2)
+        }
     }
 }

@@ -45,6 +45,64 @@ struct BuyButtonView: View {
     }
 }
 
+struct CodexItemModalTitleView: View {
+    let title: String
+    
+    var body: some View {
+        Text(title)
+            .font(.titleCodexFont)
+            .foregroundColor(.white)
+            .lineLimit(2)
+            .multilineTextAlignment(.center)
+            .padding(15.0)
+
+    }
+}
+
+struct CodexItemModalDescriptionView: View {
+    let unlockable: Unlockable
+    
+    var body: some View {
+        if (unlockable.isUnlocked) {
+            Text(unlockable.item.body)
+                .font(.codexFont)
+                .foregroundColor(.white)
+                .lineLimit(nil)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding()
+        } else {
+            Text("Mine [x] more rocks to unlock")
+                .font(.codexFont)
+                .foregroundColor(.white)
+                .lineLimit(nil)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding()
+        }
+
+    }
+}
+
+struct CodexItemModalUnlockView: View {
+    let unlockable: Unlockable
+    
+    var body: some View {
+        if unlockable.isUnlocked {
+            Text("Unlocked at 200 rocks")
+                .font(.codexFont)
+                .foregroundColor(.white)
+                .padding()
+        } else {
+            Text("Unlock at 200 rocks")
+                .font(.codexFont)
+                .foregroundColor(.white)
+                .padding()
+        }
+
+    }
+}
+
 struct CodexItemModalView: View {
     
     struct Constants {
@@ -57,62 +115,47 @@ struct CodexItemModalView: View {
     }
     
     @State var hiddenTrigger: Bool = false
-    @Binding var unlockable: Unlockable
+    var viewModel: ProgressableModel
+    @State var index: Int
+    var unlockable: Unlockable {
+        return viewModel.unlockables[index]
+    }
     
     var body: some View {
-        CodexBackgroundView(width: Constants.backgroundWidth, height: Constants.backgroundHeight).overlay(
+        CodexBackgroundView(width: Constants.backgroundWidth, height: Constants.backgroundHeight, backgroundColor: .codexItemBackgroundBlue).overlay(
             VStack(alignment: .center) {
-                Text("\(offer.title)")
-                    .font(.titleCodexFont)
-                    .foregroundColor(.white)
-                    .lineLimit(2)
-                    .multilineTextAlignment(.center)
-                    .padding(15.0)
+                CodexItemModalTitleView(title: offer.title)
                 Spacer().frame(height: 50.0)
-                CodexItemAnimatingView(storeOffer: offer).scaleEffect(4.0)
+                CodexItemAnimatingView(unlockable: unlockable).scaleEffect(4.0)
                 Spacer().frame(height: 65.0)
-                Text("\(offer.body)")
-                    .font(.codexFont)
-                    .foregroundColor(.white)
-                    .lineLimit(nil)
-                    .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .padding()
+                CodexItemModalDescriptionView(unlockable: unlockable)
                 Spacer()
-                Text("Unlocked 200/200")
-                    .font(.codexFont)
-                    .foregroundColor(.white)
-                    .padding()
+                CodexItemModalUnlockView(unlockable: unlockable)
                 Spacer()
                 if (hiddenTrigger || !hiddenTrigger) {
-                    if (!unlockable.isUnlocked) {
-                        
-                    }
-                    else if (!unlockable.isPurchased) {
+                    if (!unlockable.isPurchased && unlockable.isUnlocked) {
                         BuyButtonView(action: purchase, price: unlockable.purchaseAmount)
-                        Spacer()
                     }
-                    
                 }
-                
             }
+            .padding(.bottom, 15.0)
         )
     }
     
     func purchase() {
-       hiddenTrigger.toggle()
-       unlockable.isPurchased = true
+        hiddenTrigger.toggle()
+        viewModel.purchaseUnlockable(unlockable: unlockable)
     }
 }
 
 #if DEBUG
 
 struct CodexItemModalView_Previews: PreviewProvider {
-    @State static var unlockable = Unlockable(stat: .damageTaken(100), item: StoreOffer.offer(type: .killMonsterPotion, tier: 1), purchaseAmount: 50, isPurchased: false, isUnlocked: false)
     
     static var previews: some View {
-
-        CodexItemModalView(unlockable: $unlockable)
+        let unlockable = Unlockable(stat: .damageTaken(100), item: StoreOffer.offer(type: .killMonsterPotion, tier: 1), purchaseAmount: 50, isPurchased: false, isUnlocked: true)
+        
+        CodexItemModalView(viewModel: ProgressableModel(), index: 0)
     }
 }
 #endif

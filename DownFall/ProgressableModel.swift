@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Combine
 
 
 /*
@@ -36,7 +37,37 @@ import Foundation
 
  */
 
-class Unlockable: Codable, Identifiable, Equatable {
+
+//enum CodingKeys: CodingKey {
+//    case stat
+//    case item
+//    case purchaseAmount
+//    case isPurchased
+//    case isUnlocked
+//}
+//
+//func encode(to encoder: Encoder) throws {
+//    var container = encoder.container(keyedBy: CodingKeys.self)
+//
+//    try container.encode(stat, forKey: .stat)
+//    try container.encode(item, forKey: .item)
+//    try container.encode(purchaseAmount, forKey: .purchaseAmount)
+//    try container.encode(isPurchased, forKey: .isPurchased)
+//    try container.encode(isUnlocked, forKey: .isUnlocked)
+//}
+//
+//required init(from decoder: Decoder) throws {
+//    let container = try decoder.container(keyedBy: CodingKeys.self)
+//
+//    stat = try container.decode(Statistics.self, forKey: .stat)
+//    item = try container.decode(StoreOffer.self, forKey: .item)
+//    purchaseAmount = try container.decode(Int.self, forKey: .purchaseAmount)
+//    isPurchased = try container.decode(Bool.self, forKey: .isPurchased)
+//    isUnlocked = try container.decode(Bool.self, forKey: .isUnlocked)
+//}
+
+struct Unlockable: Codable, Identifiable, Equatable {
+    
     static func == (lhs: Unlockable, rhs: Unlockable) -> Bool {
         return lhs.id == rhs.id
     }
@@ -44,11 +75,11 @@ class Unlockable: Codable, Identifiable, Equatable {
     let stat: Statistics
     let item: StoreOffer
     let purchaseAmount: Int
-    var isPurchased: Bool
-    var isUnlocked: Bool
+    let isPurchased: Bool
+    let isUnlocked: Bool
     
     var id: String {
-        return "\(item.type)\(item.textureName)\(item.tier)"
+        return "\(item.textureName)\(item.tier)"
     }
     
     init(stat: Statistics, item: StoreOffer, purchaseAmount: Int, isPurchased: Bool, isUnlocked: Bool) {
@@ -59,14 +90,43 @@ class Unlockable: Codable, Identifiable, Equatable {
         self.isUnlocked = isUnlocked
     }
     
-}
-
-class ProgressableModel: Codable {
-    let unlockables: [Unlockable]
-
-    
-    init() {
-        unlockables = StoreOfferType.allCases.map { Unlockable(stat: .gemsCollected(.blue, 100), item: StoreOffer.offer(type: $0, tier: 1), purchaseAmount: 50, isPurchased: false, isUnlocked: false) }
+    func purchase() -> Unlockable {
+        return Unlockable(stat: stat, item: item, purchaseAmount: purchaseAmount, isPurchased: true, isUnlocked: isUnlocked)
     }
     
 }
+
+class ProgressableModel: Codable, ObservableObject {
+    @Published var unlockables: [Unlockable] = []
+    
+    enum CodingKeys: CodingKey {
+        case unlockables
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encode(unlockables, forKey: .unlockables)
+    }
+    
+    required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        unlockables = try container.decode([Unlockable].self, forKey: .unlockables)
+    }
+    
+    init() {
+        unlockables = StoreOfferType.allCases.map { Unlockable(stat: .gemsCollected(.blue, 100), item: StoreOffer.offer(type: $0, tier: 1), purchaseAmount: 50, isPurchased: false, isUnlocked: true) }
+    }
+    
+    //API
+    func purchaseUnlockable(unlockable: Unlockable) {
+        guard let index = unlockables.firstIndex(of: unlockable) else { preconditionFailure("Unlockable must be in the array") }
+        unlockables[index] = unlockable.purchase()
+        self.unlockables = unlockables
+    }
+    
+    
+    
+}
+

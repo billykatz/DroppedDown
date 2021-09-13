@@ -11,11 +11,11 @@ import Foundation
 
 extension ProfileDecodingClient {
     static let test = Self { profileType, data in
-        return Profile(name: "test-uuid", progress: 0, player: .zero, currentRun: nil, randomRune: nil, deepestDepth: 0)
+        return Profile(name: "test-uuid", progress: 0, player: .zero, currentRun: nil, randomRune: nil, deepestDepth: 0, progressModel: CodexViewModel())
     }
     
     static let progress10 = Self { profileType, data in
-        return Profile(name: "test-uuid", progress: 10, player: .playerZero, currentRun: nil, randomRune: nil, deepestDepth: 10)
+        return Profile(name: "test-uuid", progress: 10, player: .playerZero, currentRun: nil, randomRune: nil, deepestDepth: 10, progressModel: CodexViewModel())
         
     }
 }

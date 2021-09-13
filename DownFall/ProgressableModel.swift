@@ -1,5 +1,5 @@
 //
-//  ProgressableModel.swift
+//  CodexViewModel.swift
 //  DownFall
 //
 //  Created by Billy on 9/3/21.
@@ -94,11 +94,17 @@ struct Unlockable: Codable, Identifiable, Equatable {
         return Unlockable(stat: stat, item: item, purchaseAmount: purchaseAmount, isPurchased: true, isUnlocked: isUnlocked)
     }
     
+    static var debugData: [Unlockable] {
+        return StoreOfferType.allCases.map { Unlockable(stat: .oneHundredBlueRocks, item: StoreOffer.offer(type: $0, tier: 1), purchaseAmount: 50, isPurchased: false, isUnlocked: true) }
+    }
+    
 }
 
-class ProgressableModel: Codable, ObservableObject {
+class CodexViewModel: ObservableObject {
     
     @Published var unlockables: [Unlockable] = []
+    var playerData: EntityModel?
+    var statData: [Statistics]?
     
     var progress: (Int, Int) {
         var purchasedCount = 0
@@ -112,25 +118,33 @@ class ProgressableModel: Codable, ObservableObject {
         return (purchasedCount, unlockedCount)
     }
     
-    enum CodingKeys: CodingKey {
-        case unlockables
+    
+    init(unlockables: [Unlockable], playerData: EntityModel, statData: [Statistics]) {
+        self.playerData = playerData
+        self.statData = statData
+        self.unlockables = unlockables
     }
     
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-
-        try container.encode(unlockables, forKey: .unlockables)
+    func isUnlocked(unlockableStat: Statistics, playerStats: [Statistics]) -> Bool {
+        for stat in playerStats {
+            if unlockableStat.statType == stat.statType {
+                switch unlockableStat.statType {
+                case .rocksDestroyed:
+                    return unlockableStat.rockColor == stat.rockColor && stat.amount >= unlockableStat.amount
+                case .gemsCollected:
+                    return unlockableStat.gemColor == stat.gemColor && stat.amount >= unlockableStat.amount
+                case .monstersKilled:
+                    return unlockableStat.monsterType == stat.monsterType && stat.amount >= unlockableStat.amount
+                case .runeUses:
+                    return unlockableStat.runeType == stat.runeType && stat.amount >= unlockableStat.amount
+                default:
+                    return stat.amount >= unlockableStat.amount
+                }
+            }
+        }
+        return false
     }
     
-    required init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-
-        unlockables = try container.decode([Unlockable].self, forKey: .unlockables)
-    }
-    
-    init() {
-        unlockables = StoreOfferType.allCases.map { Unlockable(stat: .gemsCollected(.blue, 100), item: StoreOffer.offer(type: $0, tier: 1), purchaseAmount: 50, isPurchased: false, isUnlocked: true) }
-    }
     
     //API
     func purchaseUnlockable(unlockable: Unlockable) {
@@ -140,12 +154,11 @@ class ProgressableModel: Codable, ObservableObject {
     }
     
     
-    
 }
 
 
-extension ProgressableModel: Equatable {
-    static func == (lhs: ProgressableModel, rhs: ProgressableModel) -> Bool {
+extension CodexViewModel: Equatable {
+    static func == (lhs: CodexViewModel, rhs: CodexViewModel) -> Bool {
         for lhsUnlockable in lhs.unlockables {
             if !rhs.unlockables.contains(lhsUnlockable) {
                 return true

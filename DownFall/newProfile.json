@@ -2,9 +2,8 @@
     "name": "Profile Name",
     "progress": 3,
     "deepestDepth": 0,
-    "progressModel": {
-        "unlockables": []
-    },
+    "unlockables": [],
+    "stats": [],
     "player" :
         { "name": "player3",
             "type": "player",

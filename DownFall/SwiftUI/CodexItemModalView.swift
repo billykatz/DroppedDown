@@ -115,7 +115,7 @@ struct CodexItemModalView: View {
     }
     
     @State var hiddenTrigger: Bool = false
-    var viewModel: ProgressableModel
+    var viewModel: CodexViewModel
     @State var index: Int
     
     var unlockable: Unlockable {
@@ -154,7 +154,7 @@ struct CodexItemModalView: View {
 struct CodexItemModalView_Previews: PreviewProvider {
     
     static var previews: some View {
-        CodexItemModalView(viewModel: ProgressableModel(), index: 0)
+        CodexItemModalView(viewModel: CodexViewModel(unlockables: Unlockable.debugData, playerData: .zero, statData: []), index: 0)
     }
 }
 #endif

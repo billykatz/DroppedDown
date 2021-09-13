@@ -42,7 +42,7 @@ extension Unlockable {
 
 struct CodexItemView: View {
     
-    var viewModel: ProgressableModel
+    var viewModel: CodexViewModel
     @State var index: Int
     @State var hiddenTrigger: Bool = false
 
@@ -68,7 +68,7 @@ struct CodexItemView: View {
 struct CodexItemView_Previews: PreviewProvider {
     static var previews: some View {
         
-        let data = ProgressableModel()
+        let data = CodexViewModel(unlockables: Unlockable.debugData, playerData: .zero, statData: [])
         
         VStack {
             CodexItemView(viewModel: data, index: 0)

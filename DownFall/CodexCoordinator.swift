@@ -23,7 +23,8 @@ class CodexCoordinator {
         guard let profile = profile else { fatalError("Cannot present CodexView without a profile") }
         
         self.profile = profile
-        let codexView = CodexView(progress: profile.progressModel, selectedIndex: 0)
+        let viewModel = CodexViewModel(unlockables: Unlockable.debugData, playerData: profile.player, statData: profile.stats)
+        let codexView = CodexView(viewModel: viewModel, selectedIndex: 0)
         
         let hostingViewController = UIHostingController(rootView: codexView)
         

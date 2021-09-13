@@ -80,7 +80,7 @@ class ProfileViewModelTest: XCTestCase {
         
         /// save the profile with the uuid as the name
         /// copy all other defaults
-        let newProfile = Profile(name: "", progress: 3, player: .zero, deepestDepth: 0)
+        let newProfile = Profile(name: "", progress: 3, player: .zero, deepestDepth: 0, progressModel: CodexViewModel())
         
         XCTAssertEqual(expectedProfiles.last!?.currentRun, newProfile.currentRun)
         XCTAssertEqual(expectedProfiles.last!?.progress, newProfile.progress)
@@ -121,7 +121,7 @@ class ProfileViewModelTest: XCTestCase {
         // profiles are received on the main thread
         mainScheduler.advance()
         
-        let saveProfile = Profile(name: "test-uuid-1", progress: 1, player: .playerZero, currentRun: nil, randomRune: nil, deepestDepth: 3)
+        let saveProfile = Profile(name: "test-uuid-1", progress: 1, player: .playerZero, currentRun: nil, randomRune: nil, deepestDepth: 3, progressModel: CodexViewModel())
         profileViewModel.authenicatedSubject.send(true)
         profileViewModel.saveProfile(saveProfile)
         
@@ -169,7 +169,7 @@ class ProfileViewModelTest: XCTestCase {
         // profiles are received on the main thread
         mainScheduler.advance()
         
-        let saveProfile = Profile(name: "test-uuid-1", progress: 0, player: .playerZero, currentRun: nil, randomRune: nil, deepestDepth: 3)
+        let saveProfile = Profile(name: "test-uuid-1", progress: 0, player: .playerZero, currentRun: nil, randomRune: nil, deepestDepth: 3, progressModel: CodexViewModel())
         profileViewModel.authenicatedSubject.send(true)
         profileViewModel.saveProfile(saveProfile)
         
@@ -218,7 +218,7 @@ class ProfileViewModelTest: XCTestCase {
         // profiles are received on the main thread
         mainScheduler.advance()
         
-        let saveProfile = Profile(name: "test-uuid-1", progress: 1, player: .playerZero, currentRun: nil, randomRune: nil, deepestDepth: 3)
+        let saveProfile = Profile(name: "test-uuid-1", progress: 1, player: .playerZero, currentRun: nil, randomRune: nil, deepestDepth: 3, progressModel: CodexViewModel())
         profileViewModel.authenicatedSubject.send(true)
         profileViewModel.saveProfile(saveProfile)
         

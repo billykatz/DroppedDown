@@ -10,7 +10,7 @@ import Foundation
 
 
 struct Profile: Codable, Equatable {
-    static var zero = Profile(name: "zero", progress: 0, player: .zero, currentRun: nil, deepestDepth: 0, progressModel: ProgressableModel())
+    static var zero = Profile(name: "zero", progress: 0, player: .zero, currentRun: nil, deepestDepth: 0, stats: [], unlockables: [])
     
     let name: String
     let progress: Int
@@ -18,7 +18,8 @@ struct Profile: Codable, Equatable {
     var currentRun: RunModel?
     var randomRune: Rune?
     let deepestDepth: Int
-    let progressModel: ProgressableModel
+    let stats: [Statistics]
+    let unlockables: [Unlockable]
     
     var runPlayer: EntityModel {
         guard let rune = randomRune else {
@@ -28,21 +29,18 @@ struct Profile: Codable, Equatable {
     }
     
     func updatePlayer(_ entityModel: EntityModel) -> Profile {
-        return Profile(name: name, progress: progress + 1, player: entityModel, currentRun: currentRun, deepestDepth: deepestDepth, progressModel: progressModel)
+        return Profile(name: name, progress: progress + 1, player: entityModel, currentRun: currentRun, deepestDepth: deepestDepth, stats: stats, unlockables: unlockables)
     }
     
     func updateRunModel(_ currentRun: RunModel?) -> Profile {
-        return Profile(name: name, progress: progress + 1, player: player, currentRun: currentRun, deepestDepth: deepestDepth, progressModel: progressModel)
+        return Profile(name: name, progress: progress + 1, player: player, currentRun: currentRun, deepestDepth: deepestDepth, stats: stats, unlockables: unlockables)
     }
     
     func updateDepth(_ depth: Int) -> Profile {
         let newDepth = depth > deepestDepth ? depth : deepestDepth
-        return Profile(name: name, progress: progress + 1, player: player, currentRun: currentRun, deepestDepth: newDepth, progressModel: progressModel)
+        return Profile(name: name, progress: progress + 1, player: player, currentRun: currentRun, deepestDepth: newDepth, stats: stats, unlockables: unlockables)
     }
-    
-    func updateProgress(_ progress: ProgressableModel) -> Profile {
-        return Profile(name: name, progress: self.progress, player: player, currentRun: currentRun, deepestDepth: deepestDepth, progressModel: progress)
-    }
+
     
     // just for debug purposes
     public mutating func givePlayerARandomRune() {

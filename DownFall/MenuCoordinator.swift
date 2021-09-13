@@ -37,6 +37,7 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate, OptionsSceneDelegate,
     var profile: Profile?
     var levelCoordinator: LevelCoordinating
     var codexCoordinator: CodexCoordinator
+    var profileViewModel: ProfileViewModel?
     
     
     private lazy var mainMenuScene: MainMenu? = {
@@ -71,6 +72,7 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate, OptionsSceneDelegate,
     
     func loadedProfile(_ profile: Profile) {
         self.profile = profile
+        self.profileViewModel = ProfileViewModel(profile: profile)
         
         presentMainMenu()
     }
@@ -85,23 +87,24 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate, OptionsSceneDelegate,
     }
     
     func finishGame(playerData updatedPlayerData: EntityModel, currentRun: RunModel) {
-        /// update the profile to show
-        /// the player's gems
-        guard let profile = profile else { fatalError("We need a profile to continue") }
-        let currentRun: RunModel? = updatedPlayerData.isDead ? nil : currentRun
-        /// update run
-        let profileWithCurrentRun = profile.updateRunModel(currentRun)
-        /// update player gem carry
-        let playerUpdated = profileWithCurrentRun.player.updateCarry(carry: updatedPlayerData.carry).update(pickaxe: updatedPlayerData.pickaxe)
-        
-        
-        /// update profile with new player
-        let profileWithUpdatedPlayer = profileWithCurrentRun.updatePlayer(playerUpdated)
-        
-        //update profile with current depth
-        self.profile = profileWithUpdatedPlayer.updateDepth(currentRun?.depth ?? 0)
-        
-        GameScope.shared.profileManager.saveProfile(self.profile!)
+        profileViewModel?.finishRun(playerData: updatedPlayerData, currentRun: currentRun)
+//        /// update the profile to show
+//        /// the player's gems
+//        guard let profile = profile else { fatalError("We need a profile to continue") }
+//        let currentRun: RunModel? = updatedPlayerData.isDead ? nil : currentRun
+//        /// update run
+//        let profileWithCurrentRun = profile.updateRunModel(currentRun)
+//        /// update player gem carry
+//        let playerUpdated = profileWithCurrentRun.player.updateCarry(carry: updatedPlayerData.carry).update(pickaxe: updatedPlayerData.pickaxe)
+//        
+//        
+//        /// update profile with new player
+//        let profileWithUpdatedPlayer = profileWithCurrentRun.updatePlayer(playerUpdated)
+//        
+//        //update profile with current depth
+//        self.profile = profileWithUpdatedPlayer.updateDepth(currentRun?.depth ?? 0)
+//        
+//        GameScope.shared.profileManager.saveProfile(self.profile!)
         
         presentMainMenu(transition: SKTransition.fade(withDuration: 0.2))
         
@@ -120,7 +123,8 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate, OptionsSceneDelegate,
     }
     
     func menuStore() {
-        codexCoordinator.presentCodexView(with: profile)
+        guard let profileViewModel = profileViewModel else { preconditionFailure() }
+        codexCoordinator.presentCodexView(profileViewModel: profileViewModel)
     }
     
     func mainMenuTapped(updatedPlayerData: EntityModel) {

@@ -68,5 +68,7 @@ extension UIColor {
     static let codexItemBackgroundLightGray = UIColor(rgb: 0x747474)
     static let codexItemBackgroundBlack = UIColor.black
     static let codexItemStrokeBlue = UIColor(rgb: 0x8091AB)
+    static let codexItemStrokeGray = UIColor(rgb: 0x626262)
+    static let codexRedText = UIColor(rgb: 0xFF5050)
     
 }

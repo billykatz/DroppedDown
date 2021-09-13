@@ -49,13 +49,14 @@ enum ProfileError: Error {
     case failedToLoadRemoteProfile(Error?)
 }
 
-class ProfileViewModel: ProfileManaging {
+/// This class is soley responsible for saving and loading game files from the local disk and iCloud
+class ProfileLoadingManager: ProfileManaging {
     
     struct Constants {
         static let playerUUIDKey = "playerUUID"
         static let saveFilePath = NSHomeDirectory()
         static let tempFilePath = NSTemporaryDirectory()
-        static let tag = String(describing: ProfileViewModel.self)
+        static let tag = String(describing: ProfileLoadingManager.self)
     }
     
     /// Public interface with the loaded profile
@@ -307,22 +308,22 @@ func saveProfileLocallyAndRemotely(_ profile: Profile, localPlayer: PlayerClient
 /// Uses a JSON encoder to save the data
 func saveProfileRemotely(_ profile: Profile, localPlayer: PlayerClient, profileCodingClient: ProfileCodingClient) -> Future<Profile, Error> {
     return Future { promise in
-        GameLogger.shared.log(prefix: ProfileViewModel.Constants.tag, message: "Saving profile to GameCenter")
+        GameLogger.shared.log(prefix: ProfileLoadingManager.Constants.tag, message: "Saving profile to GameCenter")
         
         let name = profile.name
         do {
             let data = try profileCodingClient.encoder.encode(profile)
             localPlayer.saveGameData(data, name) { (savedGame, error) in
                 if let error = error {
-                    GameLogger.shared.log(prefix: ProfileViewModel.Constants.tag, message: "Error saving game file in Game Center with name \(name) due to error \(error)")
+                    GameLogger.shared.log(prefix: ProfileLoadingManager.Constants.tag, message: "Error saving game file in Game Center with name \(name) due to error \(error)")
                     promise(.failure(ProfileError.failureToSaveRemoteProfile(error)))
                 } else {
-                    GameLogger.shared.log(prefix: ProfileViewModel.Constants.tag, message: "Successfully save game file with name \(name)")
+                    GameLogger.shared.log(prefix: ProfileLoadingManager.Constants.tag, message: "Successfully save game file with name \(name)")
                     promise(.success(profile))
                 }
             }
         } catch {
-            GameLogger.shared.log(prefix: ProfileViewModel.Constants.tag, message: "Failed to encode profile with error: \(error)")
+            GameLogger.shared.log(prefix: ProfileLoadingManager.Constants.tag, message: "Failed to encode profile with error: \(error)")
             promise(.failure(ProfileError.failureToSaveRemoteProfile(error)))
         }
     }
@@ -356,16 +357,16 @@ func loadLocalProfile(pathPrefix: String, name: String, fileManagerClient: FileM
             return
         }
         let pathURL = domain.appendingPathComponent(name)
-        GameLogger.shared.log(prefix: ProfileViewModel.Constants.tag, message: "Attempt to load file at \(pathURL)")
+        GameLogger.shared.log(prefix: ProfileLoadingManager.Constants.tag, message: "Attempt to load file at \(pathURL)")
         
         do {
             let data = try Data(contentsOf: pathURL)
             let profile = try profileCodingClient.decoder.decode(Profile.self, data)
-            GameLogger.shared.log(prefix: ProfileViewModel.Constants.tag, message: "Successfully loaded local file \(profile)")
+            GameLogger.shared.log(prefix: ProfileLoadingManager.Constants.tag, message: "Successfully loaded local file \(profile)")
             promise(.success(profile))
         }
         catch let err {
-            GameLogger.shared.log(prefix: ProfileViewModel.Constants.tag, message: "Failed to load local profile \(err)")
+            GameLogger.shared.log(prefix: ProfileLoadingManager.Constants.tag, message: "Failed to load local profile \(err)")
             promise(.failure(ProfileError.failedToLoadProfile))
         }
     }
@@ -384,7 +385,7 @@ func createLocalProfile(playerUUIDKey: String, userDefaultClient: UserDefaultCli
         }
         let pathURL = domain.appendingPathComponent(uuid)
         
-        GameLogger.shared.log(prefix: ProfileViewModel.Constants.tag, message: "Attempt to save file path string at \(pathURL.path)")
+        GameLogger.shared.log(prefix: ProfileLoadingManager.Constants.tag, message: "Attempt to save file path string at \(pathURL.path)")
         
         /// The file doesnt exist, so let's create one
         do {
@@ -396,21 +397,21 @@ func createLocalProfile(playerUUIDKey: String, userDefaultClient: UserDefaultCli
             /// save the profile with the uuid as the name
             /// copy all other defaults
             // @TODO: Create a progressable model from a JSON file
-            let newProfile = Profile(name: uuid, progress: profile.progress, player: profile.player, deepestDepth: profile.deepestDepth, stats: Statistics.startingStats, unlockables: [])
+            let newProfile = Profile(name: uuid, progress: profile.progress, player: profile.player, deepestDepth: profile.deepestDepth, stats: Statistics.startingStats, unlockables: Unlockable.startingUnlockables)
             
             /// encode the new profile into data
             let jsonData = try profileCodingClient.encoder.encode(newProfile)
             
             /// write that data to file
             try jsonData.write(to: pathURL)
-            GameLogger.shared.log(prefix: ProfileViewModel.Constants.tag, message: "Successfully saved file at path \(pathURL.path)")
+            GameLogger.shared.log(prefix: ProfileLoadingManager.Constants.tag, message: "Successfully saved file at path \(pathURL.path)")
             
             /// make sure we set this to the user defaults
             userDefaultClient.set(uuid, playerUUIDKey)
             
             promise(.success(newProfile))
         } catch let err {
-            GameLogger.shared.log(prefix: ProfileViewModel.Constants.tag, message: "Failed to save file at path \(pathURL) with error: \(err)")
+            GameLogger.shared.log(prefix: ProfileLoadingManager.Constants.tag, message: "Failed to save file at path \(pathURL) with error: \(err)")
             promise(.failure(ProfileError.failedToSaveLocalProfile(err)))
         }
     }
@@ -426,19 +427,19 @@ func saveProfileLocally(_ profile: Profile, uuidKey: String, userDefaultsClient:
             return
         }
         let pathURL = domain.appendingPathComponent(uuid)
-        GameLogger.shared.log(prefix: ProfileViewModel.Constants.tag, message: "Attempt to save file locally at path \(pathURL.path)")
+        GameLogger.shared.log(prefix: ProfileLoadingManager.Constants.tag, message: "Attempt to save file locally at path \(pathURL.path)")
         
         do {
             let data = try JSONEncoder().encode(profile)
             try data.write(to: pathURL)
-            GameLogger.shared.log(prefix: ProfileViewModel.Constants.tag, message: "Successfully saved file locally at path \(pathURL.path)")
+            GameLogger.shared.log(prefix: ProfileLoadingManager.Constants.tag, message: "Successfully saved file locally at path \(pathURL.path)")
             
             /// make sure we set this to the user defaults
             userDefaultsClient.set(uuid, uuidKey)
             
             promise(.success(profile))
         } catch let err {
-            GameLogger.shared.log(prefix: ProfileViewModel.Constants.tag, message: "Failed to save file locally at path \(pathURL)")
+            GameLogger.shared.log(prefix: ProfileLoadingManager.Constants.tag, message: "Failed to save file locally at path \(pathURL)")
             promise(.failure(ProfileError.failedToSaveLocalProfile(err)))
         }
     }

@@ -63,13 +63,20 @@ struct Statistics: Codable, Equatable {
 }
 
 extension Statistics {
-    static var oneHundredBlueRocks = Self.init(rockColor: .blue, amount: 100, statType: .rocksDestroyed)
+    static var oneHundredRocks = Self.init(amount: 100, statType: .totalRocksDestroyed)
+    static var fiveHundredRocks = Self.init(amount: 500, statType: .totalRocksDestroyed)
+    static var oneThousandRocks = Self.init(amount: 1000, statType: .totalRocksDestroyed)
+    
+    static var oneHundredGems = Self.init(amount: 100, statType: .totalGemsCollected)
+    static var twoHundredGems = Self.init(amount: 200, statType: .totalGemsCollected)
+    static var threeHundredGems = Self.init(amount: 300, statType: .totalGemsCollected)
     
     /// base cases
     static var blueRocksDestroyed = Self.init(rockColor: .blue, amount: 0, statType: .rocksDestroyed)
     static var redRocksDestroyed = Self.init(rockColor: .red, amount: 0, statType: .rocksDestroyed)
     static var purpleRocksDestroyed = Self.init(rockColor: .purple, amount: 0, statType: .rocksDestroyed)
     static var totalRocksDestroyed = Self.init(amount: 0, statType: .totalRocksDestroyed)
+    static var totalRocksDestroyed100_000 = Self.init(amount: 100_000, statType: .totalRocksDestroyed)
     static var largestRockGroupDestroyed = Self.init(amount: 0, statType: .largestRockGroupDestroyed)
     static var blueGemsCollected = Self.init(gemColor: .blue, amount: 0, statType: .gemsCollected)
     static var purpleGemsCollected = Self.init(gemColor: .purple, amount: 0, statType: .gemsCollected)
@@ -99,7 +106,7 @@ extension Statistics {
                 Statistics.blueRocksDestroyed,
                 Statistics.redRocksDestroyed,
                 Statistics.purpleRocksDestroyed,
-                Statistics.totalRocksDestroyed,
+                Statistics.totalRocksDestroyed100_000,
                 Statistics.largestRockGroupDestroyed,
                 Statistics.blueGemsCollected,
                 Statistics.purpleGemsCollected,

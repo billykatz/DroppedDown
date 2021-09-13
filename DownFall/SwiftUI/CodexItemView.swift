@@ -13,11 +13,11 @@ struct CodexItemTitleView: View {
     let font = UIFont(name: UIFont.pixelFontName, size: 30.0)!
     
     let title: String
-    
+    let foregroundColor: UIColor
     var body: some View {
         Text("\(title)")
             .font(Font(font))
-            .foregroundColor(.white)
+            .foregroundColor(Color(foregroundColor))
             .lineLimit(2)
             .minimumScaleFactor(0.01)
             .multilineTextAlignment(.center)
@@ -37,29 +37,57 @@ extension Unlockable {
             return .codexItemBackgroundBlack
         }
     }
+    
+    var borderColor: UIColor {
+        if isPurchased || isUnlocked {
+            return .white
+        } else {
+            return .codexItemStrokeGray
+        }
+    }
+    
+    var textColor: UIColor {
+        if isPurchased || isUnlocked {
+            return .white
+        } else {
+            return .lightGray
+        }
+    }
 
 }
 
 struct CodexItemView: View {
     
     var viewModel: CodexViewModel
-    @State var index: Int
+    var index: Int
     @State var hiddenTrigger: Bool = false
 
     var unlockable: Unlockable {
         return viewModel.unlockables[index]
     }
+    
+    var priceTextColor: UIColor {
+        return viewModel.playerCanAfford(unlockable: unlockable) ? .white : .codexRedText
+    }
 
     var body: some View {
         if (hiddenTrigger || !hiddenTrigger) {
-            CodexBackgroundView(width: 100, height: 125, backgroundColor: unlockable.backgroundColor).overlay(
-                CodexItemAnimatingView(unlockable: unlockable)
-                    .scaleEffect(2.0)
-                    .overlay(
-                        CodexItemTitleView(title: unlockable.item.title)
-                    ).padding(20.0), alignment: .top).onReceive(viewModel.$unlockables, perform: { _ in
-                        hiddenTrigger.toggle()
-                    })
+            VStack(alignment: .center, spacing: 0) {
+                CodexBackgroundView(width: 100, height: 125, backgroundColor: unlockable.backgroundColor, borderColor: unlockable.borderColor).overlay(
+                    CodexItemAnimatingView(unlockable: unlockable)
+                        .scaleEffect(2.0)
+                        .overlay(
+                            CodexItemTitleView(title: unlockable.item.title, foregroundColor: unlockable.textColor)
+                        ).padding(20.0), alignment: .top)
+                if (!unlockable.isPurchased) {
+                    PriceView(price: unlockable.purchaseAmount, textColor: self.priceTextColor, scale: 0.5, font: Font.codexFont)
+                }
+            }
+            .onReceive(viewModel.$unlockables) { _ in
+                hiddenTrigger.toggle()
+            }
+            .background(Color.clear)
+            
         }
             
     }
@@ -67,13 +95,12 @@ struct CodexItemView: View {
 
 struct CodexItemView_Previews: PreviewProvider {
     static var previews: some View {
+
         
-        let data = CodexViewModel(unlockables: Unlockable.debugData, playerData: .zero, statData: [])
+        let data = CodexViewModel(profileViewModel: ProfileViewModel(profile: .debug), codexCoordinator: CodexCoordinator(viewController: UINavigationController()))
         
         VStack {
-            CodexItemView(viewModel: data, index: 0)
-            CodexItemView(viewModel: data, index: 1)
-            CodexItemView(viewModel: data, index: 2)
-        }
+            CodexItemView(viewModel: data, index: 4)
+        }.background(Color(UIColor.backgroundGray))
     }
 }

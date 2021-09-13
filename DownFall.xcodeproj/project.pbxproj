@@ -18,6 +18,9 @@
 		283CBBD926A8A88E00B1F7C9 /* CodexItemModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 283CBBD826A8A88E00B1F7C9 /* CodexItemModalView.swift */; };
 		283CBBDB26A8A9E100B1F7C9 /* SwiftUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 283CBBDA26A8A9E100B1F7C9 /* SwiftUIView.swift */; };
 		283F21F926E30D5200108D4D /* ProgressableModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 283F21F826E30D5200108D4D /* ProgressableModel.swift */; };
+		2842570626EF2ACB00C96CCC /* Unlockables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2842570526EF2ACB00C96CCC /* Unlockables.swift */; };
+		2842570826EF2EFC00C96CCC /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2842570726EF2EFC00C96CCC /* ProfileViewModel.swift */; };
+		2842570A26EFE82600C96CCC /* CodexPriceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2842570926EFE82600C96CCC /* CodexPriceView.swift */; };
 		2842BABF26A0EC740021CD0B /* CodexItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2842BABE26A0EC740021CD0B /* CodexItemView.swift */; };
 		2842BAC126A0EEC10021CD0B /* StoreOfferType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2842BAC026A0EEC10021CD0B /* StoreOfferType.swift */; };
 		28A836C4268FE57F00D96C48 /* JSONCoding+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A836C3268FE57F00D96C48 /* JSONCoding+Extensions.swift */; };
@@ -207,6 +210,9 @@
 		283CBBD826A8A88E00B1F7C9 /* CodexItemModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexItemModalView.swift; sourceTree = "<group>"; };
 		283CBBDA26A8A9E100B1F7C9 /* SwiftUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIView.swift; sourceTree = "<group>"; };
 		283F21F826E30D5200108D4D /* ProgressableModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressableModel.swift; sourceTree = "<group>"; };
+		2842570526EF2ACB00C96CCC /* Unlockables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Unlockables.swift; sourceTree = "<group>"; };
+		2842570726EF2EFC00C96CCC /* ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
+		2842570926EFE82600C96CCC /* CodexPriceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexPriceView.swift; sourceTree = "<group>"; };
 		2842BABE26A0EC740021CD0B /* CodexItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexItemView.swift; sourceTree = "<group>"; };
 		2842BAC026A0EEC10021CD0B /* StoreOfferType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreOfferType.swift; sourceTree = "<group>"; };
 		28A836C3268FE57F00D96C48 /* JSONCoding+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "JSONCoding+Extensions.swift"; sourceTree = "<group>"; };
@@ -407,6 +413,7 @@
 			children = (
 				28B7274326A0E90D00F349ED /* CodexView.swift */,
 				283CBBD826A8A88E00B1F7C9 /* CodexItemModalView.swift */,
+				2842570926EFE82600C96CCC /* CodexPriceView.swift */,
 				2842BABE26A0EC740021CD0B /* CodexItemView.swift */,
 				28AE3AC426A6113900BCE56A /* CodexBackgroundView.swift */,
 				28CAFA7A26A0F2F000151CA8 /* CodexItemAnimatingView.swift */,
@@ -880,10 +887,12 @@
 			children = (
 				2842BAC026A0EEC10021CD0B /* StoreOfferType.swift */,
 				283F21F826E30D5200108D4D /* ProgressableModel.swift */,
+				2842570526EF2ACB00C96CCC /* Unlockables.swift */,
 				2834737E26E94CFC0096F3DE /* StatsModel.swift */,
 				5893899E245E7D0E00350A2E /* StoreOffer.swift */,
 				3D2C757422C854F8009ABD36 /* ItemModel.swift */,
 				58C9735024969CA100288133 /* ProfileManaging.swift */,
+				2842570726EF2EFC00C96CCC /* ProfileViewModel.swift */,
 				280831FB2683A3F600EFAEC3 /* ProfileModel.swift */,
 				5811160E24D61E91000CFF12 /* RunManaging.swift */,
 			);
@@ -1106,6 +1115,7 @@
 				5894A45024C37A1100FBF839 /* LoadingScene.swift in Sources */,
 				3D30A42B2217F63500AFA1E1 /* TileCoord.swift in Sources */,
 				3D58468C22A632F100EDD845 /* AttackModel.swift in Sources */,
+				2842570626EF2ACB00C96CCC /* Unlockables.swift in Sources */,
 				3D06390922EEB54E00C4D5E9 /* ReffingState.swift in Sources */,
 				5843F4542426747100C03612 /* RotatePreviewView.swift in Sources */,
 				3DC072C123748D100046F224 /* Quadrant.swift in Sources */,
@@ -1169,6 +1179,7 @@
 				58B39BD723D21C9600915858 /* BackpackView.swift in Sources */,
 				3DD72593239DC47F005933B2 /* IndexPath+Extensions.swift in Sources */,
 				280831FE2683A7B000EFAEC3 /* UserDefaults+Extensions.swift in Sources */,
+				2842570826EF2EFC00C96CCC /* ProfileViewModel.swift in Sources */,
 				5853CD552463206500B5D89A /* RuneModel.swift in Sources */,
 				3D2C757522C854F8009ABD36 /* ItemModel.swift in Sources */,
 				3D18A39D224D68D300343C29 /* Dispatch.swift in Sources */,
@@ -1176,6 +1187,7 @@
 				3D7D8B2D2252857E0016FE4C /* CombatSimulator.swift in Sources */,
 				3DA4E8972290A88C006E90D1 /* EntityModel.swift in Sources */,
 				3D06390722EEB53C00C4D5E9 /* ComputingState.swift in Sources */,
+				2842570A26EFE82600C96CCC /* CodexPriceView.swift in Sources */,
 				28A836C4268FE57F00D96C48 /* JSONCoding+Extensions.swift in Sources */,
 				3D674C9522C9D6640003AEB4 /* MainMenu.swift in Sources */,
 				58A4B91D2472E5620011624A /* ChanceModel.swift in Sources */,
@@ -1357,8 +1369,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "DownFall/Shift Shaft.entitlements";
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = G6N5X5RF9Q;
 				INFOPLIST_FILE = DownFall/Info.plist;
@@ -1370,7 +1382,7 @@
 				MARKETING_VERSION = 1.3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.williamKatz.DroppedDown;
 				PRODUCT_NAME = "Shift Shaft";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = ShiftShaftDevelopment;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -1381,8 +1393,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "DownFall/Shift Shaft.entitlements";
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = G6N5X5RF9Q;
 				INFOPLIST_FILE = DownFall/Info.plist;
@@ -1394,7 +1406,7 @@
 				MARKETING_VERSION = 1.3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.williamKatz.DroppedDown;
 				PRODUCT_NAME = "Shift Shaft";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = ShiftShaftDevelopment;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

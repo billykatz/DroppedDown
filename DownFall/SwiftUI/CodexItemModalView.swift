@@ -8,21 +8,6 @@
 
 import SwiftUI
 
-struct PriceView: View {
-    let price: Int
-    
-    var body: some View {
-        HStack(alignment: .center, spacing: 0) {
-            Image("crystals")
-                .scaleEffect(CGSize(width: 0.75, height: 0.75))
-            Text("\(price)")
-                .font(.buttonFont)
-                .foregroundColor(.black)
-        }
-
-    }
-}
-
 struct BuyButtonView: View {
     let action: () -> ()
     let price: Int
@@ -37,7 +22,7 @@ struct BuyButtonView: View {
                     Text("Buy - ")
                         .font(.buttonFont)
                         .foregroundColor(.black)
-                    PriceView(price: price)
+                    PriceView(price: price, textColor: .black, scale: 0.75, font: Font.buttonFont)
                 }
             }
         }
@@ -123,7 +108,7 @@ struct CodexItemModalView: View {
     }
     
     var body: some View {
-        CodexBackgroundView(width: Constants.backgroundWidth, height: Constants.backgroundHeight, backgroundColor: .codexItemBackgroundBlue).overlay(
+        CodexBackgroundView(width: Constants.backgroundWidth, height: Constants.backgroundHeight, backgroundColor: .codexItemBackgroundBlue, borderColor: .codexItemStrokeBlue).overlay(
             VStack(alignment: .center) {
                 CodexItemModalTitleView(title: offer.title)
                 Spacer().frame(height: 50.0)
@@ -151,10 +136,10 @@ struct CodexItemModalView: View {
 
 #if DEBUG
 
-struct CodexItemModalView_Previews: PreviewProvider {
-    
-    static var previews: some View {
-        CodexItemModalView(viewModel: CodexViewModel(unlockables: Unlockable.debugData, playerData: .zero, statData: []), index: 0)
-    }
-}
+//struct CodexItemModalView_Previews: PreviewProvider {
+//    
+//    static var previews: some View {
+//        CodexItemModalView(viewModel: CodexViewModel(unlockables: Unlockable.debugData, menuCoordinator: nil), index: 0)
+//    }
+//}
 #endif

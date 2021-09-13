@@ -25,7 +25,7 @@ class ProfileViewModelTest: XCTestCase {
     }
     
     func testInitialProfile() {
-        let profileViewModel = ProfileViewModel(localPlayer: .success,
+        let profileViewModel = ProfileLoadingManager(localPlayer: .success,
                                                 userDefaultClient: .noUserDefaults,
                                                 fileManagerClient: .test,
                                                 scheduler: testScheduler.eraseToAnyScheduler(),
@@ -48,7 +48,7 @@ class ProfileViewModelTest: XCTestCase {
     
     func testProfileStart() {
         
-        let profileViewModel = ProfileViewModel(localPlayer: .noSavedGames,
+        let profileViewModel = ProfileLoadingManager(localPlayer: .noSavedGames,
                                                 userDefaultClient: .testUserDefaults,
                                                 fileManagerClient: .live,
                                                 scheduler: testScheduler.eraseToAnyScheduler(),
@@ -90,7 +90,7 @@ class ProfileViewModelTest: XCTestCase {
     
     func testProfileSaveLocalProfileProgressedFurther() {
         
-        let profileViewModel = ProfileViewModel(localPlayer: .noSavedGames,
+        let profileViewModel = ProfileLoadingManager(localPlayer: .noSavedGames,
                                                 userDefaultClient: .testUserDefaults,
                                                 fileManagerClient: .live,
                                                 profileCodingClient: .test,
@@ -138,7 +138,7 @@ class ProfileViewModelTest: XCTestCase {
 
     func testProfileSaveLocalProfileProgressedTheSame() {
         
-        let profileViewModel = ProfileViewModel(localPlayer: .noSavedGames,
+        let profileViewModel = ProfileLoadingManager(localPlayer: .noSavedGames,
                                                 userDefaultClient: .testUserDefaults,
                                                 fileManagerClient: .live,
                                                 profileCodingClient: .test,
@@ -187,7 +187,7 @@ class ProfileViewModelTest: XCTestCase {
     
     func testProfileDoNotSaveBecauseExistingProfileProgressedFurther() {
         
-        let profileViewModel = ProfileViewModel(localPlayer: .noSavedGames,
+        let profileViewModel = ProfileLoadingManager(localPlayer: .noSavedGames,
                                                 userDefaultClient: .testUserDefaults,
                                                 fileManagerClient: .live,
                                                 profileCodingClient: ProfileCodingClient(decoder: .progress10, encoder: .test),

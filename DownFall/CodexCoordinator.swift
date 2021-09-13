@@ -10,24 +10,62 @@ import Foundation
 import UIKit
 import SwiftUI
 
+extension UIViewController
+{
+    func bottomBlack()
+    {
+        let colorBottomBlack = UIView()
+        view.addSubview(colorBottomBlack)
+        colorBottomBlack.translatesAutoresizingMaskIntoConstraints = false
+        colorBottomBlack.backgroundColor = .backgroundGray
+        
+        let colorTopBlack = UIView()
+        view.addSubview(colorTopBlack)
+        colorTopBlack.translatesAutoresizingMaskIntoConstraints = false
+        colorTopBlack.backgroundColor = .backgroundGray
+        
+        NSLayoutConstraint.activate([
+            colorBottomBlack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            colorBottomBlack.widthAnchor.constraint(equalTo: view.widthAnchor),
+            colorBottomBlack.heightAnchor.constraint(equalTo: view.heightAnchor)
+        ])
+        
+        NSLayoutConstraint.activate([
+            colorTopBlack.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            colorTopBlack.widthAnchor.constraint(equalTo: view.widthAnchor),
+            colorTopBlack.heightAnchor.constraint(equalTo: view.heightAnchor)
+        ])
+        
+    }
+}
+
+
 class CodexCoordinator {
     
     private let viewController: UINavigationController
-    var profile: Profile?
+    var profileViewModel: ProfileViewModel?
     
     init(viewController: UINavigationController) {
         self.viewController = viewController
+        
+        self.viewController.navigationBar.barTintColor = .backgroundGray
+        self.viewController.navigationBar.tintColor = .white
+        self.viewController.navigationBar.isTranslucent = false
+        
     }
     
-    func presentCodexView(with profile: Profile?) {
-        guard let profile = profile else { fatalError("Cannot present CodexView without a profile") }
-        
-        self.profile = profile
-        let viewModel = CodexViewModel(unlockables: Unlockable.debugData, playerData: profile.player, statData: profile.stats)
+    func presentCodexView(profileViewModel: ProfileViewModel) {
+        self.profileViewModel = profileViewModel
+        let viewModel = CodexViewModel(profileViewModel: profileViewModel, codexCoordinator: self)
         let codexView = CodexView(viewModel: viewModel, selectedIndex: 0)
         
         let hostingViewController = UIHostingController(rootView: codexView)
+        hostingViewController.bottomBlack()
         
         viewController.pushViewController(hostingViewController, animated: true)
+    }
+    
+    func updateUnlockable(_ unlockables: [Unlockable]) {
+        profileViewModel?.updateUnlockables(unlockables)
     }
 }

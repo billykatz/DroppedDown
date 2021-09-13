@@ -36,7 +36,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // nav controller
         let navController = UINavigationController(rootViewController: gameViewController)
         
-        
         GameScope
             .shared
             .profileManager

@@ -18,7 +18,7 @@ final class GameScope {
     static let boardSizeCoefficient = CGFloat(0.9)
     static var shared: GameScope = GameScope(difficulty: .normal)
     var difficulty: Difficulty
-    let profileManager: ProfileManaging = ProfileViewModel()
+    let profileManager: ProfileManaging = ProfileLoadingManager()
     
     init(difficulty: Difficulty) {
         self.difficulty = difficulty

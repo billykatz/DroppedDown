@@ -8,13 +8,30 @@
 
 import SwiftUI
 
+struct CodexWalletView: View {
+    let gemAmount: Int
+    
+    var body: some View {
+        HStack {
+            Spacer()
+            HStack {
+                Image("crystals").alignmentGuide(VerticalAlignment.center, computeValue: { dimension in
+                    dimension[VerticalAlignment.center] - 3
+                })
+                Text(verbatim: "\(gemAmount)").font(.titleCodexFont).foregroundColor(.white)
+            }.padding(.trailing, 10)
+        }
+
+    }
+}
+
 struct CodexView: View {
     @ObservedObject var viewModel: CodexViewModel
     
     let columns = [
-        GridItem(.flexible(minimum: 100)),
-        GridItem(.flexible(minimum: 100)),
-        GridItem(.flexible(minimum: 100))
+        GridItem(.flexible(minimum: 100), alignment: .top),
+        GridItem(.flexible(minimum: 100), alignment: .top),
+        GridItem(.flexible(minimum: 100), alignment: .top)
     ]
     
     @State var showModal: Bool = false
@@ -25,55 +42,62 @@ struct CodexView: View {
     @State var lastUpdated: Int = 0
     
     var body: some View {
-        ZStack {
-            ScrollView {
-                Spacer().frame(height: 10.0)
-                LazyVGrid(columns: columns, spacing: 20) {
-                    ForEach(viewModel.unlockables) { unlockable in
-                        let index = viewModel.unlockables.firstIndex(of: unlockable)!
-                        CodexItemView(viewModel: viewModel, index: index).onTapGesture {
-                            selectedIndex = index
-                            showModal.toggle()
+        VStack(spacing: 4.0) {
+            CodexWalletView(gemAmount: viewModel.gemAmount)
+            ZStack {
+                ScrollView {
+                    Spacer().frame(height: 10.0)
+                    LazyVGrid(columns: columns, spacing: 20) {
+                        ForEach(viewModel.unlockables) { unlockable in
+                            let index = viewModel.unlockables.firstIndex(of: unlockable)!
+                            CodexItemView(viewModel: viewModel, index: index)
+                                .onTapGesture {
+                                selectedIndex = index
+                                showModal.toggle()
+                            }
+                            .contentShape(Rectangle())
+                            
                         }
-                        .contentShape(Rectangle())
-                    }
+                    }.frame(alignment: .top)
                 }
-            }
-            .padding(.horizontal)
-            
-            if (showModal) {
-                ZStack {
-                    GeometryReader { geo in
-                        Rectangle()
-                            .frame(width:  geo.size.width, height: geo.size.height*2, alignment: .center)
-                            .foregroundColor(.gray)
-                            .opacity(modalOpacity/2)
-                            .offset(x: 0.0, y: -100.0)
-                    }
-                    CodexItemModalView(viewModel: viewModel, index: selectedIndex)
-                    .opacity(modalOpacity)
-                        
-                }
-                .onAppear {
-                    // needs to be a withAnimation block or else it animates our sprite sheet
-                    withAnimation { modalOpacity = 1.0 }
-                }
-                .onDisappear {
-                    showModal.toggle()
-                }
-                .onTapGesture(perform: {
-                    withAnimation { modalOpacity = 0 }
-                })
+                .padding(.horizontal)
                 
+                if (showModal) {
+                    ZStack {
+                        GeometryReader { geo in
+                            Rectangle()
+                                .frame(width:  geo.size.width, height: geo.size.height*2, alignment: .center)
+                                .foregroundColor(.gray)
+                                .opacity(modalOpacity/2)
+                                .offset(x: 0.0, y: -100.0)
+                        }
+                        CodexItemModalView(viewModel: viewModel, index: selectedIndex)
+                        .opacity(modalOpacity)
+                            
+                    }
+                    .onAppear {
+                        // needs to be a withAnimation block or else it animates our sprite sheet
+                        withAnimation { modalOpacity = 1.0 }
+                    }
+                    .onDisappear {
+                        showModal.toggle()
+                    }
+                    .onTapGesture(perform: {
+                        withAnimation { modalOpacity = 0 }
+                    })
+                    
+                }
             }
-        }
+        }.background(Color(UIColor.backgroundGray))
     }
 }
 
 struct CodexView_Previews: PreviewProvider {
     static var previews: some View {
+        let profileVM = ProfileViewModel(profile: .debug)
+        let codexCoord = CodexCoordinator(viewController: UINavigationController())
         
-        let data = CodexViewModel(unlockables: Unlockable.debugData, playerData: .zero, statData: [])
+        let data = CodexViewModel(profileViewModel: profileVM, codexCoordinator: codexCoord)
         
         CodexView(viewModel: data, selectedIndex: 0)
     }

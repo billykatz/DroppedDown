@@ -10,6 +10,8 @@ import Foundation
 
 
 struct Profile: Codable, Equatable {
+    static var debug = Profile(name: "debug", progress: 0, player: .lotsOfCash, currentRun: nil, deepestDepth: 0, stats: [], unlockables: Unlockable.startingUnlockables)
+    
     static var zero = Profile(name: "zero", progress: 0, player: .zero, currentRun: nil, deepestDepth: 0, stats: [], unlockables: [])
     
     let name: String
@@ -40,7 +42,11 @@ struct Profile: Codable, Equatable {
         let newDepth = depth > deepestDepth ? depth : deepestDepth
         return Profile(name: name, progress: progress + 1, player: player, currentRun: currentRun, deepestDepth: newDepth, stats: stats, unlockables: unlockables)
     }
+    
+    func updateUnlockables(_ newUnlockables: [Unlockable]) -> Profile {
+        return Profile(name: name, progress: progress + 1, player: player, currentRun: currentRun, deepestDepth: deepestDepth, stats: stats, unlockables: newUnlockables)
 
+    }
     
     // just for debug purposes
     public mutating func givePlayerARandomRune() {

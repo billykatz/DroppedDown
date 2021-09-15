@@ -10,7 +10,7 @@ import Foundation
 
 
 struct Profile: Codable, Equatable {
-    static var debug = Profile(name: "debug", progress: 0, player: .lotsOfCash, currentRun: nil, deepestDepth: 0, stats: [], unlockables: Unlockable.startingUnlockables)
+    static var debug = Profile(name: "debug", progress: 0, player: .lotsOfCash, currentRun: nil, deepestDepth: 0, stats: Statistics.startingStats, unlockables: Unlockable.startingUnlockables)
     
     static var zero = Profile(name: "zero", progress: 0, player: .zero, currentRun: nil, deepestDepth: 0, stats: [], unlockables: [])
     
@@ -43,8 +43,17 @@ struct Profile: Codable, Equatable {
         return Profile(name: name, progress: progress + 1, player: player, currentRun: currentRun, deepestDepth: newDepth, stats: stats, unlockables: unlockables)
     }
     
-    func updateUnlockables(_ newUnlockables: [Unlockable]) -> Profile {
-        return Profile(name: name, progress: progress + 1, player: player, currentRun: currentRun, deepestDepth: deepestDepth, stats: stats, unlockables: newUnlockables)
+    func updateStatistics(_ newStats: [Statistics]) -> Profile {
+        return Profile(name: name, progress: progress, player: player, currentRun: currentRun, deepestDepth: deepestDepth, stats: newStats, unlockables: unlockables)
+    }
+    
+    func updateUnlockables(_ newUnlockable: Unlockable) -> Profile {
+        guard let index = unlockables.firstIndex(of: newUnlockable) else { preconditionFailure("Unlockable must be in the array") }
+        let newPlayer = player.spend(amount: newUnlockable.purchaseAmount)
+        var newUnlockables = unlockables
+        newUnlockables[index] = newUnlockable.purchase()
+        
+        return Profile(name: name, progress: progress + 1, player: newPlayer, currentRun: currentRun, deepestDepth: deepestDepth, stats: stats, unlockables: newUnlockables)
 
     }
     

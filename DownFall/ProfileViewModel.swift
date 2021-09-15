@@ -29,8 +29,37 @@ class ProfileViewModel {
         profileSubject.send(profile)
     }
     
-    func updateUnlockables(_ unlockables: [Unlockable]) {
-        saveProfile(profile.updateUnlockables(unlockables))
+    func updateStat(amount: Int, stat: Statistics) {
+        var newStatistics: [Statistics] = []
+        for playerStat in profile.stats {
+            var newStat = playerStat
+            if (stat == playerStat) {
+                newStat = stat.updateStatAmount(amount)
+            }
+            
+            newStatistics.append(newStat)
+        }
+        
+        let newProfile = profile.updateStatistics(newStatistics)
+        profileSubject.send(newProfile)
+    }
+    
+    func updateUnlockables(_ unlockable: Unlockable) {
+        saveProfile(profile.updateUnlockables(unlockable))
+    }
+    
+    func updatePlayerData(_ updatedPlayerData: EntityModel) {
+        saveProfile(profile.updatePlayer(updatedPlayerData))
+    }
+    
+    func nilCurrenRun() {
+        profileSubject.value.currentRun = nil
+    }
+    
+    // ju
+    func givePlayerARandomRune() {
+        profileSubject.value.givePlayerARandomRune()
+        saveProfile(profileSubject.value)
     }
     
     func finishRun(playerData updatedPlayerData: EntityModel, currentRun: RunModel) {

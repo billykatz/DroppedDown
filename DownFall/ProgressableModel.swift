@@ -43,7 +43,7 @@ class CodexViewModel: ObservableObject {
     @Published var gemAmount: Int = 0
     
     private let profileViewModel: ProfileViewModel
-    private let profile: Profile
+    private var profile: Profile
     private let profilePublisher: AnyPublisher<Profile, Never>
     private var profileCancellable = Set<AnyCancellable>()
     private weak var codexCoordinator: CodexCoordinator?
@@ -63,6 +63,7 @@ class CodexViewModel: ObservableObject {
         self.profilePublisher = profileViewModel.profilePublisher
         
         profilePublisher.sink { [weak self] newProfile in
+            self?.profile = newProfile
             self?.unlockables = newProfile.unlockables
             self?.gemAmount = newProfile.player.carry.total(in: .gem)
         }.store(in: &profileCancellable)
@@ -99,9 +100,7 @@ class CodexViewModel: ObservableObject {
     
     //API
     func purchaseUnlockable(unlockable: Unlockable) {
-        guard let index = unlockables.firstIndex(of: unlockable) else { preconditionFailure("Unlockable must be in the array") }
-        unlockables[index] = unlockable.purchase()
-        codexCoordinator?.updateUnlockable(unlockables)
+        codexCoordinator?.updateUnlockable(unlockable)
     }
     
     func playerCanAfford(unlockable: Unlockable) -> Bool {

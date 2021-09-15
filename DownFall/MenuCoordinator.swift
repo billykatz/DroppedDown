@@ -34,9 +34,12 @@ protocol MenuCoordinating: AnyObject {
 class MenuCoordinator: MenuCoordinating, MainMenuDelegate, OptionsSceneDelegate, MenuStoreSceneDelegate {
     
     var view: SKView
-    var profile: Profile?
+    var profile: Profile? {
+        profileViewModel?.profile
+    }
     var levelCoordinator: LevelCoordinating
     var codexCoordinator: CodexCoordinator
+    var settingsCoordinator: SettingsCoordinator
     var profileViewModel: ProfileViewModel?
     
     
@@ -54,9 +57,10 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate, OptionsSceneDelegate,
         return scene
     }()
     
-    init(levelCoordinator: LevelCoordinating, codexCoordinator: CodexCoordinator, view: SKView) {
+    init(levelCoordinator: LevelCoordinating, codexCoordinator: CodexCoordinator, settingsCoordinator: SettingsCoordinator, view: SKView) {
         self.levelCoordinator = levelCoordinator
         self.codexCoordinator = codexCoordinator
+        self.settingsCoordinator = settingsCoordinator
         self.view = view
     }
     
@@ -71,14 +75,13 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate, OptionsSceneDelegate,
     }
     
     func loadedProfile(_ profile: Profile) {
-        self.profile = profile
         self.profileViewModel = ProfileViewModel(profile: profile)
         
         presentMainMenu()
     }
     
     func newGame(_ playerModel: EntityModel?) {
-        profile?.currentRun = nil
+        profileViewModel?.nilCurrenRun()
         levelCoordinator.loadRun(nil, profile: profile!)
     }
     
@@ -88,30 +91,14 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate, OptionsSceneDelegate,
     
     func finishGame(playerData updatedPlayerData: EntityModel, currentRun: RunModel) {
         profileViewModel?.finishRun(playerData: updatedPlayerData, currentRun: currentRun)
-//        /// update the profile to show
-//        /// the player's gems
-//        guard let profile = profile else { fatalError("We need a profile to continue") }
-//        let currentRun: RunModel? = updatedPlayerData.isDead ? nil : currentRun
-//        /// update run
-//        let profileWithCurrentRun = profile.updateRunModel(currentRun)
-//        /// update player gem carry
-//        let playerUpdated = profileWithCurrentRun.player.updateCarry(carry: updatedPlayerData.carry).update(pickaxe: updatedPlayerData.pickaxe)
-//        
-//        
-//        /// update profile with new player
-//        let profileWithUpdatedPlayer = profileWithCurrentRun.updatePlayer(playerUpdated)
-//        
-//        //update profile with current depth
-//        self.profile = profileWithUpdatedPlayer.updateDepth(currentRun?.depth ?? 0)
-//        
-//        GameScope.shared.profileManager.saveProfile(self.profile!)
-        
         presentMainMenu(transition: SKTransition.fade(withDuration: 0.2))
         
     }
     
     func optionsSelected() {
-        view.presentScene(optionsScene, transition: SKTransition.push(with: .left, duration: 0.5))
+        guard let profileViewModel = profileViewModel else { preconditionFailure() }
+        settingsCoordinator.presentSettingsView(profileViewModel: profileViewModel)
+//        view.presentScene(optionsScene, transition: SKTransition.push(with: .left, duration: 0.5))
     }
     
     func backSelected() {
@@ -119,7 +106,7 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate, OptionsSceneDelegate,
     }
     
     func addRandomRune() {
-        profile?.givePlayerARandomRune()
+        profileViewModel?.givePlayerARandomRune()
     }
     
     func menuStore() {
@@ -128,9 +115,7 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate, OptionsSceneDelegate,
     }
     
     func mainMenuTapped(updatedPlayerData: EntityModel) {
-        guard let profile = profile else { return }
-        self.profile = profile.updatePlayer(updatedPlayerData)
-        GameScope.shared.profileManager.saveProfile(self.profile!)
+        profileViewModel?.updatePlayerData(updatedPlayerData)
         presentMainMenu(transition: SKTransition.push(with: .left, duration: 0.5))
     }
 

@@ -1,20 +1,19 @@
 //
-//  CodexCoordinator.swift
+//  SettingsCoordinator.swift
 //  DownFall
 //
-//  Created by Billy on 7/19/21.
+//  Created by Billy on 9/13/21.
 //  Copyright © 2021 William Katz LLC. All rights reserved.
 //
 
-import Foundation
 import UIKit
 import SwiftUI
 
-
-class CodexCoordinator {
+class SettingsCoordinator {
     
     private let viewController: UINavigationController
     var profileViewModel: ProfileViewModel?
+    var profileLoadingViewModel: ProfileLoadingManager?
     
     init(viewController: UINavigationController) {
         self.viewController = viewController
@@ -25,18 +24,15 @@ class CodexCoordinator {
         
     }
     
-    func presentCodexView(profileViewModel: ProfileViewModel) {
+    func presentSettingsView(profileViewModel: ProfileViewModel) {
         self.profileViewModel = profileViewModel
-        let viewModel = CodexViewModel(profileViewModel: profileViewModel, codexCoordinator: self)
-        let codexView = CodexView(viewModel: viewModel, selectedIndex: 0)
         
-        let hostingViewController = UIHostingController(rootView: codexView)
+        let settingsView = PlayerStatsView(viewModel: self.profileViewModel!)
+        let hostingViewController = UIHostingController(rootView: settingsView)
         hostingViewController.bottomBlack()
         
         viewController.pushViewController(hostingViewController, animated: true)
     }
     
-    func updateUnlockable(_ unlockable: Unlockable) {
-        profileViewModel?.updateUnlockables(unlockable)
-    }
+    
 }

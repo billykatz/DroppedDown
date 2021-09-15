@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum StatisticType: Int, Codable {
+enum StatisticType: String, Codable {
     case rocksDestroyed
     case totalRocksDestroyed
     case largestRockGroupDestroyed
@@ -44,13 +44,14 @@ enum StatisticType: Int, Codable {
     
 }
 
-struct Statistics: Codable, Equatable {
+struct Statistics: Codable, Equatable, Identifiable {
     let rockColor: ShiftShaft_Color?
     let gemColor: ShiftShaft_Color?
     let monsterType: EntityModel.EntityType?
     let runeType: RuneType?
     let amount: Int
     let statType: StatisticType
+    let id: UUID
     
     init(rockColor: ShiftShaft_Color? = nil, gemColor: ShiftShaft_Color? = nil, monsterType: EntityModel.EntityType? = nil, runeType: RuneType? = nil, amount: Int, statType: StatisticType) {
         self.rockColor = rockColor
@@ -59,6 +60,11 @@ struct Statistics: Codable, Equatable {
         self.runeType = runeType
         self.amount = amount
         self.statType = statType
+        self.id = UUID()
+    }
+    
+    func updateStatAmount(_ amount: Int) -> Statistics {
+        return Self.init(rockColor: self.rockColor, gemColor: self.gemColor, monsterType: self.monsterType, runeType: self.runeType, amount: self.amount + amount, statType: self.statType)
     }
 }
 
@@ -76,7 +82,6 @@ extension Statistics {
     static var redRocksDestroyed = Self.init(rockColor: .red, amount: 0, statType: .rocksDestroyed)
     static var purpleRocksDestroyed = Self.init(rockColor: .purple, amount: 0, statType: .rocksDestroyed)
     static var totalRocksDestroyed = Self.init(amount: 0, statType: .totalRocksDestroyed)
-    static var totalRocksDestroyed100_000 = Self.init(amount: 100_000, statType: .totalRocksDestroyed)
     static var largestRockGroupDestroyed = Self.init(amount: 0, statType: .largestRockGroupDestroyed)
     static var blueGemsCollected = Self.init(gemColor: .blue, amount: 0, statType: .gemsCollected)
     static var purpleGemsCollected = Self.init(gemColor: .purple, amount: 0, statType: .gemsCollected)
@@ -106,7 +111,7 @@ extension Statistics {
                 Statistics.blueRocksDestroyed,
                 Statistics.redRocksDestroyed,
                 Statistics.purpleRocksDestroyed,
-                Statistics.totalRocksDestroyed100_000,
+                Statistics.totalRocksDestroyed,
                 Statistics.largestRockGroupDestroyed,
                 Statistics.blueGemsCollected,
                 Statistics.purpleGemsCollected,

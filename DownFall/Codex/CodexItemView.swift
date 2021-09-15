@@ -79,14 +79,13 @@ struct CodexItemView: View {
                         .overlay(
                             CodexItemTitleView(title: unlockable.item.title, foregroundColor: unlockable.textColor)
                         ).padding(20.0), alignment: .top)
-                if (!unlockable.isPurchased) {
+                if (!unlockable.isPurchased && unlockable.isUnlocked) {
                     PriceView(price: unlockable.purchaseAmount, textColor: self.priceTextColor, scale: 0.5, font: Font.codexFont)
                 }
             }
             .onReceive(viewModel.$unlockables) { _ in
                 hiddenTrigger.toggle()
             }
-            .background(Color.clear)
             
         }
             

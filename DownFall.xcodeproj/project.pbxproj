@@ -23,6 +23,10 @@
 		2842570A26EFE82600C96CCC /* CodexPriceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2842570926EFE82600C96CCC /* CodexPriceView.swift */; };
 		2842BABF26A0EC740021CD0B /* CodexItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2842BABE26A0EC740021CD0B /* CodexItemView.swift */; };
 		2842BAC126A0EEC10021CD0B /* StoreOfferType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2842BAC026A0EEC10021CD0B /* StoreOfferType.swift */; };
+		2886E83E26F0303B0014FA5D /* SettingsCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886E83D26F0303B0014FA5D /* SettingsCoordinator.swift */; };
+		2886E84026F030750014FA5D /* UIViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886E83F26F030750014FA5D /* UIViewController+Extensions.swift */; };
+		2886E84326F031050014FA5D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886E84226F031050014FA5D /* SettingsView.swift */; };
+		2886E84526F197D00014FA5D /* PlayerStatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886E84426F197D00014FA5D /* PlayerStatView.swift */; };
 		28A836C4268FE57F00D96C48 /* JSONCoding+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A836C3268FE57F00D96C48 /* JSONCoding+Extensions.swift */; };
 		28A836C6268FE97B00D96C48 /* ProfileCodingClient+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A836C5268FE97B00D96C48 /* ProfileCodingClient+Extensions.swift */; };
 		28AE3AC126A6000600BCE56A /* CodexCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AE3AC026A6000600BCE56A /* CodexCoordinator.swift */; };
@@ -215,6 +219,10 @@
 		2842570926EFE82600C96CCC /* CodexPriceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexPriceView.swift; sourceTree = "<group>"; };
 		2842BABE26A0EC740021CD0B /* CodexItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexItemView.swift; sourceTree = "<group>"; };
 		2842BAC026A0EEC10021CD0B /* StoreOfferType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreOfferType.swift; sourceTree = "<group>"; };
+		2886E83D26F0303B0014FA5D /* SettingsCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsCoordinator.swift; sourceTree = "<group>"; };
+		2886E83F26F030750014FA5D /* UIViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extensions.swift"; sourceTree = "<group>"; };
+		2886E84226F031050014FA5D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		2886E84426F197D00014FA5D /* PlayerStatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerStatView.swift; sourceTree = "<group>"; };
 		28A836C3268FE57F00D96C48 /* JSONCoding+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "JSONCoding+Extensions.swift"; sourceTree = "<group>"; };
 		28A836C5268FE97B00D96C48 /* ProfileCodingClient+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileCodingClient+Extensions.swift"; sourceTree = "<group>"; };
 		28AE3AC026A6000600BCE56A /* CodexCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexCoordinator.swift; sourceTree = "<group>"; };
@@ -408,7 +416,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		28B7274226A0E8FA00F349ED /* SwiftUI */ = {
+		2886E84126F030F70014FA5D /* OptionsSwiftUI */ = {
+			isa = PBXGroup;
+			children = (
+				2886E84226F031050014FA5D /* SettingsView.swift */,
+				2886E84426F197D00014FA5D /* PlayerStatView.swift */,
+			);
+			name = OptionsSwiftUI;
+			sourceTree = "<group>";
+		};
+		28B7274226A0E8FA00F349ED /* Codex */ = {
 			isa = PBXGroup;
 			children = (
 				28B7274326A0E90D00F349ED /* CodexView.swift */,
@@ -418,7 +435,7 @@
 				28AE3AC426A6113900BCE56A /* CodexBackgroundView.swift */,
 				28CAFA7A26A0F2F000151CA8 /* CodexItemAnimatingView.swift */,
 			);
-			path = SwiftUI;
+			path = Codex;
 			sourceTree = "<group>";
 		};
 		3D00A0FA23AAD230007E2D8B /* Menu */ = {
@@ -595,6 +612,7 @@
 			isa = PBXGroup;
 			children = (
 				3D6AACD7222A324D00C77B24 /* CGRect+Extensions.swift */,
+				2886E83F26F030750014FA5D /* UIViewController+Extensions.swift */,
 				2811271E26863A4500F96043 /* FileManagerClient.swift */,
 				280831FD2683A7B000EFAEC3 /* UserDefaults+Extensions.swift */,
 				5827539A256B000A0065B49F /* GKLinearCongruentialRandomSource+Extensions.swift */,
@@ -711,7 +729,8 @@
 		3DF2924C20A37FEE006671AC /* DownFall */ = {
 			isa = PBXGroup;
 			children = (
-				28B7274226A0E8FA00F349ED /* SwiftUI */,
+				2886E84126F030F70014FA5D /* OptionsSwiftUI */,
+				28B7274226A0E8FA00F349ED /* Codex */,
 				58D56B5425AB91F8002D1337 /* Sound */,
 				586319C024C1FF530090CD6D /* Defaults */,
 				5802613024AFC1BE00D7CF20 /* Shift Shaft.entitlements */,
@@ -866,6 +885,7 @@
 			isa = PBXGroup;
 			children = (
 				3D14C82023A83D93003E211D /* LevelCoordinator.swift */,
+				2886E83D26F0303B0014FA5D /* SettingsCoordinator.swift */,
 				58A1C82A24CB3CAF00302183 /* MenuCoordinator.swift */,
 				28AE3AC026A6000600BCE56A /* CodexCoordinator.swift */,
 			);
@@ -1078,6 +1098,7 @@
 				58AD9282243C283300B5B1EC /* LevelGoalView.swift in Sources */,
 				5845A2C92560BA78002DBD07 /* RuneReplacementView.swift in Sources */,
 				3DF2925620A37FEE006671AC /* GameViewController.swift in Sources */,
+				2886E84526F197D00014FA5D /* PlayerStatView.swift in Sources */,
 				3D7EF45C21D18D9000A2D9E8 /* Transformation.swift in Sources */,
 				3D6AACE4222CD38E00C77B24 /* Controls.swift in Sources */,
 				280831FC2683A3F600EFAEC3 /* ProfileModel.swift in Sources */,
@@ -1150,6 +1171,8 @@
 				3DE87C8E2235D05300D750CF /* MenuSpriteNode.swift in Sources */,
 				28CAFA7B26A0F2F000151CA8 /* CodexItemAnimatingView.swift in Sources */,
 				3D6AACE1222C997800C77B24 /* Header.swift in Sources */,
+				2886E84326F031050014FA5D /* SettingsView.swift in Sources */,
+				2886E83E26F0303B0014FA5D /* SettingsCoordinator.swift in Sources */,
 				3DC072C42375452D0046F224 /* Rulebook.swift in Sources */,
 				3D06390322EEB50C00C4D5E9 /* PlayState.swift in Sources */,
 				3DD36ECB21E5B86100AC4873 /* TileStrategy.swift in Sources */,
@@ -1165,6 +1188,7 @@
 				3DC9CA1321D1DDD4004D05D5 /* Difficulty.swift in Sources */,
 				3D06390D22EEB57300C4D5E9 /* WinState.swift in Sources */,
 				3D4F569222B2D087003695D8 /* SpriteSheet.swift in Sources */,
+				2886E84026F030750014FA5D /* UIViewController+Extensions.swift in Sources */,
 				3D2C757322C85362009ABD36 /* Direction.swift in Sources */,
 				28AE3AC526A6113900BCE56A /* CodexBackgroundView.swift in Sources */,
 				582CF3EE244239A000AA2A95 /* Template.swift in Sources */,

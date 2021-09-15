@@ -71,7 +71,7 @@ struct CodexView: View {
                                 .opacity(modalOpacity/2)
                                 .offset(x: 0.0, y: -100.0)
                         }
-                        CodexItemModalView(viewModel: viewModel, index: selectedIndex, unlockable: viewModel.unlockables[selectedIndex])
+                        CodexItemModalView(viewModel: viewModel, index: selectedIndex)
                         .opacity(modalOpacity)
                             
                     }

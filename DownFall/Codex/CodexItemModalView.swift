@@ -115,16 +115,18 @@ struct CodexItemModalUnlockView: View {
 
 struct CodexItemModalView: View {
     
-    @State var hiddenTrigger: Bool = false
     var viewModel: CodexViewModel
     @State var index: Int
+    @State var hiddenTrigger: Bool = false
+    
+    var unlockable: Unlockable {
+        return viewModel.unlockables[index]
+    }
     
     struct Constants {
         static let backgroundWidth: CGFloat = 300
         static let backgroundHeight: CGFloat = 500
     }
-    
-    var offer: StoreOffer { unlockable.item }
     
     var backgroundHeight: CGFloat {
         if !unlockable.isUnlocked {
@@ -134,13 +136,12 @@ struct CodexItemModalView: View {
         }
     }
     
-    @State var unlockable: Unlockable
     
     var body: some View {
         CodexBackgroundView(width: Constants.backgroundWidth, height: backgroundHeight, backgroundColor: .codexItemBackgroundBlue, borderColor: .codexItemStrokeBlue).overlay(
             VStack(alignment: .center) {
                 Spacer().frame(height: 10.0)
-                CodexItemModalTitleView(title: offer.title)
+                CodexItemModalTitleView(title: unlockable.item.title)
                 Spacer().frame(height: 50.0)
                 CodexItemAnimatingView(unlockable: unlockable).scaleEffect(4.0)
                 Spacer().frame(height: 65.0)
@@ -159,11 +160,12 @@ struct CodexItemModalView: View {
             }
             .padding(.bottom, 15.0)
         )
+        .onReceive(viewModel.$unlockables, perform: { unlockables in
+            hiddenTrigger.toggle()
+        })
     }
     
     func purchase() {
-        unlockable = unlockable.purchase()
-        hiddenTrigger.toggle()
         viewModel.purchaseUnlockable(unlockable: unlockable)
 
     }
@@ -175,6 +177,6 @@ struct CodexItemModalView_Previews: PreviewProvider {
     static var previews: some View {
         let vm = ProfileViewModel(profile: .debugProfile)
         
-        CodexItemModalView(viewModel: CodexViewModel(profileViewModel: vm, codexCoordinator: CodexCoordinator(viewController: UINavigationController())), index: 0, unlockable: vm.profile.unlockables[0])
+        CodexItemModalView(viewModel: CodexViewModel(profileViewModel: vm, codexCoordinator: CodexCoordinator(viewController: UINavigationController())), index: 0)
     }
 }

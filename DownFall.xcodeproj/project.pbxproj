@@ -139,7 +139,6 @@
 		58153460243993F400483481 /* LevelGoalTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5815345F243993F400483481 /* LevelGoalTracker.swift */; };
 		5819AB71242A5CA600498BB6 /* SpriteAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5819AB70242A5CA600498BB6 /* SpriteAction.swift */; };
 		5819AB73242A668400498BB6 /* SwipeTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5819AB72242A668400498BB6 /* SwipeTypes.swift */; };
-		581A64CD24CE99D100B92EA6 /* OptionsScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 581A64CC24CE99D100B92EA6 /* OptionsScene.swift */; };
 		582635DD243168B500A944B6 /* ButtonIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 582635DC243168B500A944B6 /* ButtonIdentifier.swift */; };
 		5827539B256B000A0065B49F /* GKLinearCongruentialRandomSource+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5827539A256B000A0065B49F /* GKLinearCongruentialRandomSource+Extensions.swift */; };
 		582CF3EC2442391900AA2A95 /* FillableBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 582CF3EB2442391900AA2A95 /* FillableBar.swift */; };
@@ -191,7 +190,6 @@
 		58C9735124969CA100288133 /* ProfileManaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C9735024969CA100288133 /* ProfileManaging.swift */; };
 		58D56B4F25AB90DB002D1337 /* AudioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58D56B4E25AB90DB002D1337 /* AudioManager.swift */; };
 		58DCC9842451FBC700DC7AD8 /* RuneContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58DCC9832451FBC700DC7AD8 /* RuneContainerView.swift */; };
-		58DFB63C24D5EC2D00EBB13F /* OptionsScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 58DFB63B24D5EC2D00EBB13F /* OptionsScene.sks */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -340,7 +338,6 @@
 		5815345F243993F400483481 /* LevelGoalTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelGoalTracker.swift; sourceTree = "<group>"; };
 		5819AB70242A5CA600498BB6 /* SpriteAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteAction.swift; sourceTree = "<group>"; };
 		5819AB72242A668400498BB6 /* SwipeTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeTypes.swift; sourceTree = "<group>"; };
-		581A64CC24CE99D100B92EA6 /* OptionsScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionsScene.swift; sourceTree = "<group>"; };
 		582635DC243168B500A944B6 /* ButtonIdentifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonIdentifier.swift; sourceTree = "<group>"; };
 		5827539A256B000A0065B49F /* GKLinearCongruentialRandomSource+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GKLinearCongruentialRandomSource+Extensions.swift"; sourceTree = "<group>"; };
 		582CF3EB2442391900AA2A95 /* FillableBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FillableBar.swift; sourceTree = "<group>"; };
@@ -391,7 +388,6 @@
 		58C9735024969CA100288133 /* ProfileManaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileManaging.swift; sourceTree = "<group>"; };
 		58D56B4E25AB90DB002D1337 /* AudioManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioManager.swift; sourceTree = "<group>"; };
 		58DCC9832451FBC700DC7AD8 /* RuneContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneContainerView.swift; sourceTree = "<group>"; };
-		58DFB63B24D5EC2D00EBB13F /* OptionsScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = OptionsScene.sks; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -564,10 +560,8 @@
 				3D674C9422C9D6640003AEB4 /* MainMenu.swift */,
 				5894A44D24C379C800FBF839 /* LoadingScene.sks */,
 				5894A44F24C37A1100FBF839 /* LoadingScene.swift */,
-				581A64CC24CE99D100B92EA6 /* OptionsScene.swift */,
 				580EF10124E10C0F003D312B /* MenuStore.swift */,
 				580EF10324E10C30003D312B /* MenuStore.sks */,
-				58DFB63B24D5EC2D00EBB13F /* OptionsScene.sks */,
 			);
 			path = Scenes;
 			sourceTree = "<group>";
@@ -1051,7 +1045,6 @@
 				586319C224C1FF890090CD6D /* newProfile.json in Resources */,
 				3D528FD62154A50300EF65CA /* GameScene.sks in Resources */,
 				589E156825ABA1AC004A6D46 /* gemAppears.mp3 in Resources */,
-				58DFB63C24D5EC2D00EBB13F /* OptionsScene.sks in Resources */,
 				3DF2925E20A37FF0006671AC /* LaunchScreen.storyboard in Resources */,
 				3DA4E89D2290B156006E90D1 /* EntityTest.json in Resources */,
 				3D674C9322C9D54C0003AEB4 /* MainMenu.sks in Resources */,
@@ -1110,7 +1103,6 @@
 				580EF10224E10C0F003D312B /* MenuStore.swift in Sources */,
 				5811160F24D61E91000CFF12 /* RunManaging.swift in Sources */,
 				3DF2928520A76242006671AC /* Board.swift in Sources */,
-				581A64CD24CE99D100B92EA6 /* OptionsScene.swift in Sources */,
 				5867DF0C25D23CD700CCA702 /* Logger.swift in Sources */,
 				58153460243993F400483481 /* LevelGoalTracker.swift in Sources */,
 				3D7D8B37225422440016FE4C /* TilesHelper.swift in Sources */,

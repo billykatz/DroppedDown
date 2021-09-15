@@ -27,32 +27,24 @@ protocol MenuCoordinating: AnyObject {
     func loadedProfile(_ profile: Profile)
     
     /// exposed so that we can save the profile
-    var profile: Profile? { get }
+//    var profile: Profile? { get }
 }
 
 
-class MenuCoordinator: MenuCoordinating, MainMenuDelegate, OptionsSceneDelegate, MenuStoreSceneDelegate {
+class MenuCoordinator: MenuCoordinating, MainMenuDelegate, MenuStoreSceneDelegate {
     
     var view: SKView
-    var profile: Profile? {
-        profileViewModel?.profile
-    }
+//    var profile: Profile? {
+//        profileViewModel?.profile
+//    }
     var levelCoordinator: LevelCoordinating
     var codexCoordinator: CodexCoordinator
     var settingsCoordinator: SettingsCoordinator
     var profileViewModel: ProfileViewModel?
     
-    
     private lazy var mainMenuScene: MainMenu? = {
         guard let scene = GKScene(fileNamed: Identifiers.mainMenuScene)?.rootNode as? MainMenu else { return nil }
         scene.mainMenuDelegate = self
-        scene.scaleMode = .aspectFill
-        return scene
-    }()
-    
-    private lazy var optionsScene: OptionsScene? = {
-        guard let scene = GKScene(fileNamed: Identifiers.optionsScene)?.rootNode as? OptionsScene else { return nil }
-        scene.optionsDelegate = self
         scene.scaleMode = .aspectFill
         return scene
     }()
@@ -66,8 +58,8 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate, OptionsSceneDelegate,
     
     private func presentMainMenu(transition: SKTransition? = nil) {
         guard let mainMenu = mainMenuScene else { fatalError("Unable to unwrap the main menu scene")}
-        mainMenu.playerModel = profile?.player
-        mainMenu.hasRunToContinue = (profile?.currentRun != nil && profile?.currentRun != .zero)
+        mainMenu.playerModel = profileViewModel?.profile.player
+        mainMenu.hasRunToContinue = (profileViewModel?.profile.currentRun != nil && profileViewModel?.profile.currentRun != .zero)
 
         view.presentScene(mainMenu, transition: transition)
         view.ignoresSiblingOrder = true
@@ -76,33 +68,26 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate, OptionsSceneDelegate,
     
     func loadedProfile(_ profile: Profile) {
         self.profileViewModel = ProfileViewModel(profile: profile)
-        
         presentMainMenu()
     }
     
     func newGame(_ playerModel: EntityModel?) {
         profileViewModel?.nilCurrenRun()
-        levelCoordinator.loadRun(nil, profile: profile!)
+        levelCoordinator.loadRun(nil, profile: profileViewModel!.profile)
     }
     
     func continueRun() {
-        levelCoordinator.loadRun(profile!.currentRun, profile: profile!)
+        levelCoordinator.loadRun(profileViewModel!.profile.currentRun, profile: profileViewModel!.profile)
     }
     
     func finishGame(playerData updatedPlayerData: EntityModel, currentRun: RunModel) {
         profileViewModel?.finishRun(playerData: updatedPlayerData, currentRun: currentRun)
         presentMainMenu(transition: SKTransition.fade(withDuration: 0.2))
-        
     }
     
     func optionsSelected() {
         guard let profileViewModel = profileViewModel else { preconditionFailure() }
         settingsCoordinator.presentSettingsView(profileViewModel: profileViewModel)
-//        view.presentScene(optionsScene, transition: SKTransition.push(with: .left, duration: 0.5))
-    }
-    
-    func backSelected() {
-        presentMainMenu(transition: SKTransition.push(with: .right, duration: 0.5))
     }
     
     func addRandomRune() {

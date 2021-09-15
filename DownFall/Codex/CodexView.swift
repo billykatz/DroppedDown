@@ -71,7 +71,7 @@ struct CodexView: View {
                                 .opacity(modalOpacity/2)
                                 .offset(x: 0.0, y: -100.0)
                         }
-                        CodexItemModalView(viewModel: viewModel, index: selectedIndex)
+                        CodexItemModalView(viewModel: viewModel, index: selectedIndex, unlockable: viewModel.unlockables[selectedIndex])
                         .opacity(modalOpacity)
                             
                     }
@@ -94,7 +94,7 @@ struct CodexView: View {
 
 struct CodexView_Previews: PreviewProvider {
     static var previews: some View {
-        let profileVM = ProfileViewModel(profile: .debug)
+        let profileVM = ProfileViewModel(profile: .debugProfile)
         let codexCoord = CodexCoordinator(viewController: UINavigationController())
         
         let data = CodexViewModel(profileViewModel: profileVM, codexCoordinator: codexCoord)

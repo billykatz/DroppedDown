@@ -11,20 +11,44 @@ import SwiftUI
 struct BuyButtonView: View {
     let action: () -> ()
     let price: Int
+    let canAfford: Bool
+    
+    var buttonColor: Color {
+        return Color(canAfford ? .codexButtonLightGray : .codexDarkGray)
+    }
+    
+    var buttonBackground: some View {
+        RoundedRectangle(cornerRadius: 10.0)
+            .fill(buttonColor)
+            .frame(width: 200, height: 75)
+    }
     
     var body: some View {
-        Button(action: action) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 10.0)
-                    .fill(Color(UIColor.eggshellWhite))
-                    .frame(width: 200, height: 75)
-                HStack(alignment: .center, spacing: 0) {
-                    Text("Buy - ")
-                        .font(.buttonFont)
-                        .foregroundColor(.black)
-                    PriceView(price: price, textColor: .black, scale: 0.75, font: Font.buttonFont)
-                }
+        if canAfford {
+            Button(action: action) {
+                buttonBackground
+                    .overlay(HStack(alignment: .center, spacing: 0) {
+                            Text("Buy - ")
+                                .font(.buttonFont)
+                                .foregroundColor(.black)
+                                .alignmentGuide(VerticalAlignment.center, computeValue: { dimension in
+                                    dimension[VerticalAlignment.center] + 2
+                                })
+                            PriceView(price: price, textColor: .black, scale: 0.75, font: Font.buttonFont)
+                    })
             }
+
+        } else {
+            buttonBackground
+                .overlay(HStack(alignment: .center, spacing: 0) {
+                        Text("Mine more gems to buy")
+                            .font(.codexFont)
+                            .background(Color(UIColor.codexDarkGray))
+                            .padding()
+                            .minimumScaleFactor(0.1)
+                            .lineLimit(1)
+                            .foregroundColor(.black)
+                })
         }
 
     }
@@ -46,7 +70,8 @@ struct CodexItemModalTitleView: View {
 
 struct CodexItemModalDescriptionView: View {
     let unlockable: Unlockable
-    
+    let relevantPlayerStat: String
+
     var body: some View {
         if (unlockable.isUnlocked) {
             Text(unlockable.item.body)
@@ -57,13 +82,14 @@ struct CodexItemModalDescriptionView: View {
                 .fixedSize(horizontal: false, vertical: true)
                 .padding()
         } else {
-            Text("Mine [x] more rocks to unlock")
+            Text(relevantPlayerStat)
                 .font(.codexFont)
                 .foregroundColor(.white)
                 .lineLimit(nil)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding()
+                .frame(maxWidth: .infinity, alignment: .center)
         }
 
     }
@@ -72,55 +98,62 @@ struct CodexItemModalDescriptionView: View {
 struct CodexItemModalUnlockView: View {
     let unlockable: Unlockable
     
+    var statExtra: String {
+        let stat = unlockable.stat
+        let value: Any? = stat.gemColor ?? stat.rockColor ?? stat.monsterType ?? stat.runeType
+        if value == nil { return "" }
+        return " - \(String(describing: value!))"
+    }
+    
     var body: some View {
-        if unlockable.isUnlocked {
-            Text("Unlocked at 200 rocks")
-                .font(.codexFont)
-                .foregroundColor(.white)
-                .padding()
-        } else {
-            Text("Unlock at 200 rocks")
-                .font(.codexFont)
-                .foregroundColor(.white)
-                .padding()
-        }
-
+        Text("Unlocked at \(unlockable.stat.amount) \(unlockable.stat.statType.rawValue) \(statExtra)")
+            .font(.codexFont)
+            .foregroundColor(.white)
+            .padding()
     }
 }
 
 struct CodexItemModalView: View {
+    
+    @State var hiddenTrigger: Bool = false
+    var viewModel: CodexViewModel
+    @State var index: Int
     
     struct Constants {
         static let backgroundWidth: CGFloat = 300
         static let backgroundHeight: CGFloat = 500
     }
     
-    var offer: StoreOffer {
-        return unlockable.item
+    var offer: StoreOffer { unlockable.item }
+    
+    var backgroundHeight: CGFloat {
+        if !unlockable.isUnlocked {
+            return 280
+        } else {
+            return 500
+        }
     }
     
-    @State var hiddenTrigger: Bool = false
-    var viewModel: CodexViewModel
-    @State var index: Int
-    
-    var unlockable: Unlockable {
-        return viewModel.unlockables[index]
-    }
+    @State var unlockable: Unlockable
     
     var body: some View {
-        CodexBackgroundView(width: Constants.backgroundWidth, height: Constants.backgroundHeight, backgroundColor: .codexItemBackgroundBlue, borderColor: .codexItemStrokeBlue).overlay(
+        CodexBackgroundView(width: Constants.backgroundWidth, height: backgroundHeight, backgroundColor: .codexItemBackgroundBlue, borderColor: .codexItemStrokeBlue).overlay(
             VStack(alignment: .center) {
+                Spacer().frame(height: 10.0)
                 CodexItemModalTitleView(title: offer.title)
                 Spacer().frame(height: 50.0)
                 CodexItemAnimatingView(unlockable: unlockable).scaleEffect(4.0)
                 Spacer().frame(height: 65.0)
-                CodexItemModalDescriptionView(unlockable: unlockable)
+                CodexItemModalDescriptionView(unlockable: unlockable, relevantPlayerStat: viewModel.unlockAt(unlockable))
                 Spacer()
-                CodexItemModalUnlockView(unlockable: unlockable)
-                Spacer()
+                if unlockable.isUnlocked {
+                    CodexItemModalUnlockView(unlockable: unlockable)
+                    Spacer()
+                }
                 if (hiddenTrigger || !hiddenTrigger) {
                     if (!unlockable.isPurchased && unlockable.isUnlocked) {
-                        BuyButtonView(action: purchase, price: unlockable.purchaseAmount)
+                        BuyButtonView(action: purchase, price: unlockable.purchaseAmount, canAfford: viewModel.playerCanAfford(unlockable: unlockable))
+                        Spacer()
                     }
                 }
             }
@@ -129,17 +162,19 @@ struct CodexItemModalView: View {
     }
     
     func purchase() {
+        unlockable = unlockable.purchase()
         hiddenTrigger.toggle()
         viewModel.purchaseUnlockable(unlockable: unlockable)
+
     }
 }
 
-#if DEBUG
 
-//struct CodexItemModalView_Previews: PreviewProvider {
-//    
-//    static var previews: some View {
-//        CodexItemModalView(viewModel: CodexViewModel(unlockables: Unlockable.debugData, menuCoordinator: nil), index: 0)
-//    }
-//}
-#endif
+struct CodexItemModalView_Previews: PreviewProvider {
+    
+    static var previews: some View {
+        let vm = ProfileViewModel(profile: .debugProfile)
+        
+        CodexItemModalView(viewModel: CodexViewModel(profileViewModel: vm, codexCoordinator: CodexCoordinator(viewController: UINavigationController())), index: 0, unlockable: vm.profile.unlockables[0])
+    }
+}

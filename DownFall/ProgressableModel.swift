@@ -67,34 +67,8 @@ class CodexViewModel: ObservableObject {
             self?.unlockables = newProfile.unlockables
             self?.gemAmount = newProfile.player.carry.total(in: .gem)
         }.store(in: &profileCancellable)
-        
-        var newUnlockable : [Unlockable] = []
-        for unlockable in unlockables {
-            let new = Unlockable(stat: unlockable.stat, item: unlockable.item, purchaseAmount: unlockable.purchaseAmount, isPurchased: unlockable.isPurchased, isUnlocked: isUnlocked(unlockableStat: unlockable.stat, playerStats: statData))
-            newUnlockable.append(new)
-        }
 
-        self.unlockables = newUnlockable
-    }
-    
-    func isUnlocked(unlockableStat: Statistics, playerStats: [Statistics]) -> Bool {
-        for stat in playerStats {
-            if unlockableStat.statType == stat.statType {
-                switch unlockableStat.statType {
-                case .rocksDestroyed:
-                    return unlockableStat.rockColor == stat.rockColor && stat.amount >= unlockableStat.amount
-                case .gemsCollected:
-                    return unlockableStat.gemColor == stat.gemColor && stat.amount >= unlockableStat.amount
-                case .monstersKilled:
-                    return unlockableStat.monsterType == stat.monsterType && stat.amount >= unlockableStat.amount
-                case .runeUses:
-                    return unlockableStat.runeType == stat.runeType && stat.amount >= unlockableStat.amount
-                default:
-                    return stat.amount >= unlockableStat.amount
-                }
-            }
-        }
-        return false
+        profileViewModel.checkUnlockables()
     }
     
     
@@ -105,6 +79,57 @@ class CodexViewModel: ObservableObject {
     
     func playerCanAfford(unlockable: Unlockable) -> Bool {
         return playerData.canAfford(unlockable.purchaseAmount, inCurrency: .gem)
+    }
+    
+    
+    func relevantStatForUnlockable(_ unlockable: Unlockable) -> Statistics {
+        guard let stat = statData.first(where:
+                                            { stat in
+                                                stat.statType == unlockable.stat.statType
+                                                    && stat.rockColor == unlockable.stat.rockColor
+                                                    && stat.gemColor == unlockable.stat.gemColor
+                                                    && stat.monsterType == unlockable.stat.monsterType
+                                                    && stat.runeType == unlockable.stat.runeType
+                                            }) else { preconditionFailure() }
+        return stat
+    }
+    
+    func unlockAt(_ unlockable: Unlockable) -> String {
+        let target = unlockable.stat.amount
+        let relevantPlayerStat = relevantStatForUnlockable(unlockable)
+        let current = relevantPlayerStat.amount
+        
+        var value: String = ""
+        var subject: String = ""
+        
+        if let rockColor = relevantPlayerStat.rockColor {
+            value += "Mine"
+            subject = "\(rockColor) rocks"
+        } else if let gemColor = relevantPlayerStat.gemColor {
+            value += "Collect"
+            subject = "\(gemColor) gems"
+        } else if let monsterType = relevantPlayerStat.monsterType {
+            value += "Kill"
+            subject = "\(monsterType.humanReadable) monsters"
+        } else if let runeType = relevantPlayerStat.runeType {
+            value += "Use \(runeType.humanReadable)"
+            subject = "times"
+        } else if relevantPlayerStat.statType == .totalRocksDestroyed {
+            value += "Mine"
+            subject = "rocks"
+        } else if relevantPlayerStat.statType == .totalGemsCollected {
+            value += "Collect"
+            subject = "gems"
+        } else if relevantPlayerStat.statType == .totalMonstersKilled {
+            value += "Kill"
+            subject = "monsters"
+        } else if relevantPlayerStat.statType == .totalRuneUses {
+            value += "Use runes"
+            subject = "times"
+        }
+        
+        value += " \(target - current) more \(subject) to unlock this."
+        return value
     }
     
     

@@ -37,7 +37,29 @@ import Combine
 
  */
 
+enum CodexSections: String, CaseIterable, Identifiable {
+    case items
+    case runes
+    case playerUpgrades
+    case misc
+    
+    var id: String {
+        return self.rawValue
+    }
+    
+    var header: String {
+        switch self {
+        case .items: return "Items"
+        case .runes: return "Runes"
+        case .playerUpgrades: return "Upgrades"
+        case .misc: return "Misc"
+        }
+    }
+}
+
 class CodexViewModel: ObservableObject {
+    
+    public let sections = CodexSections.allCases
     
     @Published var unlockables: [Unlockable] = []
     @Published var gemAmount: Int = 0
@@ -51,6 +73,7 @@ class CodexViewModel: ObservableObject {
     private var playerData: EntityModel {
         return profile.player
     }
+    
     private var statData: [Statistics] {
         return profile.stats
     }
@@ -73,6 +96,29 @@ class CodexViewModel: ObservableObject {
     
     
     //API
+    func unlockables(in section: CodexSections) -> [Unlockable] {
+        var unlockablesInSection: [Unlockable] = []
+        for unlockable in unlockables {
+            switch unlockable.item.type {
+            case .dodge, .luck, .plusOneMaxHealth:
+                if section == .playerUpgrades {
+                    unlockablesInSection.append(unlockable)
+                }
+            case .rune where section == .runes:
+                unlockablesInSection.append(unlockable)
+            case .killMonsterPotion, .greaterHeal, .lesserHeal, .transmogrifyPotion:
+                if section == .items {
+                    unlockablesInSection.append(unlockable)
+                }
+            case .runeSlot where section == .misc:
+                unlockablesInSection.append(unlockable)
+            default:
+                break
+            }
+        }
+        return unlockablesInSection
+    }
+    
     func purchaseUnlockable(unlockable: Unlockable) {
         codexCoordinator?.updateUnlockable(unlockable)
     }

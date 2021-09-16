@@ -144,6 +144,7 @@ extension Statistics {
     static var oneHundredRocks = Self.init(amount: 100, statType: .totalRocksDestroyed)
     static var fiveHundredRocks = Self.init(amount: 500, statType: .totalRocksDestroyed)
     static var oneThousandRocks = Self.init(amount: 1000, statType: .totalRocksDestroyed)
+    static var twoThousandRocks = Self.init(amount: 2000, statType: .totalRocksDestroyed)
     
     static var blueRocks100Mined = Self.init(rockColor: .blue, amount: 100, statType: .rocksDestroyed)
     static var redRocks123Mined = Self.init(rockColor: .red, amount: 123, statType: .rocksDestroyed)

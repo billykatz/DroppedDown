@@ -10,7 +10,7 @@ import Foundation
 
 
 struct Profile: Codable, Equatable {
-    static var debugProfile = Profile(name: "debug", progress: 0, player: .lotsOfCash, currentRun: nil, deepestDepth: 0, stats: Statistics.startingStats, unlockables: Unlockable.debugStartingUnlockables)
+    static var debugProfile = Profile(name: "debug", progress: 0, player: .lotsOfCash, currentRun: nil, deepestDepth: 0, stats: Statistics.startingStats, unlockables: Unlockable.startingUnlockables)
     
     static var zero = Profile(name: "zero", progress: 0, player: .zero, currentRun: nil, deepestDepth: 0, stats: [], unlockables: [])
     

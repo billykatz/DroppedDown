@@ -47,16 +47,24 @@ struct CodexView: View {
             ZStack {
                 ScrollView {
                     Spacer().frame(height: 10.0)
-                    LazyVGrid(columns: columns, spacing: 20) {
-                        ForEach(viewModel.unlockables) { unlockable in
-                            let index = viewModel.unlockables.firstIndex(of: unlockable)!
-                            CodexItemView(viewModel: viewModel, index: index)
-                                .onTapGesture {
-                                selectedIndex = index
-                                showModal.toggle()
+                    Text("- Codex - ").font(.bigTitleCodexFont).foregroundColor(.white)
+                    LazyVGrid(columns: columns,
+                              spacing: 20) {
+                        ForEach(viewModel.sections) { section in
+                            Section(header: Text("\(section.header)").font(.titleCodexFont).foregroundColor(.white)) {
+                                ForEach(viewModel.unlockables(in: section)) {
+                                    unlockable in
+                                    let index = viewModel.unlockables.firstIndex(of: unlockable)!
+                                    CodexItemView(viewModel: viewModel, index: index)
+                                        .onTapGesture {
+                                            selectedIndex = index
+                                            showModal.toggle()
+                                        }
+                                        .contentShape(Rectangle())
+                                    
+                                }
+                                Spacer().frame(height: 10.0)
                             }
-                            .contentShape(Rectangle())
-                            
                         }
                     }.frame(alignment: .top)
                 }

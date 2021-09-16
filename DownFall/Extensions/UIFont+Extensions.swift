@@ -17,4 +17,5 @@ extension UIFont {
     static let codexFont = UIFont(name: UIFont.pixelFontName, size: 30.0)!
     static let buttonFont = UIFont(name: UIFont.pixelFontName, size: 40.0)!
     static let titleCodexFont = UIFont(name: UIFont.pixelFontName, size: 45.0)!
+    static let bigTitleCodexFont = UIFont(name: UIFont.pixelFontName, size: 65.0)!
 }

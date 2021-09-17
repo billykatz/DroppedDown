@@ -52,6 +52,9 @@ class GameScene: SKScene {
     private var level: Level?
     private var levelGoalTracker: LevelGoalTracker?
     
+    // stat tracker
+    private var runStatTracker: RunStatTracker?
+    
     // audio listener
     private var audioListener: AudioEventListener?
     
@@ -73,10 +76,12 @@ class GameScene: SKScene {
                            updatedEntity: EntityModel? = nil,
                            level: Level,
                            randomSource: GKLinearCongruentialRandomSource?,
+                           stats: [Statistics],
                            loadedTiles: [[Tile]]? = []) {
         // init our level
         self.level = level
         self.levelGoalTracker = LevelGoalTracker(level: level)
+        self.runStatTracker = RunStatTracker(runStats: stats)
         
         //create the foreground node
         foreground = SKNode()
@@ -142,6 +147,7 @@ class GameScene: SKScene {
             
             } else if case InputType.gameWin(_) = input.type {
                 guard let self = self else { return }
+                // this is to save the state at the end of the level.  
                 self.gameSceneDelegate?.saveState()
             }
         }
@@ -165,17 +171,18 @@ class GameScene: SKScene {
     }
     
     // public function that exposes all the data necessary to save the exact game state
-    public func saveAllState() -> (EntityModel, [GoalTracking], [[Tile]])? {
+    public func saveAllState() -> (EntityModel, [GoalTracking], [[Tile]], [Statistics])? {
         guard let board = self.board,
               let playerIndex = tileIndices(of: .player(.zero), in: board.tiles).first,
               case let TileType.player(data) = board.tiles[playerIndex].type,
-              let levelGoalTracking = self.levelGoalTracker?.goalProgress
+              let levelGoalTracking = self.levelGoalTracker?.goalProgress,
+              let stats = self.runStatTracker?.runStats
               else {
             GameLogger.shared.log(prefix: Constants.tag, message: "Failure to gather all information to save the game")
             return nil
         }
         
-        return (data, levelGoalTracking, board.tiles)
+        return (data, levelGoalTracking, board.tiles, stats)
     }
 }
 

@@ -32,6 +32,7 @@
 		28AE3AC126A6000600BCE56A /* CodexCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AE3AC026A6000600BCE56A /* CodexCoordinator.swift */; };
 		28AE3AC526A6113900BCE56A /* CodexBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AE3AC426A6113900BCE56A /* CodexBackgroundView.swift */; };
 		28B7274426A0E90D00F349ED /* CodexView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28B7274326A0E90D00F349ED /* CodexView.swift */; };
+		28C806AA26F3C3D500135E29 /* StatTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28C806A926F3C3D500135E29 /* StatTracker.swift */; };
 		28CAFA7B26A0F2F000151CA8 /* CodexItemAnimatingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28CAFA7A26A0F2F000151CA8 /* CodexItemAnimatingView.swift */; };
 		3D00A0F923AAC813007E2D8B /* Identifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D00A0F823AAC813007E2D8B /* Identifiers.swift */; };
 		3D06390122EEB4FB00C4D5E9 /* PauseState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D06390022EEB4FB00C4D5E9 /* PauseState.swift */; };
@@ -226,6 +227,7 @@
 		28AE3AC026A6000600BCE56A /* CodexCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexCoordinator.swift; sourceTree = "<group>"; };
 		28AE3AC426A6113900BCE56A /* CodexBackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexBackgroundView.swift; sourceTree = "<group>"; };
 		28B7274326A0E90D00F349ED /* CodexView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexView.swift; sourceTree = "<group>"; };
+		28C806A926F3C3D500135E29 /* StatTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatTracker.swift; sourceTree = "<group>"; };
 		28CAFA7A26A0F2F000151CA8 /* CodexItemAnimatingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexItemAnimatingView.swift; sourceTree = "<group>"; };
 		3D00A0F823AAC813007E2D8B /* Identifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identifiers.swift; sourceTree = "<group>"; };
 		3D06390022EEB4FB00C4D5E9 /* PauseState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PauseState.swift; sourceTree = "<group>"; };
@@ -432,6 +434,14 @@
 				28CAFA7A26A0F2F000151CA8 /* CodexItemAnimatingView.swift */,
 			);
 			path = Codex;
+			sourceTree = "<group>";
+		};
+		28C806A826F3C3C500135E29 /* StatTracking */ = {
+			isa = PBXGroup;
+			children = (
+				28C806A926F3C3D500135E29 /* StatTracker.swift */,
+			);
+			name = StatTracking;
 			sourceTree = "<group>";
 		};
 		3D00A0FA23AAD230007E2D8B /* Menu */ = {
@@ -723,6 +733,7 @@
 		3DF2924C20A37FEE006671AC /* DownFall */ = {
 			isa = PBXGroup;
 			children = (
+				28C806A826F3C3C500135E29 /* StatTracking */,
 				2886E84126F030F70014FA5D /* OptionsSwiftUI */,
 				28B7274226A0E8FA00F349ED /* Codex */,
 				58D56B5425AB91F8002D1337 /* Sound */,
@@ -1112,6 +1123,7 @@
 				3DAFBD3721B8E6E7009B116A /* InputQueue.swift in Sources */,
 				582CF3EC2442391900AA2A95 /* FillableBar.swift in Sources */,
 				58D56B4F25AB90DB002D1337 /* AudioManager.swift in Sources */,
+				28C806AA26F3C3D500135E29 /* StatTracker.swift in Sources */,
 				3DC072BB2373AF510046F224 /* SwipeRecognizerView.swift in Sources */,
 				5605D6D321CC2DF400C1C5C2 /* DFTileSpriteNode.swift in Sources */,
 				5894A45824C6048B00FBF839 /* CurrencyModel.swift in Sources */,

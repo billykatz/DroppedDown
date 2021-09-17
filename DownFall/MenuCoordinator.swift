@@ -34,9 +34,6 @@ protocol MenuCoordinating: AnyObject {
 class MenuCoordinator: MenuCoordinating, MainMenuDelegate, MenuStoreSceneDelegate {
     
     var view: SKView
-//    var profile: Profile? {
-//        profileViewModel?.profile
-//    }
     var levelCoordinator: LevelCoordinating
     var codexCoordinator: CodexCoordinator
     var settingsCoordinator: SettingsCoordinator

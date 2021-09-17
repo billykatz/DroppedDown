@@ -85,6 +85,13 @@ struct Unlockable: Codable, Identifiable, Equatable {
             Unlockable(stat: .bubbleUpUsed10, item: StoreOffer.offer(type: .rune(Rune.rune(for: .phoenix)), tier: 1), purchaseAmount: 150, isPurchased: false, isUnlocked: false),
             Unlockable(stat: .flameColumnUsed100 , item: StoreOffer.offer(type: .rune(Rune.rune(for: .transformRock)), tier: 1), purchaseAmount: 150, isPurchased: false, isUnlocked: false),
             Unlockable(stat: .allRunesUses101, item: StoreOffer.offer(type: .rune(Rune.rune(for: .moveEarth)), tier: 1), purchaseAmount: 100, isPurchased: false, isUnlocked: false),
+            
+            
+            
+            // misc
+            Unlockable(stat: .allRunesUses101, item: StoreOffer.offer(type: .runeSlot, tier: 1), purchaseAmount: 100, isPurchased: false, isUnlocked: false),
+            Unlockable(stat: .allRunesUses101, item: StoreOffer.offer(type: .runeSlot, tier: 2), purchaseAmount: 100, isPurchased: false, isUnlocked: false),
+            Unlockable(stat: .allRunesUses101, item: StoreOffer.offer(type: .runeSlot, tier: 3), purchaseAmount: 100, isPurchased: false, isUnlocked: false)
         ]
     }
     

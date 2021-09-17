@@ -38,10 +38,10 @@ import Combine
  */
 
 enum CodexSections: String, CaseIterable, Identifiable {
-    case items
-    case runes
     case playerUpgrades
     case misc
+    case items
+    case runes
     
     var id: String {
         return self.rawValue

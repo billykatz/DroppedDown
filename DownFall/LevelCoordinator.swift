@@ -56,6 +56,7 @@ class LevelCoordinator: LevelCoordinating {
                                       updatedEntity: playerData,
                                       level: level,
                                       randomSource: runModel.randomSource,
+                                      stats: runModel.stats,
                                       loadedTiles: savedTiles)
             
             view.presentScene(gameSceneNode)
@@ -75,7 +76,7 @@ class LevelCoordinator: LevelCoordinating {
         let seed = UInt64.random(in: .min ... .max)
         
         // no saved tiles for fresh run
-        let freshRunModel = RunModel(player: profile.runPlayer, seed: seed, savedTiles: nil, areas: [], goalTracking: [])
+        let freshRunModel = RunModel(player: profile.runPlayer, seed: seed, savedTiles: nil, areas: [], goalTracking: [], stats: [])
         
         self.runModel = runModel ?? freshRunModel
         RunScope.deepestDepth = profile.deepestDepth
@@ -88,6 +89,15 @@ class LevelCoordinator: LevelCoordinating {
         switch nextArea.type {
         case .level(let level):
             presentNextLevel(level, playerData: runModel.player, savedTiles: runModel.savedTiles)
+        }
+    }
+    
+    /// This should be used most of the the time.  When ever you want to proceed in the run, you should call this function.
+    func presentNextArea() {
+        let nextArea = runModel.nextArea()
+        switch nextArea.type {
+        case .level(let level):
+            presentNextLevel(level, playerData: runModel.player)
         }
     }
     
@@ -104,14 +114,6 @@ class LevelCoordinator: LevelCoordinating {
         
     }
     
-    /// This should be used most of the the time.  When ever you want to proceed in the run, you should call this function.
-    func presentNextArea() {
-        let nextArea = runModel.nextArea()
-        switch nextArea.type {
-        case .level(let level):
-            presentNextLevel(level, playerData: runModel.player)
-        }
-    }
     
     // MARK: - GameSceneCoordinatingDelegate
     func navigateToMainMenu(_ scene: SKScene, playerData: EntityModel) {
@@ -119,6 +121,7 @@ class LevelCoordinator: LevelCoordinating {
         let remove = SKAction.removeFromParent()
         scene.run(SKAction.group([fadeOut, remove])) { [weak self] in
             guard let self = self else { return }
+            self.runModel = self.saveAllState()
             self.delegate?.finishGame(playerData: playerData, currentRun: self.runModel)
         }
         
@@ -138,11 +141,12 @@ class LevelCoordinator: LevelCoordinating {
     // MARK: Saving game state
     
     func saveAllState() -> RunModel {
-        guard let (data, goalTracking, tiles) = self.gameSceneNode?.saveAllState() else {
+        guard let (data, goalTracking, tiles, updatedStats) = self.gameSceneNode?.saveAllState() else {
             GameLogger.shared.log(prefix: Constants.tag, message: "Unable to save all state")
             return self.runModel
         }
         
+        runModel.stats = updatedStats
         runModel.saveGoalTracking(goalTracking)
         runModel.player = data
         runModel = saveTiles(tiles)
@@ -153,7 +157,7 @@ class LevelCoordinator: LevelCoordinating {
     
     // MARK: Utility functions
     private func saveTiles(_ savedTiles: [[Tile]]) -> RunModel {
-        return RunModel(player: runModel.player, seed: runModel.seed, savedTiles: savedTiles, areas: runModel.areas, goalTracking: runModel.goalTracking)
+        return RunModel(player: runModel.player, seed: runModel.seed, savedTiles: savedTiles, areas: runModel.areas, goalTracking: runModel.goalTracking, stats: runModel.stats)
     }
     
     

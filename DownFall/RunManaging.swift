@@ -47,7 +47,6 @@ struct Area: Codable, Equatable {
     
     let depth: Int
     let type: AreaType
-    
         
 }
 
@@ -56,7 +55,7 @@ class RunModel: Codable, Equatable {
         return lhs.seed == rhs.seed
     }
     
-    static let zero = RunModel(player: .zero, seed: 0, savedTiles: nil, areas: [], goalTracking: [])
+    static let zero = RunModel(player: .zero, seed: 0, savedTiles: nil, areas: [], goalTracking: [], stats: [])
     
     let seed: UInt64
     var player: EntityModel
@@ -68,6 +67,8 @@ class RunModel: Codable, Equatable {
     
     var goalTracking: [GoalTracking] = []
     
+    var stats: [Statistics] = []
+    
     lazy var randomSource: GKLinearCongruentialRandomSource = {
         return GKLinearCongruentialRandomSource(seed: seed)
     }()
@@ -77,12 +78,13 @@ class RunModel: Codable, Equatable {
     }
     
     
-    init(player: EntityModel, seed: UInt64, savedTiles: [[Tile]]?, areas: [Area], goalTracking: [GoalTracking]) {
+    init(player: EntityModel, seed: UInt64, savedTiles: [[Tile]]?, areas: [Area], goalTracking: [GoalTracking], stats: [Statistics]) {
         self.player = player
         self.seed = seed
         self.savedTiles = savedTiles
         self.areas = areas
         self.goalTracking = goalTracking
+        self.stats = stats
     }
     
     func saveGoalTracking(_ goalTracking: [GoalTracking]) {

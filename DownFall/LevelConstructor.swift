@@ -26,19 +26,19 @@ struct LevelConstructor {
     
     static var tier2Items: [StoreOffer] {
         [
-        StoreOffer.offer(type: .luck(amount: 2), tier: 2),
-        StoreOffer.offer(type: .dodge(amount: 2), tier: 2),
-        StoreOffer.offer(type: .plusTwoMaxHealth, tier: 2),
-        StoreOffer.offer(type: .greaterHeal, tier: 2)
+            StoreOffer.offer(type: .luck(amount: 2), tier: 2),
+            StoreOffer.offer(type: .dodge(amount: 2), tier: 2),
+            StoreOffer.offer(type: .plusTwoMaxHealth, tier: 2),
+            StoreOffer.offer(type: .greaterHeal, tier: 2)
         ]
     }
     
     static var tier3Items: [StoreOffer] {
         [
-        StoreOffer.offer(type: .luck(amount: 3), tier: 3),
-        StoreOffer.offer(type: .dodge(amount: 3), tier: 3),
-        StoreOffer.offer(type: .plusTwoMaxHealth, tier: 3),
-        StoreOffer.offer(type: .greaterHeal, tier: 3)
+            StoreOffer.offer(type: .luck(amount: 3), tier: 3),
+            StoreOffer.offer(type: .dodge(amount: 3), tier: 3),
+            StoreOffer.offer(type: .plusTwoMaxHealth, tier: 3),
+            StoreOffer.offer(type: .greaterHeal, tier: 3)
         ]
     }
     

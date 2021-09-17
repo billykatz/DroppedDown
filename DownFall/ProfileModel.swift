@@ -47,9 +47,43 @@ struct Profile: Codable, Equatable {
         return Profile(name: name, progress: progress, player: player, currentRun: currentRun, deepestDepth: deepestDepth, stats: newStats, unlockables: unlockables)
     }
     
+    func updateStatistic(_ stat: Statistics, amount: Int, overwriteIfLarger: Bool = false) -> Profile {
+        guard (!overwriteIfLarger || (overwriteIfLarger && amount > firstStat(stat)?.amount ?? 0)),
+              let statIndex = firstIndexStat(stat)
+        else { return self }
+        
+        var newStats = stats
+        newStats[statIndex] = newStats[statIndex].updateStatAmount(amount, overwrite: overwriteIfLarger)
+        
+        return Profile(name: name, progress: progress, player: player, currentRun: currentRun, deepestDepth: deepestDepth, stats: newStats, unlockables: unlockables)
+    }
+    
+    func firstStat(_ stat: Statistics) -> Statistics? {
+        return stats.first(where: { playerStat in
+            playerStat.statType == stat.statType &&
+                playerStat.rockColor == stat.rockColor &&
+                playerStat.gemColor == stat.gemColor &&
+                playerStat.runeType == stat.runeType &&
+                playerStat.monsterType == stat.monsterType
+            
+        })
+
+    }
+    
+    func firstIndexStat(_ stat: Statistics) -> Int? {
+        return stats.firstIndex(where: { playerStat in
+            playerStat.statType == stat.statType &&
+                playerStat.rockColor == stat.rockColor &&
+                playerStat.gemColor == stat.gemColor &&
+                playerStat.runeType == stat.runeType &&
+                playerStat.monsterType == stat.monsterType
+            
+        })
+    }
+    
     func updateAllUnlockables(_ newUnlockables: [Unlockable]) -> Profile {
         return Profile(name: name, progress: progress, player: player, currentRun: currentRun, deepestDepth: deepestDepth, stats: stats, unlockables: newUnlockables)
-
+        
     }
     
     func updateUnlockables(_ newUnlockable: Unlockable) -> Profile {
@@ -59,7 +93,7 @@ struct Profile: Codable, Equatable {
         newUnlockables[index] = newUnlockable.purchase()
         
         return Profile(name: name, progress: progress, player: newPlayer, currentRun: currentRun, deepestDepth: deepestDepth, stats: stats, unlockables: newUnlockables)
-
+        
     }
     
     // just for debug purposes
@@ -67,5 +101,5 @@ struct Profile: Codable, Equatable {
         let runeType = RuneType.allCases.randomElement()!
         randomRune = Rune.rune(for: runeType)
     }
-        
+    
 }

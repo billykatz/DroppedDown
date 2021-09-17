@@ -48,7 +48,7 @@ class ProfileViewModel {
         for playerStat in profile.stats {
             var newStat = playerStat
             if (stat == playerStat) {
-                newStat = stat.updateStatAmount(amount)
+                newStat = stat.updateStatAmount(amount, overwrite: stat.statType.overwriteIfLarger)
             }
             
             newStatistics.append(newStat)
@@ -112,25 +112,40 @@ class ProfileViewModel {
         GameScope.shared.profileManager.resetUserDefaults()
     }
     
-    // ju
+    // just for debugging purposes
     func givePlayerARandomRune() {
         profileSubject.value.givePlayerARandomRune()
         saveProfile(profileSubject.value)
     }
     
     func finishRun(playerData updatedPlayerData: EntityModel, currentRun: RunModel) {
-        /// update the profile to show
-        /// the player's gems
-        let currentRun: RunModel? = updatedPlayerData.isDead ? nil : currentRun
-        /// update run
-        let profileWithCurrentRun = profile.updateRunModel(currentRun)
+        /// update the player
+        var newPlayerData = updatedPlayerData.update(pickaxe: updatedPlayerData.pickaxe)
+        
         /// update player gem carry
-        let playerUpdated = profileWithCurrentRun.player.updateCarry(carry: updatedPlayerData.carry).update(pickaxe: updatedPlayerData.pickaxe)
+        newPlayerData = newPlayerData.updateCarry(carry: updatedPlayerData.carry)
         
+        // revive
+        newPlayerData = newPlayerData.revive()
+        
+        
+        /// Update Profile
         /// update profile with new player
-        let profileWithUpdatedPlayer = profileWithCurrentRun.updatePlayer(playerUpdated)
+        var newProfile = profile.updatePlayer(newPlayerData)
         
-        //update profile with current depth
-        saveProfile(profileWithUpdatedPlayer.updateDepth(currentRun?.depth ?? 0))
+        // update stats
+        for stat in currentRun.stats {
+            let overwrite = stat.statType.overwriteIfLarger
+            newProfile = newProfile.updateStatistic(stat, amount: stat.amount, overwriteIfLarger: overwrite)
+        }
+        
+        /// update run
+        newProfile = newProfile.updateRunModel(updatedPlayerData.isDead ? nil : currentRun)
+        
+        // update lowest depth if needed
+        newProfile = newProfile.updateStatistic(.lowestDepthReached, amount: currentRun.depth, overwriteIfLarger: true)
+        
+        // save profile
+        saveProfile(newProfile)
     }
 }

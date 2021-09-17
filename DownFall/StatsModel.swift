@@ -33,6 +33,8 @@ enum StatisticType: String, Codable {
     // Damage/health
     case damageTaken
     case healthHealed
+    case damageDealt
+    case attacksDodged
     
     // win/lose
     case totalWins
@@ -41,6 +43,15 @@ enum StatisticType: String, Codable {
     // runes
     case runeUses
     case totalRuneUses
+    
+    var overwriteIfLarger: Bool {
+        switch self {
+        case .largestRockGroupDestroyed, .monstersKilledInARow, .lowestDepthReached:
+            return true
+        default:
+            return false
+        }
+    }
     
 }
 
@@ -67,8 +78,13 @@ struct Statistics: Codable, Equatable, Identifiable {
         self.id = UUID()
     }
     
-    func updateStatAmount(_ amount: Int) -> Statistics {
-        return Self.init(rockColor: self.rockColor, gemColor: self.gemColor, monsterType: self.monsterType, runeType: self.runeType, amount: self.amount + amount, statType: self.statType)
+    func updateStatAmount(_ amount: Int, overwrite: Bool) -> Statistics {
+        let newAmount = overwrite ? amount : self.amount + amount
+        return Self.init(rockColor: self.rockColor, gemColor: self.gemColor, monsterType: self.monsterType, runeType: self.runeType, amount: newAmount, statType: self.statType)
+    }
+    
+    func overwriteStatAmount(_ amount: Int) -> Statistics {
+        return Self.init(rockColor: self.rockColor, gemColor: self.gemColor, monsterType: self.monsterType, runeType: self.runeType, amount: amount, statType: self.statType)
     }
 }
 
@@ -96,6 +112,8 @@ extension Statistics {
     static var monstersKilledInARow = Self.init(amount: 0, statType: .monstersKilledInARow)
     static var damageTaken = Self.init(amount: 0, statType: .damageTaken)
     static var healthHealed = Self.init(amount: 0, statType: .healthHealed)
+    static var damageDealt = Self.init(amount: 0, statType: .damageDealt)
+    static var attacksDodged = Self.init(amount: 0, statType: .attacksDodged)
     static var totalWins = Self.init(amount: 0, statType: .totalWins)
     static var totalLoses = Self.init(amount: 0, statType: .totalLoses)
     static var totalRuneUsesamount = Self.init(amount: 0, statType: .totalRuneUses)

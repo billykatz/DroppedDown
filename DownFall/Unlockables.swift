@@ -19,6 +19,8 @@ struct Unlockable: Codable, Identifiable, Equatable {
     let purchaseAmount: Int
     let isPurchased: Bool
     let isUnlocked: Bool
+//    let applysToBasePlayer: Bool
+//    let appearsInRuns: Bool
     
     var id: String {
         return "\(item.textureName)\(item.tier)"
@@ -47,7 +49,7 @@ struct Unlockable: Codable, Identifiable, Equatable {
         ]
     }
     
-    static var startingUnlockables: [Unlockable] {
+    static var unlockables: [Unlockable] {
         [
             // mined rocks
             Unlockable(stat: .oneHundredRocks, item: StoreOffer.offer(type: .plusOneMaxHealth, tier: 1), purchaseAmount: 50, isPurchased: false, isUnlocked: false),
@@ -92,6 +94,31 @@ struct Unlockable: Codable, Identifiable, Equatable {
             Unlockable(stat: .allRunesUses101, item: StoreOffer.offer(type: .runeSlot, tier: 1), purchaseAmount: 100, isPurchased: false, isUnlocked: false),
             Unlockable(stat: .allRunesUses101, item: StoreOffer.offer(type: .runeSlot, tier: 2), purchaseAmount: 100, isPurchased: false, isUnlocked: false),
             Unlockable(stat: .allRunesUses101, item: StoreOffer.offer(type: .runeSlot, tier: 3), purchaseAmount: 100, isPurchased: false, isUnlocked: false)
+        ]
+    }
+    
+    static var startingUnlockedUnlockables: [Unlockable] {
+        let stat = Statistics(amount: 0, statType: .attacksDodged)
+        
+        
+        return [
+            Unlockable(stat: stat, item: StoreOffer.offer(type: .lesserHeal, tier: 1), purchaseAmount: 100, isPurchased: true, isUnlocked: true),
+            Unlockable(stat: stat, item: StoreOffer.offer(type: .luck(amount: 2), tier: 1), purchaseAmount: 100, isPurchased: true, isUnlocked: true),
+            Unlockable(stat: stat, item: StoreOffer.offer(type: .dodge(amount: 2), tier: 1), purchaseAmount: 100, isPurchased: true, isUnlocked: true),
+            Unlockable(stat: stat, item: StoreOffer.offer(type: .gems(amount: 25), tier: 1), purchaseAmount: 100, isPurchased: true, isUnlocked: true),
+            Unlockable(stat: stat, item: StoreOffer.offer(type: .plusOneMaxHealth, tier: 1), purchaseAmount: 100, isPurchased: true, isUnlocked: true),
+            
+            Unlockable(stat: stat, item: StoreOffer.offer(type: .luck(amount: 4), tier: 2), purchaseAmount: 100, isPurchased: true, isUnlocked: true),
+            Unlockable(stat: stat, item: StoreOffer.offer(type: .dodge(amount: 4), tier: 2), purchaseAmount: 100, isPurchased: true, isUnlocked: true),
+            Unlockable(stat: stat, item: StoreOffer.offer(type: .plusOneMaxHealth, tier: 2), purchaseAmount: 100, isPurchased: true, isUnlocked: true),
+            Unlockable(stat: stat, item: StoreOffer.offer(type: .gems(amount: 50), tier: 2), purchaseAmount: 100, isPurchased: true, isUnlocked: true),
+            Unlockable(stat: stat, item: StoreOffer.offer(type: .rune(Rune.rune(for: .getSwifty)), tier: 2), purchaseAmount: 100, isPurchased: true, isUnlocked: true),
+            Unlockable(stat: stat, item: StoreOffer.offer(type: .rune(Rune.rune(for: .fireball)), tier: 2), purchaseAmount: 100, isPurchased: true, isUnlocked: true),
+            Unlockable(stat: stat, item: StoreOffer.offer(type: .rune(Rune.rune(for: .transformRock)), tier: 2), purchaseAmount: 100, isPurchased: true, isUnlocked: true),
+            Unlockable(stat: stat, item: StoreOffer.offer(type: .killMonsterPotion, tier: 2), purchaseAmount: 100, isPurchased: true, isUnlocked: true),
+            Unlockable(stat: stat, item: StoreOffer.offer(type: .transmogrifyPotion, tier: 2), purchaseAmount: 100, isPurchased: true, isUnlocked: true),
+            Unlockable(stat: stat, item: StoreOffer.offer(type: .runeSlot, tier: 2), purchaseAmount: 100, isPurchased: true, isUnlocked: true),
+            
         ]
     }
     

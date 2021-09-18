@@ -24,6 +24,10 @@ struct Pickaxe: Equatable, Codable, Hashable {
             rune != haveRune
         })
     }
+    
+    func isAtMaxCapacity() -> Bool {
+        return runeSlots == Pickaxe.maxRuneSlots || runes.count == runeSlots
+    }
 }
 
 struct EntityModel: Equatable, Codable {

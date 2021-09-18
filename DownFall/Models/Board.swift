@@ -347,45 +347,46 @@ class Board: Equatable {
         return Set<TileCoord>(tileCoords)
     }
     
-    private func randomItem(in tier: Int, excludeRunesInPickaxe pickaxe: Pickaxe) -> StoreOffer {
-        let offersInTier = self.level.potentialItems.filter { $0.tierIndex == tier }
-        let randomNumber = Int.random(abs(tileCreator.randomSource.nextInt())) % offersInTier.count
-        let randomItem = offersInTier[randomNumber]
-        
-        if let rune = randomItem.rune, pickaxe.runes.contains(rune) {
-            // repeat until we get one that the current pickaxe doesnt contain.
-            return self.randomItem(in: tier, excludeRunesInPickaxe: pickaxe)
-        } else {
-            return randomItem
-        }
-    }
+//    private func randomItem(in tier: Int, excludeRunesInPickaxe pickaxe: Pickaxe) -> StoreOffer {
+//        let offersInTier = self.level.potentialItems.filter { $0.tierIndex == tier }
+//        let randomNumber = Int.random(abs(tileCreator.randomSource.nextInt())) % offersInTier.count
+//        let randomItem = offersInTier[randomNumber]
+//
+//        if let rune = randomItem.rune, pickaxe.runes.contains(rune) {
+//            // repeat until we get one that the current pickaxe doesnt contain.
+//            return self.randomItem(in: tier, excludeRunesInPickaxe: pickaxe)
+//        } else {
+//            return randomItem
+//        }
+//    }
     
     private func randomTwoItem(in tier: Int, excludeRunesInPickaxe pickaxe: Pickaxe) -> [StoreOffer] {
         let offersInTier = self.level.potentialItems.filter { $0.tierIndex == tier }
         
         // store two unique random items
-        var randomNumbers = Set<Int>()
+        var randomNumbersSet = Set<Int>()
         
         // grab two unique random numbers
-        while randomNumbers.count < 2 {
+        while randomNumbersSet.count < 2 {
             let randomNumber = Int.random(abs(tileCreator.randomSource.nextInt())) % offersInTier.count
-            randomNumbers.insert(randomNumber)
+            randomNumbersSet.insert(randomNumber)
         }
+        
+        let randomNumbers = Array(randomNumbersSet)
         
         // store two random items
         var randomItems : [StoreOffer] = []
         
         // get two random items
-        for number in randomNumbers {
-            randomItems.append(offersInTier[number])
-        }
-        
-        // if we picked a rune that the player already has then re-do this whole thing
-        for item in randomItems {
-            if let rune = item.rune, pickaxe.runes.contains(rune) {
-                // repeat until we get one that the current pickaxe doesnt contain.
-                return self.randomTwoItem(in: tier, excludeRunesInPickaxe: pickaxe)
+        var count = 0
+        while randomItems.count < 2 {
+            let index = randomNumbers[count]
+            let randomItem = offersInTier[index]
+            if let rune = randomItem.rune, pickaxe.runes.contains(rune) {
+                continue
             }
+            count += 1
+            randomItems.append(randomItem)
         }
         
         // finally return the random items.

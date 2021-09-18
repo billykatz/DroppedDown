@@ -3,6 +3,7 @@
     "progress": 3,
     "deepestDepth": 0,
     "unlockables": [],
+    "startingUnlockables": [],
     "stats": [],
     "player" :
         { "name": "player3",

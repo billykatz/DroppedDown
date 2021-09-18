@@ -13,13 +13,152 @@ typealias Depth = Int
 
 struct LevelConstructor {
     
+    // refactor
+    static func buildLevel(depth: Int, randomSource: GKLinearCongruentialRandomSource, playerData: EntityModel, unlockables: [Unlockable], startingUnlockables: [Unlockable]) -> Level {
+        let pillars = pillars(depth: depth, randomSource: randomSource)
+        let gemsAtDepth = maxSpawnGems(depth: depth)
+        
+        return
+            Level(
+                depth: depth,
+                monsterTypeRatio: monsterTypes(depth: depth),
+                monsterCountStart: monsterCountStart(depth: depth),
+                maxMonsterOnBoardRatio: maxMonsterOnBoardRatio(depth: depth),
+                boardSize: boardSize(depth: depth),
+                tileTypeChances: availableRocksPerLevel(depth: depth),
+                pillarCoordinates: pillars,
+                goals: levelGoal(depth: depth, pillars: pillars, gemAtDepth: gemsAtDepth, randomSource: randomSource),
+                maxSpawnGems: gemsAtDepth,
+                goalProgress: [],
+                potentialItems: potentialItems(depth: depth, unlockables: unlockables, startingUnlockables: startingUnlockables, playerData: playerData, randomSource: randomSource)
+            )
+    }
+    
+    static func potentialItems(depth: Depth, unlockables: [Unlockable], startingUnlockables: [Unlockable], playerData: EntityModel, randomSource: GKLinearCongruentialRandomSource) -> [StoreOffer] {
+        var offers = [StoreOffer]()
+        
+        offers.append(contentsOf: tierItems(tier: 1, depth: depth, unlockables: unlockables, playerData: playerData, randomSource: randomSource))
+        offers.append(contentsOf: tierItems(tier: 2, depth: depth, unlockables: unlockables, playerData: playerData, randomSource: randomSource))
+        
+        return offers
+        
+    }
+    
+    /// Item pool rewards
+    /// [✅] - At least 1 offer must be a way to heal
+    /// [✅] - If the player has an empty rune slot then increase the chance of offering a rune
+    /// [✅] - first goal: offer health and something else
+    /// [✅] - second goal: offer non-health and non-health
+    /// [✅] - if the player has a full pickaxe then increase chance of offering a rune slot
+    /// [push] - if a player just bought an item then increase the chance of it showing up
+    ///
+    /// For this release
+    /// the first tier always offers health and something else in that tier.
+    ///
+    
+    static func tierItems(tier: StoreOfferTier, depth: Depth, unlockables: [Unlockable], playerData: EntityModel, randomSource: GKLinearCongruentialRandomSource) -> [StoreOffer] {
+        
+        if tier == 1 {
+            // always offer at least 1 heal
+            let healingOptions =
+                unlockables
+                .filter { unlockable in
+                    return unlockable.isPurchased && unlockable.item.tier == tier && (unlockable.item.type == .lesserHeal || unlockable.item.type == .greaterHeal)
+                }
+            
+            guard let healingOption = healingOptions.randomElement() else { preconditionFailure("There must always be at least 1 unlockable at tier 1 for healing")}
+            
+            let otherOptions =
+                unlockables
+                .filter { unlockable in
+                    return !healingOptions.contains(unlockable) && unlockable.isPurchased && unlockable.item.tier == tier
+                }
+            
+            guard let otherOption = otherOptions.randomElement() else {  preconditionFailure("There must always be at least 1 other unlockable at tier 1 that isn't healing")}
+            
+            return [healingOption.item, otherOption.item]
+        }
+        else if tier == 2 {
+            let playerHasFullPickaxe = playerData.pickaxe?.isAtMaxCapacity() ?? false
+            
+            let chanceRune: Int
+            let chanceRuneSlot: Int
+            if playerHasFullPickaxe {
+                chanceRune = 20
+                chanceRuneSlot = 50
+            } else {
+                chanceRune = 50
+                chanceRuneSlot = 0
+            }
+            
+            var randomNumber = randomSource.nextInt(upperBound: 100)
+            var offeredRuneAlready = false
+            var offeredRuneSlotAlready = false
+            var options: [Unlockable] = []
+            while (options.count < 2) {
+                
+                if (randomNumber < chanceRune && !offeredRuneAlready) {
+                    offeredRuneAlready = true
+                    let runeOptions = unlockables.filter { unlockable in
+                        if case let StoreOfferType.rune(rune) = unlockable.item.type {
+                            return unlockable.isPurchased && unlockable.item.tier == tier && !(playerData.pickaxe?.runes.contains(rune) ?? false)
+                        } else {
+                            return false
+                        }
+                    }
+                    
+                    guard let option = runeOptions.randomElement() else { continue }
+                    
+                    options.append(option)
+                    
+                } else if (randomNumber >= chanceRune && randomNumber < chanceRune + chanceRuneSlot && !offeredRuneSlotAlready) {
+                    offeredRuneSlotAlready = true
+                    
+                    let runeSlotOptions = unlockables.filter { unlockable in
+                        return unlockable.isPurchased && unlockable.item.tier == tier && unlockable.item.type == .runeSlot
+                    }
+                    
+                    guard let option = runeSlotOptions.randomElement() else { continue }
+                    
+                    options.append(option)
+                    
+                } else {
+                    let otherOptions = unlockables.filter { unlockable in
+                        
+                        // remove runes
+                        if case StoreOfferType.rune = unlockable.item.type {
+                            return false
+                        }
+                        
+                        // remove rune slots, just offer other types of rewards
+                        return unlockable.isPurchased && unlockable.item.tier == tier && unlockable.item.type != .runeSlot
+                    }
+                    
+                    guard let option = otherOptions.randomElement() else { continue }
+                    
+                    options.append(option)
+                }
+                
+                randomNumber = randomSource.nextInt(upperBound: 100)
+
+            }
+            
+            return options.map { $0.item }
+            
+            
+        } else {
+            preconditionFailure("For this release we are only allowing two goals")
+        }
+
+    }
+    
     // ITEMS
     
     static var tier1Items:  [StoreOffer] {
         [
             StoreOffer.offer(type: .plusOneMaxHealth, tier: 1),
-//            StoreOffer.offer(type: .killMonsterPotion, tier: 1),
-//            StoreOffer.offer(type: .transmogrifyPotion, tier: 1),
+            //            StoreOffer.offer(type: .killMonsterPotion, tier: 1),
+            //            StoreOffer.offer(type: .transmogrifyPotion, tier: 1),
             StoreOffer.offer(type: .greaterHeal, tier: 1)
         ]
     }
@@ -86,7 +225,7 @@ struct LevelConstructor {
     }
     
     static func buildLevel(depth: Depth, randomSource: GKLinearCongruentialRandomSource) -> Level {
-        let pillarCoords = pillars(depth: depth)
+        let pillarCoords = pillars(depth: depth, randomSource: randomSource)
         let maxGems = maxSpawnGems(depth: depth)
         
         return Level(depth: depth,
@@ -96,7 +235,7 @@ struct LevelConstructor {
                      boardSize: boardSize(depth: depth),
                      tileTypeChances: availableRocksPerLevel(depth: depth),
                      pillarCoordinates: pillarCoords,
-                     goals: levelGoal(depth: depth, pillars: pillarCoords, gemAtDepth: maxGems),
+                     goals: levelGoal(depth: depth, pillars: pillarCoords, gemAtDepth: maxGems, randomSource: randomSource),
                      maxSpawnGems: maxGems,
                      goalProgress: [],
                      potentialItems: potentialItems(depth: depth))
@@ -158,7 +297,7 @@ struct LevelConstructor {
         return depthDivided(depth) + 3
     }
     
-    static func levelGoal(depth: Depth, pillars: [PillarCoorindates], gemAtDepth: Int, randomSource: GKLinearCongruentialRandomSource = GKLinearCongruentialRandomSource()) -> [LevelGoal] {
+    static func levelGoal(depth: Depth, pillars: [PillarCoorindates], gemAtDepth: Int, randomSource: GKLinearCongruentialRandomSource) -> [LevelGoal] {
         func randomRockGoal(_ colors: [ShiftShaft_Color], amount: Int, minimumGroupSize: Int) -> LevelGoal? {
             guard let randomColor = colors.randomElement() else { return nil }
             return LevelGoal(type: .unlockExit, tileType: .rock(color: randomColor, holdsGem: false), targetAmount: amount, minimumGroupSize: minimumGroupSize, grouped: minimumGroupSize > 1)
@@ -204,13 +343,13 @@ struct LevelConstructor {
         }
         
         return goals.compactMap { $0 }.choose(random: 2)
-//
-//        switch depth {
-//        case 0, 1:
-//            return goals.compactMap { $0 }.choose(random: 2)
-//        default:
-//            return goals.compactMap { $0 }.choose(random: 3)
-//        }
+        //
+        //        switch depth {
+        //        case 0, 1:
+        //            return goals.compactMap { $0 }.choose(random: 2)
+        //        default:
+        //            return goals.compactMap { $0 }.choose(random: 3)
+        //        }
     }
     
     static func boardSize(depth: Depth) -> Int {
@@ -246,9 +385,9 @@ struct LevelConstructor {
             
         case 10...Int.max:
             let chances = TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false): 30,
-                                                          .rock(color: .blue, holdsGem: false): 30,
-                                                          .rock(color: .purple, holdsGem: false): 30,
-                                                          .rock(color: .brown, holdsGem: false): 10])
+                                                        .rock(color: .blue, holdsGem: false): 30,
+                                                        .rock(color: .purple, holdsGem: false): 30,
+                                                        .rock(color: .brown, holdsGem: false): 10])
             return chances
         default:
             fatalError("Level must be positive")
@@ -256,7 +395,7 @@ struct LevelConstructor {
     }
     
     /// Randomly creates 0 up to a max of boardsize/8 pillar coordinates
-    static func pillars(depth: Depth, randomSource: GKLinearCongruentialRandomSource = GKLinearCongruentialRandomSource()) -> [PillarCoorindates] {
+    static func pillars(depth: Depth, randomSource: GKLinearCongruentialRandomSource) -> [PillarCoorindates] {
         
         func randomPillar(notIn set: Set<ShiftShaft_Color>) -> TileType {
             var color = ShiftShaft_Color.allCases.randomElement()!
@@ -272,13 +411,13 @@ struct LevelConstructor {
         
         
         
-//        =FLOOR( MIN(M3 - (2 - MOD(RAND() * 10, 2)),  (AD3 + RANDBETWEEN(-1,1) ) ))
+        //        =FLOOR( MIN(M3 - (2 - MOD(RAND() * 10, 2)),  (AD3 + RANDBETWEEN(-1,1) ) ))
         /// no pillars in first 5 levels
         let depthDivided = self.depthDivided(depth)
         let numPillarsBasedOnDepth =
             depthDivided == 0 ?
-                0
-                :
+            0
+            :
             depthDivided + (randomSource.positiveNextInt % 2 == 0 ? -1 : 1)
         
         let numberPillars = min(boardSize(depth: depth) - (2 - randomSource.positiveNextInt % 2), numPillarsBasedOnDepth)
@@ -395,7 +534,7 @@ struct LevelConstructor {
             let ratRange = batRange.next(30)
             let sallyRange = ratRange.next(30)
             return [.rat: ratRange, .alamo: alamoRange, .dragon: dragonRange, .bat: batRange, .sally: sallyRange]
-
+            
         default:
             fatalError()
         }

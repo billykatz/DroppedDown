@@ -13,7 +13,7 @@ import Foundation
 
 protocol GameSceneCoordinatingDelegate: AnyObject {
     func navigateToMainMenu(_ scene: SKScene, playerData: EntityModel)
-    func goToNextArea()
+    func goToNextArea(updatedPlayerData: EntityModel)
     func saveState()
 }
 
@@ -139,11 +139,14 @@ class GameScene: SKScene {
                 }
             } else if case InputType.visitStore = input.type {
                 
-                guard let self = self else { return }
+                guard let self = self,
+                      let board = self.board,
+                      let playerIndex = tileIndices(of: .player(.zero), in: board.tiles).first,
+                    case let TileType.player(data) = board.tiles[playerIndex].type else { return }
                 self.foreground.removeAllChildren()
                 self.removeFromParent()
                 self.swipeRecognizerView?.removeFromSuperview()
-                self.gameSceneDelegate?.goToNextArea()
+                self.gameSceneDelegate?.goToNextArea(updatedPlayerData: data)
             
             } else if case InputType.gameWin(_) = input.type {
                 guard let self = self else { return }

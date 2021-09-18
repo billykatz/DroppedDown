@@ -76,16 +76,16 @@ class LevelCoordinator: LevelCoordinating {
         let seed = UInt64.random(in: .min ... .max)
         
         // no saved tiles for fresh run
-        let freshRunModel = RunModel(player: profile.runPlayer, seed: seed, savedTiles: nil, areas: [], goalTracking: [], stats: [])
+        let freshRunModel = RunModel(player: profile.runPlayer, seed: seed, savedTiles: nil, areas: [], goalTracking: [], stats: [], unlockables: profile.unlockables, startingUnlockables: profile.startingUnlockbles)
         
         self.runModel = runModel ?? freshRunModel
         RunScope.deepestDepth = profile.deepestDepth
-        presentCurrentArea()
+        presentCurrentArea(updatedPlayerData: profile.runPlayer)
     }
     
     /// This should be used when you want load the run from the last part
-    func presentCurrentArea() {
-        let nextArea = runModel.currentArea()
+    func presentCurrentArea(updatedPlayerData: EntityModel) {
+        let nextArea = runModel.currentArea(updatedPlayerData: updatedPlayerData)
         switch nextArea.type {
         case .level(let level):
             presentNextLevel(level, playerData: runModel.player, savedTiles: runModel.savedTiles)
@@ -93,8 +93,8 @@ class LevelCoordinator: LevelCoordinating {
     }
     
     /// This should be used most of the the time.  When ever you want to proceed in the run, you should call this function.
-    func presentNextArea() {
-        let nextArea = runModel.nextArea()
+    func presentNextArea(updatedPlayerData: EntityModel) {
+        let nextArea = runModel.nextArea(updatedPlayerData: updatedPlayerData)
         switch nextArea.type {
         case .level(let level):
             presentNextLevel(level, playerData: runModel.player)
@@ -128,10 +128,10 @@ class LevelCoordinator: LevelCoordinating {
     }
     
     // removes the current game scene and then triggers presentation of the next area
-    func goToNextArea() {
+    func goToNextArea(updatedPlayerData: EntityModel) {
         view.presentScene(nil)
         gameSceneNode?.removeFromParent()
-        presentNextArea()
+        presentNextArea(updatedPlayerData: updatedPlayerData)
     }
     
     func saveState() {
@@ -157,7 +157,7 @@ class LevelCoordinator: LevelCoordinating {
     
     // MARK: Utility functions
     private func saveTiles(_ savedTiles: [[Tile]]) -> RunModel {
-        return RunModel(player: runModel.player, seed: runModel.seed, savedTiles: savedTiles, areas: runModel.areas, goalTracking: runModel.goalTracking, stats: runModel.stats)
+        return RunModel(player: runModel.player, seed: runModel.seed, savedTiles: savedTiles, areas: runModel.areas, goalTracking: runModel.goalTracking, stats: runModel.stats, unlockables: runModel.unlockables, startingUnlockables: runModel.startingUnlockables)
     }
     
     

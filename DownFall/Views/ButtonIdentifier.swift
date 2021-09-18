@@ -60,7 +60,7 @@ enum ButtonIdentifier: String {
         case .resume:
             return "Resume"
         case .playAgain:
-            return "Menu"
+            return "Main Menu"
         case .selectLevel:
             return "Level Select"
         case .leaveStore, .continueRun:

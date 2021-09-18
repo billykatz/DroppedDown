@@ -40,7 +40,7 @@ struct Item: Codable, Hashable {
     }
     
     static var randomColorGem: String {
-        let options = ["blueCrystal", "purpleCrystal", "redCrystal"]
+        let options = ["blueCrystal", "purpleCrystal", "redCrystal", "greenCrystal", "brownCrystal"]
         return options.randomElement()!
     }
     

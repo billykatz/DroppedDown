@@ -76,7 +76,7 @@ struct LevelConstructor {
             
             guard let otherOption = otherOptions.randomElement() else {  preconditionFailure("There must always be at least 1 other unlockable at tier 1 that isn't healing")}
             
-            return [healingOption.item, StoreOffer.offer(type: .gems(amount: 25), tier: 1)]// otherOption.item]
+            return [healingOption.item, otherOption.item]// otherOption.item]
         }
         else if tier == 2 {
             let playerHasFullPickaxe = playerData.pickaxe?.isAtMaxCapacity() ?? false
@@ -172,25 +172,35 @@ struct LevelConstructor {
         switch depth {
         case 0:
             let monsterGoal = LevelGoal.killMonsterGoal(amount: 1)
-            let gemGoal = LevelGoal.gemGoal(amount: 2)
-            let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 25)
+            let gemGoal = LevelGoal.gemGoal(amount: 1)
+            let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 20)
             
             goals = [gemGoal, rockGoal, monsterGoal]
         case 1:
-            let monsterGoal = LevelGoal.killMonsterGoal(amount: 3)
+            let monsterGoal = LevelGoal.killMonsterGoal(amount: 2)
             let gemGoal = LevelGoal.gemGoal(amount: 2)
-            let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 35)
+            let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 25)
             goals = [gemGoal, rockGoal, monsterGoal]
-        case 2...Int.max:
+        case 2,3:
             let monsterAmount = Int(Double(boardSize(depth: depth)) * Double(boardSize(depth: depth)) * maxMonsterOnBoardRatio(depth: depth))
             let gemAmount = gemAtDepth * Int.random(lower: 50, upper: 75) / 100
             
             let gemGoal = LevelGoal.gemGoal(amount: gemAmount)
-            let rockGoal = randomRockGoal([.red, .purple, .blue], amount: Int.random(lower: 40, upper: 60, interval: 5))
+            let rockGoal = randomRockGoal([.red, .purple, .blue], amount: Int.random(lower: 30, upper: 40, interval: 5))
             let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
             
             goals = [gemGoal, rockGoal, monsterGoal]
         
+        case 4...Int.max:
+            let monsterAmount = Int(Double(boardSize(depth: depth)) * Double(boardSize(depth: depth)) * maxMonsterOnBoardRatio(depth: depth))
+            let gemAmount = gemAtDepth * Int.random(lower: 50, upper: 75) / 100
+            
+            let gemGoal = LevelGoal.gemGoal(amount: gemAmount)
+            let rockGoal = randomRockGoal([.red, .purple, .blue], amount: Int.random(lower: 40, upper: 50, interval: 5))
+            let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
+            
+            goals = [gemGoal, rockGoal, monsterGoal]
+            
         default:
             goals = []
         }
@@ -222,7 +232,12 @@ struct LevelConstructor {
                                                         .rock(color: .blue, holdsGem: false): 33,
                                                         .rock(color: .purple, holdsGem: false): 33])
             return chances
-        case 5, 6, 7, 8, 9:
+        case 5, 6, 7:
+             let chances = TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false): 33,
+                                                         .rock(color: .blue, holdsGem: false): 33,
+                                                         .rock(color: .purple, holdsGem: false): 33])
+             return chances
+        case 8, 9:
             let chances = TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false): 30,
                                                         .rock(color: .blue, holdsGem: false): 30,
                                                         .rock(color: .purple, holdsGem: false): 30,
@@ -259,12 +274,24 @@ struct LevelConstructor {
         
         //        =FLOOR( MIN(M3 - (2 - MOD(RAND() * 10, 2)),  (AD3 + RANDBETWEEN(-1,1) ) ))
         /// no pillars in first 5 levels
-        let depthDivided = self.depthDivided(depth)
-        let numPillarsBasedOnDepth =
-            depthDivided == 0 ?
-            0
-            :
-            depthDivided + (randomSource.positiveNextInt % 2 == 0 ? -1 : 1)
+//        let depthDivided = self.depthDivided(depth)
+        let numPillarsBasedOnDepth: Int
+        switch depth {
+        case 1, 2, 3, 4:
+            numPillarsBasedOnDepth = 0
+        case 5, 6, 7:
+            numPillarsBasedOnDepth = 3 + (randomSource.positiveNextInt % 2 == 0 ? -1 : 1)
+        case 8, 9:
+            numPillarsBasedOnDepth = 0
+        case 10...Int.max:
+            numPillarsBasedOnDepth = 3 + (randomSource.positiveNextInt % 2 == 0 ? -1 : 1)
+        default:
+            numPillarsBasedOnDepth = 0
+        }
+//            depthDivided == 0 ?
+//            0
+//            :
+//            depthDivided + (randomSource.positiveNextInt % 2 == 0 ? -1 : 1)
         
         let numberPillars = min(boardSize(depth: depth) - (2 - randomSource.positiveNextInt % 2), numPillarsBasedOnDepth)
         

@@ -10,20 +10,24 @@ import Foundation
 
 
 struct Profile: Codable, Equatable {
-    static var debugProfile = Profile(name: "debug", progress: 0, player: .lotsOfCash, currentRun: nil, deepestDepth: 0, stats: Statistics.startingStats, unlockables: Unlockable.unlockables, startingUnlockbles: [])
+    static var debugProfile = Profile(name: "debug", player: .lotsOfCash, currentRun: nil, stats: Statistics.startingStats, unlockables: Unlockable.unlockables, startingUnlockbles: [])
     
-    static var zero = Profile(name: "zero", progress: 0, player: .zero, currentRun: nil, deepestDepth: 0, stats: [], unlockables: [], startingUnlockbles: [])
+    static var zero = Profile(name: "zero", player: .zero, currentRun: nil, stats: [], unlockables: [], startingUnlockbles: [])
     
     let name: String
-    let progress: Int
     let player: EntityModel
     var currentRun: RunModel?
     var randomRune: Rune?
-    let deepestDepth: Int
     let stats: [Statistics]
     let unlockables: [Unlockable]
     
     let startingUnlockbles: [Unlockable]
+    
+    
+    /// for now this is just the number of unlockables unlocked
+    var progress: Int {
+        return unlockables.filter { $0.isUnlocked }.count
+    }
     
 //    enum CodingKeys: String, CodingKey {
 //        case name
@@ -52,20 +56,16 @@ struct Profile: Codable, Equatable {
     }
     
     func updatePlayer(_ entityModel: EntityModel) -> Profile {
-        return Profile(name: name, progress: progress + 1, player: entityModel, currentRun: currentRun, deepestDepth: deepestDepth, stats: stats, unlockables: unlockables, startingUnlockbles: startingUnlockbles)
+        return Profile(name: name, player: entityModel, currentRun: currentRun, stats: stats, unlockables: unlockables, startingUnlockbles: startingUnlockbles)
     }
     
     func updateRunModel(_ currentRun: RunModel?) -> Profile {
-        return Profile(name: name, progress: progress + 1, player: player, currentRun: currentRun, deepestDepth: deepestDepth, stats: stats, unlockables: unlockables, startingUnlockbles: startingUnlockbles)
+        return Profile(name: name, player: player, currentRun: currentRun, stats: stats, unlockables: unlockables, startingUnlockbles: startingUnlockbles)
     }
     
-    func updateDepth(_ depth: Int) -> Profile {
-        let newDepth = depth > deepestDepth ? depth : deepestDepth
-        return Profile(name: name, progress: progress + 1, player: player, currentRun: currentRun, deepestDepth: newDepth, stats: stats, unlockables: unlockables, startingUnlockbles: startingUnlockbles)
-    }
     
     func updateStatistics(_ newStats: [Statistics]) -> Profile {
-        return Profile(name: name, progress: progress, player: player, currentRun: currentRun, deepestDepth: deepestDepth, stats: newStats, unlockables: unlockables, startingUnlockbles: startingUnlockbles)
+        return Profile(name: name, player: player, currentRun: currentRun, stats: newStats, unlockables: unlockables, startingUnlockbles: startingUnlockbles)
     }
     
     func updateStatistic(_ stat: Statistics, amount: Int, overwriteIfLarger: Bool = false) -> Profile {
@@ -76,7 +76,7 @@ struct Profile: Codable, Equatable {
         var newStats = stats
         newStats[statIndex] = newStats[statIndex].updateStatAmount(amount, overwrite: overwriteIfLarger)
         
-        return Profile(name: name, progress: progress, player: player, currentRun: currentRun, deepestDepth: deepestDepth, stats: newStats, unlockables: unlockables, startingUnlockbles: startingUnlockbles)
+        return Profile(name: name, player: player, currentRun: currentRun, stats: newStats, unlockables: unlockables, startingUnlockbles: startingUnlockbles)
     }
     
     func firstStat(_ stat: Statistics) -> Statistics? {
@@ -103,7 +103,7 @@ struct Profile: Codable, Equatable {
     }
     
     func updateAllUnlockables(_ newUnlockables: [Unlockable]) -> Profile {
-        return Profile(name: name, progress: progress, player: player, currentRun: currentRun, deepestDepth: deepestDepth, stats: stats, unlockables: newUnlockables, startingUnlockbles: startingUnlockbles)
+        return Profile(name: name, player: player, currentRun: currentRun, stats: stats, unlockables: newUnlockables, startingUnlockbles: startingUnlockbles)
         
     }
     
@@ -113,7 +113,7 @@ struct Profile: Codable, Equatable {
         var newUnlockables = unlockables
         newUnlockables[index] = newUnlockable.purchase()
         
-        return Profile(name: name, progress: progress, player: newPlayer, currentRun: currentRun, deepestDepth: deepestDepth, stats: stats, unlockables: newUnlockables, startingUnlockbles: startingUnlockbles)
+        return Profile(name: name, player: newPlayer, currentRun: currentRun, stats: stats, unlockables: newUnlockables, startingUnlockbles: startingUnlockbles)
         
     }
     

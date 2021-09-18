@@ -29,26 +29,70 @@ struct Profile: Codable, Equatable {
         return unlockables.filter { $0.isUnlocked }.count
     }
     
-//    enum CodingKeys: String, CodingKey {
-//        case name
-//        case progress
-//        case player
-//        case currentRun
-//        case randomRune
-//        case deepestDepth
-//        case stats: [Stat]
-//
-//    }
-//
-//    init(from decoder: Decoder) throws {
-//        let container = try decoder.container(keyedBy: CodingKeys.self)
-//
-//        let name = container.deco
-//    }
-//
+    enum CodingKeys: String, CodingKey {
+        case name
+        case player
+        case currentRun
+        case randomRune
+        case stats
+        case unlockables
+        case startingUnlockables
+
+    }
+    
+    init(name: String, player: EntityModel, currentRun: RunModel?, stats: [Statistics], unlockables: [Unlockable], startingUnlockbles: [Unlockable]) {
+        self.name = name
+        self.player = player
+        self.currentRun = currentRun
+        self.stats = stats
+        self.unlockables = unlockables
+        self.startingUnlockbles = startingUnlockbles
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(name, forKey: .name)
+        try container.encode(player, forKey: .player)
+        try container.encode(currentRun, forKey: .currentRun)
+        try container.encode(randomRune, forKey: .randomRune)
+        try container.encode(stats, forKey: .stats)
+        try container.encode(unlockables, forKey: .unlockables)
+        try container.encode(startingUnlockbles, forKey: .startingUnlockables)
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        name = try container.decode(String.self, forKey: .name)
+        player = try container.decode(EntityModel.self, forKey: .player)
+        currentRun = try? container.decode(RunModel.self, forKey: .currentRun)
+        randomRune = try? container.decode(Rune.self, forKey: .randomRune)
+        
+        if let stats = try? container.decode([Statistics].self, forKey: .stats) {
+            self.stats = stats
+        } else {
+            stats = Statistics.startingStats
+        }
+        
+        if let unlockables = try? container.decode([Unlockable].self, forKey: .unlockables) {
+            self.unlockables = unlockables
+        } else {
+            self.unlockables = Unlockable.unlockables
+        }
+        
+        if let startingUnlockbles = try? container.decode([Unlockable].self, forKey: .startingUnlockables) {
+            self.startingUnlockbles = startingUnlockbles
+        } else {
+            self.startingUnlockbles = Unlockable.startingUnlockedUnlockables
+        }
+    }
+
     
     // TODO: apply the unlockables that affect the base player
     var runPlayer: EntityModel {
+        var newPlayer = self.player
+//        newPlayer = newPlayer.
+        
         guard let rune = randomRune else {
             return player.update(pickaxe: Pickaxe(runeSlots: 1, runes: []))
         }

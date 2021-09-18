@@ -89,7 +89,9 @@ class RunModel: Codable, Equatable {
     /// If there was no last level, it is a fresh run, so we return a store, for now.
     func nextArea(updatedPlayerData: EntityModel) -> Area {
         self.player = updatedPlayerData
-        let nextDepth = areas.last?.depth ?? 0
+        let nextDepth: Int
+        if let last = areas.last { nextDepth = last.depth + 1 }
+        else { nextDepth = 0 }
         let nextLevel = LevelConstructor.buildLevel(depth: nextDepth, randomSource: randomSource, playerData: player, unlockables: unlockables, startingUnlockables: startingUnlockables)
         let nextArea = Area(depth: nextDepth, type: .level(nextLevel))
         areas.append(nextArea)

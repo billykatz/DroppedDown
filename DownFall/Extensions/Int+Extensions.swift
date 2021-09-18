@@ -43,10 +43,19 @@ public extension Int {
     
     
     /**
-     Returns a random integer between 0 and n-1 that is not the given number
+     Returns a random integer between between the lower and upper bound.
      */
     static func random(lower: Int, upper: Int) -> Int {
         return Int(arc4random_uniform(UInt32(lower))) + lower
+    }
+    
+    /**
+     Returns a random integer between the lower and upper bound rounded to the nearest interval
+     */
+    static func random(lower: Int, upper: Int, interval: Int) -> Int {
+        let randomInt = Int(arc4random_uniform(UInt32(lower))) + lower
+        let multipleOfInterval = randomInt / interval
+        return multipleOfInterval * interval
     }
     
 

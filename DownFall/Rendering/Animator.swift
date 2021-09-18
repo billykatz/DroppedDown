@@ -48,7 +48,7 @@ struct Animator {
         
  
             
-        case .rainEmbers:
+        case .rainEmbers, .fireball:
                        
             var spriteActions: [SpriteAction] = []
             guard let pp = getTilePosition(.player(.playerZero), tiles: endTiles) else {

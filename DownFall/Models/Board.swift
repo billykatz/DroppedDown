@@ -703,7 +703,7 @@ extension Board {
 
         
         switch rune.type {
-        case .rainEmbers:
+        case .rainEmbers, .fireball:
             return removeAndReplaces(from: tiles, specificCoord: targets, input: input)
             
         case .getSwifty:

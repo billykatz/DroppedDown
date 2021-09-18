@@ -399,7 +399,7 @@ func createLocalProfile(playerUUIDKey: String, userDefaultClient: UserDefaultCli
             /// save the profile with the uuid as the name
             /// copy all other defaults
             // @TODO: Create a progressable model from a JSON file
-            let newProfile = Profile(name: uuid, player: profile.player, stats: Statistics.startingStats, unlockables: Unlockable.unlockables, startingUnlockbles: Unlockable.startingUnlockedUnlockables)
+            let newProfile = Profile(name: uuid, player: profile.player, currentRun: nil, stats: Statistics.startingStats, unlockables: Unlockable.unlockables, startingUnlockbles: Unlockable.startingUnlockedUnlockables)
             
             /// encode the new profile into data
             let jsonData = try profileCodingClient.encoder.encode(newProfile)

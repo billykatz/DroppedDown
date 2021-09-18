@@ -36,9 +36,10 @@ struct LevelConstructor {
     
     static func potentialItems(depth: Depth, unlockables: [Unlockable], startingUnlockables: [Unlockable], playerData: EntityModel, randomSource: GKLinearCongruentialRandomSource) -> [StoreOffer] {
         var offers = [StoreOffer]()
-        
-        offers.append(contentsOf: tierItems(tier: 1, depth: depth, unlockables: unlockables, playerData: playerData, randomSource: randomSource))
-        offers.append(contentsOf: tierItems(tier: 2, depth: depth, unlockables: unlockables, playerData: playerData, randomSource: randomSource))
+        var allUnlockables = unlockables
+        allUnlockables.append(contentsOf: startingUnlockables)
+        offers.append(contentsOf: tierItems(tier: 1, depth: depth, unlockables: allUnlockables, playerData: playerData, randomSource: randomSource))
+        offers.append(contentsOf: tierItems(tier: 2, depth: depth, unlockables: allUnlockables, playerData: playerData, randomSource: randomSource))
         
         return offers
         
@@ -298,7 +299,7 @@ struct LevelConstructor {
     }
     
     static func levelGoal(depth: Depth, pillars: [PillarCoorindates], gemAtDepth: Int, randomSource: GKLinearCongruentialRandomSource) -> [LevelGoal] {
-        func randomRockGoal(_ colors: [ShiftShaft_Color], amount: Int, minimumGroupSize: Int) -> LevelGoal? {
+        func randomRockGoal(_ colors: [ShiftShaft_Color], amount: Int, minimumGroupSize: Int = 1) -> LevelGoal? {
             guard let randomColor = colors.randomElement() else { return nil }
             return LevelGoal(type: .unlockExit, tileType: .rock(color: randomColor, holdsGem: false), targetAmount: amount, minimumGroupSize: minimumGroupSize, grouped: minimumGroupSize > 1)
         }
@@ -308,48 +309,30 @@ struct LevelConstructor {
         switch depth {
         case 0:
             let monsterGoal = LevelGoal.killMonsterGoal(amount: 1)
-            let gemGoal = LevelGoal.gemGoal(amount: 1)
-            let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 2, minimumGroupSize: 3)
+            let gemGoal = LevelGoal.gemGoal(amount: 2)
+            let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 25)
             
             goals = [gemGoal, rockGoal, monsterGoal]
         case 1:
             let monsterGoal = LevelGoal.killMonsterGoal(amount: 3)
             let gemGoal = LevelGoal.gemGoal(amount: 2)
-            let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 8, minimumGroupSize: 3)
+            let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 35)
             goals = [gemGoal, rockGoal, monsterGoal]
         case 2...Int.max:
-            let minGroupSize = depthDivided(depth) + 3 + (abs(randomSource.nextInt())*100 % 2)
-            let rockAmount = Int.random(lower: 20, upper: 35) / minGroupSize
             let monsterAmount = Int(Double(boardSize(depth: depth)) * Double(boardSize(depth: depth)) * maxMonsterOnBoardRatio(depth: depth))
             let gemAmount = gemAtDepth * Int.random(lower: 50, upper: 75) / 100
-            let pillarAmount = pillars.count * 3 * Int.random(lower: 50, upper: 75) / 100
-            let useRuneAmount = depthDivided(depth) + (abs(randomSource.nextInt() * 100) % 3) + 1
             
             let gemGoal = LevelGoal.gemGoal(amount: gemAmount)
-            let rockGoal = randomRockGoal([.red, .purple, .blue], amount: rockAmount, minimumGroupSize: minGroupSize)
+            let rockGoal = randomRockGoal([.red, .purple, .blue], amount: Int.random(lower: 40, upper: 60, interval: 5))
             let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
-            let pillarGoal = LevelGoal.pillarGoal(amount: pillarAmount)
-            let useRuneGoal = LevelGoal.useRuneGoal(amount: useRuneAmount)
             
             goals = [gemGoal, rockGoal, monsterGoal]
-            
-            if pillarAmount > 0 {
-                goals.append(pillarGoal)
-            } else if useRuneAmount > 0 {
-                goals.append(useRuneGoal)
-            }
+        
         default:
             goals = []
         }
         
         return goals.compactMap { $0 }.choose(random: 2)
-        //
-        //        switch depth {
-        //        case 0, 1:
-        //            return goals.compactMap { $0 }.choose(random: 2)
-        //        default:
-        //            return goals.compactMap { $0 }.choose(random: 3)
-        //        }
     }
     
     static func boardSize(depth: Depth) -> Int {
@@ -377,17 +360,17 @@ struct LevelConstructor {
                                                         .rock(color: .purple, holdsGem: false): 33])
             return chances
         case 5, 6, 7, 8, 9:
-            let chances = TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false): 31,
-                                                        .rock(color: .blue, holdsGem: false): 31,
-                                                        .rock(color: .purple, holdsGem: false): 31,
-                                                        .rock(color: .brown, holdsGem: false): 7])
-            return chances
-            
-        case 10...Int.max:
             let chances = TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false): 30,
                                                         .rock(color: .blue, holdsGem: false): 30,
                                                         .rock(color: .purple, holdsGem: false): 30,
                                                         .rock(color: .brown, holdsGem: false): 10])
+            return chances
+            
+        case 10...Int.max:
+            let chances = TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false): 29,
+                                                        .rock(color: .blue, holdsGem: false): 29,
+                                                        .rock(color: .purple, holdsGem: false): 29,
+                                                        .rock(color: .brown, holdsGem: false): 13])
             return chances
         default:
             fatalError("Level must be positive")

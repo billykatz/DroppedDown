@@ -210,9 +210,14 @@ class Renderer: SKSpriteNode {
             case .itemUsed(let ability, let targets):
                 animateRuneUsed(input: inputType, transformations: transformations, rune: ability, targets: targets)
             case .collectOffer(let tileCoord, let offer, let discardedCoord, let discardedOffer):
-                collectOffer(transformations, offer: offer, atTilecoord: tileCoord, discardOffer: discardedOffer, discardedOfferTileCoord: discardedCoord)
-            case .collectItem:
-                collectItem(for: trans, inputType: inputType)
+                if case let StoreOfferType.gems(amount) = offer.type {
+                    collectItem(for: trans, amount: amount, atCoord: tileCoord, textureName: offer.textureName, inputType: inputType, randomColor: true)
+                } else {
+                    collectOffer(transformations, offer: offer, atTilecoord: tileCoord, discardOffer: discardedOffer, discardedOfferTileCoord: discardedCoord)
+                }
+            case let .collectItem(coord, item, _):
+                collectItem(for: trans, amount: item.amount, atCoord: coord, textureName: item.textureName, inputType: inputType)
+//                collectItem(for: trans, inputType: inputType)
             case .decrementDynamites:
                 computeNewBoard(for: transformations)
             case .refillEmpty:
@@ -267,7 +272,7 @@ class Renderer: SKSpriteNode {
         case .pause:
             // show the menu
             foreground.addChild(menuForeground)
-            menuForeground.addChildSafely(debugMenu())
+            menuForeground.addChildSafely(menuSpriteNode)
         case .gameLose:
             menuForeground.addChild(gameLoseSpriteNode)
             foreground.addChildSafely(menuForeground)
@@ -550,7 +555,7 @@ extension Renderer {
         }
     }
     
-    private func collectItem(for transformation: Transformation, inputType: InputType) {
+    private func collectItem(for transformation: Transformation, amount: Int, atCoord coord: TileCoord, textureName: String, inputType: InputType, randomColor: Bool = false) {
         computeNewBoard(for: transformation) { [weak self] in
             guard let self = self, let endTiles = transformation.endTiles  else {
                 self?.animationsFinished(endTiles: transformation.endTiles)
@@ -561,24 +566,22 @@ extension Renderer {
             self.sprites = self.createSprites(from: endTiles)
             self.add(sprites: self.sprites, tiles: endTiles)
             
-            if case let InputType.collectItem(coord, item, amount) = inputType {
+//            if case let InputType.collectItem(coord, item, amount) = inputType {
                 // add a bunch of gold sprites to the board
-                if let startPoint = self.positionsInForeground(at: [coord]).first {
-                    var addedSprites: [SKSpriteNode] = []
-                    for _ in 0..<item.amount {
-                        let identifier: String = item.type == .gold ? Identifiers.gold : item.textureName
-                        let sprite = SKSpriteNode(texture: SKTexture(imageNamed: identifier),
-                                                  color: .clear,
-                                                  size: Style.Board.goldGainSize)
-                        sprite.position = startPoint
-                        sprite.zPosition = 10_000
-                        self.spriteForeground.addChild(sprite)
-                        addedSprites.append(sprite)
-                    }
-                    self.animator.animateGold(goldSprites: addedSprites, gained: amount, from: startPoint, to: self.hud, in: self.foreground) { [weak self] in self?.animationsFinished(endTiles: transformation.endTiles) }
+            if let startPoint = self.positionsInForeground(at: [coord]).first {
+                var addedSprites: [SKSpriteNode] = []
+                for _ in 0..<amount {
+                    let identifier: String = randomColor ?  Item.randomColorGem : textureName
+                    let sprite = SKSpriteNode(texture: SKTexture(imageNamed: identifier),
+                                              color: .clear,
+                                              size: Style.Board.goldGainSize)
+                    sprite.position = startPoint
+                    sprite.zPosition = 10_000
+                    self.spriteForeground.addChild(sprite)
+                    addedSprites.append(sprite)
                 }
-            } else {
-                self.animationsFinished(endTiles: transformation.endTiles)
+                let targetPosition = self.hud.gemSpriteNode?.convert(self.hud.gemSpriteNode?.frame.center ?? .zero, to: self.foreground) ?? .zero
+                self.animator.animateGold(goldSprites: addedSprites, gained: amount, from: startPoint, to: targetPosition, in: self.hud) { [weak self] in self?.animationsFinished(endTiles: transformation.endTiles) }
             }
         }
 

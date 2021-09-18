@@ -39,6 +39,7 @@ class MainMenu: SKScene {
     weak var mainMenuDelegate: MainMenuDelegate?
     var playerModel: EntityModel?
     var hasRunToContinue: Bool?
+    var displayStoreBadge: Bool = false
     
     
     override func didMove(to view: SKView) {
@@ -89,6 +90,20 @@ class MainMenu: SKScene {
                                                            verticalPadding: Constants.buttonPadding,
                                                            translatedToBounds: true)
         
+        if displayStoreBadge {
+            let notificationBadge = SKSpriteNode(imageNamed: "notificationRed")
+            notificationBadge.size = CGSize.fifty
+            
+            notificationBadge.position = CGPoint.position(notificationBadge.frame, inside: menuStoreButton.frame, verticalAlign: .top, horizontalAnchor: .right, xOffset: 0.0, yOffset: 5.0, translatedToBounds: true)
+            
+            notificationBadge.name = "notificationRed"
+            notificationBadge.zPosition = Precedence.flying.rawValue
+            
+            addChild(notificationBadge)
+        }
+        
+        
+        
         addChild(menuStoreButton)
         
         
@@ -104,6 +119,10 @@ class MainMenu: SKScene {
         
         addChild(optionsButton)
         
+    }
+    
+    func removeStoreBadge() {
+        self.removeChild(with: "notificationRed")
     }
 }
 

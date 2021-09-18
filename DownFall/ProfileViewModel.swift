@@ -118,12 +118,26 @@ class ProfileViewModel {
         saveProfile(profileSubject.value)
     }
     
+    func playerHasPurchasableUnlockables() -> Bool {
+        for unlockable in profile.unlockables {
+            if unlockable.isUnlocked && !unlockable.isPurchased {
+                if profile.player.canAfford(unlockable.purchaseAmount, inCurrency: .gem) {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+    
     func finishRun(playerData updatedPlayerData: EntityModel, currentRun: RunModel) {
         /// update the player
-        var newPlayerData = updatedPlayerData.update(pickaxe: updatedPlayerData.pickaxe)
+        var newPlayerData = updatedPlayerData.update(pickaxe: Pickaxe(runeSlots: 1, runes: []))
         
         /// update player gem carry
         newPlayerData = newPlayerData.updateCarry(carry: updatedPlayerData.carry)
+
+        // reset to base stat of 3 hp
+        newPlayerData = newPlayerData.update(originalHp: 3, dodge: 0, luck: 0)
         
         // revive
         newPlayerData = newPlayerData.revive()

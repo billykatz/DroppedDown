@@ -215,6 +215,8 @@ class HUD: SKSpriteNode {
             showIncreaseInStat(amountLabelName: Constants.totalHealthAmountLabelName, amountIncrease: 2)
         case .plusOneMaxHealth:
             showIncreaseInStat(amountLabelName: Constants.totalHealthAmountLabelName, amountIncrease: 1)
+        case .gems(let amount):
+            showTotalGemGain(amount)
         default:
             return
         }

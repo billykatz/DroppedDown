@@ -105,17 +105,17 @@ struct EntityModel: Equatable, Codable {
     }
     
     public func update(originalHp: Int? = nil,
-                        hp: Int? = nil,
-                        name: String? = nil,
-                        attack: AttackModel? = nil,
-                        type: EntityType? = nil,
-                        carry: CarryModel? = nil,
-                        animations: [AnimationModel]? = nil,
-                        pickaxe: Pickaxe? = nil,
-                        effects: [EffectModel]? = nil,
-                        dodge: Int? = nil,
-                        luck: Int? = nil
-                        ) -> EntityModel {
+                       hp: Int? = nil,
+                       name: String? = nil,
+                       attack: AttackModel? = nil,
+                       type: EntityType? = nil,
+                       carry: CarryModel? = nil,
+                       animations: [AnimationModel]? = nil,
+                       pickaxe: Pickaxe? = nil,
+                       effects: [EffectModel]? = nil,
+                       dodge: Int? = nil,
+                       luck: Int? = nil
+    ) -> EntityModel {
         let updatedOriginalHp = originalHp ?? self.originalHp
         let updatedHp = hp ?? self.hp
         let updatedName = name ?? self.name
@@ -185,17 +185,6 @@ struct EntityModel: Equatable, Codable {
     
     func revive() -> EntityModel {
         return self.update(hp: originalHp)
-    }
-    
-    func resetToBaseStats() -> EntityModel {
-        let player = self.update(originalHp: 3,
-                                 carry: CarryModel(items: [Item(type: .gem, amount: 0, color: nil)]),
-                           pickaxe: Pickaxe(runeSlots: 1, runes: []),
-                           effects: [],
-                           dodge: 0,
-                           luck: 0
-        )
-        return player.previewAppliedEffects()
     }
     
     func didAttack() -> EntityModel {

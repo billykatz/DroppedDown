@@ -135,8 +135,6 @@
 		5802612F24AFB78B00D7CF20 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5802612E24AFB78B00D7CF20 /* GameKit.framework */; };
 		5802613224AFC23300D7CF20 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5802613124AFC23300D7CF20 /* CloudKit.framework */; };
 		580EF10024E0F083003D312B /* RunScope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 580EF0FF24E0F083003D312B /* RunScope.swift */; };
-		580EF10224E10C0F003D312B /* MenuStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 580EF10124E10C0F003D312B /* MenuStore.swift */; };
-		580EF10424E10C30003D312B /* MenuStore.sks in Resources */ = {isa = PBXBuildFile; fileRef = 580EF10324E10C30003D312B /* MenuStore.sks */; };
 		5811160F24D61E91000CFF12 /* RunManaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5811160E24D61E91000CFF12 /* RunManaging.swift */; };
 		58153460243993F400483481 /* LevelGoalTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5815345F243993F400483481 /* LevelGoalTracker.swift */; };
 		5819AB71242A5CA600498BB6 /* SpriteAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5819AB70242A5CA600498BB6 /* SpriteAction.swift */; };
@@ -336,8 +334,6 @@
 		5802613024AFC1BE00D7CF20 /* Shift Shaft.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Shift Shaft.entitlements"; sourceTree = "<group>"; };
 		5802613124AFC23300D7CF20 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		580EF0FF24E0F083003D312B /* RunScope.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunScope.swift; sourceTree = "<group>"; };
-		580EF10124E10C0F003D312B /* MenuStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuStore.swift; sourceTree = "<group>"; };
-		580EF10324E10C30003D312B /* MenuStore.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = MenuStore.sks; sourceTree = "<group>"; };
 		5811160E24D61E91000CFF12 /* RunManaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunManaging.swift; sourceTree = "<group>"; };
 		5815345F243993F400483481 /* LevelGoalTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelGoalTracker.swift; sourceTree = "<group>"; };
 		5819AB70242A5CA600498BB6 /* SpriteAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteAction.swift; sourceTree = "<group>"; };
@@ -581,8 +577,6 @@
 				3D674C9422C9D6640003AEB4 /* MainMenu.swift */,
 				5894A44D24C379C800FBF839 /* LoadingScene.sks */,
 				5894A44F24C37A1100FBF839 /* LoadingScene.swift */,
-				580EF10124E10C0F003D312B /* MenuStore.swift */,
-				580EF10324E10C30003D312B /* MenuStore.sks */,
 			);
 			path = Scenes;
 			sourceTree = "<group>";
@@ -1072,7 +1066,6 @@
 				3D674C9322C9D54C0003AEB4 /* MainMenu.sks in Resources */,
 				3DA4E8912290A722006E90D1 /* entities.json in Resources */,
 				589E157425ABA8CE004A6D46 /* TBD.mp3 in Resources */,
-				580EF10424E10C30003D312B /* MenuStore.sks in Resources */,
 				58C37F2425AB94ED00F6D164 /* pickaxe.mp3 in Resources */,
 				3D528FDF2155BD7300EF65CA /* Assets.xcassets in Resources */,
 				3DB270A522ADBD0100D9BF8B /* player.png in Resources */,
@@ -1122,7 +1115,6 @@
 				3D7EF45E21D18DAB00A2D9E8 /* TileTransformation.swift in Sources */,
 				3DB270A722AE065300D9BF8B /* Data+Extensions.swift in Sources */,
 				5819AB73242A668400498BB6 /* SwipeTypes.swift in Sources */,
-				580EF10224E10C0F003D312B /* MenuStore.swift in Sources */,
 				5811160F24D61E91000CFF12 /* RunManaging.swift in Sources */,
 				3DF2928520A76242006671AC /* Board.swift in Sources */,
 				5867DF0C25D23CD700CCA702 /* Logger.swift in Sources */,

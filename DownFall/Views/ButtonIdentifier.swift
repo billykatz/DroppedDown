@@ -60,7 +60,7 @@ enum ButtonIdentifier: String {
         case .resume:
             return "Resume"
         case .playAgain:
-            return "Play Again?"
+            return "Menu"
         case .selectLevel:
             return "Level Select"
         case .leaveStore, .continueRun:
@@ -110,7 +110,7 @@ enum ButtonIdentifier: String {
         case .mainMenuStore:
             return "Store"
         case .mainMenuOptions:
-            return "Settings"
+            return "Stats"
         case .discardFoundRune:
             return "Discard"
         case .swapRunes:

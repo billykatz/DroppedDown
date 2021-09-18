@@ -90,13 +90,24 @@ struct Profile: Codable, Equatable {
     
     // TODO: apply the unlockables that affect the base player
     var runPlayer: EntityModel {
-        var newPlayer = self.player
-//        newPlayer = newPlayer.
+        let newPlayer = player.update(pickaxe: Pickaxe(runeSlots: 1, runes: [Rune.rune(for: .flameColumn, isCharged: true)]))
+        return applyUnlockables(to: newPlayer).revive()
         
-        guard let rune = randomRune else {
-            return player.update(pickaxe: Pickaxe(runeSlots: 1, runes: []))
+//        guard let rune = randomRune else {
+//            return newPlayer.update(pickaxe: Pickaxe(runeSlots: 1, runes: []))
+//        }
+//        return newPlayer.update(pickaxe: Pickaxe(runeSlots: 1, runes: [rune]))
+    }
+    
+    //dont save this
+    func applyUnlockables(to player: EntityModel) -> EntityModel {
+        var newPlayer = player
+        for unlockable in unlockables {
+            if unlockable.applysToBasePlayer && unlockable.isUnlocked && unlockable.isPurchased {
+                newPlayer = newPlayer.applyEffect(unlockable.item.effect)
+            }
         }
-        return player.update(pickaxe: Pickaxe(runeSlots: 1, runes: [rune]))
+        return newPlayer
     }
     
     func updatePlayer(_ entityModel: EntityModel) -> Profile {

@@ -39,12 +39,14 @@ struct StatView: View {
     
     var body: some View {
         HStack {
+            #if DEBUG
             StatButton(add: false).onTapGesture(perform: {
                 viewModel.updateStat(amount: -50, stat: stat)
             })
             StatButton(add: true).onTapGesture(perform: {
                 viewModel.updateStat(amount: 50, stat: stat)
             })
+            #endif
             Text("\(stat.statType.rawValue)\(statExtra)")
             Spacer()
             Text(verbatim: "\(stat.amount)")
@@ -66,10 +68,13 @@ struct PlayerStatsView: View {
     
     let columns: [GridItem] = [.init(.flexible(minimum: 250), alignment: .leading)]
     
+    
     var body: some View {
         ScrollView{
             HStack {
                 CodexWalletView(gemAmount: gemAmount)
+                #if DEBUG
+                
                 Button(action: {
                     viewModel.updateGems(amount: -50)
                 }) {
@@ -80,6 +85,8 @@ struct PlayerStatsView: View {
                 }) {
                     StatButton(add: true)
                 }
+                
+                #endif
             }.background(Color(UIColor.backgroundGray))
             LazyVGrid(columns: columns, spacing: 20) {
                 ForEach(playerStatistics) {  stat in

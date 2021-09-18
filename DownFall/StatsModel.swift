@@ -93,7 +93,7 @@ extension Statistics {
     static var blueRocksDestroyed = Self.init(rockColor: .blue, amount: 0, statType: .rocksDestroyed)
     static var redRocksDestroyed = Self.init(rockColor: .red, amount: 0, statType: .rocksDestroyed)
     static var purpleRocksDestroyed = Self.init(rockColor: .purple, amount: 0, statType: .rocksDestroyed)
-    static var totalRocksDestroyed = Self.init(amount: 100, statType: .totalRocksDestroyed)
+    static var totalRocksDestroyed = Self.init(amount: 0, statType: .totalRocksDestroyed)
     static var largestRockGroupDestroyed = Self.init(amount: 0, statType: .largestRockGroupDestroyed)
     static var blueGemsCollected = Self.init(gemColor: .blue, amount: 0, statType: .gemsCollected)
     static var purpleGemsCollected = Self.init(gemColor: .purple, amount: 0, statType: .gemsCollected)
@@ -144,7 +144,6 @@ extension Statistics {
                 Statistics.monstersKilledInARow,
                 Statistics.damageTaken,
                 Statistics.healthHealed,
-                Statistics.totalWins,
                 Statistics.totalLoses,
                 Statistics.totalRuneUsesamount
             ]

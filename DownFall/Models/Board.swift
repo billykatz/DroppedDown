@@ -716,7 +716,7 @@ extension Board {
             return transform(targets, into: TileType.rock(color: .purple, holdsGem: false), input: input)
         case .bubbleUp:
             return bubbleUp(targets.first!, input: input)
-        case .flameWall:
+        case .flameWall, .flameColumn:
             let monsterCoords = targets.compactMap { coord -> TileCoord? in
                 if case TileType.monster = tiles[coord].type {
                     return coord

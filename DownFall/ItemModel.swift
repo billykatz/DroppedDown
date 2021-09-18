@@ -39,6 +39,11 @@ struct Item: Codable, Hashable {
         }
     }
     
+    static var randomColorGem: String {
+        let options = ["blueCrystal", "purpleCrystal", "redCrystal"]
+        return options.randomElement()!
+    }
+    
     var textureName: String {
         switch type {
         case .gold:

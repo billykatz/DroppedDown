@@ -135,7 +135,7 @@ struct Animator {
             }
             
             animate(spriteActions) { completion?() }
-        case .flameWall:
+        case .flameWall, .flameColumn:
             var spriteActions: [SpriteAction] = []
             for coord in affectedTiles {
                 let tileSprite = sprites[coord]
@@ -297,7 +297,6 @@ struct Animator {
     
     func animateCollectOffer(offerType: StoreOfferType,  offerSprite: SKSpriteNode, targetPosition: CGPoint, to hud: HUD, completion: @escaping () -> Void) {
         
-        
         let moveToAction = SKAction.move(to: targetPosition, duration: AnimationSettings.Board.goldGainSpeedEnd)
         let scaleAction = SKAction.scale(to: Style.Board.goldGainSizeEnd, duration: AnimationSettings.Board.goldGainSpeedEnd)
         let toPosition = offerSprite.frame.center.translate(xOffset: CGFloat.random(in: AnimationSettings.Gem.randomXOffsetRange), yOffset: CGFloat.random(in: AnimationSettings.Gem.randomYOffsetRange))
@@ -318,7 +317,7 @@ struct Animator {
         animate([SpriteAction(sprite: offerSprite, action: finalizedAction)], completion: completion)
     }
     
-    func animateGold(goldSprites: [SKSpriteNode], gained: Int, from startPosition: CGPoint, to hud: HUD, in foreground: SKNode, completion: @escaping () -> Void) {
+    func animateGold(goldSprites: [SKSpriteNode], gained: Int, from startPosition: CGPoint, to targetPosition: CGPoint, in hud: HUD, completion: @escaping () -> Void) {
         var index = 0
         
         var hasShownTotalGain = false
@@ -329,7 +328,6 @@ struct Animator {
             
             let moveAwayAction = SKAction.move(to: toPosition, duration: 0.25)
             
-            let targetPosition = hud.gemSpriteNode?.convert(hud.gemSpriteNode?.frame.center ?? .zero, to: foreground) ?? .zero
             let moveToAction = SKAction.move(to: targetPosition, duration: AnimationSettings.Board.goldGainSpeedEnd)
             let scaleAction = SKAction.scale(to: Style.Board.goldGainSizeEnd, duration: AnimationSettings.Board.goldGainSpeedEnd)
             

@@ -162,7 +162,7 @@ struct Rune: Hashable, Codable {
     
     static let zero = Rune(type: .getSwifty, textureName: "", cost: 0, currency: .gem, description: "", flavorText: "", targets: 0, targetTypes: [], affectSlopes: [], affectRange: 0, heal: 0, cooldown: 0, rechargeType: [], rechargeMinimum: 0, rechargeCurrent: 0, progressColor: .red, maxDistanceBetweenTargets: 0, animationTextureName: "", animationColumns: 0)
     
-    static func rune(for type: RuneType) -> Rune {
+    static func rune(for type: RuneType, isCharged: Bool = false) -> Rune {
         switch type {
         case .getSwifty:
             var cases = TileType.rockCases
@@ -344,7 +344,7 @@ struct Rune: Hashable, Codable {
                 cooldown: 25,
                 rechargeType: [TileType.rock(color: .red, holdsGem: false)],
                 rechargeMinimum: 1,
-                rechargeCurrent: 0,
+                rechargeCurrent: isCharged ? 25 : 0,
                 progressColor: .red,
                 maxDistanceBetweenTargets: Int.max,
                 animationTextureName: "flameWallSpriteSheet",

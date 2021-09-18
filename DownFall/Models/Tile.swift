@@ -37,6 +37,10 @@ enum ShiftShaft_Color: String, Codable, CaseIterable, Hashable {
         }
     }
     
+    static var pillarCases: [ShiftShaft_Color] {
+        return [.blue, .purple, .red]
+    }
+    
     var forUI: UIColor {
         switch self {
         case .blue: return .lightBarBlue

@@ -31,13 +31,16 @@ protocol MenuCoordinating: AnyObject {
 }
 
 
-class MenuCoordinator: MenuCoordinating, MainMenuDelegate, MenuStoreSceneDelegate {
+class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
     
     var view: SKView
     var levelCoordinator: LevelCoordinating
     var codexCoordinator: CodexCoordinator
     var settingsCoordinator: SettingsCoordinator
     var profileViewModel: ProfileViewModel?
+    
+    // hack for now, remove later
+    var playerTappedOnStore: Bool = false
     
     private lazy var mainMenuScene: MainMenu? = {
         guard let scene = GKScene(fileNamed: Identifiers.mainMenuScene)?.rootNode as? MainMenu else { return nil }
@@ -53,10 +56,17 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate, MenuStoreSceneDelegat
         self.view = view
     }
     
+    func viewWillAppear() {
+        if playerTappedOnStore {
+            mainMenuScene?.removeStoreBadge()
+        }
+    }
+    
     private func presentMainMenu(transition: SKTransition? = nil) {
         guard let mainMenu = mainMenuScene else { fatalError("Unable to unwrap the main menu scene")}
         mainMenu.playerModel = profileViewModel?.profile.player
         mainMenu.hasRunToContinue = (profileViewModel?.profile.currentRun != nil && profileViewModel?.profile.currentRun != .zero)
+        mainMenu.displayStoreBadge = profileViewModel?.playerHasPurchasableUnlockables() ?? false
 
         view.presentScene(mainMenu, transition: transition)
         view.ignoresSiblingOrder = true
@@ -70,10 +80,12 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate, MenuStoreSceneDelegat
     
     func newGame(_ playerModel: EntityModel?) {
         profileViewModel?.nilCurrenRun()
+        playerTappedOnStore = false
         levelCoordinator.loadRun(nil, profile: profileViewModel!.profile)
     }
     
     func continueRun() {
+        playerTappedOnStore = false
         levelCoordinator.loadRun(profileViewModel!.profile.currentRun, profile: profileViewModel!.profile)
     }
     
@@ -93,6 +105,7 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate, MenuStoreSceneDelegat
     
     func menuStore() {
         guard let profileViewModel = profileViewModel else { preconditionFailure() }
+        playerTappedOnStore = true
         codexCoordinator.presentCodexView(profileViewModel: profileViewModel)
     }
     

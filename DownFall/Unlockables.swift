@@ -20,7 +20,10 @@ struct Unlockable: Codable, Identifiable, Equatable {
     let isPurchased: Bool
     let isUnlocked: Bool
     let applysToBasePlayer: Bool
-//    let appearsInRuns: Bool
+    
+    var canAppearInRun: Bool {
+        return isUnlocked && isPurchased && !applysToBasePlayer
+    }
     
     var id: String {
         return "\(item.textureName)\(item.tier)"

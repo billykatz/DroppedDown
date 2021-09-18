@@ -68,7 +68,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
         if menuType == .gameWin {
             
             let text =
-                """
+            """
 
             You beat depth: \(level.humanReadableDepth)
 
@@ -89,7 +89,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
                 """
             Paused
 
-            This is the \(level.humanReadableDepth) depth
+            This is the depth: \(level.humanReadableDepth)
             """
             let paragraphNode = ParagraphNode.labelNode(text: text, paragraphWidth: menuSizeWidth * 0.95,
                                                         fontSize: .fontLargeSize)
@@ -126,10 +126,9 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
         else if menuType == .gameLose {
             let text =
                 """
-                    Game Over.
+                    The run is over but your journey is just beginning. Spend your gems at the store to unlock upgrades and items!
 
                     You made it to \(level.humanReadableDepth) depth.
-                    Your personal best is: \(RunScope.deepestDepth)
                 """
             let paragraphNode = ParagraphNode.labelNode(text: text, paragraphWidth: menuSizeWidth * 0.95,
                                                         fontSize: .fontLargeSize)

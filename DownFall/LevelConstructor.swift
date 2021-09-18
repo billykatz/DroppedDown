@@ -13,7 +13,6 @@ typealias Depth = Int
 
 struct LevelConstructor {
     
-    // refactor
     static func buildLevel(depth: Int, randomSource: GKLinearCongruentialRandomSource, playerData: EntityModel, unlockables: [Unlockable], startingUnlockables: [Unlockable]) -> Level {
         let pillars = pillars(depth: depth, randomSource: randomSource)
         let gemsAtDepth = maxSpawnGems(depth: depth)
@@ -64,7 +63,7 @@ struct LevelConstructor {
             let healingOptions =
                 unlockables
                 .filter { unlockable in
-                    return unlockable.isPurchased && unlockable.item.tier == tier && (unlockable.item.type == .lesserHeal || unlockable.item.type == .greaterHeal)
+                    return unlockable.canAppearInRun && unlockable.item.tier == tier && (unlockable.item.type == .lesserHeal || unlockable.item.type == .greaterHeal)
                 }
             
             guard let healingOption = healingOptions.randomElement() else { preconditionFailure("There must always be at least 1 unlockable at tier 1 for healing")}
@@ -72,12 +71,12 @@ struct LevelConstructor {
             let otherOptions =
                 unlockables
                 .filter { unlockable in
-                    return !healingOptions.contains(unlockable) && unlockable.isPurchased && unlockable.item.tier == tier
+                    return !healingOptions.contains(unlockable) && unlockable.canAppearInRun && unlockable.item.tier == tier
                 }
             
             guard let otherOption = otherOptions.randomElement() else {  preconditionFailure("There must always be at least 1 other unlockable at tier 1 that isn't healing")}
             
-            return [healingOption.item, otherOption.item]
+            return [healingOption.item, StoreOffer.offer(type: .gems(amount: 25), tier: 1)]// otherOption.item]
         }
         else if tier == 2 {
             let playerHasFullPickaxe = playerData.pickaxe?.isAtMaxCapacity() ?? false
@@ -102,7 +101,7 @@ struct LevelConstructor {
                     offeredRuneAlready = true
                     let runeOptions = unlockables.filter { unlockable in
                         if case let StoreOfferType.rune(rune) = unlockable.item.type {
-                            return unlockable.isPurchased && unlockable.item.tier == tier && !(playerData.pickaxe?.runes.contains(rune) ?? false)
+                            return unlockable.canAppearInRun && unlockable.item.tier == tier && !(playerData.pickaxe?.runes.contains(rune) ?? false)
                         } else {
                             return false
                         }
@@ -116,7 +115,7 @@ struct LevelConstructor {
                     offeredRuneSlotAlready = true
                     
                     let runeSlotOptions = unlockables.filter { unlockable in
-                        return unlockable.isPurchased && unlockable.item.tier == tier && unlockable.item.type == .runeSlot
+                        return unlockable.canAppearInRun && unlockable.item.tier == tier && unlockable.item.type == .runeSlot
                     }
                     
                     guard let option = runeSlotOptions.randomElement() else { continue }
@@ -132,7 +131,7 @@ struct LevelConstructor {
                         }
                         
                         // remove rune slots, just offer other types of rewards
-                        return unlockable.isPurchased && unlockable.item.tier == tier && unlockable.item.type != .runeSlot
+                        return unlockable.canAppearInRun && unlockable.item.tier == tier && unlockable.item.type != .runeSlot
                     }
                     
                     guard let option = otherOptions.randomElement() else { continue }
@@ -153,142 +152,6 @@ struct LevelConstructor {
 
     }
     
-    // ITEMS
-    
-    static var tier1Items:  [StoreOffer] {
-        [
-            StoreOffer.offer(type: .plusOneMaxHealth, tier: 1),
-            //            StoreOffer.offer(type: .killMonsterPotion, tier: 1),
-            //            StoreOffer.offer(type: .transmogrifyPotion, tier: 1),
-            StoreOffer.offer(type: .greaterHeal, tier: 1)
-        ]
-    }
-    
-    static var tier2Items: [StoreOffer] {
-        [
-            StoreOffer.offer(type: .luck(amount: 2), tier: 2),
-            StoreOffer.offer(type: .dodge(amount: 2), tier: 2),
-            StoreOffer.offer(type: .plusTwoMaxHealth, tier: 2),
-            StoreOffer.offer(type: .greaterHeal, tier: 2)
-        ]
-    }
-    
-    static var tier3Items: [StoreOffer] {
-        [
-            StoreOffer.offer(type: .luck(amount: 3), tier: 3),
-            StoreOffer.offer(type: .dodge(amount: 3), tier: 3),
-            StoreOffer.offer(type: .plusTwoMaxHealth, tier: 3),
-            StoreOffer.offer(type: .greaterHeal, tier: 3)
-        ]
-    }
-    
-    static var tier1Runes: [StoreOffer] {
-        [
-            StoreOffer.offer(type: .rune(Rune.rune(for: .bubbleUp)), tier: 1),
-            StoreOffer.offer(type: .rune(Rune.rune(for: .flameWall)), tier: 1),
-            StoreOffer.offer(type: .rune(Rune.rune(for: .vortex)), tier: 1),
-            StoreOffer.offer(type: .rune(Rune.rune(for: .rainEmbers)), tier: 1),
-            StoreOffer.offer(type: .rune(Rune.rune(for: .getSwifty)), tier: 1),
-            StoreOffer.offer(type: .rune(Rune.rune(for: .transformRock)), tier: 1)
-        ]
-    }
-    
-    static var basicRunes: [StoreOffer] {
-        [
-            StoreOffer.offer(type: .rune(Rune.rune(for: .rainEmbers)), tier: 2),
-            StoreOffer.offer(type: .rune(Rune.rune(for: .getSwifty)), tier: 2),
-            StoreOffer.offer(type: .rune(Rune.rune(for: .transformRock)), tier: 2)
-        ]
-    }
-    
-    /// RUNES
-    
-    static var tier2Runes: [StoreOffer] {
-        [
-            StoreOffer.offer(type: .rune(Rune.rune(for: .bubbleUp)), tier: 2),
-            StoreOffer.offer(type: .rune(Rune.rune(for: .flameWall)), tier: 2),
-            StoreOffer.offer(type: .rune(Rune.rune(for: .vortex)), tier: 2),
-            StoreOffer.offer(type: .rune(Rune.rune(for: .rainEmbers)), tier: 2),
-            StoreOffer.offer(type: .rune(Rune.rune(for: .getSwifty)), tier: 2),
-            StoreOffer.offer(type: .rune(Rune.rune(for: .transformRock)), tier: 2)
-        ]
-    }
-    
-    static var tier3Runes: [StoreOffer] {
-        [
-            StoreOffer.offer(type: .rune(Rune.rune(for: .bubbleUp)), tier: 3),
-            StoreOffer.offer(type: .rune(Rune.rune(for: .flameWall)), tier: 3),
-            StoreOffer.offer(type: .rune(Rune.rune(for: .vortex)), tier: 3),
-            StoreOffer.offer(type: .rune(Rune.rune(for: .rainEmbers)), tier: 3),
-            StoreOffer.offer(type: .rune(Rune.rune(for: .getSwifty)), tier: 3),
-            StoreOffer.offer(type: .rune(Rune.rune(for: .transformRock)), tier:32)
-        ]
-    }
-    
-    static func buildLevel(depth: Depth, randomSource: GKLinearCongruentialRandomSource) -> Level {
-        let pillarCoords = pillars(depth: depth, randomSource: randomSource)
-        let maxGems = maxSpawnGems(depth: depth)
-        
-        return Level(depth: depth,
-                     monsterTypeRatio: monsterTypes(depth: depth),
-                     monsterCountStart: monsterCountStart(depth: depth),
-                     maxMonsterOnBoardRatio: maxMonsterOnBoardRatio(depth: depth),
-                     boardSize: boardSize(depth: depth),
-                     tileTypeChances: availableRocksPerLevel(depth: depth),
-                     pillarCoordinates: pillarCoords,
-                     goals: levelGoal(depth: depth, pillars: pillarCoords, gemAtDepth: maxGems, randomSource: randomSource),
-                     maxSpawnGems: maxGems,
-                     goalProgress: [],
-                     potentialItems: potentialItems(depth: depth))
-    }
-    
-    static func tier2items(depth: Depth) -> [StoreOffer] {
-        switch depth {
-        case 1:
-            return basicRunes
-        case 3:
-            return tier2Runes
-        case 0, 2:
-            return tier2Items
-        case 4, 9, 14:
-            return [StoreOffer.offer(type: .runeSlot, tier: 2)]
-        case 5:
-            return tier2Runes
-        case 6, 7, 8:
-            return tier2Items
-        case 10, 11, 12, 13:
-            return tier2Items
-        case 14..<Int.max:
-            return tier2Items
-        default:
-            return []
-        }
-    }
-    
-    static func tier3items(depth: Depth) -> [StoreOffer] {
-        switch depth {
-        case 0,1:
-            return []
-        case 2,3:
-            return tier3Items
-        case 4, 9, 14:
-            return tier3Runes
-        case 5..<Int.max:
-            return tier3Items
-            
-        default:
-            return []
-        }
-    }
-    
-    static func potentialItems(depth: Depth) -> [StoreOffer] {
-        var offers = [StoreOffer]()
-        offers.append(contentsOf: tier1Runes)
-        offers.append(contentsOf: tier2items(depth: depth))
-        offers.append(contentsOf: tier3items(depth: depth))
-        
-        return offers
-    }
     
     static func depthDivided(_ depth: Depth) -> Int {
         return depth/5
@@ -381,9 +244,9 @@ struct LevelConstructor {
     static func pillars(depth: Depth, randomSource: GKLinearCongruentialRandomSource) -> [PillarCoorindates] {
         
         func randomPillar(notIn set: Set<ShiftShaft_Color>) -> TileType {
-            var color = ShiftShaft_Color.allCases.randomElement()!
+            var color = ShiftShaft_Color.pillarCases.randomElement()!
             while set.contains(color) {
-                color = ShiftShaft_Color.allCases.randomElement()!
+                color = ShiftShaft_Color.pillarCases.randomElement()!
             }
             return TileType.pillar(PillarData(color: color, health: 3))
         }

@@ -121,14 +121,14 @@ class Renderer: SKSpriteNode {
         
         super.init(texture: nil, color: .clear, size: CGSize.zero)
         
-        let testBackground = SKSpriteNode(texture: SKTexture(imageNamed: "test-background"), size: CGSize(width: playableRect.size.width, height: playableRect.size.width*2.1))
-        testBackground.position = CGPoint.alignHorizontally(testBackground.frame,
-                                                            relativeTo: safeArea.frame,
-                                                            horizontalAnchor: .right,
-                                                            verticalAlign: .bottom,
-                                                            translatedToBounds: true)
-        testBackground.zPosition = 0
-        foreground.addChild(testBackground)
+//        let testBackground = SKSpriteNode(texture: SKTexture(imageNamed: "test-background"), size: CGSize(width: playableRect.size.width, height: playableRect.size.width*2.1))
+//        testBackground.position = CGPoint.alignHorizontally(testBackground.frame,
+//                                                            relativeTo: safeArea.frame,
+//                                                            horizontalAnchor: .right,
+//                                                            verticalAlign: .bottom,
+//                                                            translatedToBounds: true)
+//        testBackground.zPosition = 0
+//        foreground.addChild(testBackground)
         
         // tile detail view
         self.tileDetailView = TileDetailView(foreground: foreground, playableRect: playableRect, alignedTo: hud.frame, levelSize: level.boardSize)

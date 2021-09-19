@@ -26,7 +26,6 @@ struct CodexItemAnimatingView: View {
     @State var offset: CGFloat = 0
     
     let timer = Timer.publish(every: 0.25, on: .main, in: .common).autoconnect()
-
     
     
     var spriteSheet: some View {
@@ -58,7 +57,9 @@ struct CodexItemAnimatingView: View {
         }
     }
     
-    let dimension: CGFloat = 32
+    var dimension: CGFloat {
+        32
+    }
      
     var body: some View {
         ZStack {
@@ -92,7 +93,7 @@ struct CodexItemAnimatingView_Previews: PreviewProvider {
         let unlock3 = Unlockable(stat: .clockwiseRotations, item: StoreOffer.offer(type: .transmogrifyPotion, tier: 1), purchaseAmount: 50, isPurchased: true, isUnlocked:  true, applysToBasePlayer: false)
         
         VStack(spacing: 100) {
-            CodexItemAnimatingView(unlockable: unlock).scaleEffect(4.0)
+            CodexItemAnimatingView(unlockable: unlock)
             CodexItemAnimatingView(unlockable: unlock2).scaleEffect(4.0)
             CodexItemAnimatingView(unlockable: unlock3).scaleEffect(4.0)
             

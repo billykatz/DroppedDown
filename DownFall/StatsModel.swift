@@ -158,6 +158,7 @@ extension Statistics {
 extension Statistics {
     
     // rocks mined
+    static var fiftyRocks = Self.init(amount: 50, statType: .totalRocksDestroyed)
     static var oneHundredRocks = Self.init(amount: 100, statType: .totalRocksDestroyed)
     static var fiveHundredRocks = Self.init(amount: 500, statType: .totalRocksDestroyed)
     static var oneThousandRocks = Self.init(amount: 1000, statType: .totalRocksDestroyed)
@@ -196,7 +197,7 @@ extension Statistics {
     
     // reach depth
     static let reachDepth5 = Self.init(amount: 5, statType: .lowestDepthReached)
-    static let reachDepth10 = Self.init(amount: 5, statType: .lowestDepthReached)
+    static let reachDepth10 = Self.init(amount: 10, statType: .lowestDepthReached)
     
     // largest group
     static let largestGroup40 = Self.init(amount: 40, statType: .largestRockGroupDestroyed)

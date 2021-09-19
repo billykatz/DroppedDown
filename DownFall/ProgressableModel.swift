@@ -38,10 +38,10 @@ import Combine
  */
 
 enum CodexSections: String, CaseIterable, Identifiable {
-    case playerUpgrades
-    case misc
     case items
     case runes
+    case playerUpgrades
+    case misc
     
     var id: String {
         return self.rawValue
@@ -106,7 +106,7 @@ class CodexViewModel: ObservableObject {
                 }
             case .rune where section == .runes:
                 unlockablesInSection.append(unlockable)
-            case .killMonsterPotion, .greaterHeal, .lesserHeal, .transmogrifyPotion:
+            case .killMonsterPotion, .greaterHeal, .lesserHeal, .transmogrifyPotion, .plusTwoMaxHealth:
                 if section == .items {
                     unlockablesInSection.append(unlockable)
                 }
@@ -172,6 +172,10 @@ class CodexViewModel: ObservableObject {
         } else if relevantPlayerStat.statType == .totalRuneUses {
             value += "Use runes"
             subject = "times"
+        } else if relevantPlayerStat.statType == .largestRockGroupDestroyed {
+            return "Mine a group of \(target) rocks to unlock this."
+        } else if relevantPlayerStat.statType == .lowestDepthReached {
+            return "Reach depth \(target) to unlock this."
         }
         
         value += " \(target - current) more \(subject) to unlock this."

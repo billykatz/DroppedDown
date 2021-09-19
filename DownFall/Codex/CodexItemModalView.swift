@@ -135,7 +135,7 @@ struct CodexItemModalView: View {
             return 500
         }
     }
-    
+
     
     var body: some View {
         CodexBackgroundView(width: Constants.backgroundWidth, height: backgroundHeight, backgroundColor: .codexItemBackgroundBlue, borderColor: .codexItemStrokeBlue).overlay(

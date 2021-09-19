@@ -63,16 +63,16 @@ struct StoreOffer: Codable, Hashable, Identifiable {
         let textureName: String
         switch type {
         case .dodge(let amount):
-            title = "Increase Dodge Chance"
+            title = "Dodge Up"
             body = "Increase your chance to dodge an enemy's attack by \(amount)%"
             textureName = "dodge"
         case .gems(let amount):
             title = "Gems"
             body = "Gain \(amount) gems."
             textureName = "crystals"
-        case .luck:
+        case .luck(let amount):
             title = "Luck Up"
-            body = "Increase the frequency and overall number of gems you find."
+            body = "Increase the frequency and overall number of gems you find by \(amount)%."
             textureName = "luck"
         case .plusTwoMaxHealth:
             title = "Increase Max Health"
@@ -85,7 +85,7 @@ struct StoreOffer: Codable, Hashable, Identifiable {
         case .runeSlot:
             title = "+1 Rune Slot"
             body = "Add a rune slot to your pickaxe handle"
-            textureName = "runeSlot"
+            textureName = "pickaxe-upgrade"
         case .runeUpgrade:
             title = "Rune Upgrade"
             body = "Your runes will be better"

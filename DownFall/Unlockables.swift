@@ -48,7 +48,7 @@ struct Unlockable: Codable, Identifiable, Equatable {
         [
             
             // Player Updates
-            Unlockable(stat: .fiveHundredRocks, item: StoreOffer.offer(type: .plusOneMaxHealth, tier: 1), purchaseAmount: 50, isPurchased: false, isUnlocked: false, applysToBasePlayer: true),
+            Unlockable(stat: .fiftyRocks, item: StoreOffer.offer(type: .plusOneMaxHealth, tier: 1), purchaseAmount: 10, isPurchased: false, isUnlocked: false, applysToBasePlayer: true),
             Unlockable(stat: .fiveHundredRocks, item: StoreOffer.offer(type: .luck(amount: 5), tier: 1), purchaseAmount: 50, isPurchased: false, isUnlocked: false, applysToBasePlayer: true),
             Unlockable(stat: .fiveHundredRocks, item: StoreOffer.offer(type: .dodge(amount: 5), tier: 1), purchaseAmount: 50, isPurchased: false, isUnlocked: false, applysToBasePlayer: true),
             Unlockable(stat: .twoThousandRocks, item: StoreOffer.offer(type: .plusOneMaxHealth, tier: 2), purchaseAmount: 200, isPurchased: false, isUnlocked: false, applysToBasePlayer: true),
@@ -68,7 +68,7 @@ struct Unlockable: Codable, Identifiable, Equatable {
             
             
             // Runes
-            Unlockable(stat: .blueRocks100Mined, item: StoreOffer.offer(type: .rune(Rune.rune(for: .bubbleUp)), tier: 2), purchaseAmount: 200, isPurchased: false, isUnlocked: false, applysToBasePlayer: false),
+            Unlockable(stat: .blueGems100Collected, item: StoreOffer.offer(type: .rune(Rune.rune(for: .bubbleUp)), tier: 2), purchaseAmount: 200, isPurchased: false, isUnlocked: false, applysToBasePlayer: false),
             Unlockable(stat: .purpleGems100Collected, item: StoreOffer.offer(type: .rune(Rune.rune(for: .vortex)), tier: 2), purchaseAmount: 200, isPurchased: false, isUnlocked: false, applysToBasePlayer: false),
             Unlockable(stat: .redGems100Collected, item: StoreOffer.offer(type: .rune(Rune.rune(for: .flameColumn)), tier: 2), purchaseAmount: 200, isPurchased: false, isUnlocked: false, applysToBasePlayer: false),
 

@@ -90,7 +90,7 @@ struct Profile: Codable, Equatable {
     
     // TODO: apply the unlockables that affect the base player
     var runPlayer: EntityModel {
-        let newPlayer = player.update(pickaxe: Pickaxe(runeSlots: 1, runes: [Rune.rune(for: .flameColumn, isCharged: true)]))
+        let newPlayer = player.update(pickaxe: Pickaxe(runeSlots: 1, runes: []))
         return applyUnlockables(to: newPlayer).revive()
         
 //        guard let rune = randomRune else {

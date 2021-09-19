@@ -26,7 +26,7 @@ struct Pickaxe: Equatable, Codable, Hashable {
     }
     
     func isAtMaxCapacity() -> Bool {
-        return runeSlots == Pickaxe.maxRuneSlots || runes.count == runeSlots
+        return runeSlots != Pickaxe.maxRuneSlots && runes.count == runeSlots
     }
 }
 
@@ -295,7 +295,7 @@ struct EntityModel: Equatable, Codable {
         case (.buff, .health):
             return heal(for: effect.amount)
         case (.buff, .maxHealth):
-            return update(originalHp: originalHp + effect.amount)
+            return update(originalHp: originalHp + effect.amount, hp: min(originalHp + effect.amount, hp + effect.amount))
         case (.buff, .gems):
             return update(carry: self.carry.earn(effect.amount, inCurrency: .gem))
         case (.rune, .pickaxe):

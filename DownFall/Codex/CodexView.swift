@@ -75,13 +75,13 @@ struct CodexView: View {
             ZStack {
                 ScrollView {
                     Spacer().frame(height: 10.0)
-                    Text("- Codex - ").font(.bigTitleCodexFont).foregroundColor(.white)
+                    Text("- Store - ").font(.bigTitleCodexFont).foregroundColor(.white)
                     
                     LazyVGrid(columns: columns,
                               spacing: 20) {
-//                        ForEach(viewModel.sections) { section in
-//                            Section(header: Text("\(section.header)").font(.titleCodexFont).foregroundColor(.white)) {
-                                ForEach(viewModel.unlockables) {
+                        ForEach(viewModel.sections) { section in
+                            Section(header: Text("\(section.header)").font(.titleCodexFont).foregroundColor(.white)) {
+                                ForEach(viewModel.unlockables(in: section)) {
                                     unlockable in
                                     let index = viewModel.unlockables.firstIndex(of: unlockable)!
                                     CodexItemView(viewModel: viewModel, index: index)
@@ -93,8 +93,8 @@ struct CodexView: View {
 
                                 }
                                 Spacer().frame(height: 10.0)
-//                            }
-//                        }
+                            }
+                        }
                     }.frame(alignment: .top)
                 }
                 .padding(.horizontal)

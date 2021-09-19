@@ -76,7 +76,7 @@ struct LevelConstructor {
             
             guard let otherOption = otherOptions.randomElement() else {  preconditionFailure("There must always be at least 1 other unlockable at tier 1 that isn't healing")}
             
-            return [healingOption.item, otherOption.item]// otherOption.item]
+            return [healingOption.item, otherOption.item]
         }
         else if tier == 2 {
             let playerHasFullPickaxe = playerData.pickaxe?.isAtMaxCapacity() ?? false
@@ -131,7 +131,7 @@ struct LevelConstructor {
                         }
                         
                         // remove rune slots, just offer other types of rewards
-                        return unlockable.canAppearInRun && unlockable.item.tier == tier && unlockable.item.type != .runeSlot
+                        return !options.contains(unlockable) && unlockable.canAppearInRun && unlockable.item.tier == tier && unlockable.item.type != .runeSlot
                     }
                     
                     guard let option = otherOptions.randomElement() else { continue }

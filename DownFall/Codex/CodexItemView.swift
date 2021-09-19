@@ -74,8 +74,7 @@ struct CodexItemView: View {
         if (hiddenTrigger || !hiddenTrigger) {
             VStack(alignment: .center, spacing: 0) {
                 CodexBackgroundView(width: 100, height: 125, backgroundColor: unlockable.backgroundColor, borderColor: unlockable.borderColor).overlay(
-                    CodexItemAnimatingView(unlockable: unlockable)
-                        .scaleEffect(2.0)
+                    CodexItemAnimatingView(unlockable: unlockable).scaleEffect(2.0)
                         .overlay(
                             CodexItemTitleView(title: unlockable.item.title, foregroundColor: unlockable.textColor)
                         ).padding(20.0), alignment: .top)

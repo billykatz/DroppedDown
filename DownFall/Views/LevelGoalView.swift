@@ -12,15 +12,19 @@ import Combine
 class LevelGoalView: SKSpriteNode {
     
     struct Constants {
+        static let circleNamePrefix = "Circle-"
         static let keyView = "keyView"
         static let radius = CGFloat(50)
         static let barPadding: CGFloat = 25.0
         static let barSize: CGSize = CGSize(width: 225, height: 75)
+        static let circleSize: CGSize = CGSize(width: 200, height: 200)
+        static let goalImageSize: CGSize = CGSize(width: 50, height: 50)
+        static let goalImageCompletedSize: CGSize = CGSize(width: 75, height: 75)
     }
     
-    private let fillableCircleCenter: CGPoint
     private let viewModel: LevelGoalTracker
-    private let infoSprite: SKSpriteNode
+    private var levelGoalViewModels: [FillableCircleViewModel] = []
+    private var numberOfGoals: Int = 0
     private var disposables = Set<AnyCancellable>()
     
     lazy var contentView: SKSpriteNode = {
@@ -40,20 +44,11 @@ class LevelGoalView: SKSpriteNode {
     
     init(viewModel: LevelGoalTracker, size: CGSize) {
         self.viewModel = viewModel
-        fillableCircleCenter = .zero
-                
-        let infoSprite = SKSpriteNode(texture: SKTexture(imageNamed: "info"), size: .fifty)
-        self.infoSprite = infoSprite
         
         super.init(texture: nil, color: .clear, size: size)
         
-        // position the info button sprite inside of here
-        infoSprite.position = CGPoint.position(infoSprite.frame, inside: self.contentView.frame, verticalAlign: .top, horizontalAnchor: .left, xOffset: 25.0, yOffset: 25.0)
-        
         addChild(contentView)
-        addChild(infoSprite)
-        // removing for test background purposes
-//        addBorder()
+        addBorder()
         
         isUserInteractionEnabled = true
         
@@ -67,7 +62,26 @@ class LevelGoalView: SKSpriteNode {
             .goalIsUpdated
             .sink { (completion) in
             } receiveValue: { [weak self] (goalTracking) in
-                self?.updateGoal(goalTracking)
+                self?.numberOfGoals = goalTracking.count
+                
+                for (index, updatedGoal) in goalTracking.enumerated() {
+                    let (lightFill, darkFill) = updatedGoal.fillBarColor
+                    if self?.levelGoalViewModels.optionalElement(at: index) != nil {
+                        
+                        let newVm = FillableCircleViewModel(radius: Constants.circleSize.width/2, total: updatedGoal.target, progress: updatedGoal.current, fillColor: lightFill, darkFillColor: darkFill, backgroundColor: .backgroundGray, direction: .downToUp)
+                        
+                        self?.levelGoalViewModels[index] = newVm
+                        
+                    } else {
+                        // first time through
+                        let vm = FillableCircleViewModel(radius: Constants.circleSize.width/2, total: updatedGoal.target, progress: updatedGoal.current, fillColor: lightFill, darkFillColor: darkFill, backgroundColor: .backgroundGray, direction: .downToUp)
+
+                        self?.levelGoalViewModels.append(vm)
+                    }
+                    
+                    self?.updateGoal(updatedGoal)
+                }
+                
             }.store(in: &disposables)
 
         
@@ -77,7 +91,9 @@ class LevelGoalView: SKSpriteNode {
                 
             } receiveValue: { [weak self] (event) in
                 let (goals) = event
-                self?.completedGoal(goals)
+                for goal in goals {
+                    self?.updateGoal(goal)
+                }
             }
             .store(in: &disposables)
 
@@ -93,49 +109,55 @@ class LevelGoalView: SKSpriteNode {
         self.addChildSafely(border)
         
     }
+    
+    private func updateGoal(_ updatedGoal: GoalTracking) {
+        /// remove the current bar
+        contentView.removeChild(with: "\(Constants.circleNamePrefix)\(updatedGoal.index)")
         
-    private func completedGoal(_ updatedGoals: [GoalTracking]) {
-        for goal in updatedGoals {
-            createFillableBar(for: goal, at: goal.index, orderCompleted: goal.orderCompleted)
-        }
-
+        //prime the loop
+        let circle = createFillableBar(for: updatedGoal, at: updatedGoal.index)
+        contentView.addChildSafely(circle)
     }
     
-    private func updateGoal(_ updatedGoals: [GoalTracking]) {
-        contentView.removeAllChildren()
-        createFillableBar(updatedGoals)
+    func xOffsetForGoal(widthOfItem: CGFloat, indexOfGoal: Int) -> CGFloat {
+        let totalWidthMinusItemWidth = contentView.frame.width - (CGFloat(numberOfGoals) * widthOfItem)
+        let offset = (CGFloat(indexOfGoal+1) * totalWidthMinusItemWidth / CGFloat(numberOfGoals + 1)) + (CGFloat(indexOfGoal) * widthOfItem)
+        return offset
     }
     
-    
-    private func createFillableBar(_ updatedGoals: [GoalTracking]) {
-        for (index, goalTrack) in updatedGoals.enumerated() {
-            createFillableBar(for: goalTrack, at: index)
-        }
-    }
-    
-    private func createFillableBar(for updatedGoal: GoalTracking, at index: Int, orderCompleted: Int = 0) {
-        let (lightFill, darkFill) = updatedGoal.fillBarColor
-        let bar = FillableBar(size: Constants.barSize, viewModel: FillableBarViewModel(total: updatedGoal.target, progress: updatedGoal.current, fillColor: lightFill, backgroundColor: darkFill, text: "", direction: .leftToRight))
+    private func createFillableBar(for updatedGoal: GoalTracking, at index: Int) -> SKSpriteNode {
+        guard let vm = levelGoalViewModels.optionalElement(at: index) else { return SKSpriteNode() }
+        
+        let circle = FillableCircleBar(size: Constants.circleSize, viewModel: vm)
        
         // Position the bar relative to the content view and other bars
-        bar.position = CGPoint.alignHorizontally(bar.frame, relativeTo: infoSprite.frame, horizontalAnchor: .left, verticalAlign: .bottom, verticalPadding:  (CGFloat(index) * bar.size.height) + (Constants.barPadding) + (CGFloat(index) * Constants.barPadding), translatedToBounds: true)
+        circle.position = CGPoint.position(circle.frame, inside: contentView.frame, verticalAlign: .center, horizontalAnchor: .left, xOffset: xOffsetForGoal(widthOfItem: Constants.circleSize.width, indexOfGoal: index), translatedToBounds: true)
         
         
-        contentView.addChild(bar)
-        if updatedGoal.isCompleted && updatedGoal.hasBeenRewarded {
-            let mockCircle = SKSpriteNode(color: .clear, size: .fifty)
-            bar.addCheckmark(radius: bar.frame.height/2.0*0.8, position: CGPoint.position(mockCircle.frame, inside: self.frame, verticalAlign: .center, horizontalAnchor: .right))
-            
-            let sprite = SKSpriteNode(imageNamed: "Reward\(updatedGoal.orderCompleted)Border")
-            sprite.size = bar.size
-            sprite.position = CGPoint.position(sprite.frame, inside: bar.frame, verticalAlign: .center, horizontalAnchor: .center)
-            
-            bar.addChild(sprite)
-
+        // Add the goal background, image, and current total needed views
+        let goalBackgroundView = SKShapeNode(circleOfRadius: Constants.circleSize.width/2 - 20.0)
+        goalBackgroundView.color = .black
+        
+        let goalImageView = SKSpriteNode(texture: SKTexture(imageNamed: updatedGoal.textureName()), size: (updatedGoal.isCompleted ? Constants.goalImageCompletedSize : Constants.goalImageSize))
+        
+        // dont add the current amount needed anymore
+        // and dont adjust the goal image position
+        if (!updatedGoal.isCompleted) {
+            goalImageView.position = goalImageView.position.translateVertically(25)
+            let currentTargetView = ParagraphNode(text: "\(updatedGoal.target - updatedGoal.current)", paragraphWidth: 200, fontSize: .fontLargeSize)
+            currentTargetView.position = currentTargetView.position.translateVertically(-20)
+            goalBackgroundView.addChild(currentTargetView)
         }
         
+        goalBackgroundView.zPosition = Precedence.floating.rawValue
+        goalBackgroundView.addChild(goalImageView)
+        
+        circle.addChild(goalBackgroundView)
+        circle.name = "\(Constants.circleNamePrefix)\(updatedGoal.index)"
+        
+        return circle
+        
     }
-
 
 
 }

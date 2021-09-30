@@ -59,9 +59,9 @@ class Renderer: SKSpriteNode {
     
     private lazy var hud: HUD = {
         let hud = HUD.build(color: .foregroundBlue,
-                            size: CGSize(width: playableRect.width/2,
+                            size: CGSize(width: playableRect.width,
                                          height: Style.HUD.height),
-                            delegate: self, level: level)
+                            delegate: self)
         hud.position = CGPoint.alignHorizontally(hud.frame,
                                                  relativeTo: safeArea.frame,
                                                  horizontalAnchor: .right,
@@ -74,13 +74,14 @@ class Renderer: SKSpriteNode {
     private var levelGoalTracker: LevelGoalTracker
     private lazy var levelGoalView: LevelGoalView = {
         let levelGoalView = LevelGoalView(viewModel: levelGoalTracker,
-                                          size: CGSize(width: playableRect.width/2,
+                                          size: CGSize(width: playableRect.width,
                                                        height: Style.LevelGoalView.height))
         levelGoalView.position = CGPoint.alignHorizontally(levelGoalView.frame,
                                                            relativeTo: safeArea.frame,
                                                            horizontalAnchor: .left,
                                                            verticalAlign: .bottom,
-                                                           horizontalPadding: Style.Padding.more*2,
+                                                           verticalPadding: 200.0,
+                                                           horizontalPadding: Style.Padding.less,
                                                            translatedToBounds: true)
         levelGoalView.zPosition = Precedence.flying.rawValue
         return levelGoalView

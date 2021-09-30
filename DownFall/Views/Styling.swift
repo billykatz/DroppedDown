@@ -128,13 +128,14 @@ struct Style {
     }
     
     struct LevelGoalView {
-        static let height = CGFloat(400.0)
+        static let height = CGFloat(275.0)
     }
     
     struct HUD {
-        static let height: CGFloat = 300.0
+        static let height: CGFloat = 150.0
         static let heartSize = CGSize(width: 75.0, height: 75.0)
         static let gemSize = CGSize(width: 75.0, height: 75.0)
+        static let dodgeLuckStatSize = CGSize(width: 60.0, height: 60.0)
         static let labelParagraphWidth = CGFloat(200.0)
         static let coinLabelPadding = CGFloat (50.0)
         static let gemSpritePadding = CGFloat(16.0)

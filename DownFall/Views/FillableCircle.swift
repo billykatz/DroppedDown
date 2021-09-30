@@ -24,12 +24,16 @@ struct FillableCircleViewModel: FillableCircleViewModelable & FillableBarViewMod
     var direction: BarDirection
 }
 
+extension FillableCircleViewModel: Hashable {
+    
+}
+
 class FillableCircleBar: SKSpriteNode {
     let viewModel: FillableCircleViewModel
     let contentView: SKSpriteNode
     
     struct Constants {
-        static let lineWidth = CGFloat(30.0)
+        static let lineWidth = CGFloat(20.0)
         static let overlapLineWidth = lineWidth*1.5
         static let halfLineWidth = lineWidth / 2
     }
@@ -202,7 +206,7 @@ class FillableCircleBar: SKSpriteNode {
         let circle = SKShapeNode(circleOfRadius: radius)
         circle.position = position
         circle.color = viewModel.darkFillColor
-        circle.zPosition = Precedence.menu.rawValue
+        circle.zPosition = Precedence.flying.rawValue
         
         if addCheckmark {
             let checkmark = SKSpriteNode(texture: SKTexture(imageNamed: "checkMark"), color: .clear, size: CGSize(width: Constants.lineWidth, height: Constants.lineWidth))

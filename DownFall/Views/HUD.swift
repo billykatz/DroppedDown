@@ -22,7 +22,7 @@ class HUD: SKSpriteNode {
         static let gemAmountLabelName = "gemAmountLabelName"
     }
     
-    static func build(color: UIColor, size: CGSize, delegate: SettingsDelegate?, level: Level) -> HUD {
+    static func build(color: UIColor, size: CGSize, delegate: SettingsDelegate?) -> HUD {
         let header = HUD(texture: nil, color: .clear, size: size)
         
         let setting = SKSpriteNode(texture: SKTexture(imageNamed: Identifiers.settings), color: .clear , size: Style.HUD.settingsSize)
@@ -39,7 +39,6 @@ class HUD: SKSpriteNode {
         header.isUserInteractionEnabled = true
         header.delegate = delegate
         
-        header.level = level
         
         Dispatch.shared.register { [weak header] in
             header?.handle($0)
@@ -65,7 +64,6 @@ class HUD: SKSpriteNode {
     var gemSpriteNode: SKSpriteNode?
     
     weak var delegate: SettingsDelegate?
-    var level: Level?
     
     //Mark: - Instance Methods
     
@@ -128,63 +126,64 @@ class HUD: SKSpriteNode {
                                               inside: self.frame,
                                               verticalAlign: .top,
                                               horizontalAnchor: .left,
+                                              xOffset: self.frame.width/8,
                                               yOffset: Style.Padding.most*4)
         
-        let currentHealthText = ParagraphNode(text: "\(data.hp)", paragraphWidth: 50.0, fontSize: .fontExtraLargeSize, fontColor: .lightText)
+        let currentHealthText = ParagraphNode(text: "\(data.hp)", paragraphWidth: 100.0, fontSize: .fontExtraLargeSize, fontColor: .lightText)
         currentHealthText.position = CGPoint.alignVertically(currentHealthText.frame, relativeTo: heartNode.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: Style.Padding.most,  translatedToBounds: true)
         currentHealthText.name = Constants.currentHealthAmountLabelName
 
-        let slashText = ParagraphNode(text: "/", paragraphWidth: 50.0, fontSize: .fontExtraLargeSize, fontColor: .lightText)
+        let slashText = ParagraphNode(text: "/", paragraphWidth: 100.0, fontSize: .fontExtraLargeSize, fontColor: .lightText)
         slashText.position = CGPoint.alignVertically(slashText.frame, relativeTo: currentHealthText.frame, horizontalAnchor: .right, verticalAlign: .center, translatedToBounds: true)
         
         let totalHealthText = ParagraphNode(text: "\(data.originalHp)", paragraphWidth: Style.HUD.heartSize.width*2, fontSize: .fontExtraLargeSize, fontColor: .lightText)
         totalHealthText.position = CGPoint.alignVertically(totalHealthText.frame, relativeTo: slashText.frame, horizontalAnchor: .right, verticalAlign: .center, translatedToBounds: true)
         totalHealthText.name = Constants.totalHealthAmountLabelName
-
         
         self.addChildSafely(heartNode)
         addChild(currentHealthText)
         addChild(slashText)
         addChild(totalHealthText)
         
-        // the sprite of the coin
+        // the sprite of the gem
         let gemNode = SKSpriteNode(texture: SKTexture(imageNamed: Identifiers.gem), size: Style.HUD.heartSize)
         gemNode.position = CGPoint.alignVertically(gemNode.frame, relativeTo: totalHealthText.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: Style.Padding.most * 2, translatedToBounds: true)
         gemSpriteNode = gemNode
-        self.addChild(gemNode)
         
-        // the label with the palyer's amount of gold
+        // the label with the player's amount of gems
         let gemLabel = ParagraphNode(text: "\(data.carry.total(in: .gem))", paragraphWidth: Style.HUD.labelParagraphWidth, fontSize: .fontExtraLargeSize, fontColor: .lightText)
         gemLabel.position = CGPoint.alignVertically(gemLabel.frame, relativeTo: gemNode.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: Style.Padding.more, translatedToBounds: true)
         gemLabel.name = Constants.gemAmountLabelName
-        self.addChild(gemLabel)
         
         // save this data for later
         currentTotalGem = data.carry.total(in: .gem)
         
-        
         // display the player's dodge
-        let dodgeNode = SKSpriteNode(texture: SKTexture(imageNamed: Identifiers.dodgeSprite), size: Style.HUD.gemSize)
-        dodgeNode.position = CGPoint.alignHorizontally(dodgeNode.frame, relativeTo: heartNode.frame, horizontalAnchor: .left, verticalAlign: .bottom, verticalPadding: Style.Padding.most, translatedToBounds: true)
+        let dodgeNode = SKSpriteNode(texture: SKTexture(imageNamed: Identifiers.dodgeSprite), size: Style.HUD.dodgeLuckStatSize)
+        dodgeNode.position = CGPoint.alignVertically(dodgeNode.frame, relativeTo: gemLabel.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: Style.Padding.most * 2, translatedToBounds: true)
         dodgeSprite = dodgeNode
-        self.addChild(dodgeNode)
         
-        let dodgeAmountNode = ParagraphNode(text: "\(data.dodge)", paragraphWidth: self.size.width)
+        let dodgeAmountNode = ParagraphNode(text: "\(data.dodge)", paragraphWidth: self.size.width, fontColor: .lightText)
         dodgeAmountNode.position = CGPoint.alignVertically(dodgeAmountNode.frame, relativeTo: dodgeNode.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: Style.Padding.most, translatedToBounds:  true)
         dodgeAmountNode.name = Constants.dodgeAmountLabelName
-        self.addChild(dodgeAmountNode)
-        
         // display the player's luck
-        let luckNode = SKSpriteNode(texture: SKTexture(imageNamed: Identifiers.luckSprite), size: Style.HUD.gemSize)
-        luckNode.position = CGPoint.alignHorizontally(luckNode.frame, relativeTo: gemNode.frame, horizontalAnchor: .left, verticalAlign: .bottom, verticalPadding: Style.Padding.most, translatedToBounds: true)
+        let luckNode = SKSpriteNode(texture: SKTexture(imageNamed: Identifiers.luckSprite), size: Style.HUD.dodgeLuckStatSize)
+        luckNode.position = CGPoint.alignVertically(luckNode.frame, relativeTo: dodgeAmountNode.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: Style.Padding.most * 2, translatedToBounds: true)
         luckSprite = luckNode
-        self.addChild(luckNode)
         
-        let luckAmountNode = ParagraphNode(text: "\(data.luck)", paragraphWidth: self.size.width)
+        
+        let luckAmountNode = ParagraphNode(text: "\(data.luck)", paragraphWidth: self.size.width, fontColor: .lightText)
         luckAmountNode.position = CGPoint.alignVertically(luckAmountNode.frame, relativeTo: luckNode.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: Style.Padding.most, translatedToBounds: true)
         luckAmountNode.name = Constants.luckAmountLabelName
-        self.addChild(luckAmountNode)
         
+
+        self.addChild(gemNode)
+        self.addChild(gemLabel)
+        self.addChild(dodgeNode)
+        self.addChild(dodgeAmountNode)
+        self.addChild(luckNode)
+        self.addChild(luckAmountNode)
+
     }
     
     func targetSprite(for offerType: StoreOfferType) -> SKSpriteNode? {

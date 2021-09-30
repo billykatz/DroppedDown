@@ -502,7 +502,7 @@ extension Renderer {
             else {
                 // animate received the health, dodge or luck and then compute the new board
                 let targetSprite = hud.targetSprite(for: offer.type)
-                let targetPoint = targetSprite?.convert(hud.gemSpriteNode?.frame.center ?? .zero, to: foreground) ?? .zero
+                let targetPoint = hud.convert(targetSprite?.frame.center ?? .zero, to: foreground)// ?? .zero
                 let sprite = sprites[atTilecoord.x][atTilecoord.y]
                 animator.animateCollectOffer(offerType: offer.type, offerSprite: sprite, targetPosition: targetPoint, to: hud) { [weak self] in
                     self?.computeNewBoard(for: trans.first) { [weak self] in self?.animationsFinished(endTiles: trans.first?.endTiles) }
@@ -568,7 +568,7 @@ extension Renderer {
             self.add(sprites: self.sprites, tiles: endTiles)
             
 //            if case let InputType.collectItem(coord, item, amount) = inputType {
-                // add a bunch of gold sprites to the board
+                // add a bunch of gem sprites to the board
             if let startPoint = self.positionsInForeground(at: [coord]).first {
                 var addedSprites: [SKSpriteNode] = []
                 for _ in 0..<amount {
@@ -581,7 +581,16 @@ extension Renderer {
                     self.spriteForeground.addChild(sprite)
                     addedSprites.append(sprite)
                 }
-                let targetPosition = self.hud.gemSpriteNode?.convert(self.hud.gemSpriteNode?.frame.center ?? .zero, to: self.foreground) ?? .zero
+                
+                var targetPosition = self.hud.convert(self.hud.gemSpriteNode?.frame.center ?? .zero, to: self.foreground)
+                
+                if case let InputType.collectItem(_, item, _) = inputType,
+                   let goalIndex = self.levelGoalTracker.typeAdvancesGoal(type: TileType.item(item)) {
+                    let goalOrigin = self.levelGoalView.originForGoalView(index: goalIndex)
+                    let gemGoalPosition  = self.levelGoalView.convert(goalOrigin, to: self.spriteForeground)
+                    
+                    targetPosition = gemGoalPosition
+                }
                 self.animator.animateGold(goldSprites: addedSprites, gained: amount, from: startPoint, to: targetPosition, in: self.hud) { [weak self] in self?.animationsFinished(endTiles: transformation.endTiles) }
             }
         }
@@ -623,37 +632,67 @@ extension Renderer {
         var removedAnimations: [SpriteAction] = []
         for tileTrans in removed {
             
-            /// add crumble animation and add a gem if needed
-            if let crumble = sprites[tileTrans.end.x][tileTrans.end.y].crumble() {
-                // set the position way in the background so that new nodes come in over
-                sprites[tileTrans.end.x][tileTrans.end.y].zPosition = Precedence.underground.rawValue
-                
-                removedAnimations.append(crumble)
-                
-                
-                /// Add the gem if needed
-                /// Grab the current rock on the board.
-                /// If this rock contains a gem, then add it to the board
-                let currentSprite = sprites[tileTrans.end.x][tileTrans.end.y]
-                
-                if case TileType.rock(color: let color, holdsGem: let holdsGem) = currentSprite.type,
-                   holdsGem {
+            if case InputType.touch(_, let type)? = transformation.inputType {
+                if let goalIndex = levelGoalTracker.typeAdvancesGoal(type: type) {
+                    let goalOrigin = levelGoalView.originForGoalView(index: goalIndex)
+                    let targetPosition = self.levelGoalView.convert(goalOrigin, to: self.spriteForeground)
                     
-                    /// we need to add the gem to the board or else shit is weird
-                    let sprite = DFTileSpriteNode(type: .item(Item(type: .gem, amount: 10, color: color)), height: currentSprite.size.height, width: currentSprite.size.width)
+                    sprites[tileTrans.end.x][tileTrans.end.y].zPosition = 100_000
                     
-                    // place the gem on the board where the rock was
-                    sprite.position = currentSprite.position
+                    let animation = animator.createAnimationCompletingGoals(sprite: sprites[tileTrans.end.x][tileTrans.end.y], to: targetPosition)
                     
-                    /// add the gem sprite our data store
-                    sprites[tileTrans.end.x][tileTrans.end.y] = sprite
-                    
-                    /// add the gem sprite to the foreground
-                    spriteForeground.addChild(sprite)
+                    removedAnimations.append(animation)
                     
                 }
-                
-            } else if let poof = sprites[tileTrans.end.x][tileTrans.end.y].poof(), case InputType.foundRuneDiscarded? = transformation.inputType {
+                /// crumble should happen when the rocks are not needed for the goal.
+                /// add crumble animation and add a gem if needed
+                else if let crumble = sprites[tileTrans.end.x][tileTrans.end.y].crumble() {
+                    // set the position way in the background so that new nodes come in over
+                    sprites[tileTrans.end.x][tileTrans.end.y].zPosition = Precedence.underground.rawValue
+                    
+                    removedAnimations.append(crumble)
+                    
+                    
+                    /// Add the gem if needed
+                    /// Grab the current rock on the board.
+                    /// If this rock contains a gem, then add it to the board
+                    let currentSprite = sprites[tileTrans.end.x][tileTrans.end.y]
+                    
+                    if case TileType.rock(color: let color, holdsGem: let holdsGem) = currentSprite.type,
+                       holdsGem {
+                        
+                        /// we need to add the gem to the board or else shit is weird
+                        let sprite = DFTileSpriteNode(type: .item(Item(type: .gem, amount: 10, color: color)), height: currentSprite.size.height, width: currentSprite.size.width)
+                        
+                        // place the gem on the board where the rock was
+                        sprite.position = currentSprite.position
+                        
+                        /// add the gem sprite our data store
+                        sprites[tileTrans.end.x][tileTrans.end.y] = sprite
+                        
+                        /// add the gem sprite to the foreground
+                        spriteForeground.addChild(sprite)
+                        
+                    }
+                    
+                }
+            } else if case InputType.monsterDies? = transformation.inputType {
+                let tileType = sprites[tileTrans.end.x][tileTrans.end.y].type
+                if let goalIndex = levelGoalTracker.typeAdvancesGoal(type: tileType) {
+                    let goalOrigin = levelGoalView.originForGoalView(index: goalIndex)
+                    let targetPosition = self.levelGoalView.convert(goalOrigin, to: self.spriteForeground)
+                    
+                    sprites[tileTrans.end.x][tileTrans.end.y].zPosition = 100_000
+                    
+                    let animation = animator.createAnimationCompletingGoals(sprite: sprites[tileTrans.end.x][tileTrans.end.y], to: targetPosition)
+                    
+                    removedAnimations.append(animation)
+                    
+                }
+
+            }
+            
+            if let poof = sprites[tileTrans.end.x][tileTrans.end.y].poof(), case InputType.foundRuneDiscarded? = transformation.inputType {
                 removedAnimations.append(poof)
             }
             // case for poofing the discarded store offer

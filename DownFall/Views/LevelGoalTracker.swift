@@ -197,4 +197,21 @@ class LevelGoalTracker: LevelGoalTracking {
             goalIsUpdatedSubject.send(goalProgress)
         }
     }
+    
+    public func typeAdvancesGoal(type: TileType) -> Int? {
+        var doesAffect = false
+        var goalIndex = 0
+        
+        for goal in goalProgress {
+            if goal.tileType == type && !goal.hasBeenRewarded {
+                doesAffect = true
+                goalIndex = goal.index
+            }
+        }
+        
+        if !doesAffect { return nil }
+        
+        return goalIndex
+
+    }
 }

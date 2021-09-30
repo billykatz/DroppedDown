@@ -393,6 +393,45 @@ struct Animator {
         
         animate([SpriteAction(sprite: sprite, action: sequence)], completion: completion)
     }
+    
+    func createAnimationCompletingGoals(sprite: SKSpriteNode, to targetPosition: CGPoint) -> SpriteAction {
+//        let toPosition = sprite.frame.center.translate(xOffset: CGFloat.random(in: AnimationSettings.Gem.randomXOffsetRange), yOffset: CGFloat.random(in: AnimationSettings.Gem.randomYOffsetRange))
+//
+//        let moveAwayAction = SKAction.move(to: toPosition, duration: 0.25)
+        let scaleUp = CGFloat.random(in: 1.2...1.5)
+        let scaleDownRange = CGFloat.random(in: 0.2...0.4)
+        
+        let scaleUpAction = SKAction.scale(by: scaleUp, duration: AnimationSettings.Board.workingTowardsGoal/4)
+        scaleUpAction.timingMode = .easeIn
+        let scaleDown = SKAction.scale(by: scaleDownRange, duration: AnimationSettings.Board.workingTowardsGoal/4*3)
+        scaleDown.timingMode = .easeIn
+//        let scaleSeqeunce = SKAction.sequence([scaleUpAction, scaleDown])
+        
+        let moveToAction = SKAction.move(to: targetPosition, duration: Double.random(in: AnimationSettings.Board.workingTowardsGoal-0.15...AnimationSettings.Board.workingTowardsGoal+0.15))
+        moveToAction.timingMode = .easeIn
+        
+        let moveToAndScale = SKAction.group([moveToAction, scaleDown])
+        let sequence = SKAction.sequence([scaleUpAction, moveToAndScale])
+        
+        return SpriteAction(sprite: sprite, action: sequence)//SKAction.sequence([moveToAndScale, SKAction.removeFromParent()]))
+        
+//        let moveAwayMoveToScale = SKAction.sequence([moveAwayAction, moveToAndScale])
+        
+//        moveAwayMoveToScale.timingMode = .easeOut
+        
+//            let tickUpHudCounter = SKAction.run {
+//                hud.incrementCurrencyCountByOne()
+//
+//                if !hasShownTotalGain {
+//                    hasShownTotalGain = true
+//                    hud.showTotalGemGain(goldSprites.count)
+//                }
+//            }
+        
+//            index += 1
+        
+
+    }
 
     
     func animate(_ spriteActions: [SpriteAction], completion: @escaping () -> Void) {

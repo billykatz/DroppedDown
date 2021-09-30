@@ -171,11 +171,11 @@ struct LevelConstructor {
         var goals: [LevelGoal?]
         switch depth {
         case 0:
-//            let monsterGoal = LevelGoal.killMonsterGoal(amount: 1)
-            let gemGoal = LevelGoal.gemGoal(amount: 35)
-            let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 100)
+            let monsterGoal = LevelGoal.killMonsterGoal(amount: 1)
+            let gemGoal = LevelGoal.gemGoal(amount: 15)
+            let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 20)
             
-            goals = [gemGoal, rockGoal]//, monsterGoal]
+            goals = [monsterGoal, rockGoal] //[gemGoal, rockGoal]//, monsterGoal]
         case 1:
             let monsterGoal = LevelGoal.killMonsterGoal(amount: 2)
             let gemGoal = LevelGoal.gemGoal(amount: 2)

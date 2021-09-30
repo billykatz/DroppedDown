@@ -37,6 +37,7 @@ struct AnimationSettings {
         static let runeGainSpeed = Double(1.0)
         static let goldWaitTime = Double(0.025)
         static let offerCollectDuration = Double(0.75)
+        static let workingTowardsGoal = Double(0.66)
     }
     
     struct HUD {

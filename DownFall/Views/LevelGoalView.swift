@@ -107,7 +107,6 @@ class LevelGoalView: SKSpriteNode {
         border.lineWidth = 5.0
         
         self.addChildSafely(border)
-        
     }
     
     private func updateGoal(_ updatedGoal: GoalTracking) {
@@ -157,6 +156,12 @@ class LevelGoalView: SKSpriteNode {
         
         return circle
         
+    }
+    
+    public func originForGoalView(index: Int) -> CGPoint {
+        let x: CGFloat = -contentView.frame.width/2 + xOffsetForGoal(widthOfItem: Constants.circleSize.width, indexOfGoal: index) + Constants.circleSize.width/2
+        let y: CGFloat = 0
+        return CGPoint(x: x, y: y)
     }
 
 

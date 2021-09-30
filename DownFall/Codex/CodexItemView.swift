@@ -67,7 +67,8 @@ struct CodexItemView: View {
     }
     
     var priceTextColor: UIColor {
-        return viewModel.playerCanAfford(unlockable: unlockable) ? .white : .codexRedText
+        return viewModel
+            .playerCanAfford(unlockable: unlockable) ? .white : .codexRedText
     }
 
     var body: some View {
@@ -80,6 +81,9 @@ struct CodexItemView: View {
                         ).padding(20.0), alignment: .top)
                 if (!unlockable.isPurchased && unlockable.isUnlocked) {
                     PriceView(price: unlockable.purchaseAmount, textColor: self.priceTextColor, scale: 0.5, font: Font.codexFont)
+                } else if !unlockable.isUnlocked {
+                    Spacer().frame(height: 4)
+                    Image("codex-lock").resizable().frame(width: 25, height: 25)
                 }
             }
             .onReceive(viewModel.$unlockables) { _ in

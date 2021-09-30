@@ -30,7 +30,8 @@ struct CodexItemAnimatingView: View {
     
     var spriteSheet: some View {
         Image(storeOffer.textureName)
-            .saturation(unlockable.isPurchased ? 1.0 : 0.0)
+                .saturation(unlockable.isPurchased ? 1.0 : 0.0)
+                .contrast(unlockable.isUnlocked ? 1.0: 0.0)
     }
     
     var clippedSpriteSheet: some View {

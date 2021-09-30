@@ -20,7 +20,7 @@ struct BuyButtonView: View {
     var buttonBackground: some View {
         RoundedRectangle(cornerRadius: 10.0)
             .fill(buttonColor)
-            .frame(width: 200, height: 75)
+            .frame(width: 225, height: 75)
     }
     
     var body: some View {
@@ -28,20 +28,18 @@ struct BuyButtonView: View {
             Button(action: action) {
                 buttonBackground
                     .overlay(HStack(alignment: .center, spacing: 0) {
-                            Text("Buy - ")
+                            Text("Buy")
                                 .font(.buttonFont)
                                 .foregroundColor(.black)
                                 .alignmentGuide(VerticalAlignment.center, computeValue: { dimension in
                                     dimension[VerticalAlignment.center] + 2
                                 })
-                            PriceView(price: price, textColor: .black, scale: 0.75, font: Font.buttonFont)
                     })
             }
-
         } else {
             buttonBackground
                 .overlay(HStack(alignment: .center, spacing: 0) {
-                        Text("Mine more gems to buy")
+                        Text("Collect more gems to buy")
                             .font(.codexFont)
                             .background(Color(UIColor.codexDarkGray))
                             .padding()
@@ -50,6 +48,8 @@ struct BuyButtonView: View {
                             .foregroundColor(.black)
                 })
         }
+        
+        PriceView(price: price, textColor: (canAfford ? .white : .codexRedText), scale: 0.75, font: Font.titleCodexFont)
 
     }
 }
@@ -130,7 +130,7 @@ struct CodexItemModalView: View {
     
     var backgroundHeight: CGFloat {
         if !unlockable.isUnlocked {
-            return 280
+            return 380
         } else {
             return 500
         }
@@ -150,6 +150,9 @@ struct CodexItemModalView: View {
                 if unlockable.isUnlocked {
                     CodexItemModalUnlockView(unlockable: unlockable)
                     Spacer()
+                } else {
+                    Image("codex-lock").resizable().frame(width: 75, height: 75)
+                    Spacer().frame(height: 10)
                 }
                 if (hiddenTrigger || !hiddenTrigger) {
                     if (!unlockable.isPurchased && unlockable.isUnlocked) {
@@ -166,7 +169,12 @@ struct CodexItemModalView: View {
     }
     
     func purchase() {
-        viewModel.purchaseUnlockable(unlockable: unlockable)
+        if viewModel.playerCanAfford(unlockable: unlockable) {
+            viewModel.purchaseUnlockable(unlockable: unlockable)
+            
+        } else {
+            
+        }
 
     }
 }

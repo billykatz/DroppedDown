@@ -115,7 +115,7 @@ class FillableCircleBar: SKSpriteNode {
         path.addArc(center: .zero, radius: viewModel.radius, startAngle: .pi/2, endAngle: .pi * 3/2, clockwise: false)
         let shape = SKShapeNode(path: path)
         shape.color = viewModel.fillColor
-        shape.zPosition = Precedence.menu.rawValue
+        shape.zPosition = 200
         
         let innerOutLine = SKShapeNode(circleOfRadius: innerCircleRadius)
         innerOutLine.color = viewModel.backgroundColor ?? . clear
@@ -206,7 +206,7 @@ class FillableCircleBar: SKSpriteNode {
         let circle = SKShapeNode(circleOfRadius: radius)
         circle.position = position
         circle.color = viewModel.darkFillColor
-        circle.zPosition = Precedence.flying.rawValue
+        circle.zPosition = 7500
         
         if addCheckmark {
             let checkmark = SKSpriteNode(texture: SKTexture(imageNamed: "checkMark"), color: .clear, size: CGSize(width: Constants.lineWidth, height: Constants.lineWidth))

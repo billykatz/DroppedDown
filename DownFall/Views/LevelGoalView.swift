@@ -148,7 +148,7 @@ class LevelGoalView: SKSpriteNode {
             goalBackgroundView.addChild(currentTargetView)
         }
         
-        goalBackgroundView.zPosition = Precedence.floating.rawValue
+        goalBackgroundView.zPosition = 5000
         goalBackgroundView.addChild(goalImageView)
         
         circle.addChild(goalBackgroundView)

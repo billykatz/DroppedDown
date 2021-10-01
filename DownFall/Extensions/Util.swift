@@ -13,7 +13,7 @@ enum Precedence: CGFloat {
     case underground = -10
     case background = 0
     case foreground = 10
-    case menu = 20
+    case menu = 20000
     case aboveMenu = 30
     case floating = 100
     case flying = 200

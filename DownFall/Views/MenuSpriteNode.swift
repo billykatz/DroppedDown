@@ -16,6 +16,10 @@ fileprivate func menuHeight(type: MenuType) -> CGFloat {
         return 700
     case .gameWin:
         return 500
+    case .confirmation:
+        return 750
+    case .detectedSavedGame:
+        return 800
     default:
         return 300
     }
@@ -27,7 +31,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
     
     var playableRect: CGRect
     var precedence: Precedence
-    var level: Level
+    var level: Level?
     weak var buttonDelegate: ButtonDelegate?
     
     struct Constants {
@@ -38,7 +42,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
         fatalError("init(coder:) has not been implemented")
     }
     
-    init(_ menuType: MenuType, playableRect: CGRect, precedence: Precedence, level: Level, buttonDelegate: ButtonDelegate? = nil) {
+    init(_ menuType: MenuType, playableRect: CGRect, precedence: Precedence, level: Level?, buttonDelegate: ButtonDelegate? = nil) {
         
         let menuSizeWidth = playableRect.size.width * menuType.widthCoefficient
         let menuSizeHeight = menuHeight(type: menuType)
@@ -57,7 +61,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
         setup(menuType, playableRect: playableRect, precedence: precedence, level: level, buttonDelegate: buttonDelegate)
     }
     
-    func setup(_ menuType: MenuType, playableRect: CGRect, precedence: Precedence, level: Level, completedGoals: Int = 0, buttonDelegate: ButtonDelegate? = nil) {
+    func setup(_ menuType: MenuType, playableRect: CGRect, precedence: Precedence, level: Level?, completedGoals: Int = 0, buttonDelegate: ButtonDelegate? = nil) {
         removeAllChildren()
         
         
@@ -68,11 +72,11 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
         addChild(border)
         
         // set up the buttons
-        setupButtons(menuType, playableRect, precedence: precedence, level, completedGoals: completedGoals, buttonDelegate: buttonDelegate)
-
+        setupButtons(menuType, playableRect, precedence: precedence, level: level, completedGoals: completedGoals, buttonDelegate: buttonDelegate)
+        
     }
     
-    private func setupButtons(_ menuType: MenuType, _ playableRect: CGRect, precedence: Precedence, _ level: Level, completedGoals: Int = 0, buttonDelegate: ButtonDelegate? = nil) {
+    private func setupButtons(_ menuType: MenuType, _ playableRect: CGRect, precedence: Precedence, level: Level?, completedGoals: Int = 0, buttonDelegate: ButtonDelegate? = nil) {
         let menuSizeWidth = playableRect.size.width * menuType.widthCoefficient
         let buttonSize = CGSize(width: 330, height: 125)
         
@@ -82,26 +86,26 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             let titleNode = ParagraphNode.labelNode(text: titleText, paragraphWidth: menuSizeWidth * 0.95,
                                                     fontSize: .fontExtraLargeSize)
             titleNode.position = CGPoint.position(titleNode.frame, inside: self.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most * 2)
-
             
-            let bodyText = "You beat depth: \(level.humanReadableDepth)"
+            
+            let bodyText = "You beat depth: \(level?.humanReadableDepth ?? "0")"
             let bodyNode = ParagraphNode.labelNode(text: bodyText, paragraphWidth: menuSizeWidth * 0.95,
-                                                        fontSize: .fontMediumSize)
+                                                   fontSize: .fontMediumSize)
             
             bodyNode.position = CGPoint.alignHorizontally(bodyNode.frame, relativeTo: titleNode.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.most, translatedToBounds: true)
-
+            
             bodyNode.zPosition = precedence.rawValue
             
             addChild(titleNode)
             addChild(bodyNode)
             
             let button = ShiftShaft_Button(size: buttonSize,
-                                delegate: buttonDelegate ?? self,
-                                identifier: menuType.buttonIdentifer,
-                                precedence: precedence,
-                                fontSize: .fontLargeSize,
-                                fontColor: .black,
-                                backgroundColor: .buttonGray)
+                                           delegate: buttonDelegate ?? self,
+                                           identifier: menuType.buttonIdentifer,
+                                           precedence: precedence,
+                                           fontSize: .fontLargeSize,
+                                           fontColor: .black,
+                                           backgroundColor: .buttonGray)
             button.position = CGPoint.position(button.frame, inside: self.frame, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: Style.Padding.most * 2)
             button.zPosition = 1_000_000
             addChild(button)
@@ -114,12 +118,12 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
                                                     fontSize: .fontExtraLargeSize)
             
             titleNode.position = CGPoint.position(titleNode.frame, inside: self.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most * 2)
-
             
             
-            let bodyText = "Depth level \(level.humanReadableDepth)"
+            
+            let bodyText = "Depth level \(level?.humanReadableDepth ?? "0")"
             let bodyNode = ParagraphNode.labelNode(text: bodyText, paragraphWidth: menuSizeWidth * 0.95,
-                                                        fontSize: .fontMediumSize)
+                                                   fontSize: .fontMediumSize)
             
             bodyNode.position = CGPoint.alignHorizontally(bodyNode.frame, relativeTo: titleNode.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.most, translatedToBounds: true)
             
@@ -128,23 +132,23 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             addChild(bodyNode)
             
             let mainMenuButton = ShiftShaft_Button(size: buttonSize,
-                                        delegate: buttonDelegate ?? self,
-                                        identifier: .mainMenu,
-                                        precedence: precedence,
-                                        fontSize: .fontLargeSize,
-                                        fontColor: .black,
-                                        backgroundColor: .buttonGray)
+                                                   delegate: buttonDelegate ?? self,
+                                                   identifier: .pausedExitToMainMenu,
+                                                   precedence: precedence,
+                                                   fontSize: .fontLargeSize,
+                                                   fontColor: .black,
+                                                   backgroundColor: .buttonGray)
             mainMenuButton.position = CGPoint.position(mainMenuButton.frame, inside: self.frame, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: Style.Padding.most * 2)
             addChild(mainMenuButton)
             
             
             let soundButton = ShiftShaft_Button(size: buttonSize,
-                                     delegate: buttonDelegate ?? self,
-                                     identifier: .toggleSound,
-                                     precedence: precedence,
-                                     fontSize: .fontLargeSize,
-                                     fontColor: .black,
-                                     backgroundColor: .buttonGray)
+                                                delegate: buttonDelegate ?? self,
+                                                identifier: .toggleSound,
+                                                precedence: precedence,
+                                                fontSize: .fontLargeSize,
+                                                fontColor: .black,
+                                                backgroundColor: .buttonGray)
             soundButton.position = CGPoint.alignHorizontally(soundButton.frame, relativeTo: mainMenuButton.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: Style.Padding.more * 2, translatedToBounds: true)
             addChild(soundButton)
             
@@ -156,12 +160,12 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             
             
             let resumeButton = ShiftShaft_Button(size: buttonSize,
-                                delegate: buttonDelegate ?? self,
-                                identifier: .resume,
-                                precedence: precedence,
-                                fontSize: .fontLargeSize,
-                                fontColor: .black,
-                                backgroundColor: .buttonGray)
+                                                 delegate: buttonDelegate ?? self,
+                                                 identifier: .resume,
+                                                 precedence: precedence,
+                                                 fontSize: .fontLargeSize,
+                                                 fontColor: .black,
+                                                 backgroundColor: .buttonGray)
             resumeButton.position = CGPoint.alignHorizontally(resumeButton.frame, relativeTo: soundButton.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: Style.Padding.more*2, translatedToBounds: true)
             addChild(resumeButton)
             
@@ -175,15 +179,15 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             
             
             let body1Text = "Spend gems at the store."
-            let body1Node = ParagraphNode.labelNode(text: body1Text, paragraphWidth: menuSizeWidth * 0.95,
-                                                        fontSize: .fontMediumSize)
+            let body1Node = ParagraphNode.labelNode(text: body1Text, paragraphWidth: menuSizeWidth * 0.90,
+                                                    fontSize: .fontMediumSize)
             
             body1Node.position = CGPoint.alignHorizontally(body1Node.frame, relativeTo: titleNode.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.most, translatedToBounds: true)
-
             
-            let body2Text = "You made it to depth level \(level.humanReadableDepth)."
-            let body2Node = ParagraphNode.labelNode(text: body2Text, paragraphWidth: menuSizeWidth * 0.95,
-                                                        fontSize: .fontMediumSize)
+            
+            let body2Text = "You made it to depth level \(level?.humanReadableDepth ?? "0")."
+            let body2Node = ParagraphNode.labelNode(text: body2Text, paragraphWidth: menuSizeWidth * 0.90,
+                                                    fontSize: .fontMediumSize)
             
             body2Node.position = CGPoint.alignHorizontally(body2Node.frame, relativeTo: body1Node.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.normal, translatedToBounds: true)
             
@@ -193,13 +197,14 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             
             
             let mainMenuButton = ShiftShaft_Button(size: buttonSize,
-                                        delegate: buttonDelegate ?? self,
-                                        identifier: .mainMenu,
-                                        precedence: precedence,
-                                        fontSize: .fontLargeSize,
-                                        fontColor: .black,
-                                        backgroundColor: .buttonGray)
+                                                   delegate: buttonDelegate ?? self,
+                                                   identifier: .mainMenu,
+                                                   precedence: precedence,
+                                                   fontSize: .fontLargeSize,
+                                                   fontColor: .black,
+                                                   backgroundColor: .buttonGray)
             mainMenuButton.position = CGPoint.position(mainMenuButton.frame, inside: self.frame, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: Style.Padding.most * 2)
+            
             addChild(mainMenuButton)
             
             let storeButton = ShiftShaft_Button(size: buttonSize,
@@ -210,31 +215,52 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
                                                 fontColor: .black,
                                                 backgroundColor: .buttonGray)
             storeButton.position = CGPoint.alignHorizontally(storeButton.frame, relativeTo: mainMenuButton.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: Style.Padding.more*2, translatedToBounds: true)
+            
             addChild(storeButton)
             
-
+            
+            
+            
         }
         else if menuType == .confirmation {
-            let text =
-                """
-                You have unredeemed offers.
-
-                Are you sure you want to leave the store?
-            """
-            let paragraphNode = ParagraphNode.labelNode(text: text, paragraphWidth: menuSizeWidth * 0.95, fontSize: .fontMediumSize)
+            let titleText = "Abandon run?"
+            let titleNode = ParagraphNode.labelNode(text: titleText, paragraphWidth: menuSizeWidth * 0.95,
+                                                    fontSize: .fontExtraLargeSize)
+            titleNode.position = CGPoint.position(titleNode.frame, inside: self.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most * 2)
             
-            paragraphNode.position = CGPoint.position(paragraphNode.frame, inside: self.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most)
-            paragraphNode.zPosition = precedence.rawValue
             
-            addChild(paragraphNode)
+            let bodyText = "You will lose all progress but keep any gems you earned."
+            let bodyNode = ParagraphNode.labelNode(text: bodyText, paragraphWidth: menuSizeWidth * 0.95,
+                                                   fontSize: .fontLargeSize)
             
-            if let secondaryButtonIdentifier = menuType.secondaryButtonIdentifier {
-                let secondaryButton = ShiftShaft_Button(size: buttonSize, delegate: buttonDelegate ?? self, identifier: secondaryButtonIdentifier, precedence: precedence, fontSize: .fontMediumSize, fontColor: .black)
-                secondaryButton.position = CGPoint.position(secondaryButton.frame, inside: self.frame, verticalAlign: .bottom, horizontalAnchor: .left, xOffset: Style.Padding.most, yOffset: Style.Padding.most)
-                addChild(secondaryButton)
-                
-            }
-                
+            bodyNode.position = CGPoint.alignHorizontally(bodyNode.frame, relativeTo: titleNode.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.most, translatedToBounds: true)
+            
+            bodyNode.zPosition = precedence.rawValue
+            
+            addChild(titleNode)
+            addChild(bodyNode)
+            
+            let noResume = ShiftShaft_Button(size: buttonSize,
+                                             delegate: buttonDelegate ?? self,
+                                             identifier: .doNotAbandonRun,
+                                             precedence: precedence,
+                                             fontSize: .fontLargeSize,
+                                             fontColor: .black,
+                                             backgroundColor: .buttonGray)
+            noResume.position = CGPoint.position(noResume.frame, inside: self.frame, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: Style.Padding.most * 2)
+            addChild(noResume)
+            
+            let yesAbandon = ShiftShaft_Button(size: buttonSize,
+                                               delegate: buttonDelegate ?? self,
+                                               identifier: .yesAbandonRun,
+                                               precedence: precedence,
+                                               fontSize: .fontLargeSize,
+                                               fontColor: .white,
+                                               backgroundColor: .buttonDestructiveRed)
+            yesAbandon.position = CGPoint.alignHorizontally(yesAbandon.frame, relativeTo: noResume.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: Style.Padding.more*2, translatedToBounds: true)
+            addChild(yesAbandon)
+            
+            
         }
         // TODO: Remove DEBUG code
         else if menuType == .debug {
@@ -255,8 +281,49 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             addChildSafely(viewWinMenu)
             addChildSafely(viewLoseMenu)
             
+        } else if menuType == .detectedSavedGame {
+            
+            let titleText = "Saved game"
+            let titleNode = ParagraphNode.labelNode(text: titleText, paragraphWidth: menuSizeWidth * 0.95,
+                                                    fontSize: .fontExtraLargeSize)
+            
+            titleNode.position = CGPoint.position(titleNode.frame, inside: self.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most * 2)
+            
+            
+            
+            let bodyText = "Would you like to continue or abandon your game?"
+            let bodyNode = ParagraphNode.labelNode(text: bodyText, paragraphWidth: menuSizeWidth * 0.80,
+                                                   fontSize: .fontLargeSize)
+            
+            bodyNode.position = CGPoint.alignHorizontally(bodyNode.frame, relativeTo: titleNode.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.most, translatedToBounds: true)
+            
+            
+            addChild(titleNode)
+            addChild(bodyNode)
+            
+            let abandonRunButton = ShiftShaft_Button(size: buttonSize,
+                                                     delegate: buttonDelegate ?? self,
+                                                     identifier: .mainMenuAbandonRun,
+                                                     precedence: precedence,
+                                                     fontSize: .fontLargeSize,
+                                                     fontColor: .white,
+                                                     backgroundColor: .buttonDestructiveRed)
+            abandonRunButton.position = CGPoint.position(abandonRunButton.frame, inside: self.frame, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: Style.Padding.most * 2)
+            addChild(abandonRunButton)
+            
+            
+            let continueRunButton = ShiftShaft_Button(size: buttonSize,
+                                                      delegate: buttonDelegate ?? self,
+                                                      identifier: .mainMenuContinueRun,
+                                                      precedence: precedence,
+                                                      fontSize: .fontLargeSize,
+                                                      fontColor: .black,
+                                                      backgroundColor: .buttonGray)
+            continueRunButton.position = CGPoint.alignHorizontally(continueRunButton.frame, relativeTo: abandonRunButton.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: Style.Padding.more*2, translatedToBounds: true)
+            addChild(continueRunButton)
+            
         }
-
+        
         
         for child in children {
             child.zPosition = 1_000_000
@@ -304,6 +371,15 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             InputQueue.append(Input(.visitStore))
         case .mainMenu:
             InputQueue.append(Input(.playAgain))
+        case .pausedExitToMainMenu:
+            setup(.confirmation, playableRect: self.playableRect, precedence: self.precedence, level: self.level, buttonDelegate: self.buttonDelegate)
+        case .yesAbandonRun:
+            InputQueue.append(Input(.playAgain))
+        
+        case .doNotAbandonRun:
+            InputQueue.append(Input(.play))
+            setup(.pause, playableRect: self.playableRect, precedence: self.precedence, level: self.level, buttonDelegate: self.buttonDelegate)
+            
         case .toggleSound:
             let muted = UserDefaults.standard.bool(forKey: "muteSound")
             UserDefaults.standard.setValue(!muted, forKey: "muteSound")
@@ -312,7 +388,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             let onOff = !muted ? "off" : "on"
             let newTexture = SKTexture(imageNamed: "sound-\(onOff)")
             soundIcon.texture = newTexture
-
+            
             
         // TODO: Remove DEBUG code
         case .debugPause:
@@ -327,7 +403,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             
         case .loseAndGoToStore:
             InputQueue.append(Input(.loseAndGoToStore))
- 
+            
         default:
             fatalError("These buttons dont appear in game")
         }

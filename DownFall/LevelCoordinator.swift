@@ -169,11 +169,11 @@ class LevelCoordinator: LevelCoordinating {
     }
     
     
+    
     // MARK: Utility functions
-    private func saveTiles(_ savedTiles: [[Tile]]) -> RunModel {
+    fileprivate func saveTiles(_ savedTiles: [[Tile]]) -> RunModel {
         return RunModel(player: runModel.player, seed: runModel.seed, savedTiles: savedTiles, areas: runModel.areas, goalTracking: runModel.goalTracking, stats: runModel.stats, unlockables: runModel.unlockables, startingUnlockables: runModel.startingUnlockables)
     }
-    
     
 }
 

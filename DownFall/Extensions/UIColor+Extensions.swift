@@ -29,13 +29,16 @@ extension UIColor {
     static let menuPurple = UIColor(rgb: 0x4c2f84)
     static let menuBorderGray = UIColor(rgb: 0x6C717E)
     
+    // Buttons
+    static let buttonDestructiveRed = UIColor(rgb: 0xCA0000)
+    static let buttonGray = UIColor(rgb: 0xc4c4c4)
+    
     // BG Gray
     static let backgroundGray = UIColor(rgb: 0x262626)
     static let clayRed: UIColor = UIColor(rgb: 0x9c461f)
     
     static let foregroundBlue = UIColor(rgb: 0x6885ac)
     static let eggshellWhite = UIColor(rgb: 0xc7c6c2)
-    static let buttonGray = UIColor(rgb: 0xc4c4c4)
     static let storeItemBackgroundNotSelected = UIColor(rgb: 0x8fa9af)
 
     

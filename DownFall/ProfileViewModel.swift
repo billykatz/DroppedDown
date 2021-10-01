@@ -129,7 +129,7 @@ class ProfileViewModel {
         return false
     }
     
-    func finishRun(playerData updatedPlayerData: EntityModel, currentRun: RunModel) {
+    func finishRun(playerData updatedPlayerData: EntityModel, currentRun: RunModel?) {
         /// update the player
         var newPlayerData = updatedPlayerData.update(pickaxe: Pickaxe(runeSlots: 1, runes: []))
         
@@ -148,13 +148,51 @@ class ProfileViewModel {
         var newProfile = profile.updatePlayer(newPlayerData)
         
         // update stats
+        for stat in currentRun?.stats ?? [] {
+            let overwrite = stat.statType.overwriteIfLarger
+            newProfile = newProfile.updateStatistic(stat, amount: stat.amount, overwriteIfLarger: overwrite)
+        }
+        
+        /// when a palyer abandon's a run (and we hit this coe path)
+        /// we want to nil out the player's current run.
+        newProfile = newProfile.updateRunModel(nil)
+        
+        // update lowest depth if needed
+        newProfile = newProfile.updateStatistic(.lowestDepthReached, amount: currentRun?.depth ?? 0, overwriteIfLarger: true)
+        
+        // save profile
+        saveProfile(newProfile)
+    }
+    
+    /// When we abandon the run, the player data on the provile view model is stale
+    /// So we need to take the player in the current run and update the relevant fields like the current run's carry model
+    func abandonRun(playerData stalePlayerData: EntityModel, currentRun: RunModel) {
+        /// update the player
+        var newPlayerData = stalePlayerData.update(pickaxe: Pickaxe(runeSlots: 1, runes: []))
+        
+        /// update player gem carry
+        newPlayerData = newPlayerData.updateCarry(carry: currentRun.player.carry)
+
+        // reset to base stat of 3 hp
+        newPlayerData = newPlayerData.update(originalHp: 3, dodge: 0, luck: 0)
+        
+        // revive
+        newPlayerData = newPlayerData.revive()
+        
+        
+        /// Update Profile
+        /// update profile with new player
+        var newProfile = profile.updatePlayer(newPlayerData)
+        
+        // update stats
         for stat in currentRun.stats {
             let overwrite = stat.statType.overwriteIfLarger
             newProfile = newProfile.updateStatistic(stat, amount: stat.amount, overwriteIfLarger: overwrite)
         }
         
-        /// update run
-        newProfile = newProfile.updateRunModel(updatedPlayerData.isDead ? nil : currentRun)
+        /// when a palyer abandon's a run (and we hit this coe path)
+        /// we want to nil out the player's current run.
+        newProfile = newProfile.updateRunModel(nil)
         
         // update lowest depth if needed
         newProfile = newProfile.updateStatistic(.lowestDepthReached, amount: currentRun.depth, overwriteIfLarger: true)
@@ -162,4 +200,5 @@ class ProfileViewModel {
         // save profile
         saveProfile(newProfile)
     }
+
 }

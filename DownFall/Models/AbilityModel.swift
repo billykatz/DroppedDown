@@ -121,7 +121,7 @@ enum AbilityType: Equatable {
         case .swordPickAxe: return "Sword Pick Axe"
         case .transmogrificationPotion: return "Transmogrification Potion"
         case .killMonsterPotion: return "Kill Monster Potion"
-        case .tapAwayMonster: return "Destory Monster Group"
+        case .tapAwayMonster: return "Destroy Monster Group"
         case .massMineRock: return "Mass Mine"
         case .rainEmbers: return "Rain Embers"
         case .getSwifty: return "Swift Shift"

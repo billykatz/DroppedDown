@@ -63,15 +63,20 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
         }
     }
     
-    private func presentMainMenu(transition: SKTransition? = nil) {
+    private func presentMainMenu(transition: SKTransition? = nil, allowContinueRun: Bool = true) {
         guard let mainMenu = mainMenuScene else { fatalError("Unable to unwrap the main menu scene")}
         mainMenu.playerModel = profileViewModel?.profile.player
-        mainMenu.hasRunToContinue = (profileViewModel?.profile.currentRun != nil && profileViewModel?.profile.currentRun != .zero)
+        mainMenu.hasRunToContinue = allowContinueRun && (profileViewModel?.profile.currentRun != nil && profileViewModel?.profile.currentRun != .zero)
         mainMenu.displayStoreBadge = profileViewModel?.playerHasPurchasableUnlockables() ?? false
 
         view.presentScene(mainMenu, transition: transition)
         view.ignoresSiblingOrder = true
 
+    }
+    
+    func abandonRun() {
+        //TODO implement
+        profileViewModel?.abandonRun(playerData: profileViewModel!.profile.player, currentRun: profileViewModel!.profile.currentRun!)
     }
     
     func loadedProfile(_ profile: Profile) {
@@ -92,12 +97,12 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
     
     func finishGame(playerData updatedPlayerData: EntityModel, currentRun: RunModel) {
         profileViewModel?.finishRun(playerData: updatedPlayerData, currentRun: currentRun)
-        presentMainMenu(transition: SKTransition.fade(withDuration: 0.2))
+        presentMainMenu(transition: SKTransition.fade(withDuration: 0.2), allowContinueRun: false)
     }
     
     func finishGameAndGoToStore(playerData updatedPlayerData: EntityModel, currentRun: RunModel) {
         profileViewModel?.finishRun(playerData: updatedPlayerData, currentRun: currentRun)
-        presentMainMenu()
+        presentMainMenu(transition: nil, allowContinueRun: false)
         menuStore()
     }
     
@@ -115,10 +120,4 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
         playerTappedOnStore = true
         codexCoordinator.presentCodexView(profileViewModel: profileViewModel)
     }
-    
-    func mainMenuTapped(updatedPlayerData: EntityModel) {
-        profileViewModel?.updatePlayerData(updatedPlayerData)
-        presentMainMenu(transition: SKTransition.push(with: .left, duration: 0.5))
-    }
-
 }

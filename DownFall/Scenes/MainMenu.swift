@@ -13,6 +13,7 @@ protocol MainMenuDelegate: AnyObject {
     func optionsSelected()
     func continueRun()
     func menuStore()
+    func abandonRun()
 }
 
 class MainMenu: SKScene {
@@ -22,7 +23,6 @@ class MainMenu: SKScene {
     }
     
     private var background: SKSpriteNode!
-    private var continueRunButton: ShiftShaft_Button?
     
     private lazy var logo: SKSpriteNode = {
         let ratio: CGFloat = 60.0/210.0
@@ -40,6 +40,18 @@ class MainMenu: SKScene {
     var playerModel: EntityModel?
     var hasRunToContinue: Bool?
     var displayStoreBadge: Bool = false
+    
+    lazy var detectedSavedGameMenu: MenuSpriteNode = {
+        let detectedSavedGame = MenuSpriteNode(.detectedSavedGame, playableRect: size.playableRect, precedence: .menu, level: nil, buttonDelegate: self)
+        
+        return detectedSavedGame
+    }()
+    
+    lazy var confirmAbandonRun: MenuSpriteNode = {
+        let confirmAbandonRun = MenuSpriteNode(.confirmation, playableRect: size.playableRect, precedence: .menu, level: nil, buttonDelegate: self)
+        confirmAbandonRun.zPosition = 10_000_000
+        return confirmAbandonRun
+    }()
     
     
     override func didMove(to view: SKView) {
@@ -66,25 +78,10 @@ class MainMenu: SKScene {
                                     yOffset: 150.0)
         addChild(logo)
         
-        if hasRunToContinue ?? false {
-            let levelButton = ShiftShaft_Button(size: .buttonExtralarge, delegate: self, identifier: .continueRun, image: SKSpriteNode(imageNamed: "blankButton"), shape: .rectangle, addTextLabel: true)
-
-            
-            levelButton.position = CGPoint.alignHorizontally(levelButton.frame,
-                                                           relativeTo: startButton.frame,
-                                                           horizontalAnchor: .center,
-                                                           verticalAlign: .bottom,
-                                                           verticalPadding: Constants.buttonPadding,
-                                                           translatedToBounds: true)
-            continueRunButton = levelButton
-            
-            addChild(levelButton)
-        }
-        
         let menuStoreButton = ShiftShaft_Button(size: .buttonExtralarge, delegate: self, identifier: .mainMenuStore, image: SKSpriteNode(imageNamed: "blankButton"), shape: .rectangle, addTextLabel: true)
         
         menuStoreButton.position = CGPoint.alignHorizontally(menuStoreButton.frame,
-                                                           relativeTo: continueRunButton?.frame ?? startButton.frame,
+                                                           relativeTo: startButton.frame,
                                                            horizontalAnchor: .center,
                                                            verticalAlign: .bottom,
                                                            verticalPadding: Constants.buttonPadding,
@@ -102,8 +99,6 @@ class MainMenu: SKScene {
             addChild(notificationBadge)
         }
         
-        
-        
         addChild(menuStoreButton)
         
         
@@ -119,6 +114,13 @@ class MainMenu: SKScene {
         
         addChild(optionsButton)
         
+        
+        // Show the detected saved game UX
+        if hasRunToContinue ?? false {
+            addChild(detectedSavedGameMenu)
+            detectedSavedGameMenu.zPosition = 10_000_000
+        }
+        
     }
     
     func removeStoreBadge() {
@@ -133,14 +135,26 @@ extension MainMenu: ButtonDelegate {
         case .newGame:
             mainMenuDelegate?.newGame(playerModel.previewAppliedEffects().healFull())
             
-        case .continueRun:
-            mainMenuDelegate?.continueRun()
-            
         case .mainMenuOptions:
             mainMenuDelegate?.optionsSelected()
             
         case .mainMenuStore:
             mainMenuDelegate?.menuStore()
+            
+        case .mainMenuContinueRun:
+            mainMenuDelegate?.continueRun()
+            
+        case .mainMenuAbandonRun:
+            detectedSavedGameMenu.removeFromParent()
+            addChild(confirmAbandonRun)
+            
+        case .yesAbandonRun:
+            confirmAbandonRun.removeFromParent()
+            mainMenuDelegate?.abandonRun()
+            
+        case .doNotAbandonRun:
+            confirmAbandonRun.removeFromParent()
+            addChild(detectedSavedGameMenu)
             
         default:
             ()

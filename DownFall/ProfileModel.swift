@@ -26,7 +26,7 @@ struct Profile: Codable, Equatable {
     
     /// for now this is just the number of unlockables unlocked
     var progress: Int {
-        return unlockables.filter { $0.isUnlocked }.count
+        return unlockables.filter { $0.isPurchased }.count
     }
     
     enum CodingKeys: String, CodingKey {

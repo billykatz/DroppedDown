@@ -48,7 +48,6 @@ enum ProfileError: Error {
     case failureToSaveRemoteProfile(Error)
     case failedToLoadRemoteProfile(Error?)
 }
-
 /// This class is soley responsible for saving and loading game files from the local disk and iCloud
 class ProfileLoadingManager: ProfileManaging {
     
@@ -145,7 +144,7 @@ class ProfileLoadingManager: ProfileManaging {
                         /// if there is a tie, then load the remote one
                         let remoteProgressedFuther = remote.progress >= local.progress
                         GameLogger.shared.log(prefix: Constants.tag, message: "Both local and remote file found. Loading \(remoteProgressedFuther ? remote: local)")
-                        return remoteProgressedFuther ? remote: local
+                        return progressedFuther(lhs: remote, rhs: local)
                     } else {
                         /// this is likely a new player and needs to save a new profile
                         GameLogger.shared.log(prefix: Constants.tag, message: "Neither local or remote file found.")
@@ -188,6 +187,9 @@ class ProfileLoadingManager: ProfileManaging {
                 if let vc = viewController, showGCSignIn {
                     GameLogger.shared.log(prefix: Constants.tag, message: "Showing GameCenter Log in view controller.")
                     presenter.present(vc, animated: true)
+                } else if let error = error {
+                    GameLogger.shared.log(prefix: Constants.tag, message:"\(error.localizedDescription)")
+                    authenicatedSubject.send(localPlayer.isAuthenticated())
                 } else {
                     GameLogger.shared.log(prefix: Constants.tag, message: "Player is authenticated with GameCenter \(localPlayer.isAuthenticated())")
                     authenicatedSubject.send(localPlayer.isAuthenticated())
@@ -444,5 +446,23 @@ func saveProfileLocally(_ profile: Profile, uuidKey: String, userDefaultsClient:
             GameLogger.shared.log(prefix: ProfileLoadingManager.Constants.tag, message: "Failed to save file locally at path \(pathURL)")
             promise(.failure(ProfileError.failedToSaveLocalProfile(err)))
         }
+    }
+}
+
+/// This takes a look at two profiles and determines which one has progressed further
+/// First it compares purchased items
+/// If both profiles have the same amount of purchased items it compares the number of unlocked items
+fileprivate func progressedFuther(lhs: Profile, rhs: Profile) -> Profile {
+    let rhsIsPurchased = rhs.unlockables.filter { $0.isPurchased }.count
+    let lhsIsPurchased = lhs.unlockables.filter { $0.isPurchased }.count
+    
+    let rhsIsUnlocked = rhs.unlockables.filter { $0.isUnlocked }.count
+    let lhsIsUnlocked = lhs.unlockables.filter { $0.isUnlocked }.count
+    
+    if rhsIsPurchased > lhsIsPurchased { return rhs }
+    else if lhsIsPurchased > rhsIsPurchased { return lhs }
+    else {
+        // they equal on another
+        return rhsIsUnlocked > lhsIsUnlocked ? rhs : lhs
     }
 }

@@ -71,11 +71,11 @@ struct GoalTracking: Codable, Hashable {
                         return "Mine \(target) rocks"
                     }
                 case .monster:
-                    return "Destory \(target) monsters"
+                    return "Destroy \(target) monsters"
                 case .gem:
                     return "Collect \(target) gem\(target > 1 ? "s" : "")"
                 case .pillar:
-                    return "Destory \(target) individual pillars"
+                    return "Destroy \(target) individual pillars"
                 default:
                     return ""
                 }

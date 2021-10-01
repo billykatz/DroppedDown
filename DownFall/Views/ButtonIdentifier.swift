@@ -11,6 +11,7 @@ enum ButtonIdentifier: String {
     case playAgain
     case selectLevel
     case leaveStore
+    case loseAndGoToStore
     case storeItem
     case rotate
     case wallet
@@ -88,7 +89,7 @@ enum ButtonIdentifier: String {
         case .backpackConfirm:
             return "Confirm"
         case .mainMenu:
-            return "Main Menu"
+            return "Exit to Menu"
         case .cycleLevel:
             return "Level select"
         case .seeInventory:
@@ -116,7 +117,7 @@ enum ButtonIdentifier: String {
         case .swapRunes:
             return "Swap"
         case .toggleSound:
-            return "Toggle Sound"
+            return "Sound"
         case .givePlayerRune:
             return "Give Player Random Rune"
         case .debugPause:
@@ -125,6 +126,8 @@ enum ButtonIdentifier: String {
             return "Debug Win"
         case .debugLose:
             return "Debug Lose"
+        case .loseAndGoToStore:
+            return "Go to Store"
         
         case .wallet, .infoPopup, .storeItem, .backpack, .sellHealth, .buyHealth, .sellDodge, .buyDodge, .sellLuck, .buyLuck, .buyRuneSlot, .sellRuneSlot:
             return ""

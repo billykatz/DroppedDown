@@ -127,6 +127,20 @@ class LevelCoordinator: LevelCoordinating {
         
     }
     
+    func navigateToTheStore(_ scene: SKScene, playerData: EntityModel) {
+        
+        let fadeOut = SKAction.fadeOut(withDuration: 0.75)
+        let remove = SKAction.removeFromParent()
+        scene.run(SKAction.group([fadeOut, remove])) { [weak self] in
+            guard let self = self else { return }
+            self.runModel = self.saveAllState()
+            self.delegate?.finishGameAndGoToStore(playerData: playerData, currentRun: self.runModel)
+        }
+
+    }
+    
+    
+    
     // removes the current game scene and then triggers presentation of the next area
     func goToNextArea(updatedPlayerData: EntityModel) {
         view.presentScene(nil)

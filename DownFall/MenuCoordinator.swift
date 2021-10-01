@@ -23,6 +23,7 @@ extension SKView {
 protocol MenuCoordinating: AnyObject {
     var levelCoordinator: LevelCoordinating { get }
     
+    func finishGameAndGoToStore(playerData updatedPlayerData: EntityModel, currentRun: RunModel)
     func finishGame(playerData updatedPlayerData: EntityModel, currentRun: RunModel)
     func loadedProfile(_ profile: Profile)
     
@@ -92,6 +93,12 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
     func finishGame(playerData updatedPlayerData: EntityModel, currentRun: RunModel) {
         profileViewModel?.finishRun(playerData: updatedPlayerData, currentRun: currentRun)
         presentMainMenu(transition: SKTransition.fade(withDuration: 0.2))
+    }
+    
+    func finishGameAndGoToStore(playerData updatedPlayerData: EntityModel, currentRun: RunModel) {
+        profileViewModel?.finishRun(playerData: updatedPlayerData, currentRun: currentRun)
+        presentMainMenu()
+        menuStore()
     }
     
     func optionsSelected() {

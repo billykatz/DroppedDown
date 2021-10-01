@@ -70,7 +70,7 @@ class AudioManager {
         audioThread.async { [weak self] in
             let rockSound = SKAction.playSoundFileNamed(sound.filename, waitForCompletion: waitForCompletion)
             
-            if !silent && UserDefaults.standard.bool(forKey: "muteSound") {
+            if !silent && !UserDefaults.standard.bool(forKey: "muteSound") {
                 self?.audioNode.run(rockSound)
             }
 

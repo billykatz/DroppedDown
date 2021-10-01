@@ -167,7 +167,7 @@ class RuneContainerView: SKSpriteNode {
             let runeX = frame.minX + frame.width/CGFloat(8) + (frame.width/4.0 * CGFloat(index))
             
             runeSlotView.position = CGPoint(x: runeX, y: runeY)
-            runeSlotView.zPosition = Precedence.menu.rawValue
+            runeSlotView.zPosition = 200
             runeSlotView.name = Constants.runeName
             addChild(runeSlotView)
             runeSlotViews.append(runeSlotView)

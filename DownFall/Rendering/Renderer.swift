@@ -823,12 +823,11 @@ extension Renderer {
 
 extension Renderer {
     private func gameWin(transformation: Transformation?) {
-        guard case let InputType.gameWin(completedGoals)? = transformation?.inputType else { fatalError("Should we crash?") }
         animator.gameWin(transformation: transformation, sprites: sprites) { [weak self] in
             
             guard let self = self else { return }
             self.menuForeground.removeAllChildren()
-            let gameWinMenu = MenuSpriteNode(.gameWin, playableRect: self.playableRect, precedence: .menu, level: self.level, completedGoals: completedGoals)
+            let gameWinMenu = MenuSpriteNode(.gameWin, playableRect: self.playableRect, precedence: .menu, level: self.level)
             self.menuForeground.addChild(gameWinMenu)
             self.foreground.addChildSafely(self.menuForeground)
         }

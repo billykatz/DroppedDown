@@ -12,6 +12,7 @@ import GameplayKit
 import Foundation
 
 protocol GameSceneCoordinatingDelegate: AnyObject {
+    func navigateToTheStore(_ scene: SKScene, playerData: EntityModel)
     func navigateToMainMenu(_ scene: SKScene, playerData: EntityModel)
     func goToNextArea(updatedPlayerData: EntityModel)
     func saveState()
@@ -152,6 +153,19 @@ class GameScene: SKScene {
                 guard let self = self else { return }
                 // this is to save the state at the end of the level.  
                 self.gameSceneDelegate?.saveState()
+            } else if case InputType.loseAndGoToStore = input.type {
+                guard let self = self,
+                      let board = self.board,
+                let playerIndex = tileIndices(of: .player(.zero), in: board.tiles).first
+                else { return }
+                
+                self.foreground.removeAllChildren()
+                if case let TileType.player(data) = board.tiles[playerIndex].type {
+                    self.removeFromParent()
+                    self.swipeRecognizerView?.removeFromSuperview()
+                    self.gameSceneDelegate?.navigateToTheStore(self, playerData: data)
+                }
+
             }
         }
 

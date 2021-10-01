@@ -209,7 +209,7 @@ class ShiftShaft_Button: SKShapeNode {
         if !disable {
             let shadowPath = path
             let shadowShape = SKShapeNode(path: shadowPath)
-            shadowShape.color = .storeBlack
+            shadowShape.color = .black
             self.dropShadow = shadowShape
             // does this have to be hardcoded?
             shadowShape.zPosition = -1
@@ -293,7 +293,7 @@ class ShiftShaft_Button: SKShapeNode {
         if dropShadow == nil {
             let shadowPath = CGPath(roundedRect: CGRect(x: -frame.size.width/2, y: -frame.size.height/2 - dropShadowOffset, width: frame.size.width, height: frame.size.height), cornerWidth: 5.0, cornerHeight: 5.0, transform: nil)
             let shadowShape = SKShapeNode(path: shadowPath)
-            shadowShape.color = .storeBlack
+            shadowShape.color = .black
             self.dropShadow = shadowShape
             // does this have to be hardcoded?
             shadowShape.zPosition = -1

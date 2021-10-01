@@ -90,6 +90,18 @@ class ParagraphNode: SKSpriteNode {
         self.anchorPoint = CGPoint(x:0.5, y:0.5)
     }
     
+    lazy var customFont: UIFont = {
+        guard let customFont = UIFont(name: "Alterebro-Pixel-Font", size: fontSize) else {
+            fatalError("""
+                Failed to load the "pixel-font" font.
+                Make sure the font file is included in the project and the font name is spelled correctly.
+                """
+            )
+        }
+        return customFont
+
+    }()
+    
     func imageFrom(text: NSString) -> UIImage? {
         
         // paragraph styling
@@ -100,14 +112,6 @@ class ParagraphNode: SKSpriteNode {
 
         // attributes
         var attributes: [NSAttributedString.Key: Any] = [:]
-        guard let customFont = UIFont(name: "Alterebro-Pixel-Font", size: fontSize) else {
-            fatalError("""
-                Failed to load the "pixel-font" font.
-                Make sure the font file is included in the project and the font name is spelled correctly.
-                """
-            )
-        }
-
         attributes[NSAttributedString.Key.font] = customFont
         attributes[NSAttributedString.Key.paragraphStyle] = paragraphStyle
         attributes[NSAttributedString.Key.foregroundColor] = fontColor

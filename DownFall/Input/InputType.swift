@@ -104,6 +104,7 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
     case runeReplacement(Pickaxe, Rune)
     case runeReplaced(Pickaxe, Rune)
     case foundRuneDiscarded(Rune)
+    case loseAndGoToStore
     
     var debugDescription: String {
         switch self {
@@ -181,6 +182,8 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
             return "Rune replaced"
         case .foundRuneDiscarded:
             return "Found rune discarded"
+        case .loseAndGoToStore:
+            return "Lose and go to store"
         }
     }
 }

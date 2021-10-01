@@ -199,7 +199,7 @@ class Board: Equatable {
              .boardLoaded,
              .selectLevel,
              .newTurn,
-             .visitStore,
+             .visitStore, .loseAndGoToStore,
              .itemUseCanceled, .itemCanBeUsed, .rotatePreview, .tileDetail, .levelGoalDetail, .runeReplacement:
             transformation = nil
         }

@@ -328,6 +328,9 @@ class TileCreator: TileStrategy {
         
         tiles[exitPosition.x][exitPosition.y] = Tile(type: .exit(blocked: true))
         
+        // Quick testing for rune replacement
+//        tiles[playerPosition.row-1][playerPosition.column] = Tile(type: .offer(StoreOffer.offer(type: .rune(Rune.rune(for: .bubbleUp)), tier: 1)))
+        
         return (tiles, true)
     }
     

@@ -49,7 +49,7 @@ class ParagraphNode: SKSpriteNode {
     }
     
     init(text: String,
-         paragraphWidth: CGFloat,
+         paragraphWidth: CGFloat = 2000,
          fontName: String = ParagraphNode.defaultFontName,
          fontSize: CGFloat = ParagraphNode.defaultFontSize,
          fontColor: UIColor = ParagraphNode.defaultFontColor

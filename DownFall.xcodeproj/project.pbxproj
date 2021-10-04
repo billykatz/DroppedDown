@@ -35,6 +35,8 @@
 		28B7274426A0E90D00F349ED /* CodexView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28B7274326A0E90D00F349ED /* CodexView.swift */; };
 		28C806AA26F3C3D500135E29 /* StatTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28C806A926F3C3D500135E29 /* StatTracker.swift */; };
 		28CAFA7B26A0F2F000151CA8 /* CodexItemAnimatingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28CAFA7A26A0F2F000151CA8 /* CodexItemAnimatingView.swift */; };
+		28D29AD4270B7E9D001AD50D /* RuneReplacementInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D29AD3270B7E9D001AD50D /* RuneReplacementInfoView.swift */; };
+		28D29AD6270B82DC001AD50D /* RuneReplacementEmptyPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D29AD5270B82DC001AD50D /* RuneReplacementEmptyPanelView.swift */; };
 		3D00A0F923AAC813007E2D8B /* Identifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D00A0F823AAC813007E2D8B /* Identifiers.swift */; };
 		3D06390122EEB4FB00C4D5E9 /* PauseState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D06390022EEB4FB00C4D5E9 /* PauseState.swift */; };
 		3D06390322EEB50C00C4D5E9 /* PlayState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D06390222EEB50C00C4D5E9 /* PlayState.swift */; };
@@ -229,6 +231,8 @@
 		28B7274326A0E90D00F349ED /* CodexView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexView.swift; sourceTree = "<group>"; };
 		28C806A926F3C3D500135E29 /* StatTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatTracker.swift; sourceTree = "<group>"; };
 		28CAFA7A26A0F2F000151CA8 /* CodexItemAnimatingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexItemAnimatingView.swift; sourceTree = "<group>"; };
+		28D29AD3270B7E9D001AD50D /* RuneReplacementInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneReplacementInfoView.swift; sourceTree = "<group>"; };
+		28D29AD5270B82DC001AD50D /* RuneReplacementEmptyPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneReplacementEmptyPanelView.swift; sourceTree = "<group>"; };
 		3D00A0F823AAC813007E2D8B /* Identifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identifiers.swift; sourceTree = "<group>"; };
 		3D06390022EEB4FB00C4D5E9 /* PauseState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PauseState.swift; sourceTree = "<group>"; };
 		3D06390222EEB50C00C4D5E9 /* PlayState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayState.swift; sourceTree = "<group>"; };
@@ -887,6 +891,8 @@
 				58946E382465BD10003115D2 /* RuneSlot */,
 				58B39BD623D21C9600915858 /* BackpackView.swift */,
 				5845A2C82560BA78002DBD07 /* RuneReplacementView.swift */,
+				28D29AD3270B7E9D001AD50D /* RuneReplacementInfoView.swift */,
+				28D29AD5270B82DC001AD50D /* RuneReplacementEmptyPanelView.swift */,
 			);
 			name = Backpack;
 			path = ..;
@@ -1124,6 +1130,7 @@
 				582635DD243168B500A944B6 /* ButtonIdentifier.swift in Sources */,
 				58C9735124969CA100288133 /* ProfileManaging.swift in Sources */,
 				3DAFBD3721B8E6E7009B116A /* InputQueue.swift in Sources */,
+				28D29AD6270B82DC001AD50D /* RuneReplacementEmptyPanelView.swift in Sources */,
 				582CF3EC2442391900AA2A95 /* FillableBar.swift in Sources */,
 				58D56B4F25AB90DB002D1337 /* AudioManager.swift in Sources */,
 				28C806AA26F3C3D500135E29 /* StatTracker.swift in Sources */,
@@ -1134,6 +1141,7 @@
 				589A27D123D90CD900174DE7 /* TargetingState.swift in Sources */,
 				3DA0A384230455B90041EF34 /* CGPoint+Extension.swift in Sources */,
 				3DA0A386230457580041EF34 /* SKLabelNode+Extension.swift in Sources */,
+				28D29AD4270B7E9D001AD50D /* RuneReplacementInfoView.swift in Sources */,
 				589A27CF23D8EA1C00174DE7 /* SKShapeNode+Extensions.swift in Sources */,
 				3D6AACD8222A324D00C77B24 /* CGRect+Extensions.swift in Sources */,
 				283CBBD926A8A88E00B1F7C9 /* CodexItemModalView.swift in Sources */,

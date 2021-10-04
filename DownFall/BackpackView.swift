@@ -103,7 +103,7 @@ class BackpackView: SKSpriteNode {
         /// bind to view model
         viewModel.runeReplacementPublisher.sink { [weak self, height] (value) in
             let (pickaxe, rune) = value
-            let viewModel = RuneReplacementViewModel(newRune: rune, pickaxe: pickaxe, runeToSwap: nil)
+            let viewModel = RuneReplacementViewModel(foundRune: rune, pickaxe: pickaxe, runeToSwap: nil)
             let view = RuneReplacementView(size: CGSize(width: playableRect.width, height: height),
                                            playableRect: playableRect,
                                            viewModel: viewModel)
@@ -114,6 +114,11 @@ class BackpackView: SKSpriteNode {
             self?.addChild(view)
             
         }.store(in: &disposables)
+        
+        viewModel.foundRuneDiscardedPublisher.sink { [weak self] in
+            self?.removeChild(with: "runeReplacement")
+        }.store(in: &disposables)
+        
     }
     
     required init?(coder aDecoder: NSCoder) {

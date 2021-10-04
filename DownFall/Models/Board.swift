@@ -337,7 +337,7 @@ class Board: Equatable {
         for (i, _) in tiles.enumerated() {
             for (j, _) in tiles[i].enumerated() {
                 switch tiles[i][j].type {
-                case .exit, .offer, .pillar, .monster, .item, .rock(color: _, holdsGem: true):
+                case .exit, .offer, .pillar, .monster, .item, .rock(color: _, holdsGem: true), .player:
                     tileCoords.append(TileCoord(i, j))
                 default:
                     continue

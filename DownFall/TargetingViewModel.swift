@@ -71,6 +71,11 @@ class TargetingViewModel: Targeting {
     var boardSize: Int = 0
     
     /// publishers
+    private var foundRuneDiscardedSubject = PassthroughSubject<(), Never>()
+    var foundRuneDiscardedPublisher: AnyPublisher<(), Never> {
+        return foundRuneDiscardedSubject.eraseToAnyPublisher()
+    }
+    
     var runeReplacementSubject = PassthroughSubject<(Pickaxe, Rune), Never>()
     var runeReplacementPublisher: AnyPublisher<(Pickaxe, Rune), Never> {
         return runeReplacementSubject.eraseToAnyPublisher()
@@ -87,6 +92,8 @@ class TargetingViewModel: Targeting {
         case .runeReplaced(let pickaxe, let rune):
             let runes = pickaxe.runes.filter { $0.type != rune.type }
             runeSlotsUpdated?(pickaxe.runeSlots, runes)
+        case .foundRuneDiscarded:
+            foundRuneDiscardedSubject.send(())
         case .runeReplacement(let pickaxe, let rune):
             runeReplacementSubject.send((pickaxe, rune))
         case .transformation(let trans):

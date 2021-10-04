@@ -81,4 +81,10 @@ extension UIColor {
     static let codexDarkGray = UIColor(rgb: 0x999999)
     static let codexButtonLightGray = UIColor(rgb: 0xDEDEDE)
     
+    // Rune replacement
+    static let runeInfoBorder = UIColor(rgb: 0x924A29)
+    static let runeReplacementBackgroundFillBlue = UIColor(rgb: 0x314768)
+    static let runeReplacementBackgroundStrokeBlue = UIColor(rgb: 0x8091AB)
+    static let runeReplacementEmptyPanelBackground = UIColor(rgb: 0x182334)
+    
 }

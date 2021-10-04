@@ -14,6 +14,8 @@ enum ButtonIdentifier: String {
     case yesAbandonRun
     case doNotAbandonRun
     
+    case runeReplacementCancel
+    
     case resume
     case playAgain
     case selectLevel
@@ -39,8 +41,6 @@ enum ButtonIdentifier: String {
     case cycleLevel
     case seeInventory
     case shuffleBoard
-    case runeReplaceCancel
-    case runeReplaceConfirm
     case okay
     case sellHealth
     case buyHealth
@@ -104,10 +104,6 @@ enum ButtonIdentifier: String {
             return "Inventory"
         case .shuffleBoard:
             return "Pay 2 \u{2665}: Shuffle board"
-        case .runeReplaceCancel:
-            return "Cancel"
-        case .runeReplaceConfirm:
-            return "Confirm"
         case .okay:
             return "Okay"
         case .selectProfile:
@@ -121,9 +117,9 @@ enum ButtonIdentifier: String {
         case .mainMenuOptions:
             return "Stats"
         case .discardFoundRune:
-            return "Discard"
+            return "Discard Found Rune"
         case .swapRunes:
-            return "Swap"
+            return "Swap Runes"
         case .toggleSound:
             return "Sound"
         case .givePlayerRune:
@@ -145,7 +141,7 @@ enum ButtonIdentifier: String {
         case .mainMenuContinueRun:
             return "Continue run"
         
-        case .wallet, .infoPopup, .storeItem, .backpack, .sellHealth, .buyHealth, .sellDodge, .buyDodge, .sellLuck, .buyLuck, .buyRuneSlot, .sellRuneSlot:
+        case .wallet, .infoPopup, .storeItem, .backpack, .sellHealth, .buyHealth, .sellDodge, .buyDodge, .sellLuck, .buyLuck, .buyRuneSlot, .sellRuneSlot, .runeReplacementCancel:
             return ""
         }
     }

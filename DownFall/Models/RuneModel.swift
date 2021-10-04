@@ -281,11 +281,11 @@ struct Rune: Hashable, Codable {
                 textureName: "vortex",
                 cost: 0,
                 currency: .gem,
-                description: "Turns each monster into a rock and each rock into a monster within a 3 by 3 area.",
+                description: "In 3x3 area, monsters become rocks and rocks become monsters",
                 flavorText:
                     """
-                "Ah, I see my error-- it was only suppose to be a teaspoon of bat's wing" - Dunvain the Careless
-                """
+                    "Ah, I see my error-- it was only suppose to be a teaspoon of bat's wing" - Dunvain the Careless
+                    """
                 ,
                 targets: 1,
                 targetTypes: [],

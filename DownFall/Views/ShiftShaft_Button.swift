@@ -89,6 +89,7 @@ class ShiftShaft_Button: SKShapeNode {
          image: SKSpriteNode,
          shape: ButtonShape,
          precedence: Precedence = Precedence.aboveMenu,
+         aspectFillToSize: Bool = true,
          showSelection: Bool = true,
          disable: Bool = false,
          addTextLabel: Bool = false) {
@@ -143,7 +144,9 @@ class ShiftShaft_Button: SKShapeNode {
         
         // add the image
         image.zPosition = 0
-        image.aspectFillToSize(fillSize: size)
+        if (aspectFillToSize) {
+            image.aspectFillToSize(fillSize: size)
+        }
         addChildSafely(image)
         
         /// add the path

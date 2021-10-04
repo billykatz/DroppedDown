@@ -48,7 +48,7 @@ class RuneReplacementView: SKSpriteNode, ButtonDelegate {
         runeReplacementContainer.fillColor = .runeReplacementBackgroundFillBlue
         runeReplacementContainer.strokeColor = .runeReplacementBackgroundStrokeBlue
         runeReplacementContainer.lineWidth = 18.0
-        (runeReplacementContainer).zPosition = -1
+        runeReplacementContainer.zPosition = -1
         
         
         runeInfoView.position = CGPoint.position(runeInfoView.frame, inside: runeReplacementContainer.frame, verticalAlign: .top, horizontalAnchor: .left, xOffset: 50, yOffset: 260)
@@ -74,6 +74,12 @@ class RuneReplacementView: SKSpriteNode, ButtonDelegate {
         swapRunesButton.position = CGPoint.position(swapRunesButton.frame, inside: runeReplacementContainer.frame, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: 65, translatedToBounds: true)
         swapRunesButton.name = "swapRunesButton"
         self.swapRunesButton = swapRunesButton
+        
+        
+        let backgroundOverlay = SKSpriteNode(color: .black, size: playableRect.size)
+        backgroundOverlay.alpha = 0.5
+        backgroundOverlay.zPosition = -10
+        addChild(backgroundOverlay)
         
     }
     

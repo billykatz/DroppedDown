@@ -121,7 +121,7 @@ enum TileType: Hashable, CaseIterable, Codable {
     case player(EntityModel)
     case monster(EntityModel)
     case empty
-    case emptyGem(ShiftShaft_Color)
+    case emptyGem(ShiftShaft_Color, amount: Int)
     case exit(blocked: Bool)
     case item(Item)
     case offer(StoreOffer)
@@ -135,6 +135,7 @@ enum TileType: Hashable, CaseIterable, Codable {
         case exitBlocked
         case item
         case color
+        case amount
         case dynamiteFuse
         case pillarData
         case holdsGem
@@ -167,7 +168,8 @@ enum TileType: Hashable, CaseIterable, Codable {
             self = .empty
         case .emptyGem:
             let data = try container.decode(ShiftShaft_Color.self, forKey: .color)
-            self = .emptyGem(data)
+            let amount = try container.decode(Int.self, forKey: .amount)
+            self = .emptyGem(data, amount: amount)
         case .player:
             let data = try container.decode(EntityModel.self, forKey: .entityData)
             self = .player(data)
@@ -208,9 +210,10 @@ enum TileType: Hashable, CaseIterable, Codable {
             try container.encode(data, forKey: .entityData)
         case .empty:
             try container.encode(Base.empty, forKey: .base)
-        case .emptyGem(let color):
+        case .emptyGem(let color, let amount):
             try container.encode(Base.emptyGem, forKey: .base)
             try container.encode(color, forKey: .color)
+            try container.encode(amount, forKey: .amount)
         case .exit(blocked: let blocked):
             try container.encode(Base.exit, forKey: .base)
             try container.encode(blocked, forKey: .exitBlocked)

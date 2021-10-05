@@ -210,8 +210,8 @@ class TileCreator: TileStrategy {
                         }
                         newTiles[row][col] = newTile
                     }
-                } else if case TileType.emptyGem(let color) = tiles[row][col].type {
-                    newTiles[row][col] = Tile(type: .item(Item(type: .gem, amount: 10, color: color)))
+                } else if case TileType.emptyGem(let color, let amount) = tiles[row][col].type {
+                    newTiles[row][col] = Tile(type: .item(Item(type: .gem, amount: amount, color: color)))
                 }
             }
         }

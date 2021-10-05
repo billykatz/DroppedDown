@@ -395,9 +395,6 @@ struct Animator {
     }
     
     func createAnimationCompletingGoals(sprite: SKSpriteNode, to targetPosition: CGPoint) -> SpriteAction {
-//        let toPosition = sprite.frame.center.translate(xOffset: CGFloat.random(in: AnimationSettings.Gem.randomXOffsetRange), yOffset: CGFloat.random(in: AnimationSettings.Gem.randomYOffsetRange))
-//
-//        let moveAwayAction = SKAction.move(to: toPosition, duration: 0.25)
         let scaleUp = CGFloat.random(in: 1.2...1.5)
         let scaleDownRange = CGFloat.random(in: 0.2...0.4)
         
@@ -405,7 +402,6 @@ struct Animator {
         scaleUpAction.timingMode = .easeIn
         let scaleDown = SKAction.scale(by: scaleDownRange, duration: AnimationSettings.Board.workingTowardsGoal/4*3)
         scaleDown.timingMode = .easeIn
-//        let scaleSeqeunce = SKAction.sequence([scaleUpAction, scaleDown])
         
         let moveToAction = SKAction.move(to: targetPosition, duration: Double.random(in: AnimationSettings.Board.workingTowardsGoal-0.15...AnimationSettings.Board.workingTowardsGoal+0.15))
         moveToAction.timingMode = .easeIn
@@ -414,23 +410,50 @@ struct Animator {
         let sequence = SKAction.sequence([scaleUpAction, moveToAndScale])
         
         return SpriteAction(sprite: sprite, action: sequence)//SKAction.sequence([moveToAndScale, SKAction.removeFromParent()]))
-        
-//        let moveAwayMoveToScale = SKAction.sequence([moveAwayAction, moveToAndScale])
-        
-//        moveAwayMoveToScale.timingMode = .easeOut
-        
-//            let tickUpHudCounter = SKAction.run {
-//                hud.incrementCurrencyCountByOne()
-//
-//                if !hasShownTotalGain {
-//                    hasShownTotalGain = true
-//                    hud.showTotalGemGain(goldSprites.count)
-//                }
-//            }
-        
-//            index += 1
-        
 
+    }
+    
+    lazy var numberTwoSpriteSheets: [ShiftShaft_Color: SpriteSheet] = {
+        var dict: [ShiftShaft_Color: SpriteSheet] = [:]
+        for color in [ShiftShaft_Color.red, .blue, .purple] {
+            dict[color] = SpriteSheet(texture: SKTexture(imageNamed: "number-2-\(color.humanReadable.lowercased())-spritesheet"), rows: 1, columns: 8)
+        }
+        return dict
+    }()
+    
+    mutating func createAnimationForMiningGems(from coords: [TileCoord], tilesWithGems: [TileCoord], color: ShiftShaft_Color, spriteForeground: SKNode, positionConverter: (TileCoord) -> CGPoint) -> [SpriteAction] {
+        var spriteActions: [SpriteAction] = []
+        let spriteSheet = numberTwoSpriteSheets[color]!
+        for tileWithGemCoord in tilesWithGems {
+            for coord in coords {
+                // create the empty sprite
+                let emptySprite = SKSpriteNode(color: .clear, size: CGSize(width: 16, height: 16))
+                emptySprite.position = positionConverter(coord)
+                spriteForeground.addChild(emptySprite)
+                
+                // animate the number sprite sheet
+                let animate = SKAction.animate(with: spriteSheet.animationFrames(), timePerFrame: 0.1)
+                
+                // move up and grow
+                let moveUp = SKAction.moveBy(x: 0, y: 150.0, duration: 0.4)
+                let grow = SKAction.scale(to: CGSize(width: 48, height: 48), duration: 0.4)
+                let growAndMove = SKAction.group([grow, moveUp])
+                
+                // more to and shrink
+                let moveTo = SKAction.move(to: positionConverter(tileWithGemCoord), duration: 0.4)
+                let shrinkIt = SKAction.scale(to: .zero, duration: 0.4)
+                let moveAndShirnk = SKAction.group([moveTo, shrinkIt])
+                
+                let movementAndScalingAndRemoving = SKAction.sequence([growAndMove, moveAndShirnk, SKAction.removeFromParent()])
+                movementAndScalingAndRemoving.timingMode = .easeInEaseOut
+                
+                let animateWhileMovingAndScaling = SKAction.group([animate, movementAndScalingAndRemoving])
+                
+                spriteActions.append(SpriteAction(sprite: emptySprite, action: animateWhileMovingAndScaling))
+            }
+        }
+        
+        return spriteActions
     }
 
     

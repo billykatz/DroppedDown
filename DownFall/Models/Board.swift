@@ -914,7 +914,7 @@ extension Board {
         for coord in selectedTiles {
             // turn the tile into a gem or into an empty
             if case TileType.rock(let color, let holdsGem) = tiles[coord].type, holdsGem {
-                intermediateTiles[coord.x][coord.y] = Tile(type: .emptyGem(color))
+                intermediateTiles[coord.x][coord.y] = Tile(type: .emptyGem(color, amount: numberOfGemsForGroup(size: selectedTiles.count)))
                 finalSelectedTiles.append(coord)
                 removedTilesContainGem = holdsGem
             } else {
@@ -1301,6 +1301,22 @@ extension Board {
         }
         
         return allTransformations
+    }
+}
+// step function for number of gems
+extension Board {
+    func numberOfGemsForGroup(size: Int) -> Int {
+        if (3...5).contains(size) {
+            return 2*size
+        } else if (6...10).contains(size) {
+            return 3*size
+        } else if (10...20).contains(size) {
+            return 4*size
+        } else if (20...35).contains(size) {
+            return 5*size
+        } else {
+            return 7*size
+        }
     }
 }
 

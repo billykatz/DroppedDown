@@ -28,7 +28,7 @@ class Renderer: SKSpriteNode {
     private var menuForeground = SKNode()
     
     //Animator
-    private let animator = Animator()
+    private var animator = Animator()
     
     func debugMenu() -> MenuSpriteNode {
         return MenuSpriteNode(.debug, playableRect: self.playableRect, precedence: .menu, level: self.level)
@@ -630,9 +630,13 @@ extension Renderer {
         
         // remove "removed" tiles from sprite storage
         var removedAnimations: [SpriteAction] = []
+        
+        var tilesWithGem: [TileCoord] = []
+        
         for tileTrans in removed {
             
             if case InputType.touch(_, let type)? = transformation.inputType {
+                // if rocks mined progress a goal then we want to hane them fly up to the level goal view
                 if let goalIndex = levelGoalTracker.typeAdvancesGoal(type: type) {
                     let goalOrigin = levelGoalView.originForGoalView(index: goalIndex)
                     let targetPosition = self.levelGoalView.convert(goalOrigin, to: self.spriteForeground)
@@ -642,6 +646,8 @@ extension Renderer {
                     let animation = animator.createAnimationCompletingGoals(sprite: sprites[tileTrans.end.x][tileTrans.end.y], to: targetPosition)
                     
                     removedAnimations.append(animation)
+                    
+                    
                     
                 }
                 /// crumble should happen when the rocks are not needed for the goal.
@@ -653,30 +659,33 @@ extension Renderer {
                     removedAnimations.append(crumble)
                     
                     
-                    /// Add the gem if needed
-                    /// Grab the current rock on the board.
-                    /// If this rock contains a gem, then add it to the board
+                    // Add the gem if needed
+                    // Grab the current rock on the board.
+                    // If this rock contains a gem, then add it to the board
                     let currentSprite = sprites[tileTrans.end.x][tileTrans.end.y]
                     
                     if case TileType.rock(color: let color, holdsGem: let holdsGem) = currentSprite.type,
                        holdsGem {
                         
-                        /// we need to add the gem to the board or else shit is weird
-                        let sprite = DFTileSpriteNode(type: .item(Item(type: .gem, amount: 10, color: color)), height: currentSprite.size.height, width: currentSprite.size.width)
+                        // we need to add the gem to the board or else shit is weird
+                        let sprite = DFTileSpriteNode(type: .item(Item(type: .gem, amount: 0, color: color)), height: currentSprite.size.height, width: currentSprite.size.width)
                         
                         // place the gem on the board where the rock was
                         sprite.position = currentSprite.position
                         
-                        /// add the gem sprite our data store
+                        // add the gem sprite our data store
                         sprites[tileTrans.end.x][tileTrans.end.y] = sprite
                         
-                        /// add the gem sprite to the foreground
+                        // add the gem sprite to the foreground
                         spriteForeground.addChild(sprite)
+                        
+                        tilesWithGem.append(tileTrans.end)
                         
                     }
                     
                 }
-            } else if case InputType.monsterDies? = transformation.inputType {
+            }
+            else if case InputType.monsterDies? = transformation.inputType {
                 let tileType = sprites[tileTrans.end.x][tileTrans.end.y].type
                 if let goalIndex = levelGoalTracker.typeAdvancesGoal(type: tileType) {
                     let goalOrigin = levelGoalView.originForGoalView(index: goalIndex)
@@ -703,6 +712,15 @@ extension Renderer {
 
         }
         
+        guard case let TileType.rock(color: color, holdsGem: _) =  sprites[removed.first!.end].type else { return }
+        // mining gems animations
+        let miningGemAnimations = animator.createAnimationForMiningGems(from: removed.map { $0.end }, tilesWithGems: tilesWithGem, color: color, spriteForeground: spriteForeground) { [weak self] tileCoord in
+            guard let self = self else { return .zero }
+            return self.positionInForeground(at: tileCoord)
+        }
+        removedAnimations.append(contentsOf: miningGemAnimations)
+        
+        
         // add new tiles "newTiles"
         for trans in newTiles {
             let (startRow, startCol) = trans.initial.tuple
@@ -721,7 +739,7 @@ extension Renderer {
             spriteForeground.addChild(spriteNodes[endRow][endCol])
         }
         
-        /// map the shift down tile transformation array to [SKSpriteNode, SKAction)] to work Animator world
+        // map the shift down tile transformation array to [SKSpriteNode, SKAction)] to work Animator world
         
         var shiftDownActions: [SpriteAction] = []
         for trans in shiftDown {

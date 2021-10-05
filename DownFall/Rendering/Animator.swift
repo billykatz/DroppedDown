@@ -9,7 +9,6 @@
 import Foundation
 import SpriteKit
 
-
 struct Animator {
     
     public func animateRune(_ rune: Rune,
@@ -421,6 +420,9 @@ struct Animator {
         return dict
     }()
     
+  
+
+    
     mutating func createAnimationForMiningGems(from coords: [TileCoord], tilesWithGems: [TileCoord], color: ShiftShaft_Color, spriteForeground: SKNode, positionConverter: (TileCoord) -> CGPoint) -> [SpriteAction] {
         guard !tilesWithGems.isEmpty else { return  [] }
         var spriteActions: [SpriteAction] = []
@@ -456,12 +458,12 @@ struct Animator {
                 let grow = SKAction.scale(to: CGSize(width: 125, height: 125), duration: moveAndScaleSpeed)
                 let growAndMove = SKAction.group([grow, moveUp])
                 
-                let pauseToAnimate = SKAction.wait(forDuration: 0.4)
+                let pauseToAnimate = SKAction.wait(forDuration: 0.6)
                 
                 
                 // more to and shrink
-                let moveTo = SKAction.move(to: targetPosition, duration: moveAndScaleSpeed)
-                let shrinkIt = SKAction.scale(to: .zero, duration: moveAndScaleSpeed)
+                let moveTo = SKAction.move(to: targetPosition, duration: 0.5)
+                let shrinkIt = SKAction.scale(to: .zero, duration: 0.1)
                 let moveAndShirnk = SKAction.group([moveTo, shrinkIt])
                 
                 let movementAndScaling = SKAction.sequence([initialWait, growAndMove, pauseToAnimate, moveAndShirnk])

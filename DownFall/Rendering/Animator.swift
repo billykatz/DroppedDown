@@ -422,37 +422,62 @@ struct Animator {
     }()
     
     mutating func createAnimationForMiningGems(from coords: [TileCoord], tilesWithGems: [TileCoord], color: ShiftShaft_Color, spriteForeground: SKNode, positionConverter: (TileCoord) -> CGPoint) -> [SpriteAction] {
+        guard !tilesWithGems.isEmpty else { return  [] }
         var spriteActions: [SpriteAction] = []
         let spriteSheet = numberTwoSpriteSheets[color]!
         for tileWithGemCoord in tilesWithGems {
+            // we need to add the gem to the board or else shit is weird
+            let sprite = DFTileSpriteNode(type: .item(Item(type: .gem, amount: 0, color: color)), height: 100, width: 100)
+            let targetPosition = positionConverter(tileWithGemCoord)
+            sprite.position = targetPosition
+            
+            var waitTime = 0.0
+            
             for coord in coords {
                 // create the empty sprite
                 let emptySprite = SKSpriteNode(color: .clear, size: CGSize(width: 16, height: 16))
-                emptySprite.position = positionConverter(coord)
+                
+                // start position
+                let startPosition = positionConverter(coord)
+                
+                // setup empty sprite
+                emptySprite.position = startPosition
+                emptySprite.zPosition = 100_000
                 spriteForeground.addChild(emptySprite)
                 
                 // animate the number sprite sheet
-                let animate = SKAction.animate(with: spriteSheet.animationFrames(), timePerFrame: 0.1)
+                let animate = SKAction.repeat(SKAction.animate(with: spriteSheet.animationFrames(), timePerFrame: 0.07), count: 2)
+                let moveAndScaleSpeed = 0.3
+                
+                let initialWait = SKAction.wait(forDuration: waitTime)
                 
                 // move up and grow
-                let moveUp = SKAction.moveBy(x: 0, y: 150.0, duration: 0.4)
-                let grow = SKAction.scale(to: CGSize(width: 48, height: 48), duration: 0.4)
+                let moveUp = SKAction.moveBy(x: 0, y: 150.0, duration: moveAndScaleSpeed)
+                let grow = SKAction.scale(to: CGSize(width: 125, height: 125), duration: moveAndScaleSpeed)
                 let growAndMove = SKAction.group([grow, moveUp])
                 
+                let pauseToAnimate = SKAction.wait(forDuration: 0.4)
+                
+                
                 // more to and shrink
-                let moveTo = SKAction.move(to: positionConverter(tileWithGemCoord), duration: 0.4)
-                let shrinkIt = SKAction.scale(to: .zero, duration: 0.4)
+                let moveTo = SKAction.move(to: targetPosition, duration: moveAndScaleSpeed)
+                let shrinkIt = SKAction.scale(to: .zero, duration: moveAndScaleSpeed)
                 let moveAndShirnk = SKAction.group([moveTo, shrinkIt])
                 
-                let movementAndScalingAndRemoving = SKAction.sequence([growAndMove, moveAndShirnk, SKAction.removeFromParent()])
-                movementAndScalingAndRemoving.timingMode = .easeInEaseOut
+                let movementAndScaling = SKAction.sequence([initialWait, growAndMove, pauseToAnimate, moveAndShirnk])
+                movementAndScaling.timingMode = .easeInEaseOut
                 
-                let animateWhileMovingAndScaling = SKAction.group([animate, movementAndScalingAndRemoving])
+                let animateWhileMovingAndScaling = SKAction.group([animate, movementAndScaling])
                 
                 spriteActions.append(SpriteAction(sprite: emptySprite, action: animateWhileMovingAndScaling))
+                
+                waitTime += 0.02
             }
         }
         
+        
+        
+
         return spriteActions
     }
 

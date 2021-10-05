@@ -84,7 +84,10 @@ class AudioManager {
         }
         
         audioThread.async { [weak self] in
-            self?.audioNode.run(SKAction.sequence(soundActions))
+            if !UserDefaults.standard.bool(forKey: "muteSound") {
+                self?.audioNode.run(SKAction.sequence(soundActions))
+            }
+
         }
     }
 

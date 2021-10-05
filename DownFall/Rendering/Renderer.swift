@@ -631,15 +631,29 @@ extension Renderer {
         // remove "removed" tiles from sprite storage
         var removedAnimations: [SpriteAction] = []
         
+        /// data needed to remember where we found gems
         var tilesWithGem: [TileCoord] = []
+        var removedColor: ShiftShaft_Color?
         
         for tileTrans in removed {
+            
+            // keep track of where we find gems
+            let currentSprite = sprites[tileTrans.end.x][tileTrans.end.y]
+            
+            if case TileType.rock(color: _, holdsGem: let holdsGem) = currentSprite.type,
+               holdsGem {
+                tilesWithGem.append(tileTrans.end)
+            }
+            
+            
             
             if case InputType.touch(_, let type)? = transformation.inputType {
                 // if rocks mined progress a goal then we want to hane them fly up to the level goal view
                 if let goalIndex = levelGoalTracker.typeAdvancesGoal(type: type) {
                     let goalOrigin = levelGoalView.originForGoalView(index: goalIndex)
                     let targetPosition = self.levelGoalView.convert(goalOrigin, to: self.spriteForeground)
+                    
+                    removedColor = type.color
                     
                     sprites[tileTrans.end.x][tileTrans.end.y].zPosition = 100_000
                     
@@ -656,32 +670,10 @@ extension Renderer {
                     // set the position way in the background so that new nodes come in over
                     sprites[tileTrans.end.x][tileTrans.end.y].zPosition = Precedence.underground.rawValue
                     
+                    removedColor = type.color
                     removedAnimations.append(crumble)
                     
                     
-                    // Add the gem if needed
-                    // Grab the current rock on the board.
-                    // If this rock contains a gem, then add it to the board
-                    let currentSprite = sprites[tileTrans.end.x][tileTrans.end.y]
-                    
-                    if case TileType.rock(color: let color, holdsGem: let holdsGem) = currentSprite.type,
-                       holdsGem {
-                        
-                        // we need to add the gem to the board or else shit is weird
-                        let sprite = DFTileSpriteNode(type: .item(Item(type: .gem, amount: 0, color: color)), height: currentSprite.size.height, width: currentSprite.size.width)
-                        
-                        // place the gem on the board where the rock was
-                        sprite.position = currentSprite.position
-                        
-                        // add the gem sprite our data store
-                        sprites[tileTrans.end.x][tileTrans.end.y] = sprite
-                        
-                        // add the gem sprite to the foreground
-                        spriteForeground.addChild(sprite)
-                        
-                        tilesWithGem.append(tileTrans.end)
-                        
-                    }
                     
                 }
             }
@@ -709,17 +701,25 @@ extension Renderer {
                       let poof = sprites[disardedCoord.x][disardedCoord.y].poof() {
                 removedAnimations.append(poof)
             }
+            
+            
 
         }
         
-        guard case let TileType.rock(color: color, holdsGem: _) =  sprites[removed.first!.end].type else { return }
-        // mining gems animations
-        let miningGemAnimations = animator.createAnimationForMiningGems(from: removed.map { $0.end }, tilesWithGems: tilesWithGem, color: color, spriteForeground: spriteForeground) { [weak self] tileCoord in
-            guard let self = self else { return .zero }
-            return self.positionInForeground(at: tileCoord)
+        // add the gems after everything elese has been animated for removal
+        for coord in tilesWithGem {
+            // we need to add the gem to the board or else shit is weird
+            let sprite = DFTileSpriteNode(type: .item(Item(type: .gem, amount: 0, color: removedColor!)), height: tileSize, width: tileSize)
+            
+            // place the gem on the board where the rock was
+            sprite.position = positionInForeground(at: coord)
+            
+            // add the gem sprite to our data store
+            sprites[coord.x][coord.y] = sprite
+            
+            // add the gem sprite to the foreground
+            spriteForeground.addChild(sprite)
         }
-        removedAnimations.append(contentsOf: miningGemAnimations)
-        
         
         // add new tiles "newTiles"
         for trans in newTiles {
@@ -735,11 +735,14 @@ extension Renderer {
             let y = tileSize * CGFloat(startCol) + bottomLeft.y
             sprite.position = CGPoint.init(x: y, y: x)
             
-            //add it to the scene
+            // add it to the scene
             spriteForeground.addChild(spriteNodes[endRow][endCol])
         }
         
-        // map the shift down tile transformation array to [SKSpriteNode, SKAction)] to work Animator world
+        // track where the tiles move to after shifting down
+        var newTilesWithGems: [TileCoord] = []
+        
+        // map the shift down tile transformation array to [(SKSpriteNode, SKAction)] to work Animator world
         
         var shiftDownActions: [SpriteAction] = []
         for trans in shiftDown {
@@ -753,12 +756,35 @@ extension Renderer {
                 sprite = sprites[startRow][startCol]
             }
             
+            // track where the gems are moving to so that we can target the gem in an animation
+            // gems dont always move so this code path does always get hit
+            if tilesWithGem.contains(trans.initial) {
+                let currentSprite = sprites[startRow][startCol]
+                if case TileType.item = currentSprite.type {
+                    newTilesWithGems.append(TileCoord(endRow, endCol))
+                }
+            }
+            
             //create the action
             let endPoint = CGPoint.init(x: tileSize * CGFloat(trans.end.column) + bottomLeft.x,
                                         y: tileSize * CGFloat(trans.end.row) + bottomLeft.y)
             let animation = SKAction.move(to: endPoint, duration: AnimationSettings.fallSpeed)
+            animation.timingMode = .easeIn
             let wait = SKAction.wait(forDuration: 0.33)
             shiftDownActions.append(SpriteAction(sprite: sprite, action: SKAction.sequence([wait, animation])))
+        }
+        
+        if case InputType.touch? = transformation.inputType {
+            if let removedColor = removedColor {
+                // sometimes gems dont shift down so we need to use the original tile with gems array
+                let gemCoords = newTilesWithGems.count == 0 ? tilesWithGem : newTilesWithGems
+                // mining gems animations
+                let miningGemAnimations = animator.createAnimationForMiningGems(from: removed.map { $0.end }, tilesWithGems: gemCoords, color: removedColor, spriteForeground: spriteForeground) { [weak self] tileCoord in
+                    guard let self = self else { return .zero }
+                    return self.positionInForeground(at: tileCoord)
+                }
+                removedAnimations.append(contentsOf: miningGemAnimations)
+            }
         }
         
         // animate the removal of rocks and rocks falling at the same time

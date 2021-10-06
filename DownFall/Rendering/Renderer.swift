@@ -338,6 +338,8 @@ class Renderer: SKSpriteNode {
                     sprite.showAttackTiming(frequency, turns)
                 } else if case let TileType.offer(offer) = tiles[row][col].type {
                     sprite.showOfferTier(offer)
+                } else if case let TileType.item = tiles[row][col].type {
+                    sprite.showAmount()
                 }
                 spriteForeground.addChild(sprite)
             }
@@ -640,7 +642,7 @@ extension Renderer {
             // keep track of where we find gems
             let currentSprite = sprites[tileTrans.end.x][tileTrans.end.y]
             
-            if case TileType.rock(color: _, holdsGem: let holdsGem) = currentSprite.type,
+            if case TileType.rock(color: _, holdsGem: let holdsGem, _) = currentSprite.type,
                holdsGem {
                 tilesWithGem.append(tileTrans.end)
             }
@@ -762,6 +764,10 @@ extension Renderer {
                 let currentSprite = sprites[startRow][startCol]
                 if case TileType.item = currentSprite.type {
                     newTilesWithGems.append(TileCoord(endRow, endCol))
+                    
+                    // basically if there are 2+ rocks with gems, and one of them moves and the other does not
+                    // then we ran into a bug where we only animate the formation of one of the gems
+                    tilesWithGem.removeFirst(where: { $0 == trans.initial })
                 }
             }
             
@@ -777,13 +783,13 @@ extension Renderer {
         if case InputType.touch? = transformation.inputType {
             if let removedColor = removedColor {
                 // sometimes gems dont shift down so we need to use the original tile with gems array
-                let gemCoords = newTilesWithGems.count == 0 ? tilesWithGem : newTilesWithGems
+                newTilesWithGems.append(contentsOf: tilesWithGem)
                 // mining gems animations
-                let miningGemAnimations = animator.createAnimationForMiningGems(from: removed.map { $0.end }, tilesWithGems: gemCoords, color: removedColor, spriteForeground: spriteForeground) { [weak self] tileCoord in
+                let miningGemAnimations = animator.createAnimationForMiningGems(from: removed.map { $0.end }, tilesWithGems: newTilesWithGems, color: removedColor, spriteForeground: spriteForeground, amountPerRock: numberOfGemsPerRockForGroup(size: removed.count), tileSize: tileSize) { [weak self] tileCoord in
                     guard let self = self else { return .zero }
                     return self.positionInForeground(at: tileCoord)
                 }
-                removedAnimations.append(contentsOf: miningGemAnimations)
+                 removedAnimations.append(contentsOf: miningGemAnimations)
             }
         }
         

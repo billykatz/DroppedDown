@@ -95,11 +95,11 @@ struct GoalTracking: Codable, Hashable {
         switch levelGoalType {
         case .unlockExit:
             switch self.tileType {
-            case .rock(.blue, _):
+            case .rock(.blue, _, _):
                 return (.lightBarBlue, .darkBarBlue)
-            case .rock(.red, _):
+            case .rock(.red, _, _):
                 return (.lightBarRed, .darkBarRed)
-            case .rock(.purple, _):
+            case .rock(.purple, _, _):
                 return (.lightBarPurple, .darkBarPurple)
             case .monster:
                 return (.lightBarMonster, .darkBarMonster)

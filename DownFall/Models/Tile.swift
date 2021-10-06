@@ -77,23 +77,23 @@ struct Tile: Hashable, Codable {
     }
     
     static var redRock: Tile {
-        return Tile(type: .rock(color: .red, holdsGem: false))
+        return Tile(type: .rock(color: .red, holdsGem: false, groupCount: 0))
     }
     
     static var blueRock: Tile {
-        return Tile(type: .rock(color: .blue, holdsGem: false))
+        return Tile(type: .rock(color: .blue, holdsGem: false, groupCount: 0))
     }
     
     static var greenRock: Tile {
-        return Tile(type: .rock(color: .green, holdsGem: false))
+        return Tile(type: .rock(color: .green, holdsGem: false, groupCount: 0))
     }
     
     static var purpleRock: Tile {
-        return Tile(type: .rock(color: .purple, holdsGem: false))
+        return Tile(type: .rock(color: .purple, holdsGem: false, groupCount: 0))
     }
     
     static var brownRock: Tile {
-        return Tile(type: .rock(color: .brown, holdsGem: false))
+        return Tile(type: .rock(color: .brown, holdsGem: false, groupCount: 0))
     }
     
     static var gold: Tile {
@@ -126,7 +126,7 @@ enum TileType: Hashable, CaseIterable, Codable {
     case item(Item)
     case offer(StoreOffer)
     case pillar(PillarData)
-    case rock(color: ShiftShaft_Color, holdsGem: Bool)
+    case rock(color: ShiftShaft_Color, holdsGem: Bool, groupCount: Int)
     case dynamite(DynamiteFuse)
     
     enum CodingKeys: String, CodingKey {
@@ -140,6 +140,7 @@ enum TileType: Hashable, CaseIterable, Codable {
         case pillarData
         case holdsGem
         case storeOffer
+        case groupCount
 
     }
     
@@ -185,7 +186,8 @@ enum TileType: Hashable, CaseIterable, Codable {
         case .rock:
             let color = try container.decode(ShiftShaft_Color.self, forKey: .color)
             let holdsGem = try container.decode(Bool.self, forKey: .holdsGem)
-            self = .rock(color: color, holdsGem: holdsGem)
+            let groupCount = try container.decode(Int.self, forKey: .groupCount)
+            self = .rock(color: color, holdsGem: holdsGem, groupCount: groupCount)
         case .pillar:
             let pillarData = try container.decode(PillarData.self, forKey: .pillarData)
             self = .pillar(pillarData)
@@ -223,10 +225,11 @@ enum TileType: Hashable, CaseIterable, Codable {
         case .pillar(let pillarData):
             try container.encode(Base.pillar, forKey: .base)
             try container.encode(pillarData, forKey: .pillarData)
-        case .rock(let rock, let holdsGem):
+        case .rock(let rock, let holdsGem, let groupCount):
             try container.encode(Base.rock, forKey: .base)
             try container.encode(rock, forKey: .color)
             try container.encode(holdsGem, forKey: .holdsGem)
+            try container.encode(groupCount, forKey: .groupCount)
         case .dynamite(let fuseCount):
             try container.encode(Base.dynamite, forKey: .base)
             try container.encode(fuseCount, forKey: .dynamiteFuse)
@@ -256,7 +259,7 @@ enum TileType: Hashable, CaseIterable, Codable {
     }
     
     var color: ShiftShaft_Color? {
-        if case TileType.rock(let color, _) = self {
+        if case TileType.rock(let color, _, _) = self {
             return color
         } else if case TileType.pillar(let data) = self {
             return data.color
@@ -306,7 +309,7 @@ enum TileType: Hashable, CaseIterable, Codable {
     
     private var textureName: String {
         switch self {
-        case .rock(let color, let withGem):
+        case .rock(let color, let withGem, let groupCount):
             let withGemSuffix = withGem ? "WithGem" : ""
             switch color {
             case .blue:
@@ -379,7 +382,7 @@ enum TileType: Hashable, CaseIterable, Codable {
 extension TileType {
     var humanReadable: String {
         switch self {
-        case .rock(let color, _ ):
+        case .rock(let color, _, _):
             //TODO: this might have some consequences
             return "\(color.humanReadable) rock"
         case .pillar(let data):
@@ -411,9 +414,9 @@ extension TileType {
 }
 
 extension TileType {
-    static var rockCases: [TileType] = [.rock(color: .blue, holdsGem: false), .rock(color: .green, holdsGem: false), .rock(color: .red, holdsGem: false), .rock(color: .purple, holdsGem: false), .rock(color: .brown, holdsGem: false)]
-    static var allCases: [TileType] = [.player(.zero), .exit(blocked: false), .empty, .monster(.zero), .item(.zero), .rock(color: .red, holdsGem: false), .pillar(PillarData(color: .red, health: 3))]
-    static var randomCases = [TileType.monster(.zero), .rock(color: .red, holdsGem: false), .item(Item.gem)]
+    static var rockCases: [TileType] = [.rock(color: .blue, holdsGem: false, groupCount: 0), .rock(color: .green, holdsGem: false, groupCount: 0), .rock(color: .red, holdsGem: false, groupCount: 0), .rock(color: .purple, holdsGem: false, groupCount: 0), .rock(color: .brown, holdsGem: false, groupCount: 0)]
+    static var allCases: [TileType] = [.player(.zero), .exit(blocked: false), .empty, .monster(.zero), .item(.zero), .rock(color: .red, holdsGem: false, groupCount: 0), .pillar(PillarData(color: .red, health: 3))]
+    static var randomCases = [TileType.monster(.zero), .rock(color: .red, holdsGem: false, groupCount: 0), .item(Item.gem)]
     typealias AllCases = [TileType]
     
     static func == (lhs: TileType, rhs: TileType) -> Bool {
@@ -430,8 +433,8 @@ extension TileType {
             return lhsItem.type == rhsItem.type
         case let (.pillar(leftData), .pillar(rightData)):
             return leftData.color == rightData.color
-        case let (.rock(leftColor, leftHoldsGem), .rock(rightColor, rightHoldsGem)):
-            return leftColor == rightColor && leftHoldsGem == rightHoldsGem
+        case let (.rock(leftColor, leftHoldsGem, _), .rock(rightColor, rightHoldsGem, _)):
+            return leftColor == rightColor && leftHoldsGem == rightHoldsGem 
         case let (.dynamite(lhsFuse), .dynamite(rhsFuse)):
             return lhsFuse.hasBeenDecremented == rhsFuse.hasBeenDecremented
         case let (.offer(lhsOffer), .offer(rhsOffer)):
@@ -441,5 +444,32 @@ extension TileType {
         }
     }
     
+    func hash(into hasher: inout Hasher) {
+        switch self {
+        case .player(let data):
+            hasher.combine(data)
+        case .empty:
+            hasher.combine(self.textureString())
+        case .exit:
+            hasher.combine(self.textureString())
+        case .monster(let data):
+            hasher.combine(data)
+        case .item(let data):
+            hasher.combine(data)
+        case .pillar(let data):
+            hasher.combine(data)
+        case .dynamite(let data):
+            hasher.combine(data)
+        case .rock(let color, let hasGem, let groupCount):
+            hasher.combine(color)
+//            hasher.combine(hasGem)
+//            hasher.combine(groupCount)
+        case .offer(let offer):
+            hasher.combine(offer)
+        case .emptyGem(let color, amount: let amount):
+            hasher.combine(color)
+            hasher.combine(amount)
+        }
+    }
 
 }

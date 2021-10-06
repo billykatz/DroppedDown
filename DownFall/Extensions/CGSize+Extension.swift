@@ -40,3 +40,14 @@ extension CGSize {
         return CGSize(width: width * coefficient, height: height)
     }
 }
+
+
+extension CGSize: Comparable {
+    // only good at comparing sizes with equal width and height
+    public static func < (lhs: CGSize, rhs: CGSize) -> Bool {
+        precondition(lhs.width == lhs.height && rhs.width == rhs.height, "You should only use this to compare sizes with equal width and height")
+        return lhs.width < rhs.width && lhs.height < rhs.height
+    }
+    
+    
+}

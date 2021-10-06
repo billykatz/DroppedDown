@@ -11,7 +11,25 @@ class Board: Equatable {
         return false
     }
     
-    private(set) var tiles: [[Tile]]
+    private var _tiles : [[Tile]]
+    private(set) var tiles: [[Tile]] {
+        get {
+            return _tiles
+        } set {
+            let neighnors = findNeighborsForBoard(in: newValue)
+            var newTiles = newValue
+            for row in 0..<newTiles.count {
+                for col in 0..<newTiles.count {
+                    if case TileType.rock(let color, let hasGem, _) = newTiles[row][col].type {
+                        let groupCount = neighnors[row][col]
+                        newTiles[row][col] = Tile(type: TileType.rock(color: color, holdsGem: hasGem, groupCount: groupCount))
+                    }
+                }
+            }
+            
+            _tiles = newTiles
+        }
+    }
     private(set) var level: Level
     var tileCreator: TileStrategy
     
@@ -36,12 +54,26 @@ class Board: Equatable {
     
     init(tileCreator: TileStrategy,
          tiles: [[Tile]],
-         level: Level) {
+         level: Level,
+         boardLoaded: Bool) {
         self.tileCreator = tileCreator
-        self.tiles = tiles
+        self._tiles = tiles
         self.level = level
         
+        // trigger a neighbor count pass
+        self.tiles = tiles
+        
+        if (boardLoaded) {
+            // let the world know we loaded the board from a save
+            InputQueue.append(.init(.boardLoaded, self.tiles))
+        } else {
+            //let the world know we built the board
+            InputQueue.append(.init(.boardBuilt, self.tiles))
+        }
+        
         Dispatch.shared.register { [weak self] in self?.handle(input: $0) }
+        
+        
     }
     
     private func isWithinBounds(_ tileCoord: TileCoord) -> Bool {
@@ -232,7 +264,7 @@ class Board: Equatable {
         
         tiles = newTiles
         
-        return Transformation(transformation: nil, inputType: inputType, endTiles: newTiles)
+        return Transformation(transformation: nil, inputType: inputType, endTiles: self.tiles)
 
     }
     
@@ -284,7 +316,7 @@ class Board: Equatable {
         
         let trans = Transformation(transformation: transformation.tileTransformation,
                                    inputType: transformation.inputType,
-                                   endTiles: updatedTiles,
+                                   endTiles: self.tiles,
                                    removed: transformation.removed,
                                    newTiles: transformation.newTiles,
                                    shiftDown: transformation.shiftDown)
@@ -337,7 +369,7 @@ class Board: Equatable {
         for (i, _) in tiles.enumerated() {
             for (j, _) in tiles[i].enumerated() {
                 switch tiles[i][j].type {
-                case .exit, .offer, .pillar, .monster, .item, .rock(color: _, holdsGem: true), .player:
+                case .exit, .offer, .pillar, .monster, .item, .rock(color: _, holdsGem: true, _), .player:
                     tileCoords.append(TileCoord(i, j))
                 default:
                     continue
@@ -450,10 +482,12 @@ class Board: Equatable {
             tiles[anotherRandomCoordInAnotherQuadrant.row][anotherRandomCoordInAnotherQuadrant.column] = Tile(type: .offer(randomOffers[1]))
         }
         
+        self.tiles = tiles
         return Transformation(transformation: transformedTiles, inputType: inputType, endTiles: tiles)
     }
     
     private func playerDataUpdated(inputType: InputType) -> Transformation {
+        self.tiles = tiles
         return Transformation(transformation: nil, inputType: inputType, endTiles: tiles)
     }
         
@@ -468,7 +502,7 @@ class Board: Equatable {
         
         self.tiles = newTiles
         
-        return Transformation(transformation: [TileTransformation(exitCoord, exitCoord)], inputType: inputType, endTiles: newTiles)
+        return Transformation(transformation: [TileTransformation(exitCoord, exitCoord)], inputType: inputType, endTiles: self.tiles)
     }
     
     private func rotatePreviewFinish(input: Input) -> [Transformation] {
@@ -713,7 +747,7 @@ extension Board {
             return swap(firstTarget, with: targets.last!, input: input)
             
         case .transformRock:
-            return transform(targets, into: TileType.rock(color: .purple, holdsGem: false), input: input)
+            return transform(targets, into: TileType.rock(color: .purple, holdsGem: false, groupCount: 0), input: input)
         case .bubbleUp:
             return bubbleUp(targets.first!, input: input)
         case .flameWall, .flameColumn:
@@ -775,10 +809,27 @@ extension Board {
     }
     
     
-    /// Find all contiguous neighbors of the same color as the tile that was tapped
-    /// Return a new board with the selectedTiles updated
+    func findNeighborsForBoard(in tiles: [[Tile]]) -> [[Int]] {
+        // special value -1 to indicate we havent checked this spot yet
+        let innerNeighbors = Array(repeating: -1, count: tiles.count)
+        var neighbors = Array(repeating: innerNeighbors, count: tiles.count)
+        for row in 0..<tiles.count {
+            for col in 0..<tiles.count {
+                // skip coords we have already tested
+                if (neighbors[row][col] == -1) {
+                    let foundNeighbors = findNeighbors(in: tiles, of: TileCoord(row, col)).0
+                    for coord in foundNeighbors {
+                        neighbors[coord.row][coord.column] = foundNeighbors.count
+                    }
+                }
+            }
+        }
+        
+        return neighbors
+    }
     
-    func findNeighbors(_ coord: TileCoord, killMonsters: Bool = false) -> ([TileCoord], [TileCoord]) {
+    /// Find all contiguous neighbors of the same color as the tile that was tapped
+    func findNeighbors(in tiles: [[Tile]], of coord: TileCoord, killMonsters: Bool = false) -> ([TileCoord], [TileCoord]) {
         let (x,y) = coord.tuple
         guard
             x >= 0,
@@ -831,11 +882,17 @@ extension Board {
         return (queue, Array(pillars))
     }
     
+    /// Find all contiguous neighbors of the same color as the tile that was tapped
+    /// Calls another function that finds neighbors on our current set of tiles.
+    func findNeighbors(_ coord: TileCoord, killMonsters: Bool = false) -> ([TileCoord], [TileCoord]) {
+        return findNeighbors(in: self.tiles, of: coord, killMonsters: killMonsters)
+    }
+    
     func massMine(tiles: [[Tile]], color: ShiftShaft_Color, input: Input) -> Transformation {
         var selectedCoords: [TileCoord] = []
         for row in 0..<tiles.count {
             for col in 0..<tiles.count {
-                if case TileType.rock(let tileColor, _) = tiles[row][col].type,
+                if case TileType.rock(let tileColor, _, _) = tiles[row][col].type,
                     tileColor == color {
                     selectedCoords.append(TileCoord(row: row, column: col))
                 }
@@ -913,7 +970,7 @@ extension Board {
         var removedTilesContainGem = false
         for coord in selectedTiles {
             // turn the tile into a gem or into an empty
-            if case TileType.rock(let color, let holdsGem) = tiles[coord].type, holdsGem {
+            if case TileType.rock(let color, let holdsGem, _) = tiles[coord].type, holdsGem {
                 intermediateTiles[coord.x][coord.y] = Tile(type: .emptyGem(color, amount: numberOfGemsForGroup(size: selectedTiles.count)))
                 finalSelectedTiles.append(coord)
                 removedTilesContainGem = holdsGem
@@ -956,7 +1013,7 @@ extension Board {
         // return our new board
         return Transformation(transformation: selectedTilesTransformation,
                               inputType: input.type,
-                              endTiles: intermediateTiles,
+                              endTiles: self.tiles,
                               removed: selectedTilesTransformation,
                               newTiles: newTiles,
                               shiftDown: shiftDown,
@@ -985,7 +1042,7 @@ extension Board {
                     intermediateTiles[coord.x][coord.y] = Tile(type: .pillar(PillarData(color: data.color, health: data.health-1)))
                 }
                 
-            case .rock(color: _, holdsGem: let holdsGem):
+            case .rock(color: _, holdsGem: let holdsGem, _):
                 intermediateTiles[coord.x][coord.y] = Tile.empty
                 if !removedTilesContainGem {
                     removedTilesContainGem = holdsGem
@@ -1019,7 +1076,7 @@ extension Board {
         // return our new board
         return Transformation(transformation: selectedTilesTransformation,
                               inputType: input.type,
-                              endTiles: intermediateTiles,
+                              endTiles: self.tiles,
                               removed: selectedTilesTransformation,
                               newTiles: newTiles,
                               shiftDown: shiftDown,
@@ -1085,7 +1142,7 @@ extension Board {
         
         return Transformation(transformation: transformation.tileTransformation,
                               inputType: .collectItem(coord, item, playerData.carry.total(in: item.type.currencyType)),
-                              endTiles: updatedTiles,
+                              endTiles: tiles,
                               removed: transformation.tileTransformation,
                               newTiles: transformation.newTiles,
                               shiftDown: transformation.shiftDown)
@@ -1182,16 +1239,8 @@ extension Board {
         //create a boardful of tiles
         let (tiles, newLevel) = tileCreator.board(difficulty: difficulty)
         
-        if (newLevel) {
-            //let the world know we built the board
-            InputQueue.append(.init(.boardBuilt, tiles))
-        } else {
-            // let the world know we loaded the board from a save
-            InputQueue.append(.init(.boardLoaded, tiles))
-        }
-        
         //init new board
-        return Board(tileCreator: tileCreator, tiles: tiles, level: level)
+        return Board(tileCreator: tileCreator, tiles: tiles, level: level, boardLoaded: newLevel)
     }
 }
 
@@ -1222,7 +1271,7 @@ extension Board {
             self.tiles = intermediateTiles
             return Transformation(transformation: newTiles,
                                   inputType: inputType,
-                                  endTiles: intermediateTiles,
+                                  endTiles: self.tiles,
                                   newTiles: newTiles,
                                   shiftDown: shiftDown)
         }
@@ -1287,7 +1336,6 @@ extension Board {
                         intermediateTiles: &intermediateTiles)
             
             // return our new board
-            
             allTransformations.append(Transformation(transformation: newTiles,
                                                      inputType: inputType,
                                                      endTiles: intermediateTiles,
@@ -1301,22 +1349,6 @@ extension Board {
         }
         
         return allTransformations
-    }
-}
-// step function for number of gems
-extension Board {
-    func numberOfGemsForGroup(size: Int) -> Int {
-        if (3...5).contains(size) {
-            return 2*size
-        } else if (6...10).contains(size) {
-            return 3*size
-        } else if (10...20).contains(size) {
-            return 4*size
-        } else if (20...35).contains(size) {
-            return 5*size
-        } else {
-            return 7*size
-        }
     }
 }
 
@@ -1350,7 +1382,7 @@ extension Board {
         
         return Transformation(transformation: [TileTransformation(playerPosition, playerPosition.rowBelow)],
                               inputType: .gameWin(self.level.goalProgress.count),
-                              endTiles: newTiles)
+                              endTiles: self.tiles)
     }
 }
 
@@ -1443,7 +1475,7 @@ extension Board {
             //just note that the monster attacked
             tiles[attackerPosition.x][attackerPosition.y] = Tile(type: TileType.monster(monsterModel.didAttack()))
         }
-        
+        self.tiles = tiles
         return Transformation(inputType: InputType.attack(attackType: type,
                                                           attacker: attackerPosition,
                                                           defender: defenderPostion,
@@ -1451,6 +1483,36 @@ extension Board {
                                                           dodged: dodged,
                                                           attackerIsPlayer: attackerIsPlayer
                                                           ),
-                              endTiles: tiles)
+        endTiles: self.tiles)
     }
 }
+
+
+func numberOfGemsForGroup(size: Int) -> Int {
+    if (3...5).contains(size) {
+        return 2*size
+    } else if (6...10).contains(size) {
+        return 3*size
+    } else if (10...20).contains(size) {
+        return 4*size
+    } else if (20...35).contains(size) {
+        return 5*size
+    } else {
+        return 7*size
+    }
+}
+
+func numberOfGemsPerRockForGroup(size: Int) -> Int {
+    if (3...5).contains(size) {
+        return 2
+    } else if (6...10).contains(size) {
+        return 3
+    } else if (11...20).contains(size) {
+        return 4
+    } else if (21...35).contains(size) {
+        return 5
+    } else {
+        return 7
+    }
+}
+

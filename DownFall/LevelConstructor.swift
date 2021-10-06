@@ -164,7 +164,7 @@ struct LevelConstructor {
     static func levelGoal(depth: Depth, pillars: [PillarCoorindates], gemAtDepth: Int, randomSource: GKLinearCongruentialRandomSource) -> [LevelGoal] {
         func randomRockGoal(_ colors: [ShiftShaft_Color], amount: Int, minimumGroupSize: Int = 1) -> LevelGoal? {
             guard let randomColor = colors.randomElement() else { return nil }
-            return LevelGoal(type: .unlockExit, tileType: .rock(color: randomColor, holdsGem: false), targetAmount: amount, minimumGroupSize: minimumGroupSize, grouped: minimumGroupSize > 1)
+            return LevelGoal(type: .unlockExit, tileType: .rock(color: randomColor, holdsGem: false, groupCount: 0), targetAmount: amount, minimumGroupSize: minimumGroupSize, grouped: minimumGroupSize > 1)
         }
         
         
@@ -172,7 +172,7 @@ struct LevelConstructor {
         switch depth {
         case 0:
             let monsterGoal = LevelGoal.killMonsterGoal(amount: 1)
-            let gemGoal = LevelGoal.gemGoal(amount: 15)
+            _ = LevelGoal.gemGoal(amount: 15)
             let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 20)
             
             goals = [monsterGoal, rockGoal] //[gemGoal, rockGoal]//, monsterGoal]
@@ -227,28 +227,33 @@ struct LevelConstructor {
     static func availableRocksPerLevel(depth: Depth) -> TileTypeChanceModel {
         
         switch depth {
+        // just for testing
+//        case 0:
+//            return TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false, groupCount: 0): 100,
+//                                                        .rock(color: .blue, holdsGem: false): 50  ,
+//                                                        ])
         case 0, 1, 2, 3, 4:
-            let chances = TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false): 33,
-                                                        .rock(color: .blue, holdsGem: false): 33,
-                                                        .rock(color: .purple, holdsGem: false): 33])
+            let chances = TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false, groupCount: 0): 33,
+                                                        .rock(color: .blue, holdsGem: false, groupCount: 0): 33,
+                                                        .rock(color: .purple, holdsGem: false, groupCount: 0): 33])
             return chances
         case 5, 6, 7:
-             let chances = TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false): 33,
-                                                         .rock(color: .blue, holdsGem: false): 33,
-                                                         .rock(color: .purple, holdsGem: false): 33])
+            let chances = TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false, groupCount: 0): 33,
+                                                        .rock(color: .blue, holdsGem: false, groupCount: 0): 33,
+                                                         .rock(color: .purple, holdsGem: false, groupCount: 0): 33])
              return chances
         case 8, 9:
-            let chances = TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false): 30,
-                                                        .rock(color: .blue, holdsGem: false): 30,
-                                                        .rock(color: .purple, holdsGem: false): 30,
-                                                        .rock(color: .brown, holdsGem: false): 10])
+            let chances = TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false, groupCount: 0): 30,
+                                                        .rock(color: .blue, holdsGem: false, groupCount: 0): 30,
+                                                        .rock(color: .purple, holdsGem: false, groupCount: 0): 30,
+                                                        .rock(color: .brown, holdsGem: false, groupCount: 0): 10])
             return chances
             
         case 10...Int.max:
-            let chances = TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false): 29,
-                                                        .rock(color: .blue, holdsGem: false): 29,
-                                                        .rock(color: .purple, holdsGem: false): 29,
-                                                        .rock(color: .brown, holdsGem: false): 13])
+            let chances = TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false, groupCount: 0): 29,
+                                                        .rock(color: .blue, holdsGem: false, groupCount: 0): 29,
+                                                        .rock(color: .purple, holdsGem: false, groupCount: 0): 29,
+                                                        .rock(color: .brown, holdsGem: false, groupCount: 0): 13])
             return chances
         default:
             fatalError("Level must be positive")

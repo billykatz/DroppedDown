@@ -152,6 +152,39 @@ class DFTileSpriteNode: SKSpriteNode {
         
     }
     
+    func showAmount() {
+        guard case TileType.item(let item) = self.type else  { return }
+        let amount = item.amount
+
+        let fontSize: CGFloat
+        let width: CGFloat
+        if amount < 10 {
+            fontSize = 50
+            width = self.size.width*0.45
+        } else if amount < 100 {
+            fontSize = 48
+            width = self.size.width*0.52
+        } else {
+            fontSize = 46
+            width = self.size.width*0.60
+        }
+        
+        let background = SKShapeNode(rectOf: CGSize(width: width, height: self.size.height*0.35), cornerRadius: 16.0)
+        background.color = .buttonGray
+        background.zPosition = 100
+        
+        let xAmountLabel = ParagraphNode(text: "x\(amount)", fontSize: fontSize, fontColor: .black)
+        xAmountLabel.zPosition = 101
+        
+        background.position = CGPoint.position(background.frame, inside: self.frame, verticalAlign: .bottom, horizontalAnchor: .right)//, xOffset: 10, yOffset: 10)
+        
+        xAmountLabel.position = CGPoint.position(xAmountLabel.frame, inside: background.frame, verticalAlign: .center, horizontalAnchor: .right, xOffset: 4, translatedToBounds: true)
+        
+        self.addChild(background)
+        self.addChild(xAmountLabel)
+        
+    }
+    
     func showOfferTier(_ offer: StoreOffer) {
         let sprite = SKSpriteNode(imageNamed: "Reward\(offer.tier)Border")
         sprite.position = .zero
@@ -189,20 +222,9 @@ class DFTileSpriteNode: SKSpriteNode {
         let shrinkGrowForever = SKAction.repeatForever(shrinkThenGrow)
         let spinIndefinitelyAction = SKAction.repeatForever(spin)
         gemGlow.zPosition = Precedence.underground.rawValue
-        return (gemGlow, SKAction.group([shrinkGrowForever, spinIndefinitelyAction]))
-    }
-    
-    func showGem() -> (SKSpriteNode, SKAction)? {
-        guard case TileType.rock(color: let color, holdsGem: let holdsGem) = self.type,
-              holdsGem
-        else { return nil }
-        let gem = TileType.item(Item(type: .gem, amount: 1, color: color))
-        let gemSprite = SKSpriteNode(texture: SKTexture(imageNamed: gem.textureString()), size: self.size)
-        let addGemAction = SKAction.run { [weak self] in
-            self?.addChild(gemSprite)
-        }
         
-        return (self, addGemAction)
+        return nil
+//        return (gemGlow, SKAction.group([shrinkGrowForever, spinIndefinitelyAction]))
     }
     
     func poof(_ removeFromParent: Bool = true) -> (SpriteAction)? {
@@ -218,13 +240,13 @@ class DFTileSpriteNode: SKSpriteNode {
     func crumble(_ removeFromParent: Bool = true) -> (SpriteAction)? {
         var animationFrames: [SKTexture] = []
         switch self.type {
-        case .rock(.brown, _):
+        case .rock(.brown, _, _):
             animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.brownRockCrumble), rows: 1, columns: 4).animationFrames()
-        case .rock(.red, _):
+        case .rock(.red, _, _):
             animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.redRockCrumble), rows: 1, columns: 4).animationFrames()
-        case .rock(.blue, _):
+        case .rock(.blue, _, _):
             animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.blueRockCrumble), rows: 1, columns: 4).animationFrames()
-        case .rock(.purple, _):
+        case .rock(.purple, _, _):
             animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.purpleRockCrumble), rows: 1, columns: 4).animationFrames()
         default:
             return nil
@@ -239,18 +261,24 @@ class DFTileSpriteNode: SKSpriteNode {
     }
     
     func sparkle() -> SKAction? {
+        
         var animationFrames: [SKTexture] = []
+        let amount: Int
         switch self.type {
-        case .rock(.red, let withGem):
+        case .rock(.red, let withGem, let groupCount):
             guard withGem else { return nil }
+            amount = groupCount
             animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.redRockWithGem), rows: 1, columns: 11).animationFrames()
-        case .rock(.blue, let withGem):
+        case .rock(.blue, let withGem, let groupCount):
             guard withGem else { return nil }
+            amount = groupCount
             animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.blueRockWithGem), rows: 1, columns: 13).animationFrames()
-        case .rock(.purple, let withGem):
+        case .rock(.purple, let withGem, let groupCount):
             guard withGem else { return nil }
+            amount = groupCount
             animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.purpleRockWithGem), rows: 1, columns: 10).animationFrames()
         default:
+            amount = 0
             return nil
         }
         
@@ -266,6 +294,38 @@ class DFTileSpriteNode: SKSpriteNode {
         /// Repeat forever
         let repeatForever = SKAction.repeatForever(sequence)
         
+        
+        //debug
+        if amount > 0 {
+            let fontSize: CGFloat
+            let width: CGFloat
+            if amount < 10 {
+                fontSize = 50
+                width = self.size.width*0.40
+            } else if amount < 100 {
+                fontSize = 48
+                width = self.size.width*0.50
+            } else {
+                fontSize = 46
+                width = self.size.width*0.56
+            }
+            
+            let background = SKShapeNode(rectOf: CGSize(width: width, height: self.size.height*0.35), cornerRadius: 16.0)
+            background.color = .buttonGray
+            background.zPosition = 100
+            
+            let xAmountLabel = ParagraphNode(text: "\(amount)", fontSize: fontSize, fontColor: .black)
+            xAmountLabel.zPosition = 101
+            
+            background.position = CGPoint.position(background.frame, inside: self.frame, verticalAlign: .bottom, horizontalAnchor: .right)
+            
+            xAmountLabel.position = CGPoint.position(xAmountLabel.frame, inside: background.frame, verticalAlign: .center, horizontalAnchor: .center, xOffset: 4, translatedToBounds: true)
+            
+            self.addChild(background)
+            self.addChild(xAmountLabel)
+        }
+
+//        return nil
         return repeatForever
     }
     

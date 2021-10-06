@@ -17,6 +17,7 @@ struct Transformation: Hashable {
     var shiftDown: [TileTransformation]?
     var removedTilesContainGem: Bool?
     
+    
     init(transformation tileTransformation: [TileTransformation]? = nil,
          inputType: InputType? = nil,
          endTiles: [[Tile]]? = nil,

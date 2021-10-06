@@ -9,7 +9,34 @@
 import Foundation
 import SpriteKit
 
+struct NumberTextures {
+    let number: Int
+    let color: ShiftShaft_Color
+    let texture: SKTexture
+}
+
 struct Animator {
+    
+    
+    lazy var numberTextures: [NumberTextures] = {
+        var array: [NumberTextures] = []
+        for number in [2, 3, 4, 5, 7] {
+            for color in [ShiftShaft_Color.red, .blue, .purple] {
+                let entry = NumberTextures(number: number, color: color, texture: SKTexture(imageNamed: "number-\(number)-\(color.humanReadable.lowercased())"))
+                array.append(entry)
+            }
+        }
+        return array
+    }()
+    
+    lazy var numberTwoSpriteSheets: [ShiftShaft_Color: SpriteSheet] = {
+        var dict: [ShiftShaft_Color: SpriteSheet] = [:]
+        for color in [ShiftShaft_Color.red, .blue, .purple] {
+            dict[color] = SpriteSheet(texture: SKTexture(imageNamed: "number-2-\(color.humanReadable.lowercased())-spritesheet"), rows: 1, columns: 8)
+        }
+        return dict
+    }()
+    
     
     public func animateRune(_ rune: Rune,
                             transformations: [Transformation],
@@ -319,31 +346,35 @@ struct Animator {
     func animateGold(goldSprites: [SKSpriteNode], gained: Int, from startPosition: CGPoint, to targetPosition: CGPoint, in hud: HUD, completion: @escaping () -> Void) {
         var index = 0
         
-        var hasShownTotalGain = false
+        var moveToSpeedGain = 0.001
+        var goldSpeedGain = 0.0001
         
         let animations: [SpriteAction] = goldSprites.map { sprite in
-            let wait = SKAction.wait(forDuration: Double(index) * AnimationSettings.Board.goldWaitTime)
+            let waitDuration = max(0.01, (Double(index) * (AnimationSettings.Board.goldWaitTime - goldSpeedGain)))
+            let wait = SKAction.wait(forDuration: waitDuration)
             let toPosition = sprite.frame.center.translate(xOffset: CGFloat.random(in: AnimationSettings.Gem.randomXOffsetRange), yOffset: CGFloat.random(in: AnimationSettings.Gem.randomYOffsetRange))
             
-            let moveAwayAction = SKAction.move(to: toPosition, duration: 0.25)
+            let moveAwayAction = SKAction.move(to: toPosition, duration: 0.5)
             
-            let moveToAction = SKAction.move(to: targetPosition, duration: AnimationSettings.Board.goldGainSpeedEnd)
-            let scaleAction = SKAction.scale(to: Style.Board.goldGainSizeEnd, duration: AnimationSettings.Board.goldGainSpeedEnd)
+            let totalMoveAndScaleDuration = max(0.1, AnimationSettings.Board.goldGainSpeedEnd - moveToSpeedGain)
+            let moveToAction = SKAction.move(to: targetPosition, duration: totalMoveAndScaleDuration)
+            let scaleAction = SKAction.scale(to: Style.Board.goldGainSizeEnd, duration: totalMoveAndScaleDuration)
             
             let moveToAndScale = SKAction.group([moveToAction, scaleAction])
             let moveAwayMoveToScale = SKAction.sequence([moveAwayAction, moveToAndScale])
             
             moveAwayMoveToScale.timingMode = .easeOut
             
-            let tickUpHudCounter = SKAction.run {
+            let tickUpHudCounter = SKAction.run { [index] in
                 hud.incrementCurrencyCountByOne()
                  
-                if !hasShownTotalGain {
-                    hasShownTotalGain = true
+                if index == goldSprites.count/2 {
                     hud.showTotalGemGain(goldSprites.count)
                 }
             }
             
+            moveToSpeedGain += 0.001
+            goldSpeedGain += 0.001
             index += 1
             
             return SpriteAction(sprite: sprite, action: SKAction.sequence([wait, moveAwayMoveToScale, tickUpHudCounter, SKAction.removeFromParent()]))
@@ -412,74 +443,163 @@ struct Animator {
 
     }
     
-    lazy var numberTwoSpriteSheets: [ShiftShaft_Color: SpriteSheet] = {
-        var dict: [ShiftShaft_Color: SpriteSheet] = [:]
-        for color in [ShiftShaft_Color.red, .blue, .purple] {
-            dict[color] = SpriteSheet(texture: SKTexture(imageNamed: "number-2-\(color.humanReadable.lowercased())-spritesheet"), rows: 1, columns: 8)
-        }
-        return dict
-    }()
-    
-  
-
-    
-    mutating func createAnimationForMiningGems(from coords: [TileCoord], tilesWithGems: [TileCoord], color: ShiftShaft_Color, spriteForeground: SKNode, positionConverter: (TileCoord) -> CGPoint) -> [SpriteAction] {
+    mutating func createAnimationForMiningGems(from coords: [TileCoord], tilesWithGems: [TileCoord], color: ShiftShaft_Color, spriteForeground: SKNode, amountPerRock: Int, tileSize: CGFloat, positionConverter: (TileCoord) -> CGPoint) -> [SpriteAction] {
         guard !tilesWithGems.isEmpty else { return  [] }
         var spriteActions: [SpriteAction] = []
-        let spriteSheet = numberTwoSpriteSheets[color]!
+        let numberFontSize: CGFloat = 100.0
+//        let whiteOutGemMinSize = CGSize(width: tileSize*5/6, height: tileSize*5/6)
+        var whiteOutGemBaseSize = CGSize(width: tileSize, height: tileSize)
+//        let whiteOutGemMaxSize = CGSize(width: tileSize*2, height: tileSize*2)
+        
+        let waitTimeDurationPerRock = 0.15
+        
+        let numberOfGemsPerRock = numberOfGemsPerRockForGroup(size: coords.count)
+
+        
         for tileWithGemCoord in tilesWithGems {
+            
+            // adds a white out version of the gem to create the formation effect
+            let whiteOutGem = SKSpriteNode(texture: SKTexture(imageNamed: "\(color.humanReadable.lowercased())-gem-whiteout"), size: CGSize(width: tileSize, height: tileSize))
+            
+            whiteOutGem.position = positionConverter(tileWithGemCoord)
+            whiteOutGem.zPosition = 100_000_000
+            spriteForeground.addChild(whiteOutGem)
+            
+            let numberOnGem = ParagraphNode(text: "", fontSize: numberFontSize, fontColor: .black)
+            let numberOnGemName = "\(tileWithGemCoord.x)-\(tileWithGemCoord.y)"
+            numberOnGem.name = numberOnGemName
+            numberOnGem.zPosition = 100_000_001
+            whiteOutGem.addChild(numberOnGem)
+            
             // we need to add the gem to the board or else shit is weird
             let sprite = DFTileSpriteNode(type: .item(Item(type: .gem, amount: 0, color: color)), height: 100, width: 100)
             let targetPosition = positionConverter(tileWithGemCoord)
             sprite.position = targetPosition
             
+            var total = 0
             var waitTime = 0.0
             
-            for coord in coords {
+            for (index, coord) in coords.enumerated() {
+                // update total before be do anything else
+                total += numberOfGemsPerRock
+                
+                
                 // create the empty sprite
-                let emptySprite = SKSpriteNode(color: .clear, size: CGSize(width: 16, height: 16))
+                let texture = numberTextures.first(where: { $0.number == amountPerRock && $0.color == color })!.texture
+                let numberSprite = SKSpriteNode(texture: texture, size: CGSize(width: 16, height: 16))
                 
                 // start position
                 let startPosition = positionConverter(coord)
                 
                 // setup empty sprite
-                emptySprite.position = startPosition
-                emptySprite.zPosition = 100_000
-                spriteForeground.addChild(emptySprite)
+                numberSprite.position = startPosition
+                numberSprite.zPosition = 100_000
+                spriteForeground.addChild(numberSprite)
                 
-                // animate the number sprite sheet
-                let animate = SKAction.repeat(SKAction.animate(with: spriteSheet.animationFrames(), timePerFrame: 0.07), count: 2)
-                let moveAndScaleSpeed = 0.3
-                
+                // wait the right amount of time
                 let initialWait = SKAction.wait(forDuration: waitTime)
                 
                 // move up and grow
+                let moveAndScaleSpeed = 0.3
                 let moveUp = SKAction.moveBy(x: 0, y: 150.0, duration: moveAndScaleSpeed)
                 let grow = SKAction.scale(to: CGSize(width: 125, height: 125), duration: moveAndScaleSpeed)
                 let growAndMove = SKAction.group([grow, moveUp])
                 
-                let pauseToAnimate = SKAction.wait(forDuration: 0.6)
+                let pauseDuration = 0.6
+                let pauseToAnimate = SKAction.wait(forDuration: pauseDuration)
                 
                 
                 // more to and shrink
-                let moveTo = SKAction.move(to: targetPosition, duration: 0.5)
-                let shrinkIt = SKAction.scale(to: .zero, duration: 0.1)
+                let moveAndShrinkSpeed = 0.1
+                let moveTo = SKAction.move(to: targetPosition, duration: moveAndShrinkSpeed)
+                let shrinkIt = SKAction.scale(to: .zero, duration: moveAndShrinkSpeed)
                 let moveAndShirnk = SKAction.group([moveTo, shrinkIt])
                 
-                let movementAndScaling = SKAction.sequence([initialWait, growAndMove, pauseToAnimate, moveAndShirnk])
-                movementAndScaling.timingMode = .easeInEaseOut
+                // wait before increasing the number on the gem
+//                let waitBeforeIncreaseing = SKAction.wait(forDuration: 1)
                 
-                let animateWhileMovingAndScaling = SKAction.group([animate, movementAndScaling])
+                // increase the number on gem node
+                let increaseAction = SKAction.run { [total] in
+                    guard let oldNumberOnGemLabel = whiteOutGem.childNode(withName: numberOnGemName) else { return }
+                    
+                    let newNode = ParagraphNode(text: "\(total)", fontSize: numberFontSize, fontColor: .black)
+                    newNode.position = oldNumberOnGemLabel.position
+                    newNode.name = oldNumberOnGemLabel.name
+                    newNode.zPosition = oldNumberOnGemLabel.zPosition
+                    oldNumberOnGemLabel.removeFromParent()
+                    whiteOutGem.addChild(newNode)
+                    
+                }
                 
-                spriteActions.append(SpriteAction(sprite: emptySprite, action: animateWhileMovingAndScaling))
+
                 
-                waitTime += 0.02
+                let movementAndScaling = SKAction.sequence([growAndMove, initialWait, pauseToAnimate, moveAndShirnk, increaseAction])
+                movementAndScaling.timingMode = .easeIn
+                
+                let animateWhileMovingAndScaling = SKAction.group([movementAndScaling])
+                
+                spriteActions.append(SpriteAction(sprite: numberSprite, action: animateWhileMovingAndScaling))
+                
+                // max out at 400 by 400
+                whiteOutGemBaseSize = min(CGSize(width: 400, height: 400), whiteOutGemBaseSize.scale(by: 1 + (CGFloat(index+1) * 0.005)))
+                let growTheWhiteOutGem = SKAction.scale(to: whiteOutGemBaseSize.scale(by: 1.1), duration: 0.1)
+                let shrinkTheWhiteOutGem = SKAction.scale(to: whiteOutGemBaseSize.scale(by:5/6), duration: 0.1)
+                let makewhiteOutGemOriginalSize = SKAction.scale(to: whiteOutGemBaseSize, duration: 0.05)
+                // initialWait + moveAndScaleSpeed + pauseToAnimate + moveAndShirnkSpeed
+                // we need to make space at the end of the period to give the gem time to animate
+                // thus we subtract 1x the waitTimeduratio
+                let waitUntilNumberTicksUpDuration = waitTime + moveAndScaleSpeed + pauseDuration + moveAndShrinkSpeed - waitTimeDurationPerRock
+                let whiteOutGemWait = SKAction.wait(forDuration: waitUntilNumberTicksUpDuration)
+                let whiteOutGemAction = SKAction.sequence([whiteOutGemWait, growTheWhiteOutGem, shrinkTheWhiteOutGem, makewhiteOutGemOriginalSize])
+                
+                spriteActions.append(SpriteAction(sprite: whiteOutGem, action: whiteOutGemAction))
+                
+                
+                waitTime += waitTimeDurationPerRock
             }
+            
+            
+            
+            //wait before doing these actions
+            let wait = SKAction.wait(forDuration: waitTime + 0.9)
+            
+            // scale up one more time
+            let scaleOut = SKAction.scale(to: whiteOutGemBaseSize.scale(by: 1.1), duration: 0.1)
+            
+            // reset the base size
+            whiteOutGemBaseSize = CGSize(width: tileSize, height: tileSize)
+            
+            // scale down the gem
+            let scaleDown = SKAction.scale(to: whiteOutGemBaseSize.scale(by: 5/6), duration: 0.45)
+            let scaleToOriginal = SKAction.scale(to: whiteOutGemBaseSize, duration: 0.05)
+            let sequence = SKAction.sequence([wait, scaleOut, scaleDown, scaleToOriginal])
+            sequence.timingMode = .easeIn
+            
+            // move the number label to the bottom right
+            let background = SKShapeNode(rectOf: CGSize(width: tileSize*0.5, height: tileSize*0.30), cornerRadius: 16.0)
+            let numberTargetPosition = CGPoint.position(background.frame, inside: whiteOutGem.frame, verticalAlign: .bottom, horizontalAnchor: .right)
+            
+            let scaleNumberAction = SKAction.scale(by: 0.33, duration: 0.33)
+            let moveNumberAction = SKAction.move(to: numberTargetPosition, duration: 0.33)
+            let numberScaleMove = SKAction.sequence([scaleNumberAction, moveNumberAction])
+            
+            let waitToGetLastNumberLabel = SKAction.run {
+                if let lastNumberLabel = whiteOutGem.childNode(withName: numberOnGemName) as? SKSpriteNode {
+                    
+//                    spriteActions.append(SpriteAction(sprite: lastNumberLabel, action: numberScaleMove))
+                    
+                    lastNumberLabel.run(numberScaleMove)
+
+                }
+            }
+            
+            spriteActions.append(SpriteAction(sprite: whiteOutGem, action: SKAction.sequence([wait, waitToGetLastNumberLabel])))
+            spriteActions.append(SpriteAction(sprite: whiteOutGem, action: sequence))
+            
         }
         
         
         
-
         return spriteActions
     }
 
@@ -491,6 +611,7 @@ struct Animator {
         for spriteAction in spriteActions {
             spriteAction.sprite.run(spriteAction.action) {
                 numActions -= 1
+                print(numActions)
                 if numActions == 0 {
                     completion()
                 }

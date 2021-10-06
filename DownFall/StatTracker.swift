@@ -66,7 +66,7 @@ class RunStatTracker {
                 self.addStat(Statistics(amount: 1, statType: .damageTaken), amount: 1)
             }
         case .touch(_, let type):
-            guard case let TileType.rock(color: color, holdsGem: _) = type,
+            guard case let TileType.rock(color: color, _, _) = type,
                   let removedCount = trans.removed?.count
                   else { return }
             self.addStat(Statistics(rockColor: color, amount: removedCount, statType: .rocksDestroyed), amount: removedCount)

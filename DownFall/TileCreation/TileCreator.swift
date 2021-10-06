@@ -114,7 +114,7 @@ class TileCreator: TileStrategy {
         for (key, value) in tileTypeChances.chances {
             let minValue = max(1, value)
             if let color = key.color, (lowerBound..<lowerBound+minValue).contains(randomNumber) {
-                return TileType.rock(color: color, holdsGem: shouldRockHoldGem(playerData: playerData, rockColor: color, shouldSpawnAtleastOneGem: spawnAtleastOneGem))
+                return TileType.rock(color: color, holdsGem: shouldRockHoldGem(playerData: playerData, rockColor: color, shouldSpawnAtleastOneGem: spawnAtleastOneGem), groupCount: 0)
             } else {
                 lowerBound = lowerBound + minValue
             }
@@ -159,9 +159,9 @@ class TileCreator: TileStrategy {
             switch nextTile.type {
             case .monster:
                 validTile = !neighbors.contains {  $0.type == .monster(.zero) || $0.type == .player(.zero) } && !noMoreMonsters
-            case .rock(.red, _), .rock(.purple, _), .rock(.blue, _), .rock(.brown, _):
+            case .rock(.red, _, _), .rock(.purple, _, _), .rock(.blue, _, _), .rock(.brown, _, _):
                 validTile = true
-            case .exit, .player, .rock(.green, _), .empty, .pillar, .dynamite, .emptyGem, .item, .offer, .rock(color: .blood, _):
+            case .exit, .player, .rock(.green, _, _), .empty, .pillar, .dynamite, .emptyGem, .item, .offer, .rock(color: .blood, _, _):
                 validTile = false
             }
         }
@@ -305,6 +305,7 @@ class TileCreator: TileStrategy {
         
         //
         tiles[playerPosition.x][playerPosition.y] = Tile(type: .player(playerData))
+//        tiles[3][7] = Tile(type: .player(playerData))
         
         
         // reserve all positions so we don't overwrite any one position multiple times
@@ -330,6 +331,14 @@ class TileCreator: TileStrategy {
         
         // Quick testing for rune replacement
 //        tiles[playerPosition.row-1][playerPosition.column] = Tile(type: .offer(StoreOffer.offer(type: .rune(Rune.rune(for: .bubbleUp)), tier: 1)))
+        
+        // quick testing gem collectin
+//        tiles[3][6] = Tile(type: .item(Item.init(type: .gem, amount: 10, color: .blue)))
+//        tiles[3][5] = Tile(type: .item(Item.init(type: .gem, amount: 50, color: .red)))
+//        tiles[3][4] = Tile(type: .item(Item.init(type: .gem, amount: 100, color: .purple)))
+//        tiles[3][3] = Tile(type: .item(Item.init(type: .gem, amount: 250, color: .blue)))
+//        tiles[3][2] = Tile(type: .item(Item.init(type: .gem, amount: 5, color: .red)))
+//        tiles[3][1] = Tile(type: .item(Item.init(type: .gem, amount: 25, color: .purple)))
         
         return (tiles, true)
     }

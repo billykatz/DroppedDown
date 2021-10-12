@@ -308,10 +308,9 @@ struct Animator {
         
         let moveToAction = SKAction.move(to: targetPosition, duration: AnimationSettings.Board.runeGainSpeed)
         let scaleAction = SKAction.scale(to: Style.Board.runeGainSizeEnd, duration: AnimationSettings.Board.runeGainSpeed)
-        let toPosition = runeSprite.frame.center.translate(xOffset: CGFloat.random(in: AnimationSettings.Gem.randomXOffsetRange), yOffset: CGFloat.random(in: AnimationSettings.Gem.randomYOffsetRange))
-        let moveAwayAction = SKAction.move(to: toPosition, duration: 0.25)
+        let scaleUp = SKAction.scale(by: 1.25, duration: 0.25)
         let moveToAndScale = SKAction.group([moveToAction, scaleAction])
-        let moveAwayMoveToScale = SKAction.sequence([moveAwayAction, moveToAndScale])
+        let moveAwayMoveToScale = SKAction.sequence([scaleUp, moveToAndScale])
         
         moveAwayMoveToScale.timingMode = .easeOut
         
@@ -325,10 +324,9 @@ struct Animator {
         
         let moveToAction = SKAction.move(to: targetPosition, duration: AnimationSettings.Board.goldGainSpeedEnd)
         let scaleAction = SKAction.scale(to: Style.Board.goldGainSizeEnd, duration: AnimationSettings.Board.goldGainSpeedEnd)
-        let toPosition = offerSprite.frame.center.translate(xOffset: CGFloat.random(in: AnimationSettings.Gem.randomXOffsetRange), yOffset: CGFloat.random(in: AnimationSettings.Gem.randomYOffsetRange))
-        let moveAwayAction = SKAction.move(to: toPosition, duration: 0.25)
+        let scaleUp = SKAction.scale(by: 1.25, duration: 0.25)
         let moveToAndScale = SKAction.group([moveToAction, scaleAction])
-        let moveAwayMoveToScale = SKAction.sequence([moveAwayAction, moveToAndScale])
+        let moveAwayMoveToScale = SKAction.sequence([scaleUp, moveToAndScale])
         
         moveAwayMoveToScale.timingMode = .easeOut
         
@@ -439,19 +437,18 @@ struct Animator {
         let moveToAndScale = SKAction.group([moveToAction, scaleDown])
         let sequence = SKAction.sequence([scaleUpAction, moveToAndScale])
         
-        return SpriteAction(sprite: sprite, action: sequence)//SKAction.sequence([moveToAndScale, SKAction.removeFromParent()]))
+        return SpriteAction(sprite: sprite, action: sequence)
 
     }
     
     mutating func createAnimationForMiningGems(from coords: [TileCoord], tilesWithGems: [TileCoord], color: ShiftShaft_Color, spriteForeground: SKNode, amountPerRock: Int, tileSize: CGFloat, positionConverter: (TileCoord) -> CGPoint) -> [SpriteAction] {
         guard !tilesWithGems.isEmpty else { return  [] }
         var spriteActions: [SpriteAction] = []
-        let numberFontSize: CGFloat = 100.0
-//        let whiteOutGemMinSize = CGSize(width: tileSize*5/6, height: tileSize*5/6)
+        let numberFontSize: CGFloat = 85.0
         var whiteOutGemBaseSize = CGSize(width: tileSize, height: tileSize)
-//        let whiteOutGemMaxSize = CGSize(width: tileSize*2, height: tileSize*2)
         
-        let waitTimeDurationPerRock = 0.15
+        let waitTimeDurationPerRock = 0.1
+        var waitTimeSubtractEachLoop = 0.005
         
         let numberOfGemsPerRock = numberOfGemsPerRockForGroup(size: coords.count)
 
@@ -469,6 +466,7 @@ struct Animator {
             let numberOnGemName = "\(tileWithGemCoord.x)-\(tileWithGemCoord.y)"
             numberOnGem.name = numberOnGemName
             numberOnGem.zPosition = 100_000_001
+            numberOnGem.position = numberOnGem.position.translateVertically(5)
             whiteOutGem.addChild(numberOnGem)
             
             // we need to add the gem to the board or else shit is weird
@@ -515,8 +513,6 @@ struct Animator {
                 let shrinkIt = SKAction.scale(to: .zero, duration: moveAndShrinkSpeed)
                 let moveAndShirnk = SKAction.group([moveTo, shrinkIt])
                 
-                // wait before increasing the number on the gem
-//                let waitBeforeIncreaseing = SKAction.wait(forDuration: 1)
                 
                 // increase the number on gem node
                 let increaseAction = SKAction.run { [total] in
@@ -555,45 +551,47 @@ struct Animator {
                 spriteActions.append(SpriteAction(sprite: whiteOutGem, action: whiteOutGemAction))
                 
                 
-                waitTime += waitTimeDurationPerRock
+                waitTime += max(0.01, waitTimeDurationPerRock - waitTimeSubtractEachLoop)
+                waitTimeSubtractEachLoop += 0.002
             }
             
             
-            
-            //wait before doing these actions
+            // wait before doing these actions
             let wait = SKAction.wait(forDuration: waitTime + 0.9)
             
             // scale up one more time
-            let scaleOut = SKAction.scale(to: whiteOutGemBaseSize.scale(by: 1.1), duration: 0.1)
+            let scaleOut = SKAction.scale(to: whiteOutGemBaseSize.scale(by: 1.5), duration: 0.45)
+            
+            // wiggle with it
+            let rotateCounterClockwise = SKAction.rotate(toAngle: -1/32 * .pi, duration: 0.05)
+            let rotateClockwise = SKAction.rotate(toAngle: 1/32 * .pi, duration: 0.05)
+            let rotateBack = SKAction.rotate(toAngle: 0, duration: 0.05)
+            
+            let wiggle = SKAction.sequence([rotateCounterClockwise, rotateClockwise])
+            let wiggleFourTimes = SKAction.repeat(wiggle, count: 3)
+            let wiggleThenBack = SKAction.sequence([wiggleFourTimes, rotateBack])
+            
+            let scaleUpAndWiggle = SKAction.group([scaleOut, wiggleThenBack])
             
             // reset the base size
             whiteOutGemBaseSize = CGSize(width: tileSize, height: tileSize)
-            
-            // scale down the gem
-            let scaleDown = SKAction.scale(to: whiteOutGemBaseSize.scale(by: 5/6), duration: 0.45)
-            let scaleToOriginal = SKAction.scale(to: whiteOutGemBaseSize, duration: 0.05)
-            let sequence = SKAction.sequence([wait, scaleOut, scaleDown, scaleToOriginal])
-            sequence.timingMode = .easeIn
-            
-            // move the number label to the bottom right
-            let background = SKShapeNode(rectOf: CGSize(width: tileSize*0.5, height: tileSize*0.30), cornerRadius: 16.0)
-            let numberTargetPosition = CGPoint.position(background.frame, inside: whiteOutGem.frame, verticalAlign: .bottom, horizontalAnchor: .right)
-            
-            let scaleNumberAction = SKAction.scale(by: 0.33, duration: 0.33)
-            let moveNumberAction = SKAction.move(to: numberTargetPosition, duration: 0.33)
-            let numberScaleMove = SKAction.sequence([scaleNumberAction, moveNumberAction])
-            
-            let waitToGetLastNumberLabel = SKAction.run {
-                if let lastNumberLabel = whiteOutGem.childNode(withName: numberOnGemName) as? SKSpriteNode {
-                    
-//                    spriteActions.append(SpriteAction(sprite: lastNumberLabel, action: numberScaleMove))
-                    
-                    lastNumberLabel.run(numberScaleMove)
 
-                }
-            }
+            // scale the whole thing down
+            let scaleNumberAction = SKAction.scale(to: CGSize(width: tileSize*0.4, height: tileSize*0.4), duration: 0.33)
             
-            spriteActions.append(SpriteAction(sprite: whiteOutGem, action: SKAction.sequence([wait, waitToGetLastNumberLabel])))
+            // target and move the gem sprite to the bottom right
+            let background = SKShapeNode(rectOf: CGSize(width: tileSize*0.5, height: tileSize*0.40), cornerRadius: 16.0)
+            let numberTargetPosition = CGPoint.position(background.frame, inside: whiteOutGem.frame, verticalAlign: .bottom, horizontalAnchor: .right, translatedToBounds: true)
+            let moveNumberAction = SKAction.move(to: numberTargetPosition, duration: 0.33)
+            
+            // group the scale and move together
+            // this makes it look like the whiteout gem and label become the label on the gem
+            let scaleAndMove = SKAction.group([scaleNumberAction, moveNumberAction])
+            
+            // create the sequence
+            let sequence = SKAction.sequence([wait, scaleUpAndWiggle, scaleAndMove])
+            sequence.timingMode = .easeInEaseOut
+            
             spriteActions.append(SpriteAction(sprite: whiteOutGem, action: sequence))
             
         }

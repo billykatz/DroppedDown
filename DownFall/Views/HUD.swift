@@ -92,10 +92,10 @@ class HUD: SKSpriteNode {
             switch inputType {
             case .attack:
                 showAttack(attackInput: input, endTiles: trans.first!.endTiles)
-            case .itemUsed, .decrementDynamites, .shuffleBoard, .collectOffer, .gameWin:
+            case .itemUsed, .decrementDynamites, .shuffleBoard, .gameWin:
                 if let tiles = trans.first?.endTiles,
-                    let playerCoord = getTilePosition(.player(.zero), tiles: tiles),
-                    case TileType.player(let data) = tiles[playerCoord].type {
+                   let playerCoord = getTilePosition(.player(.zero), tiles: tiles),
+                   case TileType.player(let data) = tiles[playerCoord].type {
                     show(data)
                 }
                 
@@ -104,10 +104,10 @@ class HUD: SKSpriteNode {
             }
         case .boardBuilt,. boardLoaded:
             guard let tiles = input.endTilesStruct,
-                let playerPosition = getTilePosition(.player(.zero), tiles: tiles),
-                case let TileType.player(data) = tiles[playerPosition].type else { return }
+                  let playerPosition = getTilePosition(.player(.zero), tiles: tiles),
+                  case let TileType.player(data) = tiles[playerPosition].type else { return }
             show(data)
-
+            
         default:
             ()
         }
@@ -203,17 +203,17 @@ class HUD: SKSpriteNode {
     func incrementStat(offer: StoreOfferType) {
         switch offer {
         case .dodge(amount: let amount):
-            showIncreaseInStat(amountLabelName: Constants.dodgeAmountLabelName, amountIncrease: amount)
+            showIncreaseInStat(offerType: offer, amountIncrease: amount)
         case .luck(amount: let amount):
-            showIncreaseInStat(amountLabelName: Constants.luckAmountLabelName, amountIncrease: amount)
+            showIncreaseInStat(offerType: offer, amountIncrease: amount)
         case .greaterHeal:
-            showIncreaseInStat(amountLabelName: Constants.currentHealthAmountLabelName, amountIncrease: 2)
+            showIncreaseInStat(offerType: offer, amountIncrease: 2)
         case .lesserHeal:
-            showIncreaseInStat(amountLabelName: Constants.currentHealthAmountLabelName, amountIncrease: 1)
+            showIncreaseInStat(offerType: offer, amountIncrease: 1)
         case .plusTwoMaxHealth:
-            showIncreaseInStat(amountLabelName: Constants.totalHealthAmountLabelName, amountIncrease: 2)
+            showIncreaseInStat(offerType: offer, amountIncrease: 2)
         case .plusOneMaxHealth:
-            showIncreaseInStat(amountLabelName: Constants.totalHealthAmountLabelName, amountIncrease: 1)
+            showIncreaseInStat(offerType: offer, amountIncrease: 1)
         case .gems(let amount):
             showTotalGemGain(amount)
         default:
@@ -221,20 +221,87 @@ class HUD: SKSpriteNode {
         }
     }
     
-    private func showIncreaseInStat(amountLabelName: String, amountIncrease: Int) {
-        if let currencyLabel = self.childNode(withName: amountLabelName) as? ParagraphNode {
-            let oldPosition = currencyLabel.position
-
-            // show exaclty how much gold was gained as well
-            let gainedGoldLabel = ParagraphNode(text: "+\(amountIncrease)", paragraphWidth: Style.HUD.labelParagraphWidth, fontSize: .fontExtraLargeSize, fontColor: .goldOutlineBright)
-            gainedGoldLabel.position = oldPosition.translateVertically(40.0)
-            addChildSafely(gainedGoldLabel)
-            let moveUp = SKAction.move(by: CGVector(dx: 0, dy: 100), duration: AnimationSettings.HUD.goldGainedTime)
-            let moveAndFade = SKAction.group([moveUp, SKAction.fadeOut(withDuration: AnimationSettings.HUD.gemCountFadeTime)])
-            let sequence = SKAction.sequence([moveAndFade, SKAction.removeFromParent()])
-            gainedGoldLabel.run(sequence)
+    private func showIncreaseInStat(offerType: StoreOfferType, amountIncrease: Int) {
+        
+        showIncreaseInStatByOne(offer: offerType, amountIncrease: amountIncrease)
+        let waitTime = Double(amountIncrease) * 0.2 / 2
+        
+        if let labelNames = labelNameForOfferType(offer: offerType) {
+            for labelName in labelNames {
+                if let currencyLabel = self.childNode(withName: labelName) as? ParagraphNode {
+                    let oldPosition = currencyLabel.position
+                    
+                    // show exaclty how much gold was gained as well
+                    let gainedGoldLabel = ParagraphNode(text: "+\(amountIncrease)", paragraphWidth: Style.HUD.labelParagraphWidth, fontSize: .fontExtraLargeSize, fontColor: .goldOutlineBright)
+                    gainedGoldLabel.position = oldPosition.translateVertically(40.0)
+                    addChildSafely(gainedGoldLabel)
+                    let moveUp = SKAction.move(by: CGVector(dx: 0, dy: 100), duration: AnimationSettings.HUD.goldGainedTime)
+                    let moveAndFade = SKAction.group([moveUp, SKAction.fadeOut(withDuration: AnimationSettings.HUD.gemCountFadeTime)])
+                    let sequence = SKAction.sequence([SKAction.wait(forDuration: waitTime), moveAndFade, SKAction.removeFromParent()])
+                    gainedGoldLabel.run(sequence)
+                }
+            }
         }
-
+    }
+    
+    private func labelNameForOfferType(offer: StoreOfferType) -> [String]? {
+        switch offer {
+        case .dodge:
+            return [Constants.dodgeAmountLabelName]
+        case .luck:
+            return [Constants.luckAmountLabelName]
+        case .greaterHeal:
+            return [Constants.currentHealthAmountLabelName]
+        case .lesserHeal:
+            return [Constants.currentHealthAmountLabelName]
+        case .plusTwoMaxHealth:
+            return [Constants.currentHealthAmountLabelName, Constants.totalHealthAmountLabelName]
+        case .plusOneMaxHealth:
+            return [Constants.currentHealthAmountLabelName, Constants.totalHealthAmountLabelName]
+        default:
+            return nil
+        }
+    }
+    
+    private func showIncreaseInStatByOne(offer: StoreOfferType, amountIncrease: Int) {
+        if let currencyLabelIdentifiers = labelNameForOfferType(offer: offer) {
+            for currencyLabelIdentifier in currencyLabelIdentifiers {
+                
+                // some items tick up multiple stats like +1 max health
+                var actions: [SKAction] = []
+                var waitTime = 0.05
+                for _ in 1..<amountIncrease+1 {
+                    let addNewLabel = SKAction.run {
+                        if let currencyLabel = self.childNode(withName: currencyLabelIdentifier) as? ParagraphNode,
+                           let currentTotal = Int(currencyLabel.text) {
+                            
+                            let parent = currencyLabel.parent
+                            
+                            let newCurrencyLabel = ParagraphNode(text: "\(currentTotal + 1)", paragraphWidth: Style.HUD.labelParagraphWidth, fontSize: .fontExtraLargeSize, fontColor: .lightText)
+                            newCurrencyLabel.position = currencyLabel.position
+                            newCurrencyLabel.name = currencyLabelIdentifier
+                            
+                            // remove it
+                            currencyLabel.removeFromParent()
+                            
+                            //add the new one
+                            parent?.addChildSafely(newCurrencyLabel)
+                        }
+                    }
+                    
+                    let sequence = SKAction.sequence([SKAction.wait(forDuration: waitTime), addNewLabel ])
+                    sequence.timingMode = .easeOut
+                    actions.append(sequence)
+                    
+                }
+                waitTime += 0.05
+                
+                if let currencyLabel = self.childNode(withName: currencyLabelIdentifier) as? ParagraphNode {
+                    currencyLabel.parent?.run(SKAction.sequence(actions))
+                }
+                
+            }
+        }
     }
     
     func incrementCurrencyCountByOne() {
@@ -268,7 +335,8 @@ class HUD: SKSpriteNode {
             addChildSafely(gainedGoldLabel)
             let moveUp = SKAction.move(by: CGVector(dx: 0, dy: 100), duration: AnimationSettings.HUD.goldGainedTime)
             let moveAndFade = SKAction.group([moveUp, SKAction.fadeOut(withDuration: AnimationSettings.HUD.gemCountFadeTime)])
-            let sequence = SKAction.sequence([moveAndFade, SKAction.removeFromParent()])
+            let sequence = SKAction.sequence([moveAndFade, .removeFromParent()])
+            sequence.timingMode = .easeIn
             gainedGoldLabel.run(sequence)
         }
     }

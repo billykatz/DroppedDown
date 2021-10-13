@@ -44,4 +44,7 @@ extension UserDefaults {
             }
         }
     }
+    
+    static let muteSoundKey = "muteSound"
+    static let showGroupNumberKey = "showRockGroupNumber"
 }

@@ -20,7 +20,7 @@ struct Animator {
     
     lazy var numberTextures: [NumberTextures] = {
         var array: [NumberTextures] = []
-        for number in [2, 3, 4, 5, 7] {
+        for number in [1, 2, 3] {
             for color in [ShiftShaft_Color.red, .blue, .purple] {
                 let entry = NumberTextures(number: number, color: color, texture: SKTexture(imageNamed: "number-\(number)-\(color.humanReadable.lowercased())"))
                 array.append(entry)
@@ -28,15 +28,6 @@ struct Animator {
         }
         return array
     }()
-    
-    lazy var numberTwoSpriteSheets: [ShiftShaft_Color: SpriteSheet] = {
-        var dict: [ShiftShaft_Color: SpriteSheet] = [:]
-        for color in [ShiftShaft_Color.red, .blue, .purple] {
-            dict[color] = SpriteSheet(texture: SKTexture(imageNamed: "number-2-\(color.humanReadable.lowercased())-spritesheet"), rows: 1, columns: 8)
-        }
-        return dict
-    }()
-    
     
     public func animateRune(_ rune: Rune,
                             transformations: [Transformation],
@@ -448,7 +439,8 @@ struct Animator {
         var whiteOutGemBaseSize = CGSize(width: tileSize, height: tileSize)
         
         let waitTimeDurationPerRock = 0.1
-        var waitTimeSubtractEachLoop = 0.005
+        var waitTimeSubtractEachLoop = 0.01
+        let minWaitTime = 0.01
         
         let numberOfGemsPerRock = numberOfGemsPerRockForGroup(size: coords.count)
 
@@ -551,8 +543,9 @@ struct Animator {
                 spriteActions.append(SpriteAction(sprite: whiteOutGem, action: whiteOutGemAction))
                 
                 
-                waitTime += max(0.01, waitTimeDurationPerRock - waitTimeSubtractEachLoop)
-                waitTimeSubtractEachLoop += 0.002
+                /// make sure we dont go negative
+                waitTime += max(minWaitTime, waitTimeDurationPerRock - waitTimeSubtractEachLoop)
+                waitTimeSubtractEachLoop += 0.005
             }
             
             

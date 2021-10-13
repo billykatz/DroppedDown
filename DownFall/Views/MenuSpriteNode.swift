@@ -11,7 +11,7 @@ import SpriteKit
 fileprivate func menuHeight(type: MenuType) -> CGFloat {
     switch type {
     case .pause:
-        return 825
+        return 925
     case .gameLose:
         return 700
     case .gameWin:
@@ -36,6 +36,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
     
     struct Constants {
         static let soundIconName = "soundSprite"
+        static let toggleIconName = "toggleSprite"
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -78,7 +79,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
     
     private func setupButtons(_ menuType: MenuType, _ playableRect: CGRect, precedence: Precedence, level: Level?, completedGoals: Int = 0, buttonDelegate: ButtonDelegate? = nil) {
         let menuSizeWidth = playableRect.size.width * menuType.widthCoefficient
-        let buttonSize = CGSize(width: 330, height: 125)
+        let buttonSize = CGSize(width: 375, height: 125)
         
         if menuType == .gameWin {
             
@@ -152,11 +153,27 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             soundButton.position = CGPoint.alignHorizontally(soundButton.frame, relativeTo: mainMenuButton.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: Style.Padding.more * 2, translatedToBounds: true)
             addChild(soundButton)
             
-            let onOff = UserDefaults.standard.bool(forKey: "muteSound") ? "off" : "on"
+            let onOff = UserDefaults.standard.bool(forKey: UserDefaults.muteSoundKey) ? "off" : "on"
             let soundIcon = SKSpriteNode(texture: SKTexture(imageNamed: "sound-\(onOff)"), size: CGSize(width: 75, height: 75))
             soundIcon.name = Constants.soundIconName
             soundIcon.position = CGPoint.alignVertically(soundIcon.frame, relativeTo: soundButton.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: Style.Padding.most, translatedToBounds: true)
             addChild(soundIcon)
+            
+            let rockGroupAmountButton = ShiftShaft_Button(size: buttonSize,
+                                                delegate: buttonDelegate ?? self,
+                                                identifier: .toggleShowGroupNumber,
+                                                precedence: precedence,
+                                                fontSize: .fontLargeSize,
+                                                fontColor: .black,
+                                                backgroundColor: .buttonGray)
+            rockGroupAmountButton.position = CGPoint.alignHorizontally(rockGroupAmountButton.frame, relativeTo: soundButton.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: Style.Padding.more * 2, translatedToBounds: true)
+            addChild(rockGroupAmountButton)
+            
+            let rockGroupAmountOnoff = UserDefaults.standard.bool(forKey: UserDefaults.showGroupNumberKey) ? "on" : "off"
+            let toggleRockAmountIcon = SKSpriteNode(texture: SKTexture(imageNamed: "toggle-\(rockGroupAmountOnoff)"), size: CGSize(width: 75, height: 50))
+            toggleRockAmountIcon.name = Constants.toggleIconName
+            toggleRockAmountIcon.position = CGPoint.alignVertically(toggleRockAmountIcon.frame, relativeTo: rockGroupAmountButton.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: Style.Padding.most, translatedToBounds: true)
+            addChild(toggleRockAmountIcon)
             
             
             let resumeButton = ShiftShaft_Button(size: buttonSize,
@@ -166,7 +183,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
                                                  fontSize: .fontLargeSize,
                                                  fontColor: .black,
                                                  backgroundColor: .buttonGray)
-            resumeButton.position = CGPoint.alignHorizontally(resumeButton.frame, relativeTo: soundButton.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: Style.Padding.more*2, translatedToBounds: true)
+            resumeButton.position = CGPoint.alignHorizontally(resumeButton.frame, relativeTo: rockGroupAmountButton.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: Style.Padding.more*2, translatedToBounds: true)
             addChild(resumeButton)
             
         }
@@ -381,14 +398,23 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             setup(.pause, playableRect: self.playableRect, precedence: self.precedence, level: self.level, buttonDelegate: self.buttonDelegate)
             
         case .toggleSound:
-            let muted = UserDefaults.standard.bool(forKey: "muteSound")
-            UserDefaults.standard.setValue(!muted, forKey: "muteSound")
+            let muted = UserDefaults.standard.bool(forKey: UserDefaults.muteSoundKey)
+            UserDefaults.standard.setValue(!muted, forKey: UserDefaults.muteSoundKey)
             
             guard let soundIcon = self.childNode(withName: Constants.soundIconName) as? SKSpriteNode else { return }
             let onOff = !muted ? "off" : "on"
             let newTexture = SKTexture(imageNamed: "sound-\(onOff)")
             soundIcon.texture = newTexture
             
+        case .toggleShowGroupNumber:
+            let show = UserDefaults.standard.bool(forKey: UserDefaults.showGroupNumberKey)
+            UserDefaults.standard.setValue(!show, forKey: UserDefaults.showGroupNumberKey)
+            
+            guard let toggleIcon = self.childNode(withName: Constants.toggleIconName) as? SKSpriteNode else { return }
+            let onOff = !show ? "on" : "off"
+            let newTexture = SKTexture(imageNamed: "toggle-\(onOff)")
+            toggleIcon.texture = newTexture
+
             
         // TODO: Remove DEBUG code
         case .debugPause:

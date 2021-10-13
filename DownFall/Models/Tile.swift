@@ -307,21 +307,76 @@ enum TileType: Hashable, CaseIterable, Codable {
         return TileType.item(.gold)
     }
     
+    private var isRock: Bool {
+        if case TileType.rock = self { return true }
+        return false
+    }
+    
+    public var sparkleSheetName: SpriteSheet? {
+        precondition(self.isRock, "Only call this for rocks")
+        
+        switch self {
+        case .rock(color: let color, holdsGem: let hasGem, groupCount: let groupCount):
+            guard hasGem else { return nil }
+            let gemTier = numberOfGemsPerRockForGroup(size: groupCount)
+            let spriteSheet = "\(color.humanReadable.lowercased())-rock-\(gemTier)-sparkle"
+            let numberOfColumns: Int
+            switch (color, gemTier) {
+            case (.blue, 1):
+                numberOfColumns = 6
+                
+            case (.blue, 2), (.blue, 3):
+                numberOfColumns = 13
+                
+            case (.red, 1):
+                numberOfColumns = 6
+                
+            case (.red, 2), (.red, 3):
+                numberOfColumns = 11
+                
+            case (.purple, 1):
+                numberOfColumns = 7
+                
+            case (.purple, 2), (.purple, 3):
+                numberOfColumns = 11
+                
+            default:
+                numberOfColumns = 1
+            }
+            
+            return SpriteSheet(textureName: spriteSheet, columns: numberOfColumns)
+            
+        default:
+            return nil
+        }
+    }
+    
+    var amountInGroup: Int {
+        switch self {
+            case .rock(_, _, let groupCount):
+                return groupCount
+        default:
+            return 0
+        }
+    }
+    
     private var textureName: String {
         switch self {
         case .rock(let color, let withGem, let groupCount):
+            let gemTier = numberOfGemsPerRockForGroup(size: groupCount)
             let withGemSuffix = withGem ? "WithGem" : ""
+            let gemTierSuffix = (gemTier > 0 && withGem) ? "\(gemTier)" : ""
             switch color {
             case .blue:
-                return "blueRock\(withGemSuffix)"
+                return "blueRock\(withGemSuffix)\(gemTierSuffix)"
             case .purple:
-                return "purpleRock\(withGemSuffix)"
+                return "purpleRock\(withGemSuffix)\(gemTierSuffix)"
             case .brown:
-                return "brownRock\(withGemSuffix)"
+                return "brownRock\(withGemSuffix)\(gemTierSuffix)"
             case .red:
-                return "redRock\(withGemSuffix)"
+                return "redRock\(withGemSuffix)\(gemTierSuffix)"
             case .green:
-                return "greenRock\(withGemSuffix)"
+                return "greenRock\(withGemSuffix)\(gemTierSuffix)"
             case .blood:
                 fatalError()
             }
@@ -460,10 +515,8 @@ extension TileType {
             hasher.combine(data)
         case .dynamite(let data):
             hasher.combine(data)
-        case .rock(let color, let hasGem, let groupCount):
+        case .rock(let color, _,_):
             hasher.combine(color)
-//            hasher.combine(hasGem)
-//            hasher.combine(groupCount)
         case .offer(let offer):
             hasher.combine(offer)
         case .emptyGem(let color, amount: let amount):

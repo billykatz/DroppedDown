@@ -36,9 +36,6 @@ struct Identifiers {
             static let blueRockCrumble = "blueRockCrumble"
             static let purpleRockCrumble = "purpleRockCrumble"
             
-            static let redRockWithGem = "redRockWithGemSpriteSheet"
-            static let blueRockWithGem = "blueRockWithGemSpriteSheet"
-            static let purpleRockWithGem = "purpleRockWithGemSpriteSheet"
         
         }
     }

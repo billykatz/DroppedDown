@@ -176,7 +176,7 @@ class DFTileSpriteNode: SKSpriteNode {
         let xAmountLabel = ParagraphNode(text: "x\(amount)", fontSize: fontSize, fontColor: .black)
         xAmountLabel.zPosition = 101
         
-        background.position = CGPoint.position(background.frame, inside: self.frame, verticalAlign: .bottom, horizontalAnchor: .right)//, xOffset: 10, yOffset: 10)
+        background.position = CGPoint.position(background.frame, inside: self.frame, verticalAlign: .bottom, horizontalAnchor: .right)
         
         xAmountLabel.position = CGPoint.position(xAmountLabel.frame, inside: background.frame, verticalAlign: .center, horizontalAnchor: .right, xOffset: 4, translatedToBounds: true)
         
@@ -263,24 +263,15 @@ class DFTileSpriteNode: SKSpriteNode {
     func sparkle() -> SKAction? {
         
         var animationFrames: [SKTexture] = []
-        let amount: Int
         switch self.type {
-        case .rock(.red, let withGem, let groupCount):
-            guard withGem else { return nil }
-            amount = groupCount
-            animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.redRockWithGem), rows: 1, columns: 11).animationFrames()
-        case .rock(.blue, let withGem, let groupCount):
-            guard withGem else { return nil }
-            amount = groupCount
-            animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.blueRockWithGem), rows: 1, columns: 13).animationFrames()
-        case .rock(.purple, let withGem, let groupCount):
-            guard withGem else { return nil }
-            amount = groupCount
-            animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.purpleRockWithGem), rows: 1, columns: 10).animationFrames()
+        case .rock(.red, _, _), .rock(.blue, _, _), .rock(.purple, _, _):
+            guard let spriteSheet = self.type.sparkleSheetName else { return nil }
+            animationFrames = spriteSheet.animationFrames()
         default:
-            amount = 0
             return nil
         }
+        
+        let amount = self.type.amountInGroup
         
         /// Wait for a random amount of time
         let waitAction = SKAction.wait(forDuration: TimeInterval(Int.random(lower: 2, upper: 10)),
@@ -296,7 +287,7 @@ class DFTileSpriteNode: SKSpriteNode {
         
         
         //debug
-        if amount > 0 {
+        if amount > 0 && UserDefaults.standard.bool(forKey: UserDefaults.showGroupNumberKey) {
             let fontSize: CGFloat
             let width: CGFloat
             if amount < 10 {
@@ -309,23 +300,22 @@ class DFTileSpriteNode: SKSpriteNode {
                 fontSize = 46
                 width = self.size.width*0.56
             }
-            
+
             let background = SKShapeNode(rectOf: CGSize(width: width, height: self.size.height*0.35), cornerRadius: 16.0)
             background.color = .buttonGray
             background.zPosition = 100
-            
+
             let xAmountLabel = ParagraphNode(text: "\(amount)", fontSize: fontSize, fontColor: .black)
             xAmountLabel.zPosition = 101
-            
+
             background.position = CGPoint.position(background.frame, inside: self.frame, verticalAlign: .bottom, horizontalAnchor: .right)
-            
+
             xAmountLabel.position = CGPoint.position(xAmountLabel.frame, inside: background.frame, verticalAlign: .center, horizontalAnchor: .center, xOffset: 4, translatedToBounds: true)
-            
+
             self.addChild(background)
             self.addChild(xAmountLabel)
         }
 
-//        return nil
         return repeatForever
     }
     

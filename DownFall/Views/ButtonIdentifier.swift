@@ -59,6 +59,7 @@ enum ButtonIdentifier: String {
     case discardFoundRune
     case swapRunes
     case toggleSound
+    case toggleShowGroupNumber
     case givePlayerRune
     case debugPause
     case debugWin
@@ -122,6 +123,8 @@ enum ButtonIdentifier: String {
             return "Swap Runes"
         case .toggleSound:
             return "Sound"
+        case .toggleShowGroupNumber:
+            return "Rock Group Total"
         case .givePlayerRune:
             return "Give Player Random Rune"
         case .debugPause:

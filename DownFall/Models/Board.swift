@@ -1488,31 +1488,19 @@ extension Board {
 }
 
 
-func numberOfGemsForGroup(size: Int) -> Int {
-    if (3...5).contains(size) {
-        return 2*size
-    } else if (6...10).contains(size) {
-        return 3*size
-    } else if (10...20).contains(size) {
-        return 4*size
-    } else if (20...35).contains(size) {
-        return 5*size
-    } else {
-        return 7*size
-    }
+fileprivate func numberOfGemsForGroup(size: Int) -> Int {
+    let numberPerRock = numberOfGemsPerRockForGroup(size: size)
+    return numberPerRock * size
 }
 
 func numberOfGemsPerRockForGroup(size: Int) -> Int {
-    if (3...5).contains(size) {
+    if (1...9).contains(size) {
+        return 1
+    } else if (10...29).contains(size) {
         return 2
-    } else if (6...10).contains(size) {
+    } else if (30...Int.max).contains(size) {
         return 3
-    } else if (11...20).contains(size) {
-        return 4
-    } else if (21...35).contains(size) {
-        return 5
-    } else {
-        return 7
     }
+    return 0
 }
 

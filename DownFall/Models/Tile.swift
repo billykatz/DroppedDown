@@ -56,12 +56,9 @@ enum ShiftShaft_Color: String, Codable, CaseIterable, Hashable {
 
 struct Tile: Hashable, Codable {
     let type: TileType
-    var tutorialHighlight: Bool
     
-    init(type: TileType,
-         tutorialHighlight: Bool = false) {
+    init(type: TileType) {
         self.type = type
-        self.tutorialHighlight = tutorialHighlight
     }
     
     static var exit: Tile {

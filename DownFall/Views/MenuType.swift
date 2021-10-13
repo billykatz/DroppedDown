@@ -12,8 +12,6 @@ enum MenuType {
     case pause
     case gameWin
     case rotate
-    case tutorial1Win
-    case tutorial2Win
     case gameLose
     case confirmation
     case debug
@@ -36,8 +34,6 @@ enum MenuType {
             return ButtonIdentifier.visitStore
         case .rotate:
             return ButtonIdentifier.rotate
-        case .tutorial1Win, .tutorial2Win:
-            return ButtonIdentifier.visitStore
         case .gameLose:
             return ButtonIdentifier.playAgain
         case .confirmation:

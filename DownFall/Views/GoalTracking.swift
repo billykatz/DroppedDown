@@ -66,16 +66,16 @@ struct GoalTracking: Codable, Hashable {
                 switch tileType {
                 case .rock:
                     if grouped {
-                        return "Mine \(target) groups of \(minimumAmount)+"
+                        return "Mine \(target) groups of at least \(minimumAmount) rocks"
                     } else {
                         return "Mine \(target) rocks"
                     }
                 case .monster:
-                    return "Destroy \(target) monsters"
+                    return "Destroy \(target) monster\(target > 1 ? "s" : "")"
                 case .gem:
                     return "Collect \(target) gem\(target > 1 ? "s" : "")"
                 case .pillar:
-                    return "Destroy \(target) individual pillars"
+                    return "Destroy \(target) individual pillars\(target > 1 ? "s" : "")"
                 default:
                     return ""
                 }

@@ -1240,7 +1240,7 @@ extension Board {
         let (tiles, newLevel) = tileCreator.board(difficulty: difficulty)
         
         //init new board
-        return Board(tileCreator: tileCreator, tiles: tiles, level: level, boardLoaded: newLevel)
+        return Board(tileCreator: tileCreator, tiles: tiles, level: level, boardLoaded: !newLevel)
     }
 }
 

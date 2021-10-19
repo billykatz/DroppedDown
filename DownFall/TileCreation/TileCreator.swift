@@ -34,7 +34,7 @@ class TileCreator: TileStrategy {
     let entities: EntitiesModel
     let difficulty: Difficulty
     var updatedEntity: EntityModel?
-    let tutorialConductor: TutorialConductor?
+    let tutorialConductor: TutorialConductor
     let boardSize: Int
     var level: Level
     var loadedTiles: [[Tile]]?
@@ -55,7 +55,7 @@ class TileCreator: TileStrategy {
                   level: Level,
                   randomSource: GKLinearCongruentialRandomSource,
                   loadedTiles: [[Tile]]? = [],
-                  tutorialConductor: TutorialConductor?) {
+                  tutorialConductor: TutorialConductor) {
         self.entities = entities
         self.difficulty = difficulty
         self.updatedEntity = updatedEntity
@@ -64,7 +64,7 @@ class TileCreator: TileStrategy {
         self.boardSize = level.boardSize
         self.tutorialConductor = tutorialConductor
         
-        print("loadedTiles is not nil \(loadedTiles != nil)")
+        print("loadedTiles is nil \(loadedTiles == nil)")
         self.loadedTiles = loadedTiles
     }
     
@@ -151,9 +151,9 @@ class TileCreator: TileStrategy {
     }
     
     func shouldRockHoldGem(playerData: EntityModel, rockColor: ShiftShaft_Color, shouldSpawnAtleastOneGem: Bool) -> Bool {
-        if tutorialConductor != nil {
-            return false
-        }
+        // early return if we are in the tutorial
+        guard !tutorialConductor.isTutorial else { return false }
+        
         let extraGemsBasedOnLuck = playerData.luck / 5
         let extraChanceBasedOnLuck = extraGemsBasedOnLuck * 2
         guard specialGems < level.maxSpawnGems + extraGemsBasedOnLuck else { return false }
@@ -188,7 +188,7 @@ class TileCreator: TileStrategy {
             
             switch nextTile.type {
             case .monster:
-                validTile = (!neighbors.contains {  $0.type == .monster(.zero) || $0.type == .player(.zero) } && !noMoreMonsters && (tutorialConductor == nil)) || (tutorialConductor != nil && forceMonsters)
+                validTile = (!neighbors.contains {  $0.type == .monster(.zero) || $0.type == .player(.zero) } && !noMoreMonsters && !tutorialConductor.isTutorial) || (tutorialConductor.isTutorial && forceMonsters)
             case .rock(.red, _, _), .rock(.purple, _, _), .rock(.blue, _, _), .rock(.brown, _, _):
                 validTile = true
             case .exit, .player, .rock(.green, _, _), .empty, .pillar, .dynamite, .emptyGem, .item, .offer, .rock(color: .blood, _, _):
@@ -294,7 +294,7 @@ class TileCreator: TileStrategy {
         guard let playerData = updatedEntity else { preconditionFailure("Unable to create a board without a player") }
         
         
-        if tutorialConductor != nil {
+        if tutorialConductor.isTutorial {
             var newTutorialBoard: [[Tile]] = Array.init(repeating: Array.init(repeating: .empty, count: 8), count: 8)
 
             for row in 0..<TileCreator.tutorialBoard.count {

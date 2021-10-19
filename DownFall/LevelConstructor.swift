@@ -35,7 +35,7 @@ struct LevelConstructor {
     
     static func potentialItems(depth: Depth, unlockables: [Unlockable], startingUnlockables: [Unlockable], playerData: EntityModel, randomSource: GKLinearCongruentialRandomSource, isTutorial: Bool) -> [StoreOffer] {
         
-        guard !isTutorial else {
+        if depth == 0 && isTutorial {
             return [
                 StoreOffer.offer(type: .dodge(amount: 5), tier: 1),
                 StoreOffer.offer(type: .luck(amount: 5), tier: 1)
@@ -195,7 +195,7 @@ struct LevelConstructor {
             
         case 2,3:
             let monsterAmount = Int(Double(boardSize(depth: depth)) * Double(boardSize(depth: depth)) * maxMonsterOnBoardRatio(depth: depth))
-            let rockGoal = randomRockGoal([.red, .purple, .blue], amount: Int.random(lower: 30, upper: 35, interval: 5))
+            let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 30)
             let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
             
             goals = [rockGoal, monsterGoal]

@@ -10,12 +10,14 @@ import SpriteKit
 
 class DialogueView: SKSpriteNode {
     
+    // Style constants
     let totalDialogueSize = CGSize(width: 834, height: 381)
-    let dialogueBoxSize = CGSize(width: 550, height: 360)
+    let dialogueBoxSize = CGSize(width: 534, height: 360)
     let characterBox = CGSize(width: 220, height: 220)
     let characterNameBox = CGSize(width: 292, height: 87)
     let dialogueLabelName = "dialogueLabelName"
     let dialogSpriteName = "dialog"
+    let sentenceFontSize: CGFloat = 60
     
     var containerView: SKSpriteNode
     var finishedTyping: Bool = false
@@ -31,14 +33,6 @@ class DialogueView: SKSpriteNode {
         let dialogueBackgroundImage = SKSpriteNode(texture: SKTexture(imageNamed: dialogSpriteName), size: totalDialogueSize)
         dialogueBackgroundImage.zPosition = -1
         
-//        let dialogueBox = SKShapeNode(rectOf: dialogueBoxSize, cornerRadius: 24.0)
-//        dialogueBox.strokeColor = .white
-//        dialogueBox.fillColor = .dialogueBoxBackground
-//        dialogueBox.lineWidth = 16.0
-//        
-//        dialogueBox.position = CGPoint.position(dialogueBox.frame, inside: containerView.frame, verticalAlign: .bottom, horizontalAnchor: .left)
-        
-        
         let character = SKSpriteNode(texture: SKTexture(imageNamed: dialogue.character.textureName), size: characterBox)
         character.xScale = -1
         character.zPosition = 100000
@@ -49,8 +43,9 @@ class DialogueView: SKSpriteNode {
         characterNameLabel.position = CGPoint.alignVertically(characterNameLabel.frame, relativeTo: character.frame, horizontalAnchor: .right, verticalAlign: .top, verticalPadding: -24,  horizontalPadding: -8,  translatedToBounds: true)
         characterNameLabel.zPosition = 100000
         
+        // empty sprite to position the dialog text area
         let emptySprite = SKSpriteNode(color: .clear, size: dialogueBoxSize)
-        emptySprite.position = CGPoint.alignHorizontally(emptySprite.frame, relativeTo: characterNameLabel.frame, horizontalAnchor: .left, verticalAlign: .bottom, translatedToBounds: true)
+        emptySprite.position = CGPoint.alignHorizontally(emptySprite.frame, relativeTo: characterNameLabel.frame, horizontalAnchor: .left, verticalAlign: .bottom, verticalPadding: 8.0, translatedToBounds: true)
         
         dialogueFrame = emptySprite.frame
         
@@ -65,12 +60,17 @@ class DialogueView: SKSpriteNode {
         showNextSentence()
     }
     
-    func showFullSentence() {
+    func dialogBoxPosition(_ thisFrame: CGRect) -> CGPoint {
+        return CGPoint.position(thisFrame, inside: dialogueFrame, verticalAlign: .top, horizontalAnchor: .left, translatedToBounds: true)
+    }
+    
+    // Called to skip the typing animation and just show the full sentence
+    public func showFullSentence() {
         let sentence = dialogue.sentences[sentenceIndex]
         
         let dialogueLabel = ParagraphNode(text: String(sentence), paragraphWidth: dialogueFrame.width, fontSize: sentenceFontSize, fontColor: .white)
         
-        dialogueLabel.position = CGPoint.position(dialogueLabel.frame, inside: dialogueFrame, verticalAlign: .top, horizontalAnchor: .left, translatedToBounds: true)
+        dialogueLabel.position = dialogBoxPosition(dialogueLabel.frame)
         dialogueLabel.zPosition = 100000
         
         if let currentLabel = containerView.childNode(withName: dialogueLabelName) {
@@ -88,6 +88,7 @@ class DialogueView: SKSpriteNode {
 
     }
     
+    // Public function that determines if the dialog is finished or not
     public func canShowNextSentence() -> Bool {
         sentenceIndex += 1
         if sentenceIndex >= dialogue.sentences.count {
@@ -98,14 +99,12 @@ class DialogueView: SKSpriteNode {
         
     }
     
-    let sentenceFontSize: CGFloat = 60
-    
     func showNextSentence() {
         
         finishedTyping = false
         
-        let dialogueLabel = ParagraphNode(text: dialogue.sentences[sentenceIndex], paragraphWidth: dialogueFrame.width, fontSize: sentenceFontSize, fontColor: .white)
-        dialogueLabel.position = CGPoint.position(dialogueLabel.frame, inside: dialogueFrame, verticalAlign: .top, horizontalAnchor: .left, translatedToBounds: true)
+//        let dialogueLabel = ParagraphNode(text: dialogue.sentences[sentenceIndex], paragraphWidth: dialogueFrame.width, fontSize: sentenceFontSize, fontColor: .white)
+//        dialogueLabel.position = dialogBoxPosition(dialogueLabel.frame)
         
         var waitTime = dialogue.delayBeforeTyping
         let waitIncrement = 0.025
@@ -117,14 +116,14 @@ class DialogueView: SKSpriteNode {
             let waitAction = SKAction.wait(forDuration: waitTime)
             
             let createLabelAction = SKAction.run { [containerView, sentenceIndex, dialogueLabelName, dialogueFrame, dialogue, sentenceFontSize, weak self] in
+                guard let self = self else { return }
                 let sentence = dialogue.sentences[sentenceIndex]
                 let endIndex = sentence.index(sentence.startIndex, offsetBy: index+1)
                 let subsentence = dialogue.sentences[sentenceIndex][sentence.startIndex..<endIndex]
                 
                 let dialogueLabel = ParagraphNode(text: String(subsentence), paragraphWidth: dialogueFrame.width, fontSize: sentenceFontSize, fontColor: .white)
                 
-                dialogueLabel.position = CGPoint.position(dialogueLabel.frame, inside: dialogueFrame, verticalAlign: .top, horizontalAnchor: .left, translatedToBounds: true)
-                
+                dialogueLabel.position = self.dialogBoxPosition(dialogueLabel.frame)
                 
                 if let currentLabel = containerView.childNode(withName: dialogueLabelName) {
                     currentLabel.removeFromParent()
@@ -136,7 +135,7 @@ class DialogueView: SKSpriteNode {
                 containerView.addChild(dialogueLabel)
                 
                 if endIndex == sentence.endIndex {
-                    self?.finishedTyping = true
+                    self.finishedTyping = true
                 }
 
             }

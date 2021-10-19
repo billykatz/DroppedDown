@@ -71,6 +71,19 @@ struct PlayerStatsView: View {
     
     var body: some View {
         ScrollView{
+            Button(action: {
+                UserDefaults.standard.setValue(false, forKey: UserDefaults.hasStartedTutorialKey)
+                UserDefaults.standard.setValue(false, forKey: UserDefaults.hasCompletedTutorialKey)
+                UserDefaults.standard.setValue(false, forKey: UserDefaults.hasDiedDuringTutorialKey)
+                UserDefaults.standard.setValue(false, forKey: UserDefaults.hasLaunchedBeforeKey)
+                
+            }) {
+                Text("Reset tutorial flags")
+                    .foregroundColor(.white)
+                    .frame(width: 200, height: 75)
+                    .background(Color(.backgroundGray))
+                    .cornerRadius(5.0)
+            }
             HStack {
                 CodexWalletView(gemAmount: gemAmount)
                 #if DEBUG

@@ -45,6 +45,10 @@ class Renderer: SKSpriteNode {
         return MenuSpriteNode(.pause, playableRect: self.playableRect, precedence: .menu, level: self.level)
     }()
     
+    private lazy var tutorialPauseNode: MenuSpriteNode = {
+        return MenuSpriteNode(.tutorialPause, playableRect: self.playableRect, precedence: .menu, level: self.level)
+    }()
+    
     private lazy var gameWinSpriteNode: MenuSpriteNode = {
         return MenuSpriteNode(.gameWin, playableRect: self.playableRect, precedence: .menu, level: self.level)
     }()
@@ -284,7 +288,11 @@ class Renderer: SKSpriteNode {
         case .pause:
             // show the menu
             foreground.addChild(menuForeground)
-            menuForeground.addChildSafely(menuSpriteNode)
+            if (tutorialConductor?.isInFirstLevelOfTutorial ?? false) {
+                menuForeground.addChildSafely(tutorialPauseNode)
+            } else {
+                menuForeground.addChildSafely(menuSpriteNode)
+            }
         case .gameLose:
             menuForeground.addChild(gameLoseSpriteNode)
             foreground.addChildSafely(menuForeground)
@@ -310,7 +318,7 @@ class Renderer: SKSpriteNode {
         
         let dialogueOverlay = DialogueOverlay(playableRect: playableRect, foreground: foreground, tutorialPhase: phase, levelGoalViewOrigin: levelGoalView.position) { [weak self] tileType in
             // convert the sprites to tile types
-            guard let tileTypeToHighlight = phase.highlightTileType else { return nil }
+            guard let _ = phase.highlightTileType else { return nil }
             guard let sprites = self?.sprites,
                   let first = typeCount(for: sprites.map{ $0.map { $0.type } }, of: tileType).first else { return .zero }
             

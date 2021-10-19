@@ -296,7 +296,7 @@ class TileDetailView: SKSpriteNode {
         addBorder(toView: contentView)
         
         // add the background overlay
-        addBackgroundOverlay()
+//        addBackgroundOverlay()
     }
     
     func updateLevelGoals() {

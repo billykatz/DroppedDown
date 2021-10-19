@@ -39,11 +39,10 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
     var codexCoordinator: CodexCoordinator
     var settingsCoordinator: SettingsCoordinator
     var profileViewModel: ProfileViewModel?
+    var tutorialConductor: TutorialConductor?
     
     // hack for now, remove later
     var playerTappedOnStore: Bool = false
-    
-    var isTutorial: Bool = false
     
     private lazy var mainMenuScene: MainMenu? = {
         guard let scene = GKScene(fileNamed: Identifiers.mainMenuScene)?.rootNode as? MainMenu else { return nil }
@@ -52,10 +51,11 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
         return scene
     }()
     
-    init(levelCoordinator: LevelCoordinating, codexCoordinator: CodexCoordinator, settingsCoordinator: SettingsCoordinator, view: SKView) {
+    init(levelCoordinator: LevelCoordinating, codexCoordinator: CodexCoordinator, settingsCoordinator: SettingsCoordinator, tutorialConductor: TutorialConductor, view: SKView) {
         self.levelCoordinator = levelCoordinator
         self.codexCoordinator = codexCoordinator
         self.settingsCoordinator = settingsCoordinator
+        self.tutorialConductor = tutorialConductor
         self.view = view
     }
     
@@ -86,7 +86,6 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
         if hasLaunchedBefore {
             presentMainMenu()
         } else {
-            isTutorial = true
             newGame(profileViewModel?.profile.player)
         }
     }
@@ -94,12 +93,12 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
     func newGame(_ playerModel: EntityModel?) {
         profileViewModel?.nilCurrenRun()
         playerTappedOnStore = false
-        levelCoordinator.loadRun(nil, profile: profileViewModel!.profile, isTutorial: self.isTutorial)
+        levelCoordinator.loadRun(nil, profile: profileViewModel!.profile)
     }
     
     func continueRun() {
         playerTappedOnStore = false
-        levelCoordinator.loadRun(profileViewModel!.profile.currentRun, profile: profileViewModel!.profile, isTutorial: false)
+        levelCoordinator.loadRun(profileViewModel!.profile.currentRun, profile: profileViewModel!.profile)
     }
     
     func finishGame(playerData updatedPlayerData: EntityModel, currentRun: RunModel) {

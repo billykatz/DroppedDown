@@ -82,11 +82,10 @@ class GameScene: SKScene {
                            randomSource: GKLinearCongruentialRandomSource?,
                            stats: [Statistics],
                            loadedTiles: [[Tile]]? = [],
-                           isTutorial: Bool) {
+                           tutorialConductor: TutorialConductor) {
+        
         // create the tutorial conductor
-        if isTutorial {
-            tutorialConductor = TutorialConductor()
-        }
+        self.tutorialConductor = tutorialConductor
         
         // init our level
         self.level = level
@@ -118,6 +117,9 @@ class GameScene: SKScene {
         // create the audio listener
         let audioManager = AudioManager(sceneNode: foreground)
         audioListener = AudioEventListener(audioManager: audioManager)
+        
+        // start the tutorial conductor
+        tutorialConductor.startHandlingInput()
         
         
     }
@@ -161,16 +163,19 @@ class GameScene: SKScene {
                 self.removeFromParent()
                 self.swipeRecognizerView?.removeFromSuperview()
                 
-                if (self.tutorialConductor != nil ){
-                    UserDefaults.standard.setValue(true, forKey: UserDefaults.hasCompletedTutorialKey)
-                }
-                
                 self.gameSceneDelegate?.goToNextArea(updatedPlayerData: data)
             
             } else if case InputType.gameWin(_) = input.type {
                 guard let self = self else { return }
                 // this is to save the state at the end of the level.  
                 self.gameSceneDelegate?.saveState()
+                
+                self.tutorialConductor?.setTutorialCompleted(playerDied: false)
+                
+            } else if case InputType.gameLose = input.type {
+                guard let self = self else { return }
+                
+                self.tutorialConductor?.setTutorialCompleted(playerDied: true)
             } else if case InputType.loseAndGoToStore = input.type {
                 guard let self = self,
                       let board = self.board,
@@ -189,6 +194,7 @@ class GameScene: SKScene {
 
         //Turn watcher
         TurnWatcher.shared.register()
+        
     }
     
     public func prepareForReuse() {
@@ -200,7 +206,6 @@ class GameScene: SKScene {
         rotatePreview = nil
         audioListener = nil
         runStatTracker = nil
-        tutorialConductor = nil
         swipeRecognizerView?.removeFromSuperview()
         InputQueue.reset()
         Dispatch.shared.reset()

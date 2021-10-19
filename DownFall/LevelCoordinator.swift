@@ -14,8 +14,8 @@ protocol LevelCoordinating: GameSceneCoordinatingDelegate {
     var gameSceneNode: GameScene? { get set }
     var entities: EntitiesModel? { get set }
     var delegate: MenuCoordinating? { get set }
-    func presentNextLevel(_ level: Level, playerData: EntityModel?, savedTiles: [[Tile]]?, isTutorial: Bool)
-    func loadRun(_ runModel: RunModel?, profile: Profile, isTutorial: Bool)
+    func presentNextLevel(_ level: Level, playerData: EntityModel?, savedTiles: [[Tile]]?)
+    func loadRun(_ runModel: RunModel?, profile: Profile)
     func saveAllState() -> RunModel
     
     // Exposed so that we can save the current run
@@ -31,19 +31,21 @@ class LevelCoordinator: LevelCoordinating {
     weak var delegate: MenuCoordinating?
     var gameSceneNode: GameScene?
     var entities: EntitiesModel?
+    let tutorialConductor: TutorialConductor
     let view: SKView
     
     /// Set default so we dont have to deal with optionality
     private(set) var runModel: RunModel = .zero
     
-    init(gameSceneNode: GameScene, entities: EntitiesModel, view: SKView) {
+    init(gameSceneNode: GameScene, entities: EntitiesModel, tutorialConductor: TutorialConductor, view: SKView) {
         self.gameSceneNode = gameSceneNode
         self.entities = entities
+        self.tutorialConductor = tutorialConductor
         self.view = view
         
     }
     
-    func presentNextLevel(_ level: Level, playerData: EntityModel?, savedTiles: [[Tile]]? = [], isTutorial: Bool) {
+    func presentNextLevel(_ level: Level, playerData: EntityModel?, savedTiles: [[Tile]]? = []) {
         gameSceneNode?.prepareForReuse()
         if let scene = GKScene(fileNamed: "GameScene")?.rootNode as? GameScene,
            let entities = entities {
@@ -58,7 +60,7 @@ class LevelCoordinator: LevelCoordinating {
                                       randomSource: runModel.randomSource,
                                       stats: runModel.stats,
                                       loadedTiles: savedTiles,
-                                      isTutorial: isTutorial)
+                                      tutorialConductor: tutorialConductor)
             
             view.presentScene(gameSceneNode)
             view.ignoresSiblingOrder = true
@@ -73,23 +75,23 @@ class LevelCoordinator: LevelCoordinating {
     }
     
     /// Creates a run and loads it if no current run is available
-    func loadRun(_ runModel: RunModel?, profile: Profile, isTutorial: Bool) {
+    func loadRun(_ runModel: RunModel?, profile: Profile) {
         let seed = UInt64.random(in: .min ... .max)
         
         // no saved tiles for fresh run
-        let freshRunModel = RunModel(player: profile.runPlayer, seed: seed, savedTiles: nil, areas: [], goalTracking: [], stats: [], unlockables: profile.unlockables, startingUnlockables: profile.startingUnlockbles, isTutorial: isTutorial)
+        let freshRunModel = RunModel(player: profile.runPlayer, seed: seed, savedTiles: nil, areas: [], goalTracking: [], stats: [], unlockables: profile.unlockables, startingUnlockables: profile.startingUnlockbles, isTutorial: tutorialConductor.isTutorial)
         
         self.runModel = runModel ?? freshRunModel
         RunScope.deepestDepth = profile.stats.filter( { $0.statType == .lowestDepthReached }).map { $0.amount }.first ?? 0
-        presentCurrentArea(updatedPlayerData: profile.runPlayer, isTutorial: isTutorial)
+        presentCurrentArea(updatedPlayerData: profile.runPlayer)
     }
     
     /// This should be used when you want load the run from the last part
-    func presentCurrentArea(updatedPlayerData: EntityModel, isTutorial: Bool) {
+    func presentCurrentArea(updatedPlayerData: EntityModel) {
         let nextArea = runModel.currentArea(updatedPlayerData: updatedPlayerData)
         switch nextArea.type {
         case .level(let level):
-            presentNextLevel(level, playerData: runModel.player, savedTiles: runModel.savedTiles, isTutorial: isTutorial)
+            presentNextLevel(level, playerData: runModel.player, savedTiles: runModel.savedTiles)
         }
     }
     
@@ -98,7 +100,7 @@ class LevelCoordinator: LevelCoordinating {
         let nextArea = runModel.nextArea(updatedPlayerData: updatedPlayerData)
         switch nextArea.type {
         case .level(let level):
-            presentNextLevel(level, playerData: runModel.player, isTutorial: isTutorial)
+            presentNextLevel(level, playerData: runModel.player)
         }
     }
     

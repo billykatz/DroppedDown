@@ -13,6 +13,7 @@ enum ButtonIdentifier: String {
     
     case yesAbandonRun
     case doNotAbandonRun
+    case doNotAbandonTutorial
     
     case runeReplacementCancel
     
@@ -38,6 +39,7 @@ enum ButtonIdentifier: String {
     case backpackConfirm
     case mainMenu
     case pausedExitToMainMenu
+    case tutorialPausedExitToMainMenu
     case cycleLevel
     case seeInventory
     case shuffleBoard
@@ -99,6 +101,8 @@ enum ButtonIdentifier: String {
             return "Confirm"
         case .mainMenu, .pausedExitToMainMenu:
             return "Exit to Menu"
+        case .tutorialPausedExitToMainMenu:
+            return "Exit Tutorial"
         case .cycleLevel:
             return "Level select"
         case .seeInventory:
@@ -138,7 +142,7 @@ enum ButtonIdentifier: String {
             
         case .yesAbandonRun, .mainMenuAbandonRun:
             return "Abandon run"
-        case .doNotAbandonRun:
+        case .doNotAbandonRun, .doNotAbandonTutorial:
             return "Cancel"
             
         case .mainMenuContinueRun:

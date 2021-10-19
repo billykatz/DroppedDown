@@ -10,14 +10,16 @@ import SpriteKit
 
 fileprivate func menuHeight(type: MenuType) -> CGFloat {
     switch type {
-    case .pause:
-        return 925
+    case .pause, .tutorialPause:
+        return 950
     case .gameLose:
         return 700
     case .gameWin:
         return 500
     case .confirmation:
         return 750
+    case .tutorialConfirmation:
+        return 825
     case .detectedSavedGame:
         return 800
     default:
@@ -187,6 +189,82 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             addChild(resumeButton)
             
         }
+        else if menuType == .tutorialPause {
+            
+            let titleText = "Paused"
+            let titleNode = ParagraphNode.labelNode(text: titleText, paragraphWidth: menuSizeWidth * 0.95,
+                                                    fontSize: .fontExtraLargeSize)
+            
+            titleNode.position = CGPoint.position(titleNode.frame, inside: self.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most * 2)
+            
+            
+            
+            let bodyText = "Tutorial"
+            let bodyNode = ParagraphNode.labelNode(text: bodyText, paragraphWidth: menuSizeWidth * 0.95,
+                                                   fontSize: .fontMediumSize)
+            
+            bodyNode.position = CGPoint.alignHorizontally(bodyNode.frame, relativeTo: titleNode.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.most, translatedToBounds: true)
+            
+            
+            addChild(titleNode)
+            addChild(bodyNode)
+            
+            let mainMenuButton = ShiftShaft_Button(size: buttonSize,
+                                                   delegate: buttonDelegate ?? self,
+                                                   identifier: .tutorialPausedExitToMainMenu,
+                                                   precedence: precedence,
+                                                   fontSize: .fontLargeSize,
+                                                   fontColor: .black,
+                                                   backgroundColor: .buttonGray)
+            mainMenuButton.position = CGPoint.position(mainMenuButton.frame, inside: self.frame, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: Style.Padding.most * 2)
+            addChild(mainMenuButton)
+            
+            
+            let soundButton = ShiftShaft_Button(size: buttonSize,
+                                                delegate: buttonDelegate ?? self,
+                                                identifier: .toggleSound,
+                                                precedence: precedence,
+                                                fontSize: .fontLargeSize,
+                                                fontColor: .black,
+                                                backgroundColor: .buttonGray)
+            soundButton.position = CGPoint.alignHorizontally(soundButton.frame, relativeTo: mainMenuButton.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: Style.Padding.more * 2, translatedToBounds: true)
+            addChild(soundButton)
+            
+            let onOff = UserDefaults.standard.bool(forKey: UserDefaults.muteSoundKey) ? "off" : "on"
+            let soundIcon = SKSpriteNode(texture: SKTexture(imageNamed: "sound-\(onOff)"), size: CGSize(width: 75, height: 75))
+            soundIcon.name = Constants.soundIconName
+            soundIcon.position = CGPoint.alignVertically(soundIcon.frame, relativeTo: soundButton.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: Style.Padding.most, translatedToBounds: true)
+            addChild(soundIcon)
+            
+            let rockGroupAmountButton = ShiftShaft_Button(size: buttonSize,
+                                                delegate: buttonDelegate ?? self,
+                                                identifier: .toggleShowGroupNumber,
+                                                precedence: precedence,
+                                                fontSize: .fontLargeSize,
+                                                fontColor: .black,
+                                                backgroundColor: .buttonGray)
+            rockGroupAmountButton.position = CGPoint.alignHorizontally(rockGroupAmountButton.frame, relativeTo: soundButton.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: Style.Padding.more * 2, translatedToBounds: true)
+            addChild(rockGroupAmountButton)
+            
+            let rockGroupAmountOnoff = UserDefaults.standard.bool(forKey: UserDefaults.showGroupNumberKey) ? "on" : "off"
+            let toggleRockAmountIcon = SKSpriteNode(texture: SKTexture(imageNamed: "toggle-\(rockGroupAmountOnoff)"), size: CGSize(width: 75, height: 50))
+            toggleRockAmountIcon.name = Constants.toggleIconName
+            toggleRockAmountIcon.position = CGPoint.alignVertically(toggleRockAmountIcon.frame, relativeTo: rockGroupAmountButton.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: Style.Padding.most, translatedToBounds: true)
+            addChild(toggleRockAmountIcon)
+            
+            
+            let resumeButton = ShiftShaft_Button(size: buttonSize,
+                                                 delegate: buttonDelegate ?? self,
+                                                 identifier: .resume,
+                                                 precedence: precedence,
+                                                 fontSize: .fontLargeSize,
+                                                 fontColor: .black,
+                                                 backgroundColor: .buttonGray)
+            resumeButton.position = CGPoint.alignHorizontally(resumeButton.frame, relativeTo: rockGroupAmountButton.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: Style.Padding.more*2, translatedToBounds: true)
+            addChild(resumeButton)
+            
+        }
+        
         else if menuType == .gameLose {
             let titleText = "Game Over"
             let titleNode = ParagraphNode.labelNode(text: titleText, paragraphWidth: menuSizeWidth * 0.95,
@@ -279,6 +357,57 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             
             
         }
+        else if menuType == .tutorialConfirmation {
+            let titleText = "Abandon Tutorial?"
+            let titleNode = ParagraphNode.labelNode(text: titleText, paragraphWidth: menuSizeWidth * 0.95,
+                                                    fontSize: .fontExtraLargeSize)
+            titleNode.position = CGPoint.position(titleNode.frame, inside: self.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most * 2)
+            
+            
+            let bodyText = "You can access the tutorial again from the Stats menu"
+            let bodyNode = ParagraphNode.labelNode(text: bodyText, paragraphWidth: menuSizeWidth * 0.95,
+                                                   fontSize: .fontLargeSize)
+            
+            bodyNode.position = CGPoint.alignHorizontally(bodyNode.frame, relativeTo: titleNode.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.most, translatedToBounds: true)
+            
+            bodyNode.zPosition = precedence.rawValue
+            
+            let body2Text = "You will lose all progress but keep any gems you earned."
+            let body2Node = ParagraphNode.labelNode(text: body2Text, paragraphWidth: menuSizeWidth * 0.95,
+                                                   fontSize: .fontLargeSize)
+            
+            body2Node.position = CGPoint.alignHorizontally(body2Node.frame, relativeTo: bodyNode.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.most, translatedToBounds: true)
+            
+            body2Node.zPosition = precedence.rawValue
+
+            
+            addChild(titleNode)
+            addChild(bodyNode)
+            addChild(body2Node)
+            
+            let noResume = ShiftShaft_Button(size: buttonSize,
+                                             delegate: buttonDelegate ?? self,
+                                             identifier: .doNotAbandonTutorial,
+                                             precedence: precedence,
+                                             fontSize: .fontLargeSize,
+                                             fontColor: .black,
+                                             backgroundColor: .buttonGray)
+            noResume.position = CGPoint.position(noResume.frame, inside: self.frame, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: Style.Padding.most * 2)
+            addChild(noResume)
+            
+            let yesAbandon = ShiftShaft_Button(size: buttonSize,
+                                               delegate: buttonDelegate ?? self,
+                                               identifier: .yesAbandonRun,
+                                               precedence: precedence,
+                                               fontSize: .fontLargeSize,
+                                               fontColor: .white,
+                                               backgroundColor: .buttonDestructiveRed)
+            yesAbandon.position = CGPoint.alignHorizontally(yesAbandon.frame, relativeTo: noResume.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: Style.Padding.more*2, translatedToBounds: true)
+            addChild(yesAbandon)
+            
+            
+        }
+        
         // TODO: Remove DEBUG code
         else if menuType == .debug {
             let viewPauseMenu = ShiftShaft_Button.init(size: buttonSize, delegate: self, identifier: .debugPause)
@@ -390,12 +519,18 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             InputQueue.append(Input(.playAgain))
         case .pausedExitToMainMenu:
             setup(.confirmation, playableRect: self.playableRect, precedence: self.precedence, level: self.level, buttonDelegate: self.buttonDelegate)
+        case .tutorialPausedExitToMainMenu:
+            setup(.tutorialConfirmation, playableRect: self.playableRect, precedence: self.precedence, level: self.level, buttonDelegate: self.buttonDelegate)
         case .yesAbandonRun:
             InputQueue.append(Input(.playAgain))
         
         case .doNotAbandonRun:
             InputQueue.append(Input(.play))
             setup(.pause, playableRect: self.playableRect, precedence: self.precedence, level: self.level, buttonDelegate: self.buttonDelegate)
+            
+        case .doNotAbandonTutorial:
+            InputQueue.append(Input(.play))
+            setup(.tutorialPause, playableRect: self.playableRect, precedence: self.precedence, level: self.level, buttonDelegate: self.buttonDelegate)
             
         case .toggleSound:
             let muted = UserDefaults.standard.bool(forKey: UserDefaults.muteSoundKey)

@@ -39,6 +39,9 @@
 		28CAFA7B26A0F2F000151CA8 /* CodexItemAnimatingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28CAFA7A26A0F2F000151CA8 /* CodexItemAnimatingView.swift */; };
 		28D29AD4270B7E9D001AD50D /* RuneReplacementInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D29AD3270B7E9D001AD50D /* RuneReplacementInfoView.swift */; };
 		28D29AD6270B82DC001AD50D /* RuneReplacementEmptyPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D29AD5270B82DC001AD50D /* RuneReplacementEmptyPanelView.swift */; };
+		28D6CE0B271F2A0D00532150 /* Character.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D6CE0A271F2A0D00532150 /* Character.swift */; };
+		28D6CE0D271F2A1D00532150 /* Dialogue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D6CE0C271F2A1D00532150 /* Dialogue.swift */; };
+		28D6CE0F271F2A3200532150 /* TutorialPhase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D6CE0E271F2A3200532150 /* TutorialPhase.swift */; };
 		3D00A0F923AAC813007E2D8B /* Identifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D00A0F823AAC813007E2D8B /* Identifiers.swift */; };
 		3D06390122EEB4FB00C4D5E9 /* PauseState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D06390022EEB4FB00C4D5E9 /* PauseState.swift */; };
 		3D06390322EEB50C00C4D5E9 /* PlayState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D06390222EEB50C00C4D5E9 /* PlayState.swift */; };
@@ -237,6 +240,9 @@
 		28CAFA7A26A0F2F000151CA8 /* CodexItemAnimatingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexItemAnimatingView.swift; sourceTree = "<group>"; };
 		28D29AD3270B7E9D001AD50D /* RuneReplacementInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneReplacementInfoView.swift; sourceTree = "<group>"; };
 		28D29AD5270B82DC001AD50D /* RuneReplacementEmptyPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneReplacementEmptyPanelView.swift; sourceTree = "<group>"; };
+		28D6CE0A271F2A0D00532150 /* Character.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Character.swift; sourceTree = "<group>"; };
+		28D6CE0C271F2A1D00532150 /* Dialogue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dialogue.swift; sourceTree = "<group>"; };
+		28D6CE0E271F2A3200532150 /* TutorialPhase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialPhase.swift; sourceTree = "<group>"; };
 		3D00A0F823AAC813007E2D8B /* Identifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identifiers.swift; sourceTree = "<group>"; };
 		3D06390022EEB4FB00C4D5E9 /* PauseState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PauseState.swift; sourceTree = "<group>"; };
 		3D06390222EEB50C00C4D5E9 /* PlayState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayState.swift; sourceTree = "<group>"; };
@@ -433,6 +439,9 @@
 			isa = PBXGroup;
 			children = (
 				283DC777271892BC002A499A /* TutorialConductor.swift */,
+				28D6CE0E271F2A3200532150 /* TutorialPhase.swift */,
+				28D6CE0C271F2A1D00532150 /* Dialogue.swift */,
+				28D6CE0A271F2A0D00532150 /* Character.swift */,
 			);
 			name = Tutorial;
 			sourceTree = "<group>";
@@ -1154,6 +1163,7 @@
 				5894A45824C6048B00FBF839 /* CurrencyModel.swift in Sources */,
 				5894A44C24C36B4600FBF839 /* Publishers+Extensions.swift in Sources */,
 				589A27D123D90CD900174DE7 /* TargetingState.swift in Sources */,
+				28D6CE0F271F2A3200532150 /* TutorialPhase.swift in Sources */,
 				3DA0A384230455B90041EF34 /* CGPoint+Extension.swift in Sources */,
 				3DA0A386230457580041EF34 /* SKLabelNode+Extension.swift in Sources */,
 				28D29AD4270B7E9D001AD50D /* RuneReplacementInfoView.swift in Sources */,
@@ -1191,6 +1201,7 @@
 				3D10609B233DD05500ECE7E6 /* TurnWatcher.swift in Sources */,
 				3D06390122EEB4FB00C4D5E9 /* PauseState.swift in Sources */,
 				3D58468A22A6325300EDD845 /* CarryModel.swift in Sources */,
+				28D6CE0D271F2A1D00532150 /* Dialogue.swift in Sources */,
 				5819AB71242A5CA600498BB6 /* SpriteAction.swift in Sources */,
 				582CF3F224425CC000AA2A95 /* CGFloat+Extensions.swift in Sources */,
 				3DF2928320A66BEB006671AC /* Tile.swift in Sources */,
@@ -1220,6 +1231,7 @@
 				3D4F569222B2D087003695D8 /* SpriteSheet.swift in Sources */,
 				2886E84026F030750014FA5D /* UIViewController+Extensions.swift in Sources */,
 				3D2C757322C85362009ABD36 /* Direction.swift in Sources */,
+				28D6CE0B271F2A0D00532150 /* Character.swift in Sources */,
 				28AE3AC526A6113900BCE56A /* CodexBackgroundView.swift in Sources */,
 				582CF3EE244239A000AA2A95 /* Template.swift in Sources */,
 				5867A591242B0CD1005BFD10 /* TileDetailView.swift in Sources */,

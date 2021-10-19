@@ -36,12 +36,12 @@ class LevelGoalTracker: LevelGoalTracking {
     public var goalProgress: [GoalTracking] = []
     
     private let level: Level
-    private let tutorialConductor: TutorialConductor?
+    private let tutorialConductor: TutorialConductor
     private var pillarColor =  Set<ShiftShaft_Color>(ShiftShaft_Color.pillarCases)
     private var numberOfIndividualPillars: Int = 0
     private var numberOfGoalsCompleted = 0
     
-    init(level: Level, tutorialConductor: TutorialConductor?) {
+    init(level: Level, tutorialConductor: TutorialConductor) {
         self.level = level
         self.tutorialConductor = tutorialConductor
         
@@ -88,8 +88,13 @@ class LevelGoalTracker: LevelGoalTracking {
             goalIsUpdatedSubject.send(goalProgress)
             countPillars(in: input.endTilesStruct ?? [])
             
-            if (tutorialConductor?.phase.shouldInputLevelGoalView ?? true) {
+            
+            if !tutorialConductor.isTutorial {
                 InputQueue.append(Input(.levelGoalDetail(goalProgress)))
+            } else {
+                if tutorialConductor.phase.shouldInputLevelGoalView {
+                    InputQueue.append(Input(.levelGoalDetail(goalProgress)))
+                }
             }
             
         case .itemUsed:

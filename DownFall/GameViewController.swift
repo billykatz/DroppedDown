@@ -23,6 +23,8 @@ class GameViewController: UIViewController {
     private var levelCoordinator: LevelCoordinating?
     private var menuCoordinator: MenuCoordinator?
     
+    private var tutorialConductor: TutorialConductor?
+    
     // navigation contoller
 //    var navigationController: UINavigationController?
     
@@ -36,7 +38,7 @@ class GameViewController: UIViewController {
                 self.menuCoordinator?.loadedProfile(profile, hasLaunchedBefore: hasLaunchedBefore)
                 
                 if !hasLaunchedBefore {
-//                    UserDefaults.standard.setValue(true, forKey: UserDefaults.hasLaunchedBeforeKey)
+                    UserDefaults.standard.setValue(true, forKey: UserDefaults.hasLaunchedBeforeKey)
                 }
             }
         }
@@ -80,12 +82,16 @@ class GameViewController: UIViewController {
             return GameLogger.shared.fatalLog(prefix: Constants.tag, message: "Lack of necessary information to init coordinators")
         }
         
+        /// set up the tutorial conductor
+        let tutorialConductor = TutorialConductor()
+        self.tutorialConductor = tutorialConductor
         
-        /// setup the coordinator
-        let levelCoordinator = LevelCoordinator(gameSceneNode: gameScene, entities: entities, view: view)
+        /// setup the coordinators
+        let levelCoordinator = LevelCoordinator(gameSceneNode: gameScene, entities: entities, tutorialConductor: tutorialConductor, view: view)
         let codexCoordinator = CodexCoordinator(viewController: self.navigationController!)
         let settingsCoordinator = SettingsCoordinator(viewController: self.navigationController!)
-        self.menuCoordinator = MenuCoordinator(levelCoordinator: levelCoordinator, codexCoordinator: codexCoordinator, settingsCoordinator: settingsCoordinator, view: view)
+        
+        self.menuCoordinator = MenuCoordinator(levelCoordinator: levelCoordinator, codexCoordinator: codexCoordinator, settingsCoordinator: settingsCoordinator, tutorialConductor: tutorialConductor, view: view)
         self.levelCoordinator = levelCoordinator
         self.levelCoordinator?.delegate = menuCoordinator
         

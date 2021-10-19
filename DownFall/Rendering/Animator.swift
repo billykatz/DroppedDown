@@ -425,8 +425,12 @@ struct Animator {
         let moveToAction = SKAction.move(to: targetPosition, duration: Double.random(in: AnimationSettings.Board.workingTowardsGoal-0.15...AnimationSettings.Board.workingTowardsGoal+0.15))
         moveToAction.timingMode = .easeIn
         
+        let changeZPosition = SKAction.run {
+            sprite.zPosition = -100_000
+        }
+        
         let moveToAndScale = SKAction.group([moveToAction, scaleDown])
-        let sequence = SKAction.sequence([scaleUpAction, moveToAndScale])
+        let sequence = SKAction.sequence([scaleUpAction, moveToAndScale, changeZPosition])
         
         return SpriteAction(sprite: sprite, action: sequence)
 

@@ -46,7 +46,10 @@ class Board: Equatable {
     private let tutorialConductor: TutorialConductor?
     private var hasAlreadySpawnedMonsterForTutorial = false
     private var shouldSpawnMonsterDuringTutorial: Bool {
-        return tutorialConductor != nil && !hasAlreadySpawnedMonsterForTutorial
+        if tutorialConductor?.isTutorial ?? false {
+            return !hasAlreadySpawnedMonsterForTutorial
+        }
+        return false
     }
 
     

@@ -109,10 +109,16 @@ class TileDetailView: SKSpriteNode {
                 self?.tileAttacks = attacks
                 self?.isUserInteractionEnabled = true
                 self?.addChildSafely(self?.contentView)
+                self?.contentView.alpha = 1.0
             case .levelGoalDetail(let updatedGoals):
                 self?.levelGoals = updatedGoals
                 self?.isUserInteractionEnabled = true
                 self?.addChildSafely(self?.contentView)
+                self?.contentView.alpha = 1.0
+            case .tutorialPhaseEnd(let phase):
+                if phase == .theseAreLevelGoals {
+                    self?.resetTileDetailView()
+                }
             default:
                 break
             }
@@ -379,8 +385,8 @@ class TileDetailView: SKSpriteNode {
     func addBackgroundOverlay() {
         // set up the background
         let overlay = SKShapeNode(rect: playableRect)
-        overlay.color = UIColor.white
-        overlay.alpha = 0.25
+        overlay.color = UIColor.black
+        overlay.alpha = 0.76
         overlay.zPosition = -1
         overlay.position = .zero
         overlay.name = Constants.overlayName
@@ -421,12 +427,24 @@ extension TileDetailView {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         if touches.first != nil {
             // then dismiss the view
-            tileType = nil
-            tileAttacks = []
-            levelGoals = nil
+            resetTileDetailView()
             InputQueue.append(Input(.play))
-            isUserInteractionEnabled = false
-            contentView.removeFromParent()
         }
+    }
+    
+    func resetTileDetailView() {
+        tileType = nil
+        tileAttacks = []
+        levelGoals = nil
+        isUserInteractionEnabled = false
+        
+        
+        let fadeOut = SKAction.fadeOut(withDuration: 0.25)
+        let removeCotentView = SKAction.run { [weak self] in
+            self?.contentView.removeFromParent()
+        }
+        let sequence = SKAction.sequence([fadeOut, removeCotentView])
+        sequence.timingMode = .easeIn
+        contentView.run(sequence)
     }
 }

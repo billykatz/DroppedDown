@@ -25,7 +25,7 @@ protocol MenuCoordinating: AnyObject {
     
     func finishGameAndGoToStore(playerData updatedPlayerData: EntityModel, currentRun: RunModel)
     func finishGame(playerData updatedPlayerData: EntityModel, currentRun: RunModel)
-    func loadedProfile(_ profile: Profile)
+    func loadedProfile(_ profile: Profile, hasLaunchedBefore: Bool)
     
     /// exposed so that we can save the profile
 //    var profile: Profile? { get }
@@ -42,6 +42,8 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
     
     // hack for now, remove later
     var playerTappedOnStore: Bool = false
+    
+    var isTutorial: Bool = false
     
     private lazy var mainMenuScene: MainMenu? = {
         guard let scene = GKScene(fileNamed: Identifiers.mainMenuScene)?.rootNode as? MainMenu else { return nil }
@@ -79,20 +81,25 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
         profileViewModel?.abandonRun(playerData: profileViewModel!.profile.player, currentRun: profileViewModel!.profile.currentRun!)
     }
     
-    func loadedProfile(_ profile: Profile) {
+    func loadedProfile(_ profile: Profile, hasLaunchedBefore: Bool) {
         self.profileViewModel = ProfileViewModel(profile: profile)
-        presentMainMenu()
+        if hasLaunchedBefore {
+            presentMainMenu()
+        } else {
+            isTutorial = true
+            newGame(profileViewModel?.profile.player)
+        }
     }
     
     func newGame(_ playerModel: EntityModel?) {
         profileViewModel?.nilCurrenRun()
         playerTappedOnStore = false
-        levelCoordinator.loadRun(nil, profile: profileViewModel!.profile)
+        levelCoordinator.loadRun(nil, profile: profileViewModel!.profile, isTutorial: self.isTutorial)
     }
     
     func continueRun() {
         playerTappedOnStore = false
-        levelCoordinator.loadRun(profileViewModel!.profile.currentRun, profile: profileViewModel!.profile)
+        levelCoordinator.loadRun(profileViewModel!.profile.currentRun, profile: profileViewModel!.profile, isTutorial: false)
     }
     
     func finishGame(playerData updatedPlayerData: EntityModel, currentRun: RunModel) {

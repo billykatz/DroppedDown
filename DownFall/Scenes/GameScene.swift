@@ -59,6 +59,9 @@ class GameScene: SKScene {
     // audio listener
     private var audioListener: AudioEventListener?
     
+    // tutorial
+    private var tutorialConductor: TutorialConductor?
+    
     //touch state
     private var touchWasSwipe = false
     private var touchWasCanceled = false
@@ -78,10 +81,16 @@ class GameScene: SKScene {
                            level: Level,
                            randomSource: GKLinearCongruentialRandomSource?,
                            stats: [Statistics],
-                           loadedTiles: [[Tile]]? = []) {
+                           loadedTiles: [[Tile]]? = [],
+                           isTutorial: Bool) {
+        // create the tutorial conductor
+        if isTutorial {
+            tutorialConductor = TutorialConductor()
+        }
+        
         // init our level
         self.level = level
-        self.levelGoalTracker = LevelGoalTracker(level: level)
+        self.levelGoalTracker = LevelGoalTracker(level: level, tutorialConductor: tutorialConductor)
         self.runStatTracker = RunStatTracker(runStats: stats)
         
         //create the foreground node
@@ -89,16 +98,18 @@ class GameScene: SKScene {
         foreground.position = .zero
         addChild(foreground)
         
+        
         //init our tile creator
         let tileCreator = TileCreator(entities,
                                       difficulty: difficulty,
                                       updatedEntity: updatedEntity,
                                       level: level,
                                       randomSource: randomSource ?? GKLinearCongruentialRandomSource(),
-                                      loadedTiles: loadedTiles)
+                                      loadedTiles: loadedTiles,
+                                      tutorialConductor: tutorialConductor)
         
         //board
-        board = Board.build(tileCreator: tileCreator, difficulty: difficulty, level: level)
+        board = Board.build(tileCreator: tileCreator, difficulty: difficulty, level: level, tutorialConductor: tutorialConductor)
         self.boardSize = boardSize
         
         // create haptic generator
@@ -107,6 +118,7 @@ class GameScene: SKScene {
         // create the audio listener
         let audioManager = AudioManager(sceneNode: foreground)
         audioListener = AudioEventListener(audioManager: audioManager)
+        
         
     }
     
@@ -121,7 +133,8 @@ class GameScene: SKScene {
                                  boardSize: boardSize,
                                  precedence: Precedence.foreground,
                                  level: level!,
-                                 levelGoalTracker: levelGoalTracker!)
+                                 levelGoalTracker: levelGoalTracker!,
+                                 tutorialConductor: tutorialConductor)
         
         
         // Register for inputs we care about
@@ -147,6 +160,11 @@ class GameScene: SKScene {
                 self.foreground.removeAllChildren()
                 self.removeFromParent()
                 self.swipeRecognizerView?.removeFromSuperview()
+                
+                if (self.tutorialConductor != nil ){
+                    UserDefaults.standard.setValue(true, forKey: UserDefaults.hasCompletedTutorialKey)
+                }
+                
                 self.gameSceneDelegate?.goToNextArea(updatedPlayerData: data)
             
             } else if case InputType.gameWin(_) = input.type {
@@ -181,6 +199,8 @@ class GameScene: SKScene {
         generator = nil
         rotatePreview = nil
         audioListener = nil
+        runStatTracker = nil
+        tutorialConductor = nil
         swipeRecognizerView?.removeFromSuperview()
         InputQueue.reset()
         Dispatch.shared.reset()

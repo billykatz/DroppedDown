@@ -47,4 +47,6 @@ extension UserDefaults {
     
     static let muteSoundKey = "muteSound"
     static let showGroupNumberKey = "showRockGroupNumber"
+    static let hasLaunchedBeforeKey = "hasLaunchedBefore"
+    static let hasCompletedTutorialKey = "hasCompletedTutorial"
 }

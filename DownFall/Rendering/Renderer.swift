@@ -10,6 +10,12 @@ import Foundation
 import SpriteKit
 
 class Renderer: SKSpriteNode {
+    
+    
+    /// PUBLIC
+    public var backpackView: BackpackView
+    
+    /// PRIVATE
     private let playableRect: CGRect
     private let foreground: SKNode
     private var sprites: [[DFTileSpriteNode]] = []
@@ -17,6 +23,7 @@ class Renderer: SKSpriteNode {
     private let boardSize: CGFloat!
     private var tileSize: CGFloat
     private let precedence: Precedence
+    private let tutorialConductor: TutorialConductor?
     
     // Used to determine what special UI consdierations to make for what level we are on
     private let level: Level
@@ -30,9 +37,9 @@ class Renderer: SKSpriteNode {
     //Animator
     private var animator = Animator()
     
-    func debugMenu() -> MenuSpriteNode {
-        return MenuSpriteNode(.debug, playableRect: self.playableRect, precedence: .menu, level: self.level)
-    }
+    private var dialogueOverlay: DialogueOverlay?
+    
+    /// LAZY
     
     private lazy var menuSpriteNode: MenuSpriteNode = {
         return MenuSpriteNode(.pause, playableRect: self.playableRect, precedence: .menu, level: self.level)
@@ -87,20 +94,24 @@ class Renderer: SKSpriteNode {
         return levelGoalView
     }()
     
-    public var backpackView: BackpackView
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     init(playableRect: CGRect,
          foreground givenForeground: SKNode,
          boardSize theBoardSize: Int,
          precedence: Precedence,
          level: Level,
-         levelGoalTracker: LevelGoalTracker) {
+         levelGoalTracker: LevelGoalTracker,
+         tutorialConductor: TutorialConductor?) {
         
         self.precedence = precedence
         self.playableRect = playableRect
         self.boardSize = CGFloat(theBoardSize)
         self.level = level
         self.levelGoalTracker = levelGoalTracker
+        self.tutorialConductor = tutorialConductor
         
         self.tileSize = GameScope.boardSizeCoefficient * (playableRect.width / boardSize)
         
@@ -282,13 +293,39 @@ class Renderer: SKSpriteNode {
         case .newTurn:
             ()
 //            animationsFinished(endTiles: input.endTilesStruct, ref: false)
+        case .tutorialPhaseStart(let phase):
+            showTutorial(phase: phase)
+        case .levelGoalDetail:
+            guard let phase = tutorialConductor?.phase else { return }
+            if phase == .theseAreLevelGoals {
+                showTutorial(phase: tutorialConductor?.phase)
+            }
         default:
             ()
         }
     }
     
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    private func showTutorial(phase: TutorialPhase?) {
+        guard let phase = phase else { return }
+        
+        let dialogueOverlay = DialogueOverlay(playableRect: playableRect, foreground: foreground, tutorialPhase: phase, levelGoalViewOrigin: levelGoalView.position) { [weak self] tileType in
+            // convert the sprites to tile types
+            guard let tileTypeToHighlight = phase.highlightTileType else { return nil }
+            guard let sprites = self?.sprites,
+                  let first = typeCount(for: sprites.map{ $0.map { $0.type } }, of: tileType).first else { return .zero }
+            
+            return positionInForeground(at: first)
+        }
+        
+        let wait = SKAction.wait(forDuration: phase.waitDuration)
+        let fadeIn = SKAction.fadeIn(withDuration: 0.5)
+        fadeIn.timingMode = .easeInEaseOut
+
+        
+        self.dialogueOverlay = dialogueOverlay
+        dialogueOverlay.alpha = 0
+        spriteForeground.addChild(dialogueOverlay)
+        dialogueOverlay.run(SKAction.sequence([wait, fadeIn]))
     }
     
     private func animateCompletedGoals(_ goals: [GoalTracking], input: InputType, transformation: Transformation, unlockExitTransformation: Transformation?) {
@@ -387,6 +424,11 @@ class Renderer: SKSpriteNode {
         return sprites
     }
     
+    
+    private func debugMenu() -> MenuSpriteNode {
+        return MenuSpriteNode(.debug, playableRect: self.playableRect, precedence: .menu, level: self.level)
+    }
+
     /// Attach the sprites to the input so that another object can rotate the board for us
     private func rotatePreview(for transformations: [Transformation]) {
         guard let rotateTrans = transformations.first else {
@@ -838,7 +880,9 @@ extension Renderer {
         let positionInScene = touch.location(in: self.foreground)
         let nodes = foreground.nodes(at: positionInScene)
         
-        if self.tileDetailView?.isUserInteractionEnabled ?? false {
+        if let dialogueOverlay = dialogueOverlay {
+            dialogueOverlay.touchesEnded(touches, with: event)
+        } else if self.tileDetailView?.isUserInteractionEnabled ?? false {
             self.tileDetailView?.touchesEnded(touches, with: event)
         } else {
             self.backpackView.touchesEnded(touches, with: event)

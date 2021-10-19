@@ -87,4 +87,8 @@ extension UIColor {
     static let runeReplacementBackgroundStrokeBlue = UIColor(rgb: 0x8091AB)
     static let runeReplacementEmptyPanelBackground = UIColor(rgb: 0x182334)
     
+    
+    // Dialogue
+    static let dialogueBoxBackground = UIColor(rgb: 0x508D9A)
+    
 }

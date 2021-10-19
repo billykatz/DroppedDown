@@ -15,7 +15,7 @@ protocol TileStrategy {
     var updatedEntity: EntityModel? { get }
     var level: Level { get }
     
-    func tiles(for tiles: [[Tile]]) -> [[Tile]]
+    func tiles(for tiles: [[Tile]], forceMonster: Bool) -> [[Tile]]
     func board(difficulty: Difficulty) -> ([[Tile]], newLevel: Bool)
     func randomMonster() -> TileType
     func randomMonster(not: EntityModel.EntityType) -> Tile

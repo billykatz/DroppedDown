@@ -43,6 +43,13 @@ class Board: Equatable {
         return getTileStructPosition(.player(.zero))
     }
     
+    private let tutorialConductor: TutorialConductor?
+    private var hasAlreadySpawnedMonsterForTutorial = false
+    private var shouldSpawnMonsterDuringTutorial: Bool {
+        return tutorialConductor != nil && !hasAlreadySpawnedMonsterForTutorial
+    }
+
+    
     var boardSize: Int { return tiles.count }
     
     
@@ -55,10 +62,12 @@ class Board: Equatable {
     init(tileCreator: TileStrategy,
          tiles: [[Tile]],
          level: Level,
-         boardLoaded: Bool) {
+         boardLoaded: Bool,
+         tutorialConductor: TutorialConductor?) {
         self.tileCreator = tileCreator
         self._tiles = tiles
         self.level = level
+        self.tutorialConductor = tutorialConductor
         
         // trigger a neighbor count pass
         self.tiles = tiles
@@ -232,7 +241,8 @@ class Board: Equatable {
              .selectLevel,
              .newTurn,
              .visitStore, .loseAndGoToStore,
-             .itemUseCanceled, .itemCanBeUsed, .rotatePreview, .tileDetail, .levelGoalDetail, .runeReplacement:
+             .itemUseCanceled, .itemCanBeUsed, .rotatePreview, .tileDetail, .levelGoalDetail, .runeReplacement,
+             .tutorialPhaseStart, .tutorialPhaseEnd:
             transformation = nil
         }
         
@@ -289,10 +299,12 @@ class Board: Equatable {
         if let otherOfferTile = otherOfferTile,
            let otherOffer = otherOffer,
            case InputType.collectOffer(let collectedCoord, let collectedStoreOffer, _, _) = input.type {
-            transformation = removeAndReplaces(from: tiles, specificCoord: [offerCoord, otherOfferTile], input: Input(.collectOffer(collectedCoord: collectedCoord, collectedOffer: collectedStoreOffer, discardedCoord: otherOfferTile, discardedOffer: otherOffer)))
+            transformation = removeAndReplaces(from: tiles, specificCoord: [offerCoord, otherOfferTile], input: Input(.collectOffer(collectedCoord: collectedCoord, collectedOffer: collectedStoreOffer, discardedCoord: otherOfferTile, discardedOffer: otherOffer)), forceSpawnMonsters: shouldSpawnMonsterDuringTutorial)
+            hasAlreadySpawnedMonsterForTutorial = true
         } else {
-            // remove and replace the single item tile
-            transformation = removeAndReplace(from: tiles, tileCoord: offerCoord, singleTile: true, input: input)
+            //remove and replace the single item tile
+            transformation = removeAndReplace(from: tiles, tileCoord: offerCoord, singleTile: true, input: input, forceMonsterSpawn: shouldSpawnMonsterDuringTutorial)
+            hasAlreadySpawnedMonsterForTutorial = true
         }
         
         // save the item
@@ -948,7 +960,8 @@ extension Board {
                           tileCoord: TileCoord,
                           singleTile: Bool = false,
                           input: Input,
-                          killMonsters: Bool = false) -> Transformation {
+                          killMonsters: Bool = false,
+                          forceMonsterSpawn: Bool = false) -> Transformation {
         // Check that the tile group at row, col has more than 3 tiles
         var selectedTiles: [TileCoord] = [tileCoord]
         var selectedPillars: [TileCoord] = []
@@ -1002,7 +1015,8 @@ extension Board {
         addNewTiles(shiftIndices: shiftIndices,
                     shiftDown: &shiftDown,
                     newTiles: &newTiles,
-                    intermediateTiles: &intermediateTiles)
+                    intermediateTiles: &intermediateTiles,
+                    forceMonsterSpawn: forceMonsterSpawn)
         
         //create selectedTilesTransformation array
         let selectedTilesTransformation = finalSelectedTiles.map { TileTransformation($0, $0) }
@@ -1024,7 +1038,8 @@ extension Board {
     func removeAndReplaces(from tiles: [[Tile]],
                            specificCoord: [TileCoord],
                            singleTile: Bool = false,
-                           input: Input) -> Transformation {
+                           input: Input,
+                           forceSpawnMonsters: Bool = false) -> Transformation {
         
         let selectedTiles: [TileCoord] = specificCoord
         
@@ -1064,7 +1079,8 @@ extension Board {
         addNewTiles(shiftIndices: shiftIndices,
                     shiftDown: &shiftDown,
                     newTiles: &newTiles,
-                    intermediateTiles: &intermediateTiles)
+                    intermediateTiles: &intermediateTiles,
+                    forceMonsterSpawn: forceSpawnMonsters)
         
         //create selectedTilesTransformation array
         let selectedTilesTransformation = selectedTiles.map { TileTransformation($0, $0) }
@@ -1115,13 +1131,14 @@ extension Board {
         
         
     }
-    
+        
     /// This is for collectin gems
     private func collectItem(at coord: TileCoord, input: Input) -> Transformation {
         let selectedTile = tiles[coord]
         
         //remove and replace the single item tile
-        let transformation = removeAndReplace(from: tiles, tileCoord: coord, singleTile: true, input: input)
+        let transformation = removeAndReplace(from: tiles, tileCoord: coord, singleTile: true, input: input, forceMonsterSpawn: shouldSpawnMonsterDuringTutorial)
+        hasAlreadySpawnedMonsterForTutorial = true
         
         //save the item
         guard case let TileType.item(item) = selectedTile.type,
@@ -1168,11 +1185,12 @@ extension Board {
     private func addNewTiles(shiftIndices: [Int],
                              shiftDown: inout [TileTransformation],
                              newTiles: inout [TileTransformation],
-                             intermediateTiles: inout [[Tile]]) {
+                             intermediateTiles: inout [[Tile]],
+                             forceMonsterSpawn: Bool = false) {
         // Intermediate tiles is the "in-between" board that has shifted down
         // tiles into and replaced the shifted down tiles with empty tiles
         // the tile creator replaces empty tiles with new tiles
-        let createdTiles: [[Tile]] = tileCreator.tiles(for: intermediateTiles)
+        let createdTiles: [[Tile]] = tileCreator.tiles(for: intermediateTiles, forceMonster: forceMonsterSpawn)
         
         for (col, shifts) in shiftIndices.enumerated() where shifts > 0 {
             for startIdx in 0..<shifts {
@@ -1235,12 +1253,13 @@ extension Board {
 extension Board {
     static func build(tileCreator: TileStrategy,
                       difficulty: Difficulty,
-                      level: Level) -> Board {
+                      level: Level,
+                      tutorialConductor: TutorialConductor?) -> Board {
         //create a boardful of tiles
         let (tiles, newLevel) = tileCreator.board(difficulty: difficulty)
         
         //init new board
-        return Board(tileCreator: tileCreator, tiles: tiles, level: level, boardLoaded: !newLevel)
+        return Board(tileCreator: tileCreator, tiles: tiles, level: level, boardLoaded: !newLevel, tutorialConductor: tutorialConductor)
     }
 }
 

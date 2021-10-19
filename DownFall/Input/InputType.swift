@@ -25,7 +25,7 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
         return lhs == rhs
     }
     
-    
+    // leaving out tutorial cases from here
     static var allCases: [InputType] = [.touchBegan(TileCoord(0,0), .rock(color: .red, holdsGem: false, groupCount: 0)),
                                         .touch(TileCoord(0,0), .rock(color: .red, holdsGem: false, groupCount: 0)),
                                         .rotateCounterClockwise(preview: false),
@@ -106,6 +106,10 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
     case foundRuneDiscarded(Rune)
     case loseAndGoToStore
     
+    // tutorial ish
+    case tutorialPhaseStart(TutorialPhase)
+    case tutorialPhaseEnd(TutorialPhase)
+    
     var debugDescription: String {
         switch self {
         case .transformation(let trans):
@@ -184,6 +188,14 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
             return "Found rune discarded"
         case .loseAndGoToStore:
             return "Lose and go to store"
+            
+        // tutorial stuff
+        case .tutorialPhaseStart:
+            return "Tutorial - phase start"
+        case .tutorialPhaseEnd:
+            return "Tutorial - phase end"
+            
+            
         }
     }
 }

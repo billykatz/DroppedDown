@@ -602,7 +602,7 @@ struct Animator {
         for spriteAction in spriteActions {
             spriteAction.sprite.run(spriteAction.action) {
                 numActions -= 1
-                print(numActions)
+//                print(numActions)
                 if numActions == 0 {
                     completion()
                 }

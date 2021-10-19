@@ -32,7 +32,12 @@ class GameViewController: UIViewController {
                 return
             }
             loadingSceneNode?.fadeOut {
-                self.menuCoordinator?.loadedProfile(profile)
+                let hasLaunchedBefore = UserDefaults.standard.bool(forKey: UserDefaults.hasLaunchedBeforeKey)
+                self.menuCoordinator?.loadedProfile(profile, hasLaunchedBefore: hasLaunchedBefore)
+                
+                if !hasLaunchedBefore {
+//                    UserDefaults.standard.setValue(true, forKey: UserDefaults.hasLaunchedBeforeKey)
+                }
             }
         }
     }

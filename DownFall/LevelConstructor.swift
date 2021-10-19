@@ -13,7 +13,7 @@ typealias Depth = Int
 
 struct LevelConstructor {
     
-    static func buildLevel(depth: Int, randomSource: GKLinearCongruentialRandomSource, playerData: EntityModel, unlockables: [Unlockable], startingUnlockables: [Unlockable]) -> Level {
+    static func buildLevel(depth: Int, randomSource: GKLinearCongruentialRandomSource, playerData: EntityModel, unlockables: [Unlockable], startingUnlockables: [Unlockable], isTutorial: Bool) -> Level {
         let pillars = pillars(depth: depth, randomSource: randomSource)
         let gemsAtDepth = maxSpawnGems(depth: depth)
         
@@ -26,14 +26,22 @@ struct LevelConstructor {
                 boardSize: boardSize(depth: depth),
                 tileTypeChances: availableRocksPerLevel(depth: depth),
                 pillarCoordinates: pillars,
-                goals: levelGoal(depth: depth, pillars: pillars, gemAtDepth: gemsAtDepth, randomSource: randomSource),
+                goals: levelGoal(depth: depth, pillars: pillars, gemAtDepth: gemsAtDepth, randomSource: randomSource, isTutorial: isTutorial),
                 maxSpawnGems: gemsAtDepth,
                 goalProgress: [],
-                potentialItems: potentialItems(depth: depth, unlockables: unlockables, startingUnlockables: startingUnlockables, playerData: playerData, randomSource: randomSource)
+                potentialItems: potentialItems(depth: depth, unlockables: unlockables, startingUnlockables: startingUnlockables, playerData: playerData, randomSource: randomSource, isTutorial: isTutorial)
             )
     }
     
-    static func potentialItems(depth: Depth, unlockables: [Unlockable], startingUnlockables: [Unlockable], playerData: EntityModel, randomSource: GKLinearCongruentialRandomSource) -> [StoreOffer] {
+    static func potentialItems(depth: Depth, unlockables: [Unlockable], startingUnlockables: [Unlockable], playerData: EntityModel, randomSource: GKLinearCongruentialRandomSource, isTutorial: Bool) -> [StoreOffer] {
+        
+        guard !isTutorial else {
+            return [
+                StoreOffer.offer(type: .dodge(amount: 5), tier: 1),
+                StoreOffer.offer(type: .luck(amount: 5), tier: 1)
+            ]
+        }
+        
         var offers = [StoreOffer]()
         var allUnlockables = unlockables
         allUnlockables.append(contentsOf: startingUnlockables)
@@ -161,7 +169,7 @@ struct LevelConstructor {
         return depthDivided(depth) + 3
     }
     
-    static func levelGoal(depth: Depth, pillars: [PillarCoorindates], gemAtDepth: Int, randomSource: GKLinearCongruentialRandomSource) -> [LevelGoal] {
+    static func levelGoal(depth: Depth, pillars: [PillarCoorindates], gemAtDepth: Int, randomSource: GKLinearCongruentialRandomSource, isTutorial: Bool) -> [LevelGoal] {
         func randomRockGoal(_ colors: [ShiftShaft_Color], amount: Int, minimumGroupSize: Int = 1) -> LevelGoal? {
             guard let randomColor = colors.randomElement() else { return nil }
             return LevelGoal(type: .unlockExit, tileType: .rock(color: randomColor, holdsGem: false, groupCount: 0), targetAmount: amount, minimumGroupSize: minimumGroupSize, grouped: minimumGroupSize > 1)
@@ -171,6 +179,11 @@ struct LevelConstructor {
         var goals: [LevelGoal?]
         switch depth {
         case 0:
+            if isTutorial {
+                let rockGoal = randomRockGoal([.purple], amount: 15)!
+                
+                return [rockGoal]
+            }
             let monsterGoal = LevelGoal.killMonsterGoal(amount: 1)
             let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 20)
             

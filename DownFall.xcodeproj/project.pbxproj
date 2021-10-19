@@ -18,6 +18,8 @@
 		2834737F26E94CFC0096F3DE /* StatsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2834737E26E94CFC0096F3DE /* StatsModel.swift */; };
 		283CBBD926A8A88E00B1F7C9 /* CodexItemModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 283CBBD826A8A88E00B1F7C9 /* CodexItemModalView.swift */; };
 		283CBBDB26A8A9E100B1F7C9 /* SwiftUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 283CBBDA26A8A9E100B1F7C9 /* SwiftUIView.swift */; };
+		283DC778271892BC002A499A /* TutorialConductor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 283DC777271892BC002A499A /* TutorialConductor.swift */; };
+		283DC77A2718A831002A499A /* DialogueOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 283DC7792718A831002A499A /* DialogueOverlay.swift */; };
 		283F21F926E30D5200108D4D /* ProgressableModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 283F21F826E30D5200108D4D /* ProgressableModel.swift */; };
 		2842570626EF2ACB00C96CCC /* Unlockables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2842570526EF2ACB00C96CCC /* Unlockables.swift */; };
 		2842570826EF2EFC00C96CCC /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2842570726EF2EFC00C96CCC /* ProfileViewModel.swift */; };
@@ -214,6 +216,8 @@
 		2834737E26E94CFC0096F3DE /* StatsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsModel.swift; sourceTree = "<group>"; };
 		283CBBD826A8A88E00B1F7C9 /* CodexItemModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexItemModalView.swift; sourceTree = "<group>"; };
 		283CBBDA26A8A9E100B1F7C9 /* SwiftUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIView.swift; sourceTree = "<group>"; };
+		283DC777271892BC002A499A /* TutorialConductor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialConductor.swift; sourceTree = "<group>"; };
+		283DC7792718A831002A499A /* DialogueOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogueOverlay.swift; sourceTree = "<group>"; };
 		283F21F826E30D5200108D4D /* ProgressableModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressableModel.swift; sourceTree = "<group>"; };
 		2842570526EF2ACB00C96CCC /* Unlockables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Unlockables.swift; sourceTree = "<group>"; };
 		2842570726EF2EFC00C96CCC /* ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
@@ -425,6 +429,14 @@
 			name = Run;
 			sourceTree = "<group>";
 		};
+		283DC776271892A2002A499A /* Tutorial */ = {
+			isa = PBXGroup;
+			children = (
+				283DC777271892BC002A499A /* TutorialConductor.swift */,
+			);
+			name = Tutorial;
+			sourceTree = "<group>";
+		};
 		2886E84126F030F70014FA5D /* OptionsSwiftUI */ = {
 			isa = PBXGroup;
 			children = (
@@ -484,6 +496,7 @@
 			isa = PBXGroup;
 			children = (
 				3D9C505F21FE206000A2210D /* Renderer.swift */,
+				283DC7792718A831002A499A /* DialogueOverlay.swift */,
 				3D106097232E9A0200ECE7E6 /* Animator.swift */,
 			);
 			path = Rendering;
@@ -742,6 +755,7 @@
 		3DF2924C20A37FEE006671AC /* DownFall */ = {
 			isa = PBXGroup;
 			children = (
+				283DC776271892A2002A499A /* Tutorial */,
 				280C354226F50E7E00BBE8F7 /* Run */,
 				28C806A826F3C3C500135E29 /* StatTracking */,
 				2886E84126F030F70014FA5D /* OptionsSwiftUI */,
@@ -1104,6 +1118,7 @@
 				5894B17A24607422003B86F1 /* EffectModel.swift in Sources */,
 				3D4F569422B33B44003695D8 /* Helpers.swift in Sources */,
 				28B7274426A0E90D00F349ED /* CodexView.swift in Sources */,
+				283DC77A2718A831002A499A /* DialogueOverlay.swift in Sources */,
 				3DF2925420A37FEE006671AC /* GameScene.swift in Sources */,
 				58DCC9842451FBC700DC7AD8 /* RuneContainerView.swift in Sources */,
 				3D06390B22EEB56100C4D5E9 /* AnimatingState.swift in Sources */,
@@ -1232,6 +1247,7 @@
 				3D674C9522C9D6640003AEB4 /* MainMenu.swift in Sources */,
 				58A4B91D2472E5620011624A /* ChanceModel.swift in Sources */,
 				2842BABF26A0EC740021CD0B /* CodexItemView.swift in Sources */,
+				283DC778271892BC002A499A /* TutorialConductor.swift in Sources */,
 				5881DBF4244FEE440053A690 /* RuneSlotView.swift in Sources */,
 				58383643242D7A6E004CA026 /* Array+Extensions.swift in Sources */,
 				3DA4E88D228FC7FC006E90D1 /* Label.swift in Sources */,

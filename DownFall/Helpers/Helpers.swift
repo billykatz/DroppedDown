@@ -16,6 +16,16 @@ func typeCount(for tiles: [[Tile]], of type: TileType) -> [TileCoord] {
     return tileCoords
 }
 
+func typeCount(for tileTypes: [[TileType]], of type: TileType) -> [TileCoord] {
+    var tileCoords: [TileCoord] = []
+    for (i, _) in tileTypes.enumerated() {
+        for (j, _) in tileTypes[i].enumerated() {
+            tileTypes[i][j] == type ? tileCoords.append(TileCoord(i, j)) : ()
+        }
+    }
+    return tileCoords
+}
+
 
 func isWithinBounds(_ tileCoord: TileCoord, within tiles: [[Tile]]?) -> Bool {
     guard let tiles = tiles else { return false }

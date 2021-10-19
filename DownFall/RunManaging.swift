@@ -15,7 +15,7 @@ class RunModel: Codable, Equatable {
         return lhs.seed == rhs.seed
     }
     
-    static let zero = RunModel(player: .zero, seed: 0, savedTiles: nil, areas: [], goalTracking: [], stats: [], unlockables: [], startingUnlockables: [])
+    static let zero = RunModel(player: .zero, seed: 0, savedTiles: nil, areas: [], goalTracking: [], stats: [], unlockables: [], startingUnlockables: [], isTutorial: false)
     
     let seed: UInt64
     var player: EntityModel
@@ -32,6 +32,9 @@ class RunModel: Codable, Equatable {
     var unlockables: [Unlockable]
     var startingUnlockables: [Unlockable]
     
+    //tutorial
+    let isTutorial: Bool
+    
     lazy var randomSource: GKLinearCongruentialRandomSource = {
         return GKLinearCongruentialRandomSource(seed: seed)
     }()
@@ -41,7 +44,7 @@ class RunModel: Codable, Equatable {
     }
     
     
-    init(player: EntityModel, seed: UInt64, savedTiles: [[Tile]]?, areas: [Area], goalTracking: [GoalTracking], stats: [Statistics], unlockables: [Unlockable], startingUnlockables: [Unlockable]) {
+    init(player: EntityModel, seed: UInt64, savedTiles: [[Tile]]?, areas: [Area], goalTracking: [GoalTracking], stats: [Statistics], unlockables: [Unlockable], startingUnlockables: [Unlockable], isTutorial: Bool) {
         self.player = player
         self.seed = seed
         self.savedTiles = savedTiles
@@ -50,6 +53,7 @@ class RunModel: Codable, Equatable {
         self.stats = stats
         self.unlockables = unlockables
         self.startingUnlockables = startingUnlockables
+        self.isTutorial = isTutorial
     }
     
     func saveGoalTracking(_ goalTracking: [GoalTracking]) {
@@ -92,7 +96,7 @@ class RunModel: Codable, Equatable {
         let nextDepth: Int
         if let last = areas.last { nextDepth = last.depth + 1 }
         else { nextDepth = 0 }
-        let nextLevel = LevelConstructor.buildLevel(depth: nextDepth, randomSource: randomSource, playerData: player, unlockables: unlockables, startingUnlockables: startingUnlockables)
+        let nextLevel = LevelConstructor.buildLevel(depth: nextDepth, randomSource: randomSource, playerData: player, unlockables: unlockables, startingUnlockables: startingUnlockables, isTutorial: isTutorial)
         let nextArea = Area(depth: nextDepth, type: .level(nextLevel))
         areas.append(nextArea)
         return nextArea

@@ -18,7 +18,7 @@ struct PlayState: GameState {
             return AnyGameState(WinState())
         case .gameLose:
             return AnyGameState(LoseState())
-        case .pause, .levelGoalDetail:
+        case .pause, .levelGoalDetail, .tutorialPhaseStart:
             return AnyGameState(PauseState())
         case .attack, .touch, .monsterDies,
              .rotateCounterClockwise, .rotateClockwise, .collectItem,
@@ -31,7 +31,7 @@ struct PlayState: GameState {
         case .itemUseSelected:
             return AnyGameState(TargetingState())
         case .animationsFinished, .play, .transformation, .reffingFinished, .playAgain,. selectLevel, .newTurn, .visitStore, .itemUseCanceled, .itemCanBeUsed, .itemUsed, .decrementDynamites, .rotatePreview, .rotatePreviewFinish, .refillEmpty, .tileDetail, .runeReplacement,
-             .collectOffer, .runeReplaced, .foundRuneDiscarded, .loseAndGoToStore:
+             .collectOffer, .runeReplaced, .foundRuneDiscarded, .loseAndGoToStore, .tutorialPhaseEnd:
             return nil
         }
         

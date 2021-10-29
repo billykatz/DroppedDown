@@ -68,8 +68,11 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
     private func presentMainMenu(transition: SKTransition? = nil, allowContinueRun: Bool = true) {
         guard let mainMenu = mainMenuScene else { fatalError("Unable to unwrap the main menu scene")}
         mainMenu.playerModel = profileViewModel?.profile.player
-        mainMenu.hasRunToContinue = allowContinueRun && (profileViewModel?.profile.currentRun != nil && profileViewModel?.profile.currentRun != .zero)
+//        mainMenu.hasRunToContinue = allowContinueRun && (profileViewModel?.profile.currentRun != nil && profileViewModel?.profile.currentRun != .zero)
         mainMenu.displayStoreBadge = profileViewModel?.playerHasPurchasableUnlockables() ?? false
+        if allowContinueRun && (profileViewModel?.profile.currentRun != nil && profileViewModel?.profile.currentRun != .zero) {
+            mainMenu.runToContinue = profileViewModel?.profile.currentRun
+        }
 
         view.presentScene(mainMenu, transition: transition)
         view.ignoresSiblingOrder = true
@@ -86,6 +89,7 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
         if hasLaunchedBefore {
             presentMainMenu()
         } else {
+            // This springs us into the tutorial
             newGame(profileViewModel?.profile.player)
         }
     }

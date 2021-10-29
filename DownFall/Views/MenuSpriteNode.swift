@@ -16,11 +16,11 @@ fileprivate func menuHeight(type: MenuType) -> CGFloat {
         return 700
     case .gameWin:
         return 500
-    case .confirmation:
+    case .confirmation, .confirmAbandonTutorial:
         return 750
     case .tutorialConfirmation:
         return 825
-    case .detectedSavedGame:
+    case .detectedSavedGame, .detectedSavedTutorial:
         return 800
     default:
         return 300
@@ -357,14 +357,14 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             
             
         }
-        else if menuType == .tutorialConfirmation {
-            let titleText = "Abandon Tutorial?"
+        else if menuType == .confirmAbandonTutorial {
+            let titleText = "Skip tutorial?"
             let titleNode = ParagraphNode.labelNode(text: titleText, paragraphWidth: menuSizeWidth * 0.95,
                                                     fontSize: .fontExtraLargeSize)
             titleNode.position = CGPoint.position(titleNode.frame, inside: self.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most * 2)
             
             
-            let bodyText = "You can access the tutorial again from the Stats menu"
+            let bodyText = "You can replay the tutorial from the Settings menu."
             let bodyNode = ParagraphNode.labelNode(text: bodyText, paragraphWidth: menuSizeWidth * 0.95,
                                                    fontSize: .fontLargeSize)
             
@@ -372,9 +372,50 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             
             bodyNode.zPosition = precedence.rawValue
             
-            let body2Text = "You will lose all progress but keep any gems you earned."
-            let body2Node = ParagraphNode.labelNode(text: body2Text, paragraphWidth: menuSizeWidth * 0.95,
+            addChild(titleNode)
+            addChild(bodyNode)
+            
+            let noResume = ShiftShaft_Button(size: buttonSize,
+                                             delegate: buttonDelegate ?? self,
+                                             identifier: .doNotAbandonTutorial,
+                                             precedence: precedence,
+                                             fontSize: .fontLargeSize,
+                                             fontColor: .black,
+                                             backgroundColor: .buttonGray)
+            noResume.position = CGPoint.position(noResume.frame, inside: self.frame, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: Style.Padding.most * 2)
+            addChild(noResume)
+            
+            let yesAbandon = ShiftShaft_Button(size: buttonSize,
+                                               delegate: buttonDelegate ?? self,
+                                               identifier: .yesSkipTutorial,
+                                               precedence: precedence,
+                                               fontSize: .fontLargeSize,
+                                               fontColor: .white,
+                                               backgroundColor: .buttonDestructiveRed)
+            yesAbandon.position = CGPoint.alignHorizontally(yesAbandon.frame, relativeTo: noResume.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: Style.Padding.more*2, translatedToBounds: true)
+            addChild(yesAbandon)
+            
+            
+        }
+
+        else if menuType == .tutorialConfirmation {
+            let titleText = "Abandon Tutorial?"
+            let titleNode = ParagraphNode.labelNode(text: titleText, paragraphWidth: menuSizeWidth * 0.90,
+                                                    fontSize: .fontExtraLargeSize)
+            titleNode.position = CGPoint.position(titleNode.frame, inside: self.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most * 2)
+            
+            
+            let bodyText = "You can access the tutorial again from the Stats menu"
+            let bodyNode = ParagraphNode.labelNode(text: bodyText, paragraphWidth: menuSizeWidth * 0.90,
                                                    fontSize: .fontLargeSize)
+            
+            bodyNode.position = CGPoint.alignHorizontally(bodyNode.frame, relativeTo: titleNode.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.most, translatedToBounds: true)
+            
+            bodyNode.zPosition = precedence.rawValue
+            
+            let body2Text = "You will lose all progress but keep any gems you earned."
+            let body2Node = ParagraphNode.labelNode(text: body2Text, paragraphWidth: menuSizeWidth * 0.90,
+                                                   fontSize: .fontMediumSize)
             
             body2Node.position = CGPoint.alignHorizontally(body2Node.frame, relativeTo: bodyNode.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.most, translatedToBounds: true)
             
@@ -397,7 +438,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             
             let yesAbandon = ShiftShaft_Button(size: buttonSize,
                                                delegate: buttonDelegate ?? self,
-                                               identifier: .yesAbandonRun,
+                                               identifier: .yesSkipTutorial,
                                                precedence: precedence,
                                                fontSize: .fontLargeSize,
                                                fontColor: .white,
@@ -468,6 +509,47 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             continueRunButton.position = CGPoint.alignHorizontally(continueRunButton.frame, relativeTo: abandonRunButton.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: Style.Padding.more*2, translatedToBounds: true)
             addChild(continueRunButton)
             
+        } else if menuType == .detectedSavedTutorial {
+            
+            let titleText = "Finish tutorial?"
+            let titleNode = ParagraphNode.labelNode(text: titleText, paragraphWidth: menuSizeWidth * 0.95,
+                                                    fontSize: .fontExtraLargeSize)
+            
+            titleNode.position = CGPoint.position(titleNode.frame, inside: self.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most * 2)
+            
+            
+            
+            let bodyText = "Would you like to complete the tutorial?"
+            let bodyNode = ParagraphNode.labelNode(text: bodyText, paragraphWidth: menuSizeWidth * 0.90,
+                                                   fontSize: .fontLargeSize)
+            
+            bodyNode.position = CGPoint.alignHorizontally(bodyNode.frame, relativeTo: titleNode.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.most, translatedToBounds: true)
+            
+            
+            addChild(titleNode)
+            addChild(bodyNode)
+            
+            let abandonRunButton = ShiftShaft_Button(size: buttonSize,
+                                                     delegate: buttonDelegate ?? self,
+                                                     identifier: .mainMenuAbandonTutorial,
+                                                     precedence: precedence,
+                                                     fontSize: .fontMediumSize,
+                                                     fontColor: .white,
+                                                     backgroundColor: .buttonDestructiveRed)
+            abandonRunButton.position = CGPoint.position(abandonRunButton.frame, inside: self.frame, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: Style.Padding.most * 2)
+            addChild(abandonRunButton)
+            
+            
+            let continueRunButton = ShiftShaft_Button(size: buttonSize,
+                                                      delegate: buttonDelegate ?? self,
+                                                      identifier: .mainMenuContinueTutorial,
+                                                      precedence: precedence,
+                                                      fontSize: .fontLargeSize,
+                                                      fontColor: .black,
+                                                      backgroundColor: .buttonGray)
+            continueRunButton.position = CGPoint.alignHorizontally(continueRunButton.frame, relativeTo: abandonRunButton.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: Style.Padding.more*2, translatedToBounds: true)
+            addChild(continueRunButton)
+            
         }
         
         
@@ -521,7 +603,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             setup(.confirmation, playableRect: self.playableRect, precedence: self.precedence, level: self.level, buttonDelegate: self.buttonDelegate)
         case .tutorialPausedExitToMainMenu:
             setup(.tutorialConfirmation, playableRect: self.playableRect, precedence: self.precedence, level: self.level, buttonDelegate: self.buttonDelegate)
-        case .yesAbandonRun:
+        case .yesAbandonRun, .yesSkipTutorial:
             InputQueue.append(Input(.playAgain))
         
         case .doNotAbandonRun:

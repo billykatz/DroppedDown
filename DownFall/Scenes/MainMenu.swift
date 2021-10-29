@@ -39,6 +39,7 @@ class MainMenu: SKScene {
     weak var mainMenuDelegate: MainMenuDelegate?
     var playerModel: EntityModel?
     var hasRunToContinue: Bool?
+    var runToContinue: RunModel?
     var displayStoreBadge: Bool = false
     
     lazy var detectedSavedGameMenu: MenuSpriteNode = {
@@ -52,6 +53,19 @@ class MainMenu: SKScene {
         confirmAbandonRun.zPosition = 10_000_000
         return confirmAbandonRun
     }()
+    
+    lazy var detectedSavedTutorial: MenuSpriteNode = {
+        let detectedSavedGame = MenuSpriteNode(.detectedSavedTutorial, playableRect: size.playableRect, precedence: .menu, level: nil, buttonDelegate: self)
+        
+        return detectedSavedGame
+    }()
+    
+    lazy var confirmAbandonTutorial: MenuSpriteNode = {
+        let confirmAbandonRun = MenuSpriteNode(.confirmAbandonTutorial, playableRect: size.playableRect, precedence: .menu, level: nil, buttonDelegate: self)
+        confirmAbandonRun.zPosition = 10_000_000
+        return confirmAbandonRun
+    }()
+    
     
     
     override func didMove(to view: SKView) {
@@ -69,6 +83,7 @@ class MainMenu: SKScene {
                                                 horizontalAnchor: .center,
                                                 yOffset: 200.0
         )
+        startButton.zPosition = 0
         addChild(startButton)
         
         logo.position = .position(logo.frame,
@@ -76,6 +91,7 @@ class MainMenu: SKScene {
                                     verticalAlign: .top,
                                     horizontalAnchor: .center,
                                     yOffset: 150.0)
+        logo.zPosition = 1_000_000_000_000
         addChild(logo)
         
         let menuStoreButton = ShiftShaft_Button(size: .buttonExtralarge, delegate: self, identifier: .mainMenuStore, image: SKSpriteNode(imageNamed: "blankButton"), shape: .rectangle, addTextLabel: true)
@@ -86,6 +102,7 @@ class MainMenu: SKScene {
                                                            verticalAlign: .bottom,
                                                            verticalPadding: Constants.buttonPadding,
                                                            translatedToBounds: true)
+        menuStoreButton.zPosition = 0
         
         if displayStoreBadge {
             let notificationBadge = SKSpriteNode(imageNamed: "notificationRed")
@@ -110,15 +127,20 @@ class MainMenu: SKScene {
                                                          verticalAlign: .bottom,
                                                          verticalPadding: Constants.buttonPadding,
                                                          translatedToBounds: true)
-        
+        optionsButton.zPosition = 0
         
         addChild(optionsButton)
         
         
         // Show the detected saved game UX
-        if hasRunToContinue ?? false {
-            addChild(detectedSavedGameMenu)
-            detectedSavedGameMenu.zPosition = 10_000_000
+        if let run = runToContinue {
+            if run.isTutorial && run.areas.count < 2 {
+                addChild(detectedSavedTutorial)
+                detectedSavedGameMenu.zPosition = 10_000_000
+            } else {
+                addChild(detectedSavedGameMenu)
+                detectedSavedGameMenu.zPosition = 10_000_000
+            }
         }
         
     }
@@ -141,20 +163,32 @@ extension MainMenu: ButtonDelegate {
         case .mainMenuStore:
             mainMenuDelegate?.menuStore()
             
-        case .mainMenuContinueRun:
+        case .mainMenuContinueRun, .mainMenuContinueTutorial:
             mainMenuDelegate?.continueRun()
             
         case .mainMenuAbandonRun:
             detectedSavedGameMenu.removeFromParent()
             addChild(confirmAbandonRun)
             
+        case .mainMenuAbandonTutorial:
+            detectedSavedTutorial.removeFromParent()
+            addChild(confirmAbandonTutorial)
+    
         case .yesAbandonRun:
             confirmAbandonRun.removeFromParent()
+            mainMenuDelegate?.abandonRun()
+        
+        case .yesSkipTutorial:
+            confirmAbandonTutorial.removeFromParent()
             mainMenuDelegate?.abandonRun()
             
         case .doNotAbandonRun:
             confirmAbandonRun.removeFromParent()
             addChild(detectedSavedGameMenu)
+        
+        case .doNotAbandonTutorial:
+            confirmAbandonTutorial.removeFromParent()
+            addChild(detectedSavedTutorial)
             
         default:
             ()

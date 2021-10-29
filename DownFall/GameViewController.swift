@@ -25,9 +25,6 @@ class GameViewController: UIViewController {
     
     private var tutorialConductor: TutorialConductor?
     
-    // navigation contoller
-//    var navigationController: UINavigationController?
-    
     public var profile: Profile? = nil {
         didSet {
             guard let profile = profile else {

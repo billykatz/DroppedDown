@@ -17,6 +17,8 @@ enum MenuType {
     case tutorialConfirmation
     case debug
     case detectedSavedGame
+    case detectedSavedTutorial
+    case confirmAbandonTutorial
     case tutorialPause
     
     struct Constants {
@@ -38,11 +40,11 @@ enum MenuType {
             return ButtonIdentifier.rotate
         case .gameLose:
             return ButtonIdentifier.playAgain
-        case .confirmation, .tutorialConfirmation:
+        case .confirmation, .tutorialConfirmation, .confirmAbandonTutorial:
             return ButtonIdentifier.backpackConfirm
         case .debug:
             return .resume
-        case .detectedSavedGame:
+        case .detectedSavedGame, .detectedSavedTutorial:
             return ButtonIdentifier.backpackConfirm
         }
         

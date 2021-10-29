@@ -135,7 +135,7 @@ class ShiftShaft_Button: SKShapeNode {
                               fontSize: .fontLargeSize,
                               fontColor: .brown)
             label.position = self.frame.center
-            label.zPosition = Precedence.menu.rawValue
+            label.zPosition = Precedence.button.rawValue
             
             // Add Label
             buttonView?.addChild(label)

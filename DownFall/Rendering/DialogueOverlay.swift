@@ -103,9 +103,6 @@ class DialogueView: SKSpriteNode {
         
         finishedTyping = false
         
-//        let dialogueLabel = ParagraphNode(text: dialogue.sentences[sentenceIndex], paragraphWidth: dialogueFrame.width, fontSize: sentenceFontSize, fontColor: .white)
-//        dialogueLabel.position = dialogBoxPosition(dialogueLabel.frame)
-        
         var waitTime = dialogue.delayBeforeTyping
         let waitIncrement = 0.025
         var actions: [SKAction] = []
@@ -202,8 +199,50 @@ class DialogueOverlay: SKSpriteNode {
             levelGoalsHighlight.position = levelGoalViewOrigin
             self.addChild(levelGoalsHighlight)
         }
+        
+        if tutorialPhase.shouldShowRotateFinger {
+            showRotateFinger(playableRect: playableRect)
+        }
 
         self.addChild(dialogueView)
+    }
+    
+    func showRotateFinger(playableRect: CGRect) {
+        // add the diming
+        let maskHighlightNode = SKSpriteNode(texture: nil, color: .black, size: playableRect.size.scale(by: 2.0))
+        maskHighlightNode.position = position
+        maskHighlightNode.alpha = 0.5
+        self.addChild(maskHighlightNode)
+
+        
+        
+        let finger = SKSpriteNode(texture: SKTexture(imageNamed: "finger"), size: CGSize(width: 125.0, height: 125.0))
+        let fingerStartPosition = CGPoint.position(finger.frame, inside: playableRect, verticalAlign: .bottom, horizontalAnchor: .right, xOffset: 50, yOffset: 475)
+        let fingerEndPosition = CGPoint.position(finger.frame, inside: playableRect, verticalAlign: .bottom, horizontalAnchor: .right, xOffset: 50, yOffset: 1475)
+        
+        finger.position = fingerStartPosition
+
+        
+        let moveUp = SKAction.move(to: fingerEndPosition, duration: 1.25)
+//        let fingerSwivel = SKAction.rotate(toAngle: -180, duration: 0.5)
+        
+//        let returnFingerSwivel = SKAction.rotate(toAngle: -180, duration: 0)
+        let returnAction = SKAction.move(to: fingerStartPosition, duration: 0)
+        
+        let pause = SKAction.wait(forDuration: 0.5)
+        
+        let groupFirst = SKAction.group([moveUp])
+        let groupSecond = SKAction.group([returnAction])
+        let seq = SKAction.sequence([pause, groupFirst, pause, groupSecond])
+        let runForever = SKAction.repeatForever(seq)
+        runForever.timingMode = .easeInEaseOut
+        
+        addChild(finger)
+        
+        finger.run(runForever)
+        
+        
+        
     }
     
     required init?(coder aDecoder: NSCoder) {

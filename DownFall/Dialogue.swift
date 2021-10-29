@@ -33,8 +33,7 @@ extension Dialogue {
     static let youCanRotate: Dialogue = .init(sentences:
                                                             [
                                                                 "You saw how things move down from the top when you mine?",
-                                                                "You can also rotate the level by dragging it to affect how the board shifts.",
-                                                                "Try getting to the gem you just uncovered."
+                                                                "You can also rotate the level by dragging it to affect how the board shifts."
                                                             ],
                                                           character: .teri,
                                                           delayBeforeTyping: 0.25)

@@ -70,12 +70,9 @@ class RunModel: Codable, Equatable {
             // wrap it in a AreaType
             let newAreaType = AreaType.level(level)
             
-            /// get rid of the last area
-//            _ = areas.dropLast()
+            /// replace it with one with saved goal tracking
             areas[lastAreaIndex] = Area(depth: lastArea.depth, type: newAreaType)
             
-            /// replace it with one with saved goal tracking
-//            areas.append(Area(depth: lastArea.depth, type: newAreaType))
         }
     }
     

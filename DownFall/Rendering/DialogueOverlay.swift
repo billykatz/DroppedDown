@@ -12,17 +12,19 @@ class DialogueView: SKSpriteNode {
     
     // Style constants
     let totalDialogueSize = CGSize(width: 834, height: 381)
-    let dialogueBoxSize = CGSize(width: 534, height: 360)
+    let dialogueBoxSize = CGSize(width: 528, height: 360)
     let characterBox = CGSize(width: 220, height: 220)
     let characterNameBox = CGSize(width: 292, height: 87)
     let dialogueLabelName = "dialogueLabelName"
     let dialogSpriteName = "dialog"
+    let dialogCharacterSpriteName = "dialogCharacterSpriteName"
     let sentenceFontSize: CGFloat = 60
     
     var containerView: SKSpriteNode
     var finishedTyping: Bool = false
     let dialogue: Dialogue
     let dialogueFrame: CGRect
+    let characterBoxPosition: CGPoint
     
     var sentenceIndex = 0
     
@@ -37,10 +39,10 @@ class DialogueView: SKSpriteNode {
         character.xScale = -1
         character.zPosition = 100000
 
-        character.position = CGPoint.alignVertically(character.frame, relativeTo: dialogueBackgroundImage.frame, horizontalAnchor: .left, verticalAlign: .center, verticalPadding: -15, horizontalPadding: -275, translatedToBounds: true)
+        self.characterBoxPosition = CGPoint.alignVertically(character.frame, relativeTo: dialogueBackgroundImage.frame, horizontalAnchor: .left, verticalAlign: .bottom, verticalPadding: 16, horizontalPadding: -275, translatedToBounds: true)
         
         let characterNameLabel = ParagraphNode(text: dialogue.character.humanReadable, fontSize: 80, fontColor: .white)
-        characterNameLabel.position = CGPoint.alignVertically(characterNameLabel.frame, relativeTo: character.frame, horizontalAnchor: .right, verticalAlign: .top, verticalPadding: -24,  horizontalPadding: -8,  translatedToBounds: true)
+        characterNameLabel.position = CGPoint.alignVertically(characterNameLabel.frame, relativeTo: character.frame, horizontalAnchor: .right, verticalAlign: .top, verticalPadding: 0,  horizontalPadding: -250,  translatedToBounds: true)
         characterNameLabel.zPosition = 100000
         
         // empty sprite to position the dialog text area
@@ -53,11 +55,31 @@ class DialogueView: SKSpriteNode {
         super.init(texture: nil, color: .clear, size: .fifty)
         
         containerView.addChild(dialogueBackgroundImage)
-        containerView.addChild(character)
         containerView.addChild(characterNameLabel)
         self.addChild(containerView)
         
         showNextSentence()
+    }
+    
+    private func characterImageName(with emotion: Emotion) -> String {
+        return "\(dialogue.character.rawValue)-\(emotion.rawValue)"
+    }
+    
+    func showNextCharacter() {
+        // remove the old one
+        self.removeChild(with: dialogCharacterSpriteName)
+        
+        // create the new one
+        let emotion = dialogue.sentences[sentenceIndex].emotion
+        
+        let image = SKSpriteNode(texture: SKTexture(imageNamed: characterImageName(with: emotion)), size: characterBox)
+        
+        image.name = dialogCharacterSpriteName
+        image.position = characterBoxPosition
+        image.zPosition = 100000
+        
+        containerView.addChild(image)
+        
     }
     
     func dialogBoxPosition(_ thisFrame: CGRect) -> CGPoint {
@@ -66,7 +88,7 @@ class DialogueView: SKSpriteNode {
     
     // Called to skip the typing animation and just show the full sentence
     public func showFullSentence() {
-        let sentence = dialogue.sentences[sentenceIndex]
+        let sentence = dialogue.sentences[sentenceIndex].text
         
         let dialogueLabel = ParagraphNode(text: String(sentence), paragraphWidth: dialogueFrame.width, fontSize: sentenceFontSize, fontColor: .white)
         
@@ -109,14 +131,14 @@ class DialogueView: SKSpriteNode {
         
         // build the sentence one more letter each time
         
-        for index in 0..<dialogue.sentences[sentenceIndex].count {
+        for index in 0..<dialogue.sentences[sentenceIndex].text.count {
             let waitAction = SKAction.wait(forDuration: waitTime)
             
             let createLabelAction = SKAction.run { [containerView, sentenceIndex, dialogueLabelName, dialogueFrame, dialogue, sentenceFontSize, weak self] in
                 guard let self = self else { return }
-                let sentence = dialogue.sentences[sentenceIndex]
+                let sentence = dialogue.sentences[sentenceIndex].text
                 let endIndex = sentence.index(sentence.startIndex, offsetBy: index+1)
-                let subsentence = dialogue.sentences[sentenceIndex][sentence.startIndex..<endIndex]
+                let subsentence = sentence[sentence.startIndex..<endIndex]
                 
                 let dialogueLabel = ParagraphNode(text: String(subsentence), paragraphWidth: dialogueFrame.width, fontSize: sentenceFontSize, fontColor: .white)
                 
@@ -144,6 +166,8 @@ class DialogueView: SKSpriteNode {
         }
         
         containerView.run(SKAction.group(actions))
+        
+        showNextCharacter()
         
     }
     

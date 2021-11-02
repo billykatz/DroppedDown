@@ -67,7 +67,7 @@ class DialogueView: SKSpriteNode {
     
     func showNextCharacter() {
         // remove the old one
-        self.removeChild(with: dialogCharacterSpriteName)
+        containerView.removeChild(with: dialogCharacterSpriteName)
         
         // create the new one
         let emotion = dialogue.sentences[sentenceIndex].emotion

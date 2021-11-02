@@ -51,4 +51,5 @@ extension UserDefaults {
     static let hasStartedTutorialKey = "hasStartedTutorial"
     static let hasCompletedTutorialKey = "hasCompletedTutorial"
     static let hasDiedDuringTutorialKey = "hasDiedDuringTutorial"
+    static let hasSkippedTutorialKey = "hasSkippedTutorial"
 }

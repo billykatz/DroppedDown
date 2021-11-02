@@ -147,6 +147,9 @@ class GameScene: SKScene {
                 let playerIndex = tileIndices(of: .player(.zero), in: board.tiles).first
                 else { return }
                 
+                // sets the tutorial flag if the player skips the tutorial from the pause menu
+                self.tutorialConductor?.setTutorialSkipped()
+                
                 self.foreground.removeAllChildren()
                 if case let TileType.player(data) = board.tiles[playerIndex].type {
                     self.removeFromParent()

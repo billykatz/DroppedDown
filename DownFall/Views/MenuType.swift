@@ -20,6 +20,7 @@ enum MenuType {
     case detectedSavedTutorial
     case confirmAbandonTutorial
     case tutorialPause
+    case tutorialWin
     
     struct Constants {
         static let resume = "Resume"
@@ -34,7 +35,7 @@ enum MenuType {
         switch self {
         case .pause, .tutorialPause:
             return ButtonIdentifier.resume
-        case .gameWin:
+        case .gameWin, .tutorialWin:
             return ButtonIdentifier.visitStore
         case .rotate:
             return ButtonIdentifier.rotate

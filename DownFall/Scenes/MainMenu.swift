@@ -23,6 +23,7 @@ class MainMenu: SKScene {
     }
     
     private var background: SKSpriteNode!
+    private var buttonContainer: SKNode!
     
     private lazy var logo: SKSpriteNode = {
         let ratio: CGFloat = 60.0/210.0
@@ -34,6 +35,12 @@ class MainMenu: SKScene {
         
         return loadingSprite
     }()
+    
+    private var buttonFadeInAction: SKAction {
+        let fadeIn = SKAction.fadeIn(withDuration: 0.3)
+        fadeIn.timingMode = .easeInEaseOut
+        return fadeIn
+    }
     
     
     weak var mainMenuDelegate: MainMenuDelegate?
@@ -72,6 +79,9 @@ class MainMenu: SKScene {
         background = self.childNode(withName: "background") as? SKSpriteNode
         background.color = UIColor.backgroundGray
         self.removeAllChildren(exclude: ["background"])
+        buttonContainer = SKNode()
+        buttonContainer.position = .zero.translateVertically(-100)
+        self.addChild(buttonContainer)
         
         
         let startButton = ShiftShaft_Button(size: .buttonExtralarge, delegate: self, identifier: .newGame, image: SKSpriteNode(imageNamed: "blankButton"), shape: .rectangle, addTextLabel: true)
@@ -84,7 +94,10 @@ class MainMenu: SKScene {
                                                 yOffset: 200.0
         )
         startButton.zPosition = 0
-        addChild(startButton)
+        buttonContainer.addChild(startButton)
+        
+        startButton.alpha = 0
+        startButton.run(buttonFadeInAction)
         
         logo.position = .position(logo.frame,
                                     inside: size.playableRect,
@@ -115,8 +128,9 @@ class MainMenu: SKScene {
             
             addChild(notificationBadge)
         }
-        
-        addChild(menuStoreButton)
+        buttonContainer.addChild(menuStoreButton)
+        menuStoreButton.alpha = 0
+        menuStoreButton.run(buttonFadeInAction)
         
         
         let optionsButton = ShiftShaft_Button(size: .buttonExtralarge, delegate: self, identifier: .mainMenuOptions, image: SKSpriteNode(imageNamed: "blankButton"), shape: .rectangle, addTextLabel: true)
@@ -129,14 +143,26 @@ class MainMenu: SKScene {
                                                          translatedToBounds: true)
         optionsButton.zPosition = 0
         
-        addChild(optionsButton)
+        buttonContainer.addChild(optionsButton)
+        optionsButton.alpha = 0
+        optionsButton.run(buttonFadeInAction)
+        
+        // animate the buttons to move slightly up
+        let moveUp = SKAction.move(by: CGVector(dx: 0, dy: 100), duration: 0.30)
+        moveUp.timingMode = .easeInEaseOut
+        buttonContainer.run(moveUp)
         
         
         // Show the detected saved game UX
         if let run = runToContinue {
-            if run.isTutorial && run.areas.count < 2 {
-                addChild(detectedSavedTutorial)
-                detectedSavedGameMenu.zPosition = 10_000_000
+            if run.isTutorial &&
+                run.areas.count < 2 {
+                
+                // only show the detected tutorial screen if the player has not chosen to skip the tutorialm
+                if !UserDefaults.standard.bool(forKey: UserDefaults.hasSkippedTutorialKey) {
+                    addChild(detectedSavedTutorial)
+                    detectedSavedTutorial.zPosition = 10_000_000
+                }
             } else {
                 addChild(detectedSavedGameMenu)
                 detectedSavedGameMenu.zPosition = 10_000_000

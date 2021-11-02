@@ -12,7 +12,7 @@ fileprivate func menuHeight(type: MenuType) -> CGFloat {
     switch type {
     case .pause, .tutorialPause:
         return 950
-    case .gameLose:
+    case .gameLose, .tutorialWin:
         return 700
     case .gameWin:
         return 500
@@ -93,7 +93,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             
             let bodyText = "You beat depth: \(level?.humanReadableDepth ?? "0")"
             let bodyNode = ParagraphNode.labelNode(text: bodyText, paragraphWidth: menuSizeWidth * 0.95,
-                                                   fontSize: .fontMediumSize)
+                                                   fontSize: .fontMediumSize, textAlignment: .center)
             
             bodyNode.position = CGPoint.alignHorizontally(bodyNode.frame, relativeTo: titleNode.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.most, translatedToBounds: true)
             
@@ -118,7 +118,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             
             let titleText = "Paused"
             let titleNode = ParagraphNode.labelNode(text: titleText, paragraphWidth: menuSizeWidth * 0.95,
-                                                    fontSize: .fontExtraLargeSize)
+                                                    fontSize: .fontExtraLargeSize, textAlignment: .center)
             
             titleNode.position = CGPoint.position(titleNode.frame, inside: self.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most * 2)
             
@@ -126,7 +126,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             
             let bodyText = "Depth level \(level?.humanReadableDepth ?? "0")"
             let bodyNode = ParagraphNode.labelNode(text: bodyText, paragraphWidth: menuSizeWidth * 0.95,
-                                                   fontSize: .fontMediumSize)
+                                                   fontSize: .fontMediumSize, textAlignment: .center)
             
             bodyNode.position = CGPoint.alignHorizontally(bodyNode.frame, relativeTo: titleNode.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.most, translatedToBounds: true)
             
@@ -193,7 +193,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             
             let titleText = "Paused"
             let titleNode = ParagraphNode.labelNode(text: titleText, paragraphWidth: menuSizeWidth * 0.95,
-                                                    fontSize: .fontExtraLargeSize)
+                                                    fontSize: .fontExtraLargeSize, textAlignment: .center)
             
             titleNode.position = CGPoint.position(titleNode.frame, inside: self.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most * 2)
             
@@ -201,7 +201,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             
             let bodyText = "Tutorial"
             let bodyNode = ParagraphNode.labelNode(text: bodyText, paragraphWidth: menuSizeWidth * 0.95,
-                                                   fontSize: .fontMediumSize)
+                                                   fontSize: .fontMediumSize, textAlignment: .center)
             
             bodyNode.position = CGPoint.alignHorizontally(bodyNode.frame, relativeTo: titleNode.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.most, translatedToBounds: true)
             
@@ -268,21 +268,21 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
         else if menuType == .gameLose {
             let titleText = "Game Over"
             let titleNode = ParagraphNode.labelNode(text: titleText, paragraphWidth: menuSizeWidth * 0.95,
-                                                    fontSize: .fontExtraLargeSize)
+                                                    fontSize: .fontExtraLargeSize, textAlignment: .center)
             
             titleNode.position = CGPoint.position(titleNode.frame, inside: self.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most * 2)
             
             
             let body1Text = "Spend gems at the store."
             let body1Node = ParagraphNode.labelNode(text: body1Text, paragraphWidth: menuSizeWidth * 0.90,
-                                                    fontSize: .fontMediumSize)
+                                                    fontSize: .fontMediumSize, textAlignment: .center)
             
             body1Node.position = CGPoint.alignHorizontally(body1Node.frame, relativeTo: titleNode.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.most, translatedToBounds: true)
             
             
             let body2Text = "You made it to depth level \(level?.humanReadableDepth ?? "0")."
             let body2Node = ParagraphNode.labelNode(text: body2Text, paragraphWidth: menuSizeWidth * 0.90,
-                                                    fontSize: .fontMediumSize)
+                                                    fontSize: .fontMediumSize, textAlignment: .center)
             
             body2Node.position = CGPoint.alignHorizontally(body2Node.frame, relativeTo: body1Node.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.normal, translatedToBounds: true)
             
@@ -320,13 +320,13 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
         else if menuType == .confirmation {
             let titleText = "Abandon run?"
             let titleNode = ParagraphNode.labelNode(text: titleText, paragraphWidth: menuSizeWidth * 0.95,
-                                                    fontSize: .fontExtraLargeSize)
+                                                    fontSize: .fontExtraLargeSize, textAlignment: .center)
             titleNode.position = CGPoint.position(titleNode.frame, inside: self.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most * 2)
             
             
             let bodyText = "You will lose all progress but keep any gems you earned."
             let bodyNode = ParagraphNode.labelNode(text: bodyText, paragraphWidth: menuSizeWidth * 0.95,
-                                                   fontSize: .fontLargeSize)
+                                                   fontSize: .fontLargeSize, textAlignment: .center)
             
             bodyNode.position = CGPoint.alignHorizontally(bodyNode.frame, relativeTo: titleNode.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.most, translatedToBounds: true)
             
@@ -360,13 +360,13 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
         else if menuType == .confirmAbandonTutorial {
             let titleText = "Skip tutorial?"
             let titleNode = ParagraphNode.labelNode(text: titleText, paragraphWidth: menuSizeWidth * 0.95,
-                                                    fontSize: .fontExtraLargeSize)
+                                                    fontSize: .fontExtraLargeSize, textAlignment: .center)
             titleNode.position = CGPoint.position(titleNode.frame, inside: self.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most * 2)
             
             
             let bodyText = "You can replay the tutorial from the Settings menu."
             let bodyNode = ParagraphNode.labelNode(text: bodyText, paragraphWidth: menuSizeWidth * 0.95,
-                                                   fontSize: .fontLargeSize)
+                                                   fontSize: .fontLargeSize, textAlignment: .center)
             
             bodyNode.position = CGPoint.alignHorizontally(bodyNode.frame, relativeTo: titleNode.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.most, translatedToBounds: true)
             
@@ -401,13 +401,13 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
         else if menuType == .tutorialConfirmation {
             let titleText = "Abandon Tutorial?"
             let titleNode = ParagraphNode.labelNode(text: titleText, paragraphWidth: menuSizeWidth * 0.90,
-                                                    fontSize: .fontExtraLargeSize)
+                                                    fontSize: .fontExtraLargeSize, textAlignment: .center)
             titleNode.position = CGPoint.position(titleNode.frame, inside: self.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most * 2)
             
             
             let bodyText = "You can access the tutorial again from the Stats menu"
             let bodyNode = ParagraphNode.labelNode(text: bodyText, paragraphWidth: menuSizeWidth * 0.90,
-                                                   fontSize: .fontLargeSize)
+                                                   fontSize: .fontLargeSize, textAlignment: .center)
             
             bodyNode.position = CGPoint.alignHorizontally(bodyNode.frame, relativeTo: titleNode.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.most, translatedToBounds: true)
             
@@ -415,7 +415,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             
             let body2Text = "You will lose all progress but keep any gems you earned."
             let body2Node = ParagraphNode.labelNode(text: body2Text, paragraphWidth: menuSizeWidth * 0.90,
-                                                   fontSize: .fontMediumSize)
+                                                   fontSize: .fontMediumSize, textAlignment: .center)
             
             body2Node.position = CGPoint.alignHorizontally(body2Node.frame, relativeTo: bodyNode.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.most, translatedToBounds: true)
             
@@ -447,6 +447,45 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             addChild(yesAbandon)
             
             
+        } else if menuType == .tutorialWin {
+            let titleText = "You've completed the tutorial"
+            let titleNode = ParagraphNode.labelNode(text: titleText, paragraphWidth: menuSizeWidth * 0.95,
+                                                    fontSize: .fontExtraLargeSize, textAlignment: .center)
+            titleNode.position = CGPoint.position(titleNode.frame, inside: self.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most * 2)
+            
+            
+            let bodyText = "Good luck as you journey through the mines."
+            let bodyNode = ParagraphNode.labelNode(text: bodyText, paragraphWidth: menuSizeWidth * 0.95,
+                                                   fontSize: .fontMediumSize, textAlignment: .center)
+            
+            bodyNode.position = CGPoint.alignHorizontally(bodyNode.frame, relativeTo: titleNode.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.most, translatedToBounds: true)
+            
+            bodyNode.zPosition = precedence.rawValue
+            
+            
+            let body2Text = "You can replay the tutorial from the Settings menu."
+            let body2Node = ParagraphNode.labelNode(text: body2Text, paragraphWidth: menuSizeWidth * 0.95,
+                                                   fontSize: .fontSmallSize, textAlignment: .center)
+            
+            body2Node.position = CGPoint.alignHorizontally(body2Node.frame, relativeTo: bodyNode.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.most, translatedToBounds: true)
+            
+            body2Node.zPosition = precedence.rawValue
+            
+            addChild(titleNode)
+            addChild(bodyNode)
+            addChild(body2Node)
+            
+            let button = ShiftShaft_Button(size: buttonSize,
+                                           delegate: buttonDelegate ?? self,
+                                           identifier: menuType.buttonIdentifer,
+                                           precedence: precedence,
+                                           fontSize: .fontLargeSize,
+                                           fontColor: .black,
+                                           backgroundColor: .buttonGray)
+            button.position = CGPoint.position(button.frame, inside: self.frame, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: Style.Padding.most * 2)
+            button.zPosition = 1_000_000
+            addChild(button)
+
         }
         
         // TODO: Remove DEBUG code
@@ -472,7 +511,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             
             let titleText = "Saved game"
             let titleNode = ParagraphNode.labelNode(text: titleText, paragraphWidth: menuSizeWidth * 0.95,
-                                                    fontSize: .fontExtraLargeSize)
+                                                    fontSize: .fontExtraLargeSize, textAlignment: .center)
             
             titleNode.position = CGPoint.position(titleNode.frame, inside: self.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most * 2)
             
@@ -480,7 +519,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             
             let bodyText = "Would you like to continue or abandon your game?"
             let bodyNode = ParagraphNode.labelNode(text: bodyText, paragraphWidth: menuSizeWidth * 0.80,
-                                                   fontSize: .fontLargeSize)
+                                                   fontSize: .fontLargeSize, textAlignment: .center)
             
             bodyNode.position = CGPoint.alignHorizontally(bodyNode.frame, relativeTo: titleNode.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.most, translatedToBounds: true)
             
@@ -513,7 +552,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             
             let titleText = "Finish tutorial?"
             let titleNode = ParagraphNode.labelNode(text: titleText, paragraphWidth: menuSizeWidth * 0.95,
-                                                    fontSize: .fontExtraLargeSize)
+                                                    fontSize: .fontExtraLargeSize, textAlignment: .center)
             
             titleNode.position = CGPoint.position(titleNode.frame, inside: self.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most * 2)
             
@@ -521,7 +560,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             
             let bodyText = "Would you like to complete the tutorial?"
             let bodyNode = ParagraphNode.labelNode(text: bodyText, paragraphWidth: menuSizeWidth * 0.90,
-                                                   fontSize: .fontLargeSize)
+                                                   fontSize: .fontLargeSize, textAlignment: .center)
             
             bodyNode.position = CGPoint.alignHorizontally(bodyNode.frame, relativeTo: titleNode.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.most, translatedToBounds: true)
             
@@ -595,14 +634,19 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             InputQueue.append(Input(.playAgain))
         case .selectLevel:
             InputQueue.append(Input(.selectLevel))
+            
         case .visitStore:
             InputQueue.append(Input(.visitStore))
+            
         case .mainMenu:
             InputQueue.append(Input(.playAgain))
+            
         case .pausedExitToMainMenu:
             setup(.confirmation, playableRect: self.playableRect, precedence: self.precedence, level: self.level, buttonDelegate: self.buttonDelegate)
+            
         case .tutorialPausedExitToMainMenu:
             setup(.tutorialConfirmation, playableRect: self.playableRect, precedence: self.precedence, level: self.level, buttonDelegate: self.buttonDelegate)
+            
         case .yesAbandonRun, .yesSkipTutorial:
             InputQueue.append(Input(.playAgain))
         

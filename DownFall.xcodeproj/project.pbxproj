@@ -26,6 +26,7 @@
 		2842570A26EFE82600C96CCC /* CodexPriceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2842570926EFE82600C96CCC /* CodexPriceView.swift */; };
 		2842BABF26A0EC740021CD0B /* CodexItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2842BABE26A0EC740021CD0B /* CodexItemView.swift */; };
 		2842BAC126A0EEC10021CD0B /* StoreOfferType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2842BAC026A0EEC10021CD0B /* StoreOfferType.swift */; };
+		284F2EC32731DB3C00032088 /* FTUEConductor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 284F2EC22731DB3C00032088 /* FTUEConductor.swift */; };
 		2886E83E26F0303B0014FA5D /* SettingsCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886E83D26F0303B0014FA5D /* SettingsCoordinator.swift */; };
 		2886E84026F030750014FA5D /* UIViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886E83F26F030750014FA5D /* UIViewController+Extensions.swift */; };
 		2886E84326F031050014FA5D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886E84226F031050014FA5D /* SettingsView.swift */; };
@@ -227,6 +228,7 @@
 		2842570926EFE82600C96CCC /* CodexPriceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexPriceView.swift; sourceTree = "<group>"; };
 		2842BABE26A0EC740021CD0B /* CodexItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexItemView.swift; sourceTree = "<group>"; };
 		2842BAC026A0EEC10021CD0B /* StoreOfferType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreOfferType.swift; sourceTree = "<group>"; };
+		284F2EC22731DB3C00032088 /* FTUEConductor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FTUEConductor.swift; sourceTree = "<group>"; };
 		2886E83D26F0303B0014FA5D /* SettingsCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsCoordinator.swift; sourceTree = "<group>"; };
 		2886E83F26F030750014FA5D /* UIViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extensions.swift"; sourceTree = "<group>"; };
 		2886E84226F031050014FA5D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -444,6 +446,14 @@
 				28D6CE0A271F2A0D00532150 /* Character.swift */,
 			);
 			name = Tutorial;
+			sourceTree = "<group>";
+		};
+		284F2EC12731DB2400032088 /* FTUE */ = {
+			isa = PBXGroup;
+			children = (
+				284F2EC22731DB3C00032088 /* FTUEConductor.swift */,
+			);
+			name = FTUE;
 			sourceTree = "<group>";
 		};
 		2886E84126F030F70014FA5D /* OptionsSwiftUI */ = {
@@ -764,6 +774,7 @@
 		3DF2924C20A37FEE006671AC /* DownFall */ = {
 			isa = PBXGroup;
 			children = (
+				284F2EC12731DB2400032088 /* FTUE */,
 				283DC776271892A2002A499A /* Tutorial */,
 				280C354226F50E7E00BBE8F7 /* Run */,
 				28C806A826F3C3C500135E29 /* StatTracking */,
@@ -1215,6 +1226,7 @@
 				2886E84326F031050014FA5D /* SettingsView.swift in Sources */,
 				2886E83E26F0303B0014FA5D /* SettingsCoordinator.swift in Sources */,
 				3DC072C42375452D0046F224 /* Rulebook.swift in Sources */,
+				284F2EC32731DB3C00032088 /* FTUEConductor.swift in Sources */,
 				3D06390322EEB50C00C4D5E9 /* PlayState.swift in Sources */,
 				3DD36ECB21E5B86100AC4873 /* TileStrategy.swift in Sources */,
 				3DB0CEE9239DB072002A8FF3 /* GameScope.swift in Sources */,
@@ -1439,7 +1451,7 @@
 				CODE_SIGN_ENTITLEMENTS = "DownFall/Shift Shaft.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 12;
+				CURRENT_PROJECT_VERSION = 13;
 				DEVELOPMENT_TEAM = G6N5X5RF9Q;
 				INFOPLIST_FILE = DownFall/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
@@ -1463,7 +1475,7 @@
 				CODE_SIGN_ENTITLEMENTS = "DownFall/Shift Shaft.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 12;
+				CURRENT_PROJECT_VERSION = 13;
 				DEVELOPMENT_TEAM = G6N5X5RF9Q;
 				INFOPLIST_FILE = DownFall/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;

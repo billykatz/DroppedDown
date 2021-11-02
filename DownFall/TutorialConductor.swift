@@ -9,22 +9,6 @@
 import Foundation
 
 
-///
-/// Tutorial Conductor is a class that is meant to coordinate and conduct the tutorial
-///  - shouldShowHud
-///  - shouldShowLevelGoals
-///  - shouldShowLevelDetailView
-///  - shouldShowTileDetailView
-///  - shouldShow
-///
-///  - shouldInputLevelGoalView
-///  - shouldSpawnMonsters
-///  - shouldSpawnTileWithGem
-///  -
-///
-///
-
-
 class TutorialConductor {
     
     private(set) var phase: TutorialPhase
@@ -50,9 +34,11 @@ class TutorialConductor {
     
     private var allGoalsJustCompletedHoldOffOnTutorialForATurn = false
     
-    var isInFirstLevelOfTutorial: Bool {
-        return !UserDefaults.standard.bool(forKey: UserDefaults.hasCompletedTutorialKey)
+    
+    var isTutorial: Bool {
+        return !UserDefaults.standard.bool(forKey: UserDefaults.hasCompletedTutorialKey) && !UserDefaults.standard.bool(forKey: UserDefaults.hasSkippedTutorialKey)
     }
+    
     
     init() {
         self.phase = .thisIsYou
@@ -195,9 +181,16 @@ class TutorialConductor {
         }
     }
     
+    
+    func setTutorialSkipped() {
+        if isTutorial {
+            UserDefaults.standard.setValue(true, forKey: UserDefaults.hasSkippedTutorialKey)
+        }
+    }
+    
     func setTutorialCompleted(playerDied: Bool) {
         // only set these values once
-        if !(UserDefaults.standard.bool(forKey: UserDefaults.hasCompletedTutorialKey)) {
+        if isTutorial {
             UserDefaults.standard.setValue(true, forKey: UserDefaults.hasCompletedTutorialKey)
             
             if playerDied {
@@ -205,9 +198,4 @@ class TutorialConductor {
             }
         }
     }
-    
-    var isTutorial: Bool {
-        return !UserDefaults.standard.bool(forKey: UserDefaults.hasCompletedTutorialKey)
-    }
-    
 }

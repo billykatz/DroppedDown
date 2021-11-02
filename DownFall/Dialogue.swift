@@ -73,7 +73,7 @@ extension Dialogue {
     static let yikesAMonster: Dialogue = .init(sentences:
                                                             [
                                                                 Sentence(text: "Look out! That's a monster.", emotion: .surprised),
-                                                                Sentence(text: "The red dot means it's dormant, but once the dot turns green, it can attack you.", emotion: .content),
+                                                                Sentence(text: "The red dot means it's dormant, but once the dot turns green, it can attack you.", emotion: .skeptical),
                                                                 Sentence(text:  "Tap on it to see how it attacks.", emotion: .content),
                                                                
                                                             ],

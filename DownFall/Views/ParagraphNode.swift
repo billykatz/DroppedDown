@@ -22,6 +22,7 @@ class ParagraphNode: SKSpriteNode {
     var fontSize: CGFloat
     var text: String
     var paragraphWidth: CGFloat
+    var textAlignment: NSTextAlignment
     
     func fontName(newValue: String) {
         self.fontName = newValue
@@ -52,13 +53,15 @@ class ParagraphNode: SKSpriteNode {
          paragraphWidth: CGFloat = 2000,
          fontName: String = ParagraphNode.defaultFontName,
          fontSize: CGFloat = ParagraphNode.defaultFontSize,
-         fontColor: UIColor = ParagraphNode.defaultFontColor
+         fontColor: UIColor = ParagraphNode.defaultFontColor,
+         textAlignment: NSTextAlignment = NSTextAlignment.left
          ) {
         self.fontName = fontName
         self.text = text
         self.fontSize = fontSize
         self.fontColor = fontColor
         self.paragraphWidth = paragraphWidth - 2 * Style.paragraphPadding
+        self.textAlignment = textAlignment
         super.init(texture: nil, color: .clear, size: .zero)
         
         retexture()
@@ -72,19 +75,21 @@ class ParagraphNode: SKSpriteNode {
                           paragraphWidth: CGFloat,
                           fontName: String = ParagraphNode.defaultFontName,
                           fontSize: CGFloat = ParagraphNode.defaultFontSize,
-                          fontColor: UIColor = ParagraphNode.defaultFontColor
+                          fontColor: UIColor = ParagraphNode.defaultFontColor,
+                          textAlignment: NSTextAlignment = .left
                           ) -> ParagraphNode {
         return ParagraphNode(
             text: text,
             paragraphWidth: paragraphWidth,
             fontName: fontName,
             fontSize: fontSize,
-            fontColor: fontColor
+            fontColor: fontColor,
+            textAlignment: textAlignment
         )
     }
     
     func retexture() {
-        guard let image = imageFrom(text: self.text as NSString) else { return }
+        guard let image = imageFrom(text: self.text as NSString, textAlignment: self.textAlignment) else { return }
         let texture = SKTexture(image: image)
         self.texture = texture
         self.anchorPoint = CGPoint(x:0.5, y:0.5)
@@ -102,12 +107,12 @@ class ParagraphNode: SKSpriteNode {
 
     }()
     
-    func imageFrom(text: NSString) -> UIImage? {
+    func imageFrom(text: NSString, textAlignment: NSTextAlignment) -> UIImage? {
         
         // paragraph styling
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.lineBreakMode = NSLineBreakMode.byWordWrapping
-        paragraphStyle.alignment = NSTextAlignment.left
+        paragraphStyle.alignment = textAlignment
         paragraphStyle.lineSpacing = 1;
 
         // attributes

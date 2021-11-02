@@ -288,7 +288,7 @@ class Renderer: SKSpriteNode {
         case .pause:
             // show the menu
             foreground.addChild(menuForeground)
-            if (tutorialConductor?.isInFirstLevelOfTutorial ?? false) {
+            if (tutorialConductor?.isTutorial ?? false) {
                 menuForeground.addChildSafely(tutorialPauseNode)
             } else {
                 menuForeground.addChildSafely(menuSpriteNode)

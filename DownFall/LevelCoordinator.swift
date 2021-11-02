@@ -79,7 +79,7 @@ class LevelCoordinator: LevelCoordinating {
         let seed = UInt64.random(in: .min ... .max)
         
         // no saved tiles for fresh run
-        let freshRunModel = RunModel(player: profile.runPlayer, seed: seed, savedTiles: nil, areas: [], goalTracking: [], stats: [], unlockables: profile.unlockables, startingUnlockables: profile.startingUnlockbles, isTutorial: tutorialConductor.isTutorial)
+        let freshRunModel = RunModel(player: profile.runPlayer, seed: seed, savedTiles: nil, areas: [], goalTracking: [], stats: [], unlockables: profile.unlockables, startingUnlockables: profile.startingUnlockbles, isTutorial: { return tutorialConductor.isTutorial })
         
         self.runModel = runModel ?? freshRunModel
         RunScope.deepestDepth = profile.stats.filter( { $0.statType == .lowestDepthReached }).map { $0.amount }.first ?? 0
@@ -177,7 +177,7 @@ class LevelCoordinator: LevelCoordinating {
     
     // MARK: Utility functions
     fileprivate func saveTiles(_ savedTiles: [[Tile]]) -> RunModel {
-        return RunModel(player: runModel.player, seed: runModel.seed, savedTiles: savedTiles, areas: runModel.areas, goalTracking: runModel.goalTracking, stats: runModel.stats, unlockables: runModel.unlockables, startingUnlockables: runModel.startingUnlockables, isTutorial: runModel.isTutorial)
+        return RunModel(player: runModel.player, seed: runModel.seed, savedTiles: savedTiles, areas: runModel.areas, goalTracking: runModel.goalTracking, stats: runModel.stats, unlockables: runModel.unlockables, startingUnlockables: runModel.startingUnlockables, isTutorial: { runModel.isTutorial })
     }
     
 }

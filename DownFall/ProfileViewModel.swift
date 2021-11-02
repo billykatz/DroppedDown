@@ -153,7 +153,7 @@ class ProfileViewModel {
             newProfile = newProfile.updateStatistic(stat, amount: stat.amount, overwriteIfLarger: overwrite)
         }
         
-        /// when a palyer abandon's a run (and we hit this coe path)
+        /// when a palyer abandon's a run (and we hit this code path)
         /// we want to nil out the player's current run.
         newProfile = newProfile.updateRunModel(nil)
         

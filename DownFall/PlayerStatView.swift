@@ -76,6 +76,8 @@ struct PlayerStatsView: View {
                 UserDefaults.standard.setValue(false, forKey: UserDefaults.hasCompletedTutorialKey)
                 UserDefaults.standard.setValue(false, forKey: UserDefaults.hasDiedDuringTutorialKey)
                 UserDefaults.standard.setValue(false, forKey: UserDefaults.hasLaunchedBeforeKey)
+                UserDefaults.standard.setValue(false, forKey: UserDefaults.hasSkippedTutorialKey)
+
                 
             }) {
                 Text("Reset tutorial flags")

@@ -72,6 +72,8 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
         mainMenu.displayStoreBadge = profileViewModel?.playerHasPurchasableUnlockables() ?? false
         if allowContinueRun && (profileViewModel?.profile.currentRun != nil && profileViewModel?.profile.currentRun != .zero) {
             mainMenu.runToContinue = profileViewModel?.profile.currentRun
+        } else {
+            mainMenu.runToContinue = nil
         }
 
         view.presentScene(mainMenu, transition: transition)

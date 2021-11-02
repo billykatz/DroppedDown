@@ -20,6 +20,8 @@ class MainMenu: SKScene {
     
     struct Constants {
         static let buttonPadding = CGFloat(50.0)
+        static let notificationName = "notificationRed"
+        static let blankButtonName = "blankButton"
     }
     
     private var background: SKSpriteNode!
@@ -74,7 +76,6 @@ class MainMenu: SKScene {
     }()
     
     
-    
     override func didMove(to view: SKView) {
         background = self.childNode(withName: "background") as? SKSpriteNode
         background.color = UIColor.backgroundGray
@@ -84,7 +85,7 @@ class MainMenu: SKScene {
         self.addChild(buttonContainer)
         
         
-        let startButton = ShiftShaft_Button(size: .buttonExtralarge, delegate: self, identifier: .newGame, image: SKSpriteNode(imageNamed: "blankButton"), shape: .rectangle, addTextLabel: true)
+        let startButton = ShiftShaft_Button(size: .buttonExtralarge, delegate: self, identifier: .newGame, image: SKSpriteNode(imageNamed: Constants.blankButtonName), shape: .rectangle, addTextLabel: true)
 
         
         startButton.position = CGPoint.position(startButton.frame,
@@ -107,7 +108,7 @@ class MainMenu: SKScene {
         logo.zPosition = 1_000_000_000_000
         addChild(logo)
         
-        let menuStoreButton = ShiftShaft_Button(size: .buttonExtralarge, delegate: self, identifier: .mainMenuStore, image: SKSpriteNode(imageNamed: "blankButton"), shape: .rectangle, addTextLabel: true)
+        let menuStoreButton = ShiftShaft_Button(size: .buttonExtralarge, delegate: self, identifier: .mainMenuStore, image: SKSpriteNode(imageNamed: Constants.blankButtonName), shape: .rectangle, addTextLabel: true)
         
         menuStoreButton.position = CGPoint.alignHorizontally(menuStoreButton.frame,
                                                            relativeTo: startButton.frame,
@@ -118,22 +119,22 @@ class MainMenu: SKScene {
         menuStoreButton.zPosition = 0
         
         if displayStoreBadge {
-            let notificationBadge = SKSpriteNode(imageNamed: "notificationRed")
+            let notificationBadge = SKSpriteNode(imageNamed: Constants.notificationName)
             notificationBadge.size = CGSize.fifty
             
-            notificationBadge.position = CGPoint.position(notificationBadge.frame, inside: menuStoreButton.frame, verticalAlign: .top, horizontalAnchor: .right, xOffset: 0.0, yOffset: 5.0, translatedToBounds: true)
+            notificationBadge.position = CGPoint.position(notificationBadge.frame, inside: menuStoreButton.frame, verticalAlign: .top, horizontalAnchor: .right, xOffset: 0.0, yOffset: 5.0)
             
-            notificationBadge.name = "notificationRed"
+            notificationBadge.name = Constants.notificationName
             notificationBadge.zPosition = Precedence.flying.rawValue
             
-            addChild(notificationBadge)
+            menuStoreButton.addChild(notificationBadge)
         }
         buttonContainer.addChild(menuStoreButton)
         menuStoreButton.alpha = 0
         menuStoreButton.run(buttonFadeInAction)
         
         
-        let optionsButton = ShiftShaft_Button(size: .buttonExtralarge, delegate: self, identifier: .mainMenuOptions, image: SKSpriteNode(imageNamed: "blankButton"), shape: .rectangle, addTextLabel: true)
+        let optionsButton = ShiftShaft_Button(size: .buttonExtralarge, delegate: self, identifier: .mainMenuOptions, image: SKSpriteNode(imageNamed: Constants.blankButtonName), shape: .rectangle, addTextLabel: true)
         
         optionsButton.position = CGPoint.alignHorizontally(optionsButton.frame,
                                                          relativeTo: menuStoreButton.frame,
@@ -169,10 +170,14 @@ class MainMenu: SKScene {
             }
         }
         
+        
+        // show some FTUE if needed
+        FTUEMetaGameConductor(playableRect: size.playableRect).showFirstDeathDialog(in: self)
+        
     }
     
     func removeStoreBadge() {
-        self.removeChild(with: "notificationRed")
+        self.removeChild(with: Constants.notificationName)
     }
 }
 

@@ -35,7 +35,7 @@ class GameScene: SKScene {
     private var boardSize: Int!
     
     //foreground
-    private var foreground: SKNode!
+    private(set) var foreground: SKNode!
     
     // delegate
     weak var gameSceneDelegate: GameSceneCoordinatingDelegate?
@@ -179,6 +179,9 @@ class GameScene: SKScene {
                 guard let self = self else { return }
                 
                 self.tutorialConductor?.setTutorialCompleted(playerDied: true)
+                
+                // set this so the player sees the FTUE for dying
+                UserDefaults.standard.setValue(true, forKey: UserDefaults.shouldSeeDiedForTheFirstTimeKey)
             } else if case InputType.loseAndGoToStore = input.type {
                 guard let self = self,
                       let board = self.board,

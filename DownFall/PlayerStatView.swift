@@ -77,6 +77,11 @@ struct PlayerStatsView: View {
                 UserDefaults.standard.setValue(false, forKey: UserDefaults.hasDiedDuringTutorialKey)
                 UserDefaults.standard.setValue(false, forKey: UserDefaults.hasLaunchedBeforeKey)
                 UserDefaults.standard.setValue(false, forKey: UserDefaults.hasSkippedTutorialKey)
+                
+                // other FTUE flags
+                UserDefaults.standard.setValue(false, forKey: UserDefaults.shouldSeeDiedForTheFirstTimeKey)
+                
+                UserDefaults.standard.setValue(false, forKey: UserDefaults.hasSeenDiedForTheFirstTimeKey)
 
                 
             }) {

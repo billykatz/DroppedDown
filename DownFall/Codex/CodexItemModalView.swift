@@ -132,7 +132,7 @@ struct CodexItemModalView: View {
         if !unlockable.isUnlocked {
             return 380
         } else {
-            return 500
+            return 600
         }
     }
 

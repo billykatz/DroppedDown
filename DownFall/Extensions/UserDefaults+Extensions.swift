@@ -47,9 +47,16 @@ extension UserDefaults {
     
     static let muteSoundKey = "muteSound"
     static let showGroupNumberKey = "showRockGroupNumber"
+    
+    /// tutorial flags
     static let hasLaunchedBeforeKey = "hasLaunchedBefore"
     static let hasStartedTutorialKey = "hasStartedTutorial"
     static let hasCompletedTutorialKey = "hasCompletedTutorial"
     static let hasDiedDuringTutorialKey = "hasDiedDuringTutorial"
     static let hasSkippedTutorialKey = "hasSkippedTutorial"
+    
+    // other FTUE flags
+    static let shouldSeeDiedForTheFirstTimeKey = "shouldSeeDiedForTheFirstTime"
+    static let hasSeenDiedForTheFirstTimeKey = "hasSeenDiedForTheFirstTime"
+    
 }

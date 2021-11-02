@@ -24,6 +24,7 @@ class GameViewController: UIViewController {
     private var menuCoordinator: MenuCoordinator?
     
     private var tutorialConductor: TutorialConductor?
+    private var ftueMetagameConductor: FTUEMetaGameConductor?
     
     public var profile: Profile? = nil {
         didSet {
@@ -82,6 +83,10 @@ class GameViewController: UIViewController {
         /// set up the tutorial conductor
         let tutorialConductor = TutorialConductor()
         self.tutorialConductor = tutorialConductor
+        
+        // other FTUE conductor
+        let ftueMetagameConductor = FTUEMetaGameConductor(playableRect: view.frame.size.playableRect)
+        self.ftueMetagameConductor = ftueMetagameConductor
         
         /// setup the coordinators
         let levelCoordinator = LevelCoordinator(gameSceneNode: gameScene, entities: entities, tutorialConductor: tutorialConductor, view: view)

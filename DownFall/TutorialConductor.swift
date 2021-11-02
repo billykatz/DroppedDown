@@ -89,6 +89,7 @@ class TutorialConductor {
                 }
                 
             case .newTurn:
+                
                 /// when goals are rewarded, but the countdown for showing how to kill a monster is gonna go off, we need to tell it wait a turn so the LevelGoalTracker can use the InputQueue.  Hackyyy i know.
                 guard !allGoalsJustCompletedHoldOffOnTutorialForATurn else {
                     allGoalsJustCompletedHoldOffOnTutorialForATurn = false

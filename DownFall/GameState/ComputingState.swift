@@ -26,6 +26,7 @@ struct ComputingState: GameState {
         case .tileDetail:
             return AnyGameState(PauseState())
         case .newTurn:
+            // The Board creates the newTurn when it receives a transformation with the input type "reffing finished"
             return AnyGameState(PlayState())
         default:
             return nil

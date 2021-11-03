@@ -13,8 +13,6 @@ class FTUEDialogueOverlay: SKSpriteNode {
     let playableRect: CGRect
     let dialogueView: DialogueView
     
-    
-    
     init (playableRect: CGRect, dialog: Dialogue) {
         self.playableRect = playableRect
         
@@ -52,15 +50,24 @@ class FTUEDialogueOverlay: SKSpriteNode {
 }
 
 
-class FTUEMetaGameConductor {
+class FTUEConductor {
+    
+    var shouldShowCompletedTutorial: Bool {
+        UserDefaults.standard.bool(forKey: UserDefaults.shouldShowCompletedTutorialKey) && !UserDefaults.standard.bool(forKey: UserDefaults.hasSeenCompletedTutorialKey)
+        
+    }
+    
+    var doNotShowGoDirectlyToStoreButton: Bool {
+        return !UserDefaults.standard.bool(forKey: UserDefaults.hasSkippedTutorialKey) && !UserDefaults.standard.bool(forKey: UserDefaults.hasSeenDiedForTheFirstTimeKey)
+    }
     
     public func showFirstDeathDialog(playableRect: CGRect, in view: SKNode) {
         if UserDefaults.standard.bool(forKey: UserDefaults.shouldSeeDiedForTheFirstTimeKey) && !UserDefaults.standard.bool(forKey: UserDefaults.hasSeenDiedForTheFirstTimeKey) {
             UserDefaults.standard.setValue(true, forKey: UserDefaults.hasSeenDiedForTheFirstTimeKey)
         
-            let sentence1 = Sentence(text: "Wow, good thing the Mineral Sprites are nice. They will bring you back everytime you die.", emotion: .skeptical)
-            let sentence2 = Sentence(text: "And you'll have a chance to spend your gems at the local shoppe!", emotion: .content)
-            let sentence3 = Sentence(text: "Tap on the store button and see what's available", emotion: .content)
+            let sentence1 = Sentence(text: "Wow, good thing the Mineral Sprites are so nice. They will bring you back here everytime you die.", emotion: .skeptical)
+            let sentence2 = Sentence(text: "AND you'll have a chance to spend your gems at the local store!", emotion: .content)
+            let sentence3 = Sentence(text: "Tap on the store button and see what's available.", emotion: .content)
             let dialog = Dialogue(sentences: [sentence1, sentence2, sentence3], character: .teri, delayBeforeTyping: 0.25)
             
             let dialogView = FTUEDialogueOverlay(playableRect: playableRect, dialog: dialog)
@@ -72,18 +79,12 @@ class FTUEMetaGameConductor {
         
     }
     
-    var shouldShowCompletedTutorial: Bool {
-        UserDefaults.standard.bool(forKey: UserDefaults.shouldShowCompletedTutorialKey) && !UserDefaults.standard.bool(forKey: UserDefaults.hasSeenCompletedTutorialKey)
-        
-    }
     public func dialogForCompletingTheTutorial() -> TutorialPhase? {
-        
-        
         if shouldShowCompletedTutorial {
         
             let sentence1 = Sentence(text: "I knew you could do it! Keep up the great work!!", emotion: .surprised)
             let sentence2 = Sentence(text: "One last thing, remember those Mineral Spirits I was talking about...?", emotion: .skeptical)
-            let sentence3 = Sentence(text: "Well, they are will revive you every time you die back at base camp.  So don't worry too much about dying.", emotion: .skeptical)
+            let sentence3 = Sentence(text: "Well, they will revive you every time you die. Pretty nice of them, huh?", emotion: .skeptical)
             let dialog = Dialogue(sentences: [sentence1, sentence2, sentence3], character: .teri, delayBeforeTyping: 0.25)
             
             let ftuePhase = TutorialPhase(shouldShowHud: true, shouldShowLevelGoals: true, shouldShowLevelGoalDetailView: true, shouldShowTileDetailView: true, shouldInputLevelGoalView: false, shouldSpawnMonsters: true, shouldSpawnTileWithGem: true, dialogue: dialog, highlightTileType: nil, waitDuration: 0.0, fadeInDuration: 0.25, shouldDimScreen: true, shouldHighlightLevelGoalsInHUD: false, shouldShowRotateFinger: false)
@@ -94,7 +95,44 @@ class FTUEMetaGameConductor {
         return nil
     }
 
+    var shouldShowPhaseForEncounteringFirstRune: Bool {
+        return !UserDefaults.standard.bool(forKey: UserDefaults.hasSeenFirstRuneFTUEKey)
+
+    }
     
+    public func phaseForEncounteringFirstRune(_ runeOffer: StoreOffer) -> TutorialPhase? {
+        guard shouldShowPhaseForEncounteringFirstRune  else { return nil }
+            
+        let sentence1 = Sentence(text: "Whoa! The Minersal Spirits offered you a Rune.", emotion: .surprised)
+        let sentence2 = Sentence(text: "Collect it to add it to your pickaxe and then charge it up by mining rocks with the same color.", emotion: .content)
+        let sentence3 = Sentence(text: "When the Rune is fully charged you can use its powerful ability.", emotion: .content)
+        let dialog = Dialogue(sentences: [sentence1, sentence2, sentence3], character: .teri, delayBeforeTyping: 0.25)
+        
+        let ftuePhase = TutorialPhase(shouldShowHud: true, shouldShowLevelGoals: true, shouldShowLevelGoalDetailView: true, shouldShowTileDetailView: true, shouldInputLevelGoalView: false, shouldSpawnMonsters: true, shouldSpawnTileWithGem: true, dialogue: dialog, highlightTileType: [.offer(runeOffer)], waitDuration: 0.0, fadeInDuration: 0.25, shouldDimScreen: true, shouldHighlightLevelGoalsInHUD: false, shouldShowRotateFinger: false)
+        
+        return ftuePhase
+
+    }
+    
+    var shouldShowFTUEForMiningGems: Bool {
+        return !UserDefaults.standard.bool(forKey: UserDefaults.hasSeenMinedFirstGemFTUEKey)
+    }
+    
+    public func phaseForMiningGems(_ gemTileType: TileType) -> TutorialPhase? {
+        guard shouldShowFTUEForMiningGems  else { return nil }
+            
+        let sentence1 = Sentence(text: "Nice you mined a gem!\nOnly some rocks have gems inside.  Look for a sparkle to find the gem-infused rocks.", emotion: .surprised)
+        let sentence2 = Sentence(text: "The more rocks in the group the more gems you will mine!", emotion: .content)
+        let sentence3 = Sentence(text: "Less than 10 rocks earns you 1 gem per rock. \n10 or more rocks earn you 2 gems per rock.", emotion: .skeptical)
+        let sentence4 = Sentence(text: "Some of the best miners can earn 3 gems per rock but that is super rare.", emotion: .skeptical)
+        let dialog = Dialogue(sentences: [sentence1, sentence2, sentence3, sentence4], character: .teri, delayBeforeTyping: 0.25)
+        
+        let ftuePhase = TutorialPhase(shouldShowHud: true, shouldShowLevelGoals: true, shouldShowLevelGoalDetailView: true, shouldShowTileDetailView: true, shouldInputLevelGoalView: false, shouldSpawnMonsters: true, shouldSpawnTileWithGem: true, dialogue: dialog, highlightTileType: [gemTileType], waitDuration: 0.0, fadeInDuration: 0.25, shouldDimScreen: true, shouldHighlightLevelGoalsInHUD: false, shouldShowRotateFinger: false)
+        
+        return ftuePhase
+
+    }
+
     
 }
 

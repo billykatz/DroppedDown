@@ -12,7 +12,6 @@ import Combine
 // This class is meant to interact with the Profile model
 // It is also responsible for making sure we save the Profile after every major update.
 class ProfileViewModel {
-//    let profileLoadingManger: ProfileLoadingManager
     lazy var profilePublisher: AnyPublisher<Profile, Never> = profileSubject.eraseToAnyPublisher()
     private lazy var profileSubject = CurrentValueSubject<Profile, Never>(.zero)
     
@@ -56,9 +55,6 @@ class ProfileViewModel {
         
         let newProfile = profile.updateStatistics(newStatistics)
         profileSubject.send(newProfile)
-//        saveProfile(newProfile)
-        
-//        checkUnlockables()
     }
     
     func updateGems(amount: Int) {

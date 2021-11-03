@@ -8,14 +8,10 @@
 
 import Foundation
 
-struct FTUEFlags: Codable, Hashable {
-    var hasCompletedTutorial = false
-}
-
 struct Profile: Codable, Equatable {
-    static var debugProfile = Profile(name: "debug", player: .lotsOfCash, currentRun: nil, stats: Statistics.startingStats, unlockables: Unlockable.unlockables, startingUnlockbles: [], ftueFlags: FTUEFlags())
+    static var debugProfile = Profile(name: "debug", player: .lotsOfCash, currentRun: nil, stats: Statistics.startingStats, unlockables: Unlockable.unlockables, startingUnlockbles: [])
     
-    static var zero = Profile(name: "zero", player: .zero, currentRun: nil, stats: [], unlockables: [], startingUnlockbles: [], ftueFlags: FTUEFlags())
+    static var zero = Profile(name: "zero", player: .zero, currentRun: nil, stats: [], unlockables: [], startingUnlockbles: [])
     
     let name: String
     let player: EntityModel
@@ -25,8 +21,6 @@ struct Profile: Codable, Equatable {
     let unlockables: [Unlockable]
     
     let startingUnlockbles: [Unlockable]
-    
-    var ftueFlags: FTUEFlags
     
     
     /// for now this is just the number of unlockables unlocked
@@ -45,14 +39,13 @@ struct Profile: Codable, Equatable {
 
     }
     
-    init(name: String, player: EntityModel, currentRun: RunModel?, stats: [Statistics], unlockables: [Unlockable], startingUnlockbles: [Unlockable], ftueFlags: FTUEFlags) {
+    init(name: String, player: EntityModel, currentRun: RunModel?, stats: [Statistics], unlockables: [Unlockable], startingUnlockbles: [Unlockable]) {
         self.name = name
         self.player = player
         self.currentRun = currentRun
         self.stats = stats
         self.unlockables = unlockables
         self.startingUnlockbles = startingUnlockbles
-        self.ftueFlags = ftueFlags
     }
     
     func encode(to encoder: Encoder) throws {
@@ -118,11 +111,11 @@ struct Profile: Codable, Equatable {
     }
     
     func updatePlayer(_ entityModel: EntityModel) -> Profile {
-        return Profile(name: name, player: entityModel, currentRun: currentRun, stats: stats, unlockables: unlockables, startingUnlockbles: startingUnlockbles, ftueFlags: ftueFlags)
+        return Profile(name: name, player: entityModel, currentRun: currentRun, stats: stats, unlockables: unlockables, startingUnlockbles: startingUnlockbles)
     }
     
     func updateRunModel(_ currentRun: RunModel?) -> Profile {
-        return Profile(name: name, player: player, currentRun: currentRun, stats: stats, unlockables: unlockables, startingUnlockbles: startingUnlockbles, ftueFlags: ftueFlags)
+        return Profile(name: name, player: player, currentRun: currentRun, stats: stats, unlockables: unlockables, startingUnlockbles: startingUnlockbles)
     }
     
     

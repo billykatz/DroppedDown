@@ -67,7 +67,13 @@ class DialogueView: SKSpriteNode {
     
     func showNextCharacter() {
         // remove the old one
-        containerView.removeChild(with: dialogCharacterSpriteName)
+        if let oldCharacter = containerView.childNode(withName: dialogCharacterSpriteName) {
+            let fadeOut = SKAction.fadeOut(withDuration: 0.125)
+            fadeOut.timingMode = .easeIn
+            let group = SKAction.group([fadeOut, .removeFromParent()])
+            oldCharacter.run(group)
+        }
+//        containerView.removeChild(with: dialogCharacterSpriteName)
         
         // create the new one
         let emotion = dialogue.sentences[sentenceIndex].emotion
@@ -77,8 +83,13 @@ class DialogueView: SKSpriteNode {
         image.name = dialogCharacterSpriteName
         image.position = characterBoxPosition
         image.zPosition = 100000
+        image.alpha = 0
+        
+        let fadeIn = SKAction.fadeIn(withDuration: 0.125)
+        fadeIn.timingMode = .easeOut
         
         containerView.addChild(image)
+        image.run(fadeIn)
         
     }
     

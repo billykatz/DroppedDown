@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "Reward1Border.png",
+      "filename" : "pink-diamond-stroke.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "Reward1Border@2x.png",
+      "filename" : "pink-diamond-stroke@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "Reward1Border@3x.png",
+      "filename" : "pink-diamond-stroke@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

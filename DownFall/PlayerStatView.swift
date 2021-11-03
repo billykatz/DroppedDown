@@ -78,18 +78,31 @@ struct PlayerStatsView: View {
                 UserDefaults.standard.setValue(false, forKey: UserDefaults.hasLaunchedBeforeKey)
                 UserDefaults.standard.setValue(false, forKey: UserDefaults.hasSkippedTutorialKey)
                 
-                // other FTUE flags
-                UserDefaults.standard.setValue(false, forKey: UserDefaults.shouldSeeDiedForTheFirstTimeKey)
                 
-                UserDefaults.standard.setValue(false, forKey: UserDefaults.hasSeenDiedForTheFirstTimeKey)
                 
                 UserDefaults.standard.setValue(false, forKey: UserDefaults.shouldShowCompletedTutorialKey)
                 
                 UserDefaults.standard.setValue(false, forKey: UserDefaults.hasSeenCompletedTutorialKey)
 
+
                 
             }) {
                 Text("Reset tutorial flags")
+                    .foregroundColor(.white)
+                    .frame(width: 200, height: 75)
+                    .background(Color(.backgroundGray))
+                    .cornerRadius(5.0)
+            }
+            Button(action: {
+                UserDefaults.standard.setValue(false, forKey: UserDefaults.shouldSeeDiedForTheFirstTimeKey)
+                
+                UserDefaults.standard.setValue(false, forKey: UserDefaults.hasSeenDiedForTheFirstTimeKey)
+                
+                UserDefaults.standard.setValue(false, forKey: UserDefaults.hasSeenFirstRuneFTUEKey)
+                
+                UserDefaults.standard.setValue(false, forKey: UserDefaults.hasSeenMinedFirstGemFTUEKey)
+            }){
+                Text("Reset FTUE flags")
                     .foregroundColor(.white)
                     .frame(width: 200, height: 75)
                     .background(Color(.backgroundGray))

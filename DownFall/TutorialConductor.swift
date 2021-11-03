@@ -41,7 +41,7 @@ class TutorialConductor {
     
     var shouldShowLevelGoalsAtStart: Bool {
         if isTutorial { return false }
-        else if FTUEMetaGameConductor().shouldShowCompletedTutorial { return false }
+        else if FTUEConductor().shouldShowCompletedTutorial { return false }
         else if !self.phase.shouldInputLevelGoalView { return false }
         return true
     }
@@ -49,6 +49,11 @@ class TutorialConductor {
     
     init() {
         self.phase = .thisIsYou
+        
+        if !isTutorial {
+            // just set this to a phase that allows the level goal detail view to be inputted
+            self.phase = .levelGoalRewards
+        }
     }
     
     func startHandlingInput() {
@@ -65,13 +70,88 @@ class TutorialConductor {
         }
     }
     
+    var ftueLevelGoalRewardedWaitATurn = false
+    var ftueCollectedItemDontShowMiningGem = false
+    
+    var shouldSendRuneOfferPhase: TutorialPhase? = nil
+    var shouldSendMiningGemsPhase : TutorialPhase? = nil
+    
     func handleFTUEInput(_ input: Input) {
         switch input.type {
         case .boardBuilt:
-            if let dialog = FTUEMetaGameConductor().dialogForCompletingTheTutorial() {
+            if let dialog = FTUEConductor().dialogForCompletingTheTutorial() {
                 InputQueue.append(.init(.tutorialPhaseStart(dialog)))
                 UserDefaults.standard.setValue(true, forKey: UserDefaults.hasSeenCompletedTutorialKey)
             }
+            
+            // reset these flags just in case they got set at the end of the level
+            shouldSendRuneOfferPhase = nil
+            shouldSendMiningGemsPhase = nil
+            
+        case .boardLoaded:
+            // reset these flags just in case they got set at the end of the level
+            shouldSendRuneOfferPhase = nil
+            shouldSendMiningGemsPhase = nil
+            
+        case .goalCompleted:
+            ftueLevelGoalRewardedWaitATurn = true
+            
+        case .collectItem:
+            ftueCollectedItemDontShowMiningGem = true
+            
+        case .transformation(let trans):
+            if let first = trans.first,
+               let offers = first.offers,
+               case .goalCompleted = first.inputType,
+               let runeOffer = offers.first(where: { $0.rune != nil }),
+               let phase = FTUEConductor().phaseForEncounteringFirstRune(runeOffer) {
+                shouldSendRuneOfferPhase = phase
+            }
+            
+            if let first = trans.first,
+               first.removedTilesContainGem ?? false,
+               case .touch = first.inputType,
+               let endTiles = first.endTiles {
+                let gemTile = endTiles
+                    .joined() // flatten 2d array
+                    .first(where: // find the first gem offer on the board
+                        {
+                            if case TileType.item = $0.type {
+                                return true
+                            }
+                            return false
+                        })
+                if let gemTileType = gemTile?.type, let phase = FTUEConductor().phaseForMiningGems(gemTileType){
+                    shouldSendMiningGemsPhase = phase
+                }
+                
+            }
+            
+        case .newTurn:
+            if let phase = shouldSendRuneOfferPhase {
+                shouldSendRuneOfferPhase = nil
+                InputQueue.append(.init(.tutorialPhaseStart(phase)))
+                UserDefaults.standard.setValue(true, forKey: UserDefaults.hasSeenFirstRuneFTUEKey)
+            } else if let phase = shouldSendMiningGemsPhase {
+                // basically we want to show this tip as soon as possible
+                // So if it every coincides with level goals being rewarded, then just skip it by setting the phase to nil
+                if ftueLevelGoalRewardedWaitATurn || ftueCollectedItemDontShowMiningGem {
+                    ftueLevelGoalRewardedWaitATurn = false
+                    ftueCollectedItemDontShowMiningGem = false
+                    shouldSendMiningGemsPhase = nil
+                } else {
+                    InputQueue.append(.init(.tutorialPhaseStart(phase)))
+                    shouldSendMiningGemsPhase = nil
+                    UserDefaults.standard.setValue(true, forKey: UserDefaults.hasSeenMinedFirstGemFTUEKey)
+                }
+            }
+            // reset flags that we use to push off the FTUE in case they coincide with other events 
+            else if ftueLevelGoalRewardedWaitATurn || ftueCollectedItemDontShowMiningGem {
+                ftueLevelGoalRewardedWaitATurn = false
+                ftueCollectedItemDontShowMiningGem = false
+            }
+            
+            
         default:
             ()
         }
@@ -156,7 +236,7 @@ class TutorialConductor {
                 self.phase = .levelGoalRewards
                 InputQueue.append(.init(.tutorialPhaseStart(phase)))
             }
-                
+            
             // progress the tutorial in case they forget the goal
             if turnsSinceMonsterAppeared >= 8 && !showedHowToKillAMonsterAlready {
                 showedHowToKillAMonsterAlready = true
@@ -225,7 +305,7 @@ class TutorialConductor {
             } else {
                 UserDefaults.standard.setValue(true, forKey: UserDefaults.shouldShowCompletedTutorialKey)
                 
-                if let phase = FTUEMetaGameConductor().dialogForCompletingTheTutorial() {
+                if let phase = FTUEConductor().dialogForCompletingTheTutorial() {
                     self.phase = phase
                 }
             }

@@ -251,6 +251,7 @@ enum TileType: Hashable, CaseIterable, Codable {
         return false
     }
     
+    
     var isDestructible: Bool {
         return isARock || isAPillar
     }

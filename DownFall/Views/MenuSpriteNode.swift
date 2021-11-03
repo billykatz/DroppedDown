@@ -302,16 +302,18 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             
             addChild(mainMenuButton)
             
-            let storeButton = ShiftShaft_Button(size: buttonSize,
-                                                delegate: buttonDelegate ?? self,
-                                                identifier: .loseAndGoToStore,
-                                                precedence: precedence,
-                                                fontSize: .fontLargeSize,
-                                                fontColor: .black,
-                                                backgroundColor: .buttonGray)
-            storeButton.position = CGPoint.alignHorizontally(storeButton.frame, relativeTo: mainMenuButton.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: Style.Padding.more*2, translatedToBounds: true)
-            
-            addChild(storeButton)
+            if (!FTUEConductor().doNotShowGoDirectlyToStoreButton) {
+                let storeButton = ShiftShaft_Button(size: buttonSize,
+                                                    delegate: buttonDelegate ?? self,
+                                                    identifier: .loseAndGoToStore,
+                                                    precedence: precedence,
+                                                    fontSize: .fontLargeSize,
+                                                    fontColor: .black,
+                                                    backgroundColor: .buttonGray)
+                storeButton.position = CGPoint.alignHorizontally(storeButton.frame, relativeTo: mainMenuButton.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: Style.Padding.more*2, translatedToBounds: true)
+                
+                addChild(storeButton)
+            }
             
             
             

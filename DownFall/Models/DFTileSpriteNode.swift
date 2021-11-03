@@ -52,11 +52,14 @@ class DFTileSpriteNode: SKSpriteNode {
                 
                 super.init(texture: firstTexture,
                            color: .clear,
-                           size: CGSize(width: width, height: height))
+                           size: CGSize(width: width*0.75, height: height*0.75))
                 
                 self.run(repeatAction)
             } else {
-                fallthrough
+                super.init(texture: SKTexture(imageNamed: type.textureString()),
+                           color: .clear,
+                           size: CGSize(width: width*0.75, height: height*0.75))
+//                fallthrough
             }
         default:
             super.init(texture: SKTexture(imageNamed: type.textureString()),
@@ -188,7 +191,9 @@ class DFTileSpriteNode: SKSpriteNode {
     func showOfferTier(_ offer: StoreOffer) {
         let sprite = SKSpriteNode(imageNamed: "Reward\(offer.tier)Border")
         sprite.position = .zero
-        sprite.size = self.size
+        sprite.size = self.size.scale(by: 1.33)
+//        sprite.alpha = 0.5
+        sprite.zPosition = -10
         
         addChild(sprite)
     }

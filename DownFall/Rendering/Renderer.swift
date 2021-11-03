@@ -320,7 +320,7 @@ class Renderer: SKSpriteNode {
             // convert the sprites to tile types
             guard let _ = phase.highlightTileType else { return nil }
             guard let sprites = self?.sprites,
-                  let first = typeCount(for: sprites.map{ $0.map { $0.type } }, of: tileType).first else { return .zero }
+                  let first = typeCount(for: sprites.map{ $0.map { $0.type } }, of: tileType).first else { return nil }
             
             return positionInForeground(at: first)
         }

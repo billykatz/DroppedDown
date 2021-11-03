@@ -467,15 +467,16 @@ class Board: Equatable {
         let playerQuadrant = Quadrant.quadrant(of: pp, in: boardSize)
         var transformedTiles: [TileTransformation] = []
         var reservedCoords = self.reservedCoords()
+        var offers: [StoreOffer] = []
         for (idx, _) in goals.enumerated() {
             // get a random coord not in the reserved set
-            let randomCoordInAnotherQuadrant = playerQuadrant.opposite.randomCoord(for: boardSize, notIn: reservedCoords)
+            let randomCoordInAnotherQuadrant = playerQuadrant.other.randomCoord(for: boardSize, notIn: reservedCoords)
             
             /// dont overwrite this coord in the future
             reservedCoords.insert(randomCoordInAnotherQuadrant)
             
             // get another random coord not in the reserved set
-            let anotherRandomCoordInAnotherQuadrant = playerQuadrant.opposite.randomCoord(for: boardSize, notIn: reservedCoords)
+            let anotherRandomCoordInAnotherQuadrant = playerQuadrant.other.randomCoord(for: boardSize, notIn: reservedCoords)
             
             /// dont overwrite this coord in the future
             reservedCoords.insert(anotherRandomCoordInAnotherQuadrant)
@@ -495,10 +496,12 @@ class Board: Equatable {
             tiles[randomCoordInAnotherQuadrant.row][randomCoordInAnotherQuadrant.column] = Tile(type: .offer(randomOffers[0]))
             
             tiles[anotherRandomCoordInAnotherQuadrant.row][anotherRandomCoordInAnotherQuadrant.column] = Tile(type: .offer(randomOffers[1]))
+            
+            offers = randomOffers
         }
         
         self.tiles = tiles
-        return Transformation(transformation: transformedTiles, inputType: inputType, endTiles: tiles)
+        return Transformation(transformation: transformedTiles, inputType: inputType, endTiles: tiles, offers: offers)
     }
     
     private func playerDataUpdated(inputType: InputType) -> Transformation {

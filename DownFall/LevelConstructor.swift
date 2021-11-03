@@ -37,8 +37,8 @@ struct LevelConstructor {
         
         if depth == 0 && isTutorial {
             return [
-                StoreOffer.offer(type: .dodge(amount: 5), tier: 1),
-                StoreOffer.offer(type: .luck(amount: 5), tier: 1)
+                StoreOffer.offer(type: .gems(amount: 15), tier: 1),
+                StoreOffer.offer(type: .plusOneMaxHealth, tier: 1)
             ]
         }
         
@@ -76,15 +76,16 @@ struct LevelConstructor {
             
             guard let healingOption = healingOptions.randomElement() else { preconditionFailure("There must always be at least 1 unlockable at tier 1 for healing")}
             
-            let otherOptions =
-                unlockables
-                .filter { unlockable in
-                    return !healingOptions.contains(unlockable) && unlockable.canAppearInRun && unlockable.item.tier == tier
-                }
-            
-            guard let otherOption = otherOptions.randomElement() else {  preconditionFailure("There must always be at least 1 other unlockable at tier 1 that isn't healing")}
-            
-            return [healingOption.item, otherOption.item]
+//            let otherOptions = [
+//                unlockables
+//                .filter { unlockable in
+//                    return !healingOptions.contains(unlockable) && unlockable.canAppearInRun && unlockable.item.tier == tier
+//                }
+//
+//            guard let otherOption = otherOptions.randomElement() else {  preconditionFailure("There must always be at least 1 other unlockable at tier 1 that isn't healing")}
+
+//            return [healingOption.item, otherOption.item]
+            return [healingOption.item, StoreOffer.offer(type: .rune(.rune(for: .bubbleUp)), tier: 1)]
         }
         else if tier == 2 {
             let playerHasFullPickaxe = playerData.pickaxe?.isAtMaxCapacity() ?? false

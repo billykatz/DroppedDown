@@ -61,4 +61,7 @@ extension UserDefaults {
     static let shouldShowCompletedTutorialKey = "shouldShowCompletedTutorial"
     static let hasSeenCompletedTutorialKey = "hasSeenCompletedTutorial"
     
+    static let hasSeenFirstRuneFTUEKey = "hasSeenFirstRuneFTUE"
+    static let hasSeenMinedFirstGemFTUEKey = "hasSeenMinedFirstGemFTUE"
+    
 }

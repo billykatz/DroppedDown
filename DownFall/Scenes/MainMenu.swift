@@ -172,7 +172,7 @@ class MainMenu: SKScene {
         
         
         // show some FTUE if needed
-        FTUEMetaGameConductor(playableRect: size.playableRect).showFirstDeathDialog(in: self)
+        FTUEMetaGameConductor().showFirstDeathDialog(playableRect: size.playableRect, in: self)
         
     }
     

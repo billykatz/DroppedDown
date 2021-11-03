@@ -54,13 +54,7 @@ class FTUEDialogueOverlay: SKSpriteNode {
 
 class FTUEMetaGameConductor {
     
-    private let playableRect: CGRect
-    
-    init(playableRect: CGRect){
-        self.playableRect = playableRect
-    }
-    
-    public func showFirstDeathDialog(in view: SKNode) {
+    public func showFirstDeathDialog(playableRect: CGRect, in view: SKNode) {
         if UserDefaults.standard.bool(forKey: UserDefaults.shouldSeeDiedForTheFirstTimeKey) && !UserDefaults.standard.bool(forKey: UserDefaults.hasSeenDiedForTheFirstTimeKey) {
             UserDefaults.standard.setValue(true, forKey: UserDefaults.hasSeenDiedForTheFirstTimeKey)
         
@@ -77,6 +71,29 @@ class FTUEMetaGameConductor {
         }
         
     }
+    
+    var shouldShowCompletedTutorial: Bool {
+        UserDefaults.standard.bool(forKey: UserDefaults.shouldShowCompletedTutorialKey) && !UserDefaults.standard.bool(forKey: UserDefaults.hasSeenCompletedTutorialKey)
+        
+    }
+    public func dialogForCompletingTheTutorial() -> TutorialPhase? {
+        
+        
+        if shouldShowCompletedTutorial {
+        
+            let sentence1 = Sentence(text: "I knew you could do it! Keep up the great work!!", emotion: .surprised)
+            let sentence2 = Sentence(text: "One last thing, remember those Mineral Spirits I was talking about...?", emotion: .skeptical)
+            let sentence3 = Sentence(text: "Well, they are will revive you every time you die back at base camp.  So don't worry too much about dying.", emotion: .skeptical)
+            let dialog = Dialogue(sentences: [sentence1, sentence2, sentence3], character: .teri, delayBeforeTyping: 0.25)
+            
+            let ftuePhase = TutorialPhase(shouldShowHud: true, shouldShowLevelGoals: true, shouldShowLevelGoalDetailView: true, shouldShowTileDetailView: true, shouldInputLevelGoalView: false, shouldSpawnMonsters: true, shouldSpawnTileWithGem: true, dialogue: dialog, highlightTileType: nil, waitDuration: 0.0, fadeInDuration: 0.25, shouldDimScreen: true, shouldHighlightLevelGoalsInHUD: false, shouldShowRotateFinger: false)
+            
+            return ftuePhase
+        }
+        
+        return nil
+    }
+
     
     
 }

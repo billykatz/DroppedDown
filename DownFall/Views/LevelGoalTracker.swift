@@ -89,12 +89,8 @@ class LevelGoalTracker: LevelGoalTracking {
             countPillars(in: input.endTilesStruct ?? [])
             
             
-            if !tutorialConductor.isTutorial {
+            if tutorialConductor.shouldShowLevelGoalsAtStart {
                 InputQueue.append(Input(.levelGoalDetail(goalProgress)))
-            } else {
-                if tutorialConductor.phase.shouldInputLevelGoalView {
-                    InputQueue.append(Input(.levelGoalDetail(goalProgress)))
-                }
             }
             
         case .itemUsed:

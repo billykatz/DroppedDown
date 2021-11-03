@@ -85,7 +85,7 @@ class GameViewController: UIViewController {
         self.tutorialConductor = tutorialConductor
         
         // other FTUE conductor
-        let ftueMetagameConductor = FTUEMetaGameConductor(playableRect: view.frame.size.playableRect)
+        let ftueMetagameConductor = FTUEMetaGameConductor()
         self.ftueMetagameConductor = ftueMetagameConductor
         
         /// setup the coordinators

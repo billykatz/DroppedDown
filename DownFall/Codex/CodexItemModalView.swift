@@ -125,7 +125,6 @@ struct CodexItemModalView: View {
     
     struct Constants {
         static let backgroundWidth: CGFloat = 300
-        static let backgroundHeight: CGFloat = 500
     }
     
     var backgroundHeight: CGFloat {

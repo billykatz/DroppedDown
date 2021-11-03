@@ -58,5 +58,7 @@ extension UserDefaults {
     // other FTUE flags
     static let shouldSeeDiedForTheFirstTimeKey = "shouldSeeDiedForTheFirstTime"
     static let hasSeenDiedForTheFirstTimeKey = "hasSeenDiedForTheFirstTime"
+    static let shouldShowCompletedTutorialKey = "shouldShowCompletedTutorial"
+    static let hasSeenCompletedTutorialKey = "hasSeenCompletedTutorial"
     
 }

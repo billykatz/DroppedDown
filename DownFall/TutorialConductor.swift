@@ -39,6 +39,13 @@ class TutorialConductor {
         return !UserDefaults.standard.bool(forKey: UserDefaults.hasCompletedTutorialKey) && !UserDefaults.standard.bool(forKey: UserDefaults.hasSkippedTutorialKey)
     }
     
+    var shouldShowLevelGoalsAtStart: Bool {
+        if isTutorial { return false }
+        else if FTUEMetaGameConductor().shouldShowCompletedTutorial { return false }
+        else if !self.phase.shouldInputLevelGoalView { return false }
+        return true
+    }
+    
     
     init() {
         self.phase = .thisIsYou
@@ -52,106 +59,124 @@ class TutorialConductor {
     
     private func handle(_ input: Input) {
         if isTutorial {
-            switch input.type {
-            case .boardBuilt:
-                InputQueue.append(.init(.tutorialPhaseStart(.thisIsYou)))
-            case .tutorialPhaseEnd(let phase):
-                transitionToPhase(from: phase)
-                
-            case .transformation(let trans):
-                guard let tran = trans.first,
-                      case InputType.touch? = tran.inputType,
-                      tran.newTiles != nil else {
-                    return
-                }
-                minedRocksForFirstTime = true
-            case .collectItem, .collectOffer:
-                collectedItemsForFirstTime = true
-                
-            case .tileDetail(let type, _):
-                if type == .monster(.zero) && !tappedOnMonsterForFirstTime {
-                    tappedOnMonsterForFirstTime = true
-                }
-                
-            case .monsterDies:
-                monsterKilled = true
-                
-            case .play:
-                if tappedOnMonsterForFirstTime && !showedHowToKillAMonsterAlready {
-                    showedHowToKillAMonsterAlready = true
-                    InputQueue.append(.init(.tutorialPhaseStart(phase)))
-                }
-                
-            case .goalCompleted(_, let allRewarded):
-                if allRewarded {
-                    levelGoalsAwarded = true
-                    allGoalsJustCompletedHoldOffOnTutorialForATurn = true
-                }
-                
-            case .newTurn:
-                
-                /// when goals are rewarded, but the countdown for showing how to kill a monster is gonna go off, we need to tell it wait a turn so the LevelGoalTracker can use the InputQueue.  Hackyyy i know.
-                guard !allGoalsJustCompletedHoldOffOnTutorialForATurn else {
-                    allGoalsJustCompletedHoldOffOnTutorialForATurn = false
-                    return
-                }
-                
-                if minedRocksForFirstTime && !showedRotateTutorialAlready {
-                    showedRotateTutorialAlready = true
-                    InputQueue.append(.init(.tutorialPhaseStart(phase)))
-                }
-                
-                if collectedItemsForFirstTime && !showedCollectedItemsTutorialAlready {
-                    showedCollectedItemsTutorialAlready = true
-                    InputQueue.append(.init(.tutorialPhaseStart(phase)))
-                }
-                
-                
-                // the monster has appeared
-                if collectedItemsForFirstTime {
-                    turnsSinceMonsterAppeared += 1
-                }
-                
-                if monsterKilled && !showMonsterKilledAlready {
-                    showMonsterKilledAlready = true
-                    showedHowToKillAMonsterAlready = true
-                    
-                    self.phase = levelGoalsAwarded ? .yayMonsterDead2GoalCompleted : .yayMonsterDead1GoalCompleted
-                    
-                    InputQueue.append(.init(.tutorialPhaseStart(phase)))
-                }
-                
-                // you still havent killed a monster but you completed a level goal
-                if levelGoalsAwarded && !showedLevelGoalsTutorialAlready {
-                    
-                    // we want to reset this timer so they still have a chance to do this naturally
-                    turnsSinceMonsterAppeared = 0
-                    showedLevelGoalsTutorialAlready = true
-                    self.phase = .levelGoalRewards
-                    InputQueue.append(.init(.tutorialPhaseStart(phase)))
-                }
-                    
-                // progress the tutorial in case they forget the goal
-                if turnsSinceMonsterAppeared >= 8 && !showedHowToKillAMonsterAlready {
-                    showedHowToKillAMonsterAlready = true
-                    InputQueue.append(.init(.tutorialPhaseStart(phase)))
-                }
-                
-                
-                if levelGoalsAwarded {
-                    turnsSinceExitUnlocked += 1
-                }
-                
-                if turnsSinceExitUnlocked >= 20 && !showedYouCanLeaveNowAlready {
-                    showedYouCanLeaveNowAlready = true
-                    self.phase = .youCanLeaveNow
-                    InputQueue.append(.init(.tutorialPhaseStart(phase)))
-                }
-                
-                
-            default:
-                break;
+            handleTutorialInput(input)
+        } else {
+            handleFTUEInput(input)
+        }
+    }
+    
+    func handleFTUEInput(_ input: Input) {
+        switch input.type {
+        case .boardBuilt:
+            if let dialog = FTUEMetaGameConductor().dialogForCompletingTheTutorial() {
+                InputQueue.append(.init(.tutorialPhaseStart(dialog)))
+                UserDefaults.standard.setValue(true, forKey: UserDefaults.hasSeenCompletedTutorialKey)
             }
+        default:
+            ()
+        }
+    }
+    
+    func handleTutorialInput(_ input: Input) {
+        switch input.type {
+        case .boardBuilt:
+            InputQueue.append(.init(.tutorialPhaseStart(.thisIsYou)))
+        case .tutorialPhaseEnd(let phase):
+            transitionToPhase(from: phase)
+            
+        case .transformation(let trans):
+            guard let tran = trans.first,
+                  case InputType.touch? = tran.inputType,
+                  tran.newTiles != nil else {
+                return
+            }
+            minedRocksForFirstTime = true
+        case .collectItem, .collectOffer:
+            collectedItemsForFirstTime = true
+            
+        case .tileDetail(let type, _):
+            if type == .monster(.zero) && !tappedOnMonsterForFirstTime {
+                tappedOnMonsterForFirstTime = true
+            }
+            
+        case .monsterDies:
+            monsterKilled = true
+            
+        case .play:
+            if tappedOnMonsterForFirstTime && !showedHowToKillAMonsterAlready {
+                showedHowToKillAMonsterAlready = true
+                InputQueue.append(.init(.tutorialPhaseStart(phase)))
+            }
+            
+        case .goalCompleted(_, let allRewarded):
+            if allRewarded {
+                levelGoalsAwarded = true
+                allGoalsJustCompletedHoldOffOnTutorialForATurn = true
+            }
+            
+        case .newTurn:
+            
+            /// when goals are rewarded, but the countdown for showing how to kill a monster is gonna go off, we need to tell it wait a turn so the LevelGoalTracker can use the InputQueue.  Hackyyy i know.
+            guard !allGoalsJustCompletedHoldOffOnTutorialForATurn else {
+                allGoalsJustCompletedHoldOffOnTutorialForATurn = false
+                return
+            }
+            
+            if minedRocksForFirstTime && !showedRotateTutorialAlready {
+                showedRotateTutorialAlready = true
+                InputQueue.append(.init(.tutorialPhaseStart(phase)))
+            }
+            
+            if collectedItemsForFirstTime && !showedCollectedItemsTutorialAlready {
+                showedCollectedItemsTutorialAlready = true
+                InputQueue.append(.init(.tutorialPhaseStart(phase)))
+            }
+            
+            
+            // the monster has appeared
+            if collectedItemsForFirstTime {
+                turnsSinceMonsterAppeared += 1
+            }
+            
+            if monsterKilled && !showMonsterKilledAlready {
+                showMonsterKilledAlready = true
+                showedHowToKillAMonsterAlready = true
+                
+                self.phase = levelGoalsAwarded ? .yayMonsterDead2GoalCompleted : .yayMonsterDead1GoalCompleted
+                
+                InputQueue.append(.init(.tutorialPhaseStart(phase)))
+            }
+            
+            // you still havent killed a monster but you completed a level goal
+            if levelGoalsAwarded && !showedLevelGoalsTutorialAlready {
+                
+                // we want to reset this timer so they still have a chance to do this naturally
+                turnsSinceMonsterAppeared = 0
+                showedLevelGoalsTutorialAlready = true
+                self.phase = .levelGoalRewards
+                InputQueue.append(.init(.tutorialPhaseStart(phase)))
+            }
+                
+            // progress the tutorial in case they forget the goal
+            if turnsSinceMonsterAppeared >= 8 && !showedHowToKillAMonsterAlready {
+                showedHowToKillAMonsterAlready = true
+                InputQueue.append(.init(.tutorialPhaseStart(phase)))
+            }
+            
+            
+            if levelGoalsAwarded {
+                turnsSinceExitUnlocked += 1
+            }
+            
+            if turnsSinceExitUnlocked >= 20 && !showedYouCanLeaveNowAlready {
+                showedYouCanLeaveNowAlready = true
+                self.phase = .youCanLeaveNow
+                InputQueue.append(.init(.tutorialPhaseStart(phase)))
+            }
+            
+            
+        default:
+            break;
         }
     }
     
@@ -186,6 +211,7 @@ class TutorialConductor {
     func setTutorialSkipped() {
         if isTutorial {
             UserDefaults.standard.setValue(true, forKey: UserDefaults.hasSkippedTutorialKey)
+            UserDefaults.standard.setValue(false, forKey: UserDefaults.shouldShowCompletedTutorialKey)
         }
     }
     
@@ -196,6 +222,12 @@ class TutorialConductor {
             
             if playerDied {
                 UserDefaults.standard.setValue(true, forKey: UserDefaults.hasDiedDuringTutorialKey)
+            } else {
+                UserDefaults.standard.setValue(true, forKey: UserDefaults.shouldShowCompletedTutorialKey)
+                
+                if let phase = FTUEMetaGameConductor().dialogForCompletingTheTutorial() {
+                    self.phase = phase
+                }
             }
         }
     }

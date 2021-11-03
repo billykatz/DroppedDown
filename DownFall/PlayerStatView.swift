@@ -82,6 +82,10 @@ struct PlayerStatsView: View {
                 UserDefaults.standard.setValue(false, forKey: UserDefaults.shouldSeeDiedForTheFirstTimeKey)
                 
                 UserDefaults.standard.setValue(false, forKey: UserDefaults.hasSeenDiedForTheFirstTimeKey)
+                
+                UserDefaults.standard.setValue(false, forKey: UserDefaults.shouldShowCompletedTutorialKey)
+                
+                UserDefaults.standard.setValue(false, forKey: UserDefaults.hasSeenCompletedTutorialKey)
 
                 
             }) {

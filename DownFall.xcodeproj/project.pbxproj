@@ -27,6 +27,7 @@
 		2842BABF26A0EC740021CD0B /* CodexItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2842BABE26A0EC740021CD0B /* CodexItemView.swift */; };
 		2842BAC126A0EEC10021CD0B /* StoreOfferType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2842BAC026A0EEC10021CD0B /* StoreOfferType.swift */; };
 		284F2EC32731DB3C00032088 /* FTUEConductor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 284F2EC22731DB3C00032088 /* FTUEConductor.swift */; };
+		284F2EC827335BC200032088 /* background-music.wav in Resources */ = {isa = PBXBuildFile; fileRef = 284F2EC727335BC200032088 /* background-music.wav */; };
 		2886E83E26F0303B0014FA5D /* SettingsCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886E83D26F0303B0014FA5D /* SettingsCoordinator.swift */; };
 		2886E84026F030750014FA5D /* UIViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886E83F26F030750014FA5D /* UIViewController+Extensions.swift */; };
 		2886E84326F031050014FA5D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886E84226F031050014FA5D /* SettingsView.swift */; };
@@ -229,6 +230,7 @@
 		2842BABE26A0EC740021CD0B /* CodexItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexItemView.swift; sourceTree = "<group>"; };
 		2842BAC026A0EEC10021CD0B /* StoreOfferType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreOfferType.swift; sourceTree = "<group>"; };
 		284F2EC22731DB3C00032088 /* FTUEConductor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FTUEConductor.swift; sourceTree = "<group>"; };
+		284F2EC727335BC200032088 /* background-music.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "background-music.wav"; sourceTree = "<group>"; };
 		2886E83D26F0303B0014FA5D /* SettingsCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsCoordinator.swift; sourceTree = "<group>"; };
 		2886E83F26F030750014FA5D /* UIViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extensions.swift"; sourceTree = "<group>"; };
 		2886E84226F031050014FA5D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -454,6 +456,14 @@
 				284F2EC22731DB3C00032088 /* FTUEConductor.swift */,
 			);
 			name = FTUE;
+			sourceTree = "<group>";
+		};
+		284F2EC427335B9600032088 /* Music */ = {
+			isa = PBXGroup;
+			children = (
+				284F2EC727335BC200032088 /* background-music.wav */,
+			);
+			name = Music;
 			sourceTree = "<group>";
 		};
 		2886E84126F030F70014FA5D /* OptionsSwiftUI */ = {
@@ -972,6 +982,7 @@
 		58D56B5425AB91F8002D1337 /* Sound */ = {
 			isa = PBXGroup;
 			children = (
+				284F2EC427335B9600032088 /* Music */,
 				58D56B5725AB9215002D1337 /* SoundFiles */,
 				58D56B4E25AB90DB002D1337 /* AudioManager.swift */,
 			);
@@ -1115,6 +1126,7 @@
 				589E156225AB9BE7004A6D46 /* mineRocks.wav in Resources */,
 				3DF0A6B32379CC4600941305 /* pixel-font.ttf in Resources */,
 				589E157825ABA9D7004A6D46 /* goalCompleted.mp3 in Resources */,
+				284F2EC827335BC200032088 /* background-music.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

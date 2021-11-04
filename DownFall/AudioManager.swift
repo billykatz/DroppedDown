@@ -8,6 +8,7 @@
 
 import Foundation
 import SpriteKit
+import AVFoundation
 
 enum Sound: CaseIterable {
     case pickaxe
@@ -51,13 +52,49 @@ enum Sound: CaseIterable {
 class AudioManager {
     
     let audioThread = DispatchQueue(label: "audioThread", qos: .userInitiated)
-
-    let audioNode: SKNode
+    let backgroundMusicThread = DispatchQueue(label: "musicThread", qos: .userInitiated)
+    
+    let audioNode: SKAudioNode
+    var backgroundMusicPlayer: AVAudioPlayer?
     
     init(sceneNode: SKNode) {
-        self.audioNode = sceneNode
+        self.audioNode = SKAudioNode()
         
+        backgroundMusicThread.sync { [weak self] in
+            do {
+                if let backgroundMusicPath = Bundle.main.path(forResource: "background-music", ofType: "wav") {
+                    let url = URL(fileURLWithPath: backgroundMusicPath)
+                    self?.backgroundMusicPlayer = try AVAudioPlayer(contentsOf: url)
+                    self?.backgroundMusicPlayer?.prepareToPlay()
+                } else {
+                    print("no music")
+                }
+            }
+            catch(let err) {
+                print(err)
+            }
+        }
+        
+        
+        
+        
+        sceneNode.addChild(self.audioNode)
+            
         loadAllSounds()
+    }
+    
+    func playBackgroundMusic() {
+        backgroundMusicThread.sync(execute: { [backgroundMusicPlayer] in
+            backgroundMusicPlayer?.setVolume(0, fadeDuration: 0)
+            backgroundMusicPlayer?.play()
+            backgroundMusicPlayer?.setVolume(1, fadeDuration: 2.5)
+        })
+    }
+    
+    func stopBackgroundMusic() {
+        backgroundMusicThread.sync(execute: { [backgroundMusicPlayer] in
+            backgroundMusicPlayer?.setVolume(0, fadeDuration: 1.5)
+        })
     }
     
     func loadAllSounds() {
@@ -136,6 +173,10 @@ class AudioEventListener {
                 audioManager.playSound(.levelComplete)
             case .gameLose:
                 audioManager.playSound(.gameLose)
+            case .playAgain, .loseAndGoToStore:
+                audioManager.stopBackgroundMusic()
+            case .boardBuilt, .boardLoaded:
+                audioManager.playBackgroundMusic()
                 
             default:
                 break

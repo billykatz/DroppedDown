@@ -21,6 +21,9 @@ enum MenuType {
     case confirmAbandonTutorial
     case tutorialPause
     case tutorialWin
+    case tutorialOptions
+    case options
+    
     
     struct Constants {
         static let resume = "Resume"
@@ -34,19 +37,28 @@ enum MenuType {
     var buttonIdentifer: ButtonIdentifier {
         switch self {
         case .pause, .tutorialPause:
-            return ButtonIdentifier.resume
+            return .resume
+            
         case .gameWin, .tutorialWin:
-            return ButtonIdentifier.visitStore
+            return .visitStore
+            
         case .rotate:
-            return ButtonIdentifier.rotate
+            return .rotate
+            
         case .gameLose:
-            return ButtonIdentifier.playAgain
+            return .playAgain
+            
         case .confirmation, .tutorialConfirmation, .confirmAbandonTutorial:
-            return ButtonIdentifier.backpackConfirm
+            return .backpackConfirm
+            
         case .debug:
             return .resume
+            
         case .detectedSavedGame, .detectedSavedTutorial:
-            return ButtonIdentifier.backpackConfirm
+            return .backpackConfirm
+            
+        case .options, .tutorialOptions:
+            return .soundOptionsBack
         }
         
     }

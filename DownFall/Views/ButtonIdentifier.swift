@@ -64,6 +64,7 @@ enum ButtonIdentifier: String {
     case discardFoundRune
     case swapRunes
     case toggleSound
+    case toggleMusic
     case toggleShowGroupNumber
     case givePlayerRune
     case debugPause
@@ -113,7 +114,7 @@ enum ButtonIdentifier: String {
         case .tutorialPausedExitToMainMenu:
             return "Skip Tutorial"
         case .mainMenuAbandonTutorial:
-            return "(Not recommended)\n Skip tutorial"
+            return "(Not recommended)\nSkip tutorial"
         case .mainMenuContinueTutorial:
             return "Continue tutorial"
         case .cycleLevel:
@@ -140,6 +141,8 @@ enum ButtonIdentifier: String {
             return "Swap Runes"
         case .toggleSound:
             return "Sound"
+        case .toggleMusic:
+            return "Music"
         case .toggleShowGroupNumber:
             return "Rock Group Total"
         case .givePlayerRune:

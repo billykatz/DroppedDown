@@ -163,10 +163,12 @@ class MainMenu: SKScene {
                 if !UserDefaults.standard.bool(forKey: UserDefaults.hasSkippedTutorialKey) {
                     addChild(detectedSavedTutorial)
                     detectedSavedTutorial.zPosition = 10_000_000
+                    detectedSavedTutorial.playMenuBounce()
                 }
             } else {
                 addChild(detectedSavedGameMenu)
                 detectedSavedGameMenu.zPosition = 10_000_000
+                detectedSavedGameMenu.playMenuBounce()
             }
         }
         
@@ -194,32 +196,63 @@ extension MainMenu: ButtonDelegate {
         case .mainMenuStore:
             mainMenuDelegate?.menuStore()
             
-        case .mainMenuContinueRun, .mainMenuContinueTutorial:
-            mainMenuDelegate?.continueRun()
+        case .mainMenuContinueRun:
+            detectedSavedGameMenu.fadeOut { [mainMenuDelegate, detectedSavedGameMenu] in
+                mainMenuDelegate?.continueRun()
+                detectedSavedGameMenu.removeFromParent()
+            }
+            
+        case .mainMenuContinueTutorial:
+            detectedSavedTutorial.fadeOut { [mainMenuDelegate, detectedSavedTutorial] in
+                mainMenuDelegate?.continueRun()
+                detectedSavedTutorial.removeFromParent()
+            }
+
             
         case .mainMenuAbandonRun:
-            detectedSavedGameMenu.removeFromParent()
-            addChild(confirmAbandonRun)
+            detectedSavedGameMenu.fadeOut { [weak self, confirmAbandonRun, detectedSavedGameMenu] in
+                self?.addChild(confirmAbandonRun)
+                confirmAbandonRun.playMenuBounce()
+                detectedSavedGameMenu.removeFromParent()
+            }
             
         case .mainMenuAbandonTutorial:
-            detectedSavedTutorial.removeFromParent()
-            addChild(confirmAbandonTutorial)
+            detectedSavedTutorial.fadeOut { [weak self, confirmAbandonTutorial, detectedSavedTutorial] in
+                self?.addChild(confirmAbandonTutorial)
+                confirmAbandonTutorial.playMenuBounce()
+                detectedSavedTutorial.removeFromParent()
+            }
     
         case .yesAbandonRun:
-            confirmAbandonRun.removeFromParent()
-            mainMenuDelegate?.abandonRun()
+            confirmAbandonRun.fadeOut { [mainMenuDelegate, confirmAbandonRun] in
+                mainMenuDelegate?.abandonRun()
+                confirmAbandonRun.removeFromParent()
+            }
         
         case .yesSkipTutorial:
-            confirmAbandonTutorial.removeFromParent()
-            mainMenuDelegate?.abandonRun()
+            confirmAbandonTutorial.fadeOut { [confirmAbandonTutorial, mainMenuDelegate] in
+                UserDefaults.standard.setValue(true, forKey: UserDefaults.hasSkippedTutorialKey)
+                UserDefaults.standard.setValue(false, forKey: UserDefaults.shouldShowCompletedTutorialKey)
+                mainMenuDelegate?.abandonRun()
+                confirmAbandonTutorial.removeFromParent()
+            }
+                
+            
+            
             
         case .doNotAbandonRun:
-            confirmAbandonRun.removeFromParent()
-            addChild(detectedSavedGameMenu)
+            confirmAbandonRun.fadeOut { [weak self, confirmAbandonRun, detectedSavedGameMenu] in
+                self?.addChild(detectedSavedGameMenu)
+                detectedSavedGameMenu.playMenuBounce()
+                confirmAbandonRun.removeFromParent()
+            }
         
         case .doNotAbandonTutorial:
-            confirmAbandonTutorial.removeFromParent()
-            addChild(detectedSavedTutorial)
+            confirmAbandonTutorial.fadeOut { [weak self, confirmAbandonTutorial, detectedSavedTutorial] in
+                self?.addChild(detectedSavedTutorial)
+                detectedSavedTutorial.playMenuBounce()
+                confirmAbandonTutorial.removeFromParent()
+            }
             
         default:
             ()

@@ -10,6 +10,12 @@ import Foundation
 import SpriteKit
 import AVFoundation
 
+extension UserDefaults {
+    @objc dynamic var muteMusic: Bool {
+        return bool(forKey: UserDefaults.muteMusicKey)
+    }
+}
+
 enum Sound: CaseIterable {
     case pickaxe
     case mineRocks
@@ -57,6 +63,9 @@ class AudioManager {
     let audioNode: SKAudioNode
     var backgroundMusicPlayer: AVAudioPlayer?
     
+    var observer: NSKeyValueObservation?
+
+    
     init(sceneNode: SKNode) {
         self.audioNode = SKAudioNode()
         
@@ -75,20 +84,36 @@ class AudioManager {
             }
         }
         
-        
-        
+        backgroundMusicThread.async { [weak self] in
+            self?.observer = UserDefaults.standard.observe(\.muteMusic, options: [.new], changeHandler: { [weak self] (defaults, change) in
+                let isMuted = change.newValue ?? true
+                if (isMuted) {
+                    self?.stopBackgroundMusic()
+                } else {
+                    self?.playBackgroundMusic()
+                }
+            })
+        }
+
         
         sceneNode.addChild(self.audioNode)
             
         loadAllSounds()
     }
     
+    deinit {
+        observer?.invalidate()
+    }
+
     func playBackgroundMusic() {
-        backgroundMusicThread.sync(execute: { [backgroundMusicPlayer] in
-            backgroundMusicPlayer?.setVolume(0, fadeDuration: 0)
-            backgroundMusicPlayer?.play()
-            backgroundMusicPlayer?.setVolume(1, fadeDuration: 2.5)
-        })
+        if !UserDefaults.standard.bool(forKey: UserDefaults.muteMusicKey) {
+            backgroundMusicThread.sync(execute: { [backgroundMusicPlayer] in
+                backgroundMusicPlayer?.setVolume(0, fadeDuration: 0)
+                backgroundMusicPlayer?.play()
+                backgroundMusicPlayer?.setVolume(1, fadeDuration: 2.5)
+                backgroundMusicPlayer?.numberOfLoops = 100
+            })
+        }
     }
     
     func stopBackgroundMusic() {
@@ -171,8 +196,12 @@ class AudioEventListener {
                 
             case .gameWin:
                 audioManager.playSound(.levelComplete)
+                audioManager.stopBackgroundMusic()
+            
             case .gameLose:
                 audioManager.playSound(.gameLose)
+                audioManager.stopBackgroundMusic()
+                
             case .playAgain, .loseAndGoToStore:
                 audioManager.stopBackgroundMusic()
             case .boardBuilt, .boardLoaded:

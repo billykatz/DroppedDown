@@ -188,7 +188,8 @@ class ShiftShaft_Button: SKShapeNode {
          backgroundColor: UIColor = .clayRed,
          showSelection: Bool = true,
          addTextLabel: Bool = true,
-         disable: Bool = false) {
+         disable: Bool = false,
+         textAlignment: NSTextAlignment = .center) {
         
         //Set properties
         self.buttonType = .text
@@ -215,7 +216,7 @@ class ShiftShaft_Button: SKShapeNode {
             shadowShape.color = .black
             self.dropShadow = shadowShape
             // does this have to be hardcoded?
-            shadowShape.zPosition = -1
+            shadowShape.zPosition = -100000
             addChild(shadowShape)
         }
         
@@ -228,7 +229,8 @@ class ShiftShaft_Button: SKShapeNode {
                               precedence: precedence,
                               identifier: identifier,
                               fontSize: fontSize,
-                              fontColor: fontColor)
+                              fontColor: fontColor,
+                              textAlignment: textAlignment)
             label.position = self.frame.center
             label.zPosition = Precedence.menu.rawValue
             

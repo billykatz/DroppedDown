@@ -290,12 +290,15 @@ class Renderer: SKSpriteNode {
             foreground.addChild(menuForeground)
             if (tutorialConductor?.isTutorial ?? false) {
                 menuForeground.addChildSafely(tutorialPauseNode)
+                tutorialPauseNode.playMenuBounce()
             } else {
                 menuForeground.addChildSafely(menuSpriteNode)
+                menuSpriteNode.playMenuBounce()
             }
         case .gameLose:
             menuForeground.addChild(gameLoseSpriteNode)
             foreground.addChildSafely(menuForeground)
+            gameLoseSpriteNode.playMenuBounce()
         case .playAgain:
             menuForeground.removeFromParent()
         case .newTurn:
@@ -931,6 +934,7 @@ extension Renderer {
             self.menuForeground.removeAllChildren()
             let gameWinMenu = MenuSpriteNode(.gameWin, playableRect: self.playableRect, precedence: .menu, level: self.level)
             self.menuForeground.addChild(gameWinMenu)
+            gameWinMenu.playMenuBounce()
             self.foreground.addChildSafely(self.menuForeground)
         }
     }

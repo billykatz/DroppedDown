@@ -22,6 +22,7 @@ class MainMenu: SKScene {
         static let buttonPadding = CGFloat(50.0)
         static let notificationName = "notificationRed"
         static let blankButtonName = "blankButton"
+        static let feedbackFormURLString = "https://docs.google.com/forms/d/e/1FAIpQLSce6_iG4z5Kbk3j4Uw9b1ob_I1M-2NPdA3MAmuG1zLocIvvSQ/viewform?usp=sf_link"
     }
     
     private var background: SKSpriteNode!
@@ -148,6 +149,23 @@ class MainMenu: SKScene {
         optionsButton.alpha = 0
         optionsButton.run(buttonFadeInAction)
         
+        
+        /// Feedback button
+        let feedbackButton = ShiftShaft_Button(size: .buttonExtralarge, delegate: self, identifier: .mainMenuFeedback, image: SKSpriteNode(imageNamed: Constants.blankButtonName), shape: .rectangle, addTextLabel: true)
+        
+        feedbackButton.position = CGPoint.alignHorizontally(optionsButton.frame,
+                                                         relativeTo: optionsButton.frame,
+                                                         horizontalAnchor: .center,
+                                                         verticalAlign: .bottom,
+                                                         verticalPadding: Constants.buttonPadding,
+                                                         translatedToBounds: true)
+        feedbackButton.zPosition = 0
+        
+        buttonContainer.addChild(feedbackButton)
+        feedbackButton.alpha = 0
+        feedbackButton.run(buttonFadeInAction)
+
+        
         // animate the buttons to move slightly up
         let moveUp = SKAction.move(by: CGVector(dx: 0, dy: 100), duration: 0.30)
         moveUp.timingMode = .easeInEaseOut
@@ -253,6 +271,10 @@ extension MainMenu: ButtonDelegate {
                 detectedSavedTutorial.playMenuBounce()
                 confirmAbandonTutorial.removeFromParent()
             }
+            
+        case .mainMenuFeedback:
+            let url = URL(string: Constants.feedbackFormURLString)!
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
             
         default:
             ()

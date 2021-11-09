@@ -58,14 +58,21 @@ enum ButtonIdentifier: String {
     case selectProfile
     case newProfile
     case resetData
+    
+    // Main Menu
     case mainMenuOptions
     case mainMenuStore
+    case mainMenuFeedback
+    
     case continueRun
     case discardFoundRune
     case swapRunes
+    
+    // Options
     case toggleSound
     case toggleMusic
     case toggleShowGroupNumber
+    
     case givePlayerRune
     case debugPause
     case debugWin
@@ -167,6 +174,9 @@ enum ButtonIdentifier: String {
             
         case .mainMenuContinueRun:
             return "Continue run"
+            
+        case .mainMenuFeedback:
+            return "Feedback"
             
         case .soundOptionsBack, .tutorialSoundOptionsBack:
             return "Back"

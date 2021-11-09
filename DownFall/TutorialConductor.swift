@@ -34,6 +34,9 @@ class TutorialConductor {
     
     private var allGoalsJustCompletedHoldOffOnTutorialForATurn = false
     
+    private var turnsSinceToldToRotateButHasNotYetRotated = 0
+    private var showedYouCanRotateAgain = false
+    
     
     var isTutorial: Bool {
         return !UserDefaults.standard.bool(forKey: UserDefaults.hasCompletedTutorialKey) && !UserDefaults.standard.bool(forKey: UserDefaults.hasSkippedTutorialKey)
@@ -212,6 +215,9 @@ class TutorialConductor {
                 InputQueue.append(.init(.tutorialPhaseStart(phase)))
             }
             
+            if showedRotateTutorialAlready {
+                turnsSinceToldToRotateButHasNotYetRotated += 1
+            }
             
             // the monster has appeared
             if collectedItemsForFirstTime {
@@ -236,6 +242,13 @@ class TutorialConductor {
                 self.phase = .levelGoalRewards
                 InputQueue.append(.init(.tutorialPhaseStart(phase)))
             }
+            
+            if turnsSinceToldToRotateButHasNotYetRotated >= 8 && !showedYouCanRotateAgain {
+                showedYouCanRotateAgain = true
+                self.phase = .youCanRotateAgain
+                InputQueue.append(.init(.tutorialPhaseStart(phase)))
+            }
+            
             
             // progress the tutorial in case they forget the goal
             if turnsSinceMonsterAppeared >= 8 && !showedHowToKillAMonsterAlready {
@@ -280,7 +293,7 @@ class TutorialConductor {
             InputQueue.append(.init(.tutorialPhaseStart(phase)))
         } else if oldPhase == .okayReadyToMineSomeRocks {
             self.phase = .youCanRotate
-        } else if oldPhase == .youCanRotate || oldPhase == .levelGoalRewards {
+        } else if oldPhase == .youCanRotate || oldPhase == .levelGoalRewards || oldPhase == .youCanRotateAgain {
             self.phase = .yikesAMonster
         } else if oldPhase == .yikesAMonster {
             self.phase = .killAMonster

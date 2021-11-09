@@ -59,6 +59,9 @@ extension TutorialPhase {
     
     static let youCanLeaveNow: TutorialPhase = .init(shouldShowHud: true, shouldShowLevelGoals: true, shouldShowLevelGoalDetailView: true, shouldShowTileDetailView: true, shouldInputLevelGoalView: true, shouldSpawnMonsters: false, shouldSpawnTileWithGem: false, dialogue: .youCanLeaveNow, highlightTileType: [.exit(blocked: false)], waitDuration: 0, fadeInDuration: 0.0, shouldDimScreen: true, shouldHighlightLevelGoalsInHUD: false, shouldShowRotateFinger: false)
 
+    
+    static let youCanRotateAgain: TutorialPhase = .init(shouldShowHud: true, shouldShowLevelGoals: true, shouldShowLevelGoalDetailView: true, shouldShowTileDetailView: true, shouldInputLevelGoalView: true, shouldSpawnMonsters: true, shouldSpawnTileWithGem: false, dialogue: .youCanRotateAgain, highlightTileType: nil, waitDuration: 0, fadeInDuration: 0.0, shouldDimScreen: true, shouldHighlightLevelGoalsInHUD: false, shouldShowRotateFinger: true)
+
 
     
 }

@@ -70,6 +70,15 @@ extension Dialogue {
                                                           character: .teri,
                                                           delayBeforeTyping: 0.25)
     
+    static let youCanRotateAgain: Dialogue = .init(sentences:
+                                                            [
+                                                                Sentence(text: "You know you can rotate the board right?", emotion: .skeptical),
+                                                                Sentence(text: "Try swiping up or down to rotate.", emotion: .skeptical),
+                                                                
+                                                            ],
+                                                          character: .teri,
+                                                          delayBeforeTyping: 0.25)
+    
     static let yikesAMonster: Dialogue = .init(sentences:
                                                             [
                                                                 Sentence(text: "Look out! That's a monster.", emotion: .surprised),

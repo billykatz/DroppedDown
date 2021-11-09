@@ -77,7 +77,8 @@ class TutorialConductor {
     var ftueCollectedItemDontShowMiningGem = false
     
     var shouldSendRuneOfferPhase: TutorialPhase? = nil
-    var shouldSendMiningGemsPhase : TutorialPhase? = nil
+    var shouldSendMiningGemsPhase: TutorialPhase? = nil
+    var shouldSendRuneChargedFirstTime: TutorialPhase? = nil
     
     func handleFTUEInput(_ input: Input) {
         switch input.type {
@@ -130,6 +131,16 @@ class TutorialConductor {
                 
             }
             
+            if FTUEConductor().shouldShowRuneChargedForTheFirstTime,
+                let endTiles = trans.first?.endTiles {
+                if let playerData = playerData(in: endTiles),
+                   let runes = playerData.runes,
+                   let phase = FTUEConductor().phaseForFirstRuneCharge(runes: runes) {
+                    shouldSendRuneChargedFirstTime = phase
+                }
+
+            }
+            
         case .newTurn:
             if let phase = shouldSendRuneOfferPhase {
                 shouldSendRuneOfferPhase = nil
@@ -148,6 +159,12 @@ class TutorialConductor {
                     UserDefaults.standard.setValue(true, forKey: UserDefaults.hasSeenMinedFirstGemFTUEKey)
                 }
             }
+            else if let phase = shouldSendRuneChargedFirstTime {
+                InputQueue.append(.init(.tutorialPhaseStart(phase)))
+                shouldSendRuneChargedFirstTime = nil
+                UserDefaults.standard.setValue(true, forKey: UserDefaults.hasSeenRuneChargedForTheFirstTimeFTUEKey)
+            }
+            
             // reset flags that we use to push off the FTUE in case they coincide with other events 
             else if ftueLevelGoalRewardedWaitATurn || ftueCollectedItemDontShowMiningGem {
                 ftueLevelGoalRewardedWaitATurn = false

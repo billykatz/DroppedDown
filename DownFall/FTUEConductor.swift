@@ -87,7 +87,7 @@ class FTUEConductor {
             let sentence3 = Sentence(text: "Well, they will revive you every time you die. Pretty nice of them, huh?", emotion: .skeptical)
             let dialog = Dialogue(sentences: [sentence1, sentence2, sentence3], character: .teri, delayBeforeTyping: 0.25)
             
-            let ftuePhase = TutorialPhase(shouldShowHud: true, shouldShowLevelGoals: true, shouldShowLevelGoalDetailView: true, shouldShowTileDetailView: true, shouldInputLevelGoalView: false, shouldSpawnMonsters: true, shouldSpawnTileWithGem: true, dialogue: dialog, highlightTileType: nil, waitDuration: 0.0, fadeInDuration: 0.25, shouldDimScreen: true, shouldHighlightLevelGoalsInHUD: false, shouldShowRotateFinger: false)
+            let ftuePhase = TutorialPhase(shouldShowHud: true, shouldShowLevelGoals: true, shouldShowLevelGoalDetailView: true, shouldShowTileDetailView: true, shouldInputLevelGoalView: false, shouldSpawnMonsters: true, shouldSpawnTileWithGem: true, dialogue: dialog, highlightTileType: nil, waitDuration: 0.0, fadeInDuration: 0.25, shouldDimScreen: true, shouldHighlightLevelGoalsInHUD: false, shouldShowRotateFinger: false, showAbovePickaxe: false)
             
             return ftuePhase
         }
@@ -108,7 +108,7 @@ class FTUEConductor {
         let sentence3 = Sentence(text: "When the Rune is fully charged you can use its powerful ability.", emotion: .content)
         let dialog = Dialogue(sentences: [sentence1, sentence2, sentence3], character: .teri, delayBeforeTyping: 0.25)
         
-        let ftuePhase = TutorialPhase(shouldShowHud: true, shouldShowLevelGoals: true, shouldShowLevelGoalDetailView: true, shouldShowTileDetailView: true, shouldInputLevelGoalView: false, shouldSpawnMonsters: true, shouldSpawnTileWithGem: true, dialogue: dialog, highlightTileType: [.offer(runeOffer)], waitDuration: 0.0, fadeInDuration: 0.25, shouldDimScreen: true, shouldHighlightLevelGoalsInHUD: false, shouldShowRotateFinger: false)
+        let ftuePhase = TutorialPhase(shouldShowHud: true, shouldShowLevelGoals: true, shouldShowLevelGoalDetailView: true, shouldShowTileDetailView: true, shouldInputLevelGoalView: false, shouldSpawnMonsters: true, shouldSpawnTileWithGem: true, dialogue: dialog, highlightTileType: [.offer(runeOffer)], waitDuration: 0.0, fadeInDuration: 0.25, shouldDimScreen: true, shouldHighlightLevelGoalsInHUD: false, shouldShowRotateFinger: false, showAbovePickaxe: false)
         
         return ftuePhase
 
@@ -127,7 +127,31 @@ class FTUEConductor {
         let sentence4 = Sentence(text: "Some of the best miners can earn 3 gems per rock but that is super rare.", emotion: .skeptical)
         let dialog = Dialogue(sentences: [sentence1, sentence2, sentence3, sentence4], character: .teri, delayBeforeTyping: 0.25)
         
-        let ftuePhase = TutorialPhase(shouldShowHud: true, shouldShowLevelGoals: true, shouldShowLevelGoalDetailView: true, shouldShowTileDetailView: true, shouldInputLevelGoalView: false, shouldSpawnMonsters: true, shouldSpawnTileWithGem: true, dialogue: dialog, highlightTileType: [gemTileType], waitDuration: 0.0, fadeInDuration: 0.25, shouldDimScreen: true, shouldHighlightLevelGoalsInHUD: false, shouldShowRotateFinger: false)
+        let ftuePhase = TutorialPhase(shouldShowHud: true, shouldShowLevelGoals: true, shouldShowLevelGoalDetailView: true, shouldShowTileDetailView: true, shouldInputLevelGoalView: false, shouldSpawnMonsters: true, shouldSpawnTileWithGem: true, dialogue: dialog, highlightTileType: [gemTileType], waitDuration: 0.0, fadeInDuration: 0.25, shouldDimScreen: true, shouldHighlightLevelGoalsInHUD: false, shouldShowRotateFinger: false, showAbovePickaxe: false)
+        
+        return ftuePhase
+
+    }
+    
+    var shouldShowRuneChargedForTheFirstTime: Bool {
+        return !UserDefaults.standard.bool(forKey: UserDefaults.hasSeenRuneChargedForTheFirstTimeFTUEKey)
+    }
+    
+    func runeIsCharged(_ rune: Rune) -> Bool {
+        return rune.rechargeCurrent >= rune.cooldown
+    }
+
+    
+    public func phaseForFirstRuneCharge(runes: [Rune]) -> TutorialPhase? {
+        guard shouldShowRuneChargedForTheFirstTime  else { return nil }
+        guard !runes.filter( { rune in runeIsCharged(rune) }).isEmpty else { return nil }
+            
+        let sentence1 = Sentence(text: "Woohooo! Your rune is fully charged", emotion: .surprised)
+        let sentence2 = Sentence(text: "Tap on it in your pickaxe to choose targets and unleash its power", emotion: .content)
+        let sentence3 = Sentence(text: "Runes will recahrge after each use so use them often.", emotion: .skeptical)
+        let dialog = Dialogue(sentences: [sentence1, sentence2, sentence3], character: .teri, delayBeforeTyping: 0.25)
+        
+        let ftuePhase = TutorialPhase(shouldShowHud: true, shouldShowLevelGoals: true, shouldShowLevelGoalDetailView: true, shouldShowTileDetailView: true, shouldInputLevelGoalView: true, shouldSpawnMonsters: true, shouldSpawnTileWithGem: true, dialogue: dialog, highlightTileType: nil, waitDuration: 0.0, fadeInDuration: 0.25, shouldDimScreen: true, shouldHighlightLevelGoalsInHUD: false, shouldShowRotateFinger: false, showAbovePickaxe: true)
         
         return ftuePhase
 

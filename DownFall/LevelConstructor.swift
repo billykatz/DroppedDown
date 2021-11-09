@@ -84,7 +84,8 @@ struct LevelConstructor {
 //
 //            guard let otherOption = otherOptions.randomElement() else {  preconditionFailure("There must always be at least 1 other unlockable at tier 1 that isn't healing")}
 
-//            return [healingOption.item, otherOption.item]
+//            return [healingOption.item, otherOption.
+            #warning("Fix for release")
             return [healingOption.item, StoreOffer.offer(type: .rune(.rune(for: .bubbleUp)), tier: 1)]
         }
         else if tier == 2 {
@@ -287,24 +288,24 @@ struct LevelConstructor {
                                                         .rock(color: .blue, holdsGem: false, groupCount: 0): 33,
                                                         .rock(color: .purple, holdsGem: false, groupCount: 0): 33])
             return chances
-        case 5, 6, 7:
+        case 5, 6, 7...Int.max:
             let chances = TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false, groupCount: 0): 33,
                                                         .rock(color: .blue, holdsGem: false, groupCount: 0): 33,
                                                          .rock(color: .purple, holdsGem: false, groupCount: 0): 33])
              return chances
-        case 8, 9:
-            let chances = TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false, groupCount: 0): 30,
-                                                        .rock(color: .blue, holdsGem: false, groupCount: 0): 30,
-                                                        .rock(color: .purple, holdsGem: false, groupCount: 0): 30,
-                                                        .rock(color: .brown, holdsGem: false, groupCount: 0): 10])
-            return chances
-            
-        case 10...Int.max:
-            let chances = TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false, groupCount: 0): 29,
-                                                        .rock(color: .blue, holdsGem: false, groupCount: 0): 29,
-                                                        .rock(color: .purple, holdsGem: false, groupCount: 0): 29,
-                                                        .rock(color: .brown, holdsGem: false, groupCount: 0): 13])
-            return chances
+//        case 8, 9:
+//            let chances = TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false, groupCount: 0): 30,
+//                                                        .rock(color: .blue, holdsGem: false, groupCount: 0): 30,
+//                                                        .rock(color: .purple, holdsGem: false, groupCount: 0): 30,
+//                                                        .rock(color: .brown, holdsGem: false, groupCount: 0): 10])
+//            return chances
+//
+//        case 10...Int.max:
+//            let chances = TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false, groupCount: 0): 29,
+//                                                        .rock(color: .blue, holdsGem: false, groupCount: 0): 29,
+//                                                        .rock(color: .purple, holdsGem: false, groupCount: 0): 29,
+//                                                        .rock(color: .brown, holdsGem: false, groupCount: 0): 13])
+//            return chances
         default:
             fatalError("Level must be positive")
         }

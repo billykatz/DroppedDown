@@ -209,7 +209,15 @@ class DialogueOverlay: SKSpriteNode {
         
         let dialogueView = DialogueView(dialogue: tutorialPhase.dialogue)
         dialogueView.zPosition = 200_000_000_000
-        dialogueView.position = CGPoint.position(dialogueView.frame, inside: playableRect, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: 275)
+        if (tutorialPhase.showAbovePickaxe) {
+            let fauxBackpackView = SKSpriteNode(color: .clear, size: CGSize(width: playableRect.width, height: playableRect.height * 0.2))
+            let backpackposition = CGPoint.position(this: fauxBackpackView.frame, centeredInBottomOf: playableRect)
+            fauxBackpackView.position = backpackposition
+            dialogueView.position = CGPoint.alignHorizontally(dialogueView.frame, relativeTo: fauxBackpackView.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: 200.0, translatedToBounds: true)
+            
+        } else {
+            dialogueView.position = CGPoint.position(dialogueView.frame, inside: playableRect, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: 275)
+        }
         self.dialogueView = dialogueView
         
         super.init(texture: nil, color: .clear, size: playableRect.size)
@@ -237,6 +245,12 @@ class DialogueOverlay: SKSpriteNode {
         
         if tutorialPhase.shouldShowRotateFinger {
             showRotateFinger(playableRect: playableRect)
+        }
+        
+        if tutorialPhase.showAbovePickaxe {
+            levelGoalsHighlight.position = CGPoint.position(this: CGRect(origin: .zero, size: CGSize(width: playableRect.width, height: playableRect.height * 0.2)), centeredInBottomOf: playableRect, verticalPadding: 30)
+            levelGoalsHighlight.setScale(1.1)
+            self.addChild(levelGoalsHighlight)
         }
 
         self.addChild(dialogueView)

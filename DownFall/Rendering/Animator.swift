@@ -146,6 +146,7 @@ struct Animator {
             if let targetPlayerCoord = getTilePosition(.player(.playerZero), tiles: transformations.first!.endTiles!) {
                 let position = sprites[targetPlayerCoord].position
                 let floatUpAction = SKAction.move(to: position, duration: 1.0)
+                floatUpAction.timingMode = .easeInEaseOut
                 
                 spriteActions.append(SpriteAction(sprite: playerSprite, action: floatUpAction))
                 

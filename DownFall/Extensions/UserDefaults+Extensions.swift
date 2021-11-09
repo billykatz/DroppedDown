@@ -66,5 +66,6 @@ extension UserDefaults {
     
     static let hasSeenFirstRuneFTUEKey = "hasSeenFirstRuneFTUE"
     static let hasSeenMinedFirstGemFTUEKey = "hasSeenMinedFirstGemFTUE"
+    static let hasSeenRuneChargedForTheFirstTimeFTUEKey = "hasSeenRuneChargedForTheFirstTimeFTUE"
     
 }

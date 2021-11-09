@@ -101,6 +101,9 @@ struct PlayerStatsView: View {
                 UserDefaults.standard.setValue(false, forKey: UserDefaults.hasSeenFirstRuneFTUEKey)
                 
                 UserDefaults.standard.setValue(false, forKey: UserDefaults.hasSeenMinedFirstGemFTUEKey)
+                
+                UserDefaults.standard.setValue(false, forKey: UserDefaults.hasSeenRuneChargedForTheFirstTimeFTUEKey)
+
             }){
                 Text("Reset FTUE flags")
                     .foregroundColor(.white)

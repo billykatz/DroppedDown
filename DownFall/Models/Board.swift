@@ -430,6 +430,7 @@ class Board: Equatable {
             let index = randomNumbers[count]
             let randomItem = offersInTier[index]
             if let rune = randomItem.rune, pickaxe.runes.contains(rune) {
+                // dont choose an item the player already has
                 continue
             }
             count += 1

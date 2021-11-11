@@ -13,7 +13,6 @@ struct CodexWalletView: View {
     
     var body: some View {
         HStack {
-            Spacer()
             HStack {
                 Image("crystals").alignmentGuide(VerticalAlignment.center, computeValue: { dimension in
                     dimension[VerticalAlignment.center] - 3

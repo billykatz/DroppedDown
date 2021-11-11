@@ -85,14 +85,6 @@ struct Statistics: Codable, Equatable, Identifiable {
     
     var color: UIColor {
         return .lightBarBlue
-        if let rockColor = rockColor { return rockColor.forUI }
-        else if let gemColor = gemColor { return gemColor.forUI }
-        else if let _ = monsterType { return .darkBarBlood }
-        else if statType == .totalRocksDestroyed { return  .purple }
-        else if statType == .totalMonstersKilled { return .darkBarBlood }
-//        else if statType == .
-//        else { return .darkBarPurple }
-//        return ShiftShaft_Color.blue.forUI
     }
     
     var textureName: String {

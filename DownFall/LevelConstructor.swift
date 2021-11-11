@@ -164,11 +164,12 @@ struct LevelConstructor {
     
     
     static func depthDivided(_ depth: Depth) -> Int {
-        return depth/5
+        return depth/3
     }
     
     static func maxSpawnGems(depth: Depth) -> Int {
-        return depthDivided(depth) + 3
+        // spawn at least 1
+        return max(1, depthDivided(depth))
     }
     
     static func levelGoal(depth: Depth, pillars: [PillarCoorindates], gemAtDepth: Int, randomSource: GKLinearCongruentialRandomSource, isTutorial: Bool) -> [LevelGoal] {

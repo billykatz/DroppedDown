@@ -94,7 +94,7 @@ class Renderer: SKSpriteNode {
                                                            verticalPadding: 200.0,
                                                            horizontalPadding: Style.Padding.less,
                                                            translatedToBounds: true)
-        levelGoalView.zPosition = Precedence.flying.rawValue
+        levelGoalView.zPosition = 50_000
         return levelGoalView
     }()
     
@@ -896,7 +896,9 @@ extension Renderer {
         } else if self.tileDetailView?.isUserInteractionEnabled ?? false {
             self.tileDetailView?.touchesEnded(touches, with: event)
         } else {
+            // one of these should get it
             self.backpackView.touchesEnded(touches, with: event)
+            self.levelGoalView.touchesEnded(touches, with: event)
         }
         
         for node in nodes {

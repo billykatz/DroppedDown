@@ -38,6 +38,7 @@ extension UIColor {
     static let clayRed: UIColor = UIColor(rgb: 0x9c461f)
     
     static let foregroundBlue = UIColor(rgb: 0x6885ac)
+    static let tileDetailViewBackground = UIColor(rgb: 0xB2B5C2)
     static let eggshellWhite = UIColor(rgb: 0xc7c6c2)
     static let storeItemBackgroundNotSelected = UIColor(rgb: 0x8fa9af)
 

@@ -74,7 +74,7 @@ class RuneReplacementView: SKSpriteNode, ButtonDelegate {
         swapRunesButton.position = CGPoint.position(swapRunesButton.frame, inside: runeReplacementContainer.frame, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: 65, translatedToBounds: true)
         swapRunesButton.name = "swapRunesButton"
         self.swapRunesButton = swapRunesButton
-        
+        swapRunesButton.zPosition = 10_000_000
         
         let backgroundOverlay = SKSpriteNode(color: .black, size: playableRect.size)
         backgroundOverlay.alpha = 0.5
@@ -104,7 +104,7 @@ class RuneReplacementView: SKSpriteNode, ButtonDelegate {
         runeContainer.position = CGPoint.position(runeContainer.frame, inside: playableRect, verticalAnchor: .bottom, horizontalAnchor: .center, padding: Style.Padding.most*3)
         
         /// position it high up to catch user interaction
-        runeContainer.zPosition = 10_000
+        runeContainer.zPosition = 10_000_000
         
         /// remove the old rune container
         self.removeChild(with: "runeContainer")

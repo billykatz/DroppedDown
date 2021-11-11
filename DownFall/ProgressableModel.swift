@@ -43,6 +43,9 @@ enum CodexSections: String, CaseIterable, Identifiable {
     case playerUpgrades
     case misc
     
+    static var availableInRun: [CodexSections] = [.items, .runes]
+    static var permanentUpgrades: [CodexSections] = [.playerUpgrades, .misc]
+    
     var id: String {
         return self.rawValue
     }
@@ -51,8 +54,8 @@ enum CodexSections: String, CaseIterable, Identifiable {
         switch self {
         case .items: return "Items"
         case .runes: return "Runes"
-        case .playerUpgrades: return "Upgrades"
-        case .misc: return "Misc"
+        case .playerUpgrades: return "Stats"
+        case .misc: return "Pickaxe"
         }
     }
 }
@@ -60,6 +63,9 @@ enum CodexSections: String, CaseIterable, Identifiable {
 class CodexViewModel: ObservableObject {
     
     public let sections = CodexSections.allCases
+    
+    public let availableInRun = CodexSections.availableInRun
+    public let permanentUpgrades = CodexSections.permanentUpgrades
     
     @Published var unlockables: [Unlockable] = []
     @Published var gemAmount: Int = 0
@@ -138,6 +144,14 @@ class CodexViewModel: ObservableObject {
                                                     && stat.runeType == unlockable.stat.runeType
                                             }) else { preconditionFailure() }
         return stat
+    }
+    
+    func amountNeededToUnlock(_ unlockable: Unlockable) -> Int {
+        let target = unlockable.stat.amount
+        let relevantPlayerStat = relevantStatForUnlockable(unlockable)
+        let current = relevantPlayerStat.amount
+        
+        return relevantPlayerStat.amount
     }
     
     func unlockAt(_ unlockable: Unlockable) -> String {

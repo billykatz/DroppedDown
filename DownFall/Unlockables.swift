@@ -68,15 +68,15 @@ struct Unlockable: Codable, Identifiable, Equatable {
             
             
             // Runes
-            Unlockable(stat: .blueGems100Collected, item: StoreOffer.offer(type: .rune(Rune.rune(for: .bubbleUp)), tier: 2), purchaseAmount: 200, isPurchased: false, isUnlocked: false, applysToBasePlayer: false),
-            Unlockable(stat: .purpleGems100Collected, item: StoreOffer.offer(type: .rune(Rune.rune(for: .vortex)), tier: 2), purchaseAmount: 200, isPurchased: false, isUnlocked: false, applysToBasePlayer: false),
-            Unlockable(stat: .redGems100Collected, item: StoreOffer.offer(type: .rune(Rune.rune(for: .flameColumn)), tier: 2), purchaseAmount: 200, isPurchased: false, isUnlocked: false, applysToBasePlayer: false),
+            Unlockable(stat: .twoThousandRocks, item: StoreOffer.offer(type: .rune(Rune.rune(for: .bubbleUp)), tier: 2), purchaseAmount: 200, isPurchased: false, isUnlocked: false, applysToBasePlayer: false),
+            Unlockable(stat: .twoThousandRocks, item: StoreOffer.offer(type: .rune(Rune.rune(for: .vortex)), tier: 2), purchaseAmount: 200, isPurchased: false, isUnlocked: false, applysToBasePlayer: false),
+            Unlockable(stat: .twoThousandRocks, item: StoreOffer.offer(type: .rune(Rune.rune(for: .flameColumn)), tier: 2), purchaseAmount: 200, isPurchased: false, isUnlocked: false, applysToBasePlayer: false),
 
             
             // red runes
-            Unlockable(stat: .fiveHundredGems, item: StoreOffer.offer(type: .rune(Rune.rune(for: .flameWall)), tier: 2), purchaseAmount: 300, isPurchased: false, isUnlocked: false, applysToBasePlayer: false),
+            Unlockable(stat: .oneThousandRocks, item: StoreOffer.offer(type: .rune(Rune.rune(for: .flameWall)), tier: 2), purchaseAmount: 300, isPurchased: false, isUnlocked: false, applysToBasePlayer: false),
             // rune uses
-            Unlockable(stat: .fiveHundredGems, item: StoreOffer.offer(type: .rune(Rune.rune(for: .rainEmbers)), tier: 2), purchaseAmount: 300, isPurchased: false, isUnlocked: false, applysToBasePlayer: false),
+            Unlockable(stat: .oneThousandRocks, item: StoreOffer.offer(type: .rune(Rune.rune(for: .rainEmbers)), tier: 2), purchaseAmount: 300, isPurchased: false, isUnlocked: false, applysToBasePlayer: false),
             
             
             // rune slots

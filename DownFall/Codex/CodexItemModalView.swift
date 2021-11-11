@@ -8,52 +8,6 @@
 
 import SwiftUI
 
-struct BuyButtonView: View {
-    let action: () -> ()
-    let price: Int
-    let canAfford: Bool
-    
-    var buttonColor: Color {
-        return Color(canAfford ? .codexButtonLightGray : .codexDarkGray)
-    }
-    
-    var buttonBackground: some View {
-        RoundedRectangle(cornerRadius: 10.0)
-            .fill(buttonColor)
-            .frame(width: 225, height: 75)
-    }
-    
-    var body: some View {
-        if canAfford {
-            Button(action: action) {
-                buttonBackground
-                    .overlay(HStack(alignment: .center, spacing: 0) {
-                            Text("Buy")
-                                .font(.buttonFont)
-                                .foregroundColor(.black)
-                                .alignmentGuide(VerticalAlignment.center, computeValue: { dimension in
-                                    dimension[VerticalAlignment.center] + 2
-                                })
-                    })
-            }
-        } else {
-            buttonBackground
-                .overlay(HStack(alignment: .center, spacing: 0) {
-                        Text("Collect more gems to buy")
-                            .font(.codexFont)
-                            .background(Color(UIColor.codexDarkGray))
-                            .padding()
-                            .minimumScaleFactor(0.1)
-                            .lineLimit(1)
-                            .foregroundColor(.black)
-                })
-        }
-        
-        PriceView(price: price, textColor: (canAfford ? .white : .codexRedText), scale: 0.75, font: Font.titleCodexFont)
-
-    }
-}
-
 struct CodexItemModalTitleView: View {
     let title: String
     
@@ -70,6 +24,7 @@ struct CodexItemModalTitleView: View {
 
 struct CodexItemModalDescriptionView: View {
     let unlockable: Unlockable
+    let relevantProgress: Int
     let relevantPlayerStat: String
 
     var body: some View {
@@ -82,7 +37,32 @@ struct CodexItemModalDescriptionView: View {
                 .fixedSize(horizontal: false, vertical: true)
                 .padding()
         } else {
-            Text(relevantPlayerStat)
+            CodexUnlockAtView(unlockable: unlockable,
+                              progress: relevantProgress,
+                              progressString: relevantPlayerStat)
+        }
+
+    }
+}
+
+struct CodexItemModalApplicationView: View {
+    let appliesToBaseCharacter: Bool
+    
+    var body: some View {
+        Text("Purchased")
+            .font(.titleCodexFont)
+            .foregroundColor(.white)
+        if (appliesToBaseCharacter) {
+            Text("This upgrade has been applied to your character.")
+                .font(.codexFont)
+                .foregroundColor(.white)
+                .lineLimit(nil)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .center)
+        } else {
+            Text("This item has a chance to show up in future runs.")
                 .font(.codexFont)
                 .foregroundColor(.white)
                 .lineLimit(nil)
@@ -91,27 +71,35 @@ struct CodexItemModalDescriptionView: View {
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .center)
         }
-
     }
 }
 
-struct CodexItemModalUnlockView: View {
-    let unlockable: Unlockable
-    
-    var statExtra: String {
-        let stat = unlockable.stat
-        let value: Any? = stat.gemColor ?? stat.rockColor ?? stat.monsterType ?? stat.runeType
-        if value == nil { return "" }
-        return " - \(String(describing: value!))"
-    }
+struct CodexItemModalFutureApplicationView: View {
+    let appliesToBaseCharacter: Bool
     
     var body: some View {
-        Text("Unlocked at \(unlockable.stat.amount) \(unlockable.stat.statType.rawValue) \(statExtra)")
-            .font(.codexFont)
-            .foregroundColor(.white)
-            .padding()
+        if (appliesToBaseCharacter) {
+            Text("When purchased, this upgrade will be immediately applied to your character.")
+                .font(.codexFont)
+                .foregroundColor(.white)
+                .lineLimit(nil)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .center)
+        } else {
+            Text("When purchased, this item will show up in future runs.")
+                .font(.codexFont)
+                .foregroundColor(.white)
+                .lineLimit(nil)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .center)
+        }
     }
 }
+
 
 struct CodexItemModalView: View {
     
@@ -129,7 +117,7 @@ struct CodexItemModalView: View {
     
     var backgroundHeight: CGFloat {
         if !unlockable.isUnlocked {
-            return 380
+            return 480
         } else {
             return 600
         }
@@ -144,19 +132,16 @@ struct CodexItemModalView: View {
                 Spacer().frame(height: 50.0)
                 CodexItemAnimatingView(unlockable: unlockable).scaleEffect(4.0)
                 Spacer().frame(height: 65.0)
-                CodexItemModalDescriptionView(unlockable: unlockable, relevantPlayerStat: viewModel.unlockAt(unlockable))
+                CodexItemModalDescriptionView(unlockable: unlockable, relevantProgress: viewModel.amountNeededToUnlock(unlockable), relevantPlayerStat: viewModel.unlockAt(unlockable))
                 Spacer()
-                if unlockable.isUnlocked {
-                    CodexItemModalUnlockView(unlockable: unlockable)
-                    Spacer()
-                } else {
-                    Image("codex-lock").resizable().frame(width: 75, height: 75)
-                    Spacer().frame(height: 10)
-                }
                 if (hiddenTrigger || !hiddenTrigger) {
                     if (!unlockable.isPurchased && unlockable.isUnlocked) {
                         BuyButtonView(action: purchase, price: unlockable.purchaseAmount, canAfford: viewModel.playerCanAfford(unlockable: unlockable))
+                        CodexItemModalFutureApplicationView(appliesToBaseCharacter: unlockable.applysToBasePlayer)
                         Spacer()
+                    } else if unlockable.isPurchased {
+                        CodexItemModalApplicationView(appliesToBaseCharacter: unlockable.applysToBasePlayer)
+//                        Text("Purchased").font(.titleCodexFont).foregroundColor(.white).multilineTextAlignment(.center)
                     }
                 }
             }

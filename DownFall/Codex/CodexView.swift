@@ -69,32 +69,44 @@ struct CodexView: View {
 
     }
     
+    func sectionView(section: CodexSections) -> some View {
+            ForEach(viewModel.unlockables(in: section)) {
+                unlockable in
+                let index = viewModel.unlockables.firstIndex(of: unlockable)!
+                CodexItemView(viewModel: viewModel, index: index)
+                    .onTapGesture {
+                        selectedIndex = index
+                        showModal.toggle()
+                    }
+                    .contentShape(Rectangle())
+
+            }
+    }
+    
     var body: some View {
         VStack(spacing: 4.0) {
-            CodexWalletView(gemAmount: viewModel.gemAmount)
+            CodexWalletView(gemAmount: viewModel.gemAmount).frame(alignment: .center)
             ZStack {
                 ScrollView {
                     Spacer().frame(height: 10.0)
-                    Text("- Store - ").font(.bigTitleCodexFont).foregroundColor(.white)
-                    
+                    Text("Level Goal Rewards ").font(.bigSubTitleCodexFont).foregroundColor(.white).multilineTextAlignment(.center)
+                    Text("When purchased, these items have a chance to show up in future runs. ").font(.codexFont).foregroundColor(.white).multilineTextAlignment(.center)
+                    Spacer().frame(height: 20.0)
                     LazyVGrid(columns: columns,
                               spacing: 20) {
-                        ForEach(viewModel.sections) { section in
-                            Section(header: Text("\(section.header)").font(.titleCodexFont).foregroundColor(.white)) {
-                                ForEach(viewModel.unlockables(in: section)) {
-                                    unlockable in
-                                    let index = viewModel.unlockables.firstIndex(of: unlockable)!
-                                    CodexItemView(viewModel: viewModel, index: index)
-                                        .onTapGesture {
-                                            selectedIndex = index
-                                            showModal.toggle()
-                                        }
-                                        .contentShape(Rectangle())
-
-                                }
-                                Spacer().frame(height: 10.0)
-                            }
+                        ForEach(viewModel.availableInRun) { section in
+                            sectionView(section: section)
                         }
+                    }.frame(alignment: .top)
+                    Text("Permanent Upgrades ").font(.bigSubTitleCodexFont).foregroundColor(.white).multilineTextAlignment(.center)
+                    Text("When purchased, these upgrades will be applied immediately to your character ").font(.codexFont).foregroundColor(.white).multilineTextAlignment(.center)
+                    Spacer().frame(height: 20.0)
+                    LazyVGrid(columns: columns,
+                              spacing: 20) {
+                        ForEach(viewModel.permanentUpgrades) { section in
+                            sectionView(section: section)
+                        }
+
                     }.frame(alignment: .top)
                 }
                 .padding(.horizontal)
@@ -108,6 +120,8 @@ struct CodexView: View {
 struct CodexView_Previews: PreviewProvider {
     static var previews: some View {
         let profileVM = ProfileViewModel(profile: .debugProfile)
+//        let rootVC = UIViewController()
+//        rootVC.title = "Store"
         let codexCoord = CodexCoordinator(viewController: UINavigationController())
         
         let data = CodexViewModel(profileViewModel: profileVM, codexCoordinator: codexCoord)

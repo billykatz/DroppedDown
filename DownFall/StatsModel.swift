@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 enum StatisticType: String, Codable {
     case rocksDestroyed
@@ -52,7 +53,6 @@ enum StatisticType: String, Codable {
             return false
         }
     }
-    
 }
 
 struct Statistics: Codable, Equatable, Identifiable {
@@ -63,11 +63,7 @@ struct Statistics: Codable, Equatable, Identifiable {
     let amount: Int
     let statType: StatisticType
     let id: UUID
-    
-//    static func ==(_ lhs: Statistics, _ rhs: Statistics) -> Bool {
-//        return lhs.statType == rhs.statType && lhs.rockColor == rhs.rockColor && lhs.gemColor == rhs.gemColor && lhs.monsterType == rhs.monsterType && lhs.runeType == rhs.runeType && lhs.amount == rhs.amount
-//    }
-//    
+     
     init(rockColor: ShiftShaft_Color? = nil, gemColor: ShiftShaft_Color? = nil, monsterType: EntityModel.EntityType? = nil, runeType: RuneType? = nil, amount: Int, statType: StatisticType) {
         self.rockColor = rockColor
         self.gemColor = gemColor
@@ -85,6 +81,67 @@ struct Statistics: Codable, Equatable, Identifiable {
     
     func overwriteStatAmount(_ amount: Int) -> Statistics {
         return Self.init(rockColor: self.rockColor, gemColor: self.gemColor, monsterType: self.monsterType, runeType: self.runeType, amount: amount, statType: self.statType)
+    }
+    
+    var color: UIColor {
+        return .lightBarBlue
+        if let rockColor = rockColor { return rockColor.forUI }
+        else if let gemColor = gemColor { return gemColor.forUI }
+        else if let _ = monsterType { return .darkBarBlood }
+        else if statType == .totalRocksDestroyed { return  .purple }
+        else if statType == .totalMonstersKilled { return .darkBarBlood }
+//        else if statType == .
+//        else { return .darkBarPurple }
+//        return ShiftShaft_Color.blue.forUI
+    }
+    
+    var textureName: String {
+        switch statType {
+        case .totalRocksDestroyed, .largestRockGroupDestroyed, .rocksDestroyed:
+            return "allRocks"
+        case .rocksDestroyed where rockColor == .blue:
+            return "blueRock"
+        case .rocksDestroyed where rockColor == .purple:
+            return "purpleRock"
+        case .rocksDestroyed where rockColor == .red:
+            return "redRock"
+        case .monstersKilled where monsterType == .alamo:
+            return "alamo"
+        case .monstersKilled where monsterType == .bat:
+            return "bat"
+        case .monstersKilled where monsterType == .dragon:
+            return "dragon"
+        case .monstersKilled where monsterType == .rat:
+            return "rat"
+        case .monstersKilled where monsterType == .sally:
+            return "sally"
+        case .totalMonstersKilled, .monstersKilled, .monstersKilledInARow, .totalLoses:
+            return "skullAndCrossbones"
+        case .runeUses, .totalRuneUses:
+            return  "blankRune"
+        case .lowestDepthReached, .distanceFallen:
+            return "mineshaft"
+        case .gemsCollected where gemColor == .red:
+            return "redCrystal"
+        case .gemsCollected where gemColor == .blue:
+            return "blueCrystal"
+        case .gemsCollected where gemColor == .purple:
+            return "purpleCrystal"
+        case .totalGemsCollected, .gemsCollected:
+            return "crystals"
+        case .counterClockwiseRotations:
+            return "rotateLeft"
+        case .clockwiseRotations:
+            return "rotateRight"
+        case .damageTaken, .healthHealed, .damageDealt:
+            return "fullHeart"
+        case .attacksDodged:
+            return "dodge"
+        case .totalWins:
+            return "buttonAffirmitive"
+        }
+        
+            
     }
 }
 

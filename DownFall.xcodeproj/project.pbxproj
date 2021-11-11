@@ -37,6 +37,8 @@
 		28AE3AC126A6000600BCE56A /* CodexCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AE3AC026A6000600BCE56A /* CodexCoordinator.swift */; };
 		28AE3AC526A6113900BCE56A /* CodexBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AE3AC426A6113900BCE56A /* CodexBackgroundView.swift */; };
 		28B7274426A0E90D00F349ED /* CodexView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28B7274326A0E90D00F349ED /* CodexView.swift */; };
+		28C64461273B4CFC00098C3C /* CodexUnlockAtView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28C64460273B4CFC00098C3C /* CodexUnlockAtView.swift */; };
+		28C64463273B540C00098C3C /* CodexBuyButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28C64462273B540C00098C3C /* CodexBuyButton.swift */; };
 		28C806AA26F3C3D500135E29 /* StatTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28C806A926F3C3D500135E29 /* StatTracker.swift */; };
 		28CAFA7B26A0F2F000151CA8 /* CodexItemAnimatingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28CAFA7A26A0F2F000151CA8 /* CodexItemAnimatingView.swift */; };
 		28D29AD4270B7E9D001AD50D /* RuneReplacementInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D29AD3270B7E9D001AD50D /* RuneReplacementInfoView.swift */; };
@@ -240,6 +242,8 @@
 		28AE3AC026A6000600BCE56A /* CodexCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexCoordinator.swift; sourceTree = "<group>"; };
 		28AE3AC426A6113900BCE56A /* CodexBackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexBackgroundView.swift; sourceTree = "<group>"; };
 		28B7274326A0E90D00F349ED /* CodexView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexView.swift; sourceTree = "<group>"; };
+		28C64460273B4CFC00098C3C /* CodexUnlockAtView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexUnlockAtView.swift; sourceTree = "<group>"; };
+		28C64462273B540C00098C3C /* CodexBuyButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexBuyButton.swift; sourceTree = "<group>"; };
 		28C806A926F3C3D500135E29 /* StatTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatTracker.swift; sourceTree = "<group>"; };
 		28CAFA7A26A0F2F000151CA8 /* CodexItemAnimatingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexItemAnimatingView.swift; sourceTree = "<group>"; };
 		28D29AD3270B7E9D001AD50D /* RuneReplacementInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneReplacementInfoView.swift; sourceTree = "<group>"; };
@@ -479,7 +483,9 @@
 			isa = PBXGroup;
 			children = (
 				28B7274326A0E90D00F349ED /* CodexView.swift */,
+				28C64460273B4CFC00098C3C /* CodexUnlockAtView.swift */,
 				283CBBD826A8A88E00B1F7C9 /* CodexItemModalView.swift */,
+				28C64462273B540C00098C3C /* CodexBuyButton.swift */,
 				2842570926EFE82600C96CCC /* CodexPriceView.swift */,
 				2842BABE26A0EC740021CD0B /* CodexItemView.swift */,
 				28AE3AC426A6113900BCE56A /* CodexBackgroundView.swift */,
@@ -1194,7 +1200,9 @@
 				3D6AACD8222A324D00C77B24 /* CGRect+Extensions.swift in Sources */,
 				283CBBD926A8A88E00B1F7C9 /* CodexItemModalView.swift in Sources */,
 				3DE657CD20B0AFD2003492DA /* Int+Extensions.swift in Sources */,
+				28C64461273B4CFC00098C3C /* CodexUnlockAtView.swift in Sources */,
 				3DA0087D21E6D1960017D8DA /* TileCreator.swift in Sources */,
+				28C64463273B540C00098C3C /* CodexBuyButton.swift in Sources */,
 				3D06390522EEB52300C4D5E9 /* LoseState.swift in Sources */,
 				5894A45024C37A1100FBF839 /* LoadingScene.swift in Sources */,
 				3D30A42B2217F63500AFA1E1 /* TileCoord.swift in Sources */,

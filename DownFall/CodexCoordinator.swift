@@ -33,6 +33,15 @@ class CodexCoordinator {
         let hostingViewController = UIHostingController(rootView: codexView)
         hostingViewController.bottomBlack()
         
+        let titleLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 100, height: 30))
+        titleLabel.textColor = UIColor.white
+        titleLabel.text = "Store"
+        titleLabel.textAlignment = .center
+        titleLabel.font = .bigSubtitleCodexFont
+
+        
+        hostingViewController.navigationItem.titleView = titleLabel
+        
         viewController.pushViewController(hostingViewController, animated: true)
     }
     

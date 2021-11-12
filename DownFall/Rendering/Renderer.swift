@@ -890,14 +890,14 @@ extension Renderer {
         let positionInScene = touch.location(in: self.foreground)
         let nodes = foreground.nodes(at: positionInScene)
         
-        if let dialogueOverlay = dialogueOverlay {
-            dialogueOverlay.touchesEnded(touches, with: event)
-        } else if self.tileDetailView?.isUserInteractionEnabled ?? false {
-            self.tileDetailView?.touchesEnded(touches, with: event)
+        if dialogueOverlay?.isUserInteractionEnabled ?? false {
+            dialogueOverlay?.touchesEnded(touches, with: event)
+        } else if tileDetailView?.isUserInteractionEnabled ?? false {
+            tileDetailView?.touchesEnded(touches, with: event)
         } else {
             // one of these should get it
-            self.backpackView.touchesEnded(touches, with: event)
-            self.levelGoalView.touchesEnded(touches, with: event)
+            backpackView.touchesEnded(touches, with: event)
+            levelGoalView.touchesEnded(touches, with: event)
         }
         
         for node in nodes {

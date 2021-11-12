@@ -64,11 +64,11 @@ struct GoalTracking: Codable, Hashable {
             switch levelGoalType {
             case .unlockExit:
                 switch tileType {
-                case .rock:
+                case .rock(let color, _, _):
                     if grouped {
                         return "Mine \(target) groups of at least \(minimumAmount) rocks"
                     } else {
-                        return "Mine \(target) rocks"
+                        return "Mine \(target) \(color.humanReadable) rocks"
                     }
                 case .monster:
                     return "Destroy \(target) monster\(target > 1 ? "s" : "")"

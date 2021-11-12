@@ -222,6 +222,7 @@ class DialogueOverlay: SKSpriteNode {
         
         super.init(texture: nil, color: .clear, size: playableRect.size)
         
+        self.isUserInteractionEnabled = true
         self.zPosition = 100_000_000_000
         
         let levelGoalsHighlight = SKSpriteNode(texture: SKTexture(imageNamed: highlightLevelGoalsMaskName), color: .white, size: CGSize(width: playableRect.width, height: playableRect.height * 2.31 ))
@@ -308,7 +309,11 @@ class DialogueOverlay: SKSpriteNode {
                 let fadeOut = SKAction.fadeOut(withDuration: 0.25)
                 fadeOut.timingMode = .easeIn
                 
-                self.run(SKAction.sequence([fadeOut, SKAction.removeFromParent()]))
+                let removeInteraction = SKAction.run { [weak self] in
+                    self?.isUserInteractionEnabled = false
+                }
+                
+                self.run(SKAction.sequence([fadeOut, removeInteraction, SKAction.removeFromParent()]))
                 InputQueue.append(Input(.tutorialPhaseEnd(tutorialPhase)))
             }
         }

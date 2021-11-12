@@ -98,7 +98,7 @@ struct LevelConstructor {
                 chanceRune = 20
                 chanceRuneSlot = 50
             } else {
-                chanceRune = 50
+                chanceRune = 75
                 chanceRuneSlot = 0
             }
             
@@ -198,9 +198,8 @@ struct LevelConstructor {
             goals = [rockGoal, monsterGoal]
             
         case 2,3:
-            let monsterAmount = Int(Double(boardSize(depth: depth)) * Double(boardSize(depth: depth)) * maxMonsterOnBoardRatio(depth: depth))
             let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 30)
-            let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
+            let monsterGoal = LevelGoal.killMonsterGoal(amount: 3)
             
             goals = [rockGoal, monsterGoal]
         

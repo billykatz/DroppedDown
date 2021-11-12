@@ -88,15 +88,6 @@ struct CodexView: View {
             ZStack {
                 ScrollView {
                     Spacer().frame(height: 10.0)
-                    Text("Level Goal Rewards ").font(.bigSubTitleCodexFont).foregroundColor(.white).multilineTextAlignment(.center)
-                    Text("When purchased, these items have a chance to show up in future runs. ").font(.codexFont).foregroundColor(.white).multilineTextAlignment(.center)
-                    Spacer().frame(height: 20.0)
-                    LazyVGrid(columns: columns,
-                              spacing: 20) {
-                        ForEach(viewModel.availableInRun) { section in
-                            sectionView(section: section)
-                        }
-                    }.frame(alignment: .top)
                     Text("Permanent Upgrades ").font(.bigSubTitleCodexFont).foregroundColor(.white).multilineTextAlignment(.center)
                     Text("When purchased, these upgrades will be applied immediately to your character ").font(.codexFont).foregroundColor(.white).multilineTextAlignment(.center)
                     Spacer().frame(height: 20.0)
@@ -107,6 +98,17 @@ struct CodexView: View {
                         }
 
                     }.frame(alignment: .top)
+                    Spacer().frame(height: 10.0)
+                    Text("Level Goal Rewards ").font(.bigSubTitleCodexFont).foregroundColor(.white).multilineTextAlignment(.center)
+                    Text("When purchased, these items have a chance to show up in future runs. ").font(.codexFont).foregroundColor(.white).multilineTextAlignment(.center)
+                    Spacer().frame(height: 20.0)
+                    LazyVGrid(columns: columns,
+                              spacing: 20) {
+                        ForEach(viewModel.availableInRun) { section in
+                            sectionView(section: section)
+                        }
+                    }.frame(alignment: .top)
+                    
                 }
                 .padding(.horizontal)
                 

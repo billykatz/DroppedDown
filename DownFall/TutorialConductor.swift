@@ -35,6 +35,7 @@ class TutorialConductor {
     private var allGoalsJustCompletedHoldOffOnTutorialForATurn = false
     
     private var turnsSinceToldToRotateButHasNotYetRotated = 0
+    private var shouldShowRotateHelperTutorial = true
     private var showedYouCanRotateAgain = false
     
     
@@ -184,6 +185,9 @@ class TutorialConductor {
         case .tutorialPhaseEnd(let phase):
             transitionToPhase(from: phase)
             
+        case .rotatePreviewFinish:
+            shouldShowRotateHelperTutorial = false
+            
         case .transformation(let trans):
             guard let tran = trans.first,
                   case InputType.touch? = tran.inputType,
@@ -260,7 +264,7 @@ class TutorialConductor {
                 InputQueue.append(.init(.tutorialPhaseStart(phase)))
             }
             
-            if turnsSinceToldToRotateButHasNotYetRotated >= 8 && !showedYouCanRotateAgain {
+            if turnsSinceToldToRotateButHasNotYetRotated >= 8 && !showedYouCanRotateAgain && shouldShowRotateHelperTutorial {
                 showedYouCanRotateAgain = true
                 self.phase = .youCanRotateAgain
                 InputQueue.append(.init(.tutorialPhaseStart(phase)))

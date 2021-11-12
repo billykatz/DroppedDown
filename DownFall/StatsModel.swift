@@ -89,14 +89,14 @@ struct Statistics: Codable, Equatable, Identifiable {
     
     var textureName: String {
         switch statType {
-        case .totalRocksDestroyed, .largestRockGroupDestroyed, .rocksDestroyed:
-            return "allRocks"
         case .rocksDestroyed where rockColor == .blue:
             return "blueRock"
         case .rocksDestroyed where rockColor == .purple:
             return "purpleRock"
         case .rocksDestroyed where rockColor == .red:
             return "redRock"
+        case .totalRocksDestroyed, .largestRockGroupDestroyed, .rocksDestroyed:
+            return "allRocks"
         case .monstersKilled where monsterType == .alamo:
             return "alamo"
         case .monstersKilled where monsterType == .bat:
@@ -207,17 +207,25 @@ extension Statistics {
 extension Statistics {
     
     // rocks mined
+    static var fiveRocks = Self.init(amount: 5, statType: .totalRocksDestroyed)
     static var fiftyRocks = Self.init(amount: 50, statType: .totalRocksDestroyed)
     static var oneHundredRocks = Self.init(amount: 100, statType: .totalRocksDestroyed)
     static var fiveHundredRocks = Self.init(amount: 500, statType: .totalRocksDestroyed)
     static var oneThousandRocks = Self.init(amount: 1000, statType: .totalRocksDestroyed)
     static var twoThousandRocks = Self.init(amount: 2000, statType: .totalRocksDestroyed)
+    static var fiveThousandRocks = Self.init(amount: 5000, statType: .totalRocksDestroyed)
     static var tenThousandRocks = Self.init(amount: 10000, statType: .totalRocksDestroyed)
     static var twentyThousandRocks = Self.init(amount: 20000, statType: .totalRocksDestroyed)
     
-    static var blueRocks100Mined = Self.init(rockColor: .blue, amount: 100, statType: .rocksDestroyed)
-    static var redRocks123Mined = Self.init(rockColor: .red, amount: 123, statType: .rocksDestroyed)
-    static var purpleRocks501Mined = Self.init(rockColor: .purple, amount: 501, statType: .rocksDestroyed)
+    static var oneThousandBlueRocks = Self.init(rockColor: .blue, amount: 1000, statType: .rocksDestroyed)
+    static var oneThousandRedRocks = Self.init(rockColor: .red, amount: 1000, statType: .rocksDestroyed)
+    static var twoThousandRedRocks = Self.init(rockColor: .red, amount: 2000, statType: .rocksDestroyed)
+    static var threeThousandRedRocks = Self.init(rockColor: .red, amount: 3000, statType: .rocksDestroyed)
+    static var oneThousandPurpleRocks = Self.init(rockColor: .purple, amount: 1000, statType: .rocksDestroyed)
+    
+//    static var blueRocks100Mined = Self.init(rockColor: .blue, amount: 100, statType: .rocksDestroyed)
+//    static var redRocks123Mined = Self.init(rockColor: .red, amount: 123, statType: .rocksDestroyed)
+//    static var purpleRocks501Mined = Self.init(rockColor: .purple, amount: 501, statType: .rocksDestroyed)
     
     // monsters killed
     static var dragonKilled10 = Self.init(monsterType: .dragon, amount: 10, statType: .monstersKilled)
@@ -246,6 +254,7 @@ extension Statistics {
     
     // reach depth
     static let reachDepth5 = Self.init(amount: 5, statType: .lowestDepthReached)
+    static let reachDepth8 = Self.init(amount: 8, statType: .lowestDepthReached)
     static let reachDepth10 = Self.init(amount: 10, statType: .lowestDepthReached)
     
     // largest group

@@ -124,7 +124,7 @@ class FTUEConductor {
         let sentence1 = Sentence(text: "Nice you mined a gem!\nOnly some rocks have gems inside.  Look for a sparkle to find the gem-infused rocks.", emotion: .surprised)
         let sentence2 = Sentence(text: "The more rocks in the group the more gems you will mine!", emotion: .content)
         let sentence3 = Sentence(text: "Less than 10 rocks earns you 1 gem per rock. \n10 or more rocks earn you 2 gems per rock.", emotion: .skeptical)
-        let sentence4 = Sentence(text: "Some of the best miners can earn 3 gems per rock but that is super rare.", emotion: .skeptical)
+        let sentence4 = Sentence(text: "Some of the best miners can collect 3 gems per rock but that is super rare.", emotion: .skeptical)
         let dialog = Dialogue(sentences: [sentence1, sentence2, sentence3, sentence4], character: .teri, delayBeforeTyping: 0.25)
         
         let ftuePhase = TutorialPhase(shouldShowHud: true, shouldShowLevelGoals: true, shouldShowLevelGoalDetailView: true, shouldShowTileDetailView: true, shouldInputLevelGoalView: false, shouldSpawnMonsters: true, shouldSpawnTileWithGem: true, dialogue: dialog, highlightTileType: [gemTileType], waitDuration: 0.0, fadeInDuration: 0.25, shouldDimScreen: true, shouldHighlightLevelGoalsInHUD: false, shouldShowRotateFinger: false, showAbovePickaxe: false)
@@ -146,9 +146,9 @@ class FTUEConductor {
         guard shouldShowRuneChargedForTheFirstTime  else { return nil }
         guard !runes.filter( { rune in runeIsCharged(rune) }).isEmpty else { return nil }
             
-        let sentence1 = Sentence(text: "Woohooo! Your rune is fully charged", emotion: .surprised)
-        let sentence2 = Sentence(text: "Tap on it in your pickaxe to choose targets and unleash its power", emotion: .content)
-        let sentence3 = Sentence(text: "Runes will recahrge after each use so use them often.", emotion: .skeptical)
+        let sentence1 = Sentence(text: "Woohooo! Your rune is fully charged.", emotion: .surprised)
+        let sentence2 = Sentence(text: "Tap on it in your pickaxe to choose targets and unleash its power.", emotion: .content)
+        let sentence3 = Sentence(text: "Runes will recharge after each use so use them often.", emotion: .skeptical)
         let dialog = Dialogue(sentences: [sentence1, sentence2, sentence3], character: .teri, delayBeforeTyping: 0.25)
         
         let ftuePhase = TutorialPhase(shouldShowHud: true, shouldShowLevelGoals: true, shouldShowLevelGoalDetailView: true, shouldShowTileDetailView: true, shouldInputLevelGoalView: true, shouldSpawnMonsters: true, shouldSpawnTileWithGem: true, dialogue: dialog, highlightTileType: nil, waitDuration: 0.0, fadeInDuration: 0.25, shouldDimScreen: true, shouldHighlightLevelGoalsInHUD: false, shouldShowRotateFinger: false, showAbovePickaxe: true)

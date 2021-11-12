@@ -275,7 +275,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
         }
         
         else if menuType == .gameLose {
-            let titleText = "Game Over"
+            let titleText = "You made it to depth level \(level?.humanReadableDepth ?? "0")."
             let titleNode = ParagraphNode.labelNode(text: titleText, paragraphWidth: menuSizeWidth * 0.95,
                                                     fontSize: .fontExtraLargeSize, textAlignment: .center)
             
@@ -289,15 +289,15 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             body1Node.position = CGPoint.alignHorizontally(body1Node.frame, relativeTo: titleNode.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.most, translatedToBounds: true)
             
             
-            let body2Text = "You made it to depth level \(level?.humanReadableDepth ?? "0")."
-            let body2Node = ParagraphNode.labelNode(text: body2Text, paragraphWidth: menuSizeWidth * 0.90,
-                                                    fontSize: .fontMediumSize, textAlignment: .center)
-            
-            body2Node.position = CGPoint.alignHorizontally(body2Node.frame, relativeTo: body1Node.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.normal, translatedToBounds: true)
+//            let body2Text = "You made it to depth level \(level?.humanReadableDepth ?? "0")."
+//            let body2Node = ParagraphNode.labelNode(text: body2Text, paragraphWidth: menuSizeWidth * 0.90,
+//                                                    fontSize: .fontMediumSize, textAlignment: .center)
+//
+//            body2Node.position = CGPoint.alignHorizontally(body2Node.frame, relativeTo: body1Node.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.normal, translatedToBounds: true)
             
             containerView?.addChild(titleNode)
             containerView?.addChild(body1Node)
-            containerView?.addChild(body2Node)
+//            containerView?.addChild(body2Node)
             
             
             let mainMenuButton = ShiftShaft_Button(size: buttonSize,

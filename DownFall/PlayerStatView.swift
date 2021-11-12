@@ -71,6 +71,7 @@ struct PlayerStatsView: View {
     
     var body: some View {
         ScrollView{
+            #if DEBUG
             Button(action: {
                 UserDefaults.standard.setValue(false, forKey: UserDefaults.hasStartedTutorialKey)
                 UserDefaults.standard.setValue(false, forKey: UserDefaults.hasCompletedTutorialKey)
@@ -111,6 +112,7 @@ struct PlayerStatsView: View {
                     .background(Color(.backgroundGray))
                     .cornerRadius(5.0)
             }
+            #endif
             HStack {
                 CodexWalletView(gemAmount: gemAmount)
                 #if DEBUG

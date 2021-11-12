@@ -36,6 +36,9 @@ class GameViewController: UIViewController {
                 self.menuCoordinator?.loadedProfile(profile, hasLaunchedBefore: hasLaunchedBefore)
                 
                 if !hasLaunchedBefore {
+                    // let's see if turning off sounds by defaults helps with crashes
+                    UserDefaults.standard.setValue(true, forKey: UserDefaults.muteSoundKey)
+                    
                     UserDefaults.standard.setValue(true, forKey: UserDefaults.hasLaunchedBeforeKey)
                 }
             }

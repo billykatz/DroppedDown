@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "dialog.png",
+      "filename" : "Dialog-box-1x.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "dialog@2x.png",
+      "filename" : "Dialog-box-1x@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "dialog@3x.png",
+      "filename" : "Dialog-box-1x@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

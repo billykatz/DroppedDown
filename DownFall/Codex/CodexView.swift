@@ -98,7 +98,7 @@ struct CodexView: View {
                         }
 
                     }.frame(alignment: .top)
-                    Spacer().frame(height: 10.0)
+                    Spacer().frame(height: 85.0)
                     Text("Level Goal Rewards ").font(.bigSubTitleCodexFont).foregroundColor(.white).multilineTextAlignment(.center)
                     Text("When purchased, these items have a chance to show up in future runs. ").font(.codexFont).foregroundColor(.white).multilineTextAlignment(.center)
                     Spacer().frame(height: 20.0)

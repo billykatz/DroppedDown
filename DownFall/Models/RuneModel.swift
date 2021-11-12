@@ -194,7 +194,7 @@ struct Rune: Hashable, Codable {
                         cost: 0,
                         currency: .gem,
                         description: "Transform 3 rocks into purple.",
-                        flavorText: "Barney was one a red dinosaur before running into me. - Durham the Dwarf",
+                        flavorText: "Barney was a red dinosaur before running into me. - Durham the Dwarf",
                         targets: 3,
                         targetTypes: TileType.rockCases,
                         affectSlopes: [],

@@ -12,13 +12,13 @@ class DialogueView: SKSpriteNode {
     
     // Style constants
     let totalDialogueSize = CGSize(width: 834, height: 381)
-    let dialogueBoxSize = CGSize(width: 528, height: 360)
+    let dialogueBoxSize = CGSize(width: 520, height: 360)
     let characterBox = CGSize(width: 220, height: 220)
     let characterNameBox = CGSize(width: 292, height: 87)
     let dialogueLabelName = "dialogueLabelName"
     let dialogSpriteName = "dialog"
     let dialogCharacterSpriteName = "dialogCharacterSpriteName"
-    let sentenceFontSize: CGFloat = 60
+    let sentenceFontSize: CGFloat = 64
     
     var containerView: SKSpriteNode
     var finishedTyping: Bool = false
@@ -39,15 +39,19 @@ class DialogueView: SKSpriteNode {
         character.xScale = -1
         character.zPosition = 100000
 
-        self.characterBoxPosition = CGPoint.alignVertically(character.frame, relativeTo: dialogueBackgroundImage.frame, horizontalAnchor: .left, verticalAlign: .bottom, verticalPadding: 16, horizontalPadding: -275, translatedToBounds: true)
+        self.characterBoxPosition = CGPoint.alignVertically(character.frame, relativeTo: dialogueBackgroundImage.frame, horizontalAnchor: .left, verticalAlign: .bottom, verticalPadding: 12, horizontalPadding: -275, translatedToBounds: true)
         
         let characterNameLabel = ParagraphNode(text: dialogue.character.humanReadable, fontSize: 80, fontColor: .white)
-        characterNameLabel.position = CGPoint.alignVertically(characterNameLabel.frame, relativeTo: character.frame, horizontalAnchor: .right, verticalAlign: .top, verticalPadding: 0,  horizontalPadding: -250,  translatedToBounds: true)
+        characterNameLabel.position = CGPoint.position(characterNameLabel.frame, inside: dialogueBackgroundImage.frame, verticalAlign: .top, horizontalAnchor: .left, xOffset: 150.0, translatedToBounds: true)
+            
+//            CGPoint.alignVertically(characterNameLabel.frame, relativeTo: character.frame, horizontalAnchor: .right, verticalAlign: .top, verticalPadding: 0,  horizontalPadding: -250,  translatedToBounds: true)
         characterNameLabel.zPosition = 100000
         
         // empty sprite to position the dialog text area
         let emptySprite = SKSpriteNode(color: .clear, size: dialogueBoxSize)
-        emptySprite.position = CGPoint.alignHorizontally(emptySprite.frame, relativeTo: characterNameLabel.frame, horizontalAnchor: .left, verticalAlign: .bottom, verticalPadding: 8.0, translatedToBounds: true)
+        let fakeChar = SKSpriteNode(color: .clear, size: characterBox)
+        fakeChar.position = characterBoxPosition
+        emptySprite.position = CGPoint.alignVertically(emptySprite.frame, relativeTo: fakeChar.frame, horizontalAnchor: .right, verticalAlign: .top, verticalPadding: -24.0, translatedToBounds: true)
         
         dialogueFrame = emptySprite.frame
         

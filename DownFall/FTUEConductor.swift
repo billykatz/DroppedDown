@@ -147,7 +147,7 @@ class FTUEConductor {
         guard !runes.filter( { rune in runeIsCharged(rune) }).isEmpty else { return nil }
             
         let sentence1 = Sentence(text: "Woohooo! Your rune is fully charged.", emotion: .surprised)
-        let sentence2 = Sentence(text: "Tap on it in your pickaxe to choose targets and unleash its power.", emotion: .content)
+        let sentence2 = Sentence(text: "Tap on it to choose targets and unleash its power.", emotion: .content)
         let sentence3 = Sentence(text: "Runes will recharge after each use so use them often.", emotion: .skeptical)
         let dialog = Dialogue(sentences: [sentence1, sentence2, sentence3], character: .teri, delayBeforeTyping: 0.25)
         

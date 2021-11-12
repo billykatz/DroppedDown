@@ -76,17 +76,18 @@ struct LevelConstructor {
             
             guard let healingOption = healingOptions.randomElement() else { preconditionFailure("There must always be at least 1 unlockable at tier 1 for healing")}
             
-//            let otherOptions = [
-//                unlockables
-//                .filter { unlockable in
-//                    return !healingOptions.contains(unlockable) && unlockable.canAppearInRun && unlockable.item.tier == tier
-//                }
-//
-//            guard let otherOption = otherOptions.randomElement() else {  preconditionFailure("There must always be at least 1 other unlockable at tier 1 that isn't healing")}
+            let otherOptions =
+                unlockables
+                .filter { unlockable in
+                    return !healingOptions.contains(unlockable) && unlockable.canAppearInRun && unlockable.item.tier == tier
+                }
 
-//            return [healingOption.item, otherOption.
-            #warning("Fix for release")
-            return [healingOption.item, StoreOffer.offer(type: .rune(.rune(for: .bubbleUp)), tier: 1)]
+            guard let otherOption = otherOptions.randomElement() else {  preconditionFailure("There must always be at least 1 other unlockable at tier 1 that isn't healing")}
+
+            return [healingOption.item, otherOption.item]
+            
+            // For testing purposes
+//            return [healingOption.item, StoreOffer.offer(type: .rune(.rune(for: .bubbleUp)), tier: 1)]
         }
         else if tier == 2 {
             let playerHasFullPickaxe = playerData.pickaxe?.isAtMaxCapacity() ?? false

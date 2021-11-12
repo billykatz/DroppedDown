@@ -11,7 +11,6 @@ import SpriteKit
 
 class Renderer: SKSpriteNode {
     
-    
     /// PUBLIC
     public var backpackView: BackpackView
     

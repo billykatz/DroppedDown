@@ -49,21 +49,21 @@ struct Unlockable: Codable, Identifiable, Equatable {
             
             // Player Updates
             Unlockable(stat: .fiveRocks, item: StoreOffer.offer(type: .plusOneMaxHealth, tier: 1), purchaseAmount: 0, isPurchased: false, isUnlocked: false, applysToBasePlayer: true),
-            Unlockable(stat: .oneThousandRocks, item: StoreOffer.offer(type: .luck(amount: 5), tier: 1), purchaseAmount: 100, isPurchased: false, isUnlocked: false, applysToBasePlayer: true),
-            Unlockable(stat: .oneThousandRocks, item: StoreOffer.offer(type: .dodge(amount: 5), tier: 1), purchaseAmount: 100, isPurchased: false, isUnlocked: false, applysToBasePlayer: true),
+            Unlockable(stat: .oneThousandRocks, item: StoreOffer.offer(type: .luck(amount: 5), tier: 1), purchaseAmount: 50, isPurchased: false, isUnlocked: false, applysToBasePlayer: true),
+            Unlockable(stat: .oneThousandRocks, item: StoreOffer.offer(type: .dodge(amount: 5), tier: 1), purchaseAmount: 50, isPurchased: false, isUnlocked: false, applysToBasePlayer: true),
             
             // tier 2
-            Unlockable(stat: .fiveThousandRocks, item: StoreOffer.offer(type: .plusOneMaxHealth, tier: 2), purchaseAmount: 250, isPurchased: false, isUnlocked: false, applysToBasePlayer: true),
-            Unlockable(stat: .fiveThousandRocks, item: StoreOffer.offer(type: .luck(amount: 5), tier: 2), purchaseAmount: 250, isPurchased: false, isUnlocked: false, applysToBasePlayer: true),
-            Unlockable(stat: .fiveThousandRocks, item: StoreOffer.offer(type: .dodge(amount: 5), tier: 2), purchaseAmount: 250, isPurchased: false, isUnlocked: false, applysToBasePlayer: true),
+            Unlockable(stat: .fiveThousandRocks, item: StoreOffer.offer(type: .plusOneMaxHealth, tier: 2), purchaseAmount: 200, isPurchased: false, isUnlocked: false, applysToBasePlayer: true),
+            Unlockable(stat: .fiveThousandRocks, item: StoreOffer.offer(type: .luck(amount: 5), tier: 2), purchaseAmount: 200, isPurchased: false, isUnlocked: false, applysToBasePlayer: true),
+            Unlockable(stat: .fiveThousandRocks, item: StoreOffer.offer(type: .dodge(amount: 5), tier: 2), purchaseAmount: 200, isPurchased: false, isUnlocked: false, applysToBasePlayer: true),
             
             // tier 3
-            Unlockable(stat: .reachDepth8, item: StoreOffer.offer(type: .plusOneMaxHealth, tier: 3), purchaseAmount: 1000, isPurchased: false, isUnlocked: false, applysToBasePlayer: true),
-            Unlockable(stat: .reachDepth8, item: StoreOffer.offer(type: .luck(amount: 5), tier: 3), purchaseAmount: 500, isPurchased: false, isUnlocked: false, applysToBasePlayer: true),
-            Unlockable(stat: .reachDepth8, item: StoreOffer.offer(type: .dodge(amount: 5), tier: 3), purchaseAmount: 500, isPurchased: false, isUnlocked: false, applysToBasePlayer: true),
+            Unlockable(stat: .reachDepth8, item: StoreOffer.offer(type: .plusOneMaxHealth, tier: 3), purchaseAmount: 500, isPurchased: false, isUnlocked: false, applysToBasePlayer: true),
+            Unlockable(stat: .reachDepth8, item: StoreOffer.offer(type: .luck(amount: 5), tier: 3), purchaseAmount: 350, isPurchased: false, isUnlocked: false, applysToBasePlayer: true),
+            Unlockable(stat: .reachDepth8, item: StoreOffer.offer(type: .dodge(amount: 5), tier: 3), purchaseAmount: 350, isPurchased: false, isUnlocked: false, applysToBasePlayer: true),
             
             // tier 4
-            Unlockable(stat: .reachDepth10, item: StoreOffer.offer(type: .plusOneMaxHealth, tier: 4), purchaseAmount: 1500, isPurchased: false, isUnlocked: false, applysToBasePlayer: true),
+            Unlockable(stat: .reachDepth10, item: StoreOffer.offer(type: .plusOneMaxHealth, tier: 4), purchaseAmount: 1000, isPurchased: false, isUnlocked: false, applysToBasePlayer: true),
             Unlockable(stat: .reachDepth10, item: StoreOffer.offer(type: .luck(amount: 5), tier: 4), purchaseAmount: 1000, isPurchased: false, isUnlocked: false, applysToBasePlayer: true),
             Unlockable(stat: .reachDepth10, item: StoreOffer.offer(type: .dodge(amount: 5), tier: 4), purchaseAmount: 1000, isPurchased: false, isUnlocked: false, applysToBasePlayer: true),
            
@@ -72,20 +72,19 @@ struct Unlockable: Codable, Identifiable, Equatable {
             // AVAILABLE IN RUNS
             
             // Better items
-            Unlockable(stat: .twoThousandRocks, item: StoreOffer.offer(type: .greaterHeal, tier: 1), purchaseAmount: 500, isPurchased: false, isUnlocked: false, applysToBasePlayer: false),
+            Unlockable(stat: .twoThousandRocks, item: StoreOffer.offer(type: .greaterHeal, tier: 1), purchaseAmount: 300, isPurchased: false, isUnlocked: false, applysToBasePlayer: false),
             Unlockable(stat: .twoThousandRocks, item: StoreOffer.offer(type: .plusTwoMaxHealth, tier: 2), purchaseAmount: 500, isPurchased: false, isUnlocked: false, applysToBasePlayer: false),
             
             
             // Runes
-            Unlockable(stat: .oneThousandBlueRocks, item: StoreOffer.offer(type: .rune(Rune.rune(for: .bubbleUp)), tier: 2), purchaseAmount: 1000, isPurchased: false, isUnlocked: false, applysToBasePlayer: false),
-            Unlockable(stat: .oneThousandPurpleRocks, item: StoreOffer.offer(type: .rune(Rune.rune(for: .vortex)), tier: 2), purchaseAmount: 1000, isPurchased: false, isUnlocked: false, applysToBasePlayer: false),
-            Unlockable(stat: .oneThousandRedRocks, item: StoreOffer.offer(type: .rune(Rune.rune(for: .flameColumn)), tier: 2), purchaseAmount: 1000, isPurchased: false, isUnlocked: false, applysToBasePlayer: false),
+            Unlockable(stat: .oneThousandBlueRocks, item: StoreOffer.offer(type: .rune(Rune.rune(for: .bubbleUp)), tier: 2), purchaseAmount: 500, isPurchased: false, isUnlocked: false, applysToBasePlayer: false),
+            Unlockable(stat: .oneThousandPurpleRocks, item: StoreOffer.offer(type: .rune(Rune.rune(for: .vortex)), tier: 2), purchaseAmount: 500, isPurchased: false, isUnlocked: false, applysToBasePlayer: false),
 
             
             // red runes
-            Unlockable(stat: .twoThousandRedRocks, item: StoreOffer.offer(type: .rune(Rune.rune(for: .flameWall)), tier: 2), purchaseAmount: 1250, isPurchased: false, isUnlocked: false, applysToBasePlayer: false),
-            // rune uses
-            Unlockable(stat: .threeThousandRedRocks, item: StoreOffer.offer(type: .rune(Rune.rune(for: .rainEmbers)), tier: 2), purchaseAmount: 1500, isPurchased: false, isUnlocked: false, applysToBasePlayer: false),
+            Unlockable(stat: .oneThousandRedRocks, item: StoreOffer.offer(type: .rune(Rune.rune(for: .flameColumn)), tier: 2), purchaseAmount: 500, isPurchased: false, isUnlocked: false, applysToBasePlayer: false),
+            Unlockable(stat: .twoThousandRedRocks, item: StoreOffer.offer(type: .rune(Rune.rune(for: .rainEmbers)), tier: 2), purchaseAmount: 750, isPurchased: false, isUnlocked: false, applysToBasePlayer: false),
+            Unlockable(stat: .threeThousandRedRocks, item: StoreOffer.offer(type: .rune(Rune.rune(for: .flameWall)), tier: 2), purchaseAmount: 800, isPurchased: false, isUnlocked: false, applysToBasePlayer: false),
             
             
             // rune slots

@@ -71,7 +71,34 @@ struct PlayerStatsView: View {
     
     var body: some View {
         ScrollView{
-            #if DEBUG
+            HStack {
+                CodexWalletView(gemAmount: gemAmount)
+                #if DEBUG
+                
+                Button(action: {
+                    viewModel.updateGems(amount: -50)
+                }) {
+                    StatButton(add: false)
+                }
+                Button(action: {
+                    viewModel.updateGems(amount: 50)
+                }) {
+                    StatButton(add: true)
+                }
+                
+                #endif
+            }.background(Color(UIColor.backgroundGray))
+            LazyVGrid(columns: columns, spacing: 20) {
+                ForEach(playerStatistics) {  stat in
+                    StatView(viewModel: viewModel, stat: stat)
+                }.onReceive(viewModel.profilePublisher, perform: { profile in
+                    playerStatistics = profile.stats
+                    gemAmount = viewModel.gemAmount
+                })
+            }.padding()
+            Button(action: viewModel.deletePlayerData) {
+                Text("Delete All Data")
+            }
             Button(action: {
                 UserDefaults.standard.setValue(false, forKey: UserDefaults.hasStartedTutorialKey)
                 UserDefaults.standard.setValue(false, forKey: UserDefaults.hasCompletedTutorialKey)
@@ -112,35 +139,7 @@ struct PlayerStatsView: View {
                     .background(Color(.backgroundGray))
                     .cornerRadius(5.0)
             }
-            #endif
-            HStack {
-                CodexWalletView(gemAmount: gemAmount)
-                #if DEBUG
-                
-                Button(action: {
-                    viewModel.updateGems(amount: -50)
-                }) {
-                    StatButton(add: false)
-                }
-                Button(action: {
-                    viewModel.updateGems(amount: 50)
-                }) {
-                    StatButton(add: true)
-                }
-                
-                #endif
-            }.background(Color(UIColor.backgroundGray))
-            LazyVGrid(columns: columns, spacing: 20) {
-                ForEach(playerStatistics) {  stat in
-                    StatView(viewModel: viewModel, stat: stat)
-                }.onReceive(viewModel.profilePublisher, perform: { profile in
-                    playerStatistics = profile.stats
-                    gemAmount = viewModel.gemAmount
-                })
-            }.padding()
-            Button(action: viewModel.deletePlayerData) {
-                Text("Delete All Data")
-            }
+            
         }
     }
 }

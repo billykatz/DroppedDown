@@ -93,7 +93,7 @@ class Renderer: SKSpriteNode {
                                                            verticalPadding: 200.0,
                                                            horizontalPadding: Style.Padding.less,
                                                            translatedToBounds: true)
-        levelGoalView.zPosition = 50_000
+        levelGoalView.zPosition = Precedence.flying.rawValue
         return levelGoalView
     }()
     

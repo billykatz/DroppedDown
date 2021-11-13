@@ -22,7 +22,7 @@ class MainMenu: SKScene {
         static let buttonPadding = CGFloat(50.0)
         static let notificationName = "notificationRed"
         static let blankButtonName = "blankButton"
-        static let feedbackFormURLString = "https://docs.google.com/forms/d/e/1FAIpQLSce6_iG4z5Kbk3j4Uw9b1ob_I1M-2NPdA3MAmuG1zLocIvvSQ/viewform?usp=sf_link"
+        static let feedbackFormURLString = "https://linktr.ee/shiftshaft"
     }
     
     private var background: SKSpriteNode!

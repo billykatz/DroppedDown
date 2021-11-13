@@ -15,7 +15,7 @@ fileprivate func menuHeight(type: MenuType) -> CGFloat {
     case .gameLose, .tutorialWin:
         return 700
     case .gameWin:
-        return 500
+        return 550
     case .confirmation, .confirmAbandonTutorial:
         return 750
     case .tutorialConfirmation:
@@ -137,14 +137,30 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
         let buttonSize = CGSize(width: 375, height: 125)
         
         if menuType == .gameWin {
+            var titleText = ["Great", "Awesome", "Nice Work", "Woooo"].randomElement()!
+            var bodyText = "You beat depth: \(level?.humanReadableDepth ?? "0")"
             
-            let titleText = ["Great", "Awesome", "Nice Work"].randomElement()!
+            if (level?.depth ?? 0) == 9 {
+                titleText = "Congratulations!"
+                bodyText = "You have unofficially beaten Shift Shaft.  In the near future level 10 will be a boss. For now, you can keep playing for as long as you'd like."
+            } else if (level?.depth ?? 0) == 14 {
+                titleText = "Amazing!"
+                bodyText = "Please consider DM'ing on Twitter @shift_shaft with your ideas for how to improve the game."
+            } else if (level?.depth ?? 0) == 19 {
+                titleText = "Thank you so much!"
+                bodyText = "I'm so happy you like Shift Shaft. Please share it with your friends."
+            } else if (level?.depth ?? 0) == 24 {
+                titleText = "Bravo"
+                bodyText = "Please send a screenshot to me and I'll give you a gift. \(UUID())"
+            }
+
+            
+            
             let titleNode = ParagraphNode.labelNode(text: titleText, paragraphWidth: menuSizeWidth * 0.95,
                                                     fontSize: .fontExtraLargeSize)
             titleNode.position = CGPoint.position(titleNode.frame, inside: containerFrame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most * 2)
             
             
-            let bodyText = "You beat depth: \(level?.humanReadableDepth ?? "0")"
             let bodyNode = ParagraphNode.labelNode(text: bodyText, paragraphWidth: menuSizeWidth * 0.95,
                                                    fontSize: .fontMediumSize, textAlignment: .center)
             

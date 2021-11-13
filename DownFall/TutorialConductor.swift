@@ -189,12 +189,24 @@ class TutorialConductor {
             shouldShowRotateHelperTutorial = false
             
         case .transformation(let trans):
+            if let first = trans.first,
+               case .goalCompleted = first.inputType {
+                // we want to reset this timer so they still have a chance to do this naturally
+                levelGoalsAwarded = true
+                allGoalsJustCompletedHoldOffOnTutorialForATurn = false
+            }
+            
             guard let tran = trans.first,
                   case InputType.touch? = tran.inputType,
                   tran.newTiles != nil else {
                 return
             }
             minedRocksForFirstTime = true
+            
+            
+        case .goalCompleted:
+            allGoalsJustCompletedHoldOffOnTutorialForATurn = true
+            
         case .collectItem, .collectOffer:
             collectedItemsForFirstTime = true
             
@@ -212,12 +224,6 @@ class TutorialConductor {
                 InputQueue.append(.init(.tutorialPhaseStart(phase)))
             }
             
-        case .goalCompleted(_, let allRewarded):
-            if allRewarded {
-                levelGoalsAwarded = true
-                allGoalsJustCompletedHoldOffOnTutorialForATurn = true
-            }
-            
         case .newTurn:
             
             /// when goals are rewarded, but the countdown for showing how to kill a monster is gonna go off, we need to tell it wait a turn so the LevelGoalTracker can use the InputQueue.  Hackyyy i know.
@@ -229,11 +235,13 @@ class TutorialConductor {
             if minedRocksForFirstTime && !showedRotateTutorialAlready {
                 showedRotateTutorialAlready = true
                 InputQueue.append(.init(.tutorialPhaseStart(phase)))
+                return
             }
             
             if collectedItemsForFirstTime && !showedCollectedItemsTutorialAlready {
                 showedCollectedItemsTutorialAlready = true
                 InputQueue.append(.init(.tutorialPhaseStart(phase)))
+                return
             }
             
             if showedRotateTutorialAlready {
@@ -245,6 +253,10 @@ class TutorialConductor {
                 turnsSinceMonsterAppeared += 1
             }
             
+            if levelGoalsAwarded {
+                turnsSinceExitUnlocked += 1
+            }
+            
             if monsterKilled && !showMonsterKilledAlready {
                 showMonsterKilledAlready = true
                 showedHowToKillAMonsterAlready = true
@@ -252,6 +264,7 @@ class TutorialConductor {
                 self.phase = levelGoalsAwarded ? .yayMonsterDead2GoalCompleted : .yayMonsterDead1GoalCompleted
                 
                 InputQueue.append(.init(.tutorialPhaseStart(phase)))
+                return
             }
             
             // you still havent killed a monster but you completed a level goal
@@ -262,12 +275,14 @@ class TutorialConductor {
                 showedLevelGoalsTutorialAlready = true
                 self.phase = .levelGoalRewards
                 InputQueue.append(.init(.tutorialPhaseStart(phase)))
+                return
             }
             
             if turnsSinceToldToRotateButHasNotYetRotated >= 8 && !showedYouCanRotateAgain && shouldShowRotateHelperTutorial {
                 showedYouCanRotateAgain = true
                 self.phase = .youCanRotateAgain
                 InputQueue.append(.init(.tutorialPhaseStart(phase)))
+                return
             }
             
             
@@ -275,17 +290,16 @@ class TutorialConductor {
             if turnsSinceMonsterAppeared >= 8 && !showedHowToKillAMonsterAlready {
                 showedHowToKillAMonsterAlready = true
                 InputQueue.append(.init(.tutorialPhaseStart(phase)))
+                return
             }
             
             
-            if levelGoalsAwarded {
-                turnsSinceExitUnlocked += 1
-            }
             
             if turnsSinceExitUnlocked >= 20 && !showedYouCanLeaveNowAlready {
                 showedYouCanLeaveNowAlready = true
                 self.phase = .youCanLeaveNow
                 InputQueue.append(.init(.tutorialPhaseStart(phase)))
+                return
             }
             
             

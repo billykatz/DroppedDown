@@ -68,7 +68,7 @@ struct GoalTracking: Codable, Hashable {
                     if grouped {
                         return "Mine \(target) groups of at least \(minimumAmount) rocks"
                     } else {
-                        return "Mine \(target) \(color.humanReadable) rocks"
+                        return "Mine \(target) \(color.humanReadable.lowercased()) rocks"
                     }
                 case .monster:
                     return "Destroy \(target) monster\(target > 1 ? "s" : "")"

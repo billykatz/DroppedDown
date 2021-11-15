@@ -107,13 +107,16 @@ class ProfileLoadingManager: ProfileManaging {
         
         /// Store the pipeline to fetch the UUID from user defaults and attempt to load the local profile
         let loadLocalProfilePublisher =
-            userDefaultClient
-                .fetchPlayerUUID(Constants.playerUUIDKey)
-                .print("\(Constants.tag): fetch local game files", to: GameLogger.shared)
-                .flatMap { [fileManagerClient, profileCodingClient] (uuid) -> Future<Profile?, Error> in
-                    return loadLocalProfile(pathPrefix: Constants.saveFilePath, name: uuid, fileManagerClient: fileManagerClient, profileCodingClient: profileCodingClient)
+            authenicated
+            .flatMap { [fileManagerClient, profileCodingClient, userDefaultClient] _ in
+                userDefaultClient
+                    .fetchPlayerUUID(Constants.playerUUIDKey)
+                    .print("\(Constants.tag): fetch local game files", to: GameLogger.shared)
+                    .flatMap { [fileManagerClient, profileCodingClient] (uuid) -> Future<Profile?, Error> in
+                        return loadLocalProfile(pathPrefix: Constants.saveFilePath, name: uuid, fileManagerClient: fileManagerClient, profileCodingClient: profileCodingClient)
+                    }
+                    .eraseToAnyPublisher()
                 }
-                .eraseToAnyPublisher()
         
         /// Zip the files together. No matter what we expect each inner pipeline to spit out at least one value
         let loadedProfilesZip = Publishers.CombineLatest(
@@ -235,6 +238,7 @@ class ProfileLoadingManager: ProfileManaging {
     /// Also, because this is the last step in deleting a profile we go ahead and create a new profile by trigerring a new profile to load
     public func resetUserDefaults() {
         userDefaultClient.set(nil, Constants.playerUUIDKey)
+//        let authenticated = authenicatedSubject
         authenicatedSubject.send(false)
     }
     

@@ -264,6 +264,10 @@ class Renderer: SKSpriteNode {
                         self.animationsFinished(endTiles: trans?.endTiles, ref: false)
                     }
                 }
+                
+            case .bossTurnStart(let phase):
+                animationsFinished(endTiles: trans.endTiles)
+
             case .reffingFinished, .touchBegan, .itemUseSelected:
                 () // Purposely left blank.
 
@@ -428,6 +432,11 @@ class Renderer: SKSpriteNode {
                     glow.run(spin)
                 } else if let sparkle = sprite.sparkle() {
                     sprite.run(sparkle)
+                }
+                
+                // Boss stuff
+                if tiles[row][col].bossTargetedToEat ?? false {
+                    sprite.indicateSpriteWillBeEaten()
                 }
             }
         }

@@ -93,12 +93,8 @@ class DFTileSpriteNode: SKSpriteNode {
     func indicateSpriteWillBeEaten() {
         let indicatorSprite = SKSpriteNode(color: .red, size: self.size)
         indicatorSprite.zPosition = Precedence.background.rawValue
-        
+        indicatorSprite.alpha = 0.5
         self.addChild(indicatorSprite)
-        
-        let wait = SKAction.wait(forDuration: 5.0)
-        let remove = SKAction.removeFromParent()
-        indicatorSprite.run(SKAction.sequence([wait, remove]))
     }
     
     func indicateSpriteWillBeBossAttacked() {

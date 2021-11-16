@@ -56,9 +56,13 @@ enum ShiftShaft_Color: String, Codable, CaseIterable, Hashable {
 
 struct Tile: Hashable, Codable {
     let type: TileType
+    var bossTargetedToEat: Bool?
     
-    init(type: TileType) {
+    init(type: TileType,
+         bossTargetedToEat: Bool? = false
+         ) {
         self.type = type
+        self.bossTargetedToEat = bossTargetedToEat
     }
     
     static var exit: Tile {

@@ -110,6 +110,9 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
     case tutorialPhaseStart(TutorialPhase)
     case tutorialPhaseEnd(TutorialPhase)
     
+    // boss input
+    case bossTurnStart(BossPhase)
+    
     var debugDescription: String {
         switch self {
         case .transformation(let trans):
@@ -194,6 +197,10 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
             return "Tutorial - phase start"
         case .tutorialPhaseEnd:
             return "Tutorial - phase end"
+            
+        // boss stuff
+        case .bossTurnStart(let phase):
+            return "Boss Turn Start. Phase: \(phase.bossPhaseType.rawValue). State: \(phase.bossState.bossStateType.rawValue)"
             
             
         }

@@ -62,6 +62,9 @@ class GameScene: SKScene {
     // tutorial
     private var tutorialConductor: TutorialConductor?
     
+    // boss controller
+    private var bossController: BossController?
+    
     //touch state
     private var touchWasSwipe = false
     private var touchWasCanceled = false
@@ -120,6 +123,9 @@ class GameScene: SKScene {
         
         // start the tutorial conductor
         tutorialConductor.startHandlingInput()
+        
+        // create the bossController
+        bossController = BossController(level: level)
         
         
     }
@@ -212,6 +218,7 @@ class GameScene: SKScene {
         rotatePreview = nil
         audioListener = nil
         runStatTracker = nil
+        bossController = nil
         swipeRecognizerView?.removeFromSuperview()
         InputQueue.reset()
         Dispatch.shared.reset()

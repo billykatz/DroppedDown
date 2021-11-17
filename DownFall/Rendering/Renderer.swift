@@ -266,7 +266,16 @@ class Renderer: SKSpriteNode {
                 }
                 
             case .bossTurnStart(let phase):
-                animationsFinished(endTiles: trans.endTiles)
+                switch phase.bossState.bossStateType {
+                case .eats:
+                    if trans.newTiles != nil {
+                        computeNewBoard(for: trans)
+                    }
+                case .targetEat:
+                    animationsFinished(endTiles: trans.endTiles)
+                case .rests:
+                    animationsFinished(endTiles: trans.endTiles)
+                }
 
             case .reffingFinished, .touchBegan, .itemUseSelected:
                 () // Purposely left blank.

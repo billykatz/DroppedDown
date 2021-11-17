@@ -10,11 +10,13 @@ import Foundation
 
 enum BossStateType: String, Codable {
     case targetEat
+    case eats
     case rests
 }
 
 struct BossTargets: Codable, Hashable {
     var targetsToEat: [TileCoord]?
+    var eats: [TileCoord]?
 }
 
 struct BossState: Codable, Hashable {
@@ -23,12 +25,12 @@ struct BossState: Codable, Hashable {
     
     var targets: BossTargets
     
-    func advance(tiles: [[Tile]]) -> BossState {
+    func advance(tiles: [[Tile]], turnsInState: Int) -> BossState {
         if turnsLeftInState <= 0 {
             let nextStateType = nextStateType()
             return BossState(
                 bossStateType: nextStateType,
-                turnsLeftInState: 2,
+                turnsLeftInState: turnsInState,
                 targets: BossTargets()
             )
         } else {
@@ -42,8 +44,10 @@ struct BossState: Codable, Hashable {
     
     mutating func enter(tiles: [[Tile]]) {
         switch self.bossStateType {
+        case .eats:
+            self.targets = BossTargets(targetsToEat: nil, eats: eats(in: tiles))
         case .targetEat:
-            self.targets = BossTargets(targetsToEat: targetsToEat(in: tiles))
+            self.targets = BossTargets(targetsToEat: targetsToEat(in: tiles), eats: nil)
         case .rests:
             break
         }
@@ -52,6 +56,8 @@ struct BossState: Codable, Hashable {
     private func nextStateType() -> BossStateType {
         switch self.bossStateType {
         case .targetEat:
+            return .eats
+        case .eats:
             return .rests
         case .rests:
             return .targetEat
@@ -60,6 +66,19 @@ struct BossState: Codable, Hashable {
     
     private func targetsToEat(in tiles: [[Tile]]) -> [TileCoord] {
         return targetRocksToEat(in: tiles, numberRocksToEat: 2)
+    }
+    
+    private func eats(in tiles: [[Tile]]) -> [TileCoord]? {
+        var tilesToEat: [TileCoord] = []
+        for row in 0..<tiles.count {
+            for col in 0..<tiles[row].count {
+                if tiles[row][col].bossTargetedToEat ?? false {
+                    tilesToEat.append(TileCoord(row, col))
+                }
+            }
+        }
+        if tilesToEat.isEmpty { return nil }
+        return tilesToEat
     }
 }
 
@@ -73,7 +92,7 @@ struct BossPhase: Codable, Hashable {
     
     mutating func advance(tiles: [[Tile]]) -> (BossPhase, Bool) {
         let oldBossState = bossState
-        var nextBossState = bossState.advance(tiles: tiles)
+        var nextBossState = bossState.advance(tiles: tiles, turnsInState: turnsInState())
         var sendInput = false
         if nextBossState.bossStateType != oldBossState.bossStateType {
             // there has been a change so update the bossState
@@ -82,6 +101,17 @@ struct BossPhase: Codable, Hashable {
         }
         
         return (BossPhase(bossState: nextBossState, bossPhaseType: self.bossPhaseType), sendInput)
+    }
+    
+    private func turnsInState() -> Int {
+        switch bossState.bossStateType {
+        case .targetEat:
+            return 2
+        case .eats:
+            return 0
+        case .rests:
+            return 2
+        }
     }
 }
 

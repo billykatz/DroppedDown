@@ -239,7 +239,11 @@ class Board: Equatable {
         case .bossTurnStart(let phase):
             if phase.bossState.bossStateType == .targetEat {
                 transformation = self.bossTargetsWhatToEat(input: input)
-            } else {
+            } else if phase.bossState.bossStateType == .eats {
+                let targets = phase.bossState.targets.eats ?? []
+                transformation = self.removeAndReplaces(from: tiles, specificCoord: targets, input: input)
+            }
+            else {
                 transformation = self.bossTargetsWhatToEat(input: input)
             }
         

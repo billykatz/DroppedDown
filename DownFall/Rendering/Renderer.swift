@@ -266,12 +266,14 @@ class Renderer: SKSpriteNode {
                 }
                 
             case .bossTurnStart(let phase):
-                switch phase.bossState.bossStateType {
+                switch phase.bossState.stateType {
                 case .eats:
                     if trans.newTiles != nil {
                         computeNewBoard(for: trans)
                     }
                 case .targetEat:
+                    animationsFinished(endTiles: trans.endTiles)
+                case .targetAttack:
                     animationsFinished(endTiles: trans.endTiles)
                 case .rests:
                     animationsFinished(endTiles: trans.endTiles)
@@ -446,6 +448,10 @@ class Renderer: SKSpriteNode {
                 // Boss stuff
                 if tiles[row][col].bossTargetedToEat ?? false {
                     sprite.indicateSpriteWillBeEaten()
+                }
+                
+                if tiles[row][col].bossTargetedToAttack ?? false {
+                    sprite.indicateSpriteWillBeAttacked()
                 }
             }
         }

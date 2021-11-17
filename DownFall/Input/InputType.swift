@@ -200,7 +200,7 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
             
         // boss stuff
         case .bossTurnStart(let phase):
-            return "Boss Turn Start. Phase: \(phase.bossPhaseType.rawValue). State: \(phase.bossState.bossStateType.rawValue)"
+            return "Boss Turn Start. Phase: \(phase.bossPhaseType.rawValue). State: \(phase.bossState.stateType.rawValue)"
             
             
         }

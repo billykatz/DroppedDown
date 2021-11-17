@@ -71,6 +71,7 @@ class TileCreator: TileStrategy {
     private func randomTile(given: Int, neighbors: [Tile], playerData: EntityModel, forceMonsters: Bool) -> TileType {
         guard !forceMonsters else { return randomMonster() }
         guard level.spawnsMonsters else { return randomRock([], playerData: playerData) }
+        guard !level.isBossLevel else { return randomRock([], playerData: playerData) }
         let weight = 97
         let index = abs(given) % (TileType.randomCases.count + weight)
         
@@ -94,7 +95,10 @@ class TileCreator: TileStrategy {
         let totalNumber = level.monsterTypeRatio.values.max { (first, second) -> Bool in
             return first.upper < second.upper
         }
-        guard let upperRange = totalNumber?.upper else { fatalError("We need the max number or else we cannot continue") }
+        guard let upperRange = totalNumber?.upper else {
+            fatalError("We need the max number or else we cannot continue")
+            
+        }
         
         let randomNumber = Int.random(upperRange)
         for (key, value) in level.monsterTypeRatio {

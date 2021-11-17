@@ -69,6 +69,10 @@ struct Level: Codable, Hashable {
         return true
     }
     
+    var isBossLevel: Bool {
+        return bossLevel == depth
+    }
+    
     var humanReadableDepth: String {
         return "\(depth + 1)"
     }

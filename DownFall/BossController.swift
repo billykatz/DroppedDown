@@ -10,6 +10,7 @@ import Foundation
 
 enum BossAttackType: String, Codable {
     case dynamite
+    case poison
 }
 
 enum BossStateType: String, Codable {
@@ -22,7 +23,7 @@ enum BossStateType: String, Codable {
 struct BossTargets: Codable, Hashable {
     var whatToEat: [TileCoord]?
     var eats: [TileCoord]?
-    var whatToAttack: [TileCoord]?
+    var whatToAttack: [BossAttackType: [TileCoord]]?
 }
 
 struct BossState: Codable, Hashable {
@@ -52,29 +53,39 @@ struct BossState: Codable, Hashable {
     }
     
     
-    mutating func enter(tiles: [[Tile]]) {
+    mutating func enter(tiles: [[Tile]], oldState: BossState) {
         switch self.stateType {
         case .targetEat:
             self.targets = BossTargets(whatToEat: targetsToEat(in: tiles), eats: nil)
         case .eats:
-            self.targets = BossTargets(whatToEat: nil, eats: eats(in: tiles))
+            let eatenRockCoords = eats(in: tiles)
+            let whatToAttack = attack(basedOnRocks: eatenRockCoords, in: tiles)
+            self.targets =
+                BossTargets(whatToEat: nil,
+                            eats: eatenRockCoords,
+                            whatToAttack: targetsToAttack(in: tiles, with: whatToAttack)
+                )
         case .targetAttack:
             self.targets = BossTargets(
                 whatToEat: nil,
                 eats: nil,
-                whatToAttack: targetsToAttack(in: tiles, with: self.attackType)
+                whatToAttack: oldState.targets.whatToAttack
             )
         case .rests:
             break
         }
     }
     
-    private func nextStateType() -> BossStateType {
+    func nextStateType() -> BossStateType {
         switch self.stateType {
         case .targetEat:
             return .eats
         case .eats:
-            return .targetAttack
+            if (targets.eats ?? []).isEmpty {
+                return .rests
+            } else {
+                return .targetAttack
+            }
         case .targetAttack:
             return .rests
         case .rests:
@@ -86,13 +97,13 @@ struct BossState: Codable, Hashable {
         return targetRocksToEat(in: tiles, numberRocksToEat: 2)
     }
     
-    private func targetsToAttack(in tiles: [[Tile]], with attacks: [BossAttackType]?) -> [TileCoord] {
-        guard let attacks = attacks else { return [] }
+    private func targetsToAttack(in tiles: [[Tile]], with attacks: [BossAttackType]?) -> [BossAttackType: [TileCoord]] {
+        guard let attacks = attacks else { return [:] }
         return attacked(tiles: tiles, by: attacks)
         
     }
     
-
+    
 }
 
 enum BossPhaseType: String, Codable {
@@ -105,25 +116,28 @@ struct BossPhase: Codable, Hashable {
     
     mutating func advance(tiles: [[Tile]]) -> (BossPhase, Bool) {
         let oldBossState = bossState
-        var nextBossState = bossState.advance(tiles: tiles, turnsInState: turnsInState())
+        let nextStateTurns = turnsInState(bossState.nextStateType())
+        
+        // this sets the next state's number of turns.  If the state doesnt advnace then it is ignored
+        var nextBossState = bossState.advance(tiles: tiles, turnsInState: nextStateTurns)
         var sendInput = false
         if nextBossState.stateType != oldBossState.stateType {
             // there has been a change so update the bossState
-            nextBossState.enter(tiles: tiles)
-            sendInput = nextBossState.stateType != .rests
+            nextBossState.enter(tiles: tiles, oldState: oldBossState)
+            sendInput = true
         }
         
         return (BossPhase(bossState: nextBossState, bossPhaseType: self.bossPhaseType), sendInput)
     }
     
-    private func turnsInState() -> Int {
-        switch bossState.stateType {
+    private func turnsInState(_ state: BossStateType) -> Int {
+        switch state {
         case .targetEat:
             return 2
         case .eats:
-            return 0
-        case .targetAttack:
             return 1
+        case .targetAttack:
+            return 0
         case .rests:
             return 2
         }
@@ -135,7 +149,7 @@ class BossController {
     let level: Level
     
     // Debug so we can test easily
-    let bossLevelNumber = 0
+    let bossLevelNumber = 9
     
     var phase: BossPhase
     var tiles: [[Tile]]?
@@ -151,7 +165,7 @@ class BossController {
         self.phase = BossPhase(bossState: bossState, bossPhaseType: .first)
         self.level = level
         // only listen for inputs if this is the boss level
-        guard level.depth == bossLevelNumber else { return }
+        guard isBossLevel else { return }
         
         Dispatch.shared.register { [weak self] input in
             self?.handleInput(input)
@@ -239,11 +253,13 @@ private func attack(basedOnRocks rocksEaten: [TileCoord]?, in tiles: [[Tile]]) -
             }
         }
     }
-
+    
     return tileTypes.map {
         switch $0.color {
         case .red:
             return .dynamite
+        case .blue:
+            return .poison
         default:
             return .dynamite
         }
@@ -264,53 +280,54 @@ private func eats(in tiles: [[Tile]]) -> [TileCoord]? {
 }
 
 
-func attacked(tiles: [[Tile]], by attacks: [BossAttackType]) -> [TileCoord] {
-         //TODO: can be optimized
-//         var columnsAttacked = Set<Int>()
-//         var rowsAttacked = Set<Int>()
-//         var monstersSpawned = Set<TileCoord>()
-         var bombsSpawned = Set<TileCoord>()
-         for attack in attacks {
-             switch attack {
-             case .dynamite:
-                bombsSpawned.insert(randomCoord(in: tiles, notIn: bombsSpawned))
-//             case .column:
-//                 columnsAttacked.insert(Int.random(tiles.count, notInSet: columnsAttacked))
-//             case .row:
-//                 rowsAttacked.insert(Int.random(tiles.count, notInSet: rowsAttacked))
-//             case .spawn:
-//                 monstersSpawned.insert(randomCoord(notIn: monstersSpawned))
-             }
-         }
-
-//         var columnCoords = Set<TileCoord>()
-//         var rowCoords = Set<TileCoord>()
-//         for row in 0..<tiles.count {
-//             for col in 0..<tiles.count {
-//                 if columnsAttacked.contains(col) {
-//                     columnCoords.insert(TileCoord(row, col))
-//                 }
-//                 if rowsAttacked.contains(row) {
-//                     rowCoords.insert(TileCoord(row, col))
-//                 }
-//             }
-//         }
+func attacked(tiles: [[Tile]], by attacks: [BossAttackType]) -> [BossAttackType: [TileCoord]] {
+    //TODO: can be optimized
+    var columnsAttacked = Set<Int>()
+    //         var rowsAttacked = Set<Int>()
+    //         var monstersSpawned = Set<TileCoord>()
+    var bombsSpawned = Set<TileCoord>()
+    for attack in attacks {
+        switch attack {
+        case .dynamite:
+            bombsSpawned.insert(randomCoord(in: tiles, notIn: bombsSpawned))
+        case .poison:
+            columnsAttacked.insert(Int.random(tiles.count, notInSet: columnsAttacked))
+            columnsAttacked.insert(Int.random(tiles.count, notInSet: columnsAttacked))
+        //             case .row:
+        //                 rowsAttacked.insert(Int.random(tiles.count, notInSet: rowsAttacked))
+        //             case .spawn:
+        //                 monstersSpawned.insert(randomCoord(notIn: monstersSpawned))
+        }
+    }
     
-        return  Array(bombsSpawned)
-
-//         var result: [BossAttackType: Set<TileCoord>] = [:]
-////         if !columnCoords.isEmpty {
-////             result[.column] = columnCoords
-////         }
-////         if !rowCoords.isEmpty {
-////             result[.row] = rowCoords
-////         }
-//         if !bombsSpawned.isEmpty {
-//             result[.dynamite] = bombsSpawned
-//         }
-////         if !monstersSpawned.isEmpty {
-////             result[.spawn] = monstersSpawned
-////         }
-//         return result
-
-     }
+    var columnCoords: [TileCoord] = []
+    //         var rowCoords = Set<TileCoord>()
+    for row in 0..<tiles.count {
+        for col in 0..<tiles.count {
+            if columnsAttacked.contains(col) {
+                columnCoords.append(TileCoord(row, col))
+            }
+            //                 if rowsAttacked.contains(row) {
+            //                     rowCoords.insert(TileCoord(row, col))
+            //                 }
+        }
+    }
+    
+    //        return  Array(bombsSpawned)
+    
+    var result: [BossAttackType: [TileCoord]] = [:]
+    if !columnCoords.isEmpty {
+        result[.poison] = columnCoords
+    }
+    //         if !rowCoords.isEmpty {
+    //             result[.row] = rowCoords
+    //         }
+    if !bombsSpawned.isEmpty {
+        result[.dynamite] = Array(bombsSpawned)
+    }
+    //         if !monstersSpawned.isEmpty {
+    //             result[.spawn] = monstersSpawned
+    //         }
+    return result
+    
+}

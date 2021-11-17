@@ -22,9 +22,12 @@ class Board: Equatable {
                 for col in 0..<newTiles.count {
                     if case TileType.rock(let color, let hasGem, _) = newTiles[row][col].type {
                         let groupCount = neighnors[row][col]
-                        newTiles[row][col] = Tile(type: TileType.rock(color: color, holdsGem: hasGem, groupCount: groupCount),
-                                                  bossTargetedToEat: newTiles[row][col].bossTargetedToEat,
-                                                  bossTargetedToAttack: newTiles[row][col].bossTargetedToAttack)
+                        newTiles[row][col] =
+                            Tile(
+                                type: TileType.rock(color: color, holdsGem: hasGem, groupCount: groupCount),
+                                bossTargetedToEat: newTiles[row][col].bossTargetedToEat,
+                                bossTargetedToAttack: newTiles[row][col].bossTargetedToAttack
+                            )
                     }
                 }
             }
@@ -248,7 +251,7 @@ class Board: Equatable {
                 transformation = self.bossTargetsWhatToAttack(input: input)
             }
             else {
-                transformation = self.bossTargetsWhatToEat(input: input)
+                transformation = self.resetBossFlags(input: input)
             }
         
         case .gameLose,
@@ -270,6 +273,17 @@ class Board: Equatable {
         InputQueue.append(Input(.transformation([trans])))
     }
     
+    private func resetBossFlags(input: Input) -> Transformation {
+        guard case let InputType.bossTurnStart(phase) = input.type else { return .zero }
+        for row in 0..<tiles.count {
+            for column in 0..<tiles[row].count {
+                tiles[row][column].bossTargetedToEat = false
+                tiles[row][column].bossTargetedToAttack = false
+            }
+        }
+        return Transformation(transformation: nil, inputType: .bossTurnStart(phase), endTiles: self.tiles)
+    }
+    
     private func bossTargetsWhatToEat(input: Input) -> Transformation {
         guard case let InputType.bossTurnStart(phase) = input.type else { return .zero }
         if let coords = phase.bossState.targets.whatToEat {
@@ -283,9 +297,11 @@ class Board: Equatable {
     
     private func bossTargetsWhatToAttack(input: Input) -> Transformation {
         guard case let InputType.bossTurnStart(phase) = input.type else { return .zero }
-        if let coords = phase.bossState.targets.whatToAttack {
-            coords.forEach { coord in
-                 tiles[coord.row][coord.column].bossTargetedToAttack = true
+        if let bossAttackDict = phase.bossState.targets.whatToAttack {
+            bossAttackDict.forEach { (attackType, coords) in
+                coords.forEach { coord in
+                    tiles[coord.row][coord.column].bossTargetedToAttack = true
+                }
             }
         }
         return Transformation(transformation: nil, inputType: .bossTurnStart(phase), endTiles: self.tiles)

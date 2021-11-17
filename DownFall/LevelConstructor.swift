@@ -10,6 +10,7 @@ import Foundation
 import GameplayKit
 
 typealias Depth = Int
+let bossLevel = 9
 
 struct LevelConstructor {
     
@@ -238,12 +239,13 @@ struct LevelConstructor {
             
             goals = [rockGoal, monsterGoal]
             
-        case 9:
-            let monsterAmount = 9
-            let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 60)
-            let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
+        case bossLevel:
             
-            goals = [rockGoal, monsterGoal]
+//            let monsterAmount = 9
+//            let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 60)
+//            let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
+            
+            goals = []
         
         case 10...Int.max:
             let monsterAmount = Int.random(in: 10...15)
@@ -363,6 +365,7 @@ struct LevelConstructor {
     
     
     static func monsterCountStart(depth: Depth) -> Int {
+        if depth == bossLevel { return 0 }
         return min(boardSize(depth: depth), depth + 2)
     }
     
@@ -412,7 +415,8 @@ struct LevelConstructor {
             let batRange = dragonRange.next(18)
             let ratRange = batRange.next(30)
             return [.rat: ratRange, .alamo: alamoRange, .dragon: dragonRange, .bat: batRange]
-        case 9:
+        case bossLevel:
+            return [:]
             let alamoRange = RangeModel(lower: 0, upper: 20)
             let dragonRange = alamoRange.next(25)
             let batRange = dragonRange.next(25)

@@ -82,7 +82,7 @@ class DFTileSpriteNode: SKSpriteNode {
     func indicateSpriteWillBeAttacked() {
         let indicatorSprite = SKSpriteNode(color: .yellow, size: self.size)
         indicatorSprite.zPosition = Precedence.background.rawValue
-        indicatorSprite.alpha = 0.5
+        indicatorSprite.alpha = 0.25
         
         self.addChild(indicatorSprite)
     }

@@ -44,6 +44,23 @@ extension Array where Element: Hashable {
         return newArray
     }
     
+    func dropRandom() -> ([Element], Element?) {
+        guard !isEmpty else { return ([], nil) }
+        guard count > 1 else { return ([], self.first!) }
+        let randomIndex = Int.random(in: 0..<self.count)
+        var randomElement: Element?
+        var newArray: [Element] = []
+        for (idx, element) in self.enumerated() {
+            if idx != randomIndex {
+                newArray.append(element)
+            } else {
+                randomElement = element
+            }
+        }
+        
+        return (newArray, randomElement)
+    }
+    
     func choose(random x: Int) -> [Element] {
         guard x < count else { return self }
         let elementsToRemove = count - x

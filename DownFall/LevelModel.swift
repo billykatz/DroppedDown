@@ -70,7 +70,7 @@ struct Level: Codable, Hashable {
     }
     
     var isBossLevel: Bool {
-        return bossLevel == depth
+        return bossLevelDepthNumber == depth
     }
     
     var humanReadableDepth: String {

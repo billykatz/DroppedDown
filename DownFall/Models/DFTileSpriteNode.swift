@@ -59,7 +59,6 @@ class DFTileSpriteNode: SKSpriteNode {
                 super.init(texture: SKTexture(imageNamed: type.textureString()),
                            color: .clear,
                            size: CGSize(width: width*0.75, height: height*0.75))
-//                fallthrough
             }
         default:
             super.init(texture: SKTexture(imageNamed: type.textureString()),
@@ -79,8 +78,38 @@ class DFTileSpriteNode: SKSpriteNode {
         }
     }
     
-    func indicateSpriteWillBeAttacked() {
-        let indicatorSprite = SKSpriteNode(color: .yellow, size: self.size)
+    func showFuseTiming(_ fuseAmount: Int) {
+        self.removeChild(with: "dynamiteBackground")
+        self.removeChild(with: "dynamiteAmountLabel")
+        
+        let fontSize: CGFloat = 50
+        let amount = fuseAmount
+        let fontColor: UIColor = amount <= 1 ? .red : .black
+        let background = SKShapeNode(ellipseOf: CGSize(width: self.size.width/2, height: self.size.height/2))
+        background.color = .white
+        background.zPosition = 100
+        
+        let xAmountLabel = ParagraphNode(text: "\(amount)", fontSize: fontSize, fontColor: fontColor)
+        xAmountLabel.zPosition = 101
+        
+        background.position = CGPoint.position(background.frame, inside: self.frame, verticalAlign: .center, horizontalAnchor: .center)
+        
+        xAmountLabel.position = CGPoint.position(xAmountLabel.frame, inside: background.frame, verticalAlign: .center, horizontalAnchor: .center, translatedToBounds: true)
+        
+        background.name = "dynamiteBackground"
+        xAmountLabel.name = "dynamiteAmountLabel"
+        self.addChild(background)
+        self.addChild(xAmountLabel)
+    }
+    
+    func indicateSpriteWillBeAttacked(by attackType: BossAttackType) {
+        let color: UIColor
+        switch attackType {
+        case .dynamite: color = .red
+        case .poison: color = .green
+        case .spawnSpider: color = .yellow
+        }
+        let indicatorSprite = SKSpriteNode(color: color, size: self.size)
         indicatorSprite.zPosition = Precedence.background.rawValue
         indicatorSprite.alpha = 0.25
         

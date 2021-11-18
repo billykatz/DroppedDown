@@ -157,6 +157,7 @@ class TileCreator: TileStrategy {
     func shouldRockHoldGem(playerData: EntityModel, rockColor: ShiftShaft_Color, shouldSpawnAtleastOneGem: Bool) -> Bool {
         // early return if we are in the tutorial
         guard !tutorialConductor.isTutorial else { return false }
+        guard !level.isBossLevel else { return false }
         
         let extraGemsBasedOnLuck = playerData.luck / 5
         let extraChanceBasedOnLuck = extraGemsBasedOnLuck * 2
@@ -375,12 +376,15 @@ class TileCreator: TileStrategy {
         guard level.hasExit else { return (tiles, false) }
         //place the exit on the opposite side of the grid
         #warning ("make sure this is set properly for release")
-        let exitQuadrant = playerQuadrant.opposite
-//        let exitQuadrant = playerQuadrant
-        let exitPosition = exitQuadrant.randomCoord(for: boardSize, notIn: reservedSet)
-        reservedSet.insert(exitPosition)
-        
-        tiles[exitPosition.x][exitPosition.y] = Tile(type: .exit(blocked: true))
+        // no exit on the boss level
+        if (!level.isBossLevel) {
+            let exitQuadrant = playerQuadrant.opposite
+    //        let exitQuadrant = playerQuadrant
+            let exitPosition = exitQuadrant.randomCoord(for: boardSize, notIn: reservedSet)
+            reservedSet.insert(exitPosition)
+            
+            tiles[exitPosition.x][exitPosition.y] = Tile(type: .exit(blocked: true))
+        }
         
         // Quick testing for rune replacement
 //        tiles[playerPosition.row-1][playerPosition.column] = Tile(type: .offer(StoreOffer.offer(type: .rune(Rune.rune(for: .bubbleUp)), tier: 1)))

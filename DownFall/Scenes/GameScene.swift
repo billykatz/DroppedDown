@@ -74,6 +74,9 @@ class GameScene: SKScene {
     // rotate preview
     private var rotatePreview: RotatePreviewView?
     
+    // referee
+    private var referee: Referee?
+    
     required init?(coder aDecoder: NSCoder) { super.init(coder: aDecoder) }
     
     /// Creates an instance of board and does preparation neccessary for didMove(to:) to be called
@@ -126,6 +129,15 @@ class GameScene: SKScene {
         
         // create the bossController
         bossController = BossController(level: level)
+        
+        // referee
+        referee = Referee.shared
+        
+        if bossController?.isBossLevel ?? false {
+            referee?.setWinRule(BossWin())
+        } else {
+            referee?.setWinRule(NonBossWin())
+        }
         
         
     }
@@ -282,7 +294,7 @@ extension GameScene {
         let preview = abs(currentPosition.y - lastPosition.y) > Constants.quickSwipeDistanceThreshold ? false : true
         
     
-        print("Preview?: \(preview) - \(abs(currentPosition.y - lastPosition.y))")
+//        print("Preview?: \(preview) - \(abs(currentPosition.y - lastPosition.y))")
         
         // deteremine the vector of the swipe
         let vector = currentPosition - lastPosition

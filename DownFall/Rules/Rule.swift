@@ -21,8 +21,9 @@ struct BossWin: Rule {
     }
 }
 
-struct Win: Rule {
+struct NonBossWin: Rule {
     func apply(_ tiles: [[Tile]]) -> Input? {
+        /// normal play win
         let playerPosition = getTilePosition(.player(.zero), tiles: tiles)
         guard
             let pp = playerPosition,

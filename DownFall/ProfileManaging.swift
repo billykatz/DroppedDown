@@ -238,7 +238,6 @@ class ProfileLoadingManager: ProfileManaging {
     /// Also, because this is the last step in deleting a profile we go ahead and create a new profile by trigerring a new profile to load
     public func resetUserDefaults() {
         userDefaultClient.set(nil, Constants.playerUUIDKey)
-//        let authenticated = authenicatedSubject
         authenicatedSubject.send(false)
     }
     

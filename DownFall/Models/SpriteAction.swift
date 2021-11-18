@@ -11,4 +11,14 @@ import SpriteKit
 struct SpriteAction: Hashable {
     let sprite: SKSpriteNode
     let action: SKAction
+    
+    init(_ sprite: SKSpriteNode, _ action: SKAction) {
+        self.sprite = sprite
+        self.action = action
+    }
+    
+    init(sprite: SKSpriteNode, action: SKAction) {
+        self.sprite = sprite
+        self.action = action
+    }
 }

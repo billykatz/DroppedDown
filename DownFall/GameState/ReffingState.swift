@@ -11,7 +11,7 @@ struct ReffingState: GameState {
     var state: ShiftShaft_State = .reffing
     
     func enter(_ input: Input) {
-        Referee.enterRules(input.endTilesStruct)
+        Referee.shared.enterRules(input.endTilesStruct)
     }
     
     func transitionState(given input: Input) -> AnyGameState? {

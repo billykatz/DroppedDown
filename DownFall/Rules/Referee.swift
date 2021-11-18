@@ -9,11 +9,19 @@
 import Foundation
 
 class Referee {
-    static func enterRules(_ tiles: [[Tile]]?) {
-        InputQueue.append(Referee.enforceRules(tiles))
+    
+    static var shared = Referee()
+    var winRule: Rule = NonBossWin()
+    
+    func setWinRule(_ winRule: Rule) {
+        self.winRule = winRule
     }
     
-    static func enforceRules(_ tiles: [[Tile]]?) -> Input {
+    func enterRules(_ tiles: [[Tile]]?) {
+        InputQueue.append(self.enforceRules(tiles))
+    }
+    
+    func enforceRules(_ tiles: [[Tile]]?) -> Input {
         guard let tiles = tiles, !tiles.isEmpty else { return Input(.reffingFinished(newTurn: false)) }
         
         func valid(neighbor: TileCoord?, for currCoord: TileCoord?) -> Bool {
@@ -406,11 +414,10 @@ class Referee {
         // Game Win
         // Game Lose
         // Player attack
+        // Player collects gems or items
+        // Refill empty tiles
         // Monster attack
         // Monster Die
-        // Player collects gems
-        
-        let winRule = Rulebook.winRule
         
         if let input = winRule.apply(tiles) {
             return input
@@ -443,10 +450,10 @@ class Referee {
             return monsterAttack
         }
         
-        if let decrementDynamite = decrementDynamiteFuses() {
+        // We only ever want to decrement a dynamite if they player took a turn, not if the boss took a turn.
+        if let decrementDynamite = decrementDynamiteFuses(), TurnWatcher.shared.checkNewTurn() {
             return decrementDynamite
         }
-        
         
         let newTurn = TurnWatcher.shared.getNewTurnAndReset()
         return Input(.reffingFinished(newTurn: newTurn), tiles)

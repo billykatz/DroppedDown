@@ -65,7 +65,7 @@ class RotatePreviewView {
             totalDistance = 300.0
         }
         
-        print("Distance \(distance)")
+//        print("Distance \(distance)")
         let isNegative = distance < 0 ? -1 : 1
         let cappedDistance = min(75.0, abs(distance))
         distancedMoved += cappedDistance * CGFloat(isNegative)

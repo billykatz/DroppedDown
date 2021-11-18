@@ -40,6 +40,8 @@
 		28C64461273B4CFC00098C3C /* CodexUnlockAtView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28C64460273B4CFC00098C3C /* CodexUnlockAtView.swift */; };
 		28C64463273B540C00098C3C /* CodexBuyButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28C64462273B540C00098C3C /* CodexBuyButton.swift */; };
 		28C64466274463D300098C3C /* BossController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28C64465274463D300098C3C /* BossController.swift */; };
+		28C644682745B22F00098C3C /* BossDebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28C644672745B22F00098C3C /* BossDebugView.swift */; };
+		28C6446A2746C84F00098C3C /* CGVector+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28C644692746C84F00098C3C /* CGVector+Extensions.swift */; };
 		28C806AA26F3C3D500135E29 /* StatTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28C806A926F3C3D500135E29 /* StatTracker.swift */; };
 		28CAFA7B26A0F2F000151CA8 /* CodexItemAnimatingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28CAFA7A26A0F2F000151CA8 /* CodexItemAnimatingView.swift */; };
 		28D29AD4270B7E9D001AD50D /* RuneReplacementInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D29AD3270B7E9D001AD50D /* RuneReplacementInfoView.swift */; };
@@ -117,7 +119,6 @@
 		3DC072BB2373AF510046F224 /* SwipeRecognizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC072BA2373AF510046F224 /* SwipeRecognizerView.swift */; };
 		3DC072BD23747F6B0046F224 /* CGSize+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC072BC23747F6B0046F224 /* CGSize+Extension.swift */; };
 		3DC072C123748D100046F224 /* Quadrant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC072C023748D100046F224 /* Quadrant.swift */; };
-		3DC072C42375452D0046F224 /* Rulebook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC072C32375452D0046F224 /* Rulebook.swift */; };
 		3DC072C6237545400046F224 /* Rule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC072C5237545400046F224 /* Rule.swift */; };
 		3DC9CA1321D1DDD4004D05D5 /* Difficulty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC9CA1221D1DDD4004D05D5 /* Difficulty.swift */; };
 		3DCB38AB232DCE88001D148F /* TileCoordTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DCB38AA232DCE88001D148F /* TileCoordTests.swift */; };
@@ -246,6 +247,8 @@
 		28C64460273B4CFC00098C3C /* CodexUnlockAtView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexUnlockAtView.swift; sourceTree = "<group>"; };
 		28C64462273B540C00098C3C /* CodexBuyButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexBuyButton.swift; sourceTree = "<group>"; };
 		28C64465274463D300098C3C /* BossController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BossController.swift; sourceTree = "<group>"; };
+		28C644672745B22F00098C3C /* BossDebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BossDebugView.swift; sourceTree = "<group>"; };
+		28C644692746C84F00098C3C /* CGVector+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGVector+Extensions.swift"; sourceTree = "<group>"; };
 		28C806A926F3C3D500135E29 /* StatTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatTracker.swift; sourceTree = "<group>"; };
 		28CAFA7A26A0F2F000151CA8 /* CodexItemAnimatingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexItemAnimatingView.swift; sourceTree = "<group>"; };
 		28D29AD3270B7E9D001AD50D /* RuneReplacementInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneReplacementInfoView.swift; sourceTree = "<group>"; };
@@ -323,7 +326,6 @@
 		3DC072BA2373AF510046F224 /* SwipeRecognizerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeRecognizerView.swift; sourceTree = "<group>"; };
 		3DC072BC23747F6B0046F224 /* CGSize+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGSize+Extension.swift"; sourceTree = "<group>"; };
 		3DC072C023748D100046F224 /* Quadrant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Quadrant.swift; sourceTree = "<group>"; };
-		3DC072C32375452D0046F224 /* Rulebook.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rulebook.swift; sourceTree = "<group>"; };
 		3DC072C5237545400046F224 /* Rule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rule.swift; sourceTree = "<group>"; };
 		3DC9CA1221D1DDD4004D05D5 /* Difficulty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Difficulty.swift; sourceTree = "<group>"; };
 		3DCB38AA232DCE88001D148F /* TileCoordTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileCoordTests.swift; sourceTree = "<group>"; };
@@ -500,6 +502,7 @@
 			isa = PBXGroup;
 			children = (
 				28C64465274463D300098C3C /* BossController.swift */,
+				28C644672745B22F00098C3C /* BossDebugView.swift */,
 			);
 			name = Boss;
 			sourceTree = "<group>";
@@ -686,6 +689,7 @@
 				2886E83F26F030750014FA5D /* UIViewController+Extensions.swift */,
 				2811271E26863A4500F96043 /* FileManagerClient.swift */,
 				280831FD2683A7B000EFAEC3 /* UserDefaults+Extensions.swift */,
+				28C644692746C84F00098C3C /* CGVector+Extensions.swift */,
 				5827539A256B000A0065B49F /* GKLinearCongruentialRandomSource+Extensions.swift */,
 				5894A44924C36AFA00FBF839 /* GKLocalPlayer+Extensions.swift */,
 				5894A44B24C36B4600FBF839 /* Publishers+Extensions.swift */,
@@ -740,7 +744,6 @@
 			isa = PBXGroup;
 			children = (
 				3D90AAD121D8863100C7428A /* Referee.swift */,
-				3DC072C32375452D0046F224 /* Rulebook.swift */,
 				3DC072C5237545400046F224 /* Rule.swift */,
 			);
 			path = Rules;
@@ -1232,6 +1235,8 @@
 				3D58468822A6322900EDD845 /* RangeModel.swift in Sources */,
 				3D00A0F923AAC813007E2D8B /* Identifiers.swift in Sources */,
 				3DA0A37A22FFAECE0041EF34 /* UIFont+Extensions.swift in Sources */,
+				28C644682745B22F00098C3C /* BossDebugView.swift in Sources */,
+				28C6446A2746C84F00098C3C /* CGVector+Extensions.swift in Sources */,
 				3DE87C9022374C2C00D750CF /* ShiftShaft_Button.swift in Sources */,
 				3D14C82123A83D93003E211D /* LevelCoordinator.swift in Sources */,
 				283CBBDB26A8A9E100B1F7C9 /* SwiftUIView.swift in Sources */,
@@ -1257,7 +1262,6 @@
 				3D6AACE1222C997800C77B24 /* Header.swift in Sources */,
 				2886E84326F031050014FA5D /* SettingsView.swift in Sources */,
 				2886E83E26F0303B0014FA5D /* SettingsCoordinator.swift in Sources */,
-				3DC072C42375452D0046F224 /* Rulebook.swift in Sources */,
 				284F2EC32731DB3C00032088 /* FTUEConductor.swift in Sources */,
 				3D06390322EEB50C00C4D5E9 /* PlayState.swift in Sources */,
 				3DD36ECB21E5B86100AC4873 /* TileStrategy.swift in Sources */,

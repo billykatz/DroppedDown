@@ -10,7 +10,7 @@ import Foundation
 import GameplayKit
 
 typealias Depth = Int
-let bossLevel = 9
+let bossLevelDepthNumber = 9
 
 struct LevelConstructor {
     
@@ -239,7 +239,7 @@ struct LevelConstructor {
             
             goals = [rockGoal, monsterGoal]
             
-        case bossLevel:
+        case bossLevelDepthNumber:
             
 //            let monsterAmount = 9
 //            let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 60)
@@ -291,6 +291,15 @@ struct LevelConstructor {
                                                         .rock(color: .blue, holdsGem: false, groupCount: 0): 33,
                                                         .rock(color: .purple, holdsGem: false, groupCount: 0): 33])
             return chances
+        case bossLevelDepthNumber:
+            return TileTypeChanceModel(chances: [
+                                        .rock(color: .red, holdsGem: false, groupCount: 0): 100,
+                                        
+            ])
+//            return TileTypeChanceModel(chances: [
+//                                        .rock(color: .red, holdsGem: false, groupCount: 0): 50,
+//                                        .rock(color: .blue, holdsGem: false, groupCount: 0): 50,
+//            ])
         case 5, 6, 7...Int.max:
             let chances = TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false, groupCount: 0): 33,
                                                         .rock(color: .blue, holdsGem: false, groupCount: 0): 33,
@@ -338,10 +347,13 @@ struct LevelConstructor {
         switch depth {
         case 1, 2, 3, 4:
             numPillarsBasedOnDepth = 0
-        case 5, 6, 7:
+        case 5, 6:
             numPillarsBasedOnDepth = 3 + (randomSource.positiveNextInt % 2 == 0 ? -1 : 1)
-        case 8, 9:
-            numPillarsBasedOnDepth = 0
+        case 7, 8:
+            numPillarsBasedOnDepth = 5 + (randomSource.positiveNextInt % 2 == 0 ? -1 : 1)
+        case bossLevelDepthNumber:
+            numPillarsBasedOnDepth = 1
+//            return bossPillars()
         case 10...Int.max:
             numPillarsBasedOnDepth = 3 + (randomSource.positiveNextInt % 2 == 0 ? -1 : 1)
         default:
@@ -363,9 +375,40 @@ struct LevelConstructor {
         return pillars
     }
     
+    static func bossPillars() -> [PillarCoorindates] {
+        var pillarColors: [ShiftShaft_Color] = [.blue, .blue, .blue, .purple, .purple, .purple, .red, .red, .red]
+        var coords: [TileCoord] = [
+            TileCoord(3, 3), TileCoord(4, 3), TileCoord(5, 3),
+            TileCoord(3, 4), TileCoord(4, 4), TileCoord(5, 4),
+            TileCoord(3, 5), TileCoord(4, 5), TileCoord(5, 5)
+        ]
+        
+        precondition(pillarColors.count == coords.count, "Pillar colors and coord must be equal")
+        let originalColorCount = pillarColors.count
+        var pillarCoordinates: [PillarCoorindates] = []
+        
+        // create PillarCoordinates randoming selecting elements from pillarColors and coords
+        while pillarCoordinates.count < originalColorCount {
+            let (remainingColors, randomColor) = pillarColors.dropRandom()
+            let (remainingCoords, randomCoord) = coords.dropRandom()
+            
+            pillarColors = remainingColors
+            coords = remainingCoords
+            
+            if let color = randomColor, let coord = randomCoord {
+                let pillarTile = TileType.pillar(PillarData(color: color, health: 3))
+                let pillarCoord = PillarCoorindates((pillarTile, coord))
+                pillarCoordinates.append(pillarCoord)
+            }
+            
+        }
+        
+        return pillarCoordinates
+    }
+    
     
     static func monsterCountStart(depth: Depth) -> Int {
-        if depth == bossLevel { return 0 }
+        if depth == bossLevelDepthNumber { return 0 }
         return min(boardSize(depth: depth), depth + 2)
     }
     
@@ -415,7 +458,7 @@ struct LevelConstructor {
             let batRange = dragonRange.next(18)
             let ratRange = batRange.next(30)
             return [.rat: ratRange, .alamo: alamoRange, .dragon: dragonRange, .bat: batRange]
-        case bossLevel:
+        case bossLevelDepthNumber:
             return [:]
             let alamoRange = RangeModel(lower: 0, upper: 20)
             let dragonRange = alamoRange.next(25)

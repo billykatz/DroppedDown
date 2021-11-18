@@ -6,6 +6,16 @@
 //  Copyright © 2019 William Katz LLC. All rights reserved.
 //
 
+func tileTypesOf(_ type: TileType, in tiles: [[Tile]]) -> [TileType] {
+    var tileType: [TileType] = []
+    for (i, _) in tiles.enumerated() {
+        for (j, _) in tiles[i].enumerated() {
+            tiles[i][j].type == type ? tileType.append(tiles[i][j].type) : ()
+        }
+    }
+    return tileType
+}
+
 func typeCount(for tiles: [[Tile]], of type: TileType) -> [TileCoord] {
     var tileCoords: [TileCoord] = []
     for (i, _) in tiles.enumerated() {

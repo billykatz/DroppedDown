@@ -198,10 +198,11 @@ struct Animator {
         return smokeAnimation
     }
     
-    public func explodeAnimation() -> SKAction {
+    public func explodeAnimation(size: CGSize) -> SKAction {
         let explodeTexture = SpriteSheet(texture: SKTexture(imageNamed: "explodeAnimation"), rows: 1, columns: 4).animationFrames()
         let explodeAnimation = SKAction.animate(with: explodeTexture, timePerFrame: 0.07)
-        return explodeAnimation
+        let scaleToSize = SKAction.scale(to: size, duration: 0.0)
+        return SKAction.group([scaleToSize, explodeAnimation])
     }
     
     func timePerFrame() -> Double {
@@ -669,6 +670,147 @@ struct Animator {
                 completion?()
             }
         }
+    }
+    
+    // MARK: - Boss Animations
+    
+    /// This should only be called with .dynamite as the tile types passed in
+    func animateDynamiteAppears(foreground: SKNode, tileTypes: [TileType], tileSize: CGFloat, startingPosition: CGPoint, targetPositions: [CGPoint], targetSprites: [DFTileSpriteNode], completion: @escaping () -> Void) {
+        
+        var spriteActions: [SpriteAction] = []
+        // create a dynamite stick for each dynamiate
+        var dynamiteSprites: [DFTileSpriteNode] = []
+        for tileType in tileTypes {
+            let dynamite = DFTileSpriteNode(type: tileType, height: tileSize, width: tileSize)
+            dynamite.showFuseTiming(tileType.fuseTiming ?? 0)
+            dynamiteSprites.append(dynamite)
+        }
+        
+        
+        // add them to the foreground
+        for sprite in dynamiteSprites {
+            sprite.position = startingPosition
+            sprite.zPosition = 100_000
+            foreground.addChild(sprite)
+        }
+        
+        // make it appear as if they are being thrown onto the screen
+        var actions: [SKAction] = []
+        //stagger the initial throw of each dynamite
+        var waitTime = 0.0
+        for (idx, target) in targetPositions.enumerated() {
+            let distance = target - startingPosition
+            let speed: Double = 750
+            
+            // determine the duration based on the distance to the target
+            let duration = waitTime + (Double(distance.length) / speed)
+            waitTime += Double.random(in: 0.25...0.35)
+            
+            let moveAction = SKAction.move(to: target, duration: duration)
+            
+            /// grow and shrink animation
+            let scaleBy: CGFloat = 2
+            let growAction = SKAction.scale(by: scaleBy, duration: duration/2)
+            let shrinkAction = SKAction.scale(by: 1/scaleBy, duration: duration/2)
+            let growSkrinkSequence = SKAction.sequence([growAction, shrinkAction])
+            growSkrinkSequence.timingMode = .easeInEaseOut
+            
+            // "throw" it
+            let moveGrowShrink = SKAction.group([moveAction, growSkrinkSequence])
+            
+            // run it in sequence
+            let sequence = SKAction.sequence([moveGrowShrink])
+            
+            // crumble the rock that gets "hit"
+            let spriteToRemoveOnLanding = targetSprites[idx]
+            if let crumble = spriteToRemoveOnLanding.crumble() {
+                let waitBeforeCrumble = SKAction.wait(forDuration: duration)
+                let crumbleAction = crumble.action
+                let sequence = SKAction.sequence([waitBeforeCrumble, crumbleAction])
+                sequence.timingMode = .easeIn
+                spriteActions.append(.init(spriteToRemoveOnLanding, sequence))
+            }
+            
+            actions.append(sequence)
+
+        }
+        
+        guard dynamiteSprites.count == actions.count else {
+            completion();
+            return
+        }
+        
+        for idx in 0..<dynamiteSprites.count {
+            spriteActions.append(.init(dynamiteSprites[idx], actions[idx]))
+        }
+        
+        
+        animate(spriteActions, completion: completion)
+    }
+    
+    func animateDynamiteExplosion(dynamiteSprites: [DFTileSpriteNode], foreground: SKNode, completion: @escaping () -> Void) {
+        var spriteActions: [SpriteAction] = []
+        
+        for dynamite in dynamiteSprites {
+            // create and add an empty sprite to hold all the exploding animations
+            let dynamiteEmptySprite = SKSpriteNode(color: .clear, size: dynamite.size)
+            dynamiteEmptySprite.position = dynamite.position
+            foreground.addChild(dynamiteEmptySprite)
+            
+            /// create an aniamtion that shows the fuse timer hit 0 and then explodes
+            let showFuseTime = SKAction.run {
+                dynamite.showFuseTiming(0)
+            }
+            let dynamiteWaitDuration = 0.1
+            let waitForABit = SKAction.wait(forDuration: dynamiteWaitDuration)
+            let dynamiteExplode = explodeAnimation(size: dynamite.size.scale(by: 2.0))
+            
+            // smoke
+            let smoke = smokeAnimation()
+            let fade = SKAction.fadeAlpha(to: 0.1, duration: 0.25)
+            let smokeAndFade = SKAction.group([smoke, fade])
+            smoke.timingMode = .easeOut
+            
+            
+            // sequence all
+            let dynamiteAllAction = SKAction.sequence([showFuseTime, waitForABit, dynamiteExplode, smokeAndFade, .removeFromParent()])
+            spriteActions.append(.init(dynamite, dynamiteAllAction))
+            
+            /// create a bunch of explosions
+            for _ in 0..<7 {
+                // create and randomly position sprite
+                let emptySprite = SKSpriteNode(color: .clear, size: dynamite.size)
+                let offsetRange: ClosedRange<CGFloat> = -100...100
+                let xOffset = CGFloat.random(in: offsetRange)
+                let yOffset = CGFloat.random(in: offsetRange)
+                emptySprite.position = CGPoint.position(emptySprite.frame, inside: dynamite.frame, verticalAlign: .center, horizontalAnchor: .center, xOffset: xOffset, yOffset: yOffset)
+                
+                // create the animation
+                let explosionAnimation = explodeAnimation(size: emptySprite.size.scale(by: 1.5))
+                let scaleUp = CGFloat.random(in: 3.0...5.0)
+                let scaleDown = 1/scaleUp
+                let randomScale = SKAction.scale(by: scaleUp, duration: 0.20)
+                let scaleBackDown = SKAction.scale(by: scaleDown, duration: 0.08)
+                let scaleAction = SKAction.sequence([randomScale, scaleBackDown])
+                let explodeAndScale = SKAction.group([explosionAnimation, scaleAction])
+                explodeAndScale.timingMode = .easeIn
+                
+                let waitDuration = Double.random(in: dynamiteWaitDuration...0.75)
+                let randomWaitDuration = SKAction.wait(forDuration: waitDuration)
+                
+                let allAction = SKAction.sequence([randomWaitDuration, explodeAndScale, smokeAndFade, .removeFromParent()])
+                
+                spriteActions.append(SpriteAction(emptySprite, allAction))
+                
+                /// the later the eplxosions should be on top of the earlier ones
+                emptySprite.zPosition = CGFloat(100) + CGFloat(10 * waitDuration)
+                dynamiteEmptySprite.addChild(emptySprite)
+                
+            }
+        }
+        
+        animate(spriteActions, completion: completion)
+        
     }
     
     // MARK: - Goal Completion

@@ -33,6 +33,8 @@ class TurnWatcher {
                     if transformation.first?.tileTransformation != nil {
                         self?.newTurn = true
                     }
+                case .bossTurnStart:
+                    self?.newTurn = false
                 default:
                     if transformation.first?.tileTransformation != nil {
                         self?.newTurn = true

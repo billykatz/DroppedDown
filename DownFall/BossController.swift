@@ -11,12 +11,14 @@ import Foundation
 enum BossAttackType: String, Codable {
     case dynamite
     case poison
+    case spawnSpider
 }
 
 enum BossStateType: String, Codable {
     case targetEat
     case eats
     case targetAttack
+    case attack
     case rests
 }
 
@@ -24,35 +26,36 @@ struct BossTargets: Codable, Hashable {
     var whatToEat: [TileCoord]?
     var eats: [TileCoord]?
     var whatToAttack: [BossAttackType: [TileCoord]]?
+    var attack: [BossAttackType: [TileCoord]]?
 }
 
 struct BossState: Codable, Hashable {
     let stateType: BossStateType
     let turnsLeftInState: Int
     var targets: BossTargets
-    var attackType: [BossAttackType]?
     
     func advance(tiles: [[Tile]], turnsInState: Int) -> BossState {
         if turnsLeftInState <= 0 {
             let nextStateType = nextStateType()
-            let eatenRockCoords = self.targets.eats
-            return BossState(
+            var nextBossState = BossState(
                 stateType: nextStateType,
                 turnsLeftInState: turnsInState,
-                targets: BossTargets(),
-                attackType: attack(basedOnRocks: eatenRockCoords, in: tiles)
+                targets: BossTargets()
             )
+            nextBossState.enter(tiles: tiles, oldState: self)
+            return nextBossState
         } else {
             return BossState(
                 stateType: self.stateType,
                 turnsLeftInState: self.turnsLeftInState - 1,
-                targets: targets,
-                attackType: attackType
+                targets: targets
             )
         }
     }
     
     
+    // This function is called when we enter a new boss state
+    // It is primarily responsible for initializing the BossTargets
     mutating func enter(tiles: [[Tile]], oldState: BossState) {
         switch self.stateType {
         case .targetEat:
@@ -71,6 +74,13 @@ struct BossState: Codable, Hashable {
                 eats: nil,
                 whatToAttack: oldState.targets.whatToAttack
             )
+        case .attack:
+            self.targets = BossTargets(
+                whatToEat: nil,
+                eats: nil,
+                whatToAttack: nil,
+                attack: validateAndUpdatePlannedAttacks(in: tiles, plannedAttacks: oldState.targets.whatToAttack)
+            )
         case .rests:
             break
         }
@@ -87,6 +97,8 @@ struct BossState: Codable, Hashable {
                 return .targetAttack
             }
         case .targetAttack:
+            return .attack
+        case .attack:
             return .rests
         case .rests:
             return .targetEat
@@ -94,7 +106,7 @@ struct BossState: Codable, Hashable {
     }
     
     private func targetsToEat(in tiles: [[Tile]]) -> [TileCoord] {
-        return targetRocksToEat(in: tiles, numberRocksToEat: 2)
+        return targetRocksToEat(in: tiles, numberRocksToEat: 3)
     }
     
     private func targetsToAttack(in tiles: [[Tile]], with attacks: [BossAttackType]?) -> [BossAttackType: [TileCoord]] {
@@ -108,38 +120,65 @@ struct BossState: Codable, Hashable {
 
 enum BossPhaseType: String, Codable {
     case first
+    case second
+    case third
+    case dead
 }
 
 struct BossPhase: Codable, Hashable {
-    var bossState: BossState
-    let bossPhaseType: BossPhaseType
+    private(set) var bossState: BossState
+    public let bossPhaseType: BossPhaseType
+    
+    public init() {
+        let initialState = BossState(stateType: .rests, turnsLeftInState: turnsInState(.rests), targets: BossTargets())
+        self.init(bossState: initialState, bossPhaseType: .first)
+    }
+    
+    private init(bossState: BossState, bossPhaseType: BossPhaseType) {
+        self.bossState = bossState
+        self.bossPhaseType = bossPhaseType
+    }
+    
     
     mutating func advance(tiles: [[Tile]]) -> (BossPhase, Bool) {
         let oldBossState = bossState
         let nextStateTurns = turnsInState(bossState.nextStateType())
         
         // this sets the next state's number of turns.  If the state doesnt advnace then it is ignored
-        var nextBossState = bossState.advance(tiles: tiles, turnsInState: nextStateTurns)
-        var sendInput = false
-        if nextBossState.stateType != oldBossState.stateType {
-            // there has been a change so update the bossState
-            nextBossState.enter(tiles: tiles, oldState: oldBossState)
-            sendInput = true
-        }
+        let nextBossState = bossState.advance(tiles: tiles, turnsInState: nextStateTurns)
+        let sendInput = nextBossState.stateType != oldBossState.stateType
         
-        return (BossPhase(bossState: nextBossState, bossPhaseType: self.bossPhaseType), sendInput)
+        // next boss phase might happen
+        let nextBossPhase = nextPhase(tiles: tiles)
+        
+        return (BossPhase(bossState: nextBossState, bossPhaseType: nextBossPhase), sendInput)
     }
     
-    private func turnsInState(_ state: BossStateType) -> Int {
-        switch state {
-        case .targetEat:
-            return 2
-        case .eats:
-            return 1
-        case .targetAttack:
-            return 0
-        case .rests:
-            return 2
+    func nextPhase(tiles: [[Tile]]) -> BossPhaseType {
+        switch bossPhaseType {
+        case .first:
+            let healthLeft = pillarHealthCount(for: tiles)
+            if healthLeft <= 18 {
+                return .second
+            } else {
+                return .first
+            }
+        case .second:
+            let healthLeft = pillarHealthCount(for: tiles)
+            if healthLeft <= 9 {
+                return .third
+            } else {
+                return .second
+            }
+        case .third:
+            let healthLeft = pillarHealthCount(for: tiles)
+            if healthLeft <= 0 {
+                return .dead
+            } else {
+                return .third
+            }
+        case .dead:
+            return .dead
         }
     }
 }
@@ -148,21 +187,18 @@ class BossController {
     
     let level: Level
     
-    // Debug so we can test easily
-    let bossLevelNumber = 9
-    
     var phase: BossPhase
     var tiles: [[Tile]]?
     
     
     var isBossLevel: Bool {
         // 9 is actually "10"
-        return level.depth == bossLevelNumber
+        return level.depth == bossLevelDepthNumber
     }
     
     init(level: Level) {
-        let bossState = BossState(stateType: .rests, turnsLeftInState: 2, targets: BossTargets())
-        self.phase = BossPhase(bossState: bossState, bossPhaseType: .first)
+        
+        self.phase = BossPhase()
         self.level = level
         // only listen for inputs if this is the boss level
         guard isBossLevel else { return }
@@ -203,7 +239,7 @@ class BossController {
 // It's definitely possible, if not improbable, that the number of rocks to eat is less than the n umber of rocks on the board.  We could run into an infinite loop when calling this function.  Food for thought
 func targetRocksToEat(in tiles: [[Tile]], numberRocksToEat: Int) -> [TileCoord] {
     var targets: [TileCoord] = []
-    var notTargetable = notTargetableTiles(in: tiles)
+    var notTargetable = unedibleTiles(in: tiles)
     for _ in 0..<numberRocksToEat {
         
         let newTarget = randomCoord(in: tiles, notIn: notTargetable)
@@ -216,14 +252,14 @@ func targetRocksToEat(in tiles: [[Tile]], numberRocksToEat: Int) -> [TileCoord] 
     return targets
 }
 
-private func notTargetableTiles(in tiles: [[Tile]]) -> Set<TileCoord> {
+private func unedibleTiles(in tiles: [[Tile]]) -> Set<TileCoord> {
     var set = Set<TileCoord>()
     for row in 0..<tiles.count {
         for col in 0..<tiles.count {
             switch tiles[row][col].type {
             case .rock(color: _, holdsGem: false, groupCount: _):
                 // target all rocks except for ones that are holding a gem
-                ()
+                break
             default:
                 set.insert(TileCoord(row: row, column: col))
             }
@@ -260,6 +296,8 @@ private func attack(basedOnRocks rocksEaten: [TileCoord]?, in tiles: [[Tile]]) -
             return .dynamite
         case .blue:
             return .poison
+        case .purple:
+            return .spawnSpider
         default:
             return .dynamite
         }
@@ -279,55 +317,145 @@ private func eats(in tiles: [[Tile]]) -> [TileCoord]? {
     return tilesToEat
 }
 
+/// Returns all "attackable" tiles when the boss wants to throw dyamite or spawn a minion
+private func nonAttackableCoords(tiles: [[Tile]]) -> Set<TileCoord> {
+    var reservedCoords = Set<TileCoord>()
+    for row in 0..<tiles.count {
+        for col in 0..<tiles.count {
+            let coord = TileCoord(row, col)
+            switch tiles[row][col].type {
+            case .monster, .player, .pillar:
+                reservedCoords.insert(coord)
+            default:
+                break
+            }
+        }
+    }
+    return reservedCoords
+}
 
-func attacked(tiles: [[Tile]], by attacks: [BossAttackType]) -> [BossAttackType: [TileCoord]] {
-    //TODO: can be optimized
+/// Returns a dictionary with BossAttackTypes as keys with an array of attack targets as the value.
+private func attacked(tiles: [[Tile]], by attacks: [BossAttackType]) -> [BossAttackType: [TileCoord]] {
+    
+    let untargetable: Set<TileCoord> = nonAttackableCoords(tiles: tiles)
+    
     var columnsAttacked = Set<Int>()
-    //         var rowsAttacked = Set<Int>()
-    //         var monstersSpawned = Set<TileCoord>()
+    var monstersSpawned = Set<TileCoord>()
     var bombsSpawned = Set<TileCoord>()
     for attack in attacks {
         switch attack {
         case .dynamite:
-            bombsSpawned.insert(randomCoord(in: tiles, notIn: bombsSpawned))
+            let nonTargetable = bombsSpawned.union(monstersSpawned).union(untargetable)
+            bombsSpawned.insert(randomCoord(in: tiles, notIn: nonTargetable))
         case .poison:
+            // each posion attack spawns two attacked columns, that's why we did this twice
             columnsAttacked.insert(Int.random(tiles.count, notInSet: columnsAttacked))
             columnsAttacked.insert(Int.random(tiles.count, notInSet: columnsAttacked))
-        //             case .row:
-        //                 rowsAttacked.insert(Int.random(tiles.count, notInSet: rowsAttacked))
-        //             case .spawn:
-        //                 monstersSpawned.insert(randomCoord(notIn: monstersSpawned))
+        case .spawnSpider:
+            let nonTargetable = bombsSpawned.union(monstersSpawned).union(untargetable)
+            monstersSpawned.insert(randomCoord(in: tiles, notIn: nonTargetable))
         }
     }
     
+    
     var columnCoords: [TileCoord] = []
-    //         var rowCoords = Set<TileCoord>()
     for row in 0..<tiles.count {
         for col in 0..<tiles.count {
             if columnsAttacked.contains(col) {
                 columnCoords.append(TileCoord(row, col))
             }
-            //                 if rowsAttacked.contains(row) {
-            //                     rowCoords.insert(TileCoord(row, col))
-            //                 }
         }
     }
     
-    //        return  Array(bombsSpawned)
     
     var result: [BossAttackType: [TileCoord]] = [:]
     if !columnCoords.isEmpty {
         result[.poison] = columnCoords
     }
-    //         if !rowCoords.isEmpty {
-    //             result[.row] = rowCoords
-    //         }
     if !bombsSpawned.isEmpty {
         result[.dynamite] = Array(bombsSpawned)
     }
-    //         if !monstersSpawned.isEmpty {
-    //             result[.spawn] = monstersSpawned
-    //         }
+    if !monstersSpawned.isEmpty {
+        result[.spawnSpider] = Array(monstersSpawned)
+    }
     return result
     
+}
+
+private func validateAndUpdatePlannedAttacks(in tiles: [[Tile]], plannedAttacks: [BossAttackType: [TileCoord]]?) ->  [BossAttackType: [TileCoord]]? {
+    guard let plannedAttacks = plannedAttacks else { return nil }
+    var updatedAttacks = plannedAttacks
+    var nonAttackable = nonAttackableCoords(tiles: tiles)
+    for (plannedAttack, plannedCoords) in plannedAttacks {
+        switch plannedAttack {
+        case .poison:
+            // poison will never target something illegally following the players turn
+            break
+        case .dynamite, .spawnSpider:
+            // dyamite should only ever target a rock
+            var newCoords: [TileCoord] = []
+            for coord in plannedCoords {
+                if nonAttackable.contains(coord) {
+                    // we should choose a different coord close by
+                    if let newCoord = newTarget(in: tiles, nearby: coord, nonAttackableCoords: nonAttackable) {
+                        newCoords.append(newCoord)
+                        nonAttackable.insert(newCoord)
+                    } else {
+                        // then no other legal targets were located 1 tile away from the original target.  Kudos to the player, they succesfully fizzled an attack
+                    }
+                } else {
+                    newCoords.append(coord)
+                }
+            }
+            
+            // update the planned attack to point to new coords
+            updatedAttacks[plannedAttack] = newCoords
+        }
+    }
+    
+    return updatedAttacks
+}
+
+/// Searches the tile's neighbors for a suitable
+/// It tries ortho neighbors first then it tries diagonal neighbors
+private func newTarget(in tiles: [[Tile]], nearby: TileCoord, nonAttackableCoords: Set<TileCoord>) -> TileCoord? {
+    var orthogonal = Array(nearby.orthogonalNeighbors).shuffled()
+    let diagonal = Array(nearby.diagonalNeighbors).shuffled()
+    orthogonal.append(contentsOf: diagonal)
+    var newTarget: TileCoord?
+    for neighbor in orthogonal {
+        guard isWithinBounds(neighbor, within: tiles) else { continue }
+        if !nonAttackableCoords.contains(neighbor) {
+            newTarget = neighbor
+        }
+    }
+    return newTarget
+}
+
+private func turnsInState(_ state: BossStateType) -> Int {
+    switch state {
+    case .targetEat:
+        return 1
+    case .eats:
+        return 1
+    case .targetAttack:
+        return 0
+    case .attack:
+        return 0
+    case .rests:
+        return 1
+    }
+}
+
+
+private func pillarHealthCount(for tiles: [[Tile]]) -> Int {
+    var pillarHealth = 0
+    for (i, _) in tiles.enumerated() {
+        for (j, _) in tiles[i].enumerated() {
+            if case let TileType.pillar(pillarData) = tiles[i][j].type {
+                pillarHealth += pillarData.health
+            }
+        }
+    }
+    return pillarHealth
 }

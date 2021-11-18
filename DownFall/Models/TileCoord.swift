@@ -70,8 +70,16 @@ struct TileCoord: Codable, Hashable {
         return TileCoord(x+1, y-1)
     }
     
+    var orthogonalNeighbors: Set<TileCoord> {
+        return Set<TileCoord>([colLeft, colRight, rowAbove, rowBelow])
+    }
+    
+    var diagonalNeighbors: Set<TileCoord> {
+        return Set<TileCoord>([northEast, northWest, southEast, southWest])
+    }
+    
     var allNeighbors: Set<TileCoord> {
-        return Set<TileCoord>([colLeft, colRight, rowAbove, rowBelow, northEast, northWest, southEast, southWest])
+        return Set<TileCoord>(orthogonalNeighbors.union(diagonalNeighbors))
     }
     
     func isOrthogonallyAdjacent(to other: TileCoord) -> Bool {

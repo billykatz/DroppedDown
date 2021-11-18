@@ -93,7 +93,7 @@ extension CGPoint {
         case .left:
             x = -that.width/2 + this.width/2 + xOffset
         case .center:
-            x = 0.0
+            x = 0.0 + xOffset
         case .right:
             x = that.width/2 - this.width/2 - xOffset
         }

@@ -11,6 +11,10 @@ import UIKit
 struct DynamiteFuse: Codable, Hashable {
     let count: Int
     var hasBeenDecremented: Bool
+    
+    static var standardFuse: DynamiteFuse {
+        return .init(count: 3, hasBeenDecremented: false)
+    }
 }
 
 struct PillarData: Codable, Hashable {
@@ -57,11 +61,11 @@ enum ShiftShaft_Color: String, Codable, CaseIterable, Hashable {
 struct Tile: Hashable, Codable {
     let type: TileType
     var bossTargetedToEat: Bool?
-    var bossTargetedToAttack: Bool?
+    var bossTargetedToAttack: [BossAttackType]?
     
     init(type: TileType,
          bossTargetedToEat: Bool? = false,
-         bossTargetedToAttack: Bool? = false
+         bossTargetedToAttack: [BossAttackType]? = nil
          ) {
         self.type = type
         self.bossTargetedToEat = bossTargetedToEat
@@ -362,6 +366,16 @@ enum TileType: Hashable, CaseIterable, Codable {
                 return groupCount
         default:
             return 0
+        }
+    }
+    
+    var fuseTiming: Int? {
+        switch self {
+        case .dynamite(let fuse):
+            return fuse.count
+        default:
+            return nil
+        
         }
     }
     

@@ -242,15 +242,21 @@ class Board: Equatable {
             
         // handling boss input
         case .bossTurnStart(let phase):
-            if phase.bossState.stateType == .targetEat {
+            switch phase.bossState.stateType {
+            case .targetEat:
                 transformation = self.bossTargetsWhatToEat(input: input)
-            } else if phase.bossState.stateType == .eats {
+                
+            case .eats:
                 let targets = phase.bossState.targets.eats ?? []
                 transformation = self.removeAndReplaces(from: tiles, specificCoord: targets, input: input)
-            } else if phase.bossState.stateType == .targetAttack {
+                
+            case .targetAttack:
                 transformation = self.bossTargetsWhatToAttack(input: input)
-            }
-            else {
+                
+            case .attack:
+                transformation = self.bossExecutesAttacks(input: input)
+                
+            case .rests:
                 transformation = self.resetBossFlags(input: input)
             }
         
@@ -278,7 +284,7 @@ class Board: Equatable {
         for row in 0..<tiles.count {
             for column in 0..<tiles[row].count {
                 tiles[row][column].bossTargetedToEat = false
-                tiles[row][column].bossTargetedToAttack = false
+                tiles[row][column].bossTargetedToAttack = nil
             }
         }
         return Transformation(transformation: nil, inputType: .bossTurnStart(phase), endTiles: self.tiles)
@@ -300,7 +306,31 @@ class Board: Equatable {
         if let bossAttackDict = phase.bossState.targets.whatToAttack {
             bossAttackDict.forEach { (attackType, coords) in
                 coords.forEach { coord in
-                    tiles[coord.row][coord.column].bossTargetedToAttack = true
+                    var bossTargets = tiles[coord.row][coord.column].bossTargetedToAttack ?? []
+                    bossTargets.append(attackType)
+                    tiles[coord.row][coord.column].bossTargetedToAttack = bossTargets
+                }
+            }
+        }
+        return Transformation(transformation: nil, inputType: .bossTurnStart(phase), endTiles: self.tiles)
+        
+    }
+    
+    private func bossExecutesAttacks(input: Input) -> Transformation {
+        guard case let InputType.bossTurnStart(phase) = input.type else { return .zero }
+        if let bossAttackDict = phase.bossState.targets.attack {
+            bossAttackDict.forEach { (attackType, coords) in
+                var count = 0
+                coords.forEach { coord in
+                    if attackType == .dynamite {
+                        tiles[coord.row][coord.column] = Tile(type: .dynamite(.init(count: 3+count, hasBeenDecremented: false)))
+                        count += 1
+                    } else {
+                        // Debug tool to make the tiles show up a diferent color for each attack they will receive
+                        var bossTargets = tiles[coord.row][coord.column].bossTargetedToAttack ?? []
+                        bossTargets.append(attackType)
+                        tiles[coord.row][coord.column].bossTargetedToAttack = bossTargets
+                    }
                 }
             }
         }
@@ -590,55 +620,51 @@ class Board: Equatable {
         }
         /// if we have a trans, that is because we are actually rotating
         self.tiles = tiles
-        var allTransformations = [Transformation(transformation: nil, inputType: .rotatePreviewFinish(spriteAction, trans), endTiles: tiles)]
-        
-        if typeCount(for: self.tiles, of: .empty).count > 0 {
-            print("There are empty tiles after rotating preview is finished.")
-            
-            // store tile transforamtions and shift information
-            var newTiles : [TileTransformation] = []
-            var intermediateTiles = self.tiles
-            var (shiftDown, shiftIndices) = calculateShiftIndices(for: &intermediateTiles)
-            
-            //add new tiles
-            addNewTiles(shiftIndices: shiftIndices,
-                        shiftDown: &shiftDown,
-                        newTiles: &newTiles,
-                        intermediateTiles: &intermediateTiles)
-            
-            // append the add new tiles so we add new tiles following the rotate
-            allTransformations.append(Transformation(transformation: newTiles,
-                                                     inputType: input.type,
-                                                     endTiles: intermediateTiles,
-                                                     newTiles: newTiles,
-                                                     shiftDown: shiftDown))
-        }
-        
-        return allTransformations
+        return [Transformation(transformation: nil, inputType: .rotatePreviewFinish(spriteAction, trans), endTiles: tiles)]
     }
     
     private func decrementDynamites(input: Input, dynamiteCoords: Set<TileCoord>) -> [Transformation] {
         
         var removedRocksAndPillars: [TileCoord] = []
-        for coord in dynamiteCoords {
+        var explodedDynamiteCoords: [TileCoord] = []
+        
+        let orderedDynamite = Array(dynamiteCoords)
+            .map { coord -> (TileCoord, DynamiteFuse) in
+                if case TileType.dynamite(let fuse) = tiles[coord].type {
+                    return (coord, fuse)
+                } else {
+                    fatalError()
+                }
+                
+            }.sorted { first, second in
+                return first.1.count <= second.1.count
+            }.map { $0.0 }
+        
+        
+        for coord in orderedDynamite {
             if case let TileType.dynamite(data) = tiles[coord].type {
                 let newFuse = data.count - 1
                 
                 if newFuse <= 0 {
                     /// EXPLODE
-                    tiles[coord.row][coord.column] = Tile(type: .empty)
+                    tiles[coord.row][coord.column] = Tile(type: .dynamite(DynamiteFuse(count: newFuse, hasBeenDecremented: true)))
+                    explodedDynamiteCoords.append(coord)
+                    removedRocksAndPillars.append(coord)
                     
                     let affectedNeighbors = coord.allNeighbors
                     for neighborCoord in affectedNeighbors {
                         guard isWithinBounds(neighborCoord) else { continue }
                         switch tiles[neighborCoord].type {
                         case .dynamite:
-                            tiles[neighborCoord.row][neighborCoord.column] = Tile(type: .dynamite(DynamiteFuse(count: 3, hasBeenDecremented: false)))
+                            // blow up your neighbors, but dont do it if they are already gonna blow up
+                            tiles[neighborCoord.row][neighborCoord.column] = Tile(type: .dynamite(DynamiteFuse(count: 0, hasBeenDecremented: false)))
                         case .player(let playerData):
                             tiles[neighborCoord.row][neighborCoord.column] = Tile(type: .player(playerData.wasAttacked(for: 1, from: neighborCoord.direction(relative: coord) ?? .east)))
-                        case .rock, .pillar:
+                        case .monster(let monsterData):
+                            tiles[neighborCoord.row][neighborCoord.column] = Tile(type: .player(monsterData.wasAttacked(for: 1, from: neighborCoord.direction(relative: coord) ?? .east)))
+                        case .rock, .pillar, .gem:
                             removedRocksAndPillars.append(neighborCoord)
-                        case .empty, .exit, .monster, .gem, .gold, .emptyGem:
+                        case .empty, .exit, .gold, .emptyGem:
                             () // purposefully left blank
                         case .item, .offer:
                             ()
@@ -646,13 +672,35 @@ class Board: Equatable {
                     }
                 } else {
                     tiles[coord.row][coord.column] = Tile(type: .dynamite(DynamiteFuse(count: newFuse, hasBeenDecremented: true)))
+                    
+                    let affectedNeighbors = coord.allNeighbors
+                    for neighborCoord in affectedNeighbors {
+                        guard isWithinBounds(neighborCoord) else { continue }
+                        switch tiles[neighborCoord].type {
+                        case .dynamite(let fuse):
+                            if fuse.count <= 0 {
+                                // my neighbor exploded so I should explode.
+                                tiles[coord.row][coord.column] = Tile(type: .dynamite(DynamiteFuse(count: 0, hasBeenDecremented: true)))
+                                removedRocksAndPillars.append(coord)
+                            }
+                        default:
+                            break
+                        }
+                    }
                 }
             }
             
         }
-        let removedAndReplaced = removeAndReplaces(from: tiles, specificCoord: removedRocksAndPillars, input: input)
+        let explodedDyanmiteTileTrans = explodedDynamiteCoords.map { TileTransformation($0, $0) }
+        let dynamiteTransformation = Transformation(transformation: explodedDyanmiteTileTrans, inputType: input.type, endTiles: tiles)
         
-        return [Transformation(transformation: nil, inputType: input.type, endTiles: tiles), removedAndReplaced]
+        if explodedDyanmiteTileTrans.isEmpty {
+            return [dynamiteTransformation]
+        } else {
+            
+            let removedAndReplaced = removeAndReplaces(from: tiles, specificCoord: removedRocksAndPillars, input: input, destroysGemsInRocks: true)
+            return [dynamiteTransformation, removedAndReplaced]
+        }
     }
     
     
@@ -1102,7 +1150,8 @@ extension Board {
                            specificCoord: [TileCoord],
                            singleTile: Bool = false,
                            input: Input,
-                           forceSpawnMonsters: Bool = false) -> Transformation {
+                           forceSpawnMonsters: Bool = false,
+                           destroysGemsInRocks: Bool = false) -> Transformation {
         
         let selectedTiles: [TileCoord] = specificCoord
         
@@ -1122,15 +1171,17 @@ extension Board {
                 
             case .rock(color: _, holdsGem: let holdsGem, _):
                 intermediateTiles[coord.x][coord.y] = Tile.empty
-                if !removedTilesContainGem {
+                if !removedTilesContainGem && !destroysGemsInRocks {
                     removedTilesContainGem = holdsGem
                 }
-            case .monster:
-                intermediateTiles[coord.x][coord.y] = Tile.empty
-            case .offer:
+            case .dynamite(let fuse):
+                if fuse.count <= 0 {
+                    intermediateTiles[coord.x][coord.y] = Tile.empty
+                }
+            case .monster, .offer, .gem:
                 intermediateTiles[coord.x][coord.y] = Tile.empty
             default:
-                preconditionFailure("We should only use this for rocks, pillars and monsters")
+                preconditionFailure("We should only use this for rocks, pillars and monsters. Dynamite adds a few more items to the list including gems.")
             }
         }
         
@@ -1177,13 +1228,16 @@ extension Board {
                         newTiles[i][j] = Tile(type: .player(data.resetAttacks()))
                     }
                     
-                    if case let .dynamite(data) = tiles[i][j].type {
+                    if case let .dynamite(data) = tiles[i][j].type, newTurn {
                         newTiles[i][j] = Tile(type: .dynamite(DynamiteFuse(count: data.count, hasBeenDecremented: false)))
                     }
                 }
             }
             return newTiles
         }
+        
+        
+        GameLogger.shared.log(prefix: "Board", message: "Resetting attacks.  New turn? \(newTurn)")
         
         tiles = resetAttacks(in: tiles)
         
@@ -1403,27 +1457,6 @@ extension Board {
         allTransformations.append(Transformation(transformation: transformation,
                                                  inputType: inputType,
                                                  endTiles: intermediateTiles))
-        
-        
-        /// Pillars can create voids of .empty tiles, therefore on rotate we may need to create and shift down tiles
-        if typeCount(for: self.tiles, of: .empty).count > 0 {
-            // store tile transforamtions and shift information
-            var newTiles : [TileTransformation] = []
-            var (shiftDown, shiftIndices) = calculateShiftIndices(for: &intermediateTiles)
-            
-            //add new tiles
-            addNewTiles(shiftIndices: shiftIndices,
-                        shiftDown: &shiftDown,
-                        newTiles: &newTiles,
-                        intermediateTiles: &intermediateTiles)
-            
-            // return our new board
-            allTransformations.append(Transformation(transformation: newTiles,
-                                                     inputType: inputType,
-                                                     endTiles: intermediateTiles,
-                                                     newTiles: newTiles,
-                                                     shiftDown: shiftDown))
-        }
         
         /// We support previewing the rotate transformation.  In that case, dont update our tiles to the rotated tiles just yet.  Wait for rotatePreviewFinish to do that.
         if !preview {

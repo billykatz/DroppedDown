@@ -36,7 +36,11 @@ class Renderer: SKSpriteNode {
     //Animator
     private var animator = Animator()
     
+    // Dialog for Tutorial and FTUE
     private var dialogueOverlay: DialogueOverlay?
+    
+    // Debug View for Boss
+    private var bossDebugView: BossDebugView
     
     /// LAZY
     
@@ -133,6 +137,8 @@ class Renderer: SKSpriteNode {
                                          viewModel: TargetingViewModel(),
                                          levelSize: level.boardSize)
         
+        // debug view for Boss
+        self.bossDebugView = BossDebugView(playableRect: playableRect)
         
         super.init(texture: nil, color: .clear, size: CGSize.zero)
         
@@ -154,7 +160,7 @@ class Renderer: SKSpriteNode {
         foreground.position = playableRect.center
         menuForeground.position = playableRect.center
         
-        [spriteForeground, safeArea, hud, levelGoalView, backpackView].forEach { foreground.addChild($0) }
+        [spriteForeground, safeArea, hud, levelGoalView, backpackView, bossDebugView].forEach { foreground.addChild($0) }
         
         // Register for Dispatch
         Dispatch.shared.register { [weak self] input in
@@ -232,13 +238,16 @@ class Renderer: SKSpriteNode {
                 }
             case let .collectItem(coord, item, _):
                 collectItem(for: trans, amount: item.amount, atCoord: coord, textureName: item.textureName, inputType: inputType)
-//                collectItem(for: trans, inputType: inputType)
+                
             case .decrementDynamites:
-                computeNewBoard(for: transformations)
+                decrementDynamite(in: transformations)
+                
             case .refillEmpty:
                 refillEmptyTiles(with: trans)
+                
             case .shuffleBoard:
                 computeNewBoard(for: trans)
+                
             case .runeReplaced:
                 animationsFinished(endTiles: trans.endTiles)
             case .foundRuneDiscarded:
@@ -275,6 +284,9 @@ class Renderer: SKSpriteNode {
                     animationsFinished(endTiles: trans.endTiles)
                 case .targetAttack:
                     animationsFinished(endTiles: trans.endTiles)
+                case .attack:
+                    showBossAttacks(in: transformations, bossPhase: phase)
+//                    animationsFinished(endTiles: trans.endTiles)
                 case .rests:
                     animationsFinished(endTiles: trans.endTiles)
                 }
@@ -450,8 +462,14 @@ class Renderer: SKSpriteNode {
                     sprite.indicateSpriteWillBeEaten()
                 }
                 
-                if tiles[row][col].bossTargetedToAttack ?? false {
-                    sprite.indicateSpriteWillBeAttacked()
+                if let attackTypes = tiles[row][col].bossTargetedToAttack {
+                    attackTypes.forEach { attackType in
+                        sprite.indicateSpriteWillBeAttacked(by: attackType)
+                    }
+                }
+                
+                if case TileType.dynamite(let fuse) = tiles[row][col].type {
+                    sprite.showFuseTiming(fuse.count)
                 }
             }
         }
@@ -675,6 +693,8 @@ extension Renderer {
 
     }
     
+    //MARK: Compute New Board Logic
+    
     /// Recursive wrapper for chaining animated transformations
     private func computeNewBoard(for transformations: [Transformation]) {
         computeNewBoard(for: transformations.first) { [weak self] in
@@ -701,10 +721,10 @@ extension Renderer {
         }
         
         let spriteNodes = createSprites(from: endTiles)
-        // TODO: don't hardcode this
         guard let removed = transformation.removed,
               let newTiles = transformation.newTiles,
-              let shiftDown = transformation.shiftDown else { preconditionFailure("We need these specific translations to do this.") }
+              let shiftDown = transformation.shiftDown
+        else { preconditionFailure("We need these specific translations to do this.") }
         
         // remove "removed" tiles from sprite storage
         var removedAnimations: [SpriteAction] = []
@@ -769,6 +789,18 @@ extension Renderer {
                     
                 }
 
+            }
+            
+            if case InputType.decrementDynamites? = transformation.inputType {
+                tilesWithGem = []
+                
+                if let crumble = sprites[tileTrans.end.x][tileTrans.end.y].crumble() {
+                    // set the position way in the background so that new nodes come in over
+                    sprites[tileTrans.end.x][tileTrans.end.y].zPosition = Precedence.underground.rawValue
+                    
+                    removedAnimations.append(crumble)
+                }
+                
             }
             
             if let poof = sprites[tileTrans.end.x][tileTrans.end.y].poof(), case InputType.foundRuneDiscarded? = transformation.inputType {
@@ -885,7 +917,65 @@ extension Renderer {
     
 }
 
+//MARK: - Boss logic
 
+extension Renderer {
+    private func showBossAttacks(in transformation: [Transformation], bossPhase: BossPhase) {
+        guard let trans = transformation.first, let endTiles = trans.endTiles else {
+            animationsFinished(endTiles: transformation.first?.endTiles)
+            return
+        }
+        
+        if let dynamiteAttacks = bossPhase.bossState.targets.attack?[.dynamite] {
+            let dynaTypes: [TileType] = tileTypesOf(TileType.dynamite(DynamiteFuse.init(count: 3, hasBeenDecremented: false)), in: endTiles)
+            let targets = positionsInForeground(at: dynamiteAttacks)
+            
+            let targetSprites = dynamiteAttacks.map { [sprites] in sprites[$0] }
+            
+            animator.animateDynamiteAppears(foreground: spriteForeground, tileTypes: dynaTypes, tileSize: tileSize, startingPosition: bossDebugView.center, targetPositions: targets, targetSprites: targetSprites) { [weak self] in
+                self?.animationsFinished(endTiles: transformation.first?.endTiles)
+            }
+                
+        }
+        
+    }
+
+    
+    private func decrementDynamite(in transformations: [Transformation]) {
+        guard let dynamiteTransformation = transformations.first else {
+            preconditionFailure("we need a transformation to be here")
+        }
+        
+        // when we dont explode, then just refresh the sprites and move on
+        guard !(dynamiteTransformation.tileTransformation ?? []).isEmpty else {
+            animationsFinished(endTiles: dynamiteTransformation.endTiles)
+            return
+        }
+        
+        
+        // at this point we should have the dynamite explosion and remove and replace
+        // it would be extremely hard to set up a siutation where the explosion of Dynamite doesnt lead to a remove and replace of some sort- but it is possible
+        guard let dynamiteTileTrans = dynamiteTransformation.tileTransformation,
+              transformations.count == 2,
+              let removeAndReplaceTrans = transformations.last else {
+            animationsFinished(endTiles: dynamiteTransformation.endTiles)
+            return
+//            preconditionFailure("This is hardcoded to work with two transformations. The first for exploding the dynamite and the second for the remove and replace") }
+        }
+        
+        let dynamiteCoords = dynamiteTileTrans.map { $0.initial }
+        
+        let dynamiteSprites = dynamiteCoords.map { [sprites] in sprites[$0.row][$0.column] }
+        
+        animator.animateDynamiteExplosion(dynamiteSprites: dynamiteSprites, foreground: foreground) { [weak self] in
+            self?.computeNewBoard(for: removeAndReplaceTrans)
+        }
+        
+    }
+    
+}
+
+//MARK: - Touch logic
 extension Renderer {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }

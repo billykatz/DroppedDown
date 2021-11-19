@@ -685,7 +685,7 @@ struct Animator {
     
     // MARK: - Boss Animations
     
-    func animateDynamiteAppears(foreground: SKNode, tileTypes: [TileType], tileSize: CGFloat, startingPosition: CGPoint, targetPositions: [CGPoint], targetSprites: [DFTileSpriteNode], completion: @escaping () -> Void) {
+    func animateBossSingleTargetAttack(foreground: SKNode, tileTypes: [TileType], tileSize: CGFloat, startingPosition: CGPoint, targetPositions: [CGPoint], targetSprites: [DFTileSpriteNode], completion: @escaping () -> Void) {
         
         var spriteActions: [SpriteAction] = []
         // create a dynamite stick for each dynamiate

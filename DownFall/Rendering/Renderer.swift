@@ -925,61 +925,56 @@ extension Renderer {
             return
         }
         
-        var dynamiteDone = false
-        var spawnDone = false
-        var poisonDone = false
-        var animationsDone: Bool {
-            return dynamiteDone && spawnDone && poisonDone
+        func animateDyamiate(completion:  @escaping () -> Void) {
+            if let dynamiteAttacks = bossPhase.bossState.targets.attack?[.dynamite] {
+                let dynaTypes: [TileType] = tileTypesOf(TileType.dynamite(DynamiteFuse.init(count: 3, hasBeenDecremented: false)), in: endTiles)
+                let targets = positionsInForeground(at: dynamiteAttacks)
+                
+                let targetSprites = dynamiteAttacks.map { [sprites] in sprites[$0] }
+                
+                animator.animateBossSingleTargetAttack(foreground: spriteForeground, tileTypes: dynaTypes, tileSize: tileSize, startingPosition: bossDebugView.center, targetPositions: targets, targetSprites: targetSprites, completion: completion)
+            } else { completion() }
         }
         
-        if let dynamiteAttacks = bossPhase.bossState.targets.attack?[.dynamite] {
-            let dynaTypes: [TileType] = tileTypesOf(TileType.dynamite(DynamiteFuse.init(count: 3, hasBeenDecremented: false)), in: endTiles)
-            let targets = positionsInForeground(at: dynamiteAttacks)
-            
-            let targetSprites = dynamiteAttacks.map { [sprites] in sprites[$0] }
-            
-            animator.animateDynamiteAppears(foreground: spriteForeground, tileTypes: dynaTypes, tileSize: tileSize, startingPosition: bossDebugView.center, targetPositions: targets, targetSprites: targetSprites) { [weak self] in
-                dynamiteDone = true
-                if animationsDone {
-                    self?.animationsFinished(endTiles: transformation.first?.endTiles)
-                }
-            }
-        } else { dynamiteDone = true }
-        
-        if let spiderAttacks = bossPhase.bossState.targets.attack?[.spawnSpider] {
-            var spiderTypes: [TileType] = []
-            for row in 0..<endTiles.count {
-                for col in 0..<endTiles[row].count {
-                    let coord = TileCoord(row, col)
-                    if spiderAttacks.contains(coord) {
-                        // this is a new spider
-                        spiderTypes.append(endTiles[coord].type)
+        func animateSpawnSpider(completion:  @escaping () -> Void) {
+            if let spiderAttacks = bossPhase.bossState.targets.attack?[.spawnSpider] {
+                var spiderTypes: [TileType] = []
+                for row in 0..<endTiles.count {
+                    for col in 0..<endTiles[row].count {
+                        let coord = TileCoord(row, col)
+                        if spiderAttacks.contains(coord) {
+                            // this is a new spider
+                            spiderTypes.append(endTiles[coord].type)
+                        }
                     }
                 }
-            }
-            let targets = positionsInForeground(at: spiderAttacks)
+                let targets = positionsInForeground(at: spiderAttacks)
+                
+                let targetSprites = spiderAttacks.map { [sprites] in sprites[$0] }
+                
+                animator.animateBossSingleTargetAttack(foreground: spriteForeground, tileTypes: spiderTypes, tileSize: tileSize, startingPosition: bossDebugView.center, targetPositions: targets, targetSprites: targetSprites, completion: completion)
+            } else { completion() }
             
-            let targetSprites = spiderAttacks.map { [sprites] in sprites[$0] }
-            
-            animator.animateDynamiteAppears(foreground: spriteForeground, tileTypes: spiderTypes, tileSize: tileSize, startingPosition: bossDebugView.center, targetPositions: targets, targetSprites: targetSprites) { [weak self] in
-                spawnDone = true
-                if animationsDone {
+        }
+        
+        func animatePoison(completion: @escaping () -> Void) {
+            if let attackedColumns = bossPhase.bossState.poisonAttackColumns,
+               let affectedTiles = trans.tileTransformation {
+                animator.animateBossPoisonAttack(spriteForeground, targetedColumns: attackedColumns, targetedTiles: affectedTiles, sprites: sprites, tileSize: tileSize, completion: completion)
+            } else { completion() }
+        }
+        
+        
+        /// First drop poison
+        animatePoison {
+            /// Then spiders
+            animateSpawnSpider {
+                /// Then dynamites
+                animateDyamiate { [weak self] in
                     self?.animationsFinished(endTiles: transformation.first?.endTiles)
                 }
             }
-
-        } else { spawnDone = true }
-        
-        if let attackedColumns = bossPhase.bossState.poisonAttackColumns,
-           let affectedTiles = trans.tileTransformation {
-            animator.animateBossPoisonAttack(spriteForeground, targetedColumns: attackedColumns, targetedTiles: affectedTiles, sprites: sprites, tileSize: tileSize) { [weak self] in
-                poisonDone = true
-                if animationsDone {
-                    self?.animationsFinished(endTiles: transformation.first?.endTiles)
-                }
-            }
-        } else { poisonDone = true }
-        
+        }
     }
 
     

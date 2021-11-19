@@ -667,7 +667,7 @@ class Board: Equatable {
                     explodedDynamiteCoords.append(coord)
                     removedRocksAndPillars.append(coord)
                     
-                    let affectedNeighbors = coord.allNeighbors
+                    let affectedNeighbors = coord.orthogonalNeighbors
                     for neighborCoord in affectedNeighbors {
                         guard isWithinBounds(neighborCoord) else { continue }
                         switch tiles[neighborCoord].type {
@@ -689,7 +689,7 @@ class Board: Equatable {
                 } else {
                     tiles[coord.row][coord.column] = Tile(type: .dynamite(DynamiteFuse(count: newFuse, hasBeenDecremented: true)))
                     
-                    let affectedNeighbors = coord.allNeighbors
+                    let affectedNeighbors = coord.orthogonalNeighbors
                     for neighborCoord in affectedNeighbors {
                         guard isWithinBounds(neighborCoord) else { continue }
                         switch tiles[neighborCoord].type {

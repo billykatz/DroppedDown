@@ -76,6 +76,24 @@ class RunModel: Codable, Equatable {
         }
     }
     
+    func saveBossPhase(_ phase: BossPhase) {
+        /// update the last area with the goal tracking
+        if let lastArea = areas.last,
+           let lastAreaIndex = areas.lastIndex(of: lastArea),
+           case var AreaType.level(level) = lastArea.type {
+            
+            /// save the goal progress
+            level.savedBossPhase = phase
+            
+            // wrap it in a AreaType
+            let newAreaType = AreaType.level(level)
+            
+            /// replace it with one with saved goal tracking
+            areas[lastAreaIndex] = Area(depth: lastArea.depth, type: newAreaType)
+            
+        }
+    }
+    
     /// Return the level that corresponds with the depth
     /// If that level has not been built yet, then build it, append it to our private level store, and return the newly built level
     func currentArea(updatedPlayerData: EntityModel) -> Area {

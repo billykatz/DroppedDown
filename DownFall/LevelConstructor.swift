@@ -30,6 +30,7 @@ struct LevelConstructor {
                 goals: levelGoal(depth: depth, pillars: pillars, gemAtDepth: gemsAtDepth, randomSource: randomSource, isTutorial: isTutorial),
                 maxSpawnGems: gemsAtDepth,
                 goalProgress: [],
+                savedBossPhase: BossPhase(),
                 potentialItems: potentialItems(depth: depth, unlockables: unlockables, startingUnlockables: startingUnlockables, playerData: playerData, randomSource: randomSource, isTutorial: isTutorial)
             )
     }
@@ -292,10 +293,16 @@ struct LevelConstructor {
                                                         .rock(color: .purple, holdsGem: false, groupCount: 0): 33])
             return chances
         case bossLevelDepthNumber:
-            return TileTypeChanceModel(chances: [
-                                        .rock(color: .red, holdsGem: false, groupCount: 0): 100,
-                                        
-            ])
+            return TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false, groupCount: 0): 33, .rock(color: .blue, holdsGem: false, groupCount: 0): 33, .rock(color: .purple, holdsGem: false, groupCount: 0): 33])
+//            return TileTypeChanceModel(chances: [ .rock(color: .blue, holdsGem: false, groupCount: 0): 100])
+//            return TileTypeChanceModel(chances: [
+//                                        .rock(color: .purple, holdsGem: false, groupCount: 0): 100,
+//
+//            ])
+//            return TileTypeChanceModel(chances: [
+//                                        .rock(color: .red, holdsGem: false, groupCount: 0): 100,
+//
+//            ])
 //            return TileTypeChanceModel(chances: [
 //                                        .rock(color: .red, holdsGem: false, groupCount: 0): 50,
 //                                        .rock(color: .blue, holdsGem: false, groupCount: 0): 50,
@@ -352,8 +359,8 @@ struct LevelConstructor {
         case 7, 8:
             numPillarsBasedOnDepth = 5 + (randomSource.positiveNextInt % 2 == 0 ? -1 : 1)
         case bossLevelDepthNumber:
-            numPillarsBasedOnDepth = 1
-//            return bossPillars()
+//            numPillarsBasedOnDepth = 1
+            return bossPillars()
         case 10...Int.max:
             numPillarsBasedOnDepth = 3 + (randomSource.positiveNextInt % 2 == 0 ? -1 : 1)
         default:

@@ -17,6 +17,10 @@ struct NumberTextures {
 
 struct Animator {
     
+    struct Constants {
+        static let poisonDropSpriteName = "poison-drop"
+        static let poisonDropSpriteSheetName = "poison-drop-sprite-sheet-8"
+    }
     
     lazy var numberTextures: [NumberTextures] = {
         var array: [NumberTextures] = []
@@ -190,6 +194,13 @@ struct Animator {
         default: break
         }
     }
+    
+    public var poisonDropAnimation: SKAction {
+        let posionTexture = SpriteSheet(texture: SKTexture(imageNamed: Constants.poisonDropSpriteSheetName), rows: 1, columns: 8).animationFrames()
+        let poisonAnimation = SKAction.animate(with: posionTexture, timePerFrame: 0.07)
+        return poisonAnimation
+    }
+
     
     
     public func smokeAnimation() -> SKAction {
@@ -674,21 +685,22 @@ struct Animator {
     
     // MARK: - Boss Animations
     
-    /// This should only be called with .dynamite as the tile types passed in
     func animateDynamiteAppears(foreground: SKNode, tileTypes: [TileType], tileSize: CGFloat, startingPosition: CGPoint, targetPositions: [CGPoint], targetSprites: [DFTileSpriteNode], completion: @escaping () -> Void) {
         
         var spriteActions: [SpriteAction] = []
         // create a dynamite stick for each dynamiate
-        var dynamiteSprites: [DFTileSpriteNode] = []
+        var bossAttackSprites: [DFTileSpriteNode] = []
         for tileType in tileTypes {
-            let dynamite = DFTileSpriteNode(type: tileType, height: tileSize, width: tileSize)
-            dynamite.showFuseTiming(tileType.fuseTiming ?? 0)
-            dynamiteSprites.append(dynamite)
+            let attackSprite = DFTileSpriteNode(type: tileType, height: tileSize, width: tileSize)
+            if let fuseTiming = tileType.fuseTiming {
+                attackSprite.showFuseTiming(fuseTiming)
+            }
+            bossAttackSprites.append(attackSprite)
         }
         
         
         // add them to the foreground
-        for sprite in dynamiteSprites {
+        for sprite in bossAttackSprites {
             sprite.position = startingPosition
             sprite.zPosition = 100_000
             foreground.addChild(sprite)
@@ -735,13 +747,13 @@ struct Animator {
 
         }
         
-        guard dynamiteSprites.count == actions.count else {
+        guard bossAttackSprites.count == actions.count else {
             completion();
             return
         }
         
-        for idx in 0..<dynamiteSprites.count {
-            spriteActions.append(.init(dynamiteSprites[idx], actions[idx]))
+        for idx in 0..<bossAttackSprites.count {
+            spriteActions.append(.init(bossAttackSprites[idx], actions[idx]))
         }
         
         
@@ -811,6 +823,52 @@ struct Animator {
         
         animate(spriteActions, completion: completion)
         
+    }
+    
+    func animateBossPoisonAttack(_ spriteForeground: SKNode, targetedColumns: [Int], targetedTiles: [TileTransformation], sprites: [[DFTileSpriteNode]], tileSize: CGFloat, completion: @escaping () -> Void) {
+        var spriteActions: [SpriteAction] = []
+        
+        for column in targetedColumns {
+            
+            // create 1 poison sprite for each column attack
+            let poisonSprite = SKSpriteNode(texture: SKTexture(imageNamed: Constants.poisonDropSpriteName), size: CGSize(width: tileSize, height: tileSize))
+            
+            // position it at the top and center of the attacked column
+            let boardSize = sprites.count
+            let topSpriteInColumn = sprites[boardSize-1][column]
+            let poisonSpritePosition = CGPoint.alignHorizontally(poisonSprite.frame, relativeTo: topSpriteInColumn.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: Style.Padding.normal, translatedToBounds: true)
+            poisonSprite.position = poisonSpritePosition
+            poisonSprite.zPosition = 1_000
+            
+            // add to the sprite foreground which will auto remove it after animations are finishied
+            spriteForeground.addChild(poisonSprite)
+            
+            // animate it dripping down the column
+            // grab the bottom row in the atttacked column
+            if let finalRowAttacked = targetedTiles.filter({ $0.initial.column == column }).sorted(by: { $0.initial.row < $1.initial.row }).first?.initial {
+                
+                // calculate the target sprite
+                let targetSprite = sprites[finalRowAttacked]
+                let targetPosition = CGPoint.alignVertically(poisonSprite.frame, relativeTo: targetSprite.frame, horizontalAnchor: .center, verticalAlign: .bottom, translatedToBounds: true)
+                
+                
+                let distance = targetPosition - poisonSprite.position
+                let speed: Double = 1000
+                
+                // the poison should move at the same speed regardless of the distance to the target
+                let duration = Double(distance.length) / speed
+                
+                let moveAction = SKAction.move(to: targetPosition, duration: duration)
+                
+                // after passing the final tile, then you in the splash zone
+                let splashAnimation = self.poisonDropAnimation
+                let sequence = SKAction.sequence([moveAction, splashAnimation, .removeFromParent()])
+                
+                spriteActions.append(.init(poisonSprite, sequence))
+            }
+        }
+        
+        animate(spriteActions, completion: completion)
     }
     
     // MARK: - Goal Completion

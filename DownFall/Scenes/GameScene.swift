@@ -238,18 +238,19 @@ class GameScene: SKScene {
     }
     
     // public function that exposes all the data necessary to save the exact game state
-    public func saveAllState() -> (EntityModel, [GoalTracking], [[Tile]], [Statistics])? {
+    public func saveAllState() -> (EntityModel, [GoalTracking], [[Tile]], [Statistics], BossPhase)? {
         guard let board = self.board,
               let playerIndex = tileIndices(of: .player(.zero), in: board.tiles).first,
               case let TileType.player(data) = board.tiles[playerIndex].type,
               let levelGoalTracking = self.levelGoalTracker?.goalProgress,
-              let stats = self.runStatTracker?.runStats
+              let stats = self.runStatTracker?.runStats,
+              let bossPhase = bossController?.phase
               else {
             GameLogger.shared.log(prefix: Constants.tag, message: "Failure to gather all information to save the game")
             return nil
         }
         
-        return (data, levelGoalTracking, board.tiles, stats)
+        return (data, levelGoalTracking, board.tiles, stats, bossPhase)
     }
 }
 

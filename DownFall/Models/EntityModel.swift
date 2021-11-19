@@ -45,6 +45,7 @@ struct EntityModel: Equatable, Codable {
         case lavaHorse
         case player
         case sally
+        case spider
         
         var humanReadable: String {
             switch self {
@@ -60,6 +61,8 @@ struct EntityModel: Equatable, Codable {
                 return "Sally the Salamander"
             case .player:
                 return "Player"
+            case .spider:
+                return "Spider Minion"
             default:
                 return self.rawValue
             }

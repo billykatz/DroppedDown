@@ -34,7 +34,19 @@ struct BossState: Codable, Hashable {
     let turnsLeftInState: Int
     var targets: BossTargets
     
-    func advance(tiles: [[Tile]], turnsInState: Int) -> BossState {
+    public var poisonAttackColumns: [Int]? {
+        let thingsToAttack = targets.whatToAttack ?? targets.attack ?? nil
+        guard let attacks = thingsToAttack, let poisonTargets = attacks[.poison] else { return nil }
+        
+        var poisonColumns = Set<Int>()
+        for target in poisonTargets {
+            poisonColumns.insert(target.column)
+        }
+        return Array(poisonColumns)
+        
+    }
+    
+    func advance(tiles: [[Tile]], turnsInState: Int, nummberOfRocksToEat: Int) -> BossState {
         if turnsLeftInState <= 0 {
             let nextStateType = nextStateType()
             var nextBossState = BossState(
@@ -42,7 +54,7 @@ struct BossState: Codable, Hashable {
                 turnsLeftInState: turnsInState,
                 targets: BossTargets()
             )
-            nextBossState.enter(tiles: tiles, oldState: self)
+            nextBossState.enter(tiles: tiles, oldState: self, numberOfRocksToEat: nummberOfRocksToEat)
             return nextBossState
         } else {
             return BossState(
@@ -56,10 +68,10 @@ struct BossState: Codable, Hashable {
     
     // This function is called when we enter a new boss state
     // It is primarily responsible for initializing the BossTargets
-    mutating func enter(tiles: [[Tile]], oldState: BossState) {
+    mutating func enter(tiles: [[Tile]], oldState: BossState, numberOfRocksToEat: Int) {
         switch self.stateType {
         case .targetEat:
-            self.targets = BossTargets(whatToEat: targetsToEat(in: tiles), eats: nil)
+            self.targets = BossTargets(whatToEat: targetsToEat(in: tiles, numberOfRocksToEat: numberOfRocksToEat), eats: nil)
         case .eats:
             let eatenRockCoords = eats(in: tiles)
             let whatToAttack = attack(basedOnRocks: eatenRockCoords, in: tiles)
@@ -105,8 +117,8 @@ struct BossState: Codable, Hashable {
         }
     }
     
-    private func targetsToEat(in tiles: [[Tile]]) -> [TileCoord] {
-        return targetRocksToEat(in: tiles, numberRocksToEat: 3)
+    private func targetsToEat(in tiles: [[Tile]], numberOfRocksToEat: Int) -> [TileCoord] {
+        return targetRocksToEat(in: tiles, numberRocksToEat: numberOfRocksToEat)
     }
     
     private func targetsToAttack(in tiles: [[Tile]], with attacks: [BossAttackType]?) -> [BossAttackType: [TileCoord]] {
@@ -114,6 +126,8 @@ struct BossState: Codable, Hashable {
         return attacked(tiles: tiles, by: attacks)
         
     }
+    
+    
     
     
 }
@@ -145,13 +159,22 @@ struct BossPhase: Codable, Hashable {
         let nextStateTurns = turnsInState(bossState.nextStateType())
         
         // this sets the next state's number of turns.  If the state doesnt advnace then it is ignored
-        let nextBossState = bossState.advance(tiles: tiles, turnsInState: nextStateTurns)
+        let nextBossState = bossState.advance(tiles: tiles, turnsInState: nextStateTurns, nummberOfRocksToEat: rocksToEat)
         let sendInput = nextBossState.stateType != oldBossState.stateType
         
         // next boss phase might happen
         let nextBossPhase = nextPhase(tiles: tiles)
         
         return (BossPhase(bossState: nextBossState, bossPhaseType: nextBossPhase), sendInput)
+    }
+    
+    var rocksToEat: Int {
+        switch bossPhaseType {
+        case .first: return 3
+        case .second: return 4
+        case .third: return 6
+        case .dead: return 0
+        }
     }
     
     func nextPhase(tiles: [[Tile]]) -> BossPhaseType {
@@ -198,7 +221,7 @@ class BossController {
     
     init(level: Level) {
         
-        self.phase = BossPhase()
+        self.phase = level.savedBossPhase ?? BossPhase()
         self.level = level
         // only listen for inputs if this is the boss level
         guard isBossLevel else { return }
@@ -229,6 +252,10 @@ class BossController {
         if (shouldSendInput) {
             InputQueue.append(Input(.bossTurnStart(newPhase)))
         }
+    }
+    
+    public func saveState() -> BossPhase {
+        return phase
     }
 }
 
@@ -437,7 +464,7 @@ private func turnsInState(_ state: BossStateType) -> Int {
     case .targetEat:
         return 1
     case .eats:
-        return 1
+        return 0
     case .targetAttack:
         return 0
     case .attack:

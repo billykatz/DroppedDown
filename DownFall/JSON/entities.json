@@ -344,6 +344,35 @@
             "effects": [],
             "dodge": 0,
             "luck": 0
+        },
+        { "name": "spider-minion",
+            "type": "spider",
+            "originalHp": 1,
+            "hp": 1,
+            "attack": {
+                "type": "targets",
+                "frequency" : 3,
+                "damage": 1,
+                "range": {
+                    "lower": 1,
+                    "upper": 1
+                },
+                "attacksPerTurn": 1,
+                "attackSlope": [
+                    {
+                        "over": 0,
+                        "up": -1
+                    }
+                ]
+            },
+            "animations": [],
+            "carry": {
+                "items": []
+            },
+            "abilities": [],
+            "effects": [],
+            "dodge": 0,
+            "luck": 0
         }
     ]
 }

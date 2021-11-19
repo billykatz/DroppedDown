@@ -160,13 +160,14 @@ class LevelCoordinator: LevelCoordinating {
     // MARK: Saving game state
     
     func saveAllState() -> RunModel {
-        guard let (data, goalTracking, tiles, updatedStats) = self.gameSceneNode?.saveAllState() else {
+        guard let (data, goalTracking, tiles, updatedStats, bossPhase) = self.gameSceneNode?.saveAllState() else {
             GameLogger.shared.log(prefix: Constants.tag, message: "Unable to save all state")
             return self.runModel
         }
         
         runModel.stats = updatedStats
         runModel.saveGoalTracking(goalTracking)
+        runModel.saveBossPhase(bossPhase)
         runModel.player = data
         runModel = saveTiles(tiles)
         

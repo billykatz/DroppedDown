@@ -1,17 +1,15 @@
 {
   "images" : [
     {
-      "filename" : "green reticle.png",
+      "filename" : "poison-drop-sprite-sheet.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "green reticle@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "green reticle@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

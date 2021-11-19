@@ -19,7 +19,6 @@ struct Profile: Codable, Equatable {
     var randomRune: Rune?
     let stats: [Statistics]
     let unlockables: [Unlockable]
-    
     let startingUnlockbles: [Unlockable]
     
     

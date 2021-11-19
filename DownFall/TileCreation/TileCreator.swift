@@ -9,6 +9,8 @@
 import GameplayKit
 
 class TileCreator: TileStrategy {
+
+    
     
     static let tutorialBoard: [[Tile]] =
     [
@@ -89,6 +91,13 @@ class TileCreator: TileStrategy {
         default:
             preconditionFailure("Shouldnt be here")
         }
+    }
+
+    func monsterWithType(_ type: EntityModel.EntityType) -> Tile? {
+        if let data = entities.entity(with: type) {
+            return Tile(type: TileType.monster(data))
+        }
+        return nil
     }
     
     func randomMonster() -> TileType {

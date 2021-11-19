@@ -17,6 +17,7 @@ protocol TileStrategy {
     
     func tiles(for tiles: [[Tile]], forceMonster: Bool) -> [[Tile]]
     func board(difficulty: Difficulty) -> ([[Tile]], newLevel: Bool)
+    func monsterWithType(_ type: EntityModel.EntityType) -> Tile?
     func randomMonster() -> TileType
     func randomMonster(not: EntityModel.EntityType) -> Tile
     func shuffle(tiles: [[Tile]]) -> [[Tile]]

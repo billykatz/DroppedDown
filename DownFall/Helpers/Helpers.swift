@@ -46,6 +46,15 @@ func isWithinBounds(_ tileCoord: TileCoord, within tiles: [[Tile]]?) -> Bool {
         tileCol < tiles.count
 }
 
+func isWithinBounds(_ tileCoord: TileCoord, within boardSize: Int) -> Bool {
+    let (tileRow, tileCol) = tileCoord.tuple
+    return tileRow >= 0 && //lower bound
+        tileCol >= 0 && // lower bound
+        tileRow < boardSize && // upper bound
+        tileCol < boardSize
+}
+
+
 func playerData(in tiles: [[Tile]]) -> EntityModel? {
     for (i, _) in tiles.enumerated() {
         for (j, _) in tiles[i].enumerated() {

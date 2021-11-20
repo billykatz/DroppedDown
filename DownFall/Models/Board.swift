@@ -343,7 +343,7 @@ class Board: Equatable {
                 coords.forEach { coord in
                     if attackType == .dynamite {
                         tiles[coord.row][coord.column] = Tile(type: .dynamite(.init(count: 3+count, hasBeenDecremented: false)))
-                        count += 1
+//                        count += 1
                     } else if attackType == .spawnSpider, let tile = tileCreator.monsterWithType(.spider) {
                         tiles[coord.row][coord.column] = tile
                     }
@@ -698,6 +698,7 @@ class Board: Equatable {
                                 // my neighbor exploded so I should explode.
                                 tiles[coord.row][coord.column] = Tile(type: .dynamite(DynamiteFuse(count: 0, hasBeenDecremented: true)))
                                 removedRocksAndPillars.append(coord)
+                                explodedDynamiteCoords.append(coord)
                             }
                         default:
                             break

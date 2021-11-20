@@ -760,10 +760,10 @@ struct Animator {
         animate(spriteActions, completion: completion)
     }
     
-    func animateDynamiteExplosion(dynamiteSprites: [DFTileSpriteNode], foreground: SKNode, completion: @escaping () -> Void) {
+    func animateDynamiteExplosion(dynamiteSprites: [DFTileSpriteNode], dynamiteCoords: [TileCoord], foreground: SKNode, boardSize: Int, positionInForeground: (TileCoord) -> CGPoint, completion: @escaping () -> Void) {
         var spriteActions: [SpriteAction] = []
         
-        for dynamite in dynamiteSprites {
+        for (idx, dynamite) in dynamiteSprites.enumerated() {
             // create and add an empty sprite to hold all the exploding animations
             let dynamiteEmptySprite = SKSpriteNode(color: .clear, size: dynamite.size)
             dynamiteEmptySprite.position = dynamite.position
@@ -789,13 +789,12 @@ struct Animator {
             spriteActions.append(.init(dynamite, dynamiteAllAction))
             
             /// create a bunch of explosions
-            for _ in 0..<7 {
+            let neighbors = dynamiteCoords[idx].orthogonalNeighbors.filter { isWithinBounds($0, within: boardSize) }
+            
+            for neighbor in neighbors {
                 // create and randomly position sprite
                 let emptySprite = SKSpriteNode(color: .clear, size: dynamite.size)
-                let offsetRange: ClosedRange<CGFloat> = -100...100
-                let xOffset = CGFloat.random(in: offsetRange)
-                let yOffset = CGFloat.random(in: offsetRange)
-                emptySprite.position = CGPoint.position(emptySprite.frame, inside: dynamite.frame, verticalAlign: .center, horizontalAnchor: .center, xOffset: xOffset, yOffset: yOffset)
+                emptySprite.position = positionInForeground(neighbor)
                 
                 // create the animation
                 let explosionAnimation = explodeAnimation(size: emptySprite.size.scale(by: 1.5))
@@ -807,16 +806,16 @@ struct Animator {
                 let explodeAndScale = SKAction.group([explosionAnimation, scaleAction])
                 explodeAndScale.timingMode = .easeIn
                 
-                let waitDuration = Double.random(in: dynamiteWaitDuration...0.75)
-                let randomWaitDuration = SKAction.wait(forDuration: waitDuration)
+//                let waitDuration = Double.random(in: dynamiteWaitDuration...0.75)
+//                let randomWaitDuration = SKAction.wait(forDuration: waitDuration)
                 
-                let allAction = SKAction.sequence([randomWaitDuration, explodeAndScale, smokeAndFade, .removeFromParent()])
+                let allAction = SKAction.sequence([explodeAndScale, smokeAndFade, .removeFromParent()])
                 
                 spriteActions.append(SpriteAction(emptySprite, allAction))
                 
                 /// the later the eplxosions should be on top of the earlier ones
-                emptySprite.zPosition = CGFloat(100) + CGFloat(10 * waitDuration)
-                dynamiteEmptySprite.addChild(emptySprite)
+//                emptySprite.zPosition = CGFloat(100) + CGFloat(10 * waitDuration)
+                foreground.addChild(emptySprite)
                 
             }
         }
@@ -863,6 +862,12 @@ struct Animator {
                 // after passing the final tile, then you in the splash zone
                 let splashAnimation = self.poisonDropAnimation
                 let sequence = SKAction.sequence([moveAction, splashAnimation, .removeFromParent()])
+                
+                spriteActions.append(.init(poisonSprite, sequence))
+            } else {
+                // after passing the final tile, then you in the splash zone
+                let splashAnimation = self.poisonDropAnimation
+                let sequence = SKAction.sequence([splashAnimation, .removeFromParent()])
                 
                 spriteActions.append(.init(poisonSprite, sequence))
             }

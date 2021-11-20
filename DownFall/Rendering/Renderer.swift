@@ -1004,7 +1004,12 @@ extension Renderer {
         
         let dynamiteSprites = dynamiteCoords.map { [sprites] in sprites[$0.row][$0.column] }
         
-        animator.animateDynamiteExplosion(dynamiteSprites: dynamiteSprites, foreground: foreground) { [weak self] in
+        animator.animateDynamiteExplosion(dynamiteSprites: dynamiteSprites, dynamiteCoords: dynamiteCoords, foreground: foreground, boardSize: level.boardSize,
+                                          positionInForeground: {
+                                            [weak self] in
+                                            guard let self = self else { return .zero }
+                                            return self.positionInForeground(at: $0)
+        }) { [weak self] in
             self?.computeNewBoard(for: removeAndReplaceTrans)
         }
         

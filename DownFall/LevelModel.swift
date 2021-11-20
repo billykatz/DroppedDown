@@ -78,6 +78,10 @@ struct Level: Codable, Hashable {
     var humanReadableDepth: String {
         return "\(depth + 1)"
     }
+    
+    var numberOfIndividualColumns: Int {
+        return 3*pillarCoordinates.count
+    }
         
     static let zero = Level(depth: 0, monsterTypeRatio: [:], monsterCountStart: 0, maxMonsterOnBoardRatio: 0.0, boardSize: 0, tileTypeChances: TileTypeChanceModel(chances: [.empty: 1]), pillarCoordinates: [], goals: [LevelGoal(type: .unlockExit, tileType: .empty, targetAmount: 0, minimumGroupSize: 0, grouped: false)], maxSpawnGems: 0, goalProgress: [], savedBossPhase: nil, potentialItems: [])
 }

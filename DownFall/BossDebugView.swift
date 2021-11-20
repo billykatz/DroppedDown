@@ -24,6 +24,15 @@ class BossDebugView: SKSpriteNode {
         containerView.zPosition = 100_000_000_000
         containerView.position = CGPoint.position(containerView.frame, inside: playableRect, verticalAlign: .top, horizontalAnchor: .center, yOffset: 275)
         
+        
+        // Testing the spider art
+//        let ratio = CGFloat(78.0 / 51.0)
+//        let width = playableRect.width * 0.85
+//        let height = width / ratio
+//        let spiderSprite = SKSpriteNode(texture: SKTexture(imageNamed: "boss-spider"), size: CGSize(width: width, height: height))
+//        spiderSprite.position = CGPoint.position(spiderSprite.frame, inside: containerView.frame, verticalAlign: .center, horizontalAnchor: .center)
+//        containerView.addChild(spiderSprite)
+        
         self.isUserInteractionEnabled = false
         
         Dispatch.shared.register { [weak self] input in

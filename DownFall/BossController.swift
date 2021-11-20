@@ -142,15 +142,17 @@ enum BossPhaseType: String, Codable {
 struct BossPhase: Codable, Hashable {
     private(set) var bossState: BossState
     public let bossPhaseType: BossPhaseType
+    private let numberOfIndividualColumns: Double
     
-    public init() {
+    public init(numberOfColumns: Int = 0) {
         let initialState = BossState(stateType: .rests, turnsLeftInState: turnsInState(.rests), targets: BossTargets())
-        self.init(bossState: initialState, bossPhaseType: .first)
+        self.init(bossState: initialState, bossPhaseType: .first, numberColumns: numberOfColumns)
     }
     
-    private init(bossState: BossState, bossPhaseType: BossPhaseType) {
+    private init(bossState: BossState, bossPhaseType: BossPhaseType, numberColumns: Int) {
         self.bossState = bossState
         self.bossPhaseType = bossPhaseType
+        self.numberOfIndividualColumns = Double(numberColumns)
     }
     
     
@@ -165,13 +167,13 @@ struct BossPhase: Codable, Hashable {
         // next boss phase might happen
         let nextBossPhase = nextPhase(tiles: tiles)
         
-        return (BossPhase(bossState: nextBossState, bossPhaseType: nextBossPhase), sendInput)
+        return (BossPhase(bossState: nextBossState, bossPhaseType: nextBossPhase, numberColumns: Int(numberOfIndividualColumns)), sendInput)
     }
     
     var rocksToEat: Int {
         switch bossPhaseType {
-        case .first: return 3
-        case .second: return 4
+        case .first: return 5 // return 3
+        case .second: return 5 // return 4
         case .third: return 6
         case .dead: return 0
         }
@@ -181,14 +183,14 @@ struct BossPhase: Codable, Hashable {
         switch bossPhaseType {
         case .first:
             let healthLeft = pillarHealthCount(for: tiles)
-            if healthLeft <= 18 {
+            if Double(healthLeft) <= numberOfIndividualColumns*0.66 {
                 return .second
             } else {
                 return .first
             }
         case .second:
             let healthLeft = pillarHealthCount(for: tiles)
-            if healthLeft <= 9 {
+            if Double(healthLeft) <= numberOfIndividualColumns*0.33 {
                 return .third
             } else {
                 return .second
@@ -221,7 +223,7 @@ class BossController {
     
     init(level: Level) {
         
-        self.phase = level.savedBossPhase ?? BossPhase()
+        self.phase = level.savedBossPhase ?? BossPhase(numberOfColumns: level.numberOfIndividualColumns)
         self.level = level
         // only listen for inputs if this is the boss level
         guard isBossLevel else { return }
@@ -449,14 +451,13 @@ private func newTarget(in tiles: [[Tile]], nearby: TileCoord, nonAttackableCoord
     var orthogonal = Array(nearby.orthogonalNeighbors).shuffled()
     let diagonal = Array(nearby.diagonalNeighbors).shuffled()
     orthogonal.append(contentsOf: diagonal)
-    var newTarget: TileCoord?
     for neighbor in orthogonal {
         guard isWithinBounds(neighbor, within: tiles) else { continue }
         if !nonAttackableCoords.contains(neighbor) {
-            newTarget = neighbor
+            return neighbor
         }
     }
-    return newTarget
+    return nil
 }
 
 private func turnsInState(_ state: BossStateType) -> Int {

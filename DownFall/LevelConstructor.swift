@@ -383,13 +383,69 @@ struct LevelConstructor {
     }
     
     static func bossPillars() -> [PillarCoorindates] {
-        var pillarColors: [ShiftShaft_Color] = [.blue, .blue, .blue, .purple, .purple, .purple, .red, .red, .red]
-        var coords: [TileCoord] = [
+        let pillarColors: [ShiftShaft_Color] = [.blue, .blue, .blue, .purple, .purple, .purple, .red, .red, .red]
+        let coords: [TileCoord] = [
             TileCoord(3, 3), TileCoord(4, 3), TileCoord(5, 3),
             TileCoord(3, 4), TileCoord(4, 4), TileCoord(5, 4),
             TileCoord(3, 5), TileCoord(4, 5), TileCoord(5, 5)
         ]
         
+        let pillarColorsChoice2: [ShiftShaft_Color] = [.blue, .blue, .blue, .blue, .purple, .purple, .purple, .purple, .red, .red, .red, .red]
+        let coordsChoice2: [TileCoord] = [
+            TileCoord(0, 1), TileCoord(0, 0), TileCoord(1, 1),
+            TileCoord(7, 0), TileCoord(8, 0), TileCoord(8, 1),
+            TileCoord(8, 7), TileCoord(8, 8), TileCoord(7, 8),
+            TileCoord(0, 8), TileCoord(0, 7), TileCoord(1, 8)
+        ]
+        
+        let pillarColorsChoice3: [ShiftShaft_Color] = [.blue, .blue, .blue, .blue, .blue, .blue, .purple, .purple, .purple, .purple, .purple, .red, .red, .red, .red, .red]
+        let coordsChoice3: [TileCoord] =    [
+            TileCoord(6,2),
+            TileCoord(5,2),
+            TileCoord(4,2),
+            TileCoord(3,2),
+            TileCoord(5,3),
+            TileCoord(4,3),
+            TileCoord(3,3),
+            TileCoord(2,3),
+            TileCoord(5,5),
+            TileCoord(4,5),
+            TileCoord(3,5),
+            TileCoord(2,5),
+            TileCoord(6,6),
+            TileCoord(5,6),
+            TileCoord(4,6),
+            TileCoord(3,6),
+        ]
+        
+        let pillarColorsChoice4: [ShiftShaft_Color] = [.blue, .blue, .blue, .blue, .purple, .purple, .purple, .purple, .purple, .red, .red, .red, .red, .red]
+        let coordsChoice4: [TileCoord] =    [
+            TileCoord(5,2),
+            TileCoord(4,2),
+            TileCoord(7,3),
+            TileCoord(6,3),
+            TileCoord(5,3),
+            TileCoord(4,3),
+            TileCoord(7,4),
+            TileCoord(6,4),
+            TileCoord(7,5),
+            TileCoord(6,5),
+            TileCoord(5,5),
+            TileCoord(4,5),
+            TileCoord(5,6),
+            TileCoord(4,6),
+        ]
+
+        let chosenColors = [pillarColors, pillarColorsChoice2, pillarColorsChoice3, pillarColorsChoice4]
+        let chosenCoords = [coords, coordsChoice2, coordsChoice3, coordsChoice4]
+        let randomIdx = Int.random(chosenColors.count)
+        
+        return matchupPillarsRandomly(colors: chosenColors[randomIdx], coordinatess: chosenCoords[randomIdx])
+    }
+    
+    static func matchupPillarsRandomly(colors:[ShiftShaft_Color], coordinatess: [TileCoord]) -> [PillarCoorindates] {
+        var pillarColors = colors
+        var coords = coordinatess
         precondition(pillarColors.count == coords.count, "Pillar colors and coord must be equal")
         let originalColorCount = pillarColors.count
         var pillarCoordinates: [PillarCoorindates] = []

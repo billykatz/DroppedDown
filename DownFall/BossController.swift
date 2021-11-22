@@ -242,14 +242,14 @@ struct BossPhase: Codable, Hashable {
         switch bossPhaseType {
         case .first:
             let healthLeft = pillarHealthCount(for: tiles)
-            if Double(healthLeft) <= numberOfIndividualColumns*0.95 {
+            if Double(healthLeft) <= numberOfIndividualColumns*0.66 {
                 return .second
             } else {
                 return .first
             }
         case .second:
             let healthLeft = pillarHealthCount(for: tiles)
-            if Double(healthLeft) <= numberOfIndividualColumns*0.85 {
+            if Double(healthLeft) <= numberOfIndividualColumns*0.40 {
                 return .third
             } else {
                 return .second

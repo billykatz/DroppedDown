@@ -38,7 +38,11 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
     var precedence: Precedence
     var level: Level?
     var containerView: SKSpriteNode?
+    var menuType: MenuType?
     weak var buttonDelegate: ButtonDelegate?
+    
+    
+    let overlaySpriteName = "overlaySpriteName"
     
     struct Constants {
         static let soundIconName = "soundSprite"
@@ -63,6 +67,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
         self.precedence = precedence
         self.level = level
         self.buttonDelegate = buttonDelegate
+        self.menuType = menuType
         
         
         super.init(texture: nil,
@@ -115,6 +120,8 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             child.run(appearGrowShrink)
         }
         
+        addOverlay()
+        
         containerView?.run(appearGrowShrink)
         
     }
@@ -127,10 +134,15 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
         if let container = containerView {
             spriteActions.append(SpriteAction(sprite: container, action: fadeOut))
         }
+        
+        if let overlay = self.childNode(withName: "overlaySpriteName") as? SKSpriteNode {
+            spriteActions.append(.init(sprite: overlay, action: fadeOut))
+        }
+        
         Animator().animate(spriteActions, completion: completion)
         
     }
-
+    
     
     private func setupButtons(_ menuType: MenuType, _ playableRect: CGRect, precedence: Precedence, level: Level?, completedGoals: Int = 0, buttonDelegate: ButtonDelegate? = nil) {
         let menuSizeWidth = playableRect.size.width * menuType.widthCoefficient
@@ -153,7 +165,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
                 titleText = "Bravo"
                 bodyText = "Please send a screenshot to me and I'll give you a gift. \(UUID())"
             }
-
+            
             
             
             let titleNode = ParagraphNode.labelNode(text: titleText, paragraphWidth: menuSizeWidth * 0.95,
@@ -215,15 +227,15 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             
             
             let options = ShiftShaft_Button(size: buttonSize,
-                                                delegate: buttonDelegate ?? self,
-                                                identifier: .gameMenuOptions,
-                                                precedence: precedence,
-                                                fontSize: .fontLargeSize,
-                                                fontColor: .black,
-                                                backgroundColor: .buttonGray)
+                                            delegate: buttonDelegate ?? self,
+                                            identifier: .gameMenuOptions,
+                                            precedence: precedence,
+                                            fontSize: .fontLargeSize,
+                                            fontColor: .black,
+                                            backgroundColor: .buttonGray)
             options.position = CGPoint.alignHorizontally(options.frame, relativeTo: resumeButton.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: Style.Padding.more * 2, translatedToBounds: true)
             containerView?.addChild(options)
-
+            
             
             let mainMenuButton = ShiftShaft_Button(size: buttonSize,
                                                    delegate: buttonDelegate ?? self,
@@ -269,12 +281,12 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             containerView?.addChild(resumeButton)
             
             let optionsButton = ShiftShaft_Button(size: buttonSize,
-                                                delegate: buttonDelegate ?? self,
-                                                identifier: .tutorialMenuOptions,
-                                                precedence: precedence,
-                                                fontSize: .fontLargeSize,
-                                                fontColor: .black,
-                                                backgroundColor: .buttonGray)
+                                                  delegate: buttonDelegate ?? self,
+                                                  identifier: .tutorialMenuOptions,
+                                                  precedence: precedence,
+                                                  fontSize: .fontLargeSize,
+                                                  fontColor: .black,
+                                                  backgroundColor: .buttonGray)
             optionsButton.position = CGPoint.alignHorizontally(optionsButton.frame, relativeTo: resumeButton.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: Style.Padding.more * 2, translatedToBounds: true)
             containerView?.addChild(optionsButton)
             
@@ -305,15 +317,15 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             body1Node.position = CGPoint.alignHorizontally(body1Node.frame, relativeTo: titleNode.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.most, translatedToBounds: true)
             
             
-//            let body2Text = "You made it to depth level \(level?.humanReadableDepth ?? "0")."
-//            let body2Node = ParagraphNode.labelNode(text: body2Text, paragraphWidth: menuSizeWidth * 0.90,
-//                                                    fontSize: .fontMediumSize, textAlignment: .center)
-//
-//            body2Node.position = CGPoint.alignHorizontally(body2Node.frame, relativeTo: body1Node.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.normal, translatedToBounds: true)
+            //            let body2Text = "You made it to depth level \(level?.humanReadableDepth ?? "0")."
+            //            let body2Node = ParagraphNode.labelNode(text: body2Text, paragraphWidth: menuSizeWidth * 0.90,
+            //                                                    fontSize: .fontMediumSize, textAlignment: .center)
+            //
+            //            body2Node.position = CGPoint.alignHorizontally(body2Node.frame, relativeTo: body1Node.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.normal, translatedToBounds: true)
             
             containerView?.addChild(titleNode)
             containerView?.addChild(body1Node)
-//            containerView?.addChild(body2Node)
+            //            containerView?.addChild(body2Node)
             
             
             let mainMenuButton = ShiftShaft_Button(size: buttonSize,
@@ -424,7 +436,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             
             
         }
-
+        
         else if menuType == .tutorialConfirmation {
             let titleText = "Abandon Tutorial?"
             let titleNode = ParagraphNode.labelNode(text: titleText, paragraphWidth: menuSizeWidth * 0.90,
@@ -442,12 +454,12 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             
             let body2Text = "You will lose all progress but keep any gems you earned."
             let body2Node = ParagraphNode.labelNode(text: body2Text, paragraphWidth: menuSizeWidth * 0.90,
-                                                   fontSize: .fontMediumSize, textAlignment: .center)
+                                                    fontSize: .fontMediumSize, textAlignment: .center)
             
             body2Node.position = CGPoint.alignHorizontally(body2Node.frame, relativeTo: bodyNode.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.most, translatedToBounds: true)
             
             body2Node.zPosition = precedence.rawValue
-
+            
             
             containerView?.addChild(titleNode)
             containerView?.addChild(bodyNode)
@@ -576,12 +588,12 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             ///
             let backButtonIdentifier: ButtonIdentifier = menuType == .options ? .soundOptionsBack : .tutorialSoundOptionsBack
             let backButton = ShiftShaft_Button(size: buttonSize,
-                                                   delegate: buttonDelegate ?? self,
-                                                   identifier: backButtonIdentifier,
-                                                   precedence: precedence,
-                                                   fontSize: .fontLargeSize,
-                                                   fontColor: .black,
-                                                   backgroundColor: .buttonGray)
+                                               delegate: buttonDelegate ?? self,
+                                               identifier: backButtonIdentifier,
+                                               precedence: precedence,
+                                               fontSize: .fontLargeSize,
+                                               fontColor: .black,
+                                               backgroundColor: .buttonGray)
             backButton.position = CGPoint.position(backButton.frame, inside: containerFrame, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: Style.Padding.most * 2)
             containerView?.addChild(backButton)
             
@@ -620,15 +632,15 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             musicIcon.position = CGPoint.alignVertically(musicIcon.frame, relativeTo: musicButton.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: Style.Padding.most, translatedToBounds: true)
             
             containerView?.addChild(musicIcon)
-
+            
             
             let rockGroupAmountButton = ShiftShaft_Button(size: buttonSize,
-                                                delegate: buttonDelegate ?? self,
-                                                identifier: .toggleShowGroupNumber,
-                                                precedence: precedence,
-                                                fontSize: .fontLargeSize,
-                                                fontColor: .black,
-                                                backgroundColor: .buttonGray)
+                                                          delegate: buttonDelegate ?? self,
+                                                          identifier: .toggleShowGroupNumber,
+                                                          precedence: precedence,
+                                                          fontSize: .fontLargeSize,
+                                                          fontColor: .black,
+                                                          backgroundColor: .buttonGray)
             rockGroupAmountButton.position = CGPoint.alignHorizontally(rockGroupAmountButton.frame, relativeTo: musicButton.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: Style.Padding.more * 2, translatedToBounds: true)
             containerView?.addChild(rockGroupAmountButton)
             
@@ -637,7 +649,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             toggleRockAmountIcon.name = Constants.toggleIconName
             toggleRockAmountIcon.position = CGPoint.alignVertically(toggleRockAmountIcon.frame, relativeTo: rockGroupAmountButton.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: Style.Padding.most, translatedToBounds: true)
             containerView?.addChild(toggleRockAmountIcon)
-
+            
         }
         
         
@@ -645,13 +657,20 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             child.zPosition = 100_000_000_000
         }
         
+        addOverlay()
+        
+    }
+    
+    
+    func addOverlay() {
+        self.removeChild(with: overlaySpriteName)
         // set up the background overlay
-        let overlay = SKShapeNode(rect: playableRect)
-        overlay.color = .black
+        let overlay = SKSpriteNode(color: .black, size: CGSize(width: 5000, height: 5000))
         overlay.alpha = 0.50
-        overlay.zPosition = -1
-        overlay.name = "overlaySpriteName"
+        overlay.zPosition = -100
+        overlay.name = overlaySpriteName
         self.addChild(overlay)
+        
     }
     
     func buttonPressBegan(_ button: ShiftShaft_Button) { }
@@ -673,13 +692,13 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             fadeOut {
                 InputQueue.append(Input(.visitStore))
             }
-
+            
             
         case .mainMenu:
             fadeOut {
                 InputQueue.append(Input(.playAgain))
             }
-
+            
             
         case .pausedExitToMainMenu:
             setup(.confirmation, playableRect: self.playableRect, precedence: self.precedence, level: self.level, buttonDelegate: self.buttonDelegate)
@@ -691,8 +710,8 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             fadeOut {
                 InputQueue.append(Input(.playAgain))
             }
-
-        
+            
+            
         case .doNotAbandonRun:
             fadeOut { [weak self] in
                 guard let self = self else { return }
@@ -711,7 +730,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             
         case .gameMenuOptions:
             setup(.options, playableRect: self.playableRect, precedence: self.precedence, level: self.level,  buttonDelegate: self.buttonDelegate)
-
+            
             
         case .soundOptionsBack:
             setup(.pause, playableRect: self.playableRect, precedence: self.precedence, level: self.level,  buttonDelegate: self.buttonDelegate)
@@ -730,8 +749,8 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             let onOff = !muted ? "off" : "on"
             let newTexture = SKTexture(imageNamed: "sound-\(onOff)")
             musicIcon.texture = newTexture
-
-        
+            
+            
         case .toggleSound:
             let muted = UserDefaults.standard.bool(forKey: UserDefaults.muteSoundKey)
             UserDefaults.standard.setValue(!muted, forKey: UserDefaults.muteSoundKey)
@@ -749,7 +768,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             let onOff = !show ? "on" : "off"
             let newTexture = SKTexture(imageNamed: "toggle-\(onOff)")
             toggleIcon.texture = newTexture
-
+            
             
         // TODO: Remove DEBUG code
         case .debugPause:
@@ -768,10 +787,32 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             fadeOut {
                 InputQueue.append(Input(.loseAndGoToStore))
             }
-
+            
             
         default:
             fatalError("These buttons dont appear in game")
+        }
+    }
+}
+
+
+extension MenuSpriteNode {
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let firstTouch = touches.first, let containerView = containerView, let overlay = self.childNode(withName: "overlaySpriteName")  else { return }
+        let positionInScene = firstTouch.location(in: self)
+        let nodes = self.nodes(at: positionInScene)
+        guard nodes.contains(overlay) && !nodes.contains(containerView) else { return }
+        switch self.menuType {
+        case .pause, .tutorialPause:
+                fadeOut {
+                    InputQueue.append(.init(.play))
+                }
+
+        case .gameLose, .gameWin:
+            break
+        
+        default:
+            break
         }
     }
 }

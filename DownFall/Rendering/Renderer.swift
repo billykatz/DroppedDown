@@ -41,6 +41,9 @@ class Renderer: SKSpriteNode {
     // Dialog for Tutorial and FTUE
     private var dialogueOverlay: DialogueOverlay?
     
+    // Current Menu that will receive touch events
+    var currentMenu: MenuSpriteNode?
+    
     // Debug View for Boss
     private var bossDebugView: BossDebugView
     private lazy var bossView: BossView = {
@@ -50,27 +53,6 @@ class Renderer: SKSpriteNode {
     }()
     
     /// LAZY
-    
-    private lazy var menuSpriteNode: MenuSpriteNode = {
-        return MenuSpriteNode(.pause, playableRect: self.playableRect, precedence: .menu, level: self.level)
-    }()
-    
-    private lazy var tutorialPauseNode: MenuSpriteNode = {
-        return MenuSpriteNode(.tutorialPause, playableRect: self.playableRect, precedence: .menu, level: self.level)
-    }()
-    
-    private lazy var gameWinSpriteNode: MenuSpriteNode = {
-        return MenuSpriteNode(.gameWin, playableRect: self.playableRect, precedence: .menu, level: self.level)
-    }()
-    
-    private lazy var gameLoseSpriteNode: MenuSpriteNode = {
-        return MenuSpriteNode(.gameLose, playableRect: self.playableRect, precedence: .menu, level: self.level)
-    }()
-    
-    private lazy var rotateSprite: MenuSpriteNode = {
-        return MenuSpriteNode(.rotate, playableRect: self.playableRect, precedence: .menu, level: self.level)
-    }()
-    
     private lazy var safeArea: SKSpriteNode = {
         //create safe area
         let safeArea = SKSpriteNode(color: .clear, size: CGSize(width: playableRect.width, height: 75.0))
@@ -323,26 +305,29 @@ class Renderer: SKSpriteNode {
         switch input.type {
         case .play:
             // remove the menu
-            menuForeground.removeFromParent()
-            menuForeground.removeAllChildren()
+            removeMenu()
+            
         case .pause:
             // show the menu
             foreground.addChild(menuForeground)
             if (tutorialConductor?.isTutorial ?? false) {
-                menuForeground.addChildSafely(tutorialPauseNode)
-                tutorialPauseNode.playMenuBounce()
+                let tutorialPauseMenu = createMenuSpriteNode(.tutorialPause)
+                addMenu(tutorialPauseMenu)
             } else {
-                menuForeground.addChildSafely(menuSpriteNode)
-                menuSpriteNode.playMenuBounce()
+                let pauseMenu = createMenuSpriteNode(.pause)
+                addMenu(pauseMenu)
             }
+            
         case .gameLose:
-            menuForeground.addChild(gameLoseSpriteNode)
-            foreground.addChildSafely(menuForeground)
-            gameLoseSpriteNode.playMenuBounce()
+            let gameLose = createMenuSpriteNode(.gameLose)
+            addMenu(gameLose)
+            
         case .playAgain:
-            menuForeground.removeFromParent()
+            removeMenu()
+            
         case .tutorialPhaseStart(let phase):
             showTutorial(phase: phase)
+            
         case .levelGoalDetail:
             guard let phase = tutorialConductor?.phase else { return }
             if phase == .theseAreLevelGoals {
@@ -352,6 +337,24 @@ class Renderer: SKSpriteNode {
             ()
         }
     }
+    private func addMenu(_ menuSprite: MenuSpriteNode) {
+        self.currentMenu = menuSprite
+        foreground.addChildSafely(menuSprite)
+        menuSprite.playMenuBounce()
+        
+        foreground.addChildSafely(menuForeground)
+    }
+    
+    private func removeMenu() {
+        menuForeground.removeFromParent()
+        menuForeground.removeAllChildren()
+        currentMenu = nil
+    }
+    
+    private func createMenuSpriteNode(_ menuType: MenuType) -> MenuSpriteNode {
+        return MenuSpriteNode(menuType, playableRect: self.playableRect, precedence: .menu, level: self.level)
+    }
+    
     
     private func showTutorial(phase: TutorialPhase?) {
         guard let phase = phase else { return }
@@ -1070,7 +1073,10 @@ extension Renderer {
             dialogueOverlay?.touchesEnded(touches, with: event)
         } else if tileDetailView?.isUserInteractionEnabled ?? false {
             tileDetailView?.touchesEnded(touches, with: event)
-        } else {
+        } else if let currentMenu = currentMenu {
+            currentMenu.touchesEnded(touches, with: event)
+        }
+        else {
             // one of these should get it
             backpackView.touchesEnded(touches, with: event)
             levelGoalView.touchesEnded(touches, with: event)
@@ -1110,9 +1116,8 @@ extension Renderer {
             guard let self = self else { return }
             self.menuForeground.removeAllChildren()
             let gameWinMenu = MenuSpriteNode(.gameWin, playableRect: self.playableRect, precedence: .menu, level: self.level)
-            self.menuForeground.addChild(gameWinMenu)
-            gameWinMenu.playMenuBounce()
-            self.foreground.addChildSafely(self.menuForeground)
+            
+            self.addMenu(gameWinMenu)
         }
     }
 }

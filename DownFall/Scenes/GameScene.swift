@@ -90,6 +90,8 @@ class GameScene: SKScene {
                            loadedTiles: [[Tile]]? = [],
                            tutorialConductor: TutorialConductor) {
         
+//        self.backgroundColor = .backgroundGray
+        
         // create the tutorial conductor
         self.tutorialConductor = tutorialConductor
         

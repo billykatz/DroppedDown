@@ -34,7 +34,9 @@ class Renderer: SKSpriteNode {
     private var menuForeground = SKNode()
     
     //Animator
-    private var animator = Animator()
+    private lazy var animator = {
+        return Animator(foreground: foreground)
+    }()
     
     // Dialog for Tutorial and FTUE
     private var dialogueOverlay: DialogueOverlay?
@@ -164,7 +166,7 @@ class Renderer: SKSpriteNode {
         
         foreground.position = playableRect.center
         menuForeground.position = playableRect.center
-        
+
         [spriteForeground, safeArea, hud, levelGoalView, backpackView, bossDebugView, bossView].forEach { foreground.addChild($0) }
         
         // Register for Dispatch
@@ -339,9 +341,6 @@ class Renderer: SKSpriteNode {
             gameLoseSpriteNode.playMenuBounce()
         case .playAgain:
             menuForeground.removeFromParent()
-        case .newTurn:
-            ()
-//            animationsFinished(endTiles: input.endTilesStruct, ref: false)
         case .tutorialPhaseStart(let phase):
             showTutorial(phase: phase)
         case .levelGoalDetail:
@@ -926,6 +925,7 @@ extension Renderer {
 //MARK: - Boss logic
 
 extension Renderer {
+    
     
     private func showBossPhaseChangeAttacks(in transformation: Transformation, bossPhase: BossPhase) {
         guard let grownPillars = bossPhase.phaseChangeTagets.createPillars else {

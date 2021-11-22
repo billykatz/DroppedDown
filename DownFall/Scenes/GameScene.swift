@@ -214,6 +214,9 @@ class GameScene: SKScene {
                 }
 
             }
+//            else  if case InputType.bossTurnStart(let phase) = input.type {
+//                self?.sceneShake(shakeCount: 10, intensity: .init(dx: 25, dy: 25), shakeDuration: 0.5)
+//            }
         }
 
         //Turn watcher

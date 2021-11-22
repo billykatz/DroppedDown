@@ -33,6 +33,21 @@ struct Animator {
         return array
     }()
     
+    let foreground: SKNode?
+    
+    init(foreground: SKNode? = nil) {
+        self.foreground = foreground
+    }
+    
+    func shakeScreen(duration: CGFloat = 0.5, ampX: Int = 10, ampY: Int = 10, delayBefore: Double = 0) -> SpriteAction? {
+        guard let foreground = foreground else { return nil }
+        let action = SKAction.shake(duration: duration, amplitudeX: ampX, amplitudeY: ampY)
+        let delay = SKAction.wait(forDuration: delayBefore)
+        
+        return .init(foreground, .sequence(delay, action, curve: .easeIn))
+    }
+    
+    
     public func animateRune(_ rune: Rune,
                             transformations: [Transformation],
                             affectedTiles: [TileCoord],
@@ -769,6 +784,12 @@ struct Animator {
         for (idx, dynamite) in dynamiteSprites.enumerated() {
             // when there are multiple dynamites to blowup, let's stagger them so the player can follow the action
             let waitBeforeStarting = SKAction.wait(forDuration: waitBetweenDynamiteExplosionDuration)
+            
+            // shake the screen
+            if let shake = shakeScreen(duration: 0.15, ampX: 30, ampY: 30, delayBefore: waitBetweenDynamiteExplosionDuration) {
+                spriteActions.append(shake)
+            }
+            
             waitBetweenDynamiteExplosionDuration += 0.5
             
             // create and add an empty sprite to hold all the exploding animations

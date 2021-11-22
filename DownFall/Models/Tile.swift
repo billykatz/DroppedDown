@@ -20,6 +20,12 @@ struct DynamiteFuse: Codable, Hashable {
 struct PillarData: Codable, Hashable {
     let color: ShiftShaft_Color
     let health: Int
+    
+    static var random: PillarData {
+        let availableColors: [ShiftShaft_Color] = [.red, .blue, .purple]
+        let health = 3
+        return PillarData(color: availableColors.randomElement()!, health: 3)
+    }
 }
 
 enum ShiftShaft_Color: String, Codable, CaseIterable, Hashable {

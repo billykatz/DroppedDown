@@ -24,7 +24,13 @@ class BossView: SKSpriteNode {
         return spriteProvider()
     }()
     
+    // all sprites are added to this container
     private let containerView: SKSpriteNode
+    
+    // state variables to reset the reticles when needed
+    private var dynamiteTargetToAttack: [SKSpriteNode] = []
+    private var poisonColumnsTargetToAttack: [SKSpriteNode] = []
+    private var spawnSpiderTargetToAttack: [SKSpriteNode] = []
     
     init(playableRect: CGRect,tileSize: CGFloat, spriteProvider: @escaping () -> [[DFTileSpriteNode]]) {
         self.playableRect = playableRect
@@ -62,14 +68,22 @@ class BossView: SKSpriteNode {
             }
         case .bossTurnStart(let phase):
             handleBossTurnStart(phase: phase)
+        case .bossPhaseStart(let phase):
+                handleBossPhaseStart(phase: phase)
         default:
             break
         }
     }
     
-    var dynamiteTargetToAttack: [SKSpriteNode] = []
-    var poisonColumnsTargetToAttack: [SKSpriteNode] = []
-    var spawnSpiderTargetToAttack: [SKSpriteNode] = []
+    func resetReticles() {
+        dynamiteTargetToAttack.forEach { $0.removeFromParent() }
+        poisonColumnsTargetToAttack.forEach { $0.removeFromParent() }
+        spawnSpiderTargetToAttack.forEach { $0.removeFromParent() }
+    }
+    
+    func handleBossPhaseStart(phase: BossPhase) {
+        resetReticles()
+    }
     
     func handleBossTurnStart(phase: BossPhase, transformation: Transformation? = nil) {
         switch phase.bossState.stateType {
@@ -88,9 +102,7 @@ class BossView: SKSpriteNode {
             
         case .attack:
             if (transformation != nil) {
-                dynamiteTargetToAttack.forEach { $0.removeFromParent() }
-                poisonColumnsTargetToAttack.forEach { $0.removeFromParent() }
-                spawnSpiderTargetToAttack.forEach { $0.removeFromParent() }
+                resetReticles()
             }
         default:
             break

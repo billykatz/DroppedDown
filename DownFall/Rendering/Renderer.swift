@@ -285,16 +285,23 @@ class Renderer: SKSpriteNode {
                     if trans.newTiles != nil {
                         computeNewBoard(for: trans)
                     }
+                    
                 case .targetEat:
                     animationsFinished(endTiles: trans.endTiles)
+                    
                 case .targetAttack:
                     animationsFinished(endTiles: trans.endTiles)
+                    
                 case .attack:
                     showBossAttacks(in: transformations, bossPhase: phase)
-//                    animationsFinished(endTiles: trans.endTiles)
-                case .rests:
+                
+                case .rests, .phaseChange:
+//                    showBossPhaseChangeAttacks(in: trans, bossPhase: BossPhase)
                     animationsFinished(endTiles: trans.endTiles)
                 }
+                
+            case .bossPhaseStart(let phase):
+                showBossPhaseChangeAttacks(in: trans, bossPhase: phase)
 
             case .reffingFinished, .touchBegan, .itemUseSelected:
                 () // Purposely left blank.
@@ -919,6 +926,19 @@ extension Renderer {
 //MARK: - Boss logic
 
 extension Renderer {
+    
+    private func showBossPhaseChangeAttacks(in transformation: Transformation, bossPhase: BossPhase) {
+        guard let grownPillars = bossPhase.phaseChangeTagets.createPillars else {
+            animationsFinished(endTiles: transformation.endTiles)
+            return
+        }
+        
+        animator.showPillarsGrowing(sprites: sprites, spriteForeground: spriteForeground, bossTileAttacks: grownPillars, tileSize: tileSize) { [weak self] in
+            self?.animationsFinished(endTiles: transformation.endTiles)
+        }
+    
+    }
+    
     private func showBossAttacks(in transformation: [Transformation], bossPhase: BossPhase) {
         guard let trans = transformation.first, let endTiles = trans.endTiles else {
             animationsFinished(endTiles: transformation.first?.endTiles)
@@ -1004,7 +1024,7 @@ extension Renderer {
         
         let dynamiteSprites = dynamiteCoords.map { [sprites] in sprites[$0.row][$0.column] }
         
-        animator.animateDynamiteExplosion(dynamiteSprites: dynamiteSprites, dynamiteCoords: dynamiteCoords, foreground: foreground, boardSize: level.boardSize,
+        animator.animateDynamiteExplosion(dynamiteSprites: dynamiteSprites, dynamiteCoords: dynamiteCoords, foreground: foreground, boardSize: level.boardSize, sprites: sprites,
                                           positionInForeground: {
                                             [weak self] in
                                             guard let self = self else { return .zero }

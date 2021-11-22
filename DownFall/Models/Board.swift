@@ -255,9 +255,12 @@ class Board: Equatable {
             case .attack:
                 transformation = self.bossExecutesAttacks(input: input)
                 
-            case .rests:
+            case .rests, .phaseChange:
                 transformation = self.resetBossFlags(input: input)
             }
+            
+        case .bossPhaseStart:
+            transformation = bossPhaseChange(input: input)
         
         case .gameLose,
              .play,
@@ -279,13 +282,30 @@ class Board: Equatable {
     }
     
     private func resetBossFlags(input: Input) -> Transformation {
-        guard case let InputType.bossTurnStart(phase) = input.type else { return .zero }
+//        guard case let InputType.bossTurnStart(phase) = input.type else { return .zero }
         for row in 0..<tiles.count {
             for column in 0..<tiles[row].count {
                 tiles[row][column].bossTargetedToEat = false
             }
         }
-        return Transformation(transformation: nil, inputType: .bossTurnStart(phase), endTiles: self.tiles)
+        return Transformation(transformation: nil, inputType: input.type, endTiles: self.tiles)
+    }
+    
+    // Take the boss pahse change targets and throw them into a transformation!
+    private func bossPhaseChange(input: Input) -> Transformation {
+        guard case let InputType.bossPhaseStart(phase) = input.type else { return .zero }
+        var tileTransformation: [TileTransformation] = []
+        if let bossTileAttacks = phase.phaseChangeTagets.createPillars {
+            bossTileAttacks.forEach { bossTileAttack in
+                let coord = bossTileAttack.tileCoord
+                tiles[coord.row][coord.col] = Tile(type: bossTileAttack.tileType)
+                tileTransformation.append(.init(coord, coord))
+            }
+        }
+        
+        let _ = resetBossFlags(input: input)
+        
+        return Transformation(transformation: (tileTransformation.isEmpty ? nil : tileTransformation), inputType: input.type, endTiles: self.tiles)
     }
     
     private func bossTargetsWhatToEat(input: Input) -> Transformation {

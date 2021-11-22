@@ -39,6 +39,10 @@ extension CGSize {
     func scaleWidth(by coefficient: CGFloat) -> CGSize {
         return CGSize(width: width * coefficient, height: height)
     }
+    
+    init(widthHeight: CGFloat) {
+        self.init(width: widthHeight, height: widthHeight)
+    }
 }
 
 

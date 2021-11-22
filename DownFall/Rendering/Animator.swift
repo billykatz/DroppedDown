@@ -760,10 +760,17 @@ struct Animator {
         animate(spriteActions, completion: completion)
     }
     
-    func animateDynamiteExplosion(dynamiteSprites: [DFTileSpriteNode], dynamiteCoords: [TileCoord], foreground: SKNode, boardSize: Int, positionInForeground: (TileCoord) -> CGPoint, completion: @escaping () -> Void) {
+    func animateDynamiteExplosion(dynamiteSprites: [DFTileSpriteNode], dynamiteCoords: [TileCoord], foreground: SKNode, boardSize: Int, sprites: [[DFTileSpriteNode]], positionInForeground: (TileCoord) -> CGPoint, completion: @escaping () -> Void) {
         var spriteActions: [SpriteAction] = []
         
+        
+        var waitBetweenDynamiteExplosionDuration = 0.0
+        
         for (idx, dynamite) in dynamiteSprites.enumerated() {
+            // when there are multiple dynamites to blowup, let's stagger them so the player can follow the action
+            let waitBeforeStarting = SKAction.wait(forDuration: waitBetweenDynamiteExplosionDuration)
+            waitBetweenDynamiteExplosionDuration += 0.5
+            
             // create and add an empty sprite to hold all the exploding animations
             let dynamiteEmptySprite = SKSpriteNode(color: .clear, size: dynamite.size)
             dynamiteEmptySprite.position = dynamite.position
@@ -785,16 +792,19 @@ struct Animator {
             
             
             // sequence all
-            let dynamiteAllAction = SKAction.sequence([showFuseTime, waitForABit, dynamiteExplode, smokeAndFade, .removeFromParent()])
+            let dynamiteAllAction = SKAction.sequence([showFuseTime, waitBeforeStarting, waitForABit, dynamiteExplode, smokeAndFade, .removeFromParent()])
             spriteActions.append(.init(dynamite, dynamiteAllAction))
             
             /// create a bunch of explosions
             let neighbors = dynamiteCoords[idx].orthogonalNeighbors.filter { isWithinBounds($0, within: boardSize) }
             
             for neighbor in neighbors {
+                guard isWithinBounds(neighbor, within: boardSize) else { continue }
                 // create and randomly position sprite
                 let emptySprite = SKSpriteNode(color: .clear, size: dynamite.size)
                 emptySprite.position = positionInForeground(neighbor)
+                emptySprite.zPosition = 1_000
+                foreground.addChild(emptySprite)
                 
                 // create the animation
                 let explosionAnimation = explodeAnimation(size: emptySprite.size.scale(by: 1.5))
@@ -806,16 +816,17 @@ struct Animator {
                 let explodeAndScale = SKAction.group([explosionAnimation, scaleAction])
                 explodeAndScale.timingMode = .easeIn
                 
-//                let waitDuration = Double.random(in: dynamiteWaitDuration...0.75)
-//                let randomWaitDuration = SKAction.wait(forDuration: waitDuration)
                 
-                let allAction = SKAction.sequence([explodeAndScale, smokeAndFade, .removeFromParent()])
+                let neighbor = sprites[neighbor]
+                let hideNeighbor = SKAction.run { [neighbor] in
+                    if neighbor.crumble() != nil {
+                        neighbor.alpha = 0
+                    }
+                }
+                
+                let allAction = SKAction.sequence([waitBeforeStarting, explodeAndScale, hideNeighbor, smokeAndFade, .removeFromParent()])
                 
                 spriteActions.append(SpriteAction(emptySprite, allAction))
-                
-                /// the later the eplxosions should be on top of the earlier ones
-//                emptySprite.zPosition = CGFloat(100) + CGFloat(10 * waitDuration)
-                foreground.addChild(emptySprite)
                 
             }
         }
@@ -871,6 +882,35 @@ struct Animator {
                 
                 spriteActions.append(.init(poisonSprite, sequence))
             }
+        }
+        
+        animate(spriteActions, completion: completion)
+    }
+    
+    func showPillarsGrowing(sprites: [[DFTileSpriteNode]], spriteForeground: SKNode, bossTileAttacks: [BossTileAttack], tileSize: CGFloat, completion: @escaping () -> Void) {
+        var spriteActions: [SpriteAction] = []
+        for bossTileAttack in bossTileAttacks {
+            let coord = bossTileAttack .tileCoord
+            let targetSprite = sprites[coord]
+            let emptySprite = SKSpriteNode(color: .clear, size: CGSize(widthHeight: tileSize))
+            emptySprite.position = targetSprite.position
+            spriteForeground.addChild(emptySprite)
+            
+            // crumble the thing that is there if possible.  Otherwise ignore it
+            if let crumble = targetSprite.crumble() {
+                spriteActions.append(crumble)
+            }
+
+            let newTileSprite = DFTileSpriteNode(type: bossTileAttack.tileType, height: 1, width: 1)
+            newTileSprite.zPosition = 100
+            emptySprite.addChild(newTileSprite)
+            
+            let scaleAction = SKAction.scale(to: CGSize(width: tileSize, height: tileSize), duration: 2.5)
+            let sequence = SKAction.sequence([scaleAction])
+            sequence.timingMode = .easeIn
+            
+            spriteActions.append(.init(newTileSprite, sequence))
+            
         }
         
         animate(spriteActions, completion: completion)

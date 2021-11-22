@@ -38,6 +38,8 @@ class BossDebugView: SKSpriteNode {
         Dispatch.shared.register { [weak self] input in
             if case InputType.bossTurnStart(let phase) = input.type {
                 self?.showBossPhaseInfo(phase)
+            } else if case InputType.bossPhaseStart(let phase) = input.type {
+                self?.showBossPhaseInfo(phase)
             }
         }
     }

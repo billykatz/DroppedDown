@@ -17,6 +17,9 @@ enum Axis {
 
 
 struct TileCoord: Codable, Hashable {
+    var col: Int {
+        return y
+    }
     var column: Int {
         return y
     }

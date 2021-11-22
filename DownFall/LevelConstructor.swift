@@ -30,7 +30,7 @@ struct LevelConstructor {
                 goals: levelGoal(depth: depth, pillars: pillars, gemAtDepth: gemsAtDepth, randomSource: randomSource, isTutorial: isTutorial),
                 maxSpawnGems: gemsAtDepth,
                 goalProgress: [],
-                savedBossPhase: BossPhase(),
+                savedBossPhase: nil,
                 potentialItems: potentialItems(depth: depth, unlockables: unlockables, startingUnlockables: startingUnlockables, playerData: playerData, randomSource: randomSource, isTutorial: isTutorial)
             )
     }

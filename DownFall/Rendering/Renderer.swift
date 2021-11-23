@@ -44,6 +44,9 @@ class Renderer: SKSpriteNode {
     // Current Menu that will receive touch events
     var currentMenu: MenuSpriteNode?
     
+    let gameRecapView: GameRecapView
+    let runStatTracker: RunStatTracker
+    
     // Debug View for Boss
     private var bossDebugView: BossDebugView
     private lazy var bossView: BossView = {
@@ -100,7 +103,8 @@ class Renderer: SKSpriteNode {
          precedence: Precedence,
          level: Level,
          levelGoalTracker: LevelGoalTracker,
-         tutorialConductor: TutorialConductor?) {
+         tutorialConductor: TutorialConductor?,
+         runStatTracker: RunStatTracker) {
         
         self.precedence = precedence
         self.playableRect = playableRect
@@ -128,6 +132,10 @@ class Renderer: SKSpriteNode {
         
         // debug view for Boss
         self.bossDebugView = BossDebugView(playableRect: playableRect)
+        
+        // recap view after win and loss
+        self.gameRecapView = GameRecapView(playableRect: playableRect)
+        self.runStatTracker = runStatTracker
         
         super.init(texture: nil, color: .clear, size: CGSize.zero)
         
@@ -318,9 +326,10 @@ class Renderer: SKSpriteNode {
                 addMenu(pauseMenu)
             }
             
-        case .gameLose:
-            let gameLose = createMenuSpriteNode(.gameLose)
-            addMenu(gameLose)
+        case .gameLose(let type):
+            gameRecapView.showGameRecap(win: false, killedBy: type, with: runStatTracker.runStats)
+            menuForeground.addChild(gameRecapView)
+            foreground.addChildSafely(menuForeground)
             
         case .playAgain:
             removeMenu()

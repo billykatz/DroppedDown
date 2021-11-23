@@ -92,4 +92,7 @@ extension UIColor {
     // Dialogue
     static let dialogueBoxBackground = UIColor(rgb: 0x508D9A)
     
+    // GAme recap
+    static let gameRecapBlue = UIColor(rgb: 0x566C8F)
+    
 }

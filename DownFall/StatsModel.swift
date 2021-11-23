@@ -74,6 +74,34 @@ struct Statistics: Codable, Equatable, Identifiable {
         self.id = UUID()
     }
     
+    func fuzzyEqual(rhs: Statistics) -> Bool {
+        let lhs = self
+        switch (lhs.statType, rhs.statType) {
+        case (.rocksDestroyed, .rocksDestroyed): return true
+        case (.totalRocksDestroyed, .totalRocksDestroyed): return true
+        case (.largestRockGroupDestroyed, .largestRockGroupDestroyed): return true
+        case (.gemsCollected, .gemsCollected): return true
+        case (.totalGemsCollected, .totalGemsCollected): return true
+        case (.lowestDepthReached, .lowestDepthReached): return true
+        case (.distanceFallen, .distanceFallen): return true
+        case (.counterClockwiseRotations, .counterClockwiseRotations): return true
+        case (.clockwiseRotations, .clockwiseRotations): return true
+        case (.monstersKilled, .monstersKilled): return true
+        case (.totalMonstersKilled, .totalMonstersKilled): return true
+        case (.monstersKilledInARow, .monstersKilledInARow): return true
+        case (.damageTaken, .damageTaken): return true
+        case (.healthHealed, .healthHealed): return true
+        case (.damageDealt, .damageDealt): return true
+        case (.attacksDodged, .attacksDodged): return true
+        case (.totalWins, .totalWins): return true
+        case (.totalLoses, .totalLoses): return true
+        case (.runeUses, .runeUses): return true
+        case (.totalRuneUses, .totalRuneUses): return true
+        default: return false
+
+        }
+    }
+    
     func updateStatAmount(_ amount: Int, overwrite: Bool) -> Statistics {
         let newAmount = overwrite ? amount : self.amount + amount
         return Self.init(rockColor: self.rockColor, gemColor: self.gemColor, monsterType: self.monsterType, runeType: self.runeType, amount: newAmount, statType: self.statType)

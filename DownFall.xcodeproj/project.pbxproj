@@ -15,6 +15,7 @@
 		2811271D26855FE200F96043 /* CombineExt in Frameworks */ = {isa = PBXBuildFile; productRef = 2811271C26855FE200F96043 /* CombineExt */; };
 		2811271F26863A4500F96043 /* FileManagerClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2811271E26863A4500F96043 /* FileManagerClient.swift */; };
 		2811272126863E4A00F96043 /* PlayerClientExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2811272026863E4A00F96043 /* PlayerClientExtensions.swift */; };
+		2831B6A6274C787B00F90626 /* GameRecapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2831B6A5274C787B00F90626 /* GameRecapView.swift */; };
 		2834737F26E94CFC0096F3DE /* StatsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2834737E26E94CFC0096F3DE /* StatsModel.swift */; };
 		283CBBD926A8A88E00B1F7C9 /* CodexItemModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 283CBBD826A8A88E00B1F7C9 /* CodexItemModalView.swift */; };
 		283CBBDB26A8A9E100B1F7C9 /* SwiftUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 283CBBDA26A8A9E100B1F7C9 /* SwiftUIView.swift */; };
@@ -93,7 +94,6 @@
 		3D73D2E621C2226F00DB6FB7 /* PlayerWait.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3D73D2E521C2226F00DB6FB7 /* PlayerWait.sks */; };
 		3D7D8B2D2252857E0016FE4C /* CombatSimulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D7D8B2C2252857E0016FE4C /* CombatSimulator.swift */; };
 		3D7D8B332253E5BC0016FE4C /* HUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D7D8B322253E5BC0016FE4C /* HUD.swift */; };
-		3D7D8B352253F9850016FE4C /* HelperTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D7D8B342253F9850016FE4C /* HelperTextView.swift */; };
 		3D7D8B37225422440016FE4C /* TilesHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D7D8B36225422440016FE4C /* TilesHelper.swift */; };
 		3D7EF45C21D18D9000A2D9E8 /* Transformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D7EF45B21D18D9000A2D9E8 /* Transformation.swift */; };
 		3D7EF45E21D18DAB00A2D9E8 /* TileTransformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D7EF45D21D18DAB00A2D9E8 /* TileTransformation.swift */; };
@@ -225,6 +225,7 @@
 		2811271926850E1B00F96043 /* ProfileViewModelTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModelTest.swift; sourceTree = "<group>"; };
 		2811271E26863A4500F96043 /* FileManagerClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagerClient.swift; sourceTree = "<group>"; };
 		2811272026863E4A00F96043 /* PlayerClientExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerClientExtensions.swift; sourceTree = "<group>"; };
+		2831B6A5274C787B00F90626 /* GameRecapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameRecapView.swift; sourceTree = "<group>"; };
 		2834737E26E94CFC0096F3DE /* StatsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsModel.swift; sourceTree = "<group>"; };
 		283CBBD826A8A88E00B1F7C9 /* CodexItemModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexItemModalView.swift; sourceTree = "<group>"; };
 		283CBBDA26A8A9E100B1F7C9 /* SwiftUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIView.swift; sourceTree = "<group>"; };
@@ -304,7 +305,6 @@
 		3D73D2E521C2226F00DB6FB7 /* PlayerWait.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = PlayerWait.sks; sourceTree = "<group>"; };
 		3D7D8B2C2252857E0016FE4C /* CombatSimulator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombatSimulator.swift; sourceTree = "<group>"; };
 		3D7D8B322253E5BC0016FE4C /* HUD.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HUD.swift; sourceTree = "<group>"; };
-		3D7D8B342253F9850016FE4C /* HelperTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperTextView.swift; sourceTree = "<group>"; };
 		3D7D8B36225422440016FE4C /* TilesHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TilesHelper.swift; sourceTree = "<group>"; };
 		3D7EF45B21D18D9000A2D9E8 /* Transformation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transformation.swift; sourceTree = "<group>"; };
 		3D7EF45D21D18DAB00A2D9E8 /* TileTransformation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileTransformation.swift; sourceTree = "<group>"; };
@@ -765,6 +765,7 @@
 				582635DB243168A700A944B6 /* Buttons */,
 				5843F4532426747100C03612 /* RotatePreviewView.swift */,
 				5867A590242B0CD1005BFD10 /* TileDetailView.swift */,
+				2831B6A5274C787B00F90626 /* GameRecapView.swift */,
 				3DD5AA0C2398025400FB63F4 /* Styling.swift */,
 				3DF0A6AF2379C4DC00941305 /* ParagraphNode.swift */,
 				3DC072BA2373AF510046F224 /* SwipeRecognizerView.swift */,
@@ -775,7 +776,6 @@
 				582CF3EB2442391900AA2A95 /* FillableBar.swift */,
 				58AD9280243C282100B5B1EC /* LevelGoalTracker */,
 				3D6AACDF222C996900C77B24 /* Header */,
-				3D7D8B342253F9850016FE4C /* HelperTextView.swift */,
 				3D6AACE2222CD22100C77B24 /* Controls */,
 				3D00A0FA23AAD230007E2D8B /* Menu */,
 			);
@@ -1296,6 +1296,7 @@
 				582CF3EE244239A000AA2A95 /* Template.swift in Sources */,
 				5867A591242B0CD1005BFD10 /* TileDetailView.swift in Sources */,
 				28AE3AC126A6000600BCE56A /* CodexCoordinator.swift in Sources */,
+				2831B6A6274C787B00F90626 /* GameRecapView.swift in Sources */,
 				3D7D8B332253E5BC0016FE4C /* HUD.swift in Sources */,
 				582CF3F02442553000AA2A95 /* FillableCircle.swift in Sources */,
 				3DD5AA0D2398025400FB63F4 /* Styling.swift in Sources */,
@@ -1323,7 +1324,6 @@
 				5881DBF4244FEE440053A690 /* RuneSlotView.swift in Sources */,
 				58383643242D7A6E004CA026 /* Array+Extensions.swift in Sources */,
 				3DA4E88D228FC7FC006E90D1 /* Label.swift in Sources */,
-				3D7D8B352253F9850016FE4C /* HelperTextView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

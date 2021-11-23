@@ -41,11 +41,6 @@
             "carry": {
                 "items": [
                 {
-                    "type": "gold",
-                    "amount": 15
-                    
-                },
-                {
                     "type": "gem",
                     "amount": 0
                     
@@ -102,11 +97,7 @@
                 }
             ],
             "carry": {
-                "items": [{
-                    "type": "gold",
-                    "amount": 15
-                }]
-                
+                "items": []
             },
             "abilities": [],
             "effects": [],
@@ -160,12 +151,9 @@
                         "animationType": "idle"
                     }
                 ],
-            "carry": {
-                "items": [{
-                    "type": "gold",
-                    "amount": 15
-                }]
-            },
+                "carry": {
+                    "items": []
+                },
             "abilities": [],
             "effects": [],
             "dodge": 0,
@@ -226,10 +214,7 @@
                 }
             ],
             "carry": {
-                "items": [{
-                    "type": "gold",
-                    "amount": 15
-                }]
+                "items": []
             },
             "abilities": [],
             "effects": [],
@@ -276,10 +261,7 @@
                 }
             ],
             "carry": {
-                "items": [{
-                    "type": "gold",
-                    "amount": 15
-                }]
+                "items": []
             },
             "abilities": [],
             "effects": [],
@@ -335,10 +317,7 @@
                 }
             ],
             "carry": {
-                "items": [{
-                    "type": "gold",
-                    "amount": 15
-                }]
+                "items": []
             },
             "abilities": [],
             "effects": [],

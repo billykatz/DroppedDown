@@ -318,10 +318,11 @@ class Referee {
             return nil
         }
         
-        func playerIsDead() -> Bool {
+        func playerIsDead() -> Input? {
             guard let playerPosition = playerPosition,
-                case TileType.player(let playerCombat) = tiles[playerPosition].type else { return false }
-            return playerCombat.hp <= 0
+                case TileType.player(let playerCombat) = tiles[playerPosition].type,
+                playerCombat.isDead else { return nil }
+            return Input(.gameLose(killedBy: playerCombat.killedBy))
         }
         
         func playerCollectsItem() -> Input? {
@@ -421,8 +422,8 @@ class Referee {
         
         if let input = winRule.apply(tiles) {
             return input
-        } else if playerIsDead() {
-            return Input(.gameLose("You ran out of health"))
+        } else if let gameLoseInput = playerIsDead() {
+            return gameLoseInput
         }
         
         

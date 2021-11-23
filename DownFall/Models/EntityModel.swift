@@ -67,18 +67,27 @@ struct EntityModel: Equatable, Codable {
                 return self.rawValue
             }
         }
+        
+        var textureString: String {
+            switch self {
+            case.player:
+                return "player3"
+            default:
+                return self.rawValue
+            }
+        }
     }
     
     static let playerCases: [EntityType] = [.player]
     
-    static let zero: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .rat, carry: .zero, animations: [], effects: [], dodge: 0, luck: 0)
+    static let zero: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .rat, carry: .zero, animations: [], effects: [], dodge: 0, luck: 0, killedBy: nil)
     
-    static let lotsOfCash: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .rat, carry: CarryModel(items: [Item(type: .gem, amount: 1000, color: .blue)]), animations: [], effects: [], dodge: 0, luck: 0)
+    static let lotsOfCash: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .rat, carry: CarryModel(items: [Item(type: .gem, amount: 1000, color: .blue)]), animations: [], effects: [], dodge: 0, luck: 0, killedBy: nil)
     
-    static let playerZero: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .player, carry: .zero, animations: [], pickaxe: Pickaxe(runeSlots: 0, runes: []), effects: [], dodge: 0, luck: 0)
+    static let playerZero: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .player, carry: .zero, animations: [], pickaxe: Pickaxe(runeSlots: 0, runes: []), effects: [], dodge: 0, luck: 0, killedBy: nil)
     
     static func zeroedEntity(type: EntityType) -> EntityModel {
-        return EntityModel(originalHp: 0, hp: 0, name: "", attack: .zero, type: type, carry: .zero, animations: [], effects: [], dodge: 0, luck: 0)
+        return EntityModel(originalHp: 0, hp: 0, name: "", attack: .zero, type: type, carry: .zero, animations: [], effects: [], dodge: 0, luck: 0, killedBy: nil)
     }
     
     let originalHp: Int
@@ -92,6 +101,7 @@ struct EntityModel: Equatable, Codable {
     var effects: [EffectModel]
     let dodge: Int
     let luck: Int
+    let killedBy: EntityType?
     
     private enum CodingKeys: String, CodingKey {
         case originalHp
@@ -105,6 +115,7 @@ struct EntityModel: Equatable, Codable {
         case effects
         case dodge
         case luck
+        case killedBy
     }
     
     public func update(originalHp: Int? = nil,
@@ -117,7 +128,8 @@ struct EntityModel: Equatable, Codable {
                        pickaxe: Pickaxe? = nil,
                        effects: [EffectModel]? = nil,
                        dodge: Int? = nil,
-                       luck: Int? = nil
+                       luck: Int? = nil,
+                       killedBy: EntityType? = nil
     ) -> EntityModel {
         let updatedOriginalHp = originalHp ?? self.originalHp
         let updatedHp = hp ?? self.hp
@@ -130,6 +142,7 @@ struct EntityModel: Equatable, Codable {
         let effects = effects ?? self.effects
         let dodge = dodge ?? self.dodge
         let luck = luck ?? self.luck
+        let killedBy = killedBy ?? self.killedBy
         
         return EntityModel(originalHp: updatedOriginalHp,
                            hp: updatedHp,
@@ -141,7 +154,9 @@ struct EntityModel: Equatable, Codable {
                            pickaxe: pickaxe,
                            effects: effects,
                            dodge: dodge,
-                           luck: luck
+                           luck: luck,
+                           killedBy: killedBy
+                           
         )
         
         

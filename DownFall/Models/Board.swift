@@ -700,7 +700,7 @@ class Board: Equatable {
                             tiles[neighborCoord.row][neighborCoord.column] = Tile(type: .monster(monsterData.wasAttacked(for: 1, from: neighborCoord.direction(relative: coord) ?? .east)))
                         case .rock, .pillar, .gem:
                             removedRocksAndPillars.append(neighborCoord)
-                        case .empty, .exit, .gold, .emptyGem:
+                        case .empty, .exit, .emptyGem:
                             () // purposefully left blank
                         case .item, .offer:
                             ()
@@ -1597,9 +1597,14 @@ extension Board {
             attacker = monsterModel
             defender = playerModel
             
-            let (newAttackerData, newDefenderData, defenderDodged) = CombatSimulator.simulate(attacker: attacker,
+            var (newAttackerData, newDefenderData, defenderDodged) = CombatSimulator.simulate(attacker: attacker,
                                                                                               defender: defender,
                                                                                               attacked: relativeAttackDirection)
+            
+            // keep track of what killed us
+            if newDefenderData.isDead {
+                newDefenderData = newDefenderData.update(killedBy: monsterModel.type)
+            }
             
             tiles[attackerPosition.x][attackerPosition.y] = Tile(type: TileType.monster(newAttackerData))
             tiles[defenderPosition.x][defenderPosition.y] = Tile(type: TileType.player(newDefenderData))

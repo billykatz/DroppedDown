@@ -14,9 +14,22 @@ class RunStatTracker {
     
     init(runStats: [Statistics]) {
         self.runStats = runStats
+        
+        initializeStats()
+        
         Dispatch.shared.register { [weak self] input in
             self?.handleInput(input: input)
         }
+    }
+    
+    func initializeStats() {
+        self.addStat(Statistics(amount: 0, statType: .totalRocksDestroyed), amount: 0)
+        self.addStat(Statistics(amount: 0, statType: .largestRockGroupDestroyed), amount: 0)
+        self.addStat(Statistics(amount: 0, statType: .totalGemsCollected), amount: 0)
+        self.addStat(Statistics(amount: 0, statType: .totalMonstersKilled), amount: 0)
+        self.addStat(Statistics(amount: 0, statType: .totalRuneUses), amount: 0)
+        self.addStat(Statistics(amount: 0, statType: .damageTaken), amount: 0)
+        self.addStat(Statistics(amount: 0, statType: .healthHealed), amount: 0)
     }
     
 //    Statistics.distanceFallen,
@@ -82,7 +95,7 @@ class RunStatTracker {
     }
     
     private func addStat(_ stat: Statistics, amount: Int) {
-        if let index = runStats.firstIndex(of: stat) {
+        if let index = runStats.firstIndex(where: { $0.fuzzyEqual(rhs: stat)} ) {
             runStats[index] = runStats[index].updateStatAmount(amount, overwrite: stat.statType.overwriteIfLarger)
         } else {
             runStats.append(stat)

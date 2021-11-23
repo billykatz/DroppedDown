@@ -39,7 +39,7 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
                                         ),
                                         .monsterDies(TileCoord(0,0), .wizard),
                                         .gameWin(0),
-                                        .gameLose(""),
+                                        .gameLose(killedBy: .alamo),
                                         .play,
                                         .pause,
                                         .animationsFinished(ref: true),
@@ -76,7 +76,7 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
     case monsterDies(TileCoord, EntityModel.EntityType)
     case attack(attackType: AttackType, attacker: TileCoord, defender: TileCoord?, affectedTiles: [TileCoord], dodged: Bool, attackerIsPlayer: Bool)
     case gameWin(_ goalsCompleted: Int)
-    case gameLose(String)
+    case gameLose(killedBy: EntityModel.EntityType?)
     case play
     case pause
     case animationsFinished(ref: Bool)

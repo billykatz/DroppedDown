@@ -9,13 +9,10 @@
 struct Item: Codable, Hashable {
     
     enum ItemType: String, Codable {
-        case gold
         case gem
         
         var currencyType: Currency {
             switch self {
-            case .gold:
-                return Currency.gold
             case .gem:
                 return Currency.gem
             }
@@ -28,8 +25,6 @@ struct Item: Codable, Hashable {
     
     var humanReadable: String {
         switch type {
-        case .gold:
-            return "Gold piece"
         case .gem:
             if let color = color {
                 return "\(color.humanReadable) gem"
@@ -46,8 +41,6 @@ struct Item: Codable, Hashable {
     
     var textureName: String {
         switch type {
-        case .gold:
-            return goldTextureName()
         case .gem:
             switch color {
             case .blue:
@@ -68,30 +61,12 @@ struct Item: Codable, Hashable {
         }
     }
     
-    func goldTextureName() -> String {
-        switch amount {
-        case 1...5:
-            return "1-5gold"
-        case 6...10:
-            return "6-10gold"
-        case 10...15:
-            return "11-15gold"
-        case 16...Int.max:
-            return "16-20gold"
-        default:
-            fatalError("You messed up. Gold must more than 0")
-        }
-    }
-    
     static var zero: Item {
-        return Item(type: .gold, amount: 0, color: nil)
+        return Item(type: .gem, amount: 0, color: nil)
     }
     
     static var gem: Item{
         return Item(type: .gem, amount: 1, color: nil)
     }
-    
-    static var gold: Item{
-        return Item(type: .gold, amount: 1, color: nil)
-    }
+
 }

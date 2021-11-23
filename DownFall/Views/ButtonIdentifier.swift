@@ -84,6 +84,10 @@ enum ButtonIdentifier: String {
     case tutorialMenuOptions
     case tutorialSoundOptionsBack
     
+    // game recap
+    case gameRecapViewBoard
+    case gameRecapShowRecap
+    
     var title: String {
         switch self {
         case .resume:
@@ -183,6 +187,13 @@ enum ButtonIdentifier: String {
         
         case .gameMenuOptions, .tutorialMenuOptions:
             return "Options"
+            
+        case .gameRecapViewBoard:
+            return "Show board"
+            
+        case .gameRecapShowRecap:
+            return "Show recap"
+            
         
         case .wallet, .infoPopup, .storeItem, .backpack, .sellHealth, .buyHealth, .sellDodge, .buyDodge, .sellLuck, .buyLuck, .buyRuneSlot, .sellRuneSlot, .runeReplacementCancel:
             return ""

@@ -107,10 +107,6 @@ struct Tile: Hashable, Codable {
         return Tile(type: .rock(color: .brown, holdsGem: false, groupCount: 0))
     }
     
-    static var gold: Tile {
-        return Tile(type: .gold)
-    }
-    
     static var gem: Tile {
         let gem = TileType.item(Item(type: .gem, amount: 10))
         return Tile(type: gem)
@@ -315,10 +311,6 @@ enum TileType: Hashable, CaseIterable, Codable {
         return TileType.item(.gem)
     }
     
-    static var gold: TileType {
-        return TileType.item(.gold)
-    }
-    
     private var isRock: Bool {
         if case TileType.rock = self { return true }
         return false
@@ -478,8 +470,6 @@ extension TileType {
             return data.type.humanReadable
         case .gem:
             return "gem"
-        case .gold:
-            return "gold"
         case .dynamite:
             return "dynamite"
         case .offer(let offer):

@@ -42,7 +42,7 @@ class GameRecapView: SKNode {
         
         // create the background overlay view
         let backgroundOverlay = SKSpriteNode(color: .black, size: CGSize(widthHeight: 5000))
-        backgroundOverlay.alpha = 0.25
+        backgroundOverlay.alpha = 0.5
         backgroundOverlay.zPosition = -100000
         backgroundOverlay.name = backgroundOverlayName
         containerView.addChild(backgroundOverlay)

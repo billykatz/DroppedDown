@@ -18,6 +18,10 @@ struct BossTileAttack: Codable, Hashable {
     }
 }
 
+enum BossSuperAttackType: String, Codable {
+    case web
+}
+
 enum BossAttackType: String, Codable {
     case dynamite
     case poison
@@ -31,6 +35,8 @@ enum BossStateType: String, Codable {
     case attack
     case rests
     case phaseChange
+    case targetSuperAttack
+    case superAttack
 }
 
 struct BossTargets: Codable, Hashable {
@@ -38,6 +44,7 @@ struct BossTargets: Codable, Hashable {
     var eats: [TileCoord]?
     var whatToAttack: [BossAttackType: [TileCoord]]?
     var attack: [BossAttackType: [TileCoord]]?
+    var superAttack: [BossSuperAttackType: [TileCoord]]?
 }
 
 struct BossState: Codable, Hashable {
@@ -57,9 +64,9 @@ struct BossState: Codable, Hashable {
         
     }
     
-    func advance(tiles: [[Tile]], turnsInState: Int, nummberOfRocksToEat: Int) -> BossState {
+    func advance(tiles: [[Tile]], turnsInState: Int, nummberOfRocksToEat: Int, eatenRocks: Int) -> BossState {
         if turnsLeftInState <= 0 {
-            let nextStateType = nextStateType()
+            let nextStateType = nextStateType(tiles, eatenRocks: eatenRocks)
             var nextBossState = BossState(
                 stateType: nextStateType,
                 turnsLeftInState: turnsInState,
@@ -83,6 +90,7 @@ struct BossState: Codable, Hashable {
         switch self.stateType {
         case .targetEat:
             self.targets = BossTargets(whatToEat: targetsToEat(in: tiles, numberOfRocksToEat: numberOfRocksToEat), eats: nil)
+            
         case .eats:
             let eatenRockCoords = eats(in: tiles)
             let whatToAttack = attack(basedOnRocks: eatenRockCoords, in: tiles)
@@ -91,12 +99,14 @@ struct BossState: Codable, Hashable {
                             eats: eatenRockCoords,
                             whatToAttack: targetsToAttack(in: tiles, with: whatToAttack)
                 )
+            
         case .targetAttack:
             self.targets = BossTargets(
                 whatToEat: nil,
                 eats: nil,
                 whatToAttack: oldState.targets.whatToAttack
             )
+            
         case .attack:
             self.targets = BossTargets(
                 whatToEat: nil,
@@ -104,27 +114,43 @@ struct BossState: Codable, Hashable {
                 whatToAttack: nil,
                 attack: validateAndUpdatePlannedAttacks(in: tiles, plannedAttacks: oldState.targets.whatToAttack)
             )
-        case .rests, .phaseChange:
+            
+        case .rests, .phaseChange, .superAttack, .targetSuperAttack:
             break
         }
     }
     
-    func nextStateType() -> BossStateType {
+    func nextStateType(_ tiles: [[Tile]], eatenRocks: Int) -> BossStateType {
         switch self.stateType {
         case .targetEat:
-            return .eats
+            // all the targeted tiles can be destroyed by the player in which case we should cycle back to the start of the boss routine
+            if (eats(in: tiles) ?? []).isEmpty { return .rests }
+            else { return .eats }
+            
         case .eats:
-            if (targets.eats ?? []).isEmpty {
-                return .rests
+            // after eating, there is a chance the super attack is charge in which case we would advance to super attaack targeting
+            if superAttackIsCharged(eatenRocks: eatenRocks) {
+                return .targetSuperAttack
             } else {
                 return .targetAttack
             }
+            
         case .targetAttack:
             return .attack
+            
         case .attack:
             return .rests
+            
+        case .targetSuperAttack:
+            return .superAttack
+            
+        case .superAttack:
+            return .rests
+            
         case .rests, .phaseChange:
-            return .targetEat
+            if superAttackIsCharged(eatenRocks: eatenRocks) { return  .targetSuperAttack }
+            else { return .targetEat }
+            
         }
     }
     
@@ -137,9 +163,6 @@ struct BossState: Codable, Hashable {
         return attacked(tiles: tiles, by: attacks)
         
     }
-    
-    
-    
     
 }
 
@@ -161,7 +184,7 @@ enum BossPhaseType: String, Codable {
     
     var rocksToEat: Int {
         switch self {
-        case .first: return 5 // return 3
+        case .first: return 4 // return 3
         case .second: return 5 // return 4
         case .third: return 6
         case .dead: return 0
@@ -178,31 +201,33 @@ struct BossPhase: Codable, Hashable {
     public let bossPhaseType: BossPhaseType
     private let numberOfIndividualColumns: Double
     var phaseChangeTagets: BossPhaseTargets
+    var eatenRocks: Int
     
     public init(numberOfColumns: Int = 0) {
         let initialState = BossState(stateType: .rests, turnsLeftInState: turnsInState(.rests), targets: BossTargets())
-        self.init(bossState: initialState, bossPhaseType: .first, numberColumns: numberOfColumns)
+        self.init(bossState: initialState, bossPhaseType: .first, numberColumns: numberOfColumns, eatenRocks: 0)
     }
     
-    private init(bossState: BossState, bossPhaseType: BossPhaseType, numberColumns: Int, bossPhaseChangeTargets: BossPhaseTargets? = nil) {
+    private init(bossState: BossState, bossPhaseType: BossPhaseType, numberColumns: Int, bossPhaseChangeTargets: BossPhaseTargets? = nil, eatenRocks: Int) {
         self.bossState = bossState
         self.bossPhaseType = bossPhaseType
         self.numberOfIndividualColumns = Double(numberColumns)
         self.phaseChangeTagets = bossPhaseChangeTargets ?? BossPhaseTargets(createPillars: nil)
+        self.eatenRocks = eatenRocks
     }
     
     
     mutating func advance(tiles: [[Tile]]) -> (BossPhase, Bool) {
         let oldBossState = bossState
-        let nextStateTurns = turnsInState(bossState.nextStateType())
+        let nextStateTurns = turnsInState(bossState.nextStateType(tiles, eatenRocks: eatenRocks))
         
         // this sets the next state's number of turns.  If the state doesnt advnace then it is ignored
-        let nextBossState = bossState.advance(tiles: tiles, turnsInState: nextStateTurns, nummberOfRocksToEat: bossPhaseType.rocksToEat)
+        let nextBossState = bossState.advance(tiles: tiles, turnsInState: nextStateTurns, nummberOfRocksToEat: bossPhaseType.rocksToEat, eatenRocks: eatenRocks)
         let sendInput = nextBossState.stateType != oldBossState.stateType
         
         // next boss phase might happen
         let nextBossPhaseType = nextPhase(tiles: tiles)
-        var nextBossPhase = BossPhase(bossState: nextBossState, bossPhaseType: nextBossPhaseType, numberColumns: Int(numberOfIndividualColumns))
+        var nextBossPhase = BossPhase(bossState: nextBossState, bossPhaseType: nextBossPhaseType, numberColumns: Int(numberOfIndividualColumns), eatenRocks: eatenRocks)
         
         // the phase is changing, let's do a special attack
         // this will overwrite any active boss attack, that's on purpose
@@ -218,7 +243,7 @@ struct BossPhase: Codable, Hashable {
             let numberOfAdditionalColumns = (nextPhaseChangeTagets.createPillars?.count ?? 0) * 3
             
             // create the next boss phase that will be returned
-            nextBossPhase = BossPhase(bossState: phaseChangeBossState, bossPhaseType: nextBossPhaseType, numberColumns: Int(numberOfIndividualColumns)+numberOfAdditionalColumns, bossPhaseChangeTargets: nextPhaseChangeTagets)
+            nextBossPhase = BossPhase(bossState: phaseChangeBossState, bossPhaseType: nextBossPhaseType, numberColumns: Int(numberOfIndividualColumns)+numberOfAdditionalColumns, bossPhaseChangeTargets: nextPhaseChangeTagets, eatenRocks: eatenRocks)
             
         }
         
@@ -298,8 +323,10 @@ class BossController {
             tiles = input.endTilesStruct ?? []
             
             advanceBossState()
+            
         case .boardBuilt, .boardLoaded:
             tiles = input.endTilesStruct ?? []
+            
         default:
             // ignore for now
             break
@@ -314,6 +341,12 @@ class BossController {
         if newPhase.bossPhaseType != oldPhase.bossPhaseType {
             InputQueue.append(Input(.bossPhaseStart(newPhase)))
         } else if (shouldSendInput) {
+            if newPhase.bossState.stateType == .eats {
+                self.phase.eatenRocks += newPhase.bossState.targets.eats?.count ?? 0
+            } else if newPhase.bossState.stateType == .targetSuperAttack {
+                self.phase.eatenRocks = 0
+            }
+            
             InputQueue.append(Input(.bossTurnStart(newPhase)))
         }
     }

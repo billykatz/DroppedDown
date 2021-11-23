@@ -236,7 +236,7 @@ func turnsInState(_ state: BossStateType) -> Int {
         return 0
     case .rests:
         return 1
-    case .phaseChange:
+    case .phaseChange, .superAttack, .targetSuperAttack:
         return 0
     }
 }
@@ -254,3 +254,8 @@ func pillarHealthCount(for tiles: [[Tile]]) -> Int {
     return pillarHealth
 }
 
+let superAttackChargeNumber = 8
+
+func superAttackIsCharged(eatenRocks: Int) -> Bool {
+     return eatenRocks >= 8
+}

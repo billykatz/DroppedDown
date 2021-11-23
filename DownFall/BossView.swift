@@ -69,20 +69,10 @@ class BossView: SKSpriteNode {
         case .bossTurnStart(let phase):
             handleBossTurnStart(phase: phase)
         case .bossPhaseStart(let phase):
-                handleBossPhaseStart(phase: phase)
+            handleBossPhaseStart(phase: phase)
         default:
             break
         }
-    }
-    
-    func resetReticles() {
-        dynamiteTargetToAttack.forEach { $0.removeFromParent() }
-        poisonColumnsTargetToAttack.forEach { $0.removeFromParent() }
-        spawnSpiderTargetToAttack.forEach { $0.removeFromParent() }
-    }
-    
-    func handleBossPhaseStart(phase: BossPhase) {
-        resetReticles()
     }
     
     func handleBossTurnStart(phase: BossPhase, transformation: Transformation? = nil) {
@@ -108,6 +98,18 @@ class BossView: SKSpriteNode {
             break
         }
     }
+    
+    func handleBossPhaseStart(phase: BossPhase) {
+        resetReticles()
+    }
+    
+    
+    func resetReticles() {
+        dynamiteTargetToAttack.forEach { $0.removeFromParent() }
+        poisonColumnsTargetToAttack.forEach { $0.removeFromParent() }
+        spawnSpiderTargetToAttack.forEach { $0.removeFromParent() }
+    }
+    
     
     func showDynamiteReticles(_ dynamiteTargets: [TileCoord]) {
         for target in dynamiteTargets {

@@ -255,7 +255,7 @@ class Board: Equatable {
             case .attack:
                 transformation = self.bossExecutesAttacks(input: input)
                 
-            case .rests, .phaseChange:
+            case .rests, .phaseChange, .superAttack, .targetSuperAttack:
                 transformation = self.resetBossFlags(input: input)
             }
             

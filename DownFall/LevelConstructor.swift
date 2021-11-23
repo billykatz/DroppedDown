@@ -392,7 +392,7 @@ struct LevelConstructor {
         
         let pillarColorsChoice2: [ShiftShaft_Color] = [.blue, .blue, .blue, .blue, .purple, .purple, .purple, .purple, .red, .red, .red, .red]
         let coordsChoice2: [TileCoord] = [
-            TileCoord(0, 1), TileCoord(0, 0), TileCoord(1, 1),
+            TileCoord(0, 1), TileCoord(0, 0), TileCoord(1, 0),
             TileCoord(7, 0), TileCoord(8, 0), TileCoord(8, 1),
             TileCoord(8, 7), TileCoord(8, 8), TileCoord(7, 8),
             TileCoord(0, 8), TileCoord(0, 7), TileCoord(1, 8)

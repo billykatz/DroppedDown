@@ -279,7 +279,7 @@ class Renderer: SKSpriteNode {
                 case .attack:
                     showBossAttacks(in: transformations, bossPhase: phase)
                 
-                case .rests, .phaseChange:
+                case .rests, .phaseChange, .superAttack, .targetSuperAttack:
 //                    showBossPhaseChangeAttacks(in: trans, bossPhase: BossPhase)
                     animationsFinished(endTiles: trans.endTiles)
                 }

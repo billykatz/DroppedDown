@@ -48,16 +48,22 @@ class BossDebugView: SKSpriteNode {
         containerView.removeAllChildren()
         let phaseName = phase.bossPhaseType.rawValue
         let bossState = phase.bossState.stateType.rawValue
+        let eatenRocks = phase.eatenRocks
         
-        let phaseNameLabel = ParagraphNode(text: "Phase: \(phaseName)", fontColor: .white)
+        let phaseNameLabel = ParagraphNode(text: "Phase: \(phaseName)", fontSize: .fontLargeSize, fontColor: .white)
         phaseNameLabel.position = CGPoint.position(phaseNameLabel.frame, inside: containerView.frame, verticalAlign: .top, horizontalAnchor: .center)
         
-        let stateNameLabel = ParagraphNode(text: "State: \(bossState)", fontColor: .white)
+        let stateNameLabel = ParagraphNode(text: "State: \(bossState)", fontSize: .fontLargeSize, fontColor: .white)
         stateNameLabel.position = CGPoint.alignHorizontally(stateNameLabel.frame, relativeTo: phaseNameLabel.frame, horizontalAnchor: .center, verticalAlign: .bottom, translatedToBounds: true)
+        
+        let superAttackLabel = ParagraphNode(text: "Super Attack Charge: \(eatenRocks) / \(superAttackChargeNumber)", fontSize: .fontLargeSize, fontColor: .white)
+        superAttackLabel.position = CGPoint.alignHorizontally(superAttackLabel.frame, relativeTo: stateNameLabel.frame, horizontalAnchor: .center, verticalAlign: .bottom, translatedToBounds: true)
+        
         
         
         containerView.addChild(phaseNameLabel)
         containerView.addChild(stateNameLabel)
+        containerView.addChild(superAttackLabel)
         
     }
     

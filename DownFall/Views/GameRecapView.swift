@@ -147,7 +147,7 @@ class GameRecapView: SKNode {
         buttonToShowRecapBackground.alpha = 0.0
         self.showRecapView = buttonToShowRecapBackground
         containerView.addChild(buttonToShowRecapBackground)
-
+        
         let buttonToShowRecap = ShiftShaft_Button(size: buttonSize, delegate: self, identifier: .gameRecapShowRecap, precedence: .flying, fontColor: .black, backgroundColor: .buttonGray)
         buttonToShowRecap.zPosition = 10000
         buttonToShowRecapBackground.addChild(buttonToShowRecap)
@@ -159,13 +159,13 @@ class GameRecapView: SKNode {
         containerView.addChild(buttonToView)
         containerView.addChild(buttonToExit)
         
-        animate(in: true, moveBy: false, waitTime: 0.75, duration: 0.75)
+        animate(in: true, waitTime: 0.75, duration: 0.75)
         
         
     }
     
     
-    func animate(in animateIn: Bool, moveBy: Bool, waitTime: Double, duration: Double) {
+    func animate(in animateIn: Bool, waitTime: Double, duration: Double) {
         var spriteActions: [SpriteAction] = []
         let waitDuration = waitTime
         let animateDuration = duration
@@ -177,7 +177,6 @@ class GameRecapView: SKNode {
                 child.alpha = animateIn ? 0.0 : 1.0
             }
             let targetAlpha: CGFloat
-            let moveBy: CGFloat = moveBy ? (animateIn ? 100 : -100) : 0
             let waitAction: SKAction
             if child.name == backgroundOverlayName {
                 targetAlpha = animateIn ? 0.75 : 0.0
@@ -186,26 +185,24 @@ class GameRecapView: SKNode {
                 targetAlpha = animateIn ? 1.0 : 0.0
                 waitAction = SKAction.wait(forDuration: waitDuration)
             }
-        
+            
             
             if (child == showRecapView) {
                 showRecapButton?.alpha = 1.0
                 let recapViewTargetAlpha: CGFloat = animateIn ? 0.0 : 1.0
                 let fadeTo = SKAction.fadeAlpha(to: recapViewTargetAlpha, duration: animateDuration)
-                let waitAndFadeIn = SKAction.sequence(waitAction, fadeTo, curve: .easeOut)
+                let waitAndFadeIn = SKAction.sequence(waitAction, fadeTo, curve: .easeIn)
                 spriteActions.append(.init(child, waitAndFadeIn))
             } else {
                 let fadeIn = SKAction.fadeAlpha(to: targetAlpha, duration: animateDuration)
-                let moveDown = SKAction.moveBy(x: 0, y: moveBy, duration: animateDuration)
-                let moveAndFade = SKAction.group([fadeIn, moveDown])
-                let waitAndFadeIn = SKAction.sequence(waitAction, moveAndFade, curve: .easeOut)
+                let waitAndFadeIn = SKAction.sequence(waitAction, fadeIn, curve: .easeIn)
                 spriteActions.append(.init(child, waitAndFadeIn))
             }
             
         }
         
         Animator().animate(spriteActions, completion: {})
-
+        
     }
     
     func fadeOut(completion: @escaping () -> ()) {
@@ -217,10 +214,10 @@ class GameRecapView: SKNode {
         
         Animator().animate(spriteActions, completion: completion)
     }
-        
+    
     
     func toggleRecapeView(appear: Bool) {
-        animate(in: appear, moveBy: false, waitTime: 0.0, duration: 0.25)
+        animate(in: appear, waitTime: 0.0, duration: 0.25)
     }
     
 }
@@ -229,12 +226,14 @@ extension GameRecapView: ButtonDelegate {
     func buttonTapped(_ button: ShiftShaft_Button) {
         if button.identifier == .gameRecapViewBoard {
             toggleRecapeView(appear: false)
-        } else if button.identifier == .mainMenu {
+        }
+        else if button.identifier == .gameRecapShowRecap {
+            toggleRecapeView(appear: true)
+        }
+        else if button.identifier == .mainMenu {
             fadeOut {
                 InputQueue.append(Input(.playAgain))
             }
-        }  else if button.identifier == .gameRecapShowRecap {
-            toggleRecapeView(appear: true)
         }
     }
 }

@@ -395,9 +395,9 @@ class TileCreator: TileStrategy {
             tiles[exitPosition.x][exitPosition.y] = Tile(type: .exit(blocked: true))
         }
         
-        // Quick testing for rune replacement
-        let data = entities.entity(with: .alamo)!
-        tiles[playerPosition.row+1][playerPosition.column] = Tile(type: .monster(data))
+        // Quick testing for game recap screen
+//        let data = entities.entity(with: .alamo)!
+//        tiles[playerPosition.row+1][playerPosition.column] = Tile(type: .monster(data))
         
         // quick testing gem collectin
 //        tiles[3][6] = Tile(type: .item(Item.init(type: .gem, amount: 10, color: .blue)))

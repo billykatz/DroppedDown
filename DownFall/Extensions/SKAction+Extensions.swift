@@ -14,6 +14,13 @@ extension SKAction {
         action.timingMode = curve
         return action
     }
+    
+    static func group(_ group: SKAction..., curve: SKActionTimingMode) -> SKAction {
+        let action = SKAction.group(group)
+        action.timingMode = curve
+        return action
+    }
+
 }
 
 extension SKAction {

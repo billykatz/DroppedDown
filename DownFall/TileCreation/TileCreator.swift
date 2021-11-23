@@ -396,7 +396,8 @@ class TileCreator: TileStrategy {
         }
         
         // Quick testing for rune replacement
-//        tiles[playerPosition.row-1][playerPosition.column] = Tile(type: .offer(StoreOffer.offer(type: .rune(Rune.rune(for: .bubbleUp)), tier: 1)))
+        let data = entities.entity(with: .alamo)!
+        tiles[playerPosition.row+1][playerPosition.column] = Tile(type: .monster(data))
         
         // quick testing gem collectin
 //        tiles[3][6] = Tile(type: .item(Item.init(type: .gem, amount: 10, color: .blue)))

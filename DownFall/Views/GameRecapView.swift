@@ -14,6 +14,7 @@ class GameRecapView: SKNode {
     let backgroundOverlayName = "backgroundOverlayName"
     var showBoardButton: ShiftShaft_Button?
     var showRecapButton: ShiftShaft_Button?
+    var showRecapView: SKShapeNode?
     
     init(playableRect: CGRect) {
         containerView = SKSpriteNode(color: .clear, size: playableRect.size)
@@ -21,6 +22,7 @@ class GameRecapView: SKNode {
         super.init()
         
         addChild(containerView)
+        containerView.position = containerView.position.translateVertically(-10)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -33,7 +35,7 @@ class GameRecapView: SKNode {
         self.zPosition = 900_000_000_000
         
         // create the background view
-        let blueBackgroundView = SKShapeNode(rectOf: CGSize(width: 780, height: 1100), cornerRadius: 24.0)
+        let blueBackgroundView = SKShapeNode(rectOf: CGSize(width: 780, height: 1250), cornerRadius: 24.0)
         blueBackgroundView.lineWidth = 10
         blueBackgroundView.strokeColor = .codexItemStrokeBlue
         blueBackgroundView.fillColor = .gameRecapBlue
@@ -42,7 +44,7 @@ class GameRecapView: SKNode {
         
         // create the background overlay view
         let backgroundOverlay = SKSpriteNode(color: .black, size: CGSize(widthHeight: 5000))
-        backgroundOverlay.alpha = 0.5
+        backgroundOverlay.alpha = 0.75
         backgroundOverlay.zPosition = -100000
         backgroundOverlay.name = backgroundOverlayName
         containerView.addChild(backgroundOverlay)
@@ -60,7 +62,7 @@ class GameRecapView: SKNode {
             let killedByParagraph = ParagraphNode(text: "You were killed by:", fontSize: .fontLargeSize, fontColor: .white)
             
             killedByParagraph.position = CGPoint.alignHorizontally(killedByParagraph.frame, relativeTo: title.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.more*2, translatedToBounds: true)
-            killedBySprite.position = CGPoint.alignHorizontally(killedBySprite.frame, relativeTo: killedByParagraph.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.normal, translatedToBounds: true)
+            killedBySprite.position = CGPoint.alignHorizontally(killedBySprite.frame, relativeTo: killedByParagraph.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.most, translatedToBounds: true)
             containerView.addChild(killedByParagraph)
             containerView.addChild(killedBySprite)
             
@@ -99,7 +101,7 @@ class GameRecapView: SKNode {
         let statTitleHorizontalPadding = CGFloat(75)
         let statAmountHorizontalPadding = CGFloat(125)
         var statTitleAlignNode = SKSpriteNode(color: .clear, size: .fifty)
-        statTitleAlignNode.position = CGPoint.alignHorizontally(statTitleAlignNode.frame, relativeTo: rectToAlignStats, horizontalAnchor: .center, verticalAlign: .bottom, horizontalPadding: statTitleHorizontalPadding, translatedToBounds: true)
+        statTitleAlignNode.position = CGPoint.alignHorizontally(statTitleAlignNode.frame, relativeTo: rectToAlignStats, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: -10, horizontalPadding: statTitleHorizontalPadding, translatedToBounds: true)
         var statAmountAlignNode = SKSpriteNode(color: .clear, size: .fifty)
         statAmountAlignNode.position = CGPoint.alignVertically(statAmountAlignNode.frame, relativeTo: statTitleAlignNode.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: statAmountHorizontalPadding, translatedToBounds: true)
         
@@ -129,47 +131,82 @@ class GameRecapView: SKNode {
         }
         
         // create a button that allows the player to view the board
-        let buttonSize = CGSize(width: 300, height: 150)
+        let buttonSize = CGSize(width: 300, height: 130)
         let buttonToView = ShiftShaft_Button(size: buttonSize, delegate: self, identifier: .gameRecapViewBoard, precedence: .flying, fontColor: .black, backgroundColor: .buttonGray)
-        buttonToView.position = CGPoint.alignHorizontally(buttonToView.frame, relativeTo: blueBackgroundView.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: 150)
+        buttonToView.position = CGPoint.position(buttonToView.frame, inside: blueBackgroundView.frame, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: 32.0, translatedToBounds: true)
         showBoardButton = buttonToView
         
         //
+        
+        let buttonToShowRecapBackground = SKShapeNode(rectOf: CGSize(width: 780, height: 175), cornerRadius: 24.0)
+        buttonToShowRecapBackground.lineWidth = 10
+        buttonToShowRecapBackground.strokeColor = .codexItemStrokeBlue
+        buttonToShowRecapBackground.fillColor = .gameRecapBlue
+        buttonToShowRecapBackground.zPosition = 0
+        buttonToShowRecapBackground.position = CGPoint.alignHorizontally(buttonToShowRecapBackground.frame, relativeTo: buttonToView.frame, horizontalAnchor: .center, verticalAlign: .center, translatedToBounds: true)
+        buttonToShowRecapBackground.alpha = 0.0
+        self.showRecapView = buttonToShowRecapBackground
+        containerView.addChild(buttonToShowRecapBackground)
+
         let buttonToShowRecap = ShiftShaft_Button(size: buttonSize, delegate: self, identifier: .gameRecapShowRecap, precedence: .flying, fontColor: .black, backgroundColor: .buttonGray)
-        buttonToShowRecap.position = CGPoint.alignHorizontally(buttonToView.frame, relativeTo: buttonToView.frame, horizontalAnchor: .center, verticalAlign: .center, translatedToBounds: true)
-        buttonToShowRecap.alpha = 0.0
+        buttonToShowRecap.zPosition = 10000
+        buttonToShowRecapBackground.addChild(buttonToShowRecap)
         showRecapButton = buttonToShowRecap
         
         let buttonToExit = ShiftShaft_Button(size: buttonSize, delegate: self, identifier: .mainMenu, precedence: .flying, fontColor: .black, backgroundColor: .buttonGray)
-        buttonToExit.position = CGPoint.alignHorizontally(buttonToExit.frame, relativeTo: blueBackgroundView.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: -200)
+        buttonToExit.position = CGPoint.alignHorizontally(buttonToExit.frame, relativeTo: buttonToView.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: Style.Padding.most, translatedToBounds: true)
         
         containerView.addChild(buttonToView)
-        containerView.addChild(buttonToShowRecap)
         containerView.addChild(buttonToExit)
+        
+        animate(in: true, moveBy: false, waitTime: 0.75, duration: 0.75)
         
         
     }
     
-//    func animateIn() {
-//        for child in containerView.children {
-//            child.alpha = 0
-//        }
-//        containerView.alpha = 0
-//
-//        let appear = SKAction.fadeIn(withDuration: 0.15)
-//        let appearGrowShrink = SKAction.group([appear])
-//        appearGrowShrink.timingMode = .easeOut
-//
-//        for child in containerView.children {
-//            child.run(appearGrowShrink)
-//        }
-//
-//
-//        containerView.run(appearGrowShrink)
-//
-//        showRecapButton?.alpha = 0
-//
-//    }
+    
+    func animate(in animateIn: Bool, moveBy: Bool, waitTime: Double, duration: Double) {
+        var spriteActions: [SpriteAction] = []
+        let waitDuration = waitTime
+        let animateDuration = duration
+        
+        for child in containerView.children {
+            if (child == showRecapView) {
+                child.alpha = 0.0
+            } else {
+                child.alpha = animateIn ? 0.0 : 1.0
+            }
+            let targetAlpha: CGFloat
+            let moveBy: CGFloat = moveBy ? (animateIn ? 100 : -100) : 0
+            let waitAction: SKAction
+            if child.name == backgroundOverlayName {
+                targetAlpha = animateIn ? 0.75 : 0.0
+                waitAction = SKAction.wait(forDuration: 0.0)
+            } else {
+                targetAlpha = animateIn ? 1.0 : 0.0
+                waitAction = SKAction.wait(forDuration: waitDuration)
+            }
+        
+            
+            if (child == showRecapView) {
+                showRecapButton?.alpha = 1.0
+                let recapViewTargetAlpha: CGFloat = animateIn ? 0.0 : 1.0
+                let fadeTo = SKAction.fadeAlpha(to: recapViewTargetAlpha, duration: animateDuration)
+                let waitAndFadeIn = SKAction.sequence(waitAction, fadeTo, curve: .easeOut)
+                spriteActions.append(.init(child, waitAndFadeIn))
+            } else {
+                let fadeIn = SKAction.fadeAlpha(to: targetAlpha, duration: animateDuration)
+                let moveDown = SKAction.moveBy(x: 0, y: moveBy, duration: animateDuration)
+                let moveAndFade = SKAction.group([fadeIn, moveDown])
+                let waitAndFadeIn = SKAction.sequence(waitAction, moveAndFade, curve: .easeOut)
+                spriteActions.append(.init(child, waitAndFadeIn))
+            }
+            
+        }
+        
+        Animator().animate(spriteActions, completion: {})
+
+    }
     
     func fadeOut(completion: @escaping () -> ()) {
         let fadeOut = SKAction.fadeOut(withDuration: 0.1)
@@ -182,41 +219,8 @@ class GameRecapView: SKNode {
     }
         
     
-    func toggleBoard(appear: Bool) {
-        if appear {
-            showBoardButton?.alpha = 0
-            showRecapButton?.alpha = 1
-        } else {
-            showBoardButton?.alpha = 1
-            showRecapButton?.alpha = 0
-        }
-        
-        let action: SKAction
-        if appear {
-            let fadeOut = SKAction.fadeOut(withDuration: 0.1)
-            action = fadeOut
-        } else {
-            let fadeIn = SKAction.fadeIn(withDuration: 0.1)
-            action = fadeIn
-        }
-        action.timingMode = .easeOut
-        
-        var spriteActions: [SpriteAction] = []
-        for child in containerView.children {
-//            if let child = child as? SKSpriteNode {
-            
-                if (child == showRecapButton || child == showBoardButton) { continue }
-                
-                if child.name == backgroundOverlayName {
-                    child.alpha = appear ? 0 : 0.25
-                    continue
-                }
-                
-                spriteActions.append(.init(child, action))
-//            }
-        }
-        
-        Animator().animate(spriteActions, completion: {})
+    func toggleRecapeView(appear: Bool) {
+        animate(in: appear, moveBy: false, waitTime: 0.0, duration: 0.25)
     }
     
 }
@@ -224,13 +228,13 @@ class GameRecapView: SKNode {
 extension GameRecapView: ButtonDelegate {
     func buttonTapped(_ button: ShiftShaft_Button) {
         if button.identifier == .gameRecapViewBoard {
-            toggleBoard(appear: true)
+            toggleRecapeView(appear: false)
         } else if button.identifier == .mainMenu {
             fadeOut {
                 InputQueue.append(Input(.playAgain))
             }
         }  else if button.identifier == .gameRecapShowRecap {
-            toggleBoard(appear: false)
+            toggleRecapeView(appear: true)
         }
     }
 }

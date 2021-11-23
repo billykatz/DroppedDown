@@ -90,7 +90,7 @@ struct Profile: Codable, Equatable {
     var runPlayer: EntityModel {
         let newPlayer = player.update(pickaxe: Pickaxe(runeSlots: 1, runes: []))
 //        let newPlayer = player.update(pickaxe: Pickaxe(runeSlots: 2, runes: [Rune.rune(for: .fireball), Rune.rune(for: .vortex)]))
-        return applyUnlockables(to: newPlayer).revive()
+        return applyUnlockables(to: newPlayer).revive().wasAttacked(for: 2, from: .east)
         
 //        guard let rune = randomRune else {
 //            return newPlayer.update(pickaxe: Pickaxe(runeSlots: 1, runes: []))

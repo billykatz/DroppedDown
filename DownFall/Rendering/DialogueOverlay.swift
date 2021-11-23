@@ -229,13 +229,13 @@ class DialogueOverlay: SKSpriteNode {
         self.isUserInteractionEnabled = true
         self.zPosition = 100_000_000_000
         
-        let levelGoalsHighlight = SKSpriteNode(texture: SKTexture(imageNamed: highlightLevelGoalsMaskName), color: .white, size: CGSize(width: playableRect.width, height: playableRect.height * 2.31 ))
+        let levelGoalsHighlight = SKSpriteNode(texture: SKTexture(imageNamed: highlightLevelGoalsMaskName), color: .white, size: CGSize(width: playableRect.width*4, height: playableRect.height * 2.31 ))
         
         for tileHighlight in tutorialPhase.highlightTileType ?? [] {
             if let position = tileTypeToPosition(tileHighlight) {
-                let maskHighlightNode = SKSpriteNode(texture: SKTexture(imageNamed: highlightMaskName), color: .white, size: playableRect.size.scale(by: 2.0))
+                let maskHighlightNode = SKSpriteNode(texture: SKTexture(imageNamed: highlightMaskName), color: .white, size: playableRect.size.scale(by: 6.0))
                 maskHighlightNode.position = position
-                maskHighlightNode.alpha = CGFloat(tutorialPhase.highlightTileType?.count ?? 1) == 2 ? 0.25 : 0.75
+                maskHighlightNode.alpha = 0.75
                 if tutorialPhase.shouldDimScreen {
                     self.addChild(maskHighlightNode)
                 }
@@ -245,6 +245,7 @@ class DialogueOverlay: SKSpriteNode {
         
         if tutorialPhase.shouldHighlightLevelGoalsInHUD {
             levelGoalsHighlight.position = levelGoalViewOrigin
+            levelGoalsHighlight.alpha = 0.75
             self.addChild(levelGoalsHighlight)
         }
         

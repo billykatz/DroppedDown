@@ -437,10 +437,9 @@ class TileDetailView: SKSpriteNode {
     
     func addBackgroundOverlay() {
         // set up the background
-        let overlay = SKShapeNode(rect: playableRect)
-        overlay.color = UIColor.black
-        overlay.alpha = 0.75
-        overlay.zPosition = -1
+        let overlay = SKSpriteNode(color: .black, size: CGSize(widthHeight: 5000.0))
+        overlay.alpha = 0.5
+        overlay.zPosition = -100
         overlay.position = .zero
         overlay.name = Constants.overlayName
         contentView.addChild(overlay)

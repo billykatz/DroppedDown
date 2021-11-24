@@ -437,6 +437,16 @@ enum TileType: Hashable, CaseIterable, Codable {
         }
     }
     
+    var entityData: EntityModel? {
+        switch self {
+        case .player(let data):
+            return data
+        case .monster(let data):
+            return data
+        default: return nil
+        }
+    }
+    
     
     enum TextureName: String {
         case player = "player2"

@@ -76,6 +76,16 @@ struct EntityModel: Equatable, Codable {
                 return self.rawValue
             }
         }
+        
+        var projectileRetracts: Bool {
+            switch self {
+            case .alamo, .sally:
+                return true
+            default:
+                return false
+            }
+
+        }
     }
     
     static let playerCases: [EntityType] = [.player]

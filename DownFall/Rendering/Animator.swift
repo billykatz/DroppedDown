@@ -1038,19 +1038,30 @@ struct Animator {
         // CAREFUL: Synchronizing on main thread
         let dispatchGroup = DispatchGroup()
         
-        
-        // attacker animation
-        if let attackAnimation = animation(for: .attack, fromPosition: attackerPosition, toPosition: defenderPosition, in: tiles, sprites: sprites, dispatchGroup: dispatchGroup) {
-            groupedActions.append(attackAnimation)
-        }
-        
         let attackAnimationFrames = animationFrames(for: .attack, fromPosition: attackerPosition, toPosition: defenderPosition, in: tiles)
         
+        var startFrameCount = 0
+        var midFrameCount = 0
+        var endFrameCount = 0
         // projectile
-        if let projectileGroup = projectileAnimations(from: attackerPosition, in: tiles, with: sprites, affectedTilesPosition: positions(affectedTiles), foreground: foreground, dispatchGroup: dispatchGroup, attackPosition: attackerPosition, defenderPosition: defenderPosition, attackAnimationFrameCount: attackAnimationFrames),
-            projectileGroup.count > 0 {
+        if let (startFrames, midFrames, endFrames, projectileGroup) = projectileAnimations(from: attackerPosition, in: tiles, with: sprites, affectedTilesPosition: positions(affectedTiles), foreground: foreground, dispatchGroup: dispatchGroup, attackPosition: attackerPosition, defenderPosition: defenderPosition, attackAnimationFrameCount: attackAnimationFrames),
+           projectileGroup.count > 0 {
             groupedActions.append(SKAction.group(projectileGroup))
+            
+            startFrameCount = startFrames?.count ?? 0
+            midFrameCount = midFrames?.count ?? 0
+            endFrameCount = endFrames?.count ?? 0
         }
+        
+        // attacker animation
+        
+        if let data = tiles[attackerPosition].type.entityData,
+           let attackAnimation = animation(for: .attack, fromPosition: attackerPosition, toPosition: defenderPosition, in: tiles, sprites: sprites, retracts: data.type.projectileRetracts, numberOfFramesStart: startFrameCount, numberOfFramesMid: midFrameCount, numberOfFramesEnd: endFrameCount, dispatchGroup: dispatchGroup) {
+            let attacker = sprites[attackerPosition]
+            attacker.run(attackAnimation)
+//            groupedActions.append(attackAnimation)
+        }
+        
         
         // defender animation
         if !defenderDodged,
@@ -1089,7 +1100,7 @@ struct Animator {
         
     }
     
-    private func projectileAnimations(from position: TileCoord?, in tiles: [[Tile]], with sprites: [[DFTileSpriteNode]], affectedTilesPosition: [CGPoint], foreground: SKNode, dispatchGroup: DispatchGroup, attackPosition: TileCoord, defenderPosition: TileCoord?, attackAnimationFrameCount: Int) -> [SKAction]? {
+    private func projectileAnimations(from position: TileCoord?, in tiles: [[Tile]], with sprites: [[DFTileSpriteNode]], affectedTilesPosition: [CGPoint], foreground: SKNode, dispatchGroup: DispatchGroup, attackPosition: TileCoord, defenderPosition: TileCoord?, attackAnimationFrameCount: Int) -> (startFrames: [SKTexture]?, midFrames: [SKTexture]?, endFrames: [SKTexture]?, [SKAction])? {
         
         guard let entityPosition = position else { return nil }
         
@@ -1118,7 +1129,7 @@ struct Animator {
             case .sally:
                 projectileRetracts = true
                 isProjectileSequenced = true
-                projectileTilePerFrame = 0.03
+//                projectileTilePerFrame = 0.03
                 if let defenderPos = defenderPosition {
                     flipSpriteHorizontally = attackPosition.direction(relative: defenderPos) == .east
                 }
@@ -1137,7 +1148,6 @@ struct Animator {
             if let projectileAnimation = monsterData.animation(of: .projectileMid) {
                 projectileMidAnimationFrames = projectileAnimation
             }
-            
             // grab the end tile animations
             if let projectileAnimation = monsterData.animation(of: .projectileEnd) {
                 projectileEndAnimationFrames = projectileAnimation
@@ -1171,9 +1181,11 @@ struct Animator {
             
             /// For some monster attacks, the projectile goes out and comes back.
             /// We need to animate an `idle` animation and a reverse of the original projectile aniamtion to create this effect
-            if projectileRetracts, let midFrames = projectileMidAnimationFrames {
+            if projectileRetracts,
+                let midFrames = projectileMidAnimationFrames {
                 projectileAnimations = [retractableAnimation(startFrames: startFrames, midFrames: midFrames, endFrames: projectileEndAnimationFrames, currentIndex: idx, totalAfectedTiles: affectedTileCount, projectileAnimationSpeed: projectileTilePerFrame, attackAnimationCount: attackAnimationFrameCount)]
             }
+            
             /// If the attack does not retract then we want to show the midFrames in all the tiles between 1..<n, where n is the length of the attack. Unless there is an projectileEnd aniamtion.  Then we want to only show the midFrames for the middle tiles, where the idx is in 1..<n-1.
             else if idx > 0, let midFrames = projectileMidAnimationFrames {
                 let midFrameAnimation = SKAction.animate(with: midFrames, timePerFrame: projectileTilePerFrame)
@@ -1182,10 +1194,14 @@ struct Animator {
             
             /// sequence the projectile
             if !projectileRetracts,
-                isProjectileSequenced,
+               isProjectileSequenced,
                 case let TileType.monster(monsterData) = tiles[entityPosition].type {
                 let duration = projectileKeyFrame(for: monsterData, index: idx)
                 let waitAction = SKAction.wait(forDuration: duration * projectileTilePerFrame)
+                sequencedActions.append(waitAction)
+            } else if projectileRetracts {
+                let duration = Double(attackAnimationFrameCount-3) * timePerFrame()
+                let waitAction = SKAction.wait(forDuration:  duration)
                 sequencedActions.append(waitAction)
             }
             
@@ -1216,12 +1232,15 @@ struct Animator {
             
         }
         
-        return projectileGroup
+        return (projectileStartAnimationFrames, projectileMidAnimationFrames, projectileEndAnimationFrames, projectileGroup)
     }
     
     private func retractableAnimation(startFrames: [SKTexture], midFrames: [SKTexture], endFrames: [SKTexture]?, currentIndex: Int, totalAfectedTiles: Int, projectileAnimationSpeed: Double, attackAnimationCount: Int = 0) -> SKAction {
         
+        // wait until this index gets to go.  index * # of animation frames
         let waitFrames = currentIndex * startFrames.count
+        
+        // the amount of time we should wait is equal to frames * duration
         let waitDuration = Double(waitFrames + attackAnimationCount) * projectileAnimationSpeed
         let waitAction = SKAction.wait(forDuration: waitDuration)
         
@@ -1229,10 +1248,14 @@ struct Animator {
         let startAnimation: SKAction
         //save the start frames to reverse later
         let actualStartFrames: [SKTexture]
+        
+        /// this is the final tile, so just animate the with the end animation
         if currentIndex == totalAfectedTiles - 1, let endFrames = endFrames {
             startAnimation = SKAction.animate(with: endFrames, timePerFrame: projectileAnimationSpeed)
             actualStartFrames = endFrames
-        } else {
+        }
+        /// this is not the final tile, so animate the start frames
+        else {
             startAnimation = SKAction.animate(with: startFrames, timePerFrame: projectileAnimationSpeed)
             actualStartFrames = startFrames
         }
@@ -1306,6 +1329,10 @@ struct Animator {
                            toPosition defenderPosition: TileCoord?,
                            in tiles: [[Tile]],
                            sprites: [[DFTileSpriteNode]],
+                           retracts: Bool = false,
+                           numberOfFramesStart: Int = 0,
+                           numberOfFramesMid: Int = 0,
+                           numberOfFramesEnd: Int = 0,
                            dispatchGroup: DispatchGroup,
                            reverse: Bool = false) -> SKAction? {
         
@@ -1336,7 +1363,34 @@ struct Animator {
                 let flipAnimation = SKAction.scaleX(to: -1, duration: 0.01)
                 animation = SKAction.sequence([flipAnimation, SKAction.animate(with: frames, timePerFrame: self.timePerFrame())])
             } else {
-                animation = SKAction.animate(with: frames, timePerFrame: self.timePerFrame())
+                if retracts,
+                   let defenderPos = defenderPosition,
+                    let distance = position.distance(to: defenderPos) {
+                    let firstHalfFrames = frames
+                    let startFrames = 2 * numberOfFramesStart
+                    let endFrames = numberOfFramesEnd * 2
+                    let midFrames: Int
+                    if endFrames > 0 {
+                        // this is for sally.  Sally's mid is one 1 frame but the end if 3 frames
+                        midFrames = (2 * (distance - 2) * numberOfFramesMid) + endFrames
+                    } else {
+                        midFrames = (2 * (distance - 1) * numberOfFramesMid)
+                    }
+                    
+                    let timeToWait = Double(startFrames + midFrames - frames.count) * 0.03
+                    let waitAction = SKAction.wait(forDuration: timeToWait)
+                    let secondHalfFrames = frames.reversed()
+                    
+                    let firstHalfAnimation = SKAction.animate(with: Array(firstHalfFrames), timePerFrame: self.timePerFrame())
+                    
+                    let secondHalfAnimation = SKAction.animate(with: Array(secondHalfFrames), timePerFrame: self.timePerFrame())
+                    
+                    
+                    animation = SKAction.sequence([firstHalfAnimation, waitAction, secondHalfAnimation])
+                    
+                } else {
+                    animation = SKAction.animate(with: frames, timePerFrame: self.timePerFrame())
+                }
             }
             
             dispatchGroup.enter()
@@ -1345,7 +1399,7 @@ struct Animator {
                     sprites[position].run(animation) {
                         dispatchGroup.leave()
                     }
-            }
+                }
         }
         return nil
     }

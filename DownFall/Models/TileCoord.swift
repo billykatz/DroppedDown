@@ -136,6 +136,33 @@ struct TileCoord: Codable, Hashable {
         }
     }
     
+    func distance(to otherCoord: TileCoord) -> Int? {
+        guard let axis = axis(relative: otherCoord) else { return nil }
+        return distance(to: otherCoord, along: axis)
+    }
+    
+    /// x              other(same col, row above)     x
+    /// other(colLeft, same row)    us    other(colRight, same row)
+    /// x              other(same col, row below)   x
+    func axis(relative to: TileCoord) -> Axis? {
+        if to.y <= colLeft.y && to.x == x {
+            return .horizontal
+        }
+        
+        if to.y >= colRight.y && to.x == x {
+            return .horizontal
+        }
+        
+        if to.x >= rowAbove.x && to.y == y {
+            return .vertical
+        }
+        
+        if to.x <= rowBelow.x && to.y == y {
+            return .vertical
+        }
+        return nil
+    }
+    
     /// x              other(same col, row above)     x
     /// other(colLeft, same row)    us    other(colRight, same row)
     /// x              other(same col, row below)   x

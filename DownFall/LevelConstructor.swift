@@ -490,9 +490,12 @@ struct LevelConstructor {
         
         switch depth {
         case 0, 1:
-            let ratRange = RangeModel(lower: 0, upper: 50)
-            let alamoRange = ratRange.next(50)
-            return [.rat: ratRange, .alamo: alamoRange]
+//            let ratRange = RangeModel(lower: 0, upper: 50)
+//            let alamoRange = ratRange.next(50)
+//            return [.rat: ratRange, .alamo: alamoRange]
+            let alamoRange = RangeModel(lower: 0, upper: 50)
+            let sallyRange = alamoRange.next(50)
+            return [.alamo: alamoRange, .sally: sallyRange]
         case 2:
             let ratRange = RangeModel(lower: 0, upper: 40)
             let alamoRange = ratRange.next(40)

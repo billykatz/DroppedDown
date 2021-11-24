@@ -53,6 +53,8 @@ struct GoalTracking: Codable, Hashable {
                     }
             case .useRune:
                 return "blankRune"
+            case .destroyBoss:
+                return "skullAndCrossbones"
             }
         }
         
@@ -81,6 +83,8 @@ struct GoalTracking: Codable, Hashable {
                 }
             case .useRune:
                 return "Use runes \(target) time\(target > 1 ? "s" : "")"
+            case .destroyBoss:
+                return "Defeat the boss"
             }
         }
         
@@ -112,6 +116,8 @@ struct GoalTracking: Codable, Hashable {
             }
         case .useRune:
             return (.lightBarRune, .darkBarRune)
+        case .destroyBoss:
+            return (.lightBarMonster, .darkBarMonster)
         }
     }
     

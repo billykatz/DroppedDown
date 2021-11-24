@@ -15,7 +15,7 @@ struct Style {
     
     struct LevelGoalKey {
         static let keyTextureSize = CGSize(width: 50, height: 50)
-        static let keyCircleRadius = CGFloat(25)
+        static let keyCircleRadius = CGFloat(15)
     }
     
     struct FillableBar {

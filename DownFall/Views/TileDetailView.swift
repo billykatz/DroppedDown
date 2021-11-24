@@ -68,7 +68,7 @@ class TileDetailView: SKSpriteNode {
         switch self.detailType {
             
         case .levelGoals:
-            return .foregroundBlue
+            return .gameRecapBlue
         case .tileDetail:
             return .tileDetailViewBackground
         }
@@ -116,7 +116,7 @@ class TileDetailView: SKSpriteNode {
         
         let maxWidth = self.contentView.frame.width * Constants.widthCoefficient
         let maxHeight = Constants.maxHeight
-        let detailView = SKSpriteNode(color: .tileDetailViewBackground, size: CGSize(width: maxWidth, height: maxHeight))
+        let detailView = SKSpriteNode(color: .gameRecapBlue, size: CGSize(width: maxWidth, height: maxHeight))
         
         detailView.position = CGPoint.position(detailView.frame, inside: playableRect, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: Style.Padding.most*8)
         detailView.zPosition = Precedence.flying.rawValue
@@ -347,9 +347,7 @@ class TileDetailView: SKSpriteNode {
 
         // add the border
         addBorder(toView: contentView)
-        
-        // add the background overlay
-//        addBackgroundOverlay()
+    
     }
     
     func updateLevelGoals() {
@@ -358,6 +356,7 @@ class TileDetailView: SKSpriteNode {
             detailViewTemplate.removeFromParent()
             return
         }
+        
         for child in contentView.children {
             if child.name == Constants.borderName || child.name == Constants.overlayName {
                 child.removeFromParent()
@@ -365,7 +364,7 @@ class TileDetailView: SKSpriteNode {
         }
 
         
-        let subTitleNode = ParagraphNode(text: "Level Goals", paragraphWidth: detailViewTemplate.frame.width, fontSize: .fontExtraLargeSize, fontColor: fontColor)
+        let subTitleNode = ParagraphNode(text: "Level Goals", paragraphWidth: detailViewTemplate.frame.width, fontSize: 100.0, fontColor: fontColor)
         
         subTitleNode.position = CGPoint.position(subTitleNode.frame, inside: detailViewTemplate.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most)
         
@@ -376,27 +375,31 @@ class TileDetailView: SKSpriteNode {
         for (count, goal) in updatedGoals.enumerated() {
             let circleNode = SKShapeNode(circleOfRadius: Style.LevelGoalKey.keyCircleRadius)
             circleNode.color = goal.fillBarColor.1
-            
+            circleNode.strokeColor = .black
+            circleNode.lineWidth = 2
             circleNode.position = CGPoint.position(circleNode.frame,
                                                    inside: detailViewTemplate.frame,
                                                    verticalAlign: .top,
                                                    horizontalAnchor: .left,
                                                    xOffset: Style.Padding.most*2,
-                                                   yOffset: (CGFloat(count) * Style.LevelGoalKey.keyCircleRadius * 2) + (CGFloat(count) * 15) + textHeight + Style.Padding.more*3)
+                                                   yOffset: (CGFloat(count) * Style.LevelGoalKey.keyCircleRadius * 2) + (CGFloat(count) * 35) + textHeight + Style.Padding.more*3)
 
             detailViewTemplate.addChildSafely(circleNode)
             
-            
             // create the goal description
-            let descriptionLabel = ParagraphNode(text: "\(goal.description())", paragraphWidth: detailViewTemplate.frame.maxX - circleNode.frame.maxX, fontSize: .fontLargeSize, fontColor: fontColor)
+            let descProgressFontSize: CGFloat = 75.0
+            let descriptionLabel = ParagraphNode(text: "\(goal.description())", paragraphWidth: detailViewTemplate.frame.maxX - circleNode.frame.maxX, fontSize: descProgressFontSize, fontColor: fontColor)
             
-            descriptionLabel.position = CGPoint.alignVertically(descriptionLabel.frame, relativeTo: circleNode.frame, horizontalAnchor: .right, verticalAlign: .center, verticalPadding: Style.Padding.less, horizontalPadding: 100.0,  translatedToBounds: true)
+            let descriptionPosX = CGPoint.alignHorizontally(descriptionLabel.frame, relativeTo: subTitleNode.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.less,  translatedToBounds: true).x
+            let descriptionPosY = CGPoint.alignVertically(descriptionLabel.frame, relativeTo: circleNode.frame, horizontalAnchor: .right, verticalAlign: .center, verticalPadding: Style.Padding.normal, translatedToBounds: true).y
+            
+            descriptionLabel.position = CGPoint(x: descriptionPosX, y: descriptionPosY)
             
             detailViewTemplate.addChildSafely(descriptionLabel)
     
             
             // Progress label  
-            let progressLabel = ParagraphNode(text: goal.progressDescription, paragraphWidth: detailViewTemplate.frame.maxX - circleNode.frame.maxX, fontSize: .fontLargeSize, fontColor: fontColor)
+            let progressLabel = ParagraphNode(text: goal.progressDescription, paragraphWidth: detailViewTemplate.frame.maxX - circleNode.frame.maxX, fontSize: 65.0, fontColor: fontColor)
             let x = CGPoint.position(progressLabel.frame, inside: detailViewTemplate.frame, verticalAlign: .center, horizontalAnchor: .right, xOffset: Style.Padding.most).x
             let y = CGPoint.alignVertically(progressLabel.frame, relativeTo: descriptionLabel.frame, horizontalAnchor: .right, verticalAlign: .center, translatedToBounds: true).y
             progressLabel.position = CGPoint(x: x, y: y)
@@ -417,7 +420,6 @@ class TileDetailView: SKSpriteNode {
         
         // add the border
         addBorder(toView: detailViewTemplate)
-        
         
         // add the background overlay
         addBackgroundOverlay()

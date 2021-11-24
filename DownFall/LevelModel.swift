@@ -11,6 +11,7 @@ import SpriteKit
 enum LevelGoalType: String, Codable, Hashable {
     case unlockExit
     case useRune
+    case destroyBoss
 }
 
 struct LevelGoal: Codable, Hashable {
@@ -19,6 +20,10 @@ struct LevelGoal: Codable, Hashable {
     let targetAmount: Int
     let minimumGroupSize: Int
     let grouped: Bool
+    
+    static func bossGoal() -> LevelGoal {
+        return LevelGoal(type: .destroyBoss, tileType: .empty, targetAmount: 1, minimumGroupSize: 1, grouped: false)
+    }
     
     static func gemGoal(amount: Int) -> LevelGoal {
         return LevelGoal(type: .unlockExit, tileType: .gem, targetAmount: amount, minimumGroupSize: 1, grouped: false)

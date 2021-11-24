@@ -248,7 +248,7 @@ struct LevelConstructor {
 //            let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 60)
 //            let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
             
-            goals = []
+            goals = [LevelGoal.bossGoal()]
         
         case 10...Int.max:
             let monsterAmount = Int.random(in: 10...15)

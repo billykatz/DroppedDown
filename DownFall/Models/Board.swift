@@ -1109,7 +1109,9 @@ extension Board {
                           singleTile: Bool = false,
                           input: Input,
                           killMonsters: Bool = false,
-                          forceMonsterSpawn: Bool = false) -> Transformation {
+                          forceMonsterSpawn: Bool = false,
+                          monsterWasKilled: Bool = false
+    ) -> Transformation {
         // Check that the tile group at row, col has more than 3 tiles
         var selectedTiles: [TileCoord] = [tileCoord]
         var selectedPillars: [TileCoord] = []
@@ -1164,7 +1166,9 @@ extension Board {
                     shiftDown: &shiftDown,
                     newTiles: &newTiles,
                     intermediateTiles: &intermediateTiles,
-                    forceMonsterSpawn: forceMonsterSpawn)
+                    forceMonsterSpawn: forceMonsterSpawn,
+                    monsterWasKilled: monsterWasKilled
+        )
         
         //create selectedTilesTransformation array
         let selectedTilesTransformation = finalSelectedTiles.map { TileTransformation($0, $0) }
@@ -1332,7 +1336,7 @@ extension Board {
         
         var newTiles = tiles
         newTiles[pp.row][pp.column] = Tile(type: .player(data.update(attack: data.attack.resetAttack())))
-        return removeAndReplace(from: newTiles, tileCoord: coord, singleTile: true, input: input)
+        return removeAndReplace(from: newTiles, tileCoord: coord, singleTile: true, input: input, monsterWasKilled: true)
         
     }
     
@@ -1340,11 +1344,13 @@ extension Board {
                              shiftDown: inout [TileTransformation],
                              newTiles: inout [TileTransformation],
                              intermediateTiles: inout [[Tile]],
-                             forceMonsterSpawn: Bool = false) {
+                             forceMonsterSpawn: Bool = false,
+                             monsterWasKilled: Bool = false
+    ) {
         // Intermediate tiles is the "in-between" board that has shifted down
         // tiles into and replaced the shifted down tiles with empty tiles
         // the tile creator replaces empty tiles with new tiles
-        let createdTiles: [[Tile]] = tileCreator.tiles(for: intermediateTiles, forceMonster: forceMonsterSpawn)
+        let createdTiles: [[Tile]] = tileCreator.tiles(for: intermediateTiles, forceMonster: forceMonsterSpawn, monsterWasKilled: monsterWasKilled)
         
         for (col, shifts) in shiftIndices.enumerated() where shifts > 0 {
             for startIdx in 0..<shifts {

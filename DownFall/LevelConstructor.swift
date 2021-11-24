@@ -32,7 +32,8 @@ struct LevelConstructor {
                 goalProgress: [],
                 savedBossPhase: nil,
                 potentialItems: potentialItems(depth: depth, unlockables: unlockables, startingUnlockables: startingUnlockables, playerData: playerData, randomSource: randomSource, isTutorial: isTutorial),
-                gemsSpawned: 0
+                gemsSpawned: 0,
+                monsterSpawnTurnTimer: 0
             )
     }
     
@@ -475,6 +476,7 @@ struct LevelConstructor {
         if depth == bossLevelDepthNumber { return 0 }
         return min(boardSize(depth: depth), depth + 2)
     }
+    
     
     static func monsterTypes(depth: Depth) -> [EntityModel.EntityType: RangeModel] {
         func matchUp(_ types: [EntityModel.EntityType], range: RangeModel, subRanges: Int) -> [EntityModel.EntityType: RangeModel] {

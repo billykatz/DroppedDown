@@ -157,7 +157,8 @@ class Renderer: SKSpriteNode {
         foreground.position = playableRect.center
         menuForeground.position = playableRect.center
 
-        [spriteForeground, safeArea, hud, levelGoalView, backpackView, bossDebugView, bossView].forEach { foreground.addChild($0) }
+        [spriteForeground, safeArea, hud, levelGoalView, backpackView, bossView].forEach { foreground.addChild($0) }
+//        [spriteForeground, safeArea, hud, levelGoalView, backpackView, bossDebugView, bossView].forEach { foreground.addChild($0) }
         
         // Register for Dispatch
         Dispatch.shared.register { [weak self] input in

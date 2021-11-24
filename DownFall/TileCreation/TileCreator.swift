@@ -9,7 +9,6 @@
 import GameplayKit
 
 class TileCreator: TileStrategy {
-
     
     
     static let tutorialBoard: [[Tile]] =
@@ -53,6 +52,7 @@ class TileCreator: TileStrategy {
     let maxMonsterRatio: Double = 0.15
     var numberOfTilesSinceLastGemDropped = 0
     
+    
     // debug help to get at least one gem per board
     var spawnAtleastOneGem = true;
     
@@ -81,25 +81,23 @@ class TileCreator: TileStrategy {
         guard !forceMonsters else { return randomMonster() }
         guard level.spawnsMonsters else { return randomRock([], playerData: playerData) }
         guard !level.isBossLevel else { return randomRock([], playerData: playerData) }
-        let weight = 97
+        let weight = 98
         let index = abs(given) % (TileType.randomCases.count + weight)
         
-         
-        /// 8% of the time we will try to create a monster
-        /// 92 % of the time we will create a rock.
-        /// This should probably vary based on the level
-        /// This is worth to think about more
+        
+        let endRange = level.monsterChanceOfShowingUp(tilesSinceMonsterKilled: level.monsterSpawnTurnTimer)
+        let monsterRange: ClosedRange<Int> = -1...endRange
         
         switch index {
-        case 0..<9:
+        case monsterRange:
             return randomMonster()
-        case 9...Int.max:
+        case endRange+1...Int.max:
             return randomRock(neighbors, playerData: playerData)
         default:
             preconditionFailure("Shouldnt be here")
         }
     }
-
+    
     func monsterWithType(_ type: EntityModel.EntityType) -> Tile? {
         if let data = entities.entity(with: type) {
             return Tile(type: TileType.monster(data))
@@ -152,8 +150,8 @@ class TileCreator: TileStrategy {
         var tileTypeChances = level.tileTypeChances
         if !neighbors.isEmpty {
             tileTypeChances = tileTypeChances.increaseChances(basedOn: neighbors
-                .map { $0.type }
-                .filter { TileType.rockCases.contains($0) }
+                                                                .map { $0.type }
+                                                                .filter { TileType.rockCases.contains($0) }
             )
         }
         let randomNumber = Int.random(tileTypeChances.outcomes)
@@ -161,7 +159,7 @@ class TileCreator: TileStrategy {
         for (key, value) in tileTypeChances.chances {
             let minValue = max(1, value)
             if let color = key.color,
-                (lowerBound..<lowerBound+minValue).contains(randomNumber) {
+               (lowerBound..<lowerBound+minValue).contains(randomNumber) {
                 let shouldRockHoldGem = shouldRockHoldGem(playerData: playerData, rockColor: color, shouldSpawnAtleastOneGem: spawnAtleastOneGem)
                 return TileType.rock(color: color, holdsGem: shouldRockHoldGem, groupCount: 0)
             } else {
@@ -180,7 +178,7 @@ class TileCreator: TileStrategy {
         let extraGemsBasedOnLuck = playerData.luck / 5
         let extraChanceBasedOnLuck = extraGemsBasedOnLuck * 2
         guard specialGems < level.maxSpawnGems + extraGemsBasedOnLuck else { return false }
-
+        
         let weight = 100
         let index = randomSource.nextInt() % weight
         let baseChance = 2
@@ -200,8 +198,6 @@ class TileCreator: TileStrategy {
             spawnAtleastOneGem = false
             return false || shouldSpawn
         }
-
-
     }
     
     private func randomTile(_ neighbors: [Tile], noMoreMonsters: Bool, playerData: EntityModel, forceMonsters: Bool) -> Tile {
@@ -216,6 +212,9 @@ class TileCreator: TileStrategy {
             switch nextTile.type {
             case .monster:
                 validTile = (!neighbors.contains {  $0.type == .monster(.zero) || $0.type == .player(.zero) } && !noMoreMonsters && !tutorialConductor.isTutorial) || (tutorialConductor.isTutorial && forceMonsters)
+                if validTile {
+                    print("Range: -1...\(level.monsterChanceOfShowingUp(tilesSinceMonsterKilled: level.monsterSpawnTurnTimer))")
+                }
             case .rock(.red, _, _), .rock(.purple, _, _), .rock(.blue, _, _), .rock(.brown, _, _):
                 validTile = true
             case .exit, .player, .rock(.green, _, _), .empty, .pillar, .dynamite, .emptyGem, .item, .offer, .rock(color: .blood, _, _):
@@ -226,9 +225,7 @@ class TileCreator: TileStrategy {
     }
     
     private func neighbors(of coord: TileCoord, in tiles: [[Tile]]) -> [Tile] {
-        
-        return
-            [coord.colLeft, coord.colRight, coord.rowAbove, coord.rowBelow]
+        [coord.colLeft, coord.colRight, coord.rowAbove, coord.rowBelow]
             .filter {
                 return isWithinBounds($0, within: tiles)
             }.map {
@@ -236,7 +233,7 @@ class TileCreator: TileStrategy {
             }
     }
     
-    func tiles(for tiles: [[Tile]], forceMonster: Bool) -> [[Tile]] {
+    func tiles(for tiles: [[Tile]], forceMonster: Bool, monsterWasKilled: Bool) -> [[Tile]] {
         guard let playerData = playerData(in: tiles) else { return tiles }
         
         // copy the given array to keep track of where we need tiles
@@ -246,6 +243,14 @@ class TileCreator: TileStrategy {
         numberOfTilesSinceLastGemDropped += typeCount(for: tiles, of: .empty).count
         var currMonsterCount = typeCount(for: tiles, of: .monster(.zero)).count
         var shouldForceMonsters = forceMonster
+        
+        //keep track of when monster was last killed
+        if monsterWasKilled {
+            level.monsterSpawnTurnTimer = 0
+        } else {
+            // keep track of how many tiles have been removed since the last monster
+            level.monsterSpawnTurnTimer += typeCount(for: tiles, of: .empty).count
+        }
         
         for row in 0..<newTiles.count {
             for col in 0..<newTiles[row].count {
@@ -261,8 +266,11 @@ class TileCreator: TileStrategy {
                     }
                     
                     if pillarAboveMe == 0 {
-                        let newTile = randomTile(neighbors(of: TileCoord(row: row, column: col), in: newTiles),
-                                                 noMoreMonsters: currMonsterCount >= maxMonsters, playerData: playerData, forceMonsters: shouldForceMonsters)
+                        let neighbors = neighbors(of: TileCoord(row: row, column: col), in: newTiles)
+                        let newTile = randomTile(neighbors,
+                                                 noMoreMonsters: currMonsterCount >= maxMonsters,
+                                                 playerData: playerData,
+                                                 forceMonsters: shouldForceMonsters)
                         shouldForceMonsters = false
                         if newTile.type == .monster(.zero) {
                             currMonsterCount += 1
@@ -323,7 +331,7 @@ class TileCreator: TileStrategy {
         
         if tutorialConductor.isTutorial {
             var newTutorialBoard: [[Tile]] = Array.init(repeating: Array.init(repeating: .empty, count: 8), count: 8)
-
+            
             for row in 0..<TileCreator.tutorialBoard.count {
                 for col in 0..<TileCreator.tutorialBoard.count {
                     if TileCreator.tutorialBoard[row][col].type == .player(.zero) {
@@ -381,7 +389,7 @@ class TileCreator: TileStrategy {
         
         //
         tiles[playerPosition.x][playerPosition.y] = Tile(type: .player(playerData))
-//        tiles[3][7] = Tile(type: .player(playerData))
+        //        tiles[3][7] = Tile(type: .player(playerData))
         
         
         // reserve all positions so we don't overwrite any one position multiple times
@@ -401,7 +409,7 @@ class TileCreator: TileStrategy {
         // no exit on the boss level
         if (!level.isBossLevel) {
             let exitQuadrant = playerQuadrant.opposite
-    //        let exitQuadrant = playerQuadrant
+            //        let exitQuadrant = playerQuadrant
             let exitPosition = exitQuadrant.randomCoord(for: boardSize, notIn: reservedSet)
             reservedSet.insert(exitPosition)
             
@@ -409,16 +417,16 @@ class TileCreator: TileStrategy {
         }
         
         // Quick testing for game recap screen
-//        let data = entities.entity(with: .alamo)!
-//        tiles[playerPosition.row+1][playerPosition.column] = Tile(type: .monster(data))
+        //        let data = entities.entity(with: .alamo)!
+        //        tiles[playerPosition.row+1][playerPosition.column] = Tile(type: .monster(data))
         
         // quick testing gem collectin
-//        tiles[3][6] = Tile(type: .item(Item.init(type: .gem, amount: 10, color: .blue)))
-//        tiles[3][5] = Tile(type: .item(Item.init(type: .gem, amount: 50, color: .red)))
-//        tiles[3][4] = Tile(type: .item(Item.init(type: .gem, amount: 100, color: .purple)))
-//        tiles[3][3] = Tile(type: .item(Item.init(type: .gem, amount: 250, color: .blue)))
-//        tiles[3][2] = Tile(type: .item(Item.init(type: .gem, amount: 5, color: .red)))
-//        tiles[3][1] = Tile(type: .item(Item.init(type: .gem, amount: 25, color: .purple)))
+        //        tiles[3][6] = Tile(type: .item(Item.init(type: .gem, amount: 10, color: .blue)))
+        //        tiles[3][5] = Tile(type: .item(Item.init(type: .gem, amount: 50, color: .red)))
+        //        tiles[3][4] = Tile(type: .item(Item.init(type: .gem, amount: 100, color: .purple)))
+        //        tiles[3][3] = Tile(type: .item(Item.init(type: .gem, amount: 250, color: .blue)))
+        //        tiles[3][2] = Tile(type: .item(Item.init(type: .gem, amount: 5, color: .red)))
+        //        tiles[3][1] = Tile(type: .item(Item.init(type: .gem, amount: 25, color: .purple)))
         
         return (tiles, true)
     }

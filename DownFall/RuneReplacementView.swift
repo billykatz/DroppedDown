@@ -101,7 +101,7 @@ class RuneReplacementView: SKSpriteNode, ButtonDelegate {
         /// name it so we can remove it later
         runeContainer.name = "runeContainer"
         
-        runeContainer.position = CGPoint.position(runeContainer.frame, inside: playableRect, verticalAnchor: .bottom, horizontalAnchor: .center, padding: Style.Padding.most*3)
+        runeContainer.position = CGPoint.position(runeContainer.frame, inside: playableRect, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: Style.Padding.most*3)
         
         /// position it high up to catch user interaction
         runeContainer.zPosition = 10_000_000

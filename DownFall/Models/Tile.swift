@@ -483,7 +483,7 @@ extension TileType {
 extension TileType {
     static var rockCases: [TileType] = [.rock(color: .blue, holdsGem: false, groupCount: 0), .rock(color: .green, holdsGem: false, groupCount: 0), .rock(color: .red, holdsGem: false, groupCount: 0), .rock(color: .purple, holdsGem: false, groupCount: 0), .rock(color: .brown, holdsGem: false, groupCount: 0)]
     static var allCases: [TileType] = [.player(.zero), .exit(blocked: false), .empty, .monster(.zero), .item(.zero), .rock(color: .red, holdsGem: false, groupCount: 0), .pillar(PillarData(color: .red, health: 3))]
-    static var randomCases = [TileType.monster(.zero), .rock(color: .red, holdsGem: false, groupCount: 0), .item(Item.gem)]
+    static var randomCases = [TileType.monster(.zero), .rock(color: .red, holdsGem: false, groupCount: 0)]
     typealias AllCases = [TileType]
     
     static func == (lhs: TileType, rhs: TileType) -> Bool {

@@ -62,6 +62,7 @@ class Level: Codable, Hashable {
     var savedBossPhase: BossPhase?
     let potentialItems: [StoreOffer]
     var gemsSpawned: Int
+    var monsterSpawnTurnTimer: Int
     
     init(
         depth: Depth,
@@ -76,7 +77,8 @@ class Level: Codable, Hashable {
         goalProgress: [GoalTracking],
         savedBossPhase: BossPhase?,
         potentialItems: [StoreOffer],
-        gemsSpawned: Int
+        gemsSpawned: Int,
+        monsterSpawnTurnTimer: Int
     ) {
         self.depth = depth
         self.monsterTypeRatio = monsterTypeRatio
@@ -91,6 +93,7 @@ class Level: Codable, Hashable {
         self.savedBossPhase = savedBossPhase
         self.potentialItems = potentialItems
         self.gemsSpawned = gemsSpawned
+        self.monsterSpawnTurnTimer = monsterSpawnTurnTimer
     }
     
     static func ==(_ lhs: Level, _ rhs: Level) -> Bool {
@@ -120,6 +123,52 @@ class Level: Codable, Hashable {
     var numberOfIndividualColumns: Int {
         return 3*pillarCoordinates.count
     }
+    
+    func monsterChanceOfShowingUp(tilesSinceMonsterKilled: Int) -> Int {
+        switch depth {
+        case 0,1:
+            if tilesSinceMonsterKilled < 20 {
+                return -1
+            } else if tilesSinceMonsterKilled < 50 {
+                return 3
+            } else {
+                return 10
+            }
+            
+        case 2,3,4:
+            if tilesSinceMonsterKilled < 20 {
+                return -1
+            } else if tilesSinceMonsterKilled < 45 {
+                return 4
+            } else {
+                return 15
+            }
+            
+        case 5, 6:
+            if tilesSinceMonsterKilled < 25 {
+                return -1
+            } else if tilesSinceMonsterKilled < 40 {
+                return 4
+            } else {
+                return 17
+            }
+            
+        case 7,8:
+            if tilesSinceMonsterKilled < 25 {
+                return -1
+            } else if tilesSinceMonsterKilled < 40 {
+                return 4
+            } else {
+                return 20
+            }
+
+        case bossLevelDepthNumber:
+            return -1
+            
+        default:
+            return -1
+        }
+    }
         
-    static let zero = Level(depth: 0, monsterTypeRatio: [:], monsterCountStart: 0, maxMonsterOnBoardRatio: 0.0, boardSize: 0, tileTypeChances: TileTypeChanceModel(chances: [.empty: 1]), pillarCoordinates: [], goals: [LevelGoal(type: .unlockExit, tileType: .empty, targetAmount: 0, minimumGroupSize: 0, grouped: false)], maxSpawnGems: 0, goalProgress: [], savedBossPhase: nil, potentialItems: [], gemsSpawned: 0)
+    static let zero = Level(depth: 0, monsterTypeRatio: [:], monsterCountStart: 0, maxMonsterOnBoardRatio: 0.0, boardSize: 0, tileTypeChances: TileTypeChanceModel(chances: [.empty: 1]), pillarCoordinates: [], goals: [LevelGoal(type: .unlockExit, tileType: .empty, targetAmount: 0, minimumGroupSize: 0, grouped: false)], maxSpawnGems: 0, goalProgress: [], savedBossPhase: nil, potentialItems: [], gemsSpawned: 0, monsterSpawnTurnTimer: 0)
 }

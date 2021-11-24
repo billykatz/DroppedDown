@@ -31,7 +31,8 @@ struct LevelConstructor {
                 maxSpawnGems: gemsAtDepth,
                 goalProgress: [],
                 savedBossPhase: nil,
-                potentialItems: potentialItems(depth: depth, unlockables: unlockables, startingUnlockables: startingUnlockables, playerData: playerData, randomSource: randomSource, isTutorial: isTutorial)
+                potentialItems: potentialItems(depth: depth, unlockables: unlockables, startingUnlockables: startingUnlockables, playerData: playerData, randomSource: randomSource, isTutorial: isTutorial),
+                gemsSpawned: 0
             )
     }
     

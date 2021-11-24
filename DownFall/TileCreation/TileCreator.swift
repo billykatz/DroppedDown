@@ -41,7 +41,14 @@ class TileCreator: TileStrategy {
     var level: Level
     var loadedTiles: [[Tile]]?
     var specialRocks = 0
-    var specialGems = 0
+    var specialGems: Int {
+        get {
+            level.gemsSpawned
+        }
+        set {
+            level.gemsSpawned = newValue
+        }
+    }
     var goldVariance = 2
     let maxMonsterRatio: Double = 0.15
     var numberOfTilesSinceLastGemDropped = 0
@@ -153,8 +160,10 @@ class TileCreator: TileStrategy {
         var lowerBound = 0
         for (key, value) in tileTypeChances.chances {
             let minValue = max(1, value)
-            if let color = key.color, (lowerBound..<lowerBound+minValue).contains(randomNumber) {
-                return TileType.rock(color: color, holdsGem: shouldRockHoldGem(playerData: playerData, rockColor: color, shouldSpawnAtleastOneGem: spawnAtleastOneGem), groupCount: 0)
+            if let color = key.color,
+                (lowerBound..<lowerBound+minValue).contains(randomNumber) {
+                let shouldRockHoldGem = shouldRockHoldGem(playerData: playerData, rockColor: color, shouldSpawnAtleastOneGem: spawnAtleastOneGem)
+                return TileType.rock(color: color, holdsGem: shouldRockHoldGem, groupCount: 0)
             } else {
                 lowerBound = lowerBound + minValue
             }
@@ -180,8 +189,12 @@ class TileCreator: TileStrategy {
         let totalChance = baseChance + extraChance + moreChanceBasedOnLastTimeAGemDropped
         if (0..<totalChance).contains(index) {
             numberOfTilesSinceLastGemDropped = 0
-            specialGems += 1
-            return rockColor != .brown
+            if rockColor != .brown {
+                specialGems += 1
+                return true
+            } else {
+                return false
+            }
         } else {
             let shouldSpawn = spawnAtleastOneGem
             spawnAtleastOneGem = false

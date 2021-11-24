@@ -48,7 +48,7 @@ struct PillarCoorindates: Codable, Hashable {
     
 }
 
-struct Level: Codable, Hashable {
+class Level: Codable, Hashable {
     let depth: Depth
     let monsterTypeRatio: [EntityModel.EntityType: RangeModel]
     let monsterCountStart: Int
@@ -61,7 +61,45 @@ struct Level: Codable, Hashable {
     var goalProgress: [GoalTracking]
     var savedBossPhase: BossPhase?
     let potentialItems: [StoreOffer]
+    var gemsSpawned: Int
     
+    init(
+        depth: Depth,
+        monsterTypeRatio: [EntityModel.EntityType: RangeModel],
+        monsterCountStart: Int,
+        maxMonsterOnBoardRatio: Double,
+        boardSize: Int,
+        tileTypeChances: TileTypeChanceModel,
+        pillarCoordinates: [PillarCoorindates],
+        goals: [LevelGoal],
+        maxSpawnGems: Int,
+        goalProgress: [GoalTracking],
+        savedBossPhase: BossPhase?,
+        potentialItems: [StoreOffer],
+        gemsSpawned: Int
+    ) {
+        self.depth = depth
+        self.monsterTypeRatio = monsterTypeRatio
+        self.monsterCountStart = monsterCountStart
+        self.maxMonsterOnBoardRatio = maxMonsterOnBoardRatio
+        self.boardSize = boardSize
+        self.tileTypeChances = tileTypeChances
+        self.pillarCoordinates = pillarCoordinates
+        self.goals = goals
+        self.maxSpawnGems = maxSpawnGems
+        self.goalProgress = goalProgress
+        self.savedBossPhase = savedBossPhase
+        self.potentialItems = potentialItems
+        self.gemsSpawned = gemsSpawned
+    }
+    
+    static func ==(_ lhs: Level, _ rhs: Level) -> Bool {
+        return lhs.depth == rhs.depth
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(depth)
+    }
     
     var hasExit: Bool {
         return true
@@ -83,5 +121,5 @@ struct Level: Codable, Hashable {
         return 3*pillarCoordinates.count
     }
         
-    static let zero = Level(depth: 0, monsterTypeRatio: [:], monsterCountStart: 0, maxMonsterOnBoardRatio: 0.0, boardSize: 0, tileTypeChances: TileTypeChanceModel(chances: [.empty: 1]), pillarCoordinates: [], goals: [LevelGoal(type: .unlockExit, tileType: .empty, targetAmount: 0, minimumGroupSize: 0, grouped: false)], maxSpawnGems: 0, goalProgress: [], savedBossPhase: nil, potentialItems: [])
+    static let zero = Level(depth: 0, monsterTypeRatio: [:], monsterCountStart: 0, maxMonsterOnBoardRatio: 0.0, boardSize: 0, tileTypeChances: TileTypeChanceModel(chances: [.empty: 1]), pillarCoordinates: [], goals: [LevelGoal(type: .unlockExit, tileType: .empty, targetAmount: 0, minimumGroupSize: 0, grouped: false)], maxSpawnGems: 0, goalProgress: [], savedBossPhase: nil, potentialItems: [], gemsSpawned: 0)
 }

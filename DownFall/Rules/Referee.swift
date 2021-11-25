@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 class Referee {
     
@@ -358,6 +359,50 @@ class Referee {
             return Input(.decrementDynamites(dynamitePos))
         }
         
+        var playerCoord: TileCoord {
+            return typeCount(for: tiles, of: .player(.zero)).first!
+        }
+        
+        func noMoreMoves() -> Input? {
+            var hasMoreMoves = false
+            let playerCoord = playerCoord
+            for row in 0..<tiles.count {
+                for col in 0..<tiles[row].count {
+                    let tileCoord = TileCoord(row, col)
+                    let tile = tiles[tileCoord]
+                    switch tile.type {
+                    case .empty, .dynamite:
+                        hasMoreMoves = true
+                        
+                    case .rock(_, _, let groupCount):
+                        if groupCount >= 3 {
+                            hasMoreMoves = true
+                        }
+                        
+                    case .monster, .exit(blocked: false), .item, .offer:
+                        // the player can rotate and kill a monster
+                        // the player can rotate into the exit
+                        // the player can rotate and collect an item
+                        // the player can rotate and collect an offer
+                        if tileCoord.orthogonalNeighbors.contains(playerCoord) {
+                            hasMoreMoves = true
+                        }
+                        
+                    default:
+                        break
+                        
+                    }
+                }
+            }
+            
+            if hasMoreMoves {
+                return nil
+            } else {
+                return Input(.noMoreMoves)
+            }
+            
+        }
+        
         /// We need to refill if ever there is an empty tile with a non-empty and non-pillar tile above it
         /// Edge cases: If there is a chain of 2 or more empty tiles witha pillar directly on top of them, we do not need to refill
         /// Edge cases: If there is an empty tile beneath in the same column as a pillar, but the pillar is not directly above the empty tile.  we _do_ need to refill
@@ -454,6 +499,10 @@ class Referee {
         // We only ever want to decrement a dynamite if they player took a turn, not if the boss took a turn.
         if let decrementDynamite = decrementDynamiteFuses(), TurnWatcher.shared.checkNewTurn() {
             return decrementDynamite
+        }
+        
+        if let noMoreMoves = noMoreMoves() {
+            return noMoreMoves
         }
         
         let newTurn = TurnWatcher.shared.getNewTurnAndReset()

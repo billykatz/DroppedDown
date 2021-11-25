@@ -8,6 +8,17 @@
 
 import Foundation
 
+class TestTutorialConductor: TutorialConductor
+{
+    override var isTutorial: Bool {
+        return false
+    }
+    
+    override var shouldShowLevelGoalsAtStart: Bool {
+        return false
+    }
+}
+
 
 class TutorialConductor {
     

@@ -6,6 +6,8 @@
 //  Copyright © 2018 William Katz LLC. All rights reserved.
 //
 
+import CoreGraphics
+
 class Board: Equatable {
     static func == (lhs: Board, rhs: Board) -> Bool {
         return false
@@ -206,6 +208,10 @@ class Board: Equatable {
             return
             
         case .shuffleBoard:
+            InputQueue.append(Input(.transformation([shuffleBoard(inputType: .shuffleBoard)])))
+            return
+            
+        case .noMoreMoves:
             InputQueue.append(Input(.transformation([shuffleBoard(inputType: .shuffleBoard)])))
             return
             
@@ -840,7 +846,7 @@ class Board: Equatable {
                 let newMonster = tileCreator.randomMonster()
                 newTiles[coord.row][coord.column] = Tile(type: newMonster)
             case .monster:
-                let newRock = tileCreator.randomRock([], playerData: playerData)
+                let newRock = tileCreator.randomRock([], playerData: playerData, forceHoldGem: false)
                 newTiles[coord.row][coord.column] = Tile(type: newRock)
             default:
                 break
@@ -1406,6 +1412,75 @@ extension Board {
         return (shiftDown, shiftIndices)
     }
     
+}
+
+// MARK: - Shuffle
+extension Board {
+    var playerCoord: TileCoord {
+        return typeCount(for: tiles, of: .player(.zero)).first!
+    }
+    
+    
+    func shuffleBoard(input: Input) {
+        
+        // Move rocks around
+        // Do not move the player
+        // Do not move pillars
+        // Do not move the exit
+        // Move offers closer to the player?
+        // Move gems closer to the player
+        // Kill 33% of the monsters on the board, rounded up
+        // Remove and replace those tiles
+        
+        var newTiles = self.tiles
+        var intermediateTiles = newTiles
+        var reserved = shuffleReserved()
+        let playerCoord = playerCoord
+        var killedMonsters = 0
+        var numberOfMonsters = 0
+        for row in 0..<self.tiles.count {
+            for col in 0..<self.tiles[row].count {
+                let tileCoord = TileCoord(row, col)
+                let tile = tiles[tileCoord]
+                switch tile.type {
+                case .rock:
+                    let newCoord = randomCoord(in: tiles, notIn: reserved)
+                    intermediateTiles[newCoord.row][newCoord.col] = tile
+                    reserved.insert(tileCoord)
+                case .monster:
+                    let newCoord = randomCoord(in: tiles, notIn: reserved)
+                    intermediateTiles[newCoord.row][newCoord.col] = tile
+                    reserved.insert(tileCoord)
+                    numberOfMonsters += 1
+                case .item, .offer:
+                    let range = (CGFloat(2)...CGFloat(4))
+                    let newCoord = randomCoord(in: tiles, notIn: reserved, nearby: playerCoord, in: range)
+                    intermediateTiles[newCoord.row][newCoord.col] = tile
+                    reserved.insert(tileCoord)
+                case .player, .pillar, .exit, .empty,. emptyGem, .dynamite:
+                    break
+                }
+                
+            }
+        }
+        
+        newTiles = intermediateTiles
+    }
+    
+    private func shuffleReserved() -> Set<TileCoord> {
+        var tileCoords: [TileCoord] = []
+        for (i, _) in tiles.enumerated() {
+            for (j, _) in tiles[i].enumerated() {
+                switch tiles[i][j].type {
+                case .exit, .pillar, .player:
+                    tileCoords.append(TileCoord(i, j))
+                default:
+                    continue
+                }
+            }
+        }
+        return Set<TileCoord>(tileCoords)
+    }
 }
 
 // MARK: - Factory

@@ -80,11 +80,9 @@ class ProfileViewModelTest: XCTestCase {
         
         /// save the profile with the uuid as the name
         /// copy all other defaults
-        let newProfile = Profile(name: "", progress: 3, player: .zero, deepestDepth: 0, progressModel: CodexViewModel())
+        let newProfile = Profile(name: "", player: .zero, currentRun: nil, stats: [], unlockables: [], startingUnlockbles: [])
         
         XCTAssertEqual(expectedProfiles.last!?.currentRun, newProfile.currentRun)
-        XCTAssertEqual(expectedProfiles.last!?.progress, newProfile.progress)
-        XCTAssertEqual(expectedProfiles.last!?.deepestDepth, newProfile.deepestDepth)
             
     }
     
@@ -121,10 +119,14 @@ class ProfileViewModelTest: XCTestCase {
         // profiles are received on the main thread
         mainScheduler.advance()
         
-        let saveProfile = Profile(name: "test-uuid-1", progress: 1, player: .playerZero, currentRun: nil, randomRune: nil, deepestDepth: 3, progressModel: CodexViewModel())
+        
+        
+        let saveProfile = Profile(name: "test-uuid-1", player: .playerZero, currentRun: nil, stats: [], unlockables: Unlockable.testUnlockablesOnePurchased, startingUnlockbles: [])
+        
         profileViewModel.authenicatedSubject.send(true)
         profileViewModel.saveProfile(saveProfile)
         
+        XCTAssertNotEqual(expectedProfiles.last!!.progress, saveProfile.progress)
         XCTAssertNotEqual(saveProfile.name, expectedProfiles.last!!.name)
         
         testScheduler.advance(by: 100)
@@ -133,6 +135,7 @@ class ProfileViewModelTest: XCTestCase {
         let lastProfileSaved = expectedProfiles.last!!
         
         XCTAssertEqual(saveProfile.name, lastProfileSaved.name)
+        XCTAssertEqual(saveProfile.progress, lastProfileSaved.progress)
             
     }
 
@@ -169,7 +172,8 @@ class ProfileViewModelTest: XCTestCase {
         // profiles are received on the main thread
         mainScheduler.advance()
         
-        let saveProfile = Profile(name: "test-uuid-1", progress: 0, player: .playerZero, currentRun: nil, randomRune: nil, deepestDepth: 3, progressModel: CodexViewModel())
+        let saveProfile = Profile(name: "test-uuid-1", player: .playerZero, currentRun: nil, stats: [], unlockables: [], startingUnlockbles: [])
+        
         profileViewModel.authenicatedSubject.send(true)
         profileViewModel.saveProfile(saveProfile)
         
@@ -218,17 +222,32 @@ class ProfileViewModelTest: XCTestCase {
         // profiles are received on the main thread
         mainScheduler.advance()
         
-        let saveProfile = Profile(name: "test-uuid-1", progress: 1, player: .playerZero, currentRun: nil, randomRune: nil, deepestDepth: 3, progressModel: CodexViewModel())
-        profileViewModel.authenicatedSubject.send(true)
-        profileViewModel.saveProfile(saveProfile)
+        let saveName = "SaveThisOne\(UUID())"
+        let saveProfile = Profile(name: saveName, player: .playerZero, currentRun: nil, stats: [], unlockables: Unlockable.testUnlockablesOnePurchased, startingUnlockbles: [])
         
+        
+        profileViewModel.saveProfile(saveProfile)
+        profileViewModel.authenicatedSubject.send(false)
         
         testScheduler.advance()
         mainScheduler.advance()
         
+        
+        let nextProfie = Profile(name: "this-one-is-not", player: .playerZero, currentRun: nil, stats: [], unlockables: Unlockable.testUnlockablesNonePurchased, startingUnlockbles: [])
+
+        
+        profileViewModel.saveProfile(nextProfie)
+        
+        testScheduler.advance()
+        mainScheduler.advance()
+        
+        /// there was an issue with calling this in the same exact moment when calling saveProfile which caused a stale value to be spit through the pipeline
+        /// Leave this in here to keep this test useful
+        profileViewModel.authenicatedSubject.send(false)
+        
         let lastProfileSaved = expectedProfiles.last!!
         
-        XCTAssertNotEqual(saveProfile.name, lastProfileSaved.name)
+        XCTAssertEqual(saveName, lastProfileSaved.name)
             
     }
 

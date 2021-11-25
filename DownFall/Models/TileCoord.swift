@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CoreGraphics
 
 
 
@@ -134,6 +135,12 @@ struct TileCoord: Codable, Hashable {
         case .horizontal:
             return abs(y - to.y)
         }
+    }
+    
+    func distance(to: TileCoord) -> CGFloat {
+        let x = CGFloat(abs(x - to.x))
+        let y = CGFloat(abs(y - to.y))
+        return sqrt(x*x + y*y)
     }
     
     /// x              other(same col, row above)     x

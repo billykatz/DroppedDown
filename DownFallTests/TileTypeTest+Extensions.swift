@@ -50,7 +50,8 @@ extension TileType {
                                             animations: [],
                                             effects: [],
                                             dodge:0,
-                                            luck: 0)
+                                            luck: 0,
+                                            killedBy: nil)
         )
     }
     
@@ -94,8 +95,9 @@ extension TileType {
                                             animations: animations,
                                             effects: [],
                                             dodge:0,
-                                            luck: 0
-                                            ))
+                                            luck: 0,
+                                            killedBy: nil)
+        )
     }
     
     static func createPlayer(originalHp: Int = 1,
@@ -115,7 +117,9 @@ extension TileType {
                                            pickaxe: Pickaxe(runeSlots: 0, runes: []),
                                            effects: [],
                                            dodge:0,
-                                           luck: 0))
+                                           luck: 0,
+                                           killedBy: nil)
+        )
         
     }
     

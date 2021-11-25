@@ -11,8 +11,6 @@ import SpriteKit
 class HUD: SKSpriteNode {
     
     struct Constants {
-        static let threatIndicator = "threatIndicator"
-        static let shuffleBoardButton = "shuffleBoardButton"
         static let levelGoalIndicator = "levelGoalIndicator"
         
         static let dodgeAmountLabelName = "dodgeAmountLabelName"
@@ -115,7 +113,7 @@ class HUD: SKSpriteNode {
     
     func show(_ data: EntityModel) {
         // Remove all the hearts so that we can redraw
-        self.removeAllChildren(exclude: [Identifiers.settings, Constants.threatIndicator, Constants.shuffleBoardButton, Constants.levelGoalIndicator])
+        self.removeAllChildren(exclude: [Identifiers.settings, Constants.levelGoalIndicator])
         
         
         let identifier = Identifiers.fullHeart
@@ -348,8 +346,6 @@ class HUD: SKSpriteNode {
         for node in self.nodes(at: position) {
             if node.name == Identifiers.settings {
                 delegate?.settingsTapped()
-            } else if node.name == Constants.threatIndicator {
-                print("threatIndicator touched")
             }
         }
     }

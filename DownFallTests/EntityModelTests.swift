@@ -31,7 +31,8 @@ extension EntityModel {
                            animations: animations,
                            effects: effects,
                            dodge: dodge,
-                           luck: luck)
+                           luck: luck,
+                           killedBy: nil)
     }
     
     static func createMonster(originalHp: Int = 3,
@@ -53,7 +54,8 @@ extension EntityModel {
                            animations: animations,
                            effects: effects,
                            dodge: dodge,
-                           luck: luck)
+                           luck: luck,
+                           killedBy: nil)
     }
 
 }
@@ -61,7 +63,7 @@ extension EntityModel {
 class EntityModelTests: XCTestCase {
     
     func testEntityModelParsingFromData() {
-        guard let data = try! Data.data(from: "EntityTest") else {
+        guard let data = try! Data.data(from: "entities") else {
             XCTFail("Failed to json file");
             return
         }

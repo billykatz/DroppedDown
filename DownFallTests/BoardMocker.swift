@@ -17,7 +17,7 @@ extension Int: Sequence {
 }
 
 func entities() -> EntitiesModel {
-    guard let data = try! Data.data(from: "EntityTest") else {
+    guard let data = try! Data.data(from: "entities") else {
         return EntitiesModel(entities: [])
     }
     do {
@@ -32,8 +32,9 @@ extension Board {
     convenience init(tiles: [[Tile]]) {
         let tileCreator = TileCreator(entities(),
                                       difficulty: .normal,
-                                      level: Level.zero, randomSource: GKLinearCongruentialRandomSource())
-        self.init(tileCreator: tileCreator, tiles: tiles, level: Level.zero)
+                                      level: Level.zero, randomSource: GKLinearCongruentialRandomSource(), tutorialConductor: TutorialConductor())
+        self.init(tileCreator: tileCreator, tiles: tiles, level: Level.zero, boardLoaded: false,
+                  tutorialConductor: nil)
     }
 }
 

@@ -63,7 +63,8 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
                                         .runeReplacement(Pickaxe(runeSlots: 0, runes: []), .zero),
                                         .runeReplaced(Pickaxe(runeSlots: 0, runes: []), .zero),
                                         .bossTurnStart(BossPhase()),
-                                        .bossPhaseStart(BossPhase())
+                                        .bossPhaseStart(BossPhase()),
+                                        .noMoreMoves,
                                                                  
     ]
     
@@ -115,6 +116,9 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
     // boss input
     case bossTurnStart(BossPhase)
     case bossPhaseStart(BossPhase)
+    
+    // no more moves
+    case noMoreMoves
     
     var debugDescription: String {
         switch self {
@@ -206,6 +210,10 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
             return "Boss Turn Start. Phase: \(phase.bossPhaseType.rawValue). State: \(phase.bossState.stateType.rawValue)"
         case .bossPhaseStart(let phase):
             return "Boss Phase Start. Phase: \(phase.bossPhaseType.rawValue). State: \(phase.bossState.stateType.rawValue)"
+            
+        // no more moves
+        case .noMoreMoves:
+            return "No more moves"
             
             
         }

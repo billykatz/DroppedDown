@@ -55,6 +55,31 @@ func randomCoord(in tiles: [[Tile]]?, notIn set: Set<TileCoord>) -> TileCoord {
     return tileCoord
 }
 
+func randomCoord(in tiles: [[Tile]]?, notIn set: Set<TileCoord>, nearby target: TileCoord, in range: ClosedRange<CGFloat>) -> TileCoord {
+    guard let boardSize = tiles?.count else { preconditionFailure("We need a board size to continue") }
+    let upperbound = boardSize
+    
+    var newRange = range
+    
+    
+    var tileCoord = TileCoord(row: Int.random(upperbound), column: Int.random(upperbound))
+    var maxTries = 30
+    
+    // when we choose a tileCoord that is in the reserved set or is too far from the target then
+    while set.contains(tileCoord) || !newRange.contains(tileCoord.distance(to: target))  {
+        tileCoord = TileCoord(row: Int.random(upperbound), column: Int.random(upperbound))
+        
+        maxTries -= 1
+        
+        // we might need to try a slight wider range after trying for "too long"
+        if maxTries == 0 {
+            maxTries = 30
+            newRange = newRange.lowerBound...newRange.upperBound+1
+        }
+    }
+    return tileCoord
+}
+
 func attack(basedOnRocks rocksEaten: [TileCoord]?, in tiles: [[Tile]]) -> [BossAttackType]? {
     guard let rocksEaten = rocksEaten else { return nil }
     var tileTypes: [TileType] = []

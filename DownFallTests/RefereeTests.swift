@@ -33,29 +33,29 @@ class RefereeTests: XCTestCase {
         
         let gameWin = allBlack >>> win(mockBoard)
         let gameBoard = gameWin(mockBoard)
-        let actualOutput = Referee.enforceRules(gameBoard.tiles)
+        let actualOutput = Referee().enforceRules(gameBoard.tiles)
         XCTAssertEqual(expectedOutput, actualOutput)
         
         let gameWin2 = (allGreen >>> player) >>> win(mockBoard)
         let gameBoard2 = gameWin2(mockBoard)
-        let actualOutput2 = Referee.enforceRules(gameBoard2.tiles)
+        let actualOutput2 = Referee().enforceRules(gameBoard2.tiles)
         XCTAssertEqual(expectedOutput, actualOutput2)
 
         let gameWin3 = (allGreen >>> exit) >>> win(mockBoard)
         let gameBoard3 = gameWin3(mockBoard)
-        let actualOutput3 = Referee.enforceRules(gameBoard3.tiles)
+        let actualOutput3 = Referee().enforceRules(gameBoard3.tiles)
         XCTAssertEqual(expectedOutput, actualOutput3)
     }
     
     func testRefereeNonGameLose() {
         
-        let gameLose = Input(.gameLose(""))
+        let gameLose = Input(.gameLose(killedBy: nil))
         // If the player can attack we dont lose (yet)
         var tiles = [[Tile.greenRock, .blueRock, .blueRock, .greenRock],
                      [.blueRock, Tile(type: .normalMonster), .exit, .greenRock],
                      [.greenRock, Tile(type: .normalPlayer), .blueRock, .blueRock],
                      [.blueRock, .purpleRock, .greenRock, .greenRock]]
-        var actualOutput = Referee.enforceRules(tiles)
+        var actualOutput = Referee().enforceRules(tiles)
         
         XCTAssertNotEqual(actualOutput, gameLose, "If the player can attack, we don't lose")
         
@@ -64,7 +64,7 @@ class RefereeTests: XCTestCase {
                  [.blueRock, .purpleRock, .purpleRock, .greenRock],
                  [.greenRock, Tile(type: .normalPlayer), .exit, .purpleRock],
                  [.blueRock, .purpleRock, .greenRock, .greenRock]]
-        actualOutput = Referee.enforceRules(tiles)
+        actualOutput = Referee().enforceRules(tiles)
         XCTAssertNotEqual(actualOutput, gameLose, "If the player can rotate to win, we don't lose")
         
         //the player can rotate twice to win, this is not a lose
@@ -72,7 +72,7 @@ class RefereeTests: XCTestCase {
                  [.blueRock, .purpleRock, .purpleRock, .greenRock],
                  [.greenRock, Tile(type: .normalPlayer), .blueRock, .purpleRock],
                  [.blueRock, .exit, .greenRock, .greenRock]]
-        actualOutput = Referee.enforceRules(tiles)
+        actualOutput = Referee().enforceRules(tiles)
         XCTAssertNotEqual(actualOutput, gameLose, "If the player can rotate to win, we don't lose")
         
         //the player can rotate to win once to win, this is not a lose
@@ -80,7 +80,7 @@ class RefereeTests: XCTestCase {
                  [.blueRock, .purpleRock, .purpleRock, .greenRock],
                  [.exit, Tile(type: .normalPlayer), .blueRock, .purpleRock],
                  [.blueRock, .blueRock, .greenRock, .greenRock]]
-        actualOutput = Referee.enforceRules(tiles)
+        actualOutput = Referee().enforceRules(tiles)
         XCTAssertNotEqual(actualOutput, gameLose, "If the player can rotate to win, we don't lose")
         
         //the player can rotate to kill a monster
@@ -88,7 +88,7 @@ class RefereeTests: XCTestCase {
                  [.blueRock, .purpleRock, .purpleRock, .greenRock],
                  [.greenRock, Tile(type: .normalPlayer), Tile(type: .normalMonster), .purpleRock],
                  [.blueRock, .blueRock, .greenRock, .greenRock]]
-        actualOutput = Referee.enforceRules(tiles)
+        actualOutput = Referee().enforceRules(tiles)
         XCTAssertNotEqual(actualOutput, gameLose, "If the player can rotate to attack, we don't lose")
         
         //the player can rotate to kill a monster
@@ -96,7 +96,7 @@ class RefereeTests: XCTestCase {
                  [.blueRock, .purpleRock, .purpleRock, .greenRock],
                  [.greenRock, Tile(type: .normalPlayer), .blueRock, .purpleRock],
                  [.blueRock, Tile(type: .normalMonster), .greenRock, .greenRock]]
-        actualOutput = Referee.enforceRules(tiles)
+        actualOutput = Referee().enforceRules(tiles)
         XCTAssertNotEqual(actualOutput, gameLose, "If the player can rotate to attack, we don't lose")
         
         //the player can rotate to kill a monster
@@ -104,7 +104,7 @@ class RefereeTests: XCTestCase {
                  [.blueRock, .purpleRock, .purpleRock, .greenRock],
                  [Tile(type: .normalMonster), Tile(type: .normalPlayer), .blueRock, .purpleRock],
                  [.blueRock, .blueRock, .greenRock, .greenRock]]
-        actualOutput = Referee.enforceRules(tiles)
+        actualOutput = Referee().enforceRules(tiles)
         XCTAssertNotEqual(actualOutput, gameLose, "If the player can rotate to attack, we don't lose")
 
         
@@ -118,7 +118,7 @@ class RefereeTests: XCTestCase {
                                            attacker: TileCoord(1, 1),
                                            defender: TileCoord(0, 1),
                                            affectedTiles: [TileCoord(0,1)], dodged: false, attackerIsPlayer: true))
-        let actualOutput = Referee.enforceRules(tiles)
+        let actualOutput = Referee().enforceRules(tiles)
         XCTAssertEqual(expectedOutput, actualOutput)
         
         tiles = [[.purpleRock, .blueRock, .blueRock],
@@ -128,7 +128,7 @@ class RefereeTests: XCTestCase {
                       attacker: TileCoord(2, 2),
                       defender: TileCoord(1, 2),
                       affectedTiles: [TileCoord(1,2)], dodged: false, attackerIsPlayer: true))
-        let actualOutput2 = Referee.enforceRules(tiles)
+        let actualOutput2 = Referee().enforceRules(tiles)
         XCTAssertEqual(expectedOutput, actualOutput2)
 
     }
@@ -142,7 +142,7 @@ class RefereeTests: XCTestCase {
                       defender: TileCoord(0, 0),
                       affectedTiles: [TileCoord(0, 0)], dodged: false, attackerIsPlayer: false))
 
-        var actualOutput = Referee.enforceRules(tiles)
+        var actualOutput = Referee().enforceRules(tiles)
         XCTAssertEqual(expectedOutput, actualOutput, "Pick axe monsters attack down")
         
         tiles = [[Tile.blueRock, .blueRock, .blueRock],
@@ -153,7 +153,7 @@ class RefereeTests: XCTestCase {
                                            defender: TileCoord(1, 2),
                                            affectedTiles: [TileCoord(1, 2)], dodged: false, attackerIsPlayer: false))
 
-        actualOutput = Referee.enforceRules(tiles)
+        actualOutput = Referee().enforceRules(tiles)
         XCTAssertEqual(expectedOutput, actualOutput, "Pick axe monsters attack down")
         
         tiles = [[Tile.exit, .blueRock, .blueRock],
@@ -163,7 +163,7 @@ class RefereeTests: XCTestCase {
                                        attacker: TileCoord(1, 0),
                                        defender: TileCoord(1, 1),
                                        affectedTiles: [TileCoord(1, 1)], dodged: false, attackerIsPlayer: false))
-        actualOutput = Referee.enforceRules(tiles)
+        actualOutput = Referee().enforceRules(tiles)
         XCTAssertEqual(expectedOutput, actualOutput, "Mouthy monsters attacked things on it's sides")
         
         tiles = [[Tile.exit, .blueRock, .blueRock],
@@ -173,7 +173,7 @@ class RefereeTests: XCTestCase {
                                        attacker: TileCoord(2, 1),
                                        defender: TileCoord(2, 0),
                                        affectedTiles: [TileCoord(2, 0), TileCoord(2, 2)], dodged: false, attackerIsPlayer: false))
-        actualOutput = Referee.enforceRules(tiles)
+        actualOutput = Referee().enforceRules(tiles)
         XCTAssertEqual(expectedOutput, actualOutput, "Mouthy monsters attacked things on it's sides")
 
         
@@ -185,7 +185,7 @@ class RefereeTests: XCTestCase {
                                        attacker: TileCoord(1, 0),
                                        defender: TileCoord(0, 0),
                                        affectedTiles: [TileCoord(0, 0)], dodged: false, attackerIsPlayer: false))
-        actualOutput = Referee.enforceRules(tiles)
+        actualOutput = Referee().enforceRules(tiles)
         XCTAssertNotEqual(expectedOutput, actualOutput, "Mouthy monsters attacked things on it's sides")
 
         tiles = [[.purpleRock, .blueRock, .blueRock],
@@ -195,7 +195,7 @@ class RefereeTests: XCTestCase {
                                        attacker: TileCoord(2, 2),
                                        defender: TileCoord(1, 2),
                                        affectedTiles: [TileCoord(1, 2)], dodged: false, attackerIsPlayer: false))
-        actualOutput = Referee.enforceRules(tiles)
+        actualOutput = Referee().enforceRules(tiles)
         XCTAssertNotEqual(expectedOutput, actualOutput, "Mouthy monsters attacked things on it's sides")
     }
     
@@ -207,7 +207,7 @@ class RefereeTests: XCTestCase {
                      [.greenRock, Tile(type: .normalPlayer), .blueRock, .purpleRock],
                      [.blueRock, .purpleRock, .greenRock, .greenRock]]
         var expected = Input(.monsterDies(TileCoord(1, 1), EntityModel.EntityType.rat))
-        var actual = Referee.enforceRules(tiles)
+        var actual = Referee().enforceRules(tiles)
         
         XCTAssertEqual(expected, actual, "Monster dies when hp reaches 0")
         
@@ -216,8 +216,137 @@ class RefereeTests: XCTestCase {
                  [.greenRock, Tile(type: .normalPlayer), .blueRock, .purpleRock],
                  [.blueRock, .purpleRock, Tile(type: .deadRat), .greenRock]]
         expected = Input(.monsterDies(TileCoord(1, 1), EntityModel.EntityType.rat))
-        actual = Referee.enforceRules(tiles)
+        actual = Referee().enforceRules(tiles)
         
         XCTAssertEqual(expected, actual, "Only one monster can die at a time")
+    }
+    
+    func testRefereeRefillsEmpty() {
+        
+        let tiles = [[Tile.greenRock, .blueRock, .greenRock, .greenRock],
+                     [.blueRock, .empty, .exit, .greenRock],
+                     [.greenRock, Tile(type: .normalPlayer), .blueRock, .purpleRock],
+                     [.blueRock, .purpleRock, .greenRock, .greenRock]]
+        let expected = Input(.refillEmpty)
+        let actual = Referee().enforceRules(tiles)
+        
+        XCTAssertEqual(expected, actual)
+    
+    }
+    
+    func testRefereeDoesNotRefillsEmptyWhenPillar() {
+        
+        let tiles = [[Tile.greenRock, .purplePillar, .greenRock, .greenRock],
+                     [.blueRock, .empty, .exit, .greenRock],
+                     [.greenRock, Tile(type: .normalPlayer), .blueRock, .purpleRock],
+                     [.blueRock, .purpleRock, .greenRock, .greenRock]]
+        let expected = Input(.refillEmpty)
+        let actual = Referee().enforceRules(tiles)
+        
+        XCTAssertEqual(expected, actual)
+    
+    }
+    
+    func testRefereeGameOver() {
+        
+        let tiles = [[.noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock],
+                     [.noGroupRock, .noGroupRock, .exit, .noGroupRock],
+                     [.noGroupRock, Tile(type: .normalPlayer), .noGroupRock, .noGroupRock],
+                     [.noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock]]
+        let expected = Input(.noMoreMoves)
+        let actual = Referee().enforceRules(tiles)
+        
+        XCTAssertEqual(expected, actual)
+    
+    }
+    
+    func testRefereeNotGameOverBecauseExit() {
+        
+        let tiles = [[.noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock],
+                     [.noGroupRock, .noGroupRock,  .noGroupRock, .noGroupRock],
+                     [.noGroupRock, Tile(type: .normalPlayer), .noGroupRock, .noGroupRock],
+                     [.noGroupRock, .exit, .noGroupRock, .noGroupRock]]
+        let expected = Input(.reffingFinished(newTurn: false)).type
+        let actual = Referee().enforceRules(tiles).type
+        
+        XCTAssertEqual(expected, actual)
+    
+    }
+    
+    func testRefereeNotGameOverBecausePlayerCanRotateToCollectGems() {
+        
+        let tiles = [[.noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock],
+                     [.noGroupRock, .noGroupRock,  .noGroupRock, .noGroupRock],
+                     [.noGroupRock, Tile(type: .normalPlayer), .noGroupRock, .noGroupRock],
+                     [.noGroupRock, .tenGems, .noGroupRock, .noGroupRock]]
+        let expected = Input(.reffingFinished(newTurn: false)).type
+        let actual = Referee().enforceRules(tiles).type
+        
+        XCTAssertEqual(expected, actual)
+    
+    }
+    
+    func testRefereeNotGameOverBecausePlayerCanRotateToCollectOffer() {
+        
+        let tiles = [[.noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock],
+                     [.noGroupRock, .noGroupRock,  .noGroupRock, .noGroupRock],
+                     [.noGroupRock, Tile(type: .normalPlayer), .noGroupRock, .noGroupRock],
+                     [.noGroupRock, .offer, .noGroupRock, .noGroupRock]]
+        let expected = Input(.reffingFinished(newTurn: false)).type
+        let actual = Referee().enforceRules(tiles).type
+        
+        XCTAssertEqual(expected, actual)
+    
+    }
+    
+    func testRefereeNotGameOverBecauseDynamiteWillExplode() {
+        
+        let tiles = [[.noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock],
+                     [.noGroupRock, .noGroupRock,  .noGroupRock, .noGroupRock],
+                     [.noGroupRock, Tile(type: .normalPlayer), .noGroupRock, .noGroupRock],
+                     [.noGroupRock, .dynamite, .noGroupRock, .noGroupRock]]
+        let expected = Input(.reffingFinished(newTurn: false)).type
+        let actual = Referee().enforceRules(tiles).type
+        
+        XCTAssertEqual(expected, actual)
+    
+    }
+    
+    // So this only happens when there is a internal "pocket" of empty spaces created by unmovable tiles like pillars surrounding an empty tile
+    // The logic to actual figure out if there is a "pocket" is complicated and I likely wont get to it
+    // 
+    func testRefereeShouldBeGameOverBecauseThereAreNoActualMoves() {
+        
+        let tiles = [[.noGroupRock, .purplePillar, .purplePillar, .noGroupRock],
+                     [.purplePillar, .empty,  .purplePillar, .noGroupRock],
+                     [.noGroupRock, .purplePillar, .noGroupRock, .noGroupRock],
+                     [Tile(type: .normalPlayer), .noGroupRock, .noGroupRock, .noGroupRock]]
+        let expected = Input(.reffingFinished(newTurn: false)).type
+        let actual = Referee().enforceRules(tiles).type
+        
+        XCTAssertNotEqual(expected, actual)
+    
+    }
+}
+
+extension Tile {
+    static var purplePillar: Tile {
+        return Tile(type: .pillar(PillarData(color: .purple, health: 3)))
+    }
+    
+    static var noGroupRock: Tile {
+        return Tile(type: .rock(color: .blue, holdsGem: false, groupCount: 1))
+    }
+
+    static var tenGems: Tile {
+        return Tile(type: .item(Item(type: .gem, amount: 10, color: .blue)))
+    }
+    
+    static var offer: Tile {
+        return Tile(type: .offer(.offer(type: .gems(amount: 50), tier: 1)))
+    }
+    
+    static var dynamite: Tile {
+        return Tile(type: .dynamite(DynamiteFuse(count: 2, hasBeenDecremented: false)))
     }
 }

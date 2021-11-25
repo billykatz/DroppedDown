@@ -32,7 +32,9 @@ struct PlayState: GameState {
         case .itemUseSelected:
             return AnyGameState(TargetingState())
         case .animationsFinished, .play, .transformation, .reffingFinished, .playAgain,. selectLevel, .newTurn, .visitStore, .itemUseCanceled, .itemCanBeUsed, .itemUsed, .decrementDynamites, .rotatePreview, .rotatePreviewFinish, .refillEmpty, .tileDetail, .runeReplacement,
-             .collectOffer, .runeReplaced, .foundRuneDiscarded, .loseAndGoToStore, .tutorialPhaseEnd:
+             .collectOffer, .runeReplaced, .foundRuneDiscarded, .loseAndGoToStore, .tutorialPhaseEnd,
+             .noMoreMoves
+            :
             return nil
         }
         

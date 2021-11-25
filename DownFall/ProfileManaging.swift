@@ -171,6 +171,7 @@ class ProfileLoadingManager: ProfileManaging {
         )
             .subscribe(on: scheduler)
             .receive(on: mainQueue)
+            .print("$$$ \(loadedProfileSubject.value)")
             .sink(receiveCompletion: { _ in },
                   receiveValue:
                     {  [loadedProfileSubject] value  in
@@ -212,6 +213,8 @@ class ProfileLoadingManager: ProfileManaging {
         .print("\(Constants.tag) Save Profile", to: GameLogger.shared)
         .tryFlatMap { [localPlayer, userDefaultClient, fileManagerClient, profileCodingClient] (loadedProfile, newProfile) -> AnyPublisher<Profile, Error> in
             if loadedProfile?.progress ?? 0 <= newProfile.progress {
+                GameLogger.shared.log(prefix: Constants.tag, message: "Loaded: \(loadedProfile?.progress ?? 0)")
+                GameLogger.shared.log(prefix: Constants.tag, message: "New \(newProfile.progress)")
                 GameLogger.shared.log(prefix: Constants.tag, message: "saving new profile")
                 return saveProfileLocallyAndRemotely(newProfile, localPlayer: localPlayer, uuidKey: Constants.playerUUIDKey, userDefaultsClient: userDefaultClient, isAuthenticated: localPlayer.isAuthenticated(), fileManagerClient: fileManagerClient, profileCodingClient: profileCodingClient)
             } else {

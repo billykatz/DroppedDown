@@ -45,7 +45,6 @@ enum ButtonIdentifier: String {
     case tutorialPausedExitToMainMenu
     case cycleLevel
     case seeInventory
-    case shuffleBoard
     case okay
     case sellHealth
     case buyHealth
@@ -87,6 +86,10 @@ enum ButtonIdentifier: String {
     // game recap
     case gameRecapViewBoard
     case gameRecapShowRecap
+    
+    // shuffle board
+    case confirmShufflePay2Hearts
+    case confirmShufflePay25Percent
     
     var title: String {
         switch self {
@@ -132,8 +135,6 @@ enum ButtonIdentifier: String {
             return "Level select"
         case .seeInventory:
             return "Inventory"
-        case .shuffleBoard:
-            return "Pay 2 \u{2665}: Shuffle board"
         case .okay:
             return "Okay"
         case .selectProfile:
@@ -193,6 +194,13 @@ enum ButtonIdentifier: String {
             
         case .gameRecapShowRecap:
             return "Show recap"
+            
+            
+        case .confirmShufflePay2Hearts:
+            return "Offer 2 hearts"
+        
+        case .confirmShufflePay25Percent:
+            return "Offer 25% of gems"
             
         
         case .wallet, .infoPopup, .storeItem, .backpack, .sellHealth, .buyHealth, .sellDodge, .buyDodge, .sellLuck, .buyLuck, .buyRuneSlot, .sellRuneSlot, .runeReplacementCancel:

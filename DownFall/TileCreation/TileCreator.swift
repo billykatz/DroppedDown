@@ -31,6 +31,23 @@ class TileCreator: TileStrategy {
     ]
     
     
+    static let testBoard: [[Tile]] =
+    [
+        [.redPillar, .redPillar, .redPillar, .redPillar, .redPillar, .redPillar],
+        
+        [.purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar],
+        
+        [.bluePillar, .bluePillar, .bluePillar, .bluePillar, .bluePillar, .bluePillar],
+        
+        [.purpleRock, .redRock, .purpleRock, .blueRock, .player, .blueRock],
+        
+        [.blueRock, .purpleRock, .purpleRock, .purpleRock, .blueRock, .blockedExit],
+        
+        [.blueRock, .purpleRock, .redRock, .blueRock, .redRock, .purpleRock]
+    ]
+
+    
+    
     let randomSource: GKLinearCongruentialRandomSource
     let entities: EntitiesModel
     let difficulty: Difficulty
@@ -343,6 +360,23 @@ class TileCreator: TileStrategy {
             }
             
             return (newTutorialBoard, true)
+        }
+        
+        if level.depth == testLevelDepthNumber {
+            var newTutorialBoard: [[Tile]] = Array.init(repeating: Array.init(repeating: .empty, count: level.boardSize), count: level.boardSize)
+            
+            for row in 0..<TileCreator.testBoard.count {
+                for col in 0..<TileCreator.testBoard.count {
+                    if TileCreator.testBoard[row][col].type == .player(.zero) {
+                        newTutorialBoard[row][col] = Tile(type: .player(playerData))
+                    } else {
+                        newTutorialBoard[row][col] = TileCreator.testBoard[row][col]
+                    }
+                }
+            }
+            
+            return (newTutorialBoard, true)
+
         }
         
         // early return to load the load tiles we have loaded

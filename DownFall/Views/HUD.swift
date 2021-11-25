@@ -90,7 +90,7 @@ class HUD: SKSpriteNode {
             switch inputType {
             case .attack:
                 showAttack(attackInput: input, endTiles: trans.first!.endTiles)
-            case .itemUsed, .decrementDynamites, .shuffleBoard, .gameWin:
+            case .itemUsed, .decrementDynamites, .gameWin:
                 if let tiles = trans.first?.endTiles,
                    let playerCoord = getTilePosition(.player(.zero), tiles: tiles),
                    case TileType.player(let data) = tiles[playerCoord].type {
@@ -355,8 +355,6 @@ class HUD: SKSpriteNode {
 extension HUD: ButtonDelegate {
     func buttonTapped(_ button: ShiftShaft_Button) {
         switch button.identifier {
-        case .shuffleBoard:
-            InputQueue.append(Input(.shuffleBoard))
         default:
             ()
         }

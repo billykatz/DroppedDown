@@ -11,6 +11,7 @@ import GameplayKit
 
 typealias Depth = Int
 let bossLevelDepthNumber = 9
+let testLevelDepthNumber = -1
 
 struct LevelConstructor {
     
@@ -19,27 +20,27 @@ struct LevelConstructor {
         let gemsAtDepth = maxSpawnGems(depth: depth)
         
         return
-            Level(
-                depth: depth,
-                monsterTypeRatio: monsterTypes(depth: depth),
-                monsterCountStart: monsterCountStart(depth: depth),
-                maxMonsterOnBoardRatio: maxMonsterOnBoardRatio(depth: depth),
-                boardSize: boardSize(depth: depth),
-                tileTypeChances: availableRocksPerLevel(depth: depth),
-                pillarCoordinates: pillars,
-                goals: levelGoal(depth: depth, pillars: pillars, gemAtDepth: gemsAtDepth, randomSource: randomSource, isTutorial: isTutorial),
-                maxSpawnGems: gemsAtDepth,
-                goalProgress: [],
-                savedBossPhase: nil,
-                potentialItems: potentialItems(depth: depth, unlockables: unlockables, startingUnlockables: startingUnlockables, playerData: playerData, randomSource: randomSource, isTutorial: isTutorial),
-                gemsSpawned: 0,
-                monsterSpawnTurnTimer: 0
-            )
+        Level(
+            depth: depth,
+            monsterTypeRatio: monsterTypes(depth: depth),
+            monsterCountStart: monsterCountStart(depth: depth),
+            maxMonsterOnBoardRatio: maxMonsterOnBoardRatio(depth: depth),
+            boardSize: boardSize(depth: depth),
+            tileTypeChances: availableRocksPerLevel(depth: depth),
+            pillarCoordinates: pillars,
+            goals: levelGoal(depth: depth, pillars: pillars, gemAtDepth: gemsAtDepth, randomSource: randomSource, isTutorial: isTutorial),
+            maxSpawnGems: gemsAtDepth,
+            goalProgress: [],
+            savedBossPhase: nil,
+            potentialItems: potentialItems(depth: depth, unlockables: unlockables, startingUnlockables: startingUnlockables, playerData: playerData, randomSource: randomSource, isTutorial: isTutorial),
+            gemsSpawned: 0,
+            monsterSpawnTurnTimer: 0
+        )
     }
     
     static func potentialItems(depth: Depth, unlockables: [Unlockable], startingUnlockables: [Unlockable], playerData: EntityModel, randomSource: GKLinearCongruentialRandomSource, isTutorial: Bool) -> [StoreOffer] {
         
-        if depth == 0 && isTutorial {
+        if (depth == 0 && isTutorial) || (depth == testLevelDepthNumber) {
             return [
                 StoreOffer.offer(type: .gems(amount: 15), tier: 1),
                 StoreOffer.offer(type: .plusOneMaxHealth, tier: 1)
@@ -73,7 +74,7 @@ struct LevelConstructor {
         if tier == 1 {
             // always offer at least 1 heal
             let healingOptions =
-                unlockables
+            unlockables
                 .filter { unlockable in
                     return unlockable.canAppearInRun && unlockable.item.tier == tier && (unlockable.item.type == .lesserHeal || unlockable.item.type == .greaterHeal)
                 }
@@ -81,17 +82,17 @@ struct LevelConstructor {
             guard let healingOption = healingOptions.randomElement() else { preconditionFailure("There must always be at least 1 unlockable at tier 1 for healing")}
             
             let otherOptions =
-                unlockables
+            unlockables
                 .filter { unlockable in
                     return !healingOptions.contains(unlockable) && unlockable.canAppearInRun && unlockable.item.tier == tier
                 }
-
+            
             guard let otherOption = otherOptions.randomElement() else {  preconditionFailure("There must always be at least 1 other unlockable at tier 1 that isn't healing")}
-
+            
             return [healingOption.item, otherOption.item]
             
             // For testing purposes
-//            return [healingOption.item, StoreOffer.offer(type: .rune(.rune(for: .bubbleUp)), tier: 1)]
+            //            return [healingOption.item, StoreOffer.offer(type: .rune(.rune(for: .bubbleUp)), tier: 1)]
         }
         else if tier == 2 {
             let playerHasFullPickaxe = playerData.pickaxe?.isAtMaxCapacity() ?? false
@@ -155,7 +156,7 @@ struct LevelConstructor {
                 }
                 
                 randomNumber = randomSource.nextInt(upperBound: 100)
-
+                
             }
             
             return options.map { $0.item }
@@ -164,12 +165,12 @@ struct LevelConstructor {
         } else {
             preconditionFailure("For this release we are only allowing two goals")
         }
-
+        
     }
     
     
     static func depthDivided(_ depth: Depth) -> Int {
-        return depth/3
+        return abs(depth)/3
     }
     
     static func maxSpawnGems(depth: Depth) -> Int {
@@ -206,7 +207,7 @@ struct LevelConstructor {
             let monsterGoal = LevelGoal.killMonsterGoal(amount: 3)
             
             goals = [rockGoal, monsterGoal]
-        
+            
         case 4:
             let monsterAmount = 4
             let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 35)
@@ -234,7 +235,7 @@ struct LevelConstructor {
             let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
             
             goals = [rockGoal, monsterGoal]
-        
+            
         case 8:
             let monsterAmount = 8
             let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 55)
@@ -244,19 +245,19 @@ struct LevelConstructor {
             
         case bossLevelDepthNumber:
             
-//            let monsterAmount = 9
-//            let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 60)
-//            let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
-            
             goals = [LevelGoal.bossGoal()]
-        
+            
         case 10...Int.max:
             let monsterAmount = Int.random(in: 10...15)
             let rockGoal = randomRockGoal([.red, .purple, .blue], amount: Int.random(lower: 60, upper: 75, interval: 5))
             let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
             
             goals = [rockGoal, monsterGoal]
-        
+            
+        case testLevelDepthNumber:
+            let rockGoal = randomRockGoal([.red, .purple, .blue], amount: Int.random(lower: 60, upper: 75, interval: 5))
+            let monsterGoal = LevelGoal.killMonsterGoal(amount: 1)
+            goals = [rockGoal, monsterGoal]
             
         default:
             goals = []
@@ -271,6 +272,8 @@ struct LevelConstructor {
             return 8
         case 5...Int.max:
             return 9
+        case testLevelDepthNumber:
+            return 6
         default:
             fatalError()
         }
@@ -284,11 +287,11 @@ struct LevelConstructor {
     static func availableRocksPerLevel(depth: Depth) -> TileTypeChanceModel {
         
         switch depth {
-        // just for testing
-//        case 0:
-//            return TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false, groupCount: 0): 100,
-//                                                        .rock(color: .blue, holdsGem: false): 50  ,
-//                                                        ])
+            // just for testing
+            //        case 0:
+            //            return TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false, groupCount: 0): 100,
+            //                                                        .rock(color: .blue, holdsGem: false): 50  ,
+            //                                                        ])
         case 0, 1, 2, 3, 4:
             let chances = TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false, groupCount: 0): 33,
                                                         .rock(color: .blue, holdsGem: false, groupCount: 0): 33,
@@ -296,37 +299,46 @@ struct LevelConstructor {
             return chances
         case bossLevelDepthNumber:
             return TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false, groupCount: 0): 33, .rock(color: .blue, holdsGem: false, groupCount: 0): 33, .rock(color: .purple, holdsGem: false, groupCount: 0): 33])
-//            return TileTypeChanceModel(chances: [ .rock(color: .blue, holdsGem: false, groupCount: 0): 100])
-//            return TileTypeChanceModel(chances: [
-//                                        .rock(color: .purple, holdsGem: false, groupCount: 0): 100,
-//
-//            ])
-//            return TileTypeChanceModel(chances: [
-//                                        .rock(color: .red, holdsGem: false, groupCount: 0): 100,
-//
-//            ])
-//            return TileTypeChanceModel(chances: [
-//                                        .rock(color: .red, holdsGem: false, groupCount: 0): 50,
-//                                        .rock(color: .blue, holdsGem: false, groupCount: 0): 50,
-//            ])
+            //            return TileTypeChanceModel(chances: [ .rock(color: .blue, holdsGem: false, groupCount: 0): 100])
+            //            return TileTypeChanceModel(chances: [
+            //                                        .rock(color: .purple, holdsGem: false, groupCount: 0): 100,
+            //
+            //            ])
+            //            return TileTypeChanceModel(chances: [
+            //                                        .rock(color: .red, holdsGem: false, groupCount: 0): 100,
+            //
+            //            ])
+            //            return TileTypeChanceModel(chances: [
+            //                                        .rock(color: .red, holdsGem: false, groupCount: 0): 50,
+            //                                        .rock(color: .blue, holdsGem: false, groupCount: 0): 50,
+            //            ])
         case 5, 6, 7...Int.max:
             let chances = TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false, groupCount: 0): 33,
                                                         .rock(color: .blue, holdsGem: false, groupCount: 0): 33,
-                                                         .rock(color: .purple, holdsGem: false, groupCount: 0): 33])
-             return chances
-//        case 8, 9:
-//            let chances = TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false, groupCount: 0): 30,
-//                                                        .rock(color: .blue, holdsGem: false, groupCount: 0): 30,
-//                                                        .rock(color: .purple, holdsGem: false, groupCount: 0): 30,
-//                                                        .rock(color: .brown, holdsGem: false, groupCount: 0): 10])
-//            return chances
-//
-//        case 10...Int.max:
-//            let chances = TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false, groupCount: 0): 29,
-//                                                        .rock(color: .blue, holdsGem: false, groupCount: 0): 29,
-//                                                        .rock(color: .purple, holdsGem: false, groupCount: 0): 29,
-//                                                        .rock(color: .brown, holdsGem: false, groupCount: 0): 13])
-//            return chances
+                                                        .rock(color: .purple, holdsGem: false, groupCount: 0): 33])
+            return chances
+            //        case 8, 9:
+            //            let chances = TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false, groupCount: 0): 30,
+            //                                                        .rock(color: .blue, holdsGem: false, groupCount: 0): 30,
+            //                                                        .rock(color: .purple, holdsGem: false, groupCount: 0): 30,
+            //                                                        .rock(color: .brown, holdsGem: false, groupCount: 0): 10])
+            //            return chances
+            //
+            //        case 10...Int.max:
+            //            let chances = TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false, groupCount: 0): 29,
+            //                                                        .rock(color: .blue, holdsGem: false, groupCount: 0): 29,
+            //                                                        .rock(color: .purple, holdsGem: false, groupCount: 0): 29,
+            //                                                        .rock(color: .brown, holdsGem: false, groupCount: 0): 13])
+            //            return chances
+        case testLevelDepthNumber:
+            let chances = TileTypeChanceModel(
+                chances: [
+                    .rock(color: .red, holdsGem: false, groupCount: 0): 25,
+                    .rock(color: .blue, holdsGem: false, groupCount: 0): 25,
+                    .rock(color: .purple, holdsGem: false, groupCount: 0): 25,
+                    .rock(color: .brown, holdsGem: false, groupCount: 0): 25]
+            )
+            return chances
         default:
             fatalError("Level must be positive")
         }
@@ -351,7 +363,7 @@ struct LevelConstructor {
         
         //        =FLOOR( MIN(M3 - (2 - MOD(RAND() * 10, 2)),  (AD3 + RANDBETWEEN(-1,1) ) ))
         /// no pillars in first 5 levels
-//        let depthDivided = self.depthDivided(depth)
+        //        let depthDivided = self.depthDivided(depth)
         let numPillarsBasedOnDepth: Int
         switch depth {
         case 1, 2, 3, 4:
@@ -361,7 +373,7 @@ struct LevelConstructor {
         case 7, 8:
             numPillarsBasedOnDepth = 5 + (randomSource.positiveNextInt % 2 == 0 ? -1 : 1)
         case bossLevelDepthNumber:
-//            numPillarsBasedOnDepth = 1
+            //            numPillarsBasedOnDepth = 1
             return bossPillars()
         case 10...Int.max:
             numPillarsBasedOnDepth = 3 + (randomSource.positiveNextInt % 2 == 0 ? -1 : 1)
@@ -437,7 +449,7 @@ struct LevelConstructor {
             TileCoord(5,6),
             TileCoord(4,6),
         ]
-
+        
         let chosenColors = [pillarColors, pillarColorsChoice2, pillarColorsChoice3, pillarColorsChoice4]
         let chosenCoords = [coords, coordsChoice2, coordsChoice3, coordsChoice4]
         let randomIdx = Int.random(chosenColors.count)
@@ -573,6 +585,12 @@ struct LevelConstructor {
             let ratRange = batRange.next(30)
             let sallyRange = ratRange.next(30)
             return [.rat: ratRange, .alamo: alamoRange, .dragon: dragonRange, .bat: batRange, .sally: sallyRange]
+            
+        case testLevelDepthNumber:
+            let ratRange = RangeModel(lower: 0, upper: 50)
+            let alamoRange = ratRange.next(50)
+            return [.rat: ratRange, .alamo: alamoRange]
+            
             
         default:
             fatalError()

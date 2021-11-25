@@ -47,6 +47,14 @@ struct Animator {
         return .init(foreground, .sequence(delay, action, curve: .easeIn))
     }
     
+    func shakeNode(node: SKNode, duration: CGFloat = 0.5, ampX: Int = 10, ampY: Int = 10, delayBefore: Double = 0) -> SpriteAction {
+        let action = SKAction.shake(duration: duration, amplitudeX: ampX, amplitudeY: ampY)
+        let delay = SKAction.wait(forDuration: delayBefore)
+        
+        return .init(node, .sequence(delay, action, curve: .easeIn))
+    }
+
+    
     
     public func animateRune(_ rune: Rune,
                             transformations: [Transformation],
@@ -697,6 +705,48 @@ struct Animator {
             }
         }
     }
+    
+    // MARK: - Shuffle Board Animations
+    func animateBoardShuffle(tileTransformations: [TileTransformation], sprites: [[DFTileSpriteNode]], positionInForeground: (TileCoord) -> CGPoint,  completion: @escaping () -> Void) {
+        var spriteActions: [SpriteAction] = []
+        var maxDuration = 0.0
+        // move each tile to it's destination
+        for tileTransforamtion in tileTransformations {
+            
+            let startCoord = tileTransforamtion.initial
+            let targetCoord = tileTransforamtion.end
+            let waitDuration = Double.random(in: 0.2...0.5)
+            let animationDuration = Double.random(in: 0.4..<0.6)
+            
+            // grab the maxduration so we know for how long to wiggle
+            maxDuration = max(maxDuration, waitDuration + animationDuration)
+            
+            // grab the sprite
+            let sprite = sprites[startCoord]
+            
+            // wait a bit
+            let waitBeforeMoving = SKAction.wait(forDuration: waitDuration)
+            
+            /// move it to the new
+            let targetPosition = positionInForeground(targetCoord)
+            let moveTo = SKAction.move(to: targetPosition, duration: animationDuration)
+            moveTo.timingMode = .easeInEaseOut
+            
+            let allAction = SKAction.sequence([waitBeforeMoving, moveTo])
+            
+            spriteActions.append(.init(sprite, allAction))
+        }
+        
+        
+        // wiggle all tiles for the duration of the animation
+        for sprite in sprites.reduce([], +) {
+            let wiggle = shakeNode(node: sprite, duration: maxDuration+0.5, ampX: 10, ampY: 10, delayBefore: 0.0)
+            spriteActions.append(wiggle)
+        }
+        
+        animate(spriteActions, completion: completion)
+    }
+    
     
     // MARK: - Boss Animations
     

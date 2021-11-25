@@ -22,7 +22,7 @@ struct PlayState: GameState {
             return AnyGameState(PauseState())
         case .attack, .touch, .monsterDies,
              .rotateCounterClockwise, .rotateClockwise, .collectItem,
-             .touchBegan, .shuffleBoard, .unlockExit, .goalCompleted,
+             .touchBegan, .unlockExit, .goalCompleted,
              .bossTurnStart, .bossPhaseStart:
             return AnyGameState(ComputingState())
         case .boardBuilt:

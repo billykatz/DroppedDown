@@ -22,9 +22,9 @@ struct ReffingState: GameState {
             return AnyGameState(ComputingState())
         case .reffingFinished(newTurn: false):
             return AnyGameState(PlayState())
-        case .attack, .monsterDies, .collectItem, .decrementDynamites, .refillEmpty, .collectOffer, .noMoreMoves:
+        case .attack, .monsterDies, .collectItem, .decrementDynamites, .refillEmpty, .collectOffer:
             return AnyGameState(ComputingState())
-        case .runeReplacement:
+        case .runeReplacement, .noMoreMoves:
             return AnyGameState(PauseState())
         case .gameWin:
             return AnyGameState(WinState())

@@ -100,7 +100,6 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
     case rotatePreviewFinish([SpriteAction], Transformation?)
     case refillEmpty
     case tileDetail(TileType, [TileCoord])
-    case shuffleBoard
     case unlockExit
     case levelGoalDetail([GoalTracking])
     case goalCompleted([GoalTracking], allGoalsCompleted: Bool)
@@ -119,6 +118,7 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
     
     // no more moves
     case noMoreMoves
+    case noMoreMovesConfirm(payTwoHearts: Bool, pay25Percent: Bool)
     
     var debugDescription: String {
         switch self {
@@ -180,8 +180,6 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
             return "Refill empty tiles"
         case .tileDetail:
             return "Tile detail"
-        case .shuffleBoard:
-            return "Shuffle board"
         case .unlockExit:
             return "Unlock Exit"
         case .levelGoalDetail:
@@ -214,6 +212,9 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
         // no more moves
         case .noMoreMoves:
             return "No more moves"
+            
+        case  .noMoreMovesConfirm(let payTwoHearts, let pay25Percent):
+            return "No more move confirmation. Pay 2 hearts? \(payTwoHearts). Pay 25%? \(pay25Percent)."
             
             
         }

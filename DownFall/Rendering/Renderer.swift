@@ -243,9 +243,6 @@ class Renderer: SKSpriteNode {
             case .refillEmpty:
                 refillEmptyTiles(with: trans)
                 
-            case .shuffleBoard:
-                computeNewBoard(for: trans)
-                
             case .runeReplaced:
                 animationsFinished(endTiles: trans.endTiles)
             case .foundRuneDiscarded:
@@ -295,6 +292,9 @@ class Renderer: SKSpriteNode {
                 
             case .bossPhaseStart(let phase):
                 showBossPhaseChangeAttacks(in: trans, bossPhase: phase)
+                
+            case .noMoreMovesConfirm:
+                shuffleBoard(transformations: transformations)
 
             case .reffingFinished, .touchBegan, .itemUseSelected:
                 () // Purposely left blank.
@@ -343,6 +343,10 @@ class Renderer: SKSpriteNode {
             if phase == .theseAreLevelGoals {
                 showTutorial(phase: tutorialConductor?.phase)
             }
+            
+        case .noMoreMoves:
+            showNoMoreMovesModal(playerData: <#T##EntityModel#>)
+            
         default:
             ()
         }
@@ -933,6 +937,48 @@ extension Renderer {
         
     }
     
+}
+
+//MARK: - Shuffle board logic
+
+extension Renderer {
+    private func showNoMoreMovesModal(playerData: EntityModel) {
+        let noMoreMovesModal = ConfirmShuffleView(playableRect: playableRect, canPayTwoHearts: playerData.hp > 2, playersGemAmount: playerData.carry.totalGem)
+        noMoreMovesModal.zPosition = 100_000_000
+        menuForeground.addChild(noMoreMovesModal)
+    }
+    
+    
+    private func shuffleBoard(transformations: [Transformation]) {
+        guard let shuffleTrans = transformations.first,
+              let shuffleTileTrans = shuffleTrans.tileTransformation
+              else {
+                  animationsFinished(endTiles: transformations.last?.endTiles)
+                  return
+              }
+        
+        // animate all the tiles swapping positions
+        animator.animateBoardShuffle(tileTransformations: shuffleTileTrans, sprites: sprites, positionInForeground: positionInForeground(at:)) { [weak self] in
+            self?.animationsFinished(endTiles: shuffleTrans.endTiles)
+        }
+
+        
+//        guard let shuffleTrans = transformations.first,
+//              let shuffleTileTrans = shuffleTrans.tileTransformation,
+//              let removeAndReplaceTrans = transformations.last else {
+//                  animationsFinished(endTiles: transformations.last?.endTiles)
+//                  return
+//              }
+//
+//        // animate all the tiles swapping positions
+//        animator.animateBoardShuffle(tileTransformations: shuffleTileTrans, sprites: sprites, positionInForeground: positionInForeground(at:)) { [weak self] in
+//            self?.computeNewBoard(for: [removeAndReplaceTrans])
+//        }
+        
+        // show a modal that says something about the Mineral Spirits shuffling the board because you were out of moves
+        // animate the removal and replacement of the monsters
+    }
+
 }
 
 //MARK: - Boss logic

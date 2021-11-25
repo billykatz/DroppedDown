@@ -15,7 +15,7 @@ struct CarryModel: Codable, Equatable {
         return items.contains { $0.type == .gem }
     }
     
-    private var totalGem: Int {
+    var totalGem: Int {
         return items.filter({ $0.type == .gem }).first?.amount ?? 0
     }
     

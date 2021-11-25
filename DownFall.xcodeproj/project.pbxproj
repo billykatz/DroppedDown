@@ -29,6 +29,7 @@
 		2842BAC126A0EEC10021CD0B /* StoreOfferType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2842BAC026A0EEC10021CD0B /* StoreOfferType.swift */; };
 		284F2EC32731DB3C00032088 /* FTUEConductor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 284F2EC22731DB3C00032088 /* FTUEConductor.swift */; };
 		284F2EC827335BC200032088 /* background-music.wav in Resources */ = {isa = PBXBuildFile; fileRef = 284F2EC727335BC200032088 /* background-music.wav */; };
+		288330F7274FDB400070A1E8 /* ConfirmShuffleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 288330F6274FDB400070A1E8 /* ConfirmShuffleView.swift */; };
 		2886E83E26F0303B0014FA5D /* SettingsCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886E83D26F0303B0014FA5D /* SettingsCoordinator.swift */; };
 		2886E84026F030750014FA5D /* UIViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886E83F26F030750014FA5D /* UIViewController+Extensions.swift */; };
 		2886E84326F031050014FA5D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886E84226F031050014FA5D /* SettingsView.swift */; };
@@ -239,6 +240,7 @@
 		2842BAC026A0EEC10021CD0B /* StoreOfferType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreOfferType.swift; sourceTree = "<group>"; };
 		284F2EC22731DB3C00032088 /* FTUEConductor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FTUEConductor.swift; sourceTree = "<group>"; };
 		284F2EC727335BC200032088 /* background-music.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "background-music.wav"; sourceTree = "<group>"; };
+		288330F6274FDB400070A1E8 /* ConfirmShuffleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmShuffleView.swift; sourceTree = "<group>"; };
 		2886E83D26F0303B0014FA5D /* SettingsCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsCoordinator.swift; sourceTree = "<group>"; };
 		2886E83F26F030750014FA5D /* UIViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extensions.swift"; sourceTree = "<group>"; };
 		2886E84226F031050014FA5D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -766,6 +768,7 @@
 				5843F4532426747100C03612 /* RotatePreviewView.swift */,
 				5867A590242B0CD1005BFD10 /* TileDetailView.swift */,
 				2831B6A5274C787B00F90626 /* GameRecapView.swift */,
+				288330F6274FDB400070A1E8 /* ConfirmShuffleView.swift */,
 				3DD5AA0C2398025400FB63F4 /* Styling.swift */,
 				3DF0A6AF2379C4DC00941305 /* ParagraphNode.swift */,
 				3DC072BA2373AF510046F224 /* SwipeRecognizerView.swift */,
@@ -1316,6 +1319,7 @@
 				3DA4E8972290A88C006E90D1 /* EntityModel.swift in Sources */,
 				3D06390722EEB53C00C4D5E9 /* ComputingState.swift in Sources */,
 				2842570A26EFE82600C96CCC /* CodexPriceView.swift in Sources */,
+				288330F7274FDB400070A1E8 /* ConfirmShuffleView.swift in Sources */,
 				28A836C4268FE57F00D96C48 /* JSONCoding+Extensions.swift in Sources */,
 				3D674C9522C9D6640003AEB4 /* MainMenu.swift in Sources */,
 				58A4B91D2472E5620011624A /* ChanceModel.swift in Sources */,

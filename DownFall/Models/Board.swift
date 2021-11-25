@@ -207,12 +207,9 @@ class Board: Equatable {
             InputQueue.append(Input(.transformation([refillEmpty(inputType: .refillEmpty)])))
             return
             
-        case .shuffleBoard:
-            InputQueue.append(Input(.transformation([shuffleBoard(inputType: .shuffleBoard)])))
-            return
-            
-        case .noMoreMoves:
-            InputQueue.append(Input(.transformation([shuffleBoard(inputType: .shuffleBoard)])))
+        case .noMoreMovesConfirm(let payTwoHearts, let pay25Percent):
+            let shuffleBoard = shuffleBoard(input: input)
+            InputQueue.append(Input(.transformation(shuffleBoard)))
             return
             
         case .unlockExit:
@@ -279,7 +276,7 @@ class Board: Equatable {
              .newTurn,
              .visitStore, .loseAndGoToStore,
              .itemUseCanceled, .itemCanBeUsed, .rotatePreview, .tileDetail, .levelGoalDetail, .runeReplacement,
-             .tutorialPhaseStart, .tutorialPhaseEnd:
+             .tutorialPhaseStart, .tutorialPhaseEnd, .noMoreMoves:
             transformation = nil
         }
         
@@ -1415,13 +1412,14 @@ extension Board {
 }
 
 // MARK: - Shuffle
+
 extension Board {
     var playerCoord: TileCoord {
         return typeCount(for: tiles, of: .player(.zero)).first!
     }
     
     
-    func shuffleBoard(input: Input) {
+    func shuffleBoard(input: Input) -> [Transformation] {
         
         // Move rocks around
         // Do not move the player
@@ -1432,39 +1430,59 @@ extension Board {
         // Kill 33% of the monsters on the board, rounded up
         // Remove and replace those tiles
         
-        var newTiles = self.tiles
-        var intermediateTiles = newTiles
+        var intermediateTiles = self.tiles
         var reserved = shuffleReserved()
         let playerCoord = playerCoord
-        var killedMonsters = 0
-        var numberOfMonsters = 0
+        var monsterCoords: [TileCoord] = []
+        var tileTransformations: [TileTransformation] = []
+        
         for row in 0..<self.tiles.count {
             for col in 0..<self.tiles[row].count {
                 let tileCoord = TileCoord(row, col)
                 let tile = tiles[tileCoord]
+                
                 switch tile.type {
                 case .rock:
                     let newCoord = randomCoord(in: tiles, notIn: reserved)
                     intermediateTiles[newCoord.row][newCoord.col] = tile
-                    reserved.insert(tileCoord)
+                    reserved.insert(newCoord)
+                    tileTransformations.append(TileTransformation(tileCoord, newCoord))
+                    
                 case .monster:
                     let newCoord = randomCoord(in: tiles, notIn: reserved)
                     intermediateTiles[newCoord.row][newCoord.col] = tile
-                    reserved.insert(tileCoord)
-                    numberOfMonsters += 1
+                    reserved.insert(newCoord)
+                    monsterCoords.append(newCoord)
+                    tileTransformations.append(TileTransformation(tileCoord, newCoord))
+                    
                 case .item, .offer:
-                    let range = (CGFloat(2)...CGFloat(4))
+                    let range = (CGFloat(1)...CGFloat(3))
                     let newCoord = randomCoord(in: tiles, notIn: reserved, nearby: playerCoord, in: range)
                     intermediateTiles[newCoord.row][newCoord.col] = tile
-                    reserved.insert(tileCoord)
-                case .player, .pillar, .exit, .empty,. emptyGem, .dynamite:
+                    reserved.insert(newCoord)
+                    tileTransformations.append(TileTransformation(tileCoord, newCoord))
+                    
+                case .player, .pillar, .exit, .empty, .emptyGem, .dynamite:
                     break
                 }
                 
             }
         }
         
-        newTiles = intermediateTiles
+        
+        self.tiles = intermediateTiles
+        
+        let numMonsters = monsterCoords.count
+        let numberOfMonstersToKill = numMonsters/2
+        let randomMonsterCoords = monsterCoords.choose(random: numberOfMonstersToKill)
+        
+        let shuffleTransformation = Transformation(transformation: tileTransformations, inputType: input.type, endTiles: self.tiles)
+        
+//        let removeMonstersAndReplace = removeAndReplaces(from: self.tiles, specificCoord: randomMonsterCoords, input: input)
+        
+        return [shuffleTransformation]
+//        return [shuffleTransformation, removeMonstersAndReplace]
+        
     }
     
     private func shuffleReserved() -> Set<TileCoord> {

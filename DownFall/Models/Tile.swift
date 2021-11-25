@@ -79,6 +79,11 @@ struct Tile: Hashable, Codable {
         return Tile(type: .exit(blocked: false))
     }
     
+    static var blockedExit: Tile {
+        return Tile(type: .exit(blocked: true))
+    }
+
+    
     static var empty: Tile {
         return Tile(type: .empty)
     }
@@ -105,6 +110,18 @@ struct Tile: Hashable, Codable {
     
     static var brownRock: Tile {
         return Tile(type: .rock(color: .brown, holdsGem: false, groupCount: 0))
+    }
+    
+    static var purplePillar: Tile {
+        return Tile(type: .pillar(PillarData(color: .purple, health: 3)))
+    }
+    
+    static var bluePillar: Tile {
+        return Tile(type: .pillar(PillarData(color: .blue, health: 3)))
+    }
+    
+    static var redPillar: Tile {
+        return Tile(type: .pillar(PillarData(color: .red, health: 3)))
     }
     
     static var gem: Tile {

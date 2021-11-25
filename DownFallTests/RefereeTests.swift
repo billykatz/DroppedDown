@@ -260,6 +260,19 @@ class RefereeTests: XCTestCase {
     
     }
     
+    func testRefereeNotGameOverBecauseThereIsAGroupOfRocks() {
+        
+        let tiles = [[.noGroupRock, .noGroupRock, .noGroupRock, .threeGroupRock],
+                     [.noGroupRock, .noGroupRock,  .noGroupRock, .noGroupRock],
+                     [.noGroupRock, Tile(type: .normalPlayer), .noGroupRock, .noGroupRock],
+                     [.noGroupRock, .exit, .noGroupRock, .noGroupRock]]
+        let expected = Input(.reffingFinished(newTurn: false)).type
+        let actual = Referee().enforceRules(tiles).type
+        
+        XCTAssertEqual(expected, actual)
+    
+    }
+    
     func testRefereeNotGameOverBecauseExit() {
         
         let tiles = [[.noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock],
@@ -336,6 +349,10 @@ extension Tile {
     
     static var noGroupRock: Tile {
         return Tile(type: .rock(color: .blue, holdsGem: false, groupCount: 1))
+    }
+    
+    static var threeGroupRock: Tile {
+        return Tile(type: .rock(color: .blue, holdsGem: false, groupCount: 13))
     }
 
     static var tenGems: Tile {

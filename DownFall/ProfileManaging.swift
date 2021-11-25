@@ -171,7 +171,6 @@ class ProfileLoadingManager: ProfileManaging {
         )
             .subscribe(on: scheduler)
             .receive(on: mainQueue)
-            .print("$$$ \(loadedProfileSubject.value)")
             .sink(receiveCompletion: { _ in },
                   receiveValue:
                     {  [loadedProfileSubject] value  in

@@ -347,7 +347,7 @@ struct Animator {
     }
 
     
-    func animateCollectOffer(offerType: StoreOfferType,  offerSprite: SKSpriteNode, targetPosition: CGPoint, to hud: HUD, completion: @escaping () -> Void) {
+    func animateCollectOffer(offerType: StoreOfferType,  offerSprite: SKSpriteNode, targetPosition: CGPoint, to hud: HUD, updatedPlayerData: EntityModel, completion: @escaping () -> Void) {
         
         let moveToAction = SKAction.move(to: targetPosition, duration: AnimationSettings.Board.goldGainSpeedEnd)
         let scaleAction = SKAction.scale(to: Style.Board.goldGainSizeEnd, duration: AnimationSettings.Board.goldGainSpeedEnd)
@@ -358,7 +358,7 @@ struct Animator {
         moveAwayMoveToScale.timingMode = .easeOut
         
         let hudAction = SKAction.run {
-            hud.incrementStat(offer: offerType)
+            hud.incrementStat(offer: offerType, updatedPlayerData: updatedPlayerData)
         }
         
         let hudActionRemoveFromparent = SKAction.group([hudAction, .removeFromParent()])

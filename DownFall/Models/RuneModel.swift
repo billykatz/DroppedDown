@@ -106,6 +106,10 @@ struct Rune: Hashable, Codable {
         return ""
     }
     
+    var isCharged: Bool {
+        return rechargeCurrent >= cooldown
+    }
+    
     func update(type: RuneType? = nil,
                 textureName: String? = nil,
                 cost: Int? = nil,

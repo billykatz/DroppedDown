@@ -65,32 +65,12 @@ class HUD: SKSpriteNode {
     
     //Mark: - Instance Methods
     
-    private func showAttack(attackInput: Input, endTiles: [[Tile]]?) {
-        if case InputType.attack(_,
-                                 _,
-                                 let defenderPosition,
-                                 _,
-                                 _,
-                                 _) = attackInput.type {
-            print("Defender position \(String(describing: defenderPosition))")
-        }
-        guard let tiles = endTiles else { return }
-        
-        for tile in tiles.flatMap({ $0 }) {
-            if case let TileType.player(playerData) = tile.type {
-                show(playerData)
-            }
-        }
-    }
-    
     func handle(_ input: Input) {
         switch input.type {
         case .transformation(let trans):
             guard let inputType = trans.first?.inputType else { return }
             switch inputType {
-            case .attack:
-                showAttack(attackInput: input, endTiles: trans.first!.endTiles)
-            case .itemUsed, .decrementDynamites, .gameWin, .noMoreMoves, .noMoreMovesConfirm:
+            case .itemUsed, .decrementDynamites, .gameWin, .noMoreMoves, .noMoreMovesConfirm, .attack:
                 if let tiles = trans.first?.endTiles,
                    let playerCoord = getTilePosition(.player(.zero), tiles: tiles),
                    case TileType.player(let data) = tiles[playerCoord].type {
@@ -198,16 +178,18 @@ class HUD: SKSpriteNode {
 
     }
     
-    func incrementStat(offer: StoreOfferType) {
+    func incrementStat(offer: StoreOfferType, updatedPlayerData: EntityModel) {
         switch offer {
         case .dodge(amount: let amount):
             showIncreaseInStat(offerType: offer, amountIncrease: amount)
         case .luck(amount: let amount):
             showIncreaseInStat(offerType: offer, amountIncrease: amount)
         case .greaterHeal:
-            showIncreaseInStat(offerType: offer, amountIncrease: 2)
+            let maxHealthGain = min(2, updatedPlayerData.originalHp - updatedPlayerData.hp)
+            showIncreaseInStat(offerType: offer, amountIncrease: maxHealthGain)
         case .lesserHeal:
-            showIncreaseInStat(offerType: offer, amountIncrease: 1)
+            let maxHealthGain = min(1, updatedPlayerData.originalHp - updatedPlayerData.hp)
+            showIncreaseInStat(offerType: offer, amountIncrease: maxHealthGain)
         case .plusTwoMaxHealth:
             showIncreaseInStat(offerType: offer, amountIncrease: 2)
         case .plusOneMaxHealth:

@@ -388,6 +388,12 @@ class Referee {
                             hasMoreMoves = true
                         }
                         
+                    case .player(let data):
+                        // the player can use their rune that is already charged
+                        if (data.pickaxe?.runes.filter({ $0.isCharged }).count ?? 0) >= 1 {
+                            hasMoreMoves = true
+                        }
+                        
                     default:
                         break
                         

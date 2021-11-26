@@ -621,17 +621,25 @@ extension Renderer {
                 animator.animateCollectRune(runeSprite: sprite, targetPosition: targetPoint) { [weak self] in
                     self?.computeNewBoard(for: trans.first) { [weak self] in self?.animationsFinished(endTiles: trans.first?.endTiles) }
                 }
+                
+                return
             }
             
-            else {
+            else if let endTiles = trans.first?.endTiles,
+                    let playerCoord = getTilePosition(.player(.zero), tiles: endTiles),
+                    case TileType.player(let data) = endTiles[playerCoord].type {
                 // animate received the health, dodge or luck and then compute the new board
                 let targetSprite = hud.targetSprite(for: offer.type)
                 let targetPoint = hud.convert(targetSprite?.frame.center ?? .zero, to: foreground)// ?? .zero
                 let sprite = sprites[atTilecoord.x][atTilecoord.y]
-                animator.animateCollectOffer(offerType: offer.type, offerSprite: sprite, targetPosition: targetPoint, to: hud) { [weak self] in
+                animator.animateCollectOffer(offerType: offer.type, offerSprite: sprite, targetPosition: targetPoint, to: hud, updatedPlayerData: data) { [weak self] in
                     self?.computeNewBoard(for: trans.first) { [weak self] in self?.animationsFinished(endTiles: trans.first?.endTiles) }
                 }
+                
+                return
             }
+            
+            self.computeNewBoard(for: trans.first) { [weak self] in self?.animationsFinished(endTiles: trans.first?.endTiles) }
             return
         }
         

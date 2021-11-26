@@ -1473,7 +1473,7 @@ extension Board {
                     if pay2Hearts {
                         newData = data.wasAttacked(for: 2, from: .east)
                     } else {
-                        let twentyFivePercent = Double(data.carry.totalGem) * 100 * 0.25
+                        let twentyFivePercent = Double(data.carry.totalGem) * 0.25
                         newData = data.spend(amount: Int(twentyFivePercent))
                     }
                     

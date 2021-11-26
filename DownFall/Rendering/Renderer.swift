@@ -957,7 +957,7 @@ extension Renderer {
 
 extension Renderer {
     private func showNoMoreMovesModal(playerData: EntityModel) {
-        let noMoreMovesModal = ConfirmShuffleView(playableRect: playableRect, canPayTwoHearts: playerData.hp > 2, playersGemAmount: playerData.carry.totalGem)
+        let noMoreMovesModal = ConfirmShuffleView(playableRect: playableRect, canPayTwoHearts: playerData.hp > 2, playersGemAmount: playerData.carry.totalGem, sprites: sprites)
         noMoreMovesModal.zPosition = 100_000_000
         
 //        var spriteActions: [SpriteAction] = []

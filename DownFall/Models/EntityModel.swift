@@ -82,6 +82,8 @@ struct EntityModel: Equatable, Codable {
     
     static let zero: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .rat, carry: .zero, animations: [], effects: [], dodge: 0, luck: 0, killedBy: nil)
     
+    static let ratZero: EntityModel = EntityModel(originalHp: 1, hp: 1, name: "rat", attack: .zero, type: .rat, carry: .zero, animations: [], effects: [], dodge: 0, luck: 0, killedBy: nil)
+    
     static let lotsOfCash: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .rat, carry: CarryModel(items: [Item(type: .gem, amount: 1000, color: .blue)]), animations: [], effects: [], dodge: 0, luck: 0, killedBy: nil)
     
     static let playerZero: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .player, carry: .zero, animations: [], pickaxe: Pickaxe(runeSlots: 0, runes: []), effects: [], dodge: 0, luck: 0, killedBy: nil)

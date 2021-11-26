@@ -132,6 +132,10 @@ struct Tile: Hashable, Codable {
     static func monster(_ model: EntityModel) -> Tile {
         return Tile(type: TileType.monster(model))
     }
+    
+    static var ratTileTestOnly: Tile {
+        return Tile(type: .monster(.ratZero))
+    }
 }
 
 extension Tile: Equatable {

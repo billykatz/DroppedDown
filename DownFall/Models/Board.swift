@@ -13,27 +13,47 @@ class Board: Equatable {
         return false
     }
     
+    func calculateNeighbors(for tiles: [[Tile]]) -> [[Tile]] {
+        let neighbors = findNeighborsForBoard(in: tiles)
+        var newTiles = tiles
+        for row in 0..<newTiles.count {
+            for col in 0..<newTiles.count {
+                if case TileType.rock(let color, let hasGem, _) = newTiles[row][col].type {
+                    let groupCount = neighbors[row][col]
+                    newTiles[row][col] =
+                        Tile(
+                            type: TileType.rock(color: color, holdsGem: hasGem, groupCount: groupCount),
+                            bossTargetedToEat: newTiles[row][col].bossTargetedToEat
+                        )
+                }
+            }
+        }
+        
+        return newTiles
+
+    }
+    
     private var _tiles : [[Tile]]
     private(set) var tiles: [[Tile]] {
         get {
             return _tiles
         } set {
-            let neighnors = findNeighborsForBoard(in: newValue)
-            var newTiles = newValue
-            for row in 0..<newTiles.count {
-                for col in 0..<newTiles.count {
-                    if case TileType.rock(let color, let hasGem, _) = newTiles[row][col].type {
-                        let groupCount = neighnors[row][col]
-                        newTiles[row][col] =
-                            Tile(
-                                type: TileType.rock(color: color, holdsGem: hasGem, groupCount: groupCount),
-                                bossTargetedToEat: newTiles[row][col].bossTargetedToEat
-                            )
-                    }
-                }
-            }
-            
-            _tiles = newTiles
+//            let neighnors = findNeighborsForBoard(in: newValue)
+            _tiles = calculateNeighbors(for: newValue)
+//            for row in 0..<newTiles.count {
+//                for col in 0..<newTiles.count {
+//                    if case TileType.rock(let color, let hasGem, _) = newTiles[row][col].type {
+//                        let groupCount = neighnors[row][col]
+//                        newTiles[row][col] =
+//                            Tile(
+//                                type: TileType.rock(color: color, holdsGem: hasGem, groupCount: groupCount),
+//                                bossTargetedToEat: newTiles[row][col].bossTargetedToEat
+//                            )
+//                    }
+//                }
+//            }
+//
+//            _tiles = newTiles
         }
     }
     private(set) var level: Level
@@ -1424,15 +1444,20 @@ extension Board {
         // Kill 33% of the monsters on the board, rounded up
         // Remove and replace those tiles
         
-        var intermediateTiles = self.tiles
-        var reserved = shuffleReserved()
-        let playerCoord = playerCoord
-        var monsterCoords: [TileCoord] = []
-        var tileTransformations: [TileTransformation] = []
         
         var boardHasMoves = false
-        
+        var intermediateTiles = self.tiles
+        var tileTransformations: [TileTransformation] = []
+        var count = 0
         while !boardHasMoves {
+            print("$$$ Board has more moves checking loop: \(count)")
+            count += 1
+            /// this is a loop so we need to set or reset local variables to properly find a solution
+            let playerCoord = playerCoord
+            var monsterCoords: [TileCoord] = []
+            var reserved = shuffleReserved()
+            tileTransformations.removeAll()
+            
             for row in 0..<self.tiles.count {
                 for col in 0..<self.tiles[row].count {
                     let tileCoord = TileCoord(row, col)
@@ -1446,11 +1471,7 @@ extension Board {
                         tileTransformations.append(TileTransformation(tileCoord, newCoord))
                         
                     case .monster:
-                        let newCoord = randomCoord(in: tiles, notIn: reserved)
-                        intermediateTiles[newCoord.row][newCoord.col] = tile
-                        reserved.insert(newCoord)
-                        monsterCoords.append(newCoord)
-                        tileTransformations.append(TileTransformation(tileCoord, newCoord))
+                        monsterCoords.append(tileCoord)
                         
                     case .item, .offer:
                         let range = (CGFloat(1)...CGFloat(3))
@@ -1478,14 +1499,17 @@ extension Board {
                 }
             }
             
+            let randomMonsterCoords = monsterCoords.choose(random: monsterCoords.count/2)
+            for coord in randomMonsterCoords {
+                intermediateTiles[coord.row][coord.col] = .empty
+            }
             
-            self.tiles = intermediateTiles
-            boardHasMoves = boardHasMoreMoves(tiles: self.tiles)
+            
+            intermediateTiles = calculateNeighbors(for: intermediateTiles)
+            boardHasMoves = boardHasMoreMoves(tiles: intermediateTiles)
         }
         
-        let numMonsters = monsterCoords.count
-        let numberOfMonstersToKill = numMonsters/2
-        let randomMonsterCoords = monsterCoords.choose(random: numberOfMonstersToKill)
+        self.tiles = intermediateTiles
         
         let shuffleTransformation = Transformation(transformation: tileTransformations, inputType: input.type, endTiles: self.tiles)
         
@@ -1501,7 +1525,7 @@ extension Board {
         for (i, _) in tiles.enumerated() {
             for (j, _) in tiles[i].enumerated() {
                 switch tiles[i][j].type {
-                case .exit, .pillar, .player:
+                case .exit, .pillar, .player, .monster:
                     tileCoords.append(TileCoord(i, j))
                 default:
                     continue

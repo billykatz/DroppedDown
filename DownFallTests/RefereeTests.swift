@@ -343,6 +343,11 @@ class RefereeTests: XCTestCase {
 }
 
 extension Tile {
+    static var ratTileTestOnly: Tile {
+        return Tile(type: .monster(.zero))
+    }
+    
+    
     static var purplePillar: Tile {
         return Tile(type: .pillar(PillarData(color: .purple, health: 3)))
     }

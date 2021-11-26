@@ -33,7 +33,7 @@ class TileCreator: TileStrategy {
     
     static let testBoard: [[Tile]] =
     [
-        [.redPillar, .redPillar, .redPillar, .redPillar, .redPillar, .redPillar],
+        [.ratTileTestOnly, .ratTileTestOnly, .ratTileTestOnly, .ratTileTestOnly, .ratTileTestOnly, .ratTileTestOnly],
         
         [.purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar],
         

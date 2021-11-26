@@ -47,11 +47,11 @@ struct Animator {
         return .init(foreground, .sequence(delay, action, curve: .easeIn))
     }
     
-    func shakeNode(node: SKNode, duration: CGFloat = 0.5, ampX: Int = 10, ampY: Int = 10, delayBefore: Double = 0) -> SpriteAction {
+    func shakeNode(node: SKNode, duration: CGFloat = 0.5, ampX: Int = 10, ampY: Int = 10, delayBefore: Double = 0, timingMode: SKActionTimingMode = .easeIn) -> SpriteAction {
         let action = SKAction.shake(duration: duration, amplitudeX: ampX, amplitudeY: ampY)
         let delay = SKAction.wait(forDuration: delayBefore)
         
-        return .init(node, .sequence(delay, action, curve: .easeIn))
+        return .init(node, .sequence(delay, action, curve: timingMode))
     }
 
     
@@ -715,10 +715,10 @@ struct Animator {
             
             let startCoord = tileTransforamtion.initial
             let targetCoord = tileTransforamtion.end
-            let waitDuration = Double.random(in: 0.2...0.5)
+            let waitDuration = Double.random(in: 0.2...0.6)
             let animationDuration = Double.random(in: 0.4..<0.6)
             
-            // grab the maxduration so we know for how long to wiggle
+            // grab the max duration so we know for how long to wiggle
             maxDuration = max(maxDuration, waitDuration + animationDuration)
             
             // grab the sprite

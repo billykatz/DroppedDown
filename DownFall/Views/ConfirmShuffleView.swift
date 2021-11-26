@@ -11,15 +11,15 @@ import SpriteKit
 class ConfirmShuffleView: SKNode {
     
     let containerView: SKSpriteNode
-    
     let canPayTwoHearts: Bool
     let playersGemAmount: Int
+    let sprites: [[DFTileSpriteNode]]
     
-    init(playableRect: CGRect, canPayTwoHearts: Bool, playersGemAmount: Int) {
+    init(playableRect: CGRect, canPayTwoHearts: Bool, playersGemAmount: Int, sprites: [[DFTileSpriteNode]]) {
         containerView = SKSpriteNode(color: .clear, size: playableRect.size)
         self.canPayTwoHearts = canPayTwoHearts
         self.playersGemAmount = playersGemAmount
-        
+        self.sprites = sprites
         super.init()
         
         addChild(containerView)
@@ -38,9 +38,9 @@ class ConfirmShuffleView: SKNode {
         
         // create the background view
         let blueBackgroundView = SKShapeNode(rectOf: CGSize(width: 780, height: 500), cornerRadius: 24.0)
-        blueBackgroundView.lineWidth = 10
+        blueBackgroundView.lineWidth = 20
         blueBackgroundView.strokeColor = .codexItemStrokeBlue
-        blueBackgroundView.fillColor = .gameRecapBlue
+        blueBackgroundView.fillColor = .menuPurple
         blueBackgroundView.zPosition = -10
         blueBackgroundView.position = CGPoint.position(blueBackgroundView.frame, inside: containerView.frame, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: 40, translatedToBounds: true)
         containerView.addChild(blueBackgroundView)
@@ -51,17 +51,17 @@ class ConfirmShuffleView: SKNode {
         title.position = CGPoint.position(title.frame, inside: blueBackgroundView.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most, translatedToBounds: true)
         containerView.addChild(title)
         
-        let subTitleString = "The Mineral Spirits detected no more moves.  They are offering their services to shuffle the board."
+        let subTitleString = "The Mineral Spirits are offering their services to shuffle the board."
         let subTitleParagraph = ParagraphNode(text: subTitleString, paragraphWidth: blueBackgroundView.frame.width * 0.9, fontSize: 65.0, fontColor: .white, textAlignment: .center)
         subTitleParagraph.position = CGPoint.alignHorizontally(subTitleParagraph.frame, relativeTo: title.frame, horizontalAnchor: .center, verticalAlign: .bottom, translatedToBounds: true)
         containerView.addChild(subTitleParagraph)
         
         // create a button that allows the player to view the board
-        let buttonSize = CGSize(width: 400, height: 80)
+        let buttonSize = CGSize(width: 400, height: 100)
         
         let buttonPayTwoHearts = ShiftShaft_Button(size: buttonSize, delegate: self, identifier: .confirmShufflePay2Hearts, precedence: .flying, fontSize: 65.0, fontColor: .black, backgroundColor: .buttonGray)
         buttonPayTwoHearts.zPosition = 10000
-        buttonPayTwoHearts.position = CGPoint.alignHorizontally(buttonPayTwoHearts.frame, relativeTo: subTitleParagraph.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.more*2, translatedToBounds: true)
+        buttonPayTwoHearts.position = CGPoint.alignHorizontally(buttonPayTwoHearts.frame, relativeTo: subTitleParagraph.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.more*4, translatedToBounds: true)
         buttonPayTwoHearts.enable(canPayTwoHearts)
         containerView.addChild(buttonPayTwoHearts)
         
@@ -89,11 +89,24 @@ class ConfirmShuffleView: SKNode {
             spriteActions.append(.init(child, waitAndFadeIn))
         }
         
+        for sprite in sprites.flatMap({ $0 }) {
+            let shake = Animator().shakeNode(node: sprite, duration: 5, ampX: 5, ampY: 5, delayBefore: 0.0, timingMode: .linear)
+            let loop = SKAction.repeatForever(shake.action)
+            spriteActions.append(.init(sprite, loop))
+        
+        }
+        
         Animator().animate(spriteActions, completion: {})
         
     }
     
     func fadeOut(completion: @escaping () -> ()) {
+        
+//        for child in sprites.flatMap({ $0 }) {
+//            child.removeAllActions()
+//
+//        }
+        
         let fadeOut = SKAction.fadeOut(withDuration: 0.1)
         fadeOut.timingMode = .easeOut
         

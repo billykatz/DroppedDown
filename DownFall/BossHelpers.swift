@@ -72,9 +72,9 @@ func randomCoord(in tiles: [[Tile]]?, notIn set: Set<TileCoord>, nearby target: 
         maxTries -= 1
         
         // we might need to try a slight wider range after trying for "too long"
-        if maxTries == 0 {
+        if maxTries <= 0 {
             maxTries = 30
-            newRange = newRange.lowerBound...newRange.upperBound+1
+            newRange = newRange.lowerBound-1...newRange.upperBound+1
         }
     }
     return tileCoord

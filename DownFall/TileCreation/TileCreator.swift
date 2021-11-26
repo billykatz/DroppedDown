@@ -163,7 +163,7 @@ class TileCreator: TileStrategy {
         return tileCoord
     }
     
-    func randomRock(_ neighbors: [Tile] = [], playerData: EntityModel, forceHoldGem: Bool = false) -> TileType {
+    func randomRock(_ neighbors: [Tile] = [], playerData: EntityModel) -> TileType {
         var tileTypeChances = level.tileTypeChances
         if !neighbors.isEmpty {
             tileTypeChances = tileTypeChances.increaseChances(basedOn: neighbors
@@ -177,7 +177,7 @@ class TileCreator: TileStrategy {
             let minValue = max(1, value)
             if let color = key.color,
                (lowerBound..<lowerBound+minValue).contains(randomNumber) {
-                let shouldRockHoldGem = forceHoldGem || shouldRockHoldGem(playerData: playerData, rockColor: color, shouldSpawnAtleastOneGem: spawnAtleastOneGem)
+                let shouldRockHoldGem = shouldRockHoldGem(playerData: playerData, rockColor: color, shouldSpawnAtleastOneGem: spawnAtleastOneGem)
                 return TileType.rock(color: color, holdsGem: shouldRockHoldGem, groupCount: 0)
             } else {
                 lowerBound = lowerBound + minValue
@@ -212,8 +212,14 @@ class TileCreator: TileStrategy {
             }
         } else {
             let shouldSpawn = spawnAtleastOneGem
-            spawnAtleastOneGem = false
-            return false || shouldSpawn
+            if rockColor != .brown {
+                specialGems += 1
+                spawnAtleastOneGem = false
+                return shouldSpawn
+            } else {
+                return false
+            }
+            
         }
     }
     
@@ -300,36 +306,6 @@ class TileCreator: TileStrategy {
             }
         }
         
-        return newTiles
-    }
-    
-    func shuffle(tiles: [[Tile]]) -> [[Tile]] {
-        guard let playerData = playerData(in: tiles) else { return tiles }
-        var newTiles = tiles
-        var reservedCoords = Set<TileCoord>()
-        var currentMonsterCount = 0
-        for row in 0..<tiles.count {
-            for col in 0..<tiles.count {
-                switch tiles[row][col].type {
-                case .monster:
-                    currentMonsterCount += 1
-                    newTiles[row][col] = Tile(type: randomRock([], playerData: playerData))
-                case .rock(_ , let hasGem, _):
-                    newTiles[row][col] = Tile(type: randomRock([], playerData: playerData, forceHoldGem: hasGem))
-                case .player(let data):
-                    reservedCoords.insert(TileCoord(row: row, column: col))
-                    newTiles[row][col] = Tile(type: .player(data.wasAttacked(for: 2, from: .south)))
-                default:
-                    reservedCoords.insert(TileCoord(row: row, column: col))
-                }
-            }
-        }
-        
-        let newMonsterCount = max(1, currentMonsterCount-2)
-        for _ in 0..<newMonsterCount {
-            let coord = randomCoord(notIn: reservedCoords)
-            newTiles[coord.row][coord.column] = Tile(type: randomMonster())
-        }
         return newTiles
     }
     

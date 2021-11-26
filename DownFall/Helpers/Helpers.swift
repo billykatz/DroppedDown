@@ -54,6 +54,47 @@ func isWithinBounds(_ tileCoord: TileCoord, within boardSize: Int) -> Bool {
         tileCol < boardSize
 }
 
+func boardHasMoreMoves(tiles: [[Tile]]) -> Bool {
+    var hasMoreMoves = false
+    guard let playerCoord = getTilePosition(.player(.zero), tiles: tiles) else { return hasMoreMoves }
+    for row in 0..<tiles.count {
+        for col in 0..<tiles[row].count {
+            let tileCoord = TileCoord(row, col)
+            let tile = tiles[tileCoord]
+            switch tile.type {
+            case .empty, .dynamite:
+                hasMoreMoves = true
+                
+            case .rock(_, _, let groupCount):
+                if groupCount >= 3 {
+                    hasMoreMoves = true
+                }
+                
+            case .monster, .exit(blocked: false), .item, .offer:
+                // the player can rotate and kill a monster
+                // the player can rotate into the exit
+                // the player can rotate and collect an item
+                // the player can rotate and collect an offer
+                if tileCoord.orthogonalNeighbors.contains(playerCoord) {
+                    hasMoreMoves = true
+                }
+                
+            case .player(let data):
+                // the player can use their rune that is already charged
+                if (data.pickaxe?.runes.filter({ $0.isCharged }).count ?? 0) >= 1 {
+                    hasMoreMoves = true
+                }
+                
+            default:
+                break
+                
+            }
+        }
+    }
+    
+    return hasMoreMoves
+}
+
 
 func playerData(in tiles: [[Tile]]) -> EntityModel? {
     for (i, _) in tiles.enumerated() {

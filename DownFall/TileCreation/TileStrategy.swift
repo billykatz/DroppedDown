@@ -20,8 +20,7 @@ protocol TileStrategy {
     func monsterWithType(_ type: EntityModel.EntityType) -> Tile?
     func randomMonster() -> TileType
     func randomMonster(not: EntityModel.EntityType) -> Tile
-    func shuffle(tiles: [[Tile]]) -> [[Tile]]
-    func randomRock(_ neighbors: [Tile], playerData: EntityModel, forceHoldGem: Bool) -> TileType
+    func randomRock(_ neighbors: [Tile], playerData: EntityModel) -> TileType
 
 }
     

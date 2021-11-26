@@ -849,7 +849,7 @@ class Board: Equatable {
                 let newMonster = tileCreator.randomMonster()
                 newTiles[coord.row][coord.column] = Tile(type: newMonster)
             case .monster:
-                let newRock = tileCreator.randomRock([], playerData: playerData, forceHoldGem: false)
+                let newRock = tileCreator.randomRock([], playerData: playerData)
                 newTiles[coord.row][coord.column] = Tile(type: newRock)
             default:
                 break
@@ -876,17 +876,6 @@ class Board: Equatable {
         
     }
 }
-
-//MARK: shuffle board
-
-extension Board {
-    func shuffleBoard(inputType: InputType) -> Transformation {
-        let newTiles = tileCreator.shuffle(tiles: self.tiles)
-        self.tiles = newTiles
-        return Transformation(transformation: nil, inputType: inputType, endTiles: newTiles)
-    }
-}
-
 
 
 //MARK: - use ability
@@ -1424,7 +1413,6 @@ extension Board {
         return typeCount(for: tiles, of: .player(.zero)).first!
     }
     
-    
     func shuffleBoard(input: Input, pay2Hearts: Bool, pay25PercentGems: Bool) -> [Transformation] {
         
         // Move rocks around
@@ -1442,53 +1430,58 @@ extension Board {
         var monsterCoords: [TileCoord] = []
         var tileTransformations: [TileTransformation] = []
         
-        for row in 0..<self.tiles.count {
-            for col in 0..<self.tiles[row].count {
-                let tileCoord = TileCoord(row, col)
-                let tile = tiles[tileCoord]
-                
-                switch tile.type {
-                case .rock:
-                    let newCoord = randomCoord(in: tiles, notIn: reserved)
-                    intermediateTiles[newCoord.row][newCoord.col] = tile
-                    reserved.insert(newCoord)
-                    tileTransformations.append(TileTransformation(tileCoord, newCoord))
+        var boardHasMoves = false
+        
+        while !boardHasMoves {
+            for row in 0..<self.tiles.count {
+                for col in 0..<self.tiles[row].count {
+                    let tileCoord = TileCoord(row, col)
+                    let tile = tiles[tileCoord]
                     
-                case .monster:
-                    let newCoord = randomCoord(in: tiles, notIn: reserved)
-                    intermediateTiles[newCoord.row][newCoord.col] = tile
-                    reserved.insert(newCoord)
-                    monsterCoords.append(newCoord)
-                    tileTransformations.append(TileTransformation(tileCoord, newCoord))
-                    
-                case .item, .offer:
-                    let range = (CGFloat(1)...CGFloat(3))
-                    let newCoord = randomCoord(in: tiles, notIn: reserved, nearby: playerCoord, in: range)
-                    intermediateTiles[newCoord.row][newCoord.col] = tile
-                    reserved.insert(newCoord)
-                    tileTransformations.append(TileTransformation(tileCoord, newCoord))
-                    
-                case .player(let data):
-                    let newData: EntityModel
-                    if pay2Hearts {
-                        newData = data.wasAttacked(for: 2, from: .east)
-                    } else {
-                        let twentyFivePercent = Double(data.carry.totalGem) * 0.25
-                        newData = data.spend(amount: Int(twentyFivePercent))
+                    switch tile.type {
+                    case .rock:
+                        let newCoord = randomCoord(in: tiles, notIn: reserved)
+                        intermediateTiles[newCoord.row][newCoord.col] = tile
+                        reserved.insert(newCoord)
+                        tileTransformations.append(TileTransformation(tileCoord, newCoord))
+                        
+                    case .monster:
+                        let newCoord = randomCoord(in: tiles, notIn: reserved)
+                        intermediateTiles[newCoord.row][newCoord.col] = tile
+                        reserved.insert(newCoord)
+                        monsterCoords.append(newCoord)
+                        tileTransformations.append(TileTransformation(tileCoord, newCoord))
+                        
+                    case .item, .offer:
+                        let range = (CGFloat(1)...CGFloat(3))
+                        let newCoord = randomCoord(in: tiles, notIn: reserved, nearby: playerCoord, in: range)
+                        intermediateTiles[newCoord.row][newCoord.col] = tile
+                        reserved.insert(newCoord)
+                        tileTransformations.append(TileTransformation(tileCoord, newCoord))
+                        
+                    case .player(let data):
+                        let newData: EntityModel
+                        if pay2Hearts {
+                            newData = data.wasAttacked(for: 2, from: .east)
+                        } else {
+                            let twentyFivePercent = Double(data.carry.totalGem) * 0.25
+                            newData = data.spend(amount: Int(twentyFivePercent))
+                        }
+                        
+                        let newTile = Tile(type: .player(newData))
+                        intermediateTiles[tileCoord.row][tileCoord.col] = newTile
+                        
+                    case .pillar, .exit, .empty, .emptyGem, .dynamite:
+                        break
                     }
                     
-                    let newTile = Tile(type: .player(newData))
-                    intermediateTiles[tileCoord.row][tileCoord.col] = newTile
-                    
-                case .pillar, .exit, .empty, .emptyGem, .dynamite:
-                    break
                 }
-                
             }
+            
+            
+            self.tiles = intermediateTiles
+            boardHasMoves = boardHasMoreMoves(tiles: self.tiles)
         }
-        
-        
-        self.tiles = intermediateTiles
         
         let numMonsters = monsterCoords.count
         let numberOfMonstersToKill = numMonsters/2

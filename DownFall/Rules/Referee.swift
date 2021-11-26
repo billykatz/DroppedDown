@@ -93,17 +93,6 @@ class Referee {
         let exitPosition = getTilePosition(.exit(blocked: false), tiles: tiles)
         let dynamitePositions = getTilePositions(.dynamite(DynamiteFuse(count: 0, hasBeenDecremented: false)), tiles: tiles)
         
-        func boardHasMoreMoves() -> Bool {
-            guard let playerPosition = playerPosition else { return false }
-            for (i, row) in tiles.enumerated() {
-                for (j, _) in row.enumerated() {
-                    if findNeighbors(i, j).count > 2 || valid(neighbor: exitPosition, for: playerPosition) || playerHasPossibleAttack() {
-                        return true
-                    }
-                }
-            }
-            return false
-        }
         
         func calculateTargetSlope(in slopedDirection: AttackSlope, distance i: Int, from position: TileCoord) -> TileCoord {
             let (initialRow, initialCol) = position.tuple
@@ -364,43 +353,7 @@ class Referee {
         }
         
         func noMoreMoves() -> Input? {
-            var hasMoreMoves = false
-            let playerCoord = playerCoord
-            for row in 0..<tiles.count {
-                for col in 0..<tiles[row].count {
-                    let tileCoord = TileCoord(row, col)
-                    let tile = tiles[tileCoord]
-                    switch tile.type {
-                    case .empty, .dynamite:
-                        hasMoreMoves = true
-                        
-                    case .rock(_, _, let groupCount):
-                        if groupCount >= 3 {
-                            hasMoreMoves = true
-                        }
-                        
-                    case .monster, .exit(blocked: false), .item, .offer:
-                        // the player can rotate and kill a monster
-                        // the player can rotate into the exit
-                        // the player can rotate and collect an item
-                        // the player can rotate and collect an offer
-                        if tileCoord.orthogonalNeighbors.contains(playerCoord) {
-                            hasMoreMoves = true
-                        }
-                        
-                    case .player(let data):
-                        // the player can use their rune that is already charged
-                        if (data.pickaxe?.runes.filter({ $0.isCharged }).count ?? 0) >= 1 {
-                            hasMoreMoves = true
-                        }
-                        
-                    default:
-                        break
-                        
-                    }
-                }
-            }
-            
+            let hasMoreMoves = boardHasMoreMoves(tiles: tiles)
             if hasMoreMoves {
                 return nil
             } else {

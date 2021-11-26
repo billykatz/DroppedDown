@@ -90,7 +90,7 @@ class HUD: SKSpriteNode {
             switch inputType {
             case .attack:
                 showAttack(attackInput: input, endTiles: trans.first!.endTiles)
-            case .itemUsed, .decrementDynamites, .gameWin:
+            case .itemUsed, .decrementDynamites, .gameWin, .noMoreMoves, .noMoreMovesConfirm:
                 if let tiles = trans.first?.endTiles,
                    let playerCoord = getTilePosition(.player(.zero), tiles: tiles),
                    case TileType.player(let data) = tiles[playerCoord].type {

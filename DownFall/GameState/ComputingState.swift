@@ -19,6 +19,8 @@ struct ComputingState: GameState {
                 return AnyGameState(ComputingState())
             } else if case .touchBegan? = trans.first?.inputType {
                 return AnyGameState(PlayState())
+            } else if case .noMoreMoves = trans.first?.inputType {
+                return AnyGameState(PauseState())
             }
             else {
                 return AnyGameState(AnimatingState())

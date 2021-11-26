@@ -41,7 +41,7 @@ class TileCreator: TileStrategy {
         
         [.purpleRock, .redRock, .purpleRock, .blueRock, .player, .blueRock],
         
-        [.blueRock, .purpleRock, .purpleRock, .purpleRock, .blueRock, .blockedExit],
+        [.blueRock, .purpleRock, .redRock, .purpleRock, .blueRock, .blockedExit],
         
         [.blueRock, .purpleRock, .redRock, .blueRock, .redRock, .purpleRock]
     ]

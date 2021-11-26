@@ -23,13 +23,15 @@ class ConfirmShuffleView: SKNode {
         super.init()
         
         addChild(containerView)
+        
+        showShuffleConfirmation()
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func showGameRecap(win: Bool, killedBy: EntityModel.EntityType?, with statistics: [Statistics]) {
+    func showShuffleConfirmation() {
         
         self.isUserInteractionEnabled = true
         self.zPosition = 900_000_000_000
@@ -39,33 +41,33 @@ class ConfirmShuffleView: SKNode {
         blueBackgroundView.lineWidth = 10
         blueBackgroundView.strokeColor = .codexItemStrokeBlue
         blueBackgroundView.fillColor = .gameRecapBlue
-        blueBackgroundView.zPosition = 10
-        blueBackgroundView.position = CGPoint.position(blueBackgroundView.frame, inside: containerView.frame, verticalAlign: .bottom, horizontalAnchor: .center)
+        blueBackgroundView.zPosition = -10
+        blueBackgroundView.position = CGPoint.position(blueBackgroundView.frame, inside: containerView.frame, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: 40, translatedToBounds: true)
         containerView.addChild(blueBackgroundView)
         
         // create the title "Game Over" or "You frikkin did it!"
         let titleString = "No more moves"
         let title = ParagraphNode(text: titleString, fontColor: .white)
-        title.position = CGPoint.position(title.frame, inside: blueBackgroundView.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most*2, translatedToBounds: true)
+        title.position = CGPoint.position(title.frame, inside: blueBackgroundView.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most, translatedToBounds: true)
         containerView.addChild(title)
         
         let subTitleString = "The Mineral Spirits detected no more moves.  They are offering their services to shuffle the board."
-        let subTitleParagraph = ParagraphNode(text: subTitleString, paragraphWidth: blueBackgroundView.frame.width * 0.9, fontSize: .fontLargeSize, fontColor: .white)
+        let subTitleParagraph = ParagraphNode(text: subTitleString, paragraphWidth: blueBackgroundView.frame.width * 0.9, fontSize: 65.0, fontColor: .white, textAlignment: .center)
         subTitleParagraph.position = CGPoint.alignHorizontally(subTitleParagraph.frame, relativeTo: title.frame, horizontalAnchor: .center, verticalAlign: .bottom, translatedToBounds: true)
         containerView.addChild(subTitleParagraph)
         
         // create a button that allows the player to view the board
-        let buttonSize = CGSize(width: 200, height: 100)
+        let buttonSize = CGSize(width: 400, height: 80)
         
-        let buttonPayTwoHearts = ShiftShaft_Button(size: buttonSize, delegate: self, identifier: .confirmShufflePay2Hearts, precedence: .flying, fontSize: .fontMediumSize, fontColor: .black, backgroundColor: .buttonGray)
+        let buttonPayTwoHearts = ShiftShaft_Button(size: buttonSize, delegate: self, identifier: .confirmShufflePay2Hearts, precedence: .flying, fontSize: 65.0, fontColor: .black, backgroundColor: .buttonGray)
         buttonPayTwoHearts.zPosition = 10000
-        buttonPayTwoHearts.position = CGPoint.alignHorizontally(buttonPayTwoHearts.frame, relativeTo: subTitleParagraph.frame, horizontalAnchor: .center, verticalAlign: .bottom, translatedToBounds: true)
+        buttonPayTwoHearts.position = CGPoint.alignHorizontally(buttonPayTwoHearts.frame, relativeTo: subTitleParagraph.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.more*2, translatedToBounds: true)
         buttonPayTwoHearts.enable(canPayTwoHearts)
         containerView.addChild(buttonPayTwoHearts)
         
-        let buttonPay25PercentGem = ShiftShaft_Button(size: buttonSize, delegate: self, identifier: .confirmShufflePay25Percent, precedence: .flying, fontSize: .fontMediumSize, fontColor: .black, backgroundColor: .buttonGray)
+        let buttonPay25PercentGem = ShiftShaft_Button(size: buttonSize, delegate: self, identifier: .confirmShufflePay25Percent, precedence: .flying, fontSize: 65.0, fontColor: .black, backgroundColor: .buttonGray)
         buttonPay25PercentGem.zPosition = 10000
-        buttonPay25PercentGem.position = CGPoint.alignHorizontally(buttonPay25PercentGem.frame, relativeTo: buttonPayTwoHearts.frame, horizontalAnchor: .center, verticalAlign: .bottom, translatedToBounds: true)
+        buttonPay25PercentGem.position = CGPoint.alignHorizontally(buttonPay25PercentGem.frame, relativeTo: buttonPayTwoHearts.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.more, translatedToBounds: true)
         containerView.addChild(buttonPay25PercentGem)
         
         animate(in: true, waitTime: 0.75, duration: 0.75)
@@ -104,13 +106,14 @@ class ConfirmShuffleView: SKNode {
 
 extension ConfirmShuffleView: ButtonDelegate {
     func buttonTapped(_ button: ShiftShaft_Button) {
-        fadeOut {
+        fadeOut { [weak self] in
             if button.identifier == .confirmShufflePay25Percent {
                 InputQueue.append(Input(.noMoreMovesConfirm(payTwoHearts: false, pay25Percent: true)))
             }
             else if button.identifier == .confirmShufflePay2Hearts {
                 InputQueue.append(Input(.noMoreMovesConfirm(payTwoHearts: true, pay25Percent: false)))
             }
+            self?.removeFromParent()
         }
     }
 }

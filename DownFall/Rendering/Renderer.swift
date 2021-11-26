@@ -293,6 +293,15 @@ class Renderer: SKSpriteNode {
             case .bossPhaseStart(let phase):
                 showBossPhaseChangeAttacks(in: trans, bossPhase: phase)
                 
+            case .noMoreMoves:
+                guard let endTiles = trans.endTiles,
+                      let playerCoord = trans.tileTransformation?.first,
+                      case TileType.player(let data) = endTiles[playerCoord.initial].type
+                else {
+                    return
+                }
+                showNoMoreMovesModal(playerData: data)
+            
             case .noMoreMovesConfirm:
                 shuffleBoard(transformations: transformations)
 
@@ -343,9 +352,6 @@ class Renderer: SKSpriteNode {
             if phase == .theseAreLevelGoals {
                 showTutorial(phase: tutorialConductor?.phase)
             }
-            
-        case .noMoreMoves:
-            showNoMoreMovesModal(playerData: <#T##EntityModel#>)
             
         default:
             ()
@@ -945,7 +951,17 @@ extension Renderer {
     private func showNoMoreMovesModal(playerData: EntityModel) {
         let noMoreMovesModal = ConfirmShuffleView(playableRect: playableRect, canPayTwoHearts: playerData.hp > 2, playersGemAmount: playerData.carry.totalGem)
         noMoreMovesModal.zPosition = 100_000_000
-        menuForeground.addChild(noMoreMovesModal)
+        
+//        var spriteActions: [SpriteAction] = []
+//        for sprite in sprites.reduce([], +) {
+//            let action = animator.shakeNode(node: sprite, duration: 100, ampX: 10, ampY: 10, delayBefore: 0.0)
+//            spriteActions.append(action)
+//            
+//        }
+//        
+        foreground.addChild(noMoreMovesModal)
+//        animator.animate(spriteActions, completion:  {})
+        
     }
     
     

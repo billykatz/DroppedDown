@@ -207,8 +207,14 @@ class Board: Equatable {
             InputQueue.append(Input(.transformation([refillEmpty(inputType: .refillEmpty)])))
             return
             
+        case .noMoreMoves:
+            // we need to send the player's data over to the Renderer
+            let basicTransformation = Transformation(transformation: [TileTransformation(playerCoord, playerCoord)], inputType: input.type, endTiles: self.tiles)
+            InputQueue.append(Input(.transformation([basicTransformation])))
+            return
+            
         case .noMoreMovesConfirm(let payTwoHearts, let pay25Percent):
-            let shuffleBoard = shuffleBoard(input: input)
+            let shuffleBoard = shuffleBoard(input: input, pay2Hearts: payTwoHearts, pay25PercentGems: pay25Percent)
             InputQueue.append(Input(.transformation(shuffleBoard)))
             return
             
@@ -1419,7 +1425,7 @@ extension Board {
     }
     
     
-    func shuffleBoard(input: Input) -> [Transformation] {
+    func shuffleBoard(input: Input, pay2Hearts: Bool, pay25PercentGems: Bool) -> [Transformation] {
         
         // Move rocks around
         // Do not move the player
@@ -1462,7 +1468,19 @@ extension Board {
                     reserved.insert(newCoord)
                     tileTransformations.append(TileTransformation(tileCoord, newCoord))
                     
-                case .player, .pillar, .exit, .empty, .emptyGem, .dynamite:
+                case .player(let data):
+                    let newData: EntityModel
+                    if pay2Hearts {
+                        newData = data.wasAttacked(for: 2, from: .east)
+                    } else {
+                        let twentyFivePercent = Double(data.carry.totalGem) * 100 * 0.25
+                        newData = data.spend(amount: Int(twentyFivePercent))
+                    }
+                    
+                    let newTile = Tile(type: .player(newData))
+                    intermediateTiles[tileCoord.row][tileCoord.col] = newTile
+                    
+                case .pillar, .exit, .empty, .emptyGem, .dynamite:
                     break
                 }
                 

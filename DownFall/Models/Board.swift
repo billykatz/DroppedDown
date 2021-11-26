@@ -1449,6 +1449,8 @@ extension Board {
         var intermediateTiles = self.tiles
         var tileTransformations: [TileTransformation] = []
         var count = 0
+        var randomMonsterCoords: [TileCoord] = []
+        
         while !boardHasMoves {
             print("$$$ Board has more moves checking loop: \(count)")
             count += 1
@@ -1499,12 +1501,7 @@ extension Board {
                 }
             }
             
-            let randomMonsterCoords = monsterCoords.choose(random: monsterCoords.count/2)
-            for coord in randomMonsterCoords {
-                intermediateTiles[coord.row][coord.col] = .empty
-            }
-            
-            
+            randomMonsterCoords = monsterCoords.choose(random: monsterCoords.count/2)
             intermediateTiles = calculateNeighbors(for: intermediateTiles)
             boardHasMoves = boardHasMoreMoves(tiles: intermediateTiles)
         }
@@ -1513,10 +1510,9 @@ extension Board {
         
         let shuffleTransformation = Transformation(transformation: tileTransformations, inputType: input.type, endTiles: self.tiles)
         
-//        let removeMonstersAndReplace = removeAndReplaces(from: self.tiles, specificCoord: randomMonsterCoords, input: input)
+        let removeMonstersAndReplace = removeAndReplaces(from: self.tiles, specificCoord: randomMonsterCoords, input: input)
         
-        return [shuffleTransformation]
-//        return [shuffleTransformation, removeMonstersAndReplace]
+        return [shuffleTransformation, removeMonstersAndReplace]
         
     }
     

@@ -782,7 +782,7 @@ extension Renderer {
             
             
             if case InputType.touch(_, let type)? = transformation.inputType {
-                // if rocks mined progress a goal then we want to hane them fly up to the level goal view
+                // if rocks mined progress a goal then we want to have them fly up to the level goal view
                 if let goalIndex = levelGoalTracker.typeAdvancesGoal(type: type) {
                     let goalOrigin = levelGoalView.originForGoalView(index: goalIndex)
                     let targetPosition = self.levelGoalView.convert(goalOrigin, to: self.spriteForeground)
@@ -846,6 +846,13 @@ extension Renderer {
             else if case InputType.collectOffer(_, _, let disardedCoord, _)? = transformation.inputType,
                       let poof = sprites[disardedCoord.x][disardedCoord.y].poof() {
                 removedAnimations.append(poof)
+            }
+            
+            // MARK: monsters killed during
+            if case InputType.noMoreMovesConfirm? = transformation.inputType {
+                for tileTrans in removed {
+                    animator.animon
+                }
             }
             
             
@@ -956,26 +963,21 @@ extension Renderer {
 //MARK: - Shuffle board logic
 
 extension Renderer {
+    
+    // show a modal that asks the player to make an offer to the Mineral Spirits
     private func showNoMoreMovesModal(playerData: EntityModel) {
         let noMoreMovesModal = ConfirmShuffleView(playableRect: playableRect, canPayTwoHearts: playerData.hp > 2, playersGemAmount: playerData.carry.totalGem, sprites: sprites)
         noMoreMovesModal.zPosition = 100_000_000
         
-//        var spriteActions: [SpriteAction] = []
-//        for sprite in sprites.reduce([], +) {
-//            let action = animator.shakeNode(node: sprite, duration: 100, ampX: 10, ampY: 10, delayBefore: 0.0)
-//            spriteActions.append(action)
-//            
-//        }
-//        
         foreground.addChild(noMoreMovesModal)
-//        animator.animate(spriteActions, completion:  {})
         
     }
     
     
     private func shuffleBoard(transformations: [Transformation]) {
         guard let shuffleTrans = transformations.first,
-              let shuffleTileTrans = shuffleTrans.tileTransformation
+              let shuffleTileTrans = shuffleTrans.tileTransformation,
+              let removeAndReplace = transformations.last
               else {
                   animationsFinished(endTiles: transformations.last?.endTiles)
                   return
@@ -983,24 +985,10 @@ extension Renderer {
         
         // animate all the tiles swapping positions
         animator.animateBoardShuffle(tileTransformations: shuffleTileTrans, sprites: sprites, positionInForeground: positionInForeground(at:)) { [weak self] in
-            self?.animationsFinished(endTiles: shuffleTrans.endTiles)
+            
+            // animate the removal and replacement of the monsters
+            self?.computeNewBoard(for: removeAndReplace)
         }
-
-        
-//        guard let shuffleTrans = transformations.first,
-//              let shuffleTileTrans = shuffleTrans.tileTransformation,
-//              let removeAndReplaceTrans = transformations.last else {
-//                  animationsFinished(endTiles: transformations.last?.endTiles)
-//                  return
-//              }
-//
-//        // animate all the tiles swapping positions
-//        animator.animateBoardShuffle(tileTransformations: shuffleTileTrans, sprites: sprites, positionInForeground: positionInForeground(at:)) { [weak self] in
-//            self?.computeNewBoard(for: [removeAndReplaceTrans])
-//        }
-        
-        // show a modal that says something about the Mineral Spirits shuffling the board because you were out of moves
-        // animate the removal and replacement of the monsters
     }
 
 }

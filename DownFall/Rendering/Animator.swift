@@ -747,6 +747,90 @@ struct Animator {
         animate(spriteActions, completion: completion)
     }
     
+    let mineralSpiritsAttackSpriteSheet = SpriteSheet(texture: SKTexture(imageNamed: "mineralSpiritsAttackSpriteSheet"), rows: 1, columns: 5)
+    let mineralSpiritsTexture = SKTexture(imageNamed: "mineralSprits")
+    
+    func animateMineralSpirits(targetTileCoords: [TileCoord], playableRect: CGRect, spriteForeground: SKNode, tileSize: CGFloat, positionInForeground: (TileCoord) -> CGPoint) -> (waitDuration: Double, [SpriteAction]) {
+        var spriteActions: [SpriteAction] = []
+        let tileSize = CGSize(widthHeight: tileSize)
+        
+        // duration for movement
+        let durationForMovement = 2.5
+        
+        var waitBeforeAdditionalTargets = 0.0
+        
+        for coord in targetTileCoords {
+            let emptySprite = SKSpriteNode.init(color: .clear, size: tileSize)
+            emptySprite.zRotation = CGFloat.random(in: (0.0)...(.pi*2))
+            emptySprite.zPosition = 1000
+            emptySprite.position = positionInForeground(coord)
+            spriteForeground.addChild(emptySprite)
+            
+            // choose a distance away to start the mineral sprite
+            let distanceFromTarget = CGFloat(1500)
+            
+            
+            // choose where to start
+            let startingX = 0.0 - distanceFromTarget
+            let startingY = 0.0 - distanceFromTarget
+            let waitBefore = SKAction.wait(forDuration: waitBeforeAdditionalTargets)
+            
+            // MARK: First
+            // choose the startingLocation
+            let firstStartingPosition = CGPoint(x: startingX, y: 0.0)
+            let firstEndingPosition = firstStartingPosition.translate(xOffset: distanceFromTarget * 2, yOffset: 0.0)
+            let secondStartingPosition = CGPoint(x: 0.0, y: startingY)
+            let secondEndPosition = secondStartingPosition.translate(xOffset: 0.0, yOffset: distanceFromTarget * 2)
+            
+            let firstMineralSpirit = SKSpriteNode(texture: mineralSpiritsTexture, size: tileSize)
+            firstMineralSpirit.position = firstStartingPosition
+            emptySprite.addChild(firstMineralSpirit)
+            
+            // Actions for the first mineral sprite
+            let rotate = SKAction.rotate(byAngle: -.pi/2, duration: 0.0)
+            let animateMovement = SKAction.animate(with: mineralSpiritsAttackSpriteSheet.animationFrames(), timePerFrame: timePerFrame())
+            let moveAcrossTheScreen = SKAction.move(to: firstEndingPosition, duration: durationForMovement)
+//            moveAcrossTheScreen.timingMode = .easeIn
+            
+            let grouped = SKAction.group(animateMovement, moveAcrossTheScreen)
+            let allAction = SKAction.sequence([rotate, waitBefore, grouped])
+            
+            spriteActions.append(.init(firstMineralSpirit, allAction))
+            
+            
+            // MARK: Second
+            let secondMineralSpirit = SKSpriteNode(texture: mineralSpiritsTexture, size: tileSize)
+            secondMineralSpirit.position = secondStartingPosition
+            emptySprite.addChild(secondMineralSpirit)
+            // Actions for the second animations
+            let secondAnimateMovement = SKAction.animate(with: mineralSpiritsAttackSpriteSheet.animationFrames(), timePerFrame: timePerFrame())
+            let secondMoveAcrossTheScreen = SKAction.move(to: secondEndPosition, duration: durationForMovement)
+//            secondMoveAcrossTheScreen.timingMode = .easeIn
+            
+            // group and secquence actions
+            let secondGrouped = SKAction.group(secondAnimateMovement, secondMoveAcrossTheScreen)
+            let secondAllAction = SKAction.sequence([waitBefore, secondGrouped])
+
+            spriteActions.append(.init(secondMineralSpirit, secondAllAction))
+            
+
+            
+            waitBeforeAdditionalTargets += 0.75
+        }
+        
+        waitBeforeAdditionalTargets += durationForMovement
+        
+        
+        return (waitDuration: waitBeforeAdditionalTargets, spriteActions)
+    }
+    
+    /// We also want to create an aniamtion for when the mineral spritis kill a monster during the shuffle board (we will want to resuse this animation for other things as well)
+    /// Lets take a the mineral spritis sprite sheet and animate  sprite moving across the sceen at an angle
+    /// Lets do that twice and make it so that the two sprites cross at the excat point over the monster they are kill
+    /// While it animates across the screen, leave behind a trail of white that fades away as the time passes
+    /// When the two paths cross the monster should player it's "take damage" animation
+    /// When the two paths leave screen then the monsters should die and play their death animation
+    
     
     // MARK: - Boss Animations
     

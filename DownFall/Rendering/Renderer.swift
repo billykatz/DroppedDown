@@ -769,6 +769,17 @@ extension Renderer {
         var tilesWithGem: [TileCoord] = []
         var removedColor: ShiftShaft_Color?
         
+        /// additional witing time for certain actions
+        var additionalWaiting: Double = 0.0
+        
+        // MARK: monsters killed during the board shuffle
+        if case InputType.noMoreMovesConfirm? = transformation.inputType {
+            let mineralSpritsKillMonstersTuple = animator.animateMineralSpirits(targetTileCoords: removed.map { $0.initial }, playableRect: playableRect, spriteForeground: spriteForeground, tileSize: tileSize, positionInForeground: positionInForeground(at:))
+            removedAnimations.append(contentsOf: mineralSpritsKillMonstersTuple.1)
+            
+            additionalWaiting += mineralSpritsKillMonstersTuple.waitDuration
+        }
+        
         for tileTrans in removed {
             
             // keep track of where we find gems
@@ -847,19 +858,9 @@ extension Renderer {
                       let poof = sprites[disardedCoord.x][disardedCoord.y].poof() {
                 removedAnimations.append(poof)
             }
-            
-            // MARK: monsters killed during
-            if case InputType.noMoreMovesConfirm? = transformation.inputType {
-                for tileTrans in removed {
-                    animator.animon
-                }
-            }
-            
-            
-
         }
         
-        // add the gems after everything elese has been animated for removal
+        // add the gems after everything else has been animated for removal
         for coord in tilesWithGem {
             // we need to add the gem to the board or else shit is weird
             let sprite = DFTileSpriteNode(type: .item(Item(type: .gem, amount: 0, color: removedColor!)), height: tileSize, width: tileSize)
@@ -927,7 +928,7 @@ extension Renderer {
                                         y: tileSize * CGFloat(trans.end.row) + bottomLeft.y)
             let animation = SKAction.move(to: endPoint, duration: AnimationSettings.fallSpeed)
             animation.timingMode = .easeIn
-            let wait = SKAction.wait(forDuration: 0.33)
+            let wait = SKAction.wait(forDuration: 0.33 + additionalWaiting)
             shiftDownActions.append(SpriteAction(sprite: sprite, action: SKAction.sequence([wait, animation])))
         }
         

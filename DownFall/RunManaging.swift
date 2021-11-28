@@ -113,9 +113,9 @@ class RunModel: Codable, Equatable {
         let nextDepth: Int
         #warning("Debugging boss level")
         if let last = areas.last { nextDepth = last.depth + 1 }
-//        else { nextDepth = 0 }
+        else { nextDepth = 0 }
 //        else { nextDepth = bossLevelDepthNumber }
-        else { nextDepth = testLevelDepthNumber }
+//        else { nextDepth = testLevelDepthNumber }
         let nextLevel = LevelConstructor.buildLevel(depth: nextDepth, randomSource: randomSource, playerData: player, unlockables: unlockables, startingUnlockables: startingUnlockables, isTutorial: isTutorial)
         let nextArea = Area(depth: nextDepth, type: .level(nextLevel))
         areas.append(nextArea)

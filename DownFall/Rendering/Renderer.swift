@@ -990,6 +990,7 @@ extension Renderer {
                   let tiles = shuffleTrans.endTiles else {
                       return
                   }
+            // we need to reset the the sprites in between these animations before animaing remove and replace
             let newSprites = self.createSprites(from: tiles)
             self.sprites = newSprites
             self.add(sprites: self.sprites, tiles: tiles)

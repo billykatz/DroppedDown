@@ -967,7 +967,7 @@ extension Renderer {
     
     // show a modal that asks the player to make an offer to the Mineral Spirits
     private func showNoMoreMovesModal(playerData: EntityModel) {
-        let noMoreMovesModal = ConfirmShuffleView(playableRect: playableRect, canPayTwoHearts: playerData.hp > 2, playersGemAmount: playerData.carry.totalGem, sprites: sprites)
+        let noMoreMovesModal = ConfirmShuffleView(playableRect: playableRect, canPayTwoHearts: playerData.hp > 2, playersGemAmount: playerData.carry.totalGem, sprites: sprites, spriteForeground: spriteForeground, tileSize: tileSize)
         noMoreMovesModal.zPosition = 100_000_000
         
         foreground.addChild(noMoreMovesModal)

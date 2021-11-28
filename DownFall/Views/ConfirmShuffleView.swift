@@ -14,12 +14,17 @@ class ConfirmShuffleView: SKNode {
     let canPayTwoHearts: Bool
     let playersGemAmount: Int
     let sprites: [[DFTileSpriteNode]]
+    let spriteForeground: SKNode
+    let tileSize: CGFloat
+    var buttons: [ShiftShaft_Button] = []
     
-    init(playableRect: CGRect, canPayTwoHearts: Bool, playersGemAmount: Int, sprites: [[DFTileSpriteNode]]) {
+    init(playableRect: CGRect, canPayTwoHearts: Bool, playersGemAmount: Int, sprites: [[DFTileSpriteNode]], spriteForeground: SKNode, tileSize: CGFloat) {
         containerView = SKSpriteNode(color: .clear, size: playableRect.size)
         self.canPayTwoHearts = canPayTwoHearts
         self.playersGemAmount = playersGemAmount
         self.sprites = sprites
+        self.spriteForeground = spriteForeground
+        self.tileSize = tileSize
         super.init()
         
         addChild(containerView)
@@ -69,8 +74,10 @@ class ConfirmShuffleView: SKNode {
         buttonPay25PercentGem.zPosition = 10000
         buttonPay25PercentGem.position = CGPoint.alignHorizontally(buttonPay25PercentGem.frame, relativeTo: buttonPayTwoHearts.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.more, translatedToBounds: true)
         containerView.addChild(buttonPay25PercentGem)
+        buttons.append(buttonPayTwoHearts)
+        buttons.append(buttonPay25PercentGem)
         
-        animate(in: true, waitTime: 0.75, duration: 0.75)
+        animate(in: true, waitTime: 0.5, duration: 0.5)
         
     }
     
@@ -93,33 +100,66 @@ class ConfirmShuffleView: SKNode {
             let shake = Animator().shakeNode(node: sprite, duration: 5, ampX: 5, ampY: 5, delayBefore: 0.0, timingMode: .linear)
             let loop = SKAction.repeatForever(shake.action)
             spriteActions.append(.init(sprite, loop))
-        
+            
         }
         
         Animator().animate(spriteActions, completion: {})
         
     }
     
-    func fadeOut(completion: @escaping () -> ()) {
-        
-//        for child in sprites.flatMap({ $0 }) {
-//            child.removeAllActions()
-//
-//        }
-        
-        let fadeOut = SKAction.fadeOut(withDuration: 0.1)
-        fadeOut.timingMode = .easeOut
-        
+    func fadeOut(paidTwoHearts: Bool, paidAmount: Int, completion: @escaping () -> ()) {
         var spriteActions: [SpriteAction] = []
-        spriteActions.append(SpriteAction(sprite: containerView, action: fadeOut))
         
-        Animator().animate(spriteActions, completion: completion)
+        
+        if let playerSprite = sprites
+            .reduce([], +)
+            .filter({ sprite in
+                if case TileType.player = sprite.type  {
+                    return true
+                } else {
+                    return false
+                }
+            }).first {
+            
+            Animator(foreground: nil, tileSize: tileSize).animatePlayerPayingForBoardShuffle(playerSprite: playerSprite, paidTwoHearts: paidTwoHearts, paidAmount: paidAmount, spriteForeground: spriteForeground) { [containerView] in
+                
+                let fadeOut = SKAction.fadeOut(withDuration: 0.1)
+                fadeOut.timingMode = .easeOut
+                
+                spriteActions.append(SpriteAction(sprite: containerView, action: fadeOut))
+                
+                Animator().animate(spriteActions, completion: completion)
+            }
+            
+        } else {
+            let fadeOut = SKAction.fadeOut(withDuration: 0.1)
+            fadeOut.timingMode = .easeOut
+            
+            spriteActions.append(SpriteAction(sprite: containerView, action: fadeOut))
+            
+            Animator().animate(spriteActions, completion: completion)
+        }
+        
     }
 }
 
 extension ConfirmShuffleView: ButtonDelegate {
     func buttonTapped(_ button: ShiftShaft_Button) {
-        fadeOut { [weak self] in
+        for button in buttons {
+            button.enable(false)
+        }
+        var paidTwoHearts: Bool = false
+        var paidAmount: Int = 0
+        if button.identifier == .confirmShufflePay25Percent {
+            paidTwoHearts = false
+            paidAmount = Int(Double(playersGemAmount) * 0.25)
+        }
+        else if button.identifier == .confirmShufflePay2Hearts {
+            paidTwoHearts = true
+            paidAmount = 2
+        }
+        
+        fadeOut(paidTwoHearts: paidTwoHearts, paidAmount: paidAmount) { [weak self] in
             if button.identifier == .confirmShufflePay25Percent {
                 InputQueue.append(Input(.noMoreMovesConfirm(payTwoHearts: false, pay25Percent: true)))
             }

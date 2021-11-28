@@ -34,9 +34,15 @@ struct Animator {
     }()
     
     let foreground: SKNode?
+    let tileSize: CGFloat?
     
-    init(foreground: SKNode? = nil) {
+    var tileCGSize: CGSize {
+        return CGSize(widthHeight: tileSize ?? .zero)
+    }
+    
+    init(foreground: SKNode? = nil, tileSize: CGFloat? = nil) {
         self.foreground = foreground
+        self.tileSize = tileSize
     }
     
     func shakeScreen(duration: CGFloat = 0.5, ampX: Int = 10, ampY: Int = 10, delayBefore: Double = 0) -> SpriteAction? {
@@ -707,6 +713,55 @@ struct Animator {
     }
     
     // MARK: - Shuffle Board Animations
+    
+    func animatePlayerPayingForBoardShuffle(playerSprite: DFTileSpriteNode, paidTwoHearts: Bool, paidAmount: Int?, spriteForeground: SKNode, completion: @escaping () -> Void) {
+        
+        let paidWithSprite: SKSpriteNode
+        let fullHeartSpriteName = "fullHeart"
+        let gemsSpriteName = "crystals"
+        var paidAmountString = ""
+        if paidTwoHearts {
+            paidWithSprite = SKSpriteNode(texture: SKTexture(imageNamed: fullHeartSpriteName), size: tileCGSize)
+        } else {
+            paidWithSprite = SKSpriteNode(texture: SKTexture(imageNamed: gemsSpriteName), size: tileCGSize)
+        }
+        
+        if let newPaidAmount = paidAmount {
+            paidAmountString = "\(newPaidAmount)"
+        }
+        
+        // create and add container over palyer sprite
+        let container = SKSpriteNode(texture: nil, size: tileCGSize)
+        container.position = playerSprite.position
+        container.zPosition = 1000
+        spriteForeground.addChild(container)
+        
+        // create a minus in front of the payment
+        let minusString = ParagraphNode(text: "- \(paidAmountString)", fontSize: .fontLargeSize, fontColor: .red)
+        minusString.position = CGPoint.position(minusString.frame, inside: container.frame, verticalAlign: .center, horizontalAnchor: .left)
+        container.addChild(minusString)
+        
+        // position the paidWithSprite next to the minus string
+        paidWithSprite.position = CGPoint.alignVertically(paidWithSprite.frame, relativeTo: minusString.frame, horizontalAnchor: .right, verticalAlign: .center, verticalPadding: -4.0, horizontalPadding: 4.0, translatedToBounds: true)
+        container.addChild(paidWithSprite)
+        
+        
+        // move it up fade away and scale smaller all at the same time
+        let duration = Double(1.5)
+        let moveUpAction = SKAction.moveBy(x: 0.0, y: 50.0, duration: duration)
+        let fadeAwayAction = SKAction.fadeAlpha(to: 0.2, duration: duration)
+        
+        let seq = SKAction.group(moveUpAction, fadeAwayAction, curve: .easeIn)
+        
+        animate([.init(container, seq)]) {
+            container.removeFromParent()
+            completion()
+        }
+        
+        
+    }
+    
+    
     func animateBoardShuffle(tileTransformations: [TileTransformation], sprites: [[DFTileSpriteNode]], positionInForeground: (TileCoord) -> CGPoint,  completion: @escaping () -> Void) {
         var spriteActions: [SpriteAction] = []
         var maxDuration = 0.0

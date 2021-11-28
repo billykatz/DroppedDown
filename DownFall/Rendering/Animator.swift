@@ -750,12 +750,12 @@ struct Animator {
     let mineralSpiritsAttackSpriteSheet = SpriteSheet(texture: SKTexture(imageNamed: "mineralSpiritsAttackSpriteSheet"), rows: 1, columns: 5)
     let mineralSpiritsTexture = SKTexture(imageNamed: "mineralSprits")
     
-    func animateMineralSpirits(targetTileCoords: [TileCoord], playableRect: CGRect, spriteForeground: SKNode, tileSize: CGFloat, positionInForeground: (TileCoord) -> CGPoint) -> (waitDuration: Double, [SpriteAction]) {
+    func animateMineralSpirits(targetTileCoords: [TileCoord], playableRect: CGRect, spriteForeground: SKNode, tileSize: CGFloat, sprites: [[DFTileSpriteNode]], positionInForeground: (TileCoord) -> CGPoint) -> (waitDuration: Double, [SpriteAction]) {
         var spriteActions: [SpriteAction] = []
         let tileSize = CGSize(widthHeight: tileSize)
         
         // duration for movement
-        let durationForMovement = 2.5
+        let durationForMovement = 1.0
         
         var waitBeforeAdditionalTargets = 0.0
         
@@ -773,52 +773,88 @@ struct Animator {
             // choose where to start
             let startingX = 0.0 - distanceFromTarget
             let startingY = 0.0 - distanceFromTarget
-            let waitBefore = SKAction.wait(forDuration: waitBeforeAdditionalTargets)
-            
-            // MARK: First
-            // choose the startingLocation
             let firstStartingPosition = CGPoint(x: startingX, y: 0.0)
-            let firstEndingPosition = firstStartingPosition.translate(xOffset: distanceFromTarget * 2, yOffset: 0.0)
             let secondStartingPosition = CGPoint(x: 0.0, y: startingY)
+            
+            // choose where to end
+            let firstEndingPosition = firstStartingPosition.translate(xOffset: distanceFromTarget * 2, yOffset: 0.0)
             let secondEndPosition = secondStartingPosition.translate(xOffset: 0.0, yOffset: distanceFromTarget * 2)
             
+            // create and add both sprites
             let firstMineralSpirit = SKSpriteNode(texture: mineralSpiritsTexture, size: tileSize)
             firstMineralSpirit.position = firstStartingPosition
             emptySprite.addChild(firstMineralSpirit)
             
-            // Actions for the first mineral sprite
-            let rotate = SKAction.rotate(byAngle: -.pi/2, duration: 0.0)
-            let animateMovement = SKAction.animate(with: mineralSpiritsAttackSpriteSheet.animationFrames(), timePerFrame: timePerFrame())
-            let moveAcrossTheScreen = SKAction.move(to: firstEndingPosition, duration: durationForMovement)
-//            moveAcrossTheScreen.timingMode = .easeIn
-            
-            let grouped = SKAction.group(animateMovement, moveAcrossTheScreen)
-            let allAction = SKAction.sequence([rotate, waitBefore, grouped])
-            
-            spriteActions.append(.init(firstMineralSpirit, allAction))
-            
-            
-            // MARK: Second
             let secondMineralSpirit = SKSpriteNode(texture: mineralSpiritsTexture, size: tileSize)
             secondMineralSpirit.position = secondStartingPosition
             emptySprite.addChild(secondMineralSpirit)
-            // Actions for the second animations
-            let secondAnimateMovement = SKAction.animate(with: mineralSpiritsAttackSpriteSheet.animationFrames(), timePerFrame: timePerFrame())
-            let secondMoveAcrossTheScreen = SKAction.move(to: secondEndPosition, duration: durationForMovement)
-//            secondMoveAcrossTheScreen.timingMode = .easeIn
             
-            // group and secquence actions
-            let secondGrouped = SKAction.group(secondAnimateMovement, secondMoveAcrossTheScreen)
-            let secondAllAction = SKAction.sequence([waitBefore, secondGrouped])
-
-            spriteActions.append(.init(secondMineralSpirit, secondAllAction))
+            for (idx, sprite) in [firstMineralSpirit, secondMineralSpirit].enumerated() {
+                let rotate: SKAction
+                var startPosition: CGPoint
+                var endPosition: CGPoint
+                if idx == 0 {
+                    rotate = SKAction.rotate(byAngle: -.pi/2, duration: 0.0)
+                    startPosition = firstStartingPosition
+                    endPosition = firstEndingPosition
+                } else {
+                    rotate = SKAction.rotate(byAngle: 0.0, duration: 0.0)
+                    startPosition = secondStartingPosition
+                    endPosition = secondEndPosition
+                }
+                
+                let animateMovement = SKAction.animate(with: mineralSpiritsAttackSpriteSheet.animationFrames(), timePerFrame: timePerFrame())
+                let waitBefore = SKAction.wait(forDuration: waitBeforeAdditionalTargets)
+                let moveAcrossTheScreen = SKAction.move(to: endPosition, duration: durationForMovement)
+                moveAcrossTheScreen.timingMode = .easeInEaseOut
+                
+                let grouped = SKAction.group(animateMovement, moveAcrossTheScreen)
+                let allAction = SKAction.sequence([rotate, waitBefore, grouped])
+                
+                spriteActions.append(.init(sprite, allAction))
+                
+                // lets create some trailing ghost
+                let trailingOffset: CGFloat = -200.0
+                var zPosition = sprite.zPosition
+                var alpha = sprite.alpha
+                for _ in 0..<5 {
+                    zPosition -= 50
+                    alpha -= 0.15
+                    if idx == 0 {
+                        startPosition = startPosition.translate(xOffset: trailingOffset, yOffset: 0.0)
+                    } else {
+                        startPosition = startPosition.translate(xOffset: 0.0, yOffset: trailingOffset)
+                    }
+                    
+                    let trailingSpirit = SKSpriteNode(texture: mineralSpiritsTexture, size: tileSize)
+                    trailingSpirit.position = startPosition
+                    trailingSpirit.zPosition = zPosition
+                    trailingSpirit.alpha = alpha
+                    emptySprite.addChild(trailingSpirit)
+                    
+                    spriteActions.append(.init(trailingSpirit, allAction))
+                    
+                }
+                
+            }
             
-
+            let durationBeforeMonsterTakesDamage = waitBeforeAdditionalTargets + (durationForMovement/2)
+            
+            if let takeDamageAnimation = sprites[coord].takeDamage() {
+                let (sprite, animation) = takeDamageAnimation.tuple
+                let waitBefore = SKAction.wait(forDuration: durationBeforeMonsterTakesDamage)
+                
+                spriteActions.append(.init(sprite, SKAction.sequence([waitBefore, animation])))
+            }
+            
+            
             
             waitBeforeAdditionalTargets += 0.75
         }
         
-        waitBeforeAdditionalTargets += durationForMovement
+        waitBeforeAdditionalTargets += durationForMovement - ( durationForMovement/2 )
+        
+        
         
         
         return (waitDuration: waitBeforeAdditionalTargets, spriteActions)

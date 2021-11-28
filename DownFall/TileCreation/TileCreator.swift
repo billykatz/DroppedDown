@@ -33,15 +33,15 @@ class TileCreator: TileStrategy {
     
     static let testBoard: [[Tile]] =
     [
-        [.ratTileTestOnly, .ratTileTestOnly, .ratTileTestOnly, .ratTileTestOnly, .ratTileTestOnly, .ratTileTestOnly],
+        [.brownRock, .brownRock, .redRock, .purpleRock, .purpleRock, .redRock],
         
-        [.purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar],
+        [.redRock, .ratTileTestOnly, .blueRock, .redRock, .purplePillar, .blueRock],
         
-        [.bluePillar, .bluePillar, .bluePillar, .bluePillar, .bluePillar, .bluePillar],
+        [.ratTileTestOnly, .bluePillar, .brownRock, .brownRock, .purpleRock, .bluePillar],
         
-        [.purpleRock, .redRock, .purpleRock, .blueRock, .player, .blueRock],
+        [.purpleRock, .redRock, .ratTileTestOnly, .blueRock, .player, .blueRock],
         
-        [.blueRock, .purpleRock, .redRock, .purpleRock, .blueRock, .blockedExit],
+        [.ratTileTestOnly, .purpleRock, .redRock, .redPillar, .blueRock, .blockedExit],
         
         [.blueRock, .purpleRock, .redRock, .blueRock, .redRock, .purpleRock]
     ]
@@ -345,7 +345,10 @@ class TileCreator: TileStrategy {
                 for col in 0..<TileCreator.testBoard.count {
                     if TileCreator.testBoard[row][col].type == .player(.zero) {
                         newTutorialBoard[row][col] = Tile(type: .player(playerData))
-                    } else {
+                    } else if TileCreator.testBoard[row][col].type == .monster(.ratZero) {
+                        newTutorialBoard[row][col] = Tile(type: .monster(entities.entity(with: .rat)!))
+                    }
+                    else {
                         newTutorialBoard[row][col] = TileCreator.testBoard[row][col]
                     }
                 }

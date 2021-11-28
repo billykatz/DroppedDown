@@ -139,14 +139,14 @@ class Renderer: SKSpriteNode {
         
         super.init(texture: nil, color: .clear, size: CGSize.zero)
         
-//        let testBackground = SKSpriteNode(texture: SKTexture(imageNamed: "test-background"), size: CGSize(width: playableRect.size.width, height: playableRect.size.width*2.1))
-//        testBackground.position = CGPoint.alignHorizontally(testBackground.frame,
-//                                                            relativeTo: safeArea.frame,
-//                                                            horizontalAnchor: .right,
-//                                                            verticalAlign: .bottom,
-//                                                            translatedToBounds: true)
-//        testBackground.zPosition = 0
-//        foreground.addChild(testBackground)
+        //        let testBackground = SKSpriteNode(texture: SKTexture(imageNamed: "test-background"), size: CGSize(width: playableRect.size.width, height: playableRect.size.width*2.1))
+        //        testBackground.position = CGPoint.alignHorizontally(testBackground.frame,
+        //                                                            relativeTo: safeArea.frame,
+        //                                                            horizontalAnchor: .right,
+        //                                                            verticalAlign: .bottom,
+        //                                                            translatedToBounds: true)
+        //        testBackground.zPosition = 0
+        //        foreground.addChild(testBackground)
         
         // tile detail view
         self.tileDetailView = TileDetailView(foreground: foreground, playableRect: playableRect, alignedTo: hud.frame, levelSize: level.boardSize)
@@ -156,9 +156,9 @@ class Renderer: SKSpriteNode {
         
         foreground.position = playableRect.center
         menuForeground.position = playableRect.center
-
+        
         [spriteForeground, safeArea, hud, levelGoalView, backpackView, bossView].forEach { foreground.addChild($0) }
-//        [spriteForeground, safeArea, hud, levelGoalView, backpackView, bossDebugView, bossView].forEach { foreground.addChild($0) }
+        //        [spriteForeground, safeArea, hud, levelGoalView, backpackView, bossDebugView, bossView].forEach { foreground.addChild($0) }
         
         // Register for Dispatch
         Dispatch.shared.register { [weak self] input in
@@ -210,7 +210,7 @@ class Renderer: SKSpriteNode {
                     }
                     animator.animateCannotMineRock(sprites: sprites) { [weak self] in
                         self?.animationsFinished(endTiles: trans.endTiles,
-                                           ref: false)
+                                                 ref: false)
                     }
                 }
             case .attack:
@@ -225,7 +225,7 @@ class Renderer: SKSpriteNode {
                 animationsFinished(endTiles: trans.endTiles)
             case .unlockExit:
                 animationsFinished(endTiles: trans.endTiles)
-
+                
             case .itemUsed(let ability, let targets):
                 animateRuneUsed(input: inputType, transformations: transformations, rune: ability, targets: targets)
             case .collectOffer(let tileCoord, let offer, let discardedCoord, let discardedOffer):
@@ -284,9 +284,9 @@ class Renderer: SKSpriteNode {
                     
                 case .attack:
                     showBossAttacks(in: transformations, bossPhase: phase)
-                
+                    
                 case .rests, .phaseChange, .superAttack, .targetSuperAttack:
-//                    showBossPhaseChangeAttacks(in: trans, bossPhase: BossPhase)
+                    //                    showBossPhaseChangeAttacks(in: trans, bossPhase: BossPhase)
                     animationsFinished(endTiles: trans.endTiles)
                 }
                 
@@ -301,13 +301,13 @@ class Renderer: SKSpriteNode {
                     return
                 }
                 showNoMoreMovesModal(playerData: data)
-            
+                
             case .noMoreMovesConfirm:
                 shuffleBoard(transformations: transformations)
-
+                
             case .reffingFinished, .touchBegan, .itemUseSelected:
                 () // Purposely left blank.
-
+                
             default:
                 // Transformation assoc value should ony exist for certain inputs
                 fatalError()
@@ -391,7 +391,7 @@ class Renderer: SKSpriteNode {
         let wait = SKAction.wait(forDuration: phase.waitDuration)
         let fadeIn = SKAction.fadeIn(withDuration: 0.5)
         fadeIn.timingMode = .easeInEaseOut
-
+        
         
         self.dialogueOverlay = dialogueOverlay
         dialogueOverlay.alpha = 0
@@ -406,7 +406,7 @@ class Renderer: SKSpriteNode {
                                        sprites: sprites,
                                        foreground: spriteForeground,
                                        levelGoalOrigin: self.levelGoalView.frame.origin.translate(xOffset: self.levelGoalView.frame.width/2, yOffset: -20.0)
-                                       ) { [weak self] in
+        ) { [weak self] in
             self?.animationsFinished(endTiles: unlockExitTransformation?.endTiles ?? transformation.endTiles)
         }
         
@@ -508,7 +508,7 @@ class Renderer: SKSpriteNode {
     private func debugMenu() -> MenuSpriteNode {
         return MenuSpriteNode(.debug, playableRect: self.playableRect, precedence: .menu, level: self.level)
     }
-
+    
     /// Attach the sprites to the input so that another object can rotate the board for us
     private func rotatePreview(for transformations: [Transformation]) {
         guard let rotateTrans = transformations.first else {
@@ -520,8 +520,8 @@ class Renderer: SKSpriteNode {
     private func refillEmptyTiles(with transformation: Transformation, completion: (() -> ())? = nil) {
         guard let shiftDown = transformation.shiftDown,
               let finalTiles = transformation.endTiles else {
-            preconditionFailure("All these conditions must be met to refill empty tiles")
-        }
+                  preconditionFailure("All these conditions must be met to refill empty tiles")
+              }
         
         /// It is possible to create shift down without new tiles. Consider the scenario where there is one column with two pillars with at least one tile separating them. A player could destory the lower pillar and expect the tiles above it to fall down.
         /// [pillar]                  [pillar]
@@ -699,8 +699,8 @@ extension Renderer {
             self.sprites = self.createSprites(from: endTiles)
             self.add(sprites: self.sprites, tiles: endTiles)
             
-//            if case let InputType.collectItem(coord, item, amount) = inputType {
-                // add a bunch of gem sprites to the board
+            //            if case let InputType.collectItem(coord, item, amount) = inputType {
+            // add a bunch of gem sprites to the board
             if let startPoint = self.positionsInForeground(at: [coord]).first {
                 var addedSprites: [SKSpriteNode] = []
                 for _ in 0..<amount {
@@ -726,7 +726,7 @@ extension Renderer {
                 self.animator.animateGold(goldSprites: addedSprites, gained: amount, from: startPoint, to: targetPosition, in: self.hud) { [weak self] in self?.animationsFinished(endTiles: transformation.endTiles) }
             }
         }
-
+        
     }
     
     //MARK: Compute New Board Logic
@@ -774,7 +774,7 @@ extension Renderer {
         
         // MARK: monsters killed during the board shuffle
         if case InputType.noMoreMovesConfirm? = transformation.inputType {
-            let mineralSpritsKillMonstersTuple = animator.animateMineralSpirits(targetTileCoords: removed.map { $0.initial }, playableRect: playableRect, spriteForeground: spriteForeground, tileSize: tileSize, positionInForeground: positionInForeground(at:))
+            let mineralSpritsKillMonstersTuple = animator.animateMineralSpirits(targetTileCoords: removed.map { $0.initial }, playableRect: playableRect, spriteForeground: spriteForeground, tileSize: tileSize, sprites: sprites, positionInForeground: positionInForeground(at:))
             removedAnimations.append(contentsOf: mineralSpritsKillMonstersTuple.1)
             
             additionalWaiting += mineralSpritsKillMonstersTuple.waitDuration
@@ -835,7 +835,7 @@ extension Renderer {
                     removedAnimations.append(animation)
                     
                 }
-
+                
             }
             
             if case InputType.decrementDynamites? = transformation.inputType {
@@ -855,7 +855,7 @@ extension Renderer {
             }
             // case for poofing the discarded store offer
             else if case InputType.collectOffer(_, _, let disardedCoord, _)? = transformation.inputType,
-                      let poof = sprites[disardedCoord.x][disardedCoord.y].poof() {
+                    let poof = sprites[disardedCoord.x][disardedCoord.y].poof() {
                 removedAnimations.append(poof)
             }
         }
@@ -918,7 +918,7 @@ extension Renderer {
                     newTilesWithGems.append(TileCoord(endRow, endCol))
                     
                     // basically if there are 2+ rocks with gems, and one of them moves and the other does not
-                    // then we ran into a bug where we only animate the formation of one of the gems
+                    // then we ran into an edge case where we would have only animated the formation of one of the gems
                     tilesWithGem.removeFirst(where: { $0 == trans.initial })
                 }
             }
@@ -941,7 +941,7 @@ extension Renderer {
                     guard let self = self else { return .zero }
                     return self.positionInForeground(at: tileCoord)
                 }
-                 removedAnimations.append(contentsOf: miningGemAnimations)
+                removedAnimations.append(contentsOf: miningGemAnimations)
             }
         }
         
@@ -979,19 +979,25 @@ extension Renderer {
         guard let shuffleTrans = transformations.first,
               let shuffleTileTrans = shuffleTrans.tileTransformation,
               let removeAndReplace = transformations.last
-              else {
-                  animationsFinished(endTiles: transformations.last?.endTiles)
-                  return
-              }
+        else {
+            animationsFinished(endTiles: transformations.last?.endTiles)
+            return
+        }
         
         // animate all the tiles swapping positions
         animator.animateBoardShuffle(tileTransformations: shuffleTileTrans, sprites: sprites, positionInForeground: positionInForeground(at:)) { [weak self] in
-            
+            guard let self = self,
+                  let tiles = shuffleTrans.endTiles else {
+                      return
+                  }
+            let newSprites = self.createSprites(from: tiles)
+            self.sprites = newSprites
+            self.add(sprites: self.sprites, tiles: tiles)
             // animate the removal and replacement of the monsters
-            self?.computeNewBoard(for: removeAndReplace)
+            self.computeNewBoard(for: removeAndReplace)
         }
     }
-
+    
 }
 
 //MARK: - Boss logic
@@ -1008,7 +1014,7 @@ extension Renderer {
         animator.showPillarsGrowing(sprites: sprites, spriteForeground: spriteForeground, bossTileAttacks: grownPillars, tileSize: tileSize) { [weak self] in
             self?.animationsFinished(endTiles: transformation.endTiles)
         }
-    
+        
     }
     
     private func showBossAttacks(in transformation: [Transformation], bossPhase: BossPhase) {
@@ -1068,7 +1074,7 @@ extension Renderer {
             }
         }
     }
-
+    
     
     private func decrementDynamite(in transformations: [Transformation]) {
         guard let dynamiteTransformation = transformations.first else {
@@ -1087,10 +1093,10 @@ extension Renderer {
         guard let dynamiteTileTrans = dynamiteTransformation.tileTransformation,
               transformations.count == 2,
               let removeAndReplaceTrans = transformations.last else {
-            animationsFinished(endTiles: dynamiteTransformation.endTiles)
-            return
-//            preconditionFailure("This is hardcoded to work with two transformations. The first for exploding the dynamite and the second for the remove and replace") }
-        }
+                  animationsFinished(endTiles: dynamiteTransformation.endTiles)
+                  return
+                  //            preconditionFailure("This is hardcoded to work with two transformations. The first for exploding the dynamite and the second for the remove and replace") }
+              }
         
         let dynamiteCoords = dynamiteTileTrans.map { $0.initial }
         
@@ -1098,9 +1104,9 @@ extension Renderer {
         
         animator.animateDynamiteExplosion(dynamiteSprites: dynamiteSprites, dynamiteCoords: dynamiteCoords, foreground: foreground, boardSize: level.boardSize, sprites: sprites,
                                           positionInForeground: {
-                                            [weak self] in
-                                            guard let self = self else { return .zero }
-                                            return self.positionInForeground(at: $0)
+            [weak self] in
+            guard let self = self else { return .zero }
+            return self.positionInForeground(at: $0)
         }) { [weak self] in
             self?.computeNewBoard(for: removeAndReplaceTrans)
         }

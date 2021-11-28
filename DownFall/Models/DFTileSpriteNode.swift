@@ -346,5 +346,22 @@ class DFTileSpriteNode: SKSpriteNode {
         return repeatForever
     }
     
+    func takeDamage() -> SpriteAction? {
+        switch self.type {
+        case .monster(let monsterData):
+            switch monsterData.type {
+            case .rat:
+                let animationModel = monsterData.animations.first { $0.animationType == .dying }
+                let animationFrames = animationModel?.animationTextures ?? []
+                let animation = SKAction.animate(with: animationFrames, timePerFrame: 0.07)
+                return .init(self, animation)
+            default:
+                return nil
+            }
+        default:
+            return nil
+        }
+    }
+    
 }
 

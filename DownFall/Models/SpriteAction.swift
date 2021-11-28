@@ -12,6 +12,10 @@ struct SpriteAction: Hashable {
     let sprite: SKNode
     let action: SKAction
     
+    var tuple: (SKNode, SKAction) {
+        return (sprite, action)
+    }
+    
     init(_ sprite: SKSpriteNode, _ action: SKAction) {
         self.sprite = sprite
         self.action = action

@@ -268,7 +268,9 @@ struct LevelConstructor {
     
     static func boardSize(depth: Depth) -> Int {
         switch depth {
-        case 0, 1, 2, 3, 4:
+        case 0, 1:
+            return 7
+        case 2, 3, 4:
             return 8
         case 5...Int.max:
             return 9

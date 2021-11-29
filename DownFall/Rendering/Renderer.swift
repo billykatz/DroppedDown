@@ -67,7 +67,8 @@ class Renderer: SKSpriteNode {
         let hud = HUD.build(color: .foregroundBlue,
                             size: CGSize(width: playableRect.width,
                                          height: Style.HUD.height),
-                            delegate: self)
+                            delegate: self,
+                            level: level)
         hud.position = CGPoint.alignHorizontally(hud.frame,
                                                  relativeTo: safeArea.frame,
                                                  horizontalAnchor: .right,
@@ -769,10 +770,10 @@ extension Renderer {
         var tilesWithGem: [TileCoord] = []
         var removedColor: ShiftShaft_Color?
         
-        /// additional witing time for certain actions
+        /// additional waiting time for certain actions
         var additionalWaiting: Double = 0.0
         
-        // MARK: monsters killed during the board shuffle
+        // MARK: Monsters killed during the board shuffle
         if case InputType.noMoreMovesConfirm? = transformation.inputType {
             let mineralSpritsKillMonstersTuple = animator.animateMineralSpirits(targetTileCoords: removed.map { $0.initial }, playableRect: playableRect, spriteForeground: spriteForeground, tileSize: tileSize, sprites: sprites, positionInForeground: positionInForeground(at:))
             removedAnimations.append(contentsOf: mineralSpritsKillMonstersTuple.1)
@@ -780,19 +781,21 @@ extension Renderer {
             additionalWaiting += mineralSpritsKillMonstersTuple.waitDuration
         }
         
+        // MARK: Removal animations
         for tileTrans in removed {
             
-            // keep track of where we find gems
             let currentSprite = sprites[tileTrans.end.x][tileTrans.end.y]
             
+            // keep track of whre we find gems
             if case TileType.rock(color: _, holdsGem: let holdsGem, _) = currentSprite.type,
                holdsGem {
                 tilesWithGem.append(tileTrans.end)
             }
             
             
-            
+            // MARK: The player tapped on something
             if case InputType.touch(_, let type)? = transformation.inputType {
+                
                 // if rocks mined progress a goal then we want to have them fly up to the level goal view
                 if let goalIndex = levelGoalTracker.typeAdvancesGoal(type: type) {
                     let goalOrigin = levelGoalView.originForGoalView(index: goalIndex)
@@ -810,20 +813,20 @@ extension Renderer {
                     
                 }
                 /// crumble should happen when the rocks are not needed for the goal.
-                /// add crumble animation and add a gem if needed
                 else if let crumble = sprites[tileTrans.end.x][tileTrans.end.y].crumble() {
                     // set the position way in the background so that new nodes come in over
                     sprites[tileTrans.end.x][tileTrans.end.y].zPosition = Precedence.underground.rawValue
                     
                     removedColor = type.color
                     removedAnimations.append(crumble)
-                    
-                    
-                    
                 }
             }
+            
+            // MARK: Monster died
             else if case InputType.monsterDies? = transformation.inputType {
                 let tileType = sprites[tileTrans.end.x][tileTrans.end.y].type
+                
+                // If the monster is the type that advances the level goal
                 if let goalIndex = levelGoalTracker.typeAdvancesGoal(type: tileType) {
                     let goalOrigin = levelGoalView.originForGoalView(index: goalIndex)
                     let targetPosition = self.levelGoalView.convert(goalOrigin, to: self.spriteForeground)
@@ -834,13 +837,19 @@ extension Renderer {
                     
                     removedAnimations.append(animation)
                     
+                } else {
+                    // TODO: This is where we want to play the dying animation
+                    // https://trello.com/c/2zeYHAYW
                 }
                 
             }
             
+            // MARK: Decremt the dynamite fuses and explode
             if case InputType.decrementDynamites? = transformation.inputType {
+                // when a rock with a gem is blown up, so is the gem inside of it
                 tilesWithGem = []
                 
+                // Some of the removed rocks could be rocks, we want to make them crumble
                 if let crumble = sprites[tileTrans.end.x][tileTrans.end.y].crumble() {
                     // set the position way in the background so that new nodes come in over
                     sprites[tileTrans.end.x][tileTrans.end.y].zPosition = Precedence.underground.rawValue
@@ -850,20 +859,26 @@ extension Renderer {
                 
             }
             
-            if let poof = sprites[tileTrans.end.x][tileTrans.end.y].poof(), case InputType.foundRuneDiscarded? = transformation.inputType {
+            // MARK: Poofing sprites
+            // The rune discarded during RuneReplacement should poof
+            if case InputType.foundRuneDiscarded? = transformation.inputType,
+               let poof = sprites[tileTrans.end.x][tileTrans.end.y].poof() {
                 removedAnimations.append(poof)
             }
-            // case for poofing the discarded store offer
+            // The offer that is not collected should poof
             else if case InputType.collectOffer(_, _, let disardedCoord, _)? = transformation.inputType,
                     let poof = sprites[disardedCoord.x][disardedCoord.y].poof() {
                 removedAnimations.append(poof)
             }
         }
         
+        // MARK: Add gem sprites to the board
         // add the gems after everything else has been animated for removal
         for coord in tilesWithGem {
             // we need to add the gem to the board or else shit is weird
             let sprite = DFTileSpriteNode(type: .item(Item(type: .gem, amount: 0, color: removedColor!)), height: tileSize, width: tileSize)
+            
+            sprite.alpha = 0.0
             
             // place the gem on the board where the rock was
             sprite.position = positionInForeground(at: coord)
@@ -875,7 +890,7 @@ extension Renderer {
             spriteForeground.addChild(sprite)
         }
         
-        // add new tiles "newTiles"
+        // MARK: Add new tiles with the new tiles TileTransformation
         for trans in newTiles {
             let (startRow, startCol) = trans.initial.tuple
             let (endRow, endCol) = trans.end.tuple
@@ -883,7 +898,7 @@ extension Renderer {
             // get sprite from the target sprites row and col
             let sprite = spriteNodes[endRow][endCol]
             
-            // place the tile at the "start" which is above the visible board
+            // place the tile at the "start" which could be above the visible board
             // the animation will then move them to the correct place in the foreground
             let x = tileSize * boardSize + ( CGFloat(startRow) * tileSize ) + bottomLeft.x
             let y = tileSize * CGFloat(startCol) + bottomLeft.y
@@ -896,17 +911,22 @@ extension Renderer {
         // track where the tiles move to after shifting down
         var newTilesWithGems: [TileCoord] = []
         
-        // map the shift down tile transformation array to [(SKSpriteNode, SKAction)] to work Animator world
         
+        // MARK: Create shift down animations for the tiles
+        // map the shift down tile transformation array to [(SKSpriteNode, SKAction)] to work Animator world
         var shiftDownActions: [SpriteAction] = []
         for trans in shiftDown {
             
             let (startRow, startCol) = trans.initial.tuple
             let (endRow, endCol) = trans.end.tuple
             let sprite: SKSpriteNode
+            
+            // Some tiles have an inital row that is outside the board limits.  In that case we need to grab the sprite from the spriteNodes array which has been created with sprites from the "endTiles" of this transformation
             if trans.initial.row >= Int(boardSize) {
                 sprite = spriteNodes[endRow][endCol]
-            } else {
+            }
+            // Otherwise, the sprite is already on the board and we can just grab it from our local sprites storage
+            else {
                 sprite = sprites[startRow][startCol]
             }
             
@@ -928,6 +948,8 @@ extension Renderer {
                                         y: tileSize * CGFloat(trans.end.row) + bottomLeft.y)
             let animation = SKAction.move(to: endPoint, duration: AnimationSettings.fallSpeed)
             animation.timingMode = .easeIn
+            
+            // Add in additionalWaiting duration so that we can time some removal animations before the shift down animations
             let wait = SKAction.wait(forDuration: 0.33 + additionalWaiting)
             shiftDownActions.append(SpriteAction(sprite: sprite, action: SKAction.sequence([wait, animation])))
         }
@@ -937,7 +959,7 @@ extension Renderer {
                 // sometimes gems dont shift down so we need to use the original tile with gems array
                 newTilesWithGems.append(contentsOf: tilesWithGem)
                 // mining gems animations
-                let miningGemAnimations = animator.createAnimationForMiningGems(from: removed.map { $0.end }, tilesWithGems: newTilesWithGems, color: removedColor, spriteForeground: spriteForeground, amountPerRock: numberOfGemsPerRockForGroup(size: removed.count), tileSize: tileSize) { [weak self] tileCoord in
+                let miningGemAnimations = animator.createAnimationForMiningGems(from: removed.map { $0.end }, tilesWithGems: newTilesWithGems, color: removedColor, spriteForeground: spriteForeground, sprites: sprites, amountPerRock: numberOfGemsPerRockForGroup(size: removed.count), tileSize: tileSize) { [weak self] tileCoord in
                     guard let self = self else { return .zero }
                     return self.positionInForeground(at: tileCoord)
                 }

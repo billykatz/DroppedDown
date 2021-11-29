@@ -478,7 +478,7 @@ struct Animator {
 
     }
     
-    mutating func createAnimationForMiningGems(from coords: [TileCoord], tilesWithGems: [TileCoord], color: ShiftShaft_Color, spriteForeground: SKNode, amountPerRock: Int, tileSize: CGFloat, positionConverter: (TileCoord) -> CGPoint) -> [SpriteAction] {
+    mutating func createAnimationForMiningGems(from coords: [TileCoord], tilesWithGems: [TileCoord], color: ShiftShaft_Color, spriteForeground: SKNode, sprites: [[DFTileSpriteNode]], amountPerRock: Int, tileSize: CGFloat, positionConverter: (TileCoord) -> CGPoint) -> [SpriteAction] {
         guard !tilesWithGems.isEmpty else { return  [] }
         var spriteActions: [SpriteAction] = []
         let numberFontSize: CGFloat = 85.0
@@ -508,12 +508,17 @@ struct Animator {
             whiteOutGem.addChild(numberOnGem)
             
             // we need to add the gem to the board or else shit is weird
-            let sprite = DFTileSpriteNode(type: .item(Item(type: .gem, amount: 0, color: color)), height: 100, width: 100)
+            let actualGemSprite = DFTileSpriteNode(type: .item(Item(type: .gem, amount: 0, color: color)), height: 100, width: 100)
             let targetPosition = positionConverter(tileWithGemCoord)
-            sprite.position = targetPosition
+            actualGemSprite.position = targetPosition
+            
+            
             
             var total = 0
             var waitTime = 0.0
+            
+            var numberWaitTime = 0.1
+            
             
             for (index, coord) in coords.enumerated() {
                 // update total before be do anything else
@@ -533,7 +538,8 @@ struct Animator {
                 spriteForeground.addChild(numberSprite)
                 
                 // wait the right amount of time
-                let initialWait = SKAction.wait(forDuration: waitTime)
+                let initialWait = SKAction.wait(forDuration: numberWaitTime)
+                numberWaitTime += 0.02
                 
                 // move up and grow
                 let moveAndScaleSpeed = 0.3
@@ -541,11 +547,11 @@ struct Animator {
                 let grow = SKAction.scale(to: CGSize(width: 125, height: 125), duration: moveAndScaleSpeed)
                 let growAndMove = SKAction.group([grow, moveUp])
                 
-                let pauseDuration = 0.6
+                let pauseDuration = 0.4
                 let pauseToAnimate = SKAction.wait(forDuration: pauseDuration)
                 
                 
-                // more to and shrink
+                // move to and shrink
                 let moveAndShrinkSpeed = 0.1
                 let moveTo = SKAction.move(to: targetPosition, duration: moveAndShrinkSpeed)
                 let shrinkIt = SKAction.scale(to: .zero, duration: moveAndShrinkSpeed)
@@ -582,7 +588,7 @@ struct Animator {
                 // initialWait + moveAndScaleSpeed + pauseToAnimate + moveAndShirnkSpeed
                 // we need to make space at the end of the period to give the gem time to animate
                 // thus we subtract 1x the waitTimeduratio
-                let waitUntilNumberTicksUpDuration = waitTime + moveAndScaleSpeed + pauseDuration + moveAndShrinkSpeed - waitTimeDurationPerRock
+                let waitUntilNumberTicksUpDuration = numberWaitTime + moveAndScaleSpeed + pauseDuration + moveAndShrinkSpeed - waitTimeDurationPerRock
                 let whiteOutGemWait = SKAction.wait(forDuration: waitUntilNumberTicksUpDuration)
                 let whiteOutGemAction = SKAction.sequence([whiteOutGemWait, growTheWhiteOutGem, shrinkTheWhiteOutGem, makewhiteOutGemOriginalSize])
                 
@@ -596,7 +602,7 @@ struct Animator {
             
             
             // wait before doing these actions
-            let wait = SKAction.wait(forDuration: waitTime + 0.9)
+            let wait = SKAction.wait(forDuration: numberWaitTime + 0.9)
             
             // scale up one more time
             let scaleOut = SKAction.scale(to: whiteOutGemBaseSize.scale(by: 1.5), duration: 0.45)
@@ -627,8 +633,13 @@ struct Animator {
             // this makes it look like the whiteout gem and label become the label on the gem
             let scaleAndMove = SKAction.group([scaleNumberAction, moveNumberAction])
             
+            // add the actual gem
+            let addActualGem = SKAction.run { [spriteForeground] in
+                spriteForeground.addChild(actualGemSprite)
+            }
+            
             // create the sequence
-            let sequence = SKAction.sequence([wait, scaleUpAndWiggle, scaleAndMove])
+            let sequence = SKAction.sequence([wait, addActualGem, scaleUpAndWiggle, scaleAndMove])
             sequence.timingMode = .easeInEaseOut
             
             spriteActions.append(SpriteAction(sprite: whiteOutGem, action: sequence))

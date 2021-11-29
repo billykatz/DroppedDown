@@ -10,6 +10,7 @@ import Foundation
 
 
 struct Identifiers {
+    static let depthLevelLabel = "depthLevelLabel"
     static let settings = "setting"
     static let header = "header"
     static let fullHeart = "fullHeart"

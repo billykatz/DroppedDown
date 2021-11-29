@@ -94,6 +94,11 @@
                     "numberOfFrames": 5,
                     "animationType": "projectileMid",
                     "keyframe": 1
+                },
+                {
+                    "animationFilename": "dragonDying",
+                    "numberOfFrames": 4,
+                    "animationType": "dying"
                 }
             ],
             "carry": {
@@ -258,6 +263,11 @@
                     "animationFilename": "alamoMid",
                     "numberOfFrames": 3,
                     "animationType": "projectileMid"
+                },
+                {
+                    "animationFilename": "alamoDying",
+                    "numberOfFrames": 5,
+                    "animationType": "dying"
                 }
             ],
             "carry": {

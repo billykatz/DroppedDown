@@ -20,19 +20,35 @@ class HUD: SKSpriteNode {
         static let gemAmountLabelName = "gemAmountLabelName"
     }
     
-    static func build(color: UIColor, size: CGSize, delegate: SettingsDelegate?) -> HUD {
+    static func build(color: UIColor, size: CGSize, delegate: SettingsDelegate?, level: Level) -> HUD {
         let header = HUD(texture: nil, color: .clear, size: size)
         
+        let settingsTapTarget = SKSpriteNode(texture: nil, size: Style.HUD.settingsTapTargetSize)
         let setting = SKSpriteNode(texture: SKTexture(imageNamed: Identifiers.settings), color: .clear , size: Style.HUD.settingsSize)
         
-        setting.name = Identifiers.settings
-        setting.position = CGPoint.position(setting.frame,
+        settingsTapTarget.name = Identifiers.settings
+        settingsTapTarget.position = CGPoint.position(setting.frame,
                                             inside: header.frame,
                                             verticalAlign: .top,
-                                            horizontalAnchor: .right)
-        setting.zPosition = 1_000_000
+                                            horizontalAnchor: .right,
+                                            xOffset: 80.0,
+                                            yOffset: -40.0
+                                            
+        )
+        settingsTapTarget.zPosition = 1_000_000
+        settingsTapTarget.addChild(setting)
         
-        header.addChild(setting)
+        header.addChild(settingsTapTarget)
+        
+        
+        let depthLevelTitle = ParagraphNode(text: "Depth", fontSize: .fontLargeSize, fontColor: .lightText)
+        let depthLevelNumber = ParagraphNode(text: level.humanReadableDepth, fontSize: .fontLargeSize, fontColor: .lightText)
+        depthLevelNumber.position = CGPoint.position(depthLevelNumber.frame, inside: header.frame, verticalAlign: .top, horizontalAnchor: .left, xOffset: 100, yOffset: 10)
+        depthLevelNumber.name = Identifiers.depthLevelLabel
+        depthLevelTitle.position = CGPoint.alignHorizontally(depthLevelTitle.frame, relativeTo: depthLevelNumber.frame, horizontalAnchor: .center, verticalAlign: .top, translatedToBounds: true)
+        depthLevelTitle.name = Identifiers.depthLevelLabel
+        header.addChild(depthLevelNumber)
+        header.addChild(depthLevelTitle)
         
         header.isUserInteractionEnabled = true
         header.delegate = delegate
@@ -93,7 +109,7 @@ class HUD: SKSpriteNode {
     
     func show(_ data: EntityModel) {
         // Remove all the hearts so that we can redraw
-        self.removeAllChildren(exclude: [Identifiers.settings, Constants.levelGoalIndicator])
+        self.removeAllChildren(exclude: [Identifiers.settings, Constants.levelGoalIndicator, Identifiers.depthLevelLabel])
         
         
         let identifier = Identifiers.fullHeart
@@ -334,11 +350,11 @@ class HUD: SKSpriteNode {
     
 }
 
-extension HUD: ButtonDelegate {
-    func buttonTapped(_ button: ShiftShaft_Button) {
-        switch button.identifier {
-        default:
-            ()
-        }
-    }
-}
+//extension HUD: ButtonDelegate {
+//    func buttonTapped(_ button: ShiftShaft_Button) {
+//        switch button.identifier {
+//        default:
+//            ()
+//        }
+//    }
+//}

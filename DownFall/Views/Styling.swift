@@ -144,5 +144,6 @@ struct Style {
         static let healthBarHeight = CGFloat(50.0)
         static let lanternSize = CGSize(width: 150.0, height: 150.0)
         static let settingsSize = CGSize(width: 75.0, height: 75.0)
+        static let settingsTapTargetSize = CGSize(width: 125.0, height: 125.0)
     }
 }

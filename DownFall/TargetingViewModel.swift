@@ -191,10 +191,16 @@ class TargetingViewModel: Targeting {
         
     }
 
+    var needsToTargetPlayer: Bool {
+        rune?.targetTypes?.contains(.player(.playerZero)) ?? false
+    }
+    
+    var playerCoord: TileCoord? {
+        return tileCoords(for: tiles ?? [], of: .player(.playerZero)).first
+    }
     
     private func areTargetsLegal(_ coords: [TileCoord]) -> Bool {
         guard let tiles = tiles else { return false }
-        let needsToTargetPlayer: Bool = rune?.targetTypes?.contains(.player(.playerZero)) ?? false
         var hasPlayerTargeted = false
         for coord in coords {
             if !isTargetLegal(coord) {
@@ -206,7 +212,7 @@ class TargetingViewModel: Targeting {
         }
         
         /// For some items we MUST target the player.
-        /// If needsToTargetPlayer == false, then the palyer is not a legal target and we will continue past the guard
+        /// If needsToTargetPlayer == false, then the player is not a legal target and we will continue past the guard
         /// If needsToTargetPlayer == true, then we need to check if we have the player targeted in set of targets
         guard needsToTargetPlayer == hasPlayerTargeted else { return false }
         
@@ -312,19 +318,32 @@ class TargetingViewModel: Targeting {
                 
             }
         } else {
+            // the player has tapped on a tile that is already targeted. So remove the tile coord
             if currentTargets.targets.contains(where: { return $0.coord == coord } ) {
-                // remove the targeting
+                
+                // dont let them unhighlight the player
+                guard let playerCoord = playerCoord,
+                    needsToTargetPlayer,
+                    playerCoord == coord else {
+                     return
+                }
+                
+                // otherwise, remove the targeting
                 currentTargets.targets.removeAll(where: { return $0.coord == coord })
                 let newTargets = currentTargets.targets
                 let areLegal = areTargetsLegal(newTargets.map { $0.coord })
                 currentTargets = AllTarget(targets: newTargets, areLegal: areLegal)
-            } else if currentTargets.targets.count < self.numberOfTargets {
+            }
+            // the number of targets is less than the max number of targets. So just add it to list of tile coords
+            else if currentTargets.targets.count < self.numberOfTargets {
                 //add the new target
                 currentTargets.targets.append(Target(coord: coord, associatedCoord: [], isLegal: isTargetLegal(coord)))
                 let areLegal = areTargetsLegal(currentTargets.targets.map { $0.coord })
                 currentTargets = AllTarget(targets: currentTargets.targets, areLegal: areLegal)
                 
-            } else {
+            }
+            // we need to remove on target becaue the max number is reached
+            else {
                 // move the most recently placed unless there is one that is "illegal" then move that one.
                 let count = currentTargets.targets.count
                 // remove the first if they are illegally placed
@@ -333,7 +352,17 @@ class TargetingViewModel: Targeting {
                 // if nothing has been removed then remove the first one placed
                 if !currentTargets.targets.isEmpty,
                    currentTargets.targets.count == count {
-                    currentTargets.targets.removeFirst()
+                    
+                    if needsToTargetPlayer {
+                        currentTargets.targets.removeFirst { target in
+                            let coord = target.coord
+                            let tiles = tiles ?? []
+                            return tiles[coord].type != TileType.player(.playerZero)
+                        }
+                    }
+                    else {
+                        currentTargets.targets.removeFirst()
+                    }
                 }
                 //add the new target
                 currentTargets.targets.append(Target(coord: coord, associatedCoord: [], isLegal: isTargetLegal(coord)))
@@ -372,14 +401,20 @@ class TargetingViewModel: Targeting {
     private func autoTarget() {
         guard let tiles = tiles else { return }
         var targetCoords: [TileCoord] = []
+        
         for type in typesOfTargets {
-            targetCoords.append(contentsOf: typeCount(for: tiles, of: type))
+            targetCoords.append(contentsOf: tileCoords(for: tiles, of: type))
         }
+        
+        // if the number of legal targets it less than or equal to the number of total possible targets for this rune then auto target them.
         if targetCoords.count <= numberOfTargets {
-            // targets are necessarily legal because we looped over types of targets
             let targets = targetCoords.map { Target(coord: $0, associatedCoord: [], isLegal: true) }
             let areLegal = areTargetsLegal(targets.map { $0.coord })
             currentTargets = AllTarget(targets: targets, areLegal: areLegal)
+        } else if needsToTargetPlayer,
+                  let playerCoord = playerCoord{
+            let targets = Target(coord: playerCoord, associatedCoord: [], isLegal: true)
+            currentTargets = AllTarget(targets: [targets], areLegal: true)
         }
     }
 }

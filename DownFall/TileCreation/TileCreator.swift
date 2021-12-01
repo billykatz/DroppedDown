@@ -263,8 +263,8 @@ class TileCreator: TileStrategy {
         var newTiles: [[Tile]] = tiles
         
         let maxMonsters = Int(Double(tiles.count * tiles.count) * level.maxMonsterOnBoardRatio)
-        numberOfTilesSinceLastGemDropped += typeCount(for: tiles, of: .empty).count
-        var currMonsterCount = typeCount(for: tiles, of: .monster(.zero)).count
+        numberOfTilesSinceLastGemDropped += tileCoords(for: tiles, of: .empty).count
+        var currMonsterCount = tileCoords(for: tiles, of: .monster(.zero)).count
         var shouldForceMonsters = forceMonster
         
         //keep track of when monster was last killed
@@ -272,7 +272,7 @@ class TileCreator: TileStrategy {
             level.monsterSpawnTurnTimer = 0
         } else {
             // keep track of how many tiles have been removed since the last monster
-            level.monsterSpawnTurnTimer += typeCount(for: tiles, of: .empty).count
+            level.monsterSpawnTurnTimer += tileCoords(for: tiles, of: .empty).count
         }
         
         for row in 0..<newTiles.count {

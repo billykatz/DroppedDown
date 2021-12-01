@@ -132,8 +132,8 @@ extension TileType {
 func win(_ board: Board) -> Builder {
     return { board in
         guard board.boardSize > 1 else { return board } //cant win if there is only 1 row
-        let playerPosition = typeCount(for: board.tiles, of: .player(.zero)).first
-        let exitPosition = typeCount(for: board.tiles, of: .exit(blocked: false)).first
+        let playerPosition = tileCoords(for: board.tiles, of: .player(.zero)).first
+        let exitPosition = tileCoords(for: board.tiles, of: .exit(blocked: false)).first
         var newTiles = board.tiles
         
         if let pp = playerPosition, let ep = exitPosition {
@@ -197,7 +197,7 @@ func playerAttacks(_ board: Board,
                    _ player: Tile = Tile(type: .player(.zero))) -> Builder {
     return { board in
         guard board.boardSize > 1 else { return board }
-        let playerPosition = typeCount(for: board.tiles, of: .player(.zero)).first
+        let playerPosition = tileCoords(for: board.tiles, of: .player(.zero)).first
         var newTiles = board.tiles
         
         if let pp = playerPosition{

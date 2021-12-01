@@ -349,7 +349,7 @@ class Referee {
         }
         
         var playerCoord: TileCoord {
-            return typeCount(for: tiles, of: .player(.zero)).first!
+            return tileCoords(for: tiles, of: .player(.zero)).first!
         }
         
         func noMoreMoves() -> Input? {

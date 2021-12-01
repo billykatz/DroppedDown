@@ -16,7 +16,7 @@ func tileTypesOf(_ type: TileType, in tiles: [[Tile]]) -> [TileType] {
     return tileType
 }
 
-func typeCount(for tiles: [[Tile]], of type: TileType) -> [TileCoord] {
+func tileCoords(for tiles: [[Tile]], of type: TileType) -> [TileCoord] {
     var tileCoords: [TileCoord] = []
     for (i, _) in tiles.enumerated() {
         for (j, _) in tiles[i].enumerated() {

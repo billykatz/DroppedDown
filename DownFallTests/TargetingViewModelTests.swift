@@ -29,7 +29,7 @@ class TargetingViewModelTests: XCTestCase {
         let boardWithPlayerAndMonster = allblue >>> playerAndMonster
         let tiles = boardWithPlayerAndMonster(board).tiles
         
-        self.playerCoord = typeCount(for: tiles, of: .player(.zero)).first
+        self.playerCoord = tileCoords(for: tiles, of: .player(.zero)).first
         
         Dispatch.shared.send(Input(.boardBuilt, board.tiles))
         

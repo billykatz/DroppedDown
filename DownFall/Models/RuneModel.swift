@@ -183,7 +183,8 @@ struct Rune: Hashable, Codable {
                         affectSlopes: [],
                         affectRange: 0,
                         heal: 0,
-                        cooldown: 25,
+//                cooldown: 25,
+                        cooldown: 5,
                         rechargeType: [TileType.rock(color: .blue, holdsGem: false, groupCount: 0)],
                         rechargeMinimum: 1,
                         rechargeCurrent: 0,
@@ -270,7 +271,8 @@ struct Rune: Hashable, Codable {
                 affectSlopes: [],
                 affectRange: 0,
                 heal: 0,
-                cooldown: 25,
+                //                cooldown: 25,
+                cooldown: 5,
                 rechargeType: [TileType.rock(color: .blue, holdsGem: false, groupCount: 0)],
                 rechargeMinimum: 1,
                 rechargeCurrent: 0,
@@ -423,7 +425,7 @@ struct Rune: Hashable, Codable {
                 animationTextureName: "",
                 animationColumns: 0
             )
-
+            
         case .gemification:
             return Rune(
                 type: .gemification,
@@ -468,7 +470,7 @@ struct Rune: Hashable, Codable {
                 animationTextureName: "",
                 animationColumns: 0
             )
-
+            
         case .phoenix:
             return Rune(
                 type: .phoenix,
@@ -491,7 +493,7 @@ struct Rune: Hashable, Codable {
                 animationTextureName: "",
                 animationColumns: 0
             )
-
+            
         }
     }
 }

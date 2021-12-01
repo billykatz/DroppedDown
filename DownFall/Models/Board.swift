@@ -664,7 +664,7 @@ class Board: Equatable {
     private func unlockExit(inputType: InputType) -> Transformation {
         var newTiles = tiles
         
-        guard let exitCoord = typeCount(for: tiles, of: .exit(blocked: true)).first else {
+        guard let exitCoord = tileCoords(for: tiles, of: .exit(blocked: true)).first else {
             return Transformation(transformation: nil, inputType: inputType, endTiles: self.tiles)
         }
         
@@ -1440,7 +1440,7 @@ extension Board {
 
 extension Board {
     var playerCoord: TileCoord {
-        return typeCount(for: tiles, of: .player(.zero)).first!
+        return tileCoords(for: tiles, of: .player(.zero)).first!
     }
     
     func shuffleBoard(input: Input, pay2Hearts: Bool, pay25PercentGems: Bool) -> [Transformation] {
@@ -1569,7 +1569,7 @@ extension Board {
         /// Pillars can create voids of .empty tiles, therefore on rotate we may need to create and shift down tiles
         var intermediateTiles: [[Tile]] = self.tiles
         
-        if typeCount(for: self.tiles, of: .empty).count > 0 {
+        if tileCoords(for: self.tiles, of: .empty).count > 0 {
             // store tile transforamtions and shift information
             var newTiles : [TileTransformation] = []
             var (shiftDown, shiftIndices) = calculateShiftIndices(for: &intermediateTiles)

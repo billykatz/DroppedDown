@@ -9,57 +9,11 @@
 import Foundation
 import Combine
 
-struct Target {
-    let coord: TileCoord
-    let associatedCoord: [TileCoord]
-    let isLegal: Bool
-    
-    var all: [TileCoord] {
-        return  [coord] + associatedCoord
-    }
-}
-
-struct AllTarget {
-    var targets: [Target]
-    let areLegal: Bool
-    
-    var all: [TileCoord] {
-        return targets.reduce([]) { prev, target in
-            var newArray = prev
-            newArray.append(contentsOf: target.all)
-            return newArray
-        }
-    }
-}
-
-protocol TargetingOutputs {
-    var toastMessage: String { get }
-    var currentTargets: AllTarget { get }
-    var legallyTargeted: Bool { get }
-    var inventory: [Rune] { get }
-    var runeReplacementPublisher: AnyPublisher<(Pickaxe, Rune), Never> { get }
-}
-
-protocol TargetingInputs {
-    
-    /// Use this to choose targets
-    func didTarget(_ coord: TileCoord)
-    
-    /// Use this to consume the item
-    func didUse(_ rune: Rune?)
-    
-    /// Use this to select an ability
-    func didSelect(_ rune: Rune?)
-}
-
-protocol Targeting: TargetingOutputs, TargetingInputs {}
-
 
 class TargetingViewModel: Targeting {
     
     public var updateCallback: (() -> Void)?
     public var runeSlotsUpdated: ((Int, [Rune]) -> Void)?
-    public var targetsUpdated: (() -> Void)?
     
     private var runeSlots: Int = 0
     var inventory: [Rune] = []
@@ -74,83 +28,6 @@ class TargetingViewModel: Targeting {
     var runeReplacementSubject = PassthroughSubject<(Pickaxe, Rune), Never>()
     var runeReplacementPublisher: AnyPublisher<(Pickaxe, Rune), Never> {
         return runeReplacementSubject.eraseToAnyPublisher()
-    }
-    
-    init() {
-        Dispatch.shared.register { [weak self] (input) in
-            self?.handle(input)
-        }
-    }
-    
-    func handle(_ input: Input) {
-        switch input.type {
-        case .runeReplaced(let pickaxe, let rune):
-            let runes = pickaxe.runes.filter { $0.type != rune.type }
-            runeSlotsUpdated?(pickaxe.runeSlots, runes)
-        case .foundRuneDiscarded:
-            foundRuneDiscardedSubject.send(())
-        case .runeReplacement(let pickaxe, let rune):
-            runeReplacementSubject.send((pickaxe, rune))
-        case .transformation(let trans):
-            if let inputType = trans.first?.inputType,
-                case InputType.itemUsed = inputType,
-                let endTiles = trans.first?.endTiles {
-                if let playerData = playerData(in: endTiles),
-                   let runes = playerData.runes {
-                    let runeSlots = playerData.runeSlots ?? 0
-                    self.runeSlots = runeSlots
-                    inventory = playerData.runes ?? []
-                    runeSlotsUpdated?(runeSlots, runes)
-                }
-
-            } else if let inputType = trans.first?.inputType,
-                 case InputType.itemUseSelected = inputType {
-                // skip these as well
-            }
-            else {
-                /// clear out targets after any transformation
-                currentTargets = AllTarget(targets: [], areLegal: false)
-            }
-        case .animationsFinished:
-            if let endTiles = input.endTilesStruct {
-                if let playerData = playerData(in: endTiles),
-                    let runes = playerData.runes {
-                    let runeSlots = playerData.runeSlots ?? 0
-                    self.runeSlots = runeSlots
-                    inventory = playerData.runes ?? []
-                    runeSlotsUpdated?(runeSlots, runes)
-                }
-            }
-        case .newTurn:
-            guard let tiles = input.endTilesStruct else { return }
-            self.tiles = tiles
-            
-            if let playerData = playerData(in: tiles),
-               let runes = playerData.runes {
-                let runeSlots = playerData.runeSlots ?? 0
-                self.runeSlots = runeSlots
-                inventory = playerData.runes ?? []
-                runeSlotsUpdated?(runeSlots, runes)
-            }
-            
-        case .boardBuilt, .boardLoaded:
-            guard let tiles = input.endTilesStruct else { return }
-            
-            boardSize = tiles.count
-            
-            if let playerData = playerData(in: tiles),
-               let runes = playerData.runes {
-                let runeSlots = playerData.runeSlots ?? 0
-                self.runeSlots = runeSlots
-                inventory = playerData.runes ?? []
-                runeSlotsUpdated?(runeSlots, runes)
-            }
-        case .itemUseCanceled:
-            ()
-        default:
-            ()
-        }
-        
     }
     
     var rune: Rune? {
@@ -218,7 +95,6 @@ class TargetingViewModel: Targeting {
     var currentTargets: AllTarget = AllTarget(targets: [], areLegal: false) {
         didSet {
             updateCallback?()
-            targetsUpdated?()
         }
     }
     
@@ -237,6 +113,84 @@ class TargetingViewModel: Targeting {
             updateCallback?()
         }
     }
+    
+    init() {
+        Dispatch.shared.register { [weak self] (input) in
+            self?.handle(input)
+        }
+    }
+    
+    func handle(_ input: Input) {
+        switch input.type {
+        case .runeReplaced(let pickaxe, let rune):
+            let runes = pickaxe.runes.filter { $0.type != rune.type }
+            runeSlotsUpdated?(pickaxe.runeSlots, runes)
+        case .foundRuneDiscarded:
+            foundRuneDiscardedSubject.send(())
+        case .runeReplacement(let pickaxe, let rune):
+            runeReplacementSubject.send((pickaxe, rune))
+        case .transformation(let trans):
+            if let inputType = trans.first?.inputType,
+                case InputType.itemUsed = inputType,
+                let endTiles = trans.first?.endTiles {
+                if let playerData = playerData(in: endTiles),
+                   let runes = playerData.runes {
+                    let runeSlots = playerData.runeSlots ?? 0
+                    self.runeSlots = runeSlots
+                    inventory = playerData.runes ?? []
+                    runeSlotsUpdated?(runeSlots, runes)
+                }
+
+            } else if let inputType = trans.first?.inputType,
+                 case InputType.itemUseSelected = inputType {
+                // skip these as well
+            }
+            else {
+                /// clear out targets after any transformation
+                currentTargets = AllTarget(targets: [], areLegal: false)
+            }
+        case .animationsFinished:
+            if let endTiles = input.endTilesStruct {
+                if let playerData = playerData(in: endTiles),
+                    let runes = playerData.runes {
+                    let runeSlots = playerData.runeSlots ?? 0
+                    self.runeSlots = runeSlots
+                    inventory = playerData.runes ?? []
+                    runeSlotsUpdated?(runeSlots, runes)
+                }
+            }
+        case .newTurn:
+            guard let tiles = input.endTilesStruct else { return }
+            self.tiles = tiles
+            
+            if let playerData = playerData(in: tiles),
+               let runes = playerData.runes {
+                let runeSlots = playerData.runeSlots ?? 0
+                self.runeSlots = runeSlots
+                inventory = playerData.runes ?? []
+                runeSlotsUpdated?(runeSlots, runes)
+            }
+            
+        case .boardBuilt, .boardLoaded:
+            guard let tiles = input.endTilesStruct else { return }
+            self.tiles = tiles
+            boardSize = tiles.count
+            
+            if let playerData = playerData(in: tiles),
+               let runes = playerData.runes {
+                let runeSlots = playerData.runeSlots ?? 0
+                self.runeSlots = runeSlots
+                inventory = playerData.runes ?? []
+                runeSlotsUpdated?(runeSlots, runes)
+            }
+        case .itemUseCanceled:
+            ()
+        default:
+            ()
+        }
+        
+    }
+
     
     private func areTargetsLegal(_ coords: [TileCoord]) -> Bool {
         guard let tiles = tiles else { return false }
@@ -297,19 +251,10 @@ class TargetingViewModel: Targeting {
         return affectSlope.flatMap { attackSlope in
             return (range.lower...range.upper).compactMap { range in
                 let coord = calculateTargetSlope(in: attackSlope, distance: range, from: position)
-                return isWithinBounds(coord) ? coord : nil
+                return isWithinBounds(coord, within: boardSize) ? coord : nil
             }
         }
     }
-    
-    func isWithinBounds(_ tileCoord: TileCoord) -> Bool {
-        let (tileRow, tileCol) = tileCoord.tuple
-        return tileRow >= 0 && //lower bound
-            tileCol >= 0 && // lower bound
-            tileRow < boardSize && // upper bound
-            tileCol < boardSize
-    }
-    
     
     /**
      Toggles targeted-ness of a tile.  If a tile is not targeted it becomes targeted.  The opposite is true.

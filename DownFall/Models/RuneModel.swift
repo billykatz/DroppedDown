@@ -83,7 +83,7 @@ struct Rune: Hashable, Codable {
     var rechargeMinimum: Int
     var rechargeCurrent: Int
     var progressColor: ShiftShaft_Color
-    var maxDistanceBetweenTargets: Int
+    var maxDistanceBetweenTargets: CGFloat
     var recordedProgress: CGFloat? = 0
     let animationTextureName: String
     let animationColumns: Int
@@ -125,7 +125,7 @@ struct Rune: Hashable, Codable {
                 rechargeMinimum: Int? = nil,
                 rechargeCurrent: Int? = nil,
                 progressColor: ShiftShaft_Color? = nil,
-                maxDistanceBetweenTargets: Int? = nil,
+                maxDistanceBetweenTargets: CGFloat? = nil,
                 animationTextureName: String? = nil,
                 animationColumns: Int? = nil) -> Rune {
         return Rune(type: type ?? self.type,
@@ -210,7 +210,7 @@ struct Rune: Hashable, Codable {
                         rechargeMinimum: 1,
                         rechargeCurrent: 0,
                         progressColor: .purple,
-                        maxDistanceBetweenTargets: Int.max,
+                        maxDistanceBetweenTargets: CGFloat.greatestFiniteMagnitude,
                         animationTextureName: "transformRockSpriteSheet",
                         animationColumns: 8
             )
@@ -231,7 +231,7 @@ struct Rune: Hashable, Codable {
                         rechargeMinimum: 1,
                         rechargeCurrent: 0,
                         progressColor: .red,
-                        maxDistanceBetweenTargets: Int.max,
+                        maxDistanceBetweenTargets: CGFloat.greatestFiniteMagnitude,
                         animationTextureName: "rainEmbersSpriteSheet",
                         animationColumns: 5
             )
@@ -253,7 +253,7 @@ struct Rune: Hashable, Codable {
                 rechargeMinimum: 1,
                 rechargeCurrent: 0,
                 progressColor: .red,
-                maxDistanceBetweenTargets: Int.max,
+                maxDistanceBetweenTargets: CGFloat.greatestFiniteMagnitude,
                 animationTextureName: "flameWallSpriteSheet",
                 animationColumns: 5
             )
@@ -277,7 +277,7 @@ struct Rune: Hashable, Codable {
                 rechargeMinimum: 1,
                 rechargeCurrent: 0,
                 progressColor: .blue,
-                maxDistanceBetweenTargets: Int.max,
+                maxDistanceBetweenTargets: CGFloat.greatestFiniteMagnitude,
                 animationTextureName: "rainEmbersSpriteSheet",
                 animationColumns: 5
             )
@@ -303,7 +303,7 @@ struct Rune: Hashable, Codable {
                 rechargeMinimum: 1,
                 rechargeCurrent: 0,
                 progressColor: .purple,
-                maxDistanceBetweenTargets: Int.max,
+                maxDistanceBetweenTargets: CGFloat.greatestFiniteMagnitude,
                 animationTextureName: "vortexSpriteSheet",
                 animationColumns: 5
             )
@@ -330,7 +330,7 @@ struct Rune: Hashable, Codable {
                 rechargeMinimum: 1,
                 rechargeCurrent: 0,
                 progressColor: .blood,
-                maxDistanceBetweenTargets: Int.max,
+                maxDistanceBetweenTargets: CGFloat.greatestFiniteMagnitude,
                 animationTextureName: "",
                 animationColumns: 0
             )
@@ -352,7 +352,7 @@ struct Rune: Hashable, Codable {
                 rechargeMinimum: 1,
                 rechargeCurrent: isCharged ? 25 : 0,
                 progressColor: .red,
-                maxDistanceBetweenTargets: Int.max,
+                maxDistanceBetweenTargets: CGFloat.greatestFiniteMagnitude,
                 animationTextureName: "flameWallSpriteSheet",
                 animationColumns: 5
             )
@@ -375,7 +375,7 @@ struct Rune: Hashable, Codable {
                 rechargeMinimum: 1,
                 rechargeCurrent: 0,
                 progressColor: .red,
-                maxDistanceBetweenTargets: Int.max,
+                maxDistanceBetweenTargets: CGFloat.greatestFiniteMagnitude,
                 animationTextureName: "rainEmbersSpriteSheet",
                 animationColumns: 5
             )
@@ -398,7 +398,7 @@ struct Rune: Hashable, Codable {
                 rechargeMinimum: 1,
                 rechargeCurrent: 0,
                 progressColor: .red,
-                maxDistanceBetweenTargets: Int.max,
+                maxDistanceBetweenTargets: CGFloat.greatestFiniteMagnitude,
                 animationTextureName: "",
                 animationColumns: 0
             )
@@ -421,7 +421,7 @@ struct Rune: Hashable, Codable {
                 rechargeMinimum: 1,
                 rechargeCurrent: 0,
                 progressColor: .purple,
-                maxDistanceBetweenTargets: Int.max,
+                maxDistanceBetweenTargets: CGFloat.greatestFiniteMagnitude,
                 animationTextureName: "",
                 animationColumns: 0
             )
@@ -444,7 +444,7 @@ struct Rune: Hashable, Codable {
                 rechargeMinimum: 1,
                 rechargeCurrent: 0,
                 progressColor: .purple,
-                maxDistanceBetweenTargets: Int.max,
+                maxDistanceBetweenTargets: CGFloat.greatestFiniteMagnitude,
                 animationTextureName: "",
                 animationColumns: 0
             )
@@ -466,7 +466,7 @@ struct Rune: Hashable, Codable {
                 rechargeMinimum: 1,
                 rechargeCurrent: 0,
                 progressColor: .purple,
-                maxDistanceBetweenTargets: Int.max,
+                maxDistanceBetweenTargets: CGFloat.greatestFiniteMagnitude,
                 animationTextureName: "",
                 animationColumns: 0
             )
@@ -489,7 +489,7 @@ struct Rune: Hashable, Codable {
                 rechargeMinimum: 1,
                 rechargeCurrent: 0,
                 progressColor: .red,
-                maxDistanceBetweenTargets: Int.max,
+                maxDistanceBetweenTargets: CGFloat.greatestFiniteMagnitude,
                 animationTextureName: "",
                 animationColumns: 0
             )

@@ -8,6 +8,7 @@
 
 import Foundation
 import Combine
+import CoreGraphics
 
 
 class TargetingViewModel: Targeting {
@@ -217,7 +218,7 @@ class TargetingViewModel: Targeting {
         guard needsToTargetPlayer == hasPlayerTargeted else { return false }
         
         /// ensure that the targets are within the correct distance of each other
-        let targetDistance = rune?.maxDistanceBetweenTargets ?? Int.max
+        let targetDistance = rune?.maxDistanceBetweenTargets ?? CGFloat.greatestFiniteMagnitude
         
         /// we may never append anything to this but thats okay.
         var results: [Bool] = []
@@ -225,8 +226,8 @@ class TargetingViewModel: Targeting {
         for (outIdx, outerElement) in coords.enumerated() {
             for (inIdx, innerElement) in coords.enumerated() {
                 if outIdx == inIdx { continue }
-                results.append(outerElement.distance(to: innerElement, along: .vertical) <= targetDistance)
-                results.append(outerElement.distance(to: innerElement, along: .horizontal) <= targetDistance)
+                results.append(outerElement.distance(to: innerElement) <= targetDistance)
+                results.append(outerElement.distance(to: innerElement) <= targetDistance)
             }
         }
         
@@ -323,8 +324,7 @@ class TargetingViewModel: Targeting {
                 
                 // dont let them unhighlight the player
                 guard let playerCoord = playerCoord,
-                    needsToTargetPlayer,
-                    playerCoord == coord else {
+                    (needsToTargetPlayer && playerCoord != coord) else {
                      return
                 }
                 

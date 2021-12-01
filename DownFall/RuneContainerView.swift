@@ -45,7 +45,6 @@ class RuneContainerViewModel: RuneContainerViewModelable {
 
 class RuneContainerView: SKSpriteNode {
     let viewModel: RuneContainerViewModelable
-    let mode: ViewMode
     var runeSlotViewModels: [RuneSlotViewModel] = []
     private var runeSlotViews:  [RuneSlotView] = []
     var disposables = Set<AnyCancellable>()
@@ -55,9 +54,8 @@ class RuneContainerView: SKSpriteNode {
         static let runeDetailViewName = "runeDetailView"
     }
     
-    init(viewModel: RuneContainerViewModelable, mode: ViewMode, size: CGSize) {
+    init(viewModel: RuneContainerViewModelable, size: CGSize) {
         self.viewModel = viewModel
-        self.mode = mode
         super.init(texture: nil, color: .clear, size: size)
         isUserInteractionEnabled = true
         
@@ -112,8 +110,8 @@ class RuneContainerView: SKSpriteNode {
         let runeDetailView = RuneDetailView(viewModel: RuneDetailViewModel(rune: rune,
                                                                            progress: CGFloat(progress),
                                                                            confirmed: runeWasUsed,
-                                                                           canceled: runeUseWasCanceled,
-                                                                           mode: mode),
+                                                                           canceled: runeUseWasCanceled
+                                                                          ),
                                             size: size)
         runeDetailView.name = Constants.runeDetailViewName
         addChild(runeDetailView)

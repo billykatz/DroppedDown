@@ -9,11 +9,6 @@
 import Foundation
 import Combine
 
-enum ViewMode {
-    case inventory
-    case itemDetail
-}
-
 struct Target {
     let coord: TileCoord
     let associatedCoord: [TileCoord]

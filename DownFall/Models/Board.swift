@@ -860,6 +860,13 @@ class Board: Equatable {
         }
     }
     
+    private func drillDown(input: Input) -> Transformation {
+        guard let playerData = playerData(in: tiles) else { return Transformation(transformation: nil, inputType: input.type, endTiles: tiles) }
+        var newTiles = tiles
+        
+        return Transformation(transformation: nil, inputType: input.type, endTiles: tiles)
+    }
+    
     private func vortex(tiles:  [[Tile]], targets: [TileCoord], input: Input) -> Transformation {
         guard let playerData = playerData(in: tiles) else { return Transformation(transformation: nil, inputType: input.type, endTiles: tiles) }
         var newTiles = tiles
@@ -939,6 +946,9 @@ extension Board {
             return flameWall(tiles: tiles, targets: monsterCoords, input: input)
         case .vortex:
             return vortex(tiles: tiles, targets: targets, input: input)
+            
+        case .drillDown:
+            return drillDown(input: input)
             
         default: fatalError()
         }

@@ -94,7 +94,6 @@ class RuneReplacementView: SKSpriteNode, ButtonDelegate {
         
         /// create the rune container view
         let runeContainer = RuneContainerView(viewModel: runeContainverViewModel,
-                                              mode: .inventory,
                                               size: CGSize(width: playableRect.width,
                                                            height: Style.Backpack.runeInventorySize))
         

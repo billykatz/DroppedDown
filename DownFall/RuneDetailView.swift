@@ -16,7 +16,6 @@ protocol RuneDetailViewModelable {
     var canceled: (() -> ())? { get set }
     var isCharged: Bool { get }
     var chargeDescription: String? { get }
-    var mode: ViewMode { get }
 }
 
 class RuneDetailViewModel: RuneDetailViewModelable {
@@ -24,14 +23,12 @@ class RuneDetailViewModel: RuneDetailViewModelable {
     var progress: CGFloat
     var confirmed: ((Rune) -> ())?
     var canceled: (() -> ())?
-    var mode: ViewMode
     
-    init(rune: Rune?, progress: CGFloat, confirmed: ((Rune) -> ())?, canceled: (() -> ())?, mode: ViewMode) {
+    init(rune: Rune?, progress: CGFloat, confirmed: ((Rune) -> ())?, canceled: (() -> ())?) {
         self.rune = rune
         self.progress = progress
         self.confirmed = confirmed
         self.canceled = canceled
-        self.mode = mode
     }
     
     /// returns true is we have completed the charging of a rune

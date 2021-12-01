@@ -174,7 +174,6 @@ class BackpackView: SKSpriteNode {
         
         /// create the rune container view
         let runeContainer = RuneContainerView(viewModel: viewModel,
-                                              mode: .inventory,
                                               size: CGSize(width: playableRect.width,
                                                            height: Style.Backpack.runeInventorySize))
         

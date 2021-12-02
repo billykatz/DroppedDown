@@ -386,7 +386,7 @@ struct Rune: Hashable, Codable {
                 textureName: "rune-drilldown-off",
                 cost: 0,
                 currency: .gem,
-                description: "Move all the way to the bottom. Destroy all monsters and rocks along the way.",
+                description: "Drill down until you reach the bottom of the board or a non-destructible tile.",
                 flavorText: "A straight line isn't always the fastest way to the bottom, but in this case it is.",
                 targets: 1,
                 targetTypes: [.player(.playerZero)],

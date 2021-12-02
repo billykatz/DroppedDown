@@ -214,27 +214,34 @@ class Renderer: SKSpriteNode {
                                                  ref: false)
                     }
                 }
+                
             case .attack:
                 animateAttack(attackInput: inputType, endTiles: trans.endTiles)
+                
             case .gameWin:
                 animate(trans.tileTransformation) { [weak self] in
                     self?.gameWin(transformation: trans)
                 }
+                
             case .monsterDies:
                 computeNewBoard(for: trans)
+                
             case .newTurn:
                 animationsFinished(endTiles: trans.endTiles)
+                
             case .unlockExit:
                 animationsFinished(endTiles: trans.endTiles)
                 
             case .itemUsed(let ability, let allTarget):
                 animateRuneUsed(input: inputType, transformations: transformations, rune: ability, targets: allTarget.allTargetAssociatedCoords)
+                
             case .collectOffer(let tileCoord, let offer, let discardedCoord, let discardedOffer):
                 if case let StoreOfferType.gems(amount) = offer.type {
                     collectItem(for: trans, amount: amount, atCoord: tileCoord, textureName: offer.textureName, inputType: inputType, randomColor: true)
                 } else {
                     collectOffer(transformations, offer: offer, atTilecoord: tileCoord, discardOffer: discardedOffer, discardedOfferTileCoord: discardedCoord)
                 }
+                
             case let .collectItem(coord, item, _):
                 collectItem(for: trans, amount: item.amount, atCoord: coord, textureName: item.textureName, inputType: inputType)
                 
@@ -415,7 +422,8 @@ class Renderer: SKSpriteNode {
     
     private func animateRuneUsed(input: InputType, transformations: [Transformation], rune: Rune, targets: [TileCoord]) {
         animator.animateRune(rune, transformations: transformations, affectedTiles: targets, sprites: sprites, spriteForeground: spriteForeground) { [weak self] in
-            self?.animationsFinished(endTiles: transformations.first?.endTiles)
+            self?.computeNewBoard(for: transformations)
+//            self?.animationsFinished(endTiles: transformations.first?.endTiles)
         }
         
     }
@@ -761,7 +769,11 @@ extension Renderer {
         guard let removed = transformation.removed,
               let newTiles = transformation.newTiles,
               let shiftDown = transformation.shiftDown
-        else { preconditionFailure("We need these specific translations to do this.") }
+        else {
+            animationsFinished(endTiles: endTiles)
+            return
+//            preconditionFailure("We need these specific translations to do this.")
+        }
         
         // remove "removed" tiles from sprite storage
         var removedAnimations: [SpriteAction] = []

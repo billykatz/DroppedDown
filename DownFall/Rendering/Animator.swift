@@ -20,6 +20,7 @@ struct Animator {
     struct Constants {
         static let poisonDropSpriteName = "poison-drop"
         static let poisonDropSpriteSheetName = "poison-drop-sprite-sheet-8"
+        static let runeDrillDownSpriteSheetName4 = "rune-drilldown-spriteSheet4"
     }
     
     lazy var numberTextures: [NumberTextures] = {
@@ -40,10 +41,26 @@ struct Animator {
         return CGSize(widthHeight: tileSize ?? .zero)
     }
     
+    
+    
+    var poisonDropAnimation: SKAction {
+        let posionTexture = SpriteSheet(texture: SKTexture(imageNamed: Constants.poisonDropSpriteSheetName), rows: 1, columns: 8).animationFrames()
+        let poisonAnimation = SKAction.animate(with: posionTexture, timePerFrame: 0.07)
+        return poisonAnimation
+    }
+    
+    
+    var smokeAnimation: SKAction {
+        let smokeTexture = SpriteSheet(texture: SKTexture(imageNamed: "smokeAnimation"), rows: 1, columns: 6).animationFrames()
+        let smokeAnimation = SKAction.animate(with: smokeTexture, timePerFrame: 0.07)
+        return smokeAnimation
+    }
+    
     init(foreground: SKNode? = nil, tileSize: CGFloat? = nil) {
         self.foreground = foreground
         self.tileSize = tileSize
     }
+    
     
     func shakeScreen(duration: CGFloat = 0.5, ampX: Int = 10, ampY: Int = 10, delayBefore: Double = 0) -> SpriteAction? {
         guard let foreground = foreground else { return nil }
@@ -59,15 +76,14 @@ struct Animator {
         
         return .init(node, .sequence(delay, action, curve: timingMode))
     }
-
     
     
-    public func animateRune(_ rune: Rune,
-                            transformations: [Transformation],
-                            affectedTiles: [TileCoord],
-                            sprites: [[DFTileSpriteNode]],
-                            spriteForeground: SKNode,
-                            completion: (() -> ())? = nil) {
+    func animateRune(_ rune: Rune,
+                     transformations: [Transformation],
+                     affectedTiles: [TileCoord],
+                     sprites: [[DFTileSpriteNode]],
+                     spriteForeground: SKNode,
+                     completion: (() -> ())? = nil) {
         let runeAnimation = SpriteSheet(texture: rune.animationTexture, rows: 1, columns: rune.animationColumns)
         guard let endTiles = transformations.first?.endTiles else {
             completion?()
@@ -78,7 +94,7 @@ struct Animator {
             completion?()
             return
         }
-
+        
         
         switch rune.type {
         case .getSwifty:
@@ -94,12 +110,12 @@ struct Animator {
                 let spriteAction = SpriteAction(sprite: sprites[start.row][start.column], action: runeAndMoveAnimation)
                 spriteActions.append(spriteAction)
             }
-        animate(spriteActions) { completion?() }
-        
- 
+            animate(spriteActions) { completion?() }
+            
+            
             
         case .rainEmbers, .fireball:
-                       
+            
             var spriteActions: [SpriteAction] = []
             guard let pp = getTilePosition(.player(.playerZero), tiles: endTiles) else {
                 completion?()
@@ -130,9 +146,9 @@ struct Animator {
                 
                 let sequencedActions = SKAction.sequence([
                     rotateAction,
-                                                          combinedAction,
-                                                          smokeAnimation(),
-                                                          removeAction])
+                    combinedAction,
+                    smokeAnimation,
+                    removeAction])
                 
                 let fireballSpriteContainer = SKSpriteNode(color: .clear,
                                                            size: sprites[target.row][target.column].size)
@@ -147,7 +163,7 @@ struct Animator {
             }
             
             animate(spriteActions) { completion?() }
-
+            
         case .transformRock:
             var spriteActions: [SpriteAction] = []
             for tileTrans in tileTransformation {
@@ -158,7 +174,7 @@ struct Animator {
                 spriteActions.append(spriteAction)
             }
             animate(spriteActions) { completion?() }
-
+            
         case .bubbleUp:
             var spriteActions: [SpriteAction] = []
             
@@ -175,7 +191,7 @@ struct Animator {
             bubbleSprite.alpha  = 0.25
             playerSprite.addChild(bubbleSprite)
             
-
+            
             if let targetPlayerCoord = getTilePosition(.player(.playerZero), tiles: transformations.first!.endTiles!) {
                 let position = sprites[targetPlayerCoord].position
                 let floatUpAction = SKAction.move(to: position, duration: 1.0)
@@ -222,20 +238,6 @@ struct Animator {
         case .drillDown: completion?()
         default: break
         }
-    }
-    
-    public var poisonDropAnimation: SKAction {
-        let posionTexture = SpriteSheet(texture: SKTexture(imageNamed: Constants.poisonDropSpriteSheetName), rows: 1, columns: 8).animationFrames()
-        let poisonAnimation = SKAction.animate(with: posionTexture, timePerFrame: 0.07)
-        return poisonAnimation
-    }
-
-    
-    
-    public func smokeAnimation() -> SKAction {
-        let smokeTexture = SpriteSheet(texture: SKTexture(imageNamed: "smokeAnimation"), rows: 1, columns: 6).animationFrames()
-        let smokeAnimation = SKAction.animate(with: smokeTexture, timePerFrame: 0.07)
-        return smokeAnimation
     }
     
     public func explodeAnimation(size: CGSize) -> SKAction {
@@ -299,10 +301,10 @@ struct Animator {
                  sprites: [[DFTileSpriteNode]],
                  completion: (() -> Void)? = nil) {
         guard let transformation = transformation,
-            let playerWinTransformation = transformation.tileTransformation?.first else {
-                completion?()
-                return
-        }
+              let playerWinTransformation = transformation.tileTransformation?.first else {
+                  completion?()
+                  return
+              }
         
         let exitSprite = sprites[playerWinTransformation.end]
         exitSprite.removeMinecart()
@@ -351,7 +353,7 @@ struct Animator {
         
         animate([SpriteAction(sprite: runeSprite, action: finalizedAction)], completion: completion)
     }
-
+    
     
     func animateCollectOffer(offerType: StoreOfferType,  offerSprite: SKSpriteNode, targetPosition: CGPoint, to hud: HUD, updatedPlayerData: EntityModel, completion: @escaping () -> Void) {
         
@@ -398,7 +400,7 @@ struct Animator {
             
             let tickUpHudCounter = SKAction.run { [index] in
                 hud.incrementCurrencyCountByOne()
-                 
+                
                 if index == goldSprites.count/2 {
                     hud.showTotalGemGain(goldSprites.count)
                 }
@@ -443,7 +445,7 @@ struct Animator {
         
         /// smoke animation
         let increaseSize = SKAction.scale(to: CGSize(width: tileSize, height: tileSize), duration: 0)
-        let smokeAnimation = smokeAnimation()
+        let smokeAnimation = smokeAnimation
         let increaseSmoke = SKAction.sequence([increaseSize, smokeAnimation])
         
         /// remove it
@@ -475,7 +477,7 @@ struct Animator {
         let sequence = SKAction.sequence([scaleUpAction, moveToAndScale, changeZPosition])
         
         return SpriteAction(sprite: sprite, action: sequence)
-
+        
     }
     
     mutating func createAnimationForMiningGems(from coords: [TileCoord], tilesWithGems: [TileCoord], color: ShiftShaft_Color, spriteForeground: SKNode, sprites: [[DFTileSpriteNode]], amountPerRock: Int, tileSize: CGFloat, positionConverter: (TileCoord) -> CGPoint) -> [SpriteAction] {
@@ -489,7 +491,7 @@ struct Animator {
         let minWaitTime = 0.01
         
         let numberOfGemsPerRock = numberOfGemsPerRockForGroup(size: coords.count)
-
+        
         
         for tileWithGemCoord in tilesWithGems {
             
@@ -571,7 +573,7 @@ struct Animator {
                     
                 }
                 
-
+                
                 
                 let movementAndScaling = SKAction.sequence([growAndMove, initialWait, pauseToAnimate, moveAndShirnk, increaseAction])
                 movementAndScaling.timingMode = .easeIn
@@ -620,7 +622,7 @@ struct Animator {
             
             // reset the base size
             whiteOutGemBaseSize = CGSize(width: tileSize, height: tileSize)
-
+            
             // scale the whole thing down
             let scaleNumberAction = SKAction.scale(to: CGSize(width: tileSize*0.4, height: tileSize*0.4), duration: 0.33)
             
@@ -650,7 +652,7 @@ struct Animator {
         
         return spriteActions
     }
-
+    
     
     func animate(_ spriteActions: [SpriteAction], completion: @escaping () -> Void) {
         if spriteActions.count == 0 { completion() }
@@ -659,7 +661,7 @@ struct Animator {
         for spriteAction in spriteActions {
             spriteAction.sprite.run(spriteAction.action) {
                 numActions -= 1
-//                print(numActions)
+                //                print(numActions)
                 if numActions == 0 {
                     completion()
                 }
@@ -995,7 +997,7 @@ struct Animator {
             }
             
             actions.append(sequence)
-
+            
         }
         
         guard bossAttackSprites.count == actions.count else {
@@ -1042,7 +1044,7 @@ struct Animator {
             let dynamiteExplode = explodeAnimation(size: dynamite.size.scale(by: 2.0))
             
             // smoke
-            let smoke = smokeAnimation()
+            let smoke = smokeAnimation
             let fade = SKAction.fadeAlpha(to: 0.1, duration: 0.25)
             let smokeAndFade = SKAction.group([smoke, fade])
             smoke.timingMode = .easeOut
@@ -1157,7 +1159,7 @@ struct Animator {
             if let crumble = targetSprite.crumble() {
                 spriteActions.append(crumble)
             }
-
+            
             let newTileSprite = DFTileSpriteNode(type: bossTileAttack.tileType, height: 1, width: 1)
             newTileSprite.zPosition = 100
             emptySprite.addChild(newTileSprite)
@@ -1192,7 +1194,7 @@ struct Animator {
             let sprite = sprites[rockCoord.end]
             
             // smoke animation
-            let smoke = self.smokeAnimation()
+            let smoke = self.smokeAnimation
             
             // create the crumble smoke sequence
             spriteActions.append(SpriteAction(sprite: sprite, action: SKAction.sequence([crumble.action, smoke])))
@@ -1208,7 +1210,7 @@ struct Animator {
                 
                 let movement = SKAction.move(to: endPosition, duration: 1.0)
                 let scale = SKAction.scale(to: 1.0, duration: 1.0)
-
+                
                 spriteActions.append(SpriteAction(sprite: itemSprite, action: SKAction.group([movement, scale])))
             }
         }
@@ -1221,7 +1223,7 @@ struct Animator {
             if let unlockTrans = unlockExitTransformation,
                let exitCoord = unlockTrans.tileTransformation?.first?.initial {
                 // smoke animation
-                let smoke = self.smokeAnimation()
+                let smoke = self.smokeAnimation
                 
                 let sprite = sprites[exitCoord.row][exitCoord.column]
                 
@@ -1249,7 +1251,7 @@ struct Animator {
                                     let affectedTiles,
                                     let defenderDodged,
                                     _
-            ) = attackInputType else { return }
+        ) = attackInputType else { return }
         
         /*
          Attack animations involve a few things depending on the attack.
@@ -1284,13 +1286,13 @@ struct Animator {
         
         // projectile
         if let projectileGroup = projectileAnimations(from: attackerPosition, in: tiles, with: sprites, affectedTilesPosition: positions(affectedTiles), foreground: foreground, dispatchGroup: dispatchGroup, attackPosition: attackerPosition, defenderPosition: defenderPosition, attackAnimationFrameCount: attackAnimationFrames),
-            projectileGroup.count > 0 {
+           projectileGroup.count > 0 {
             groupedActions.append(SKAction.group(projectileGroup))
         }
         
         // defender animation
         if !defenderDodged,
-            let defend = animation(for: .hurt, fromPosition: defenderPosition, toPosition: nil, in: tiles, sprites: sprites, dispatchGroup: dispatchGroup) {
+           let defend = animation(for: .hurt, fromPosition: defenderPosition, toPosition: nil, in: tiles, sprites: sprites, dispatchGroup: dispatchGroup) {
             groupedActions.append(defend)
         } else if defenderDodged {
             let dodgedText = ParagraphNode(text: "Dodged!", paragraphWidth: 800.0, fontSize: .fontGiantSize, fontColor: .yellow)
@@ -1418,8 +1420,8 @@ struct Animator {
             
             /// sequence the projectile
             if !projectileRetracts,
-                isProjectileSequenced,
-                case let TileType.monster(monsterData) = tiles[entityPosition].type {
+               isProjectileSequenced,
+               case let TileType.monster(monsterData) = tiles[entityPosition].type {
                 let duration = projectileKeyFrame(for: monsterData, index: idx)
                 let waitAction = SKAction.wait(forDuration: duration * projectileTilePerFrame)
                 sequencedActions.append(waitAction)
@@ -1427,7 +1429,7 @@ struct Animator {
             
             /// Show smoke as an after effect if needed
             if showSmokeAfter {
-                projectileAnimations.append(smokeAnimation())
+                projectileAnimations.append(smokeAnimation)
             }
             
             /// Flip the sprites along y-axis to face the correct direction
@@ -1437,11 +1439,11 @@ struct Animator {
             
             /// The action that animates the actual projectile
             let projectileAction =
-                SKAction.run {
-                    foreground.addChild(sprite)
-                    sprite.run (SKAction.sequence(projectileAnimations)) {
-                        sprite.removeFromParent()
-                    }
+            SKAction.run {
+                foreground.addChild(sprite)
+                sprite.run (SKAction.sequence(projectileAnimations)) {
+                    sprite.removeFromParent()
+                }
             }
             
             sequencedActions.append(projectileAction)
@@ -1527,10 +1529,10 @@ struct Animator {
                                  in tiles: [[Tile]]) -> Int {
         if let position = position {
             if case let TileType.monster(monsterData) = tiles[position].type,
-                let attackAnimation = monsterData.animation(of: animationType) {
+               let attackAnimation = monsterData.animation(of: animationType) {
                 return attackAnimation.count
             } else if case let TileType.player(playerData) = tiles[position].type,
-                let attackAnimation = playerData.animation(of: animationType) {
+                      let attackAnimation = playerData.animation(of: animationType) {
                 return attackAnimation.count
             }
         }
@@ -1549,10 +1551,10 @@ struct Animator {
         // get the animation for the animation type
         if let position = position {
             if case let TileType.monster(monsterData) = tiles[position].type,
-                let animation = monsterData.animation(of: animationType) {
+               let animation = monsterData.animation(of: animationType) {
                 animationFrames = animation
             } else if case let TileType.player(playerData) = tiles[position].type,
-                let animation = playerData.animation(of: animationType) {
+                      let animation = playerData.animation(of: animationType) {
                 animationFrames = animation
             }
         }
@@ -1564,10 +1566,10 @@ struct Animator {
         
         // animate!
         if let position = position,
-            var frames = animationFrames {
+           var frames = animationFrames {
             if reverse { frames.reverse() }
             let animation: SKAction
-                
+            
             if flipHorizontally {
                 let flipAnimation = SKAction.scaleX(to: -1, duration: 0.01)
                 animation = SKAction.sequence([flipAnimation, SKAction.animate(with: frames, timePerFrame: self.timePerFrame())])
@@ -1577,10 +1579,10 @@ struct Animator {
             
             dispatchGroup.enter()
             return
-                SKAction.run {
-                    sprites[position].run(animation) {
-                        dispatchGroup.leave()
-                    }
+            SKAction.run {
+                sprites[position].run(animation) {
+                    dispatchGroup.leave()
+                }
             }
         }
         return nil

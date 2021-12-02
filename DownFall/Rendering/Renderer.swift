@@ -35,7 +35,7 @@ class Renderer: SKSpriteNode {
     
     //Animator
     private lazy var animator = {
-        return Animator(foreground: foreground)
+        return Animator(foreground: foreground, tileSize: tileSize)
     }()
     
     // Dialog for Tutorial and FTUE
@@ -770,9 +770,9 @@ extension Renderer {
               let newTiles = transformation.newTiles,
               let shiftDown = transformation.shiftDown
         else {
+            #warning("I removed the precondition failure here because I wanted to use this function to end all rune use animations.  I would check here for any strange bugs around animating.")
             animationsFinished(endTiles: endTiles)
             return
-//            preconditionFailure("We need these specific translations to do this.")
         }
         
         // remove "removed" tiles from sprite storage
@@ -792,6 +792,7 @@ extension Renderer {
             
             additionalWaiting += mineralSpritsKillMonstersTuple.waitDuration
         }
+        
         
         // MARK: Removal animations
         for tileTrans in removed {

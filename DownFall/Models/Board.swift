@@ -881,7 +881,7 @@ class Board: Equatable {
                 switch tiles[coord].type {
                 case .monster, .rock:
                     tilesToBeDestroyed.append(coord)
-                    tileTransformation.append(TileTransformation(coord, coord))
+                    newTiles[coord.row][coord.col] = .empty
                 case .gem, .dynamite, .exit, .item, .pillar, .offer:
                     stoppedByNonDestructible = true
                 default:
@@ -890,30 +890,28 @@ class Board: Equatable {
             }
         }
         
-//        guard !tilesToBeDestroyed.isEmpty,
-//              let minCoord = tilesToBeDestroyed.min(by: { $0.row < $1.row }) else {
-//            return [Transformation(transformation: nil, inputType: input.type, endTiles: tiles)]
-//        }
+        guard !tilesToBeDestroyed.isEmpty,
+              let minCoord = tilesToBeDestroyed.min(by: { $0.row < $1.row }) else {
+            return [Transformation(transformation: nil, inputType: input.type, endTiles: tiles)]
+        }
         
         
-        /// the player will fall from their original coord to the lowest coord of the tiles that were destroyed
-//        tileTransformation.append(TileTransformation(playerCoord, minCoord))
+        // the player will fall from their original coord to the lowest coord of the tiles that were destroyed
+        tileTransformation.append(TileTransformation(playerCoord, minCoord))
         
-        /// we dont need to destroy this rock/monster any more when we go to remove and replace
-//        tilesToBeDestroyed.removeFirst(where: { $0 == minCoord })
-//        tilesToBeDestroyed.append(playerCoord)
-//        newTiles[playerCoord.row][playerCoord.col] = Tile(type: .empty)
-//        newTiles[minCoord.row][minCoord.col] = Tile(type: .player(playerData))
-//        self.tiles = newTiles
+        // we dont need to destroy this rock/monster any more when we go to remove and replace
+        tilesToBeDestroyed.removeFirst(where: { $0 == minCoord })
+        tilesToBeDestroyed.append(playerCoord)
+        newTiles[playerCoord.row][playerCoord.col] = Tile(type: .empty)
+        newTiles[minCoord.row][minCoord.col] = Tile(type: .player(playerData))
+        self.tiles = newTiles
         
-        // destroy all rocks and tiles on the way to the bottom. skip over other things
-        let removeAndReplace = removeAndReplaces(from: self.tiles, specificCoord: tilesToBeDestroyed, input: input)
+        let trans = Transformation(transformation: tileTransformation, inputType: input.type, endTiles: tiles)
         
         
         // return an array of transformations
         return [
-            removeAndReplace
-        
+            trans
         ]
     }
     

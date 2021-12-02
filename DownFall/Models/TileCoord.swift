@@ -197,6 +197,7 @@ struct TileCoord: Codable, Hashable {
         return coordinates
     }
     
+    
     /// Returns true if self ( c ) exists on the line from points a and to b. With a magnitude larger than ab and in the same direction as the vector ab
     /// ---a---b---c
     /// return true

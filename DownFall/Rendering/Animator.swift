@@ -56,6 +56,12 @@ struct Animator {
         return smokeAnimation
     }
     
+    var drillDownAnimation: SKAction {
+        let drillTextures = SpriteSheet(textureName: Constants.runeDrillDownSpriteSheetName4, columns: 4).animationFrames()
+        let drillAnimation = SKAction.animate(with: drillTextures, timePerFrame: timePerFrame())
+        return drillAnimation
+    }
+    
     init(foreground: SKNode? = nil, tileSize: CGFloat? = nil) {
         self.foreground = foreground
         self.tileSize = tileSize
@@ -83,20 +89,21 @@ struct Animator {
                      affectedTiles: [TileCoord],
                      sprites: [[DFTileSpriteNode]],
                      spriteForeground: SKNode,
-                     completion: (() -> ())? = nil) {
+                     completion: @escaping () -> Void) {
         let runeAnimation = SpriteSheet(texture: rune.animationTexture, rows: 1, columns: rune.animationColumns)
         guard let endTiles = transformations.first?.endTiles else {
-            completion?()
+            completion()
             return
         }
         
         guard let tileTransformation = transformations.first?.tileTransformation else {
-            completion?()
+            completion()
             return
         }
         
         
         switch rune.type {
+            
         case .getSwifty:
             var spriteActions: [SpriteAction] = []
             for tileTrans in tileTransformation {
@@ -110,15 +117,14 @@ struct Animator {
                 let spriteAction = SpriteAction(sprite: sprites[start.row][start.column], action: runeAndMoveAnimation)
                 spriteActions.append(spriteAction)
             }
-            animate(spriteActions) { completion?() }
             
-            
+            animate(spriteActions) { completion() }
             
         case .rainEmbers, .fireball:
             
             var spriteActions: [SpriteAction] = []
             guard let pp = getTilePosition(.player(.playerZero), tiles: endTiles) else {
-                completion?()
+                completion()
                 return
             }
             
@@ -162,7 +168,7 @@ struct Animator {
                 
             }
             
-            animate(spriteActions) { completion?() }
+            animate(spriteActions) { completion() }
             
         case .transformRock:
             var spriteActions: [SpriteAction] = []
@@ -173,7 +179,7 @@ struct Animator {
                 let spriteAction = SpriteAction(sprite: sprites[start.row][start.column], action: runeAnimationAction)
                 spriteActions.append(spriteAction)
             }
-            animate(spriteActions) { completion?() }
+            animate(spriteActions) { completion() }
             
         case .bubbleUp:
             var spriteActions: [SpriteAction] = []
@@ -181,7 +187,7 @@ struct Animator {
             let bubbleSprite = SKSpriteNode(imageNamed: "bubble")
             
             guard let originalPlayerPosition = affectedTiles.first else {
-                completion?()
+                completion()
                 return
             }
             let playerSprite = sprites[originalPlayerPosition]
@@ -201,7 +207,8 @@ struct Animator {
                 
             }
             
-            animate(spriteActions) { completion?() }
+            animate(spriteActions) { completion() }
+            
         case .flameWall, .flameColumn:
             var spriteActions: [SpriteAction] = []
             for coord in affectedTiles {
@@ -225,7 +232,8 @@ struct Animator {
                 let spriteAction = SpriteAction(sprite: emptySprite, action: sequence)
                 spriteActions.append(spriteAction)
             }
-            animate(spriteActions) { completion?() }
+            animate(spriteActions) { completion() }
+            
         case .vortex:
             var spriteActions: [SpriteAction] = []
             for tileCoord in affectedTiles {
@@ -234,10 +242,88 @@ struct Animator {
                 let spriteAction = SpriteAction(sprite: sprites[tileCoord], action: runeAnimationAction)
                 spriteActions.append(spriteAction)
             }
-            animate(spriteActions) { completion?() }
-        case .drillDown: completion?()
+            animate(spriteActions) { completion() }
+            
+        case .drillDown:
+            // this is a special case for remove and replace so we just complete here and then computer board is called.
+            guard let trans = transformations.first else {
+                completion()
+                return
+            }
+            
+            animateDrillDownRuneUsed(spriteForeground: spriteForeground, sprites: sprites, transformation: trans, completion: completion)
+            
         default: break
         }
+    }
+    
+    func animateDrillDownRuneUsed(spriteForeground: SKNode, sprites: [[DFTileSpriteNode]], transformation: Transformation, completion: @escaping () -> Void) {
+        guard let playerTileTrans = transformation.tileTransformation?.first else {
+            completion()
+            return
+        }
+        var spriteActions: [SpriteAction] = []
+        // the player will fall 1 tile every 0.21 seconds
+        let fallSpeed = 0.21
+        let inBetweenTime = 0.05
+        let initialWait = 1.0
+        var totalDuration = initialWait
+        var waitDuration = initialWait
+        
+        // get the player tile trans
+        let playerSprite = sprites[playerTileTrans.initial]
+        
+        // fall to each tile we destroy and pause a moment before destroying the next tile
+        for destroyedTile in playerTileTrans.coordsBelowStartIncludingEnd {
+            // get the target position
+            let targetPlayerPosition = sprites[destroyedTile].position
+            
+            // wait before falling
+            let waitAction = SKAction.wait(forDuration: waitDuration)
+            let fallAction = SKAction.move(to: targetPlayerPosition, duration: fallSpeed)
+            fallAction.timingMode = .easeInEaseOut
+            let seq = SKAction.sequence([waitAction, fallAction])
+            
+            spriteActions.append(.init(playerSprite, seq))
+            
+            let destroyedSprite = sprites[destroyedTile]
+            // show the thing dying or exploding
+            switch destroyedSprite.type {
+            case .monster:
+                if let dying = destroyedSprite.dyingAnimation() {
+                    let seq = SKAction.sequence([waitAction, dying.action])
+                    spriteActions.append(.init(destroyedSprite, seq))
+                }
+            case .rock:
+                if let crumble = destroyedSprite.crumble() {
+                    let seq = SKAction.sequence([waitAction, crumble.action])
+                    spriteActions.append(.init(destroyedSprite, seq))
+                }
+            default:
+                break
+            }
+            waitDuration += (fallSpeed + inBetweenTime)
+            totalDuration += fallSpeed + inBetweenTime
+        }
+        
+        // add the drill and animation on top of it
+        let drillAnimatingSprite = SKSpriteNode(texture: SKTexture(imageNamed: "rune-drill-down-frame-1"), size: tileCGSize.scale(by: 2))
+        drillAnimatingSprite.alpha = 0.75
+        drillAnimatingSprite.zPosition = 1000
+        playerSprite.addChild(drillAnimatingSprite)
+        
+        // calculate how many times to animate the loop
+        let loops: Int = Int(ceil((totalDuration / CGFloat(4.0*timePerFrame()))))
+        let loopDrillAnimation = SKAction.repeat(drillDownAnimation, count: loops)
+        let drillSeq = SKAction.sequence([loopDrillAnimation, .removeFromParent()])
+        spriteActions.append(.init(drillAnimatingSprite, drillSeq))
+        
+        // shake the fricking screen
+        if let screenShake = shakeScreen(duration: totalDuration, ampX: 10, ampY: 10, delayBefore: 0.0) {
+            spriteActions.append(screenShake)
+        }
+        
+        animate(spriteActions, completion: completion)
     }
     
     public func explodeAnimation(size: CGSize) -> SKAction {
@@ -661,7 +747,7 @@ struct Animator {
         for spriteAction in spriteActions {
             spriteAction.sprite.run(spriteAction.action) {
                 numActions -= 1
-                //                print(numActions)
+                print(numActions)
                 if numActions == 0 {
                     completion()
                 }
@@ -908,7 +994,7 @@ struct Animator {
             
             let durationBeforeMonsterTakesDamage = waitBeforeAdditionalTargets + (durationForMovement/2)
             
-            if let takeDamageAnimation = sprites[coord].takeDamage() {
+            if let takeDamageAnimation = sprites[coord].dyingAnimation() {
                 let (sprite, animation) = takeDamageAnimation.tuple
                 let waitBefore = SKAction.wait(forDuration: durationBeforeMonsterTakesDamage)
                 

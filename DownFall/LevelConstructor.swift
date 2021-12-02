@@ -290,10 +290,10 @@ struct LevelConstructor {
         
         switch depth {
             // just for testing
-            //        case 0:
-            //            return TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false, groupCount: 0): 100,
-            //                                                        .rock(color: .blue, holdsGem: false): 50  ,
-            //                                                        ])
+//            case 0:
+//                return TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false, groupCount: 0): 50,
+//                                                     .rock(color: .blue, holdsGem: false, groupCount: 0): 50  ,
+//                                                            ])
         case 0, 1, 2, 3, 4:
             let chances = TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false, groupCount: 0): 33,
                                                         .rock(color: .blue, holdsGem: false, groupCount: 0): 33,

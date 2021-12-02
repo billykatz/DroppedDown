@@ -254,7 +254,7 @@ class TargetingViewModel: Targeting {
         return false
     }
     
-    public func affectedTiles(affectSlope: [AttackSlope], range: RangeModel, from position: TileCoord) -> [TileCoord] {
+    public func affectedTiles(affectSlope: [AttackSlope], range: RangeModel, from position: TileCoord, tiles: [[Tile]]?, stopsTileTypes: [TileType]?) -> [TileCoord] {
         func calculateTargetSlope(in slopedDirection: AttackSlope, distance i: Int, from position: TileCoord) -> TileCoord {
             let (initialRow, initialCol) = position.tuple
             
@@ -264,10 +264,27 @@ class TargetingViewModel: Targeting {
             return TileCoord(initialRow + (i * slopedDirection.up), initialCol + (i * slopedDirection.over))
         }
         
+        func tileStopsEffect(coord: TileCoord) -> Bool {
+            guard let stopsEffect = stopsTileTypes,
+                  let tiles = tiles else { return false }
+            return stopsEffect.contains(where: { tileType in
+                TileType.fuzzyEquals(tiles[coord].type, tileType)
+            })
+        }
+        
+        var effectCancelled = false
+        
         return affectSlope.flatMap { attackSlope in
             return (range.lower...range.upper).compactMap { range in
                 let coord = calculateTargetSlope(in: attackSlope, distance: range, from: position)
-                return isWithinBounds(coord, within: boardSize) ? coord : nil
+                let shouldReturnValue = isWithinBounds(coord, within: boardSize) && !tileStopsEffect(coord: coord) && !effectCancelled
+                
+                if shouldReturnValue {
+                    return coord
+                } else {
+                    effectCancelled = true
+                    return nil
+                }
             }
         }
     }
@@ -332,7 +349,9 @@ class TargetingViewModel: Targeting {
             /// calculate the associated coords
             let associatedCoords: [TileCoord] = affectedTiles(affectSlope: rune.affectSlopes,
                                                               range: RangeModel(lower: 1, upper: range),
-                                                              from: coord)
+                                                              from: coord,
+                                                              tiles: tiles,
+                                                              stopsTileTypes: rune.stopsEffectTypes)
             
             /// add the new target
             targets.append(Target(coord: coord,

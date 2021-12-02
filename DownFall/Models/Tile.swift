@@ -458,6 +458,33 @@ enum TileType: Hashable, CaseIterable, Codable {
         }
     }
     
+    static func fuzzyEquals(_ lhs: TileType, _ rhs: TileType) -> Bool {
+        switch (lhs, rhs) {
+        case (.player, player):
+            return true
+        case (.monster, monster):
+            return true
+        case (.empty, empty):
+            return true
+        case (.emptyGem, emptyGem):
+            return true
+        case (.exit, exit):
+            return true
+        case (.item, item):
+            return true
+        case (.offer, offer):
+            return true
+        case (.pillar, pillar):
+            return true
+        case (.rock, rock):
+            return true
+        case (.dynamite, dynamite):
+            return true
+        default:
+            return false
+        }
+    }
+    
     
     enum TextureName: String {
         case player = "player2"

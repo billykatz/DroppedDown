@@ -242,21 +242,14 @@ class DFTileSpriteNode: SKSpriteNode {
     func glow() -> (SKSpriteNode, SKAction)? {
         guard type == TileType.item(.gem)  else { return nil }
         let gemGlow = SKSpriteNode(texture: SKTexture(imageNamed: "crystalGlow"), color: .clear, size: self.size)
-//        let spin = SKAction.rotate(byAngle: .pi*2.0, duration: AnimationSettings.Renderer.glowSpinSpeed)
-//        let shrink = SKAction.scale(by: 0.8, duration: 1.0)
-//        let grow = SKAction.scale(to: self.size, duration: 1.0)
-//        let shrinkThenGrow = SKAction.sequence([shrink, grow])
-//        let shrinkGrowForever = SKAction.repeatForever(shrinkThenGrow)
-//        let spinIndefinitelyAction = SKAction.repeatForever(spin)
         gemGlow.zPosition = Precedence.underground.rawValue
         
         return nil
-//        return (gemGlow, SKAction.group([shrinkGrowForever, spinIndefinitelyAction]))
     }
     
     func poof(_ removeFromParent: Bool = true) -> (SpriteAction)? {
         
-        let smokeAnimation = Animator().smokeAnimation()
+        let smokeAnimation = Animator().smokeAnimation
         let remove = SKAction.removeFromParent()
         let sequencedActions: [SKAction] = [smokeAnimation, remove]
         let sequence = SKAction.sequence(sequencedActions)
@@ -346,11 +339,11 @@ class DFTileSpriteNode: SKSpriteNode {
         return repeatForever
     }
     
-    func takeDamage() -> SpriteAction? {
+    func dyingAnimation() -> SpriteAction? {
         switch self.type {
         case .monster(let monsterData):
             switch monsterData.type {
-            case .rat:
+            case .rat, .alamo:
                 let animationModel = monsterData.animations.first { $0.animationType == .dying }
                 let animationFrames = animationModel?.animationTextures ?? []
                 let animation = SKAction.animate(with: animationFrames, timePerFrame: 0.07)

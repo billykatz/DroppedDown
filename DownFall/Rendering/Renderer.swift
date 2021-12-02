@@ -227,8 +227,8 @@ class Renderer: SKSpriteNode {
             case .unlockExit:
                 animationsFinished(endTiles: trans.endTiles)
                 
-            case .itemUsed(let ability, let targets):
-                animateRuneUsed(input: inputType, transformations: transformations, rune: ability, targets: targets)
+            case .itemUsed(let ability, let allTarget):
+                animateRuneUsed(input: inputType, transformations: transformations, rune: ability, targets: allTarget.allTargetAssociatedCoords)
             case .collectOffer(let tileCoord, let offer, let discardedCoord, let discardedOffer):
                 if case let StoreOfferType.gems(amount) = offer.type {
                     collectItem(for: trans, amount: amount, atCoord: tileCoord, textureName: offer.textureName, inputType: inputType, randomColor: true)

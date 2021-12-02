@@ -40,7 +40,7 @@ class TargetingViewModelTests: XCTestCase {
     func testDidTargetSingle() {
         // given
         let vm = TargetingViewModel()
-        XCTAssertEqual(vm.currentTargets.all.count, 0)
+        XCTAssertEqual(vm.currentTargets.allTargetCoords.count, 0)
         sendTiles()
         
         //when
@@ -49,7 +49,7 @@ class TargetingViewModelTests: XCTestCase {
         vm.didTarget(TileCoord(1, 1))
         
         // verify
-        XCTAssertEqual(vm.currentTargets.all.count, 9)
+        XCTAssertEqual(vm.currentTargets.allTargetCoords.count, 9)
         
         
     }
@@ -57,7 +57,7 @@ class TargetingViewModelTests: XCTestCase {
     func testDidTargetMultiple() {
         // given
         let vm = TargetingViewModel()
-        XCTAssertEqual(vm.currentTargets.all.count, 0)
+        XCTAssertEqual(vm.currentTargets.allTargetCoords.count, 0)
         
         //when
         let _ = sendTiles()
@@ -66,25 +66,25 @@ class TargetingViewModelTests: XCTestCase {
         vm.didTarget(.zero)
         
         // verify
-        XCTAssertEqual(vm.currentTargets.all.count, 1)
+        XCTAssertEqual(vm.currentTargets.allTargetCoords.count, 1)
         
         //when
         vm.didTarget(TileCoord(0,3))
         
         // verify
-        XCTAssertEqual(vm.currentTargets.all.count, 2)
+        XCTAssertEqual(vm.currentTargets.allTargetCoords.count, 2)
         
         // when we try to target a 3rd, it removes an old target to add the new one
         vm.didTarget(TileCoord(0,4))
         
         //verify
-        XCTAssertEqual(vm.currentTargets.all.count, 2)
+        XCTAssertEqual(vm.currentTargets.allTargetCoords.count, 2)
         
         // when we try to target a 3rd, it removes an old target to add the new one
         vm.didTarget(TileCoord(0,5))
         
         //verify
-        XCTAssertEqual(vm.currentTargets.all.count, 2)
+        XCTAssertEqual(vm.currentTargets.allTargetCoords.count, 2)
         
         
         // when you target one that has already been chosen
@@ -93,7 +93,7 @@ class TargetingViewModelTests: XCTestCase {
         vm.didTarget(TileCoord(0,5))
         
         //verify
-        XCTAssertEqual(vm.currentTargets.all.count, 1)
+        XCTAssertEqual(vm.currentTargets.allTargetCoords.count, 1)
         
         // when you target one that has already been chosen
         // it removes it
@@ -101,13 +101,13 @@ class TargetingViewModelTests: XCTestCase {
         vm.didTarget(TileCoord(0,4))
         
         //verify
-        XCTAssertEqual(vm.currentTargets.all.count, 0)
+        XCTAssertEqual(vm.currentTargets.allTargetCoords.count, 0)
     }
     
     func testAutoTargetPlayer() {
         // given
         let vm = TargetingViewModel()
-        XCTAssertEqual(vm.currentTargets.all.count, 0)
+        XCTAssertEqual(vm.currentTargets.allTargetCoords.count, 0)
         
         //when
         let tiles = sendTiles()
@@ -123,7 +123,7 @@ class TargetingViewModelTests: XCTestCase {
         vm.didSelect(Rune.rune(for: .bubbleUp))
         
         // verify
-        XCTAssertEqual(vm.currentTargets.all.count, 1)
+        XCTAssertEqual(vm.currentTargets.allTargetCoords.count, 1)
         
         
         
@@ -133,7 +133,7 @@ class TargetingViewModelTests: XCTestCase {
     func testAutoTargetMonster() {
         // given
         let vm = TargetingViewModel()
-        XCTAssertEqual(vm.currentTargets.all.count, 0)
+        XCTAssertEqual(vm.currentTargets.allTargetCoords.count, 0)
         
         // with 1 monster
         let tiles = sendTiles(2)
@@ -152,14 +152,14 @@ class TargetingViewModelTests: XCTestCase {
 
         
         // verify
-        XCTAssertEqual(vm.currentTargets.all.count, 2)
+        XCTAssertEqual(vm.currentTargets.allTargetCoords.count, 2)
         
     }
     
     func testAutoTargetMonsterFail() {
         // given
         let vm = TargetingViewModel()
-        XCTAssertEqual(vm.currentTargets.all.count, 0)
+        XCTAssertEqual(vm.currentTargets.allTargetCoords.count, 0)
         
         //when
         Dispatch.shared.send(Input(InputType.itemUseSelected(Rune.rune(for: .rainEmbers))))
@@ -168,7 +168,7 @@ class TargetingViewModelTests: XCTestCase {
         sendTiles(3)
         
         // verify
-        XCTAssertEqual(vm.currentTargets.all.count, 0)
+        XCTAssertEqual(vm.currentTargets.allTargetCoords.count, 0)
         
     }
     
@@ -176,14 +176,14 @@ class TargetingViewModelTests: XCTestCase {
     func testAutoTargetFail() {
         // given
         let vm = TargetingViewModel()
-        XCTAssertEqual(vm.currentTargets.all.count, 0)
+        XCTAssertEqual(vm.currentTargets.allTargetCoords.count, 0)
         
         //when
         Dispatch.shared.send(Input(InputType.itemUseSelected(Rune.rune(for: .getSwifty))))
         sendTiles()
         
         // verify
-        XCTAssertEqual(vm.currentTargets.all.count, 0)
+        XCTAssertEqual(vm.currentTargets.allTargetCoords.count, 0)
         
     }
     

@@ -219,7 +219,7 @@ struct Animator {
                 spriteActions.append(spriteAction)
             }
             animate(spriteActions) { completion?() }
-
+        case .drillDown: completion?()
         default: break
         }
     }

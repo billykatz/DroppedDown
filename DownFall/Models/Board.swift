@@ -201,13 +201,13 @@ class Board: Equatable {
                 )
             )
             
-        case .itemUsed(let rune, let targets):
-            let trans = useRune(rune, on: targets, input: input)
+        case .itemUsed(let rune, let allTarget):
+            let trans = useRune(rune, on: allTarget, input: input)
             
             InputQueue.append(
                 Input(
                     InputType.transformation(
-                        [trans]
+                        trans
                     ),
                     tiles
                 )
@@ -860,11 +860,50 @@ class Board: Equatable {
         }
     }
     
-    private func drillDown(input: Input) -> Transformation {
-        guard let playerData = playerData(in: tiles) else { return Transformation(transformation: nil, inputType: input.type, endTiles: tiles) }
+    private func drillDown(allTarget: AllTarget, input: Input) -> [Transformation] {
+        guard let playerData = playerData(in: tiles) else { return [Transformation(transformation: nil, inputType: input.type, endTiles: tiles)] }
+        var tileTransformation: [TileTransformation] = []
         var newTiles = tiles
         
-        return Transformation(transformation: nil, inputType: input.type, endTiles: tiles)
+        // get the affected tile coords
+        let affectedTiles = allTarget.targets.flatMap { $0.associatedCoord }
+        // keep track of which tiles have been transformed upon
+        // only destroy monsters and rocks
+        var tilesToBeDestroyed: [TileCoord] = []
+        for coord in affectedTiles {
+            switch tiles[coord].type {
+            case .monster, .rock:
+                tilesToBeDestroyed.append(coord)
+                tileTransformation.append(TileTransformation(coord, coord))
+            default:
+                break
+            }
+        }
+        
+        guard !tilesToBeDestroyed.isEmpty,
+              let minCoord = tilesToBeDestroyed.min(by: { $0.row < $1.row }) else {
+            return [Transformation(transformation: nil, inputType: input.type, endTiles: tiles)]
+        }
+        
+        
+        
+        tileTransformation.append(TileTransformation(playerCoord, minCoord))
+        tilesToBeDestroyed.removeFirst(where: { $0 == minCoord })
+        tilesToBeDestroyed.append(playerCoord)
+        newTiles[playerCoord.row][playerCoord.col] = Tile(type: .empty)
+        newTiles[minCoord.row][minCoord.col] = Tile(type: .player(playerData))
+        self.tiles = newTiles
+        
+        // destroy all rocks and tiles on the way to the bottom. skip over other things
+        let removeAndReplace = removeAndReplaces(from: self.tiles, specificCoord: tilesToBeDestroyed, input: input)
+        
+        
+        // return an array of transformations
+        return [
+            Transformation(transformation: tileTransformation, inputType: input.type, endTiles: tiles),
+            removeAndReplace
+        
+        ]
     }
     
     private func vortex(tiles:  [[Tile]], targets: [TileCoord], input: Input) -> Transformation {
@@ -905,11 +944,11 @@ class Board: Equatable {
 }
 
 
-//MARK: - use ability
+//MARK: - Use Rune
 
 extension Board {
     
-    private func useRune(_ rune: Rune, on targets: [TileCoord], input: Input) -> Transformation {
+    private func useRune(_ rune: Rune, on allTargets: AllTarget, input: Input) -> [Transformation] {
         guard let playerData = playerEntityData,
               let pp = playerPosition else {
             /// no update for the player is needed
@@ -920,21 +959,21 @@ extension Board {
         let updatedPlayer = playerData.useRune(rune)
         tiles[pp.row][pp.column] = Tile(type: .player(updatedPlayer))
         
-        
+        let targets = allTargets.allTargetAssociatedCoords
         switch rune.type {
         case .rainEmbers, .fireball:
-            return removeAndReplaces(from: tiles, specificCoord: targets, input: input)
+            return [removeAndReplaces(from: tiles, specificCoord: targets, input: input)]
             
         case .getSwifty:
             guard let firstTarget = targets.first, targets.count == 2 else {
-                return Transformation(transformation: nil, inputType: input.type, endTiles: tiles)
+                return [Transformation(transformation: nil, inputType: input.type, endTiles: tiles)]
             }
-            return swap(firstTarget, with: targets.last!, input: input)
+            return [swap(firstTarget, with: targets.last!, input: input)]
             
         case .transformRock:
-            return transform(targets, into: TileType.rock(color: .purple, holdsGem: false, groupCount: 0), input: input)
+            return [transform(targets, into: TileType.rock(color: .purple, holdsGem: false, groupCount: 0), input: input)]
         case .bubbleUp:
-            return bubbleUp(targets.first!, input: input)
+            return [bubbleUp(targets.first!, input: input)]
         case .flameWall, .flameColumn:
             let monsterCoords = targets.compactMap { coord -> TileCoord? in
                 if case TileType.monster = tiles[coord].type {
@@ -943,12 +982,12 @@ extension Board {
                     return nil
                 }
             }
-            return flameWall(tiles: tiles, targets: monsterCoords, input: input)
+            return [flameWall(tiles: tiles, targets: monsterCoords, input: input)]
         case .vortex:
-            return vortex(tiles: tiles, targets: targets, input: input)
+            return [vortex(tiles: tiles, targets: targets, input: input)]
             
         case .drillDown:
-            return drillDown(input: input)
+            return drillDown(allTarget: allTargets, input: input)
             
         default: fatalError()
         }
@@ -1247,7 +1286,7 @@ extension Board {
                 if fuse.count <= 0 {
                     intermediateTiles[coord.x][coord.y] = Tile.empty
                 }
-            case .monster, .offer, .gem:
+            case .monster, .offer, .gem, .empty:
                 intermediateTiles[coord.x][coord.y] = Tile.empty
             default:
                 preconditionFailure("We should only use this for rocks, pillars and monsters. Dynamite adds a few more items to the list including gems.")

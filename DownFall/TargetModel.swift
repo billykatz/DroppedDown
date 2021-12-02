@@ -6,7 +6,7 @@
 //  Copyright © 2021 William Katz LLC. All rights reserved.
 //
 
-struct Target {
+struct Target: Codable, Hashable {
     let coord: TileCoord
     let associatedCoord: [TileCoord]
     let isLegal: Bool
@@ -14,17 +14,18 @@ struct Target {
     var all: [TileCoord] {
         return  [coord] + associatedCoord
     }
+    
 }
 
-struct AllTarget {
+struct AllTarget: Codable, Hashable {
     var targets: [Target]
     let areLegal: Bool
     
-    var all: [TileCoord] {
-        return targets.reduce([]) { prev, target in
-            var newArray = prev
-            newArray.append(contentsOf: target.all)
-            return newArray
-        }
+    var allTargetCoords: [TileCoord] {
+        return targets.map { $0.coord }
+    }
+    
+    var allTargetAssociatedCoords: [TileCoord] {
+        return targets.flatMap { $0.all }
     }
 }

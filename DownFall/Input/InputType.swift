@@ -50,7 +50,7 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
                                         .itemUseCanceled,
                                         .itemUseSelected(.zero),
                                         .itemCanBeUsed(false),
-                                        .itemUsed(.zero, []),
+                                        .itemUsed(.zero, .init(targets: [], areLegal: false)),
                                         .decrementDynamites(Set<TileCoord>()),
                                         .rotatePreview([], .zero),
                                         .rotatePreviewFinish([], nil),
@@ -94,7 +94,7 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
     case itemUseSelected(Rune)
     case itemUseCanceled
     case itemCanBeUsed(Bool)
-    case itemUsed(Rune, [TileCoord])
+    case itemUsed(Rune, AllTarget)
     case decrementDynamites(Set<TileCoord>)
     case rotatePreview([[DFTileSpriteNode]], Transformation)
     case rotatePreviewFinish([SpriteAction], Transformation?)
@@ -169,7 +169,7 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
         case .itemCanBeUsed(let used):
             return "item can be used: \(used)"
         case .itemUsed(let ability, let targets):
-            return "\(ability.textureName) used on targets \(targets)"
+            return "\(ability.textureName) used on targets \(targets.allTargetCoords)"
         case .decrementDynamites:
             return "Decrement the dynamite fuses"
         case .rotatePreview:

@@ -96,7 +96,16 @@ struct Profile: Codable, Equatable {
 //        guard let rune = randomRune else {
 //            return testPlayer.update(pickaxe: Pickaxe(runeSlots: 1, runes: []))
 //        }
-        return testPlayer.update(pickaxe: Pickaxe(runeSlots: 1, runes: [Rune.rune(for: .getSwifty)]))
+        return testPlayer.update(pickaxe:
+                                    Pickaxe(runeSlots: 4,
+                                                  runes: [
+                                                    .rune(for: .transformRock),
+                                                    .rune(for: .vortex),
+                                                    .rune(for: .drillDown),
+                                                    .rune(for: .rainEmbers),
+                                                  ]
+                                           )
+        )
     }
     
     //dont save this

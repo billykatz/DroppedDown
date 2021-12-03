@@ -17,6 +17,7 @@ struct Transformation: Hashable {
     var shiftDown: [TileTransformation]?
     var removedTilesContainGem: Bool?
     var offers: [StoreOffer]?
+    var monstersDies: [MonsterDies]?
     
     
     
@@ -27,7 +28,8 @@ struct Transformation: Hashable {
          newTiles: [TileTransformation]? = nil,
          shiftDown: [TileTransformation]? = nil,
          removedTilesContainGem: Bool? = false,
-         offers: [StoreOffer]? = nil
+         offers: [StoreOffer]? = nil,
+         monstersDies: [MonsterDies]? = nil
     ) {
         self.tileTransformation = tileTransformation
         self.inputType = inputType
@@ -37,6 +39,7 @@ struct Transformation: Hashable {
         self.shiftDown = shiftDown
         self.removedTilesContainGem = removedTilesContainGem
         self.offers = offers
+        self.monstersDies = monstersDies
     }
     
     static var zero : Transformation {

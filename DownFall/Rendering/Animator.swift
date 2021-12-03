@@ -333,6 +333,7 @@ struct Animator {
                 let (innerFireballDuration, fireballAnimation) = createFireballAnimation(sprites: sprites, from: playerCoord, to: targetCoord, delayBeforeShoot: delayBeforeShoot + innerDelayBeforeShoot, spriteForeground: spriteForeground, runeAnimation: runeAnimation)
 
                 fireballAnimation.sprite.alpha = alpha
+                fireballAnimation.sprite.zPosition = zPosition
                 spriteActions.append(fireballAnimation)
                 
                 zPosition -= 50

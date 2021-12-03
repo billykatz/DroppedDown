@@ -68,6 +68,11 @@ struct Animator {
     }
     
     
+    
+    func playerCoord(_ sprites: [[DFTileSpriteNode]]) -> TileCoord? {
+        return tileCoords(for: sprites, of: .player(.playerZero)).first
+    }
+    
     func shakeScreen(duration: CGFloat = 0.5, ampX: Int = 10, ampY: Int = 10, delayBefore: Double = 0) -> SpriteAction? {
         guard let foreground = foreground else { return nil }
         let action = SKAction.shake(duration: duration, amplitudeX: ampX, amplitudeY: ampY)
@@ -128,44 +133,21 @@ struct Animator {
                 return
             }
             
+            var delay = 0.0
             for target in affectedTiles {
-                let horizontalDistane = pp.distance(to: target, along: .horizontal)
-                let verticalDistane = pp.distance(to: target, along: .vertical)
-                let distance = CGFloat.hypotenuseDistance(sideALength: CGFloat(horizontalDistane), sideBLength: CGFloat(verticalDistane))
+                let (fireballDuration, fireballAnimation) = createFireballAnimation(sprites: sprites, from: pp, to: target, delayBeforeShoot: delay, spriteForeground: spriteForeground, runeAnimation: runeAnimation)
                 
-                let duration = Double(distance * 0.1)
-                let angle = CGFloat.angle(sideALength: CGFloat(horizontalDistane),
-                                          sideBLength: CGFloat(verticalDistane))
+                if let screenShake = shakeScreen(duration: 0.25, ampX: 15, ampY: 15, delayBefore: fireballDuration + delay) {
+                    spriteActions.append(screenShake)
+                }
                 
-                let fireballAction = SKAction.repeat(SKAction.animate(with: runeAnimation.animationFrames(), timePerFrame: 0.07), count: Int(duration * 0.07))
+                if case TileType.monster = sprites[target].type,
+                   let dying = sprites[target].dyingAnimation(durationWaitBefore: fireballDuration + delay) {
+                    spriteActions.append(dying)
+                }
                 
-                let xDistance = CGFloat(pp.totalDistance(to: target, along: .horizontal))
-                let yDistance = CGFloat(pp.totalDistance(to: target, along: .vertical))
-                
-                let rotateAngle = CGFloat.rotateAngle(startAngle: .pi*3/2, targetAngle: angle, xDistance: xDistance, yDistance: yDistance)
-                
-                
-                let moveAction = SKAction.move(to:sprites[target.row][target.column].position, duration: duration)
-                let rotateAction = SKAction.rotate(byAngle: rotateAngle, duration: 0)
-                let combinedAction = SKAction.group([fireballAction, moveAction])
-                let removeAction = SKAction.removeFromParent()
-                
-                let sequencedActions = SKAction.sequence([
-                    rotateAction,
-                    combinedAction,
-                    smokeAnimation,
-                    removeAction])
-                
-                let fireballSpriteContainer = SKSpriteNode(color: .clear,
-                                                           size: sprites[target.row][target.column].size)
-                
-                
-                //start the fireball from the player
-                fireballSpriteContainer.position = sprites[pp.row][pp.column].position
-                fireballSpriteContainer.zPosition = Precedence.flying.rawValue
-                spriteForeground.addChild(fireballSpriteContainer)
-                spriteActions.append(SpriteAction(sprite: fireballSpriteContainer, action: sequencedActions))
-                
+                spriteActions.append(fireballAnimation)
+                delay += 0.5
             }
             
             animate(spriteActions) { completion() }
@@ -253,8 +235,108 @@ struct Animator {
             
             animateDrillDownRuneUsed(spriteForeground: spriteForeground, sprites: sprites, transformation: trans, completion: completion)
             
+        case .fieryRage:
+            guard let trans = transformations.first else {
+                completion()
+                return
+            }
+            animateFieryRage(spriteForeground: spriteForeground, sprites: sprites, transformation: trans, runeAnimation: runeAnimation, completion: completion)
+            
         default: break
         }
+    }
+    
+    func createFireballAnimation(sprites: [[DFTileSpriteNode]], from startcoord: TileCoord, to targetCoord: TileCoord, delayBeforeShoot: Double, spriteForeground: SKNode, runeAnimation: SpriteSheet) -> (animationDuration: Double, spriteAction: SpriteAction) {
+        let flyingSpeed = 0.1
+        let startSprite = sprites[startcoord]
+        let targetSprite = sprites[targetCoord]
+        
+        // get the distance the fireball needs to travel
+        let horizontalDistane = startcoord.distance(to: targetCoord, along: .horizontal)
+        let verticalDistane = startcoord.distance(to: targetCoord, along: .vertical)
+        let distance = CGFloat.hypotenuseDistance(sideALength: CGFloat(horizontalDistane), sideBLength: CGFloat(verticalDistane))
+        
+        // the time the fireball actually flies
+        let duration = Double(distance * flyingSpeed)
+            
+        // determine where to rotate the sprite
+        // this xDistance and yDistance can be negative
+        let xDistance = CGFloat(startcoord.totalDistance(to: targetCoord, along: .horizontal))
+        let yDistance = CGFloat(startcoord.totalDistance(to: targetCoord, along: .vertical))
+        // this is the angle we want to get to
+        let angle = CGFloat.angle(sideALength: CGFloat(horizontalDistane),
+                                  sideBLength: CGFloat(verticalDistane))
+        // this detemines how much we actually need to rotate by
+        let rotateAngle = CGFloat.rotateAngle(startAngle: .pi*3/2, targetAngle: angle, xDistance: xDistance, yDistance: yDistance)
+        let rotateAction = SKAction.rotate(byAngle: rotateAngle, duration: 0)
+        
+        
+        let frames = Double(runeAnimation.animationFrames().count)
+        
+        let waitBeforeShoot = SKAction.wait(forDuration: delayBeforeShoot)
+        let fireballAction = SKAction.repeat(SKAction.animate(with: runeAnimation.animationFrames(), timePerFrame: timePerFrame()), count: Int(duration * 0.07 * frames))
+        let moveAction = SKAction.move(to: targetSprite.position, duration: duration)
+        moveAction.timingMode = .easeIn
+        let combinedAction = SKAction.group([fireballAction, moveAction])
+        let removeAction = SKAction.removeFromParent()
+            
+        let sequencedActions = SKAction.sequence([
+            rotateAction,
+            waitBeforeShoot,
+            combinedAction,
+            smokeAnimation,
+            removeAction])
+        
+        let fireballSpriteContainer = SKSpriteNode(color: .clear,
+                                                   size: tileCGSize)
+            
+            
+            //start the fireball from the player
+        fireballSpriteContainer.position = startSprite.position
+        fireballSpriteContainer.zPosition = Precedence.flying.rawValue
+        spriteForeground.addChild(fireballSpriteContainer)
+        return (animationDuration: duration, spriteAction: SpriteAction(sprite: fireballSpriteContainer, action: sequencedActions))
+
+    }
+    
+    func animateFieryRage(spriteForeground: SKNode, sprites: [[DFTileSpriteNode]], transformation: Transformation, runeAnimation: SpriteSheet, completion: @escaping () -> Void) {
+        // determine how many monsters actually die by using the tile transformations
+        // shoot a fireball in the 4 orthogonal directions
+        // some of the fireballs should end at a monster
+        // if the fireball doesnt kill a monster then it should end on the side of the board
+        // take time between firing each fireball
+        
+        guard let tileTrans = transformation.tileTransformation,
+              let playerCoord = playerCoord(sprites) else {
+            completion()
+            return
+        }
+        
+        var spriteActions: [SpriteAction] = []
+        
+        var delayBeforeShoot = 0.25
+        for tileTran in tileTrans {
+            let targetCoord = tileTran.initial
+            
+            let (fireballDuration, fireballAnimation) = createFireballAnimation(sprites: sprites, from: playerCoord, to: targetCoord, delayBeforeShoot: delayBeforeShoot, spriteForeground: spriteForeground, runeAnimation: runeAnimation)
+            
+            if let screenShake = shakeScreen(duration: 0.25, ampX: 15, ampY: 15, delayBefore: fireballDuration + delayBeforeShoot) {
+                spriteActions.append(screenShake)
+            }
+            
+            if case TileType.monster = sprites[targetCoord].type,
+               let dying = sprites[targetCoord].dyingAnimation(durationWaitBefore: fireballDuration + delayBeforeShoot) {
+                spriteActions.append(dying)
+            }
+            
+            spriteActions.append(fireballAnimation)
+            
+            delayBeforeShoot += 0.5
+                        
+        }
+        
+        
+        animate(spriteActions, completion: completion)
     }
     
     func animateDrillDownRuneUsed(spriteForeground: SKNode, sprites: [[DFTileSpriteNode]], transformation: Transformation, completion: @escaping () -> Void) {
@@ -290,14 +372,12 @@ struct Animator {
             // show the thing dying or exploding
             switch destroyedSprite.type {
             case .monster:
-                if let dying = destroyedSprite.dyingAnimation() {
-                    let seq = SKAction.sequence([waitAction, dying.action])
-                    spriteActions.append(.init(destroyedSprite, seq))
+                if let dying = destroyedSprite.dyingAnimation(durationWaitBefore: waitDuration) {
+                    spriteActions.append(dying)
                 }
             case .rock:
                 if let crumble = destroyedSprite.crumble() {
-                    let seq = SKAction.sequence([waitAction, crumble.action])
-                    spriteActions.append(.init(destroyedSprite, seq))
+                    spriteActions.append(crumble)
                 }
             default:
                 break

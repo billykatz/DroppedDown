@@ -423,7 +423,6 @@ class Renderer: SKSpriteNode {
     private func animateRuneUsed(input: InputType, transformations: [Transformation], rune: Rune, targets: [TileCoord]) {
         animator.animateRune(rune, transformations: transformations, affectedTiles: targets, sprites: sprites, spriteForeground: spriteForeground) { [weak self] in
             self?.computeNewBoard(for: transformations)
-//            self?.animationsFinished(endTiles: transformations.first?.endTiles)
         }
         
     }

@@ -347,7 +347,7 @@ struct EntityModel: Equatable, Codable {
         var newRunes: [Rune] = []
         for rune in self.runes ?? [] {
             var newRune = rune
-            if rune.rechargeType.contains(tileType) {
+            if rune.rechargeType.contains(where: { TileType.fuzzyEquals($0, tileType)} ) {
                 newRune = rune.progress(count)
             }
             newRunes.append(newRune)

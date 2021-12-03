@@ -254,7 +254,7 @@ class TargetingViewModel: Targeting {
         return false
     }
     
-    public func affectedTiles(affectSlope: [AttackSlope], range: RangeModel, from position: TileCoord, tiles: [[Tile]]?, stopsTileTypes: [TileType]?) -> [TileCoord] {
+    public func affectedTiles(affectSlope: [AttackSlope], range: RangeModel, from position: TileCoord, tiles: [[Tile]]?, stopsTileTypes: EndEffectTile?) -> [TileCoord] {
         func calculateTargetSlope(in slopedDirection: AttackSlope, distance i: Int, from position: TileCoord) -> TileCoord {
             let (initialRow, initialCol) = position.tuple
             
@@ -264,29 +264,46 @@ class TargetingViewModel: Targeting {
             return TileCoord(initialRow + (i * slopedDirection.up), initialCol + (i * slopedDirection.over))
         }
         
-        func tileStopsEffect(coord: TileCoord) -> Bool {
+        func tileStopsEffect(coord: TileCoord) -> (TileCoord?, Bool) {
             guard let stopsEffect = stopsTileTypes,
-                  let tiles = tiles else { return false }
-            return stopsEffect.contains(where: { tileType in
+                  let tiles = tiles else { return (nil, false) }
+            let contains = stopsEffect.tileTypes.contains(where: { tileType in
                 TileType.fuzzyEquals(tiles[coord].type, tileType)
             })
+            if contains && stopsEffect.inclusive {
+                return (coord, true)
+            } else if contains && !stopsEffect.inclusive {
+                return (nil, true)
+            } else { return (nil, false) }
         }
         
-        var effectCancelled = false
+        var effectedTileCoords: [TileCoord] = []
         
-        return affectSlope.flatMap { attackSlope in
-            return (range.lower...range.upper).compactMap { range in
-                let coord = calculateTargetSlope(in: attackSlope, distance: range, from: position)
-                let shouldReturnValue = isWithinBounds(coord, within: boardSize) && !tileStopsEffect(coord: coord) && !effectCancelled
-                
-                if shouldReturnValue {
-                    return coord
-                } else {
-                    effectCancelled = true
-                    return nil
+        for slope in affectSlope {
+            var effectCancelled = false
+            for distance in range.lower...range.upper {
+                if !effectCancelled {
+                    let coord = calculateTargetSlope(in: slope, distance: distance, from: position)
+                    guard isWithinBounds(coord, within: boardSize) else { continue }
+                    
+                    let (endTileCoord, stopsEffect) = tileStopsEffect(coord: coord)
+                    let shouldReturnValue = !stopsEffect
+                    
+                    if shouldReturnValue {
+                        effectedTileCoords.append(coord)
+                    } else {
+                        
+                        // if the stop range is inclusive then add the last tile
+                        if let endTileCoord = endTileCoord {
+                            effectedTileCoords.append(endTileCoord)
+                        }
+                        effectCancelled = true
+                    }
                 }
+
             }
         }
+        return effectedTileCoords
     }
     
     func targets(given coord: TileCoord, withRune rune: Rune) -> AllTarget {
@@ -381,10 +398,15 @@ class TargetingViewModel: Targeting {
             if currentTargets.targets.contains(where: { return $0.coord == coord } ) {
                 
                 // dont let them unhighlight the player
-                guard let playerCoord = playerCoord,
-                    (needsToTargetPlayer && playerCoord != coord) else {
-                     return
+                if needsToTargetPlayer,
+                   let playerCoord = playerCoord,
+                   playerCoord != coord {
+                    return
                 }
+//                guard let playerCoord = playerCoord,
+//                    (needsToTargetPlayer && playerCoord != coord) else {
+//                     return
+//                }
                 
                 // otherwise, remove the targeting
                 currentTargets.targets.removeAll(where: { return $0.coord == coord })

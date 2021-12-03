@@ -171,7 +171,15 @@ class Board: Equatable {
             transformation = attack(input)
             
         case .monsterDies(let tileCoord, _):
+            guard let playerData = playerEntityData,
+                  let pp = playerPosition else {
+                /// no update for the player is needed
+                break
+            }
+
             //only remove a single tile when a monster dies
+            let updatedPlayer = playerData.progressRunes(tileType: TileType.monster(.zero), count: 1)
+            tiles[pp.row][pp.column] = Tile(type: .player(updatedPlayer))
             transformation = monsterDied(at: tileCoord, input: input)
             
         case .gameWin:
@@ -860,6 +868,52 @@ class Board: Equatable {
         }
     }
     
+    private func fieryRage(allTarget: AllTarget, input: Input) -> [Transformation] {
+        // destroy any monsters that are within the the effected tile coords
+        
+        var newTiles = tiles
+        let playerCoord = playerCoord
+        
+        var minLeftCoord: TileCoord = playerCoord
+        var maxRightCoord: TileCoord = playerCoord
+        var maxTopCoord: TileCoord = playerCoord
+        var minBottomCoord: TileCoord = playerCoord
+        
+        // gets the most left, right, top and bottom coords
+        // also kills each monster
+        for tileCoord in allTarget.allTargetAssociatedCoords {
+            if tileCoord.row == playerCoord.row {
+                // set the min left or max right potential
+                if tileCoord.col < minLeftCoord.col {
+                    minLeftCoord = tileCoord
+                } else if tileCoord.col > maxRightCoord.col {
+                    maxRightCoord = tileCoord
+                }
+            } else if tileCoord.col == playerCoord.col {
+                if tileCoord.row < minBottomCoord.row {
+                    minBottomCoord = tileCoord
+                } else if tileCoord.row > maxTopCoord.row {
+                    maxTopCoord = tileCoord
+                }
+            }
+            
+            if case TileType.monster = tiles[tileCoord].type {
+                newTiles[tileCoord.row][tileCoord.col] = .empty
+            }
+        }
+        
+        self.tiles = newTiles
+        
+        let tileTransformations = [minLeftCoord, maxRightCoord, minBottomCoord, maxTopCoord]
+            .filter { $0 != playerCoord }
+            .map { TileTransformation($0, $0) }
+        
+        let trans = Transformation(transformation: tileTransformations, inputType: input.type, endTiles: self.tiles)
+        
+        return [trans]
+        
+    }
+    
     private func drillDown(allTarget: AllTarget, input: Input) -> [Transformation] {
         guard let playerData = playerData(in: tiles) else { return [Transformation(transformation: nil, inputType: input.type, endTiles: tiles)] }
         var tileTransformation: [TileTransformation] = []
@@ -997,6 +1051,10 @@ extension Board {
             
         case .drillDown:
             return drillDown(allTarget: allTargets, input: input)
+            
+        case .fieryRage:
+            return fieryRage(allTarget: allTargets, input: input)
+            
             
         default: fatalError()
         }

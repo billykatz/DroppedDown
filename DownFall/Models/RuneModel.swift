@@ -25,6 +25,7 @@ enum RuneType: String, Codable, Hashable, CaseIterable {
     case gemification
     case moveEarth
     case phoenix
+    case fieryRage
     
     var humanReadable: String {
         switch self {
@@ -56,6 +57,8 @@ enum RuneType: String, Codable, Hashable, CaseIterable {
             return "Move Earth"
         case .phoenix:
             return "Phoenix"
+        case .fieryRage:
+            return "Fiery Rage"
         }
     }
 }
@@ -64,6 +67,11 @@ extension Rune {
     static func ==(_ lhsRune: Rune, _ rhsRune: Rune) -> Bool {
         return lhsRune.type == rhsRune.type
     }
+}
+
+struct EndEffectTile: Hashable, Codable {
+    let tileTypes: [TileType]
+    let inclusive: Bool
 }
 
 struct Rune: Hashable, Codable {
@@ -77,7 +85,7 @@ struct Rune: Hashable, Codable {
     var targetTypes: [TileType]?
     var affectSlopes: [AttackSlope]
     var affectRange: Int
-    var stopsEffectTypes: [TileType]?
+    var stopsEffectTypes: EndEffectTile?
     var heal: Int?
     var cooldown: Int
     var rechargeType: [TileType]
@@ -121,7 +129,7 @@ struct Rune: Hashable, Codable {
                 targetTypes: [TileType]? = nil,
                 affectSlopes: [AttackSlope]? = nil,
                 affectRange: Int? = nil,
-                stopsEffectTypes: [TileType]? = nil,
+                stopsEffectTypes: EndEffectTile? = nil,
                 cooldown: Int? = nil,
                 rechargeType: [TileType]? = nil,
                 rechargeMinimum: Int? = nil,
@@ -404,7 +412,7 @@ struct Rune: Hashable, Codable {
                 targetTypes: [.player(.playerZero)],
                 affectSlopes: [AttackSlope(over: 0, up: -1)],
                 affectRange: Int.max,
-                stopsEffectTypes: [.exit(blocked: false), .exit(blocked: true), .item(.zero), .gem, .pillar(.random), .dynamite(.standardFuse), .offer(.zero)],
+                stopsEffectTypes: EndEffectTile(tileTypes: [.exit(blocked: false), .exit(blocked: true), .item(.zero), .gem, .pillar(.random), .dynamite(.standardFuse), .offer(.zero)], inclusive: false),
                 heal: 0,
 //                cooldown: 25,
                 cooldown: 5,
@@ -413,7 +421,7 @@ struct Rune: Hashable, Codable {
                 rechargeCurrent: 0,
                 progressColor: .red,
                 maxDistanceBetweenTargets: CGFloat.greatestFiniteMagnitude,
-                animationTextureName: "",
+                animationTextureName: "rune-drilldown-spriteSheet4",
                 animationColumns: 0
             )
             
@@ -512,6 +520,32 @@ struct Rune: Hashable, Codable {
                 animationColumns: 0
             )
             
+        case .fieryRage:
+            return Rune(
+                type: .fieryRage,
+                textureName: "rune-fireyrage-on",
+                cost: 0,
+                currency: .gem,
+                description: "Throw a fireball above, below and to each side of you.",
+                flavorText: "I discovered move by accident after losing a match of Cave Chess. - Margarey The Hothead ",
+                targets: 1,
+                targetTypes: [.player(.playerZero)],
+                affectSlopes: AttackSlope.orthogonalDirectionAttacks,
+                affectRange: Int.max,
+                stopsEffectTypes: EndEffectTile(tileTypes: [.monster(.zero)], inclusive: true),
+                heal: 0,
+                cooldown: 1,
+                rechargeType: [TileType.monster(.zero)],
+                rechargeMinimum: 1,
+                rechargeCurrent: 1,
+                progressColor: .blood,
+                maxDistanceBetweenTargets: CGFloat.greatestFiniteMagnitude,
+                animationTextureName: "rainEmbersSpriteSheet",
+                animationColumns: 5
+            )
+            
         }
+        
+        
     }
 }

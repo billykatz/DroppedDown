@@ -339,15 +339,16 @@ class DFTileSpriteNode: SKSpriteNode {
         return repeatForever
     }
     
-    func dyingAnimation() -> SpriteAction? {
+    func dyingAnimation(durationWaitBefore: Double = 0.0) -> SpriteAction? {
         switch self.type {
         case .monster(let monsterData):
             switch monsterData.type {
             case .rat, .alamo:
                 let animationModel = monsterData.animations.first { $0.animationType == .dying }
                 let animationFrames = animationModel?.animationTextures ?? []
+                let waitBefore = SKAction.wait(forDuration: durationWaitBefore)
                 let animation = SKAction.animate(with: animationFrames, timePerFrame: 0.07)
-                return .init(self, animation)
+                return .init(self, SKAction.sequence([waitBefore, animation]))
             default:
                 return nil
             }

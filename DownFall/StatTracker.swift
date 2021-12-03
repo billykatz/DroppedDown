@@ -52,9 +52,6 @@ class RunStatTracker {
         case .collectItem(_, let item, _):
             self.addStat(Statistics(amount: item.amount, statType: .totalGemsCollected), amount: item.amount)
             self.addStat(Statistics(gemColor: item.color, amount: item.amount, statType: .gemsCollected), amount: item.amount)
-        case .monsterDies(_, let type):
-            self.addStat(Statistics(amount: 1, statType: .totalMonstersKilled), amount: 1)
-            self.addStat(Statistics(monsterType: type, amount: 1, statType: .monstersKilled), amount: 1)
         case .collectOffer(_, let offer, _, _):
             if offer.type == .lesserHeal {
                 self.addStat(Statistics(amount: 1, statType: .healthHealed), amount: 1)
@@ -92,6 +89,18 @@ class RunStatTracker {
             break
             
         }
+        
+        for tran in transformation {
+            if let monstersKilled = tran.monstersDies {
+                for monstersKill in monstersKilled {
+                    if case TileType.monster(let data) = monstersKill.tileType {
+                        self.addStat(Statistics(amount: 1, statType: .totalMonstersKilled), amount: 1)
+                        self.addStat(Statistics(monsterType: data.type, amount: 1, statType: .monstersKilled), amount: 1)
+                    }
+                }
+            }
+        }
+
     }
     
     private func addStat(_ stat: Statistics, amount: Int) {

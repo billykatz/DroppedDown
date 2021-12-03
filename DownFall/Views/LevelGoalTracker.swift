@@ -166,12 +166,20 @@ class LevelGoalTracker: LevelGoalTracking {
                     advanceGoal(for: type, units: count)
                 }
                 countPillars(in: trans.first?.endTiles ?? [])
-            case .monsterDies(_, let type):
-                advanceGoal(for: .monster(EntityModel.zeroedEntity(type: type)), units: 1)
             case .collectItem(_, let item, _):
                 advanceGoal(for: TileType.item(item), units: item.amount)
             default:
                 ()
+            }
+        }
+        
+        for tran in trans {
+            if let monstersKilled = tran.monstersDies {
+                for monstersKill in monstersKilled {
+                    if case TileType.monster(let data) = monstersKill.tileType {
+                        advanceGoal(for: .monster(EntityModel.zeroedEntity(type: data.type)), units: 1)
+                    }
+                }
             }
         }
     }

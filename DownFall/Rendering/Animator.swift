@@ -22,6 +22,10 @@ struct Animator {
         static let poisonDropSpriteSheetName = "poison-drop-sprite-sheet-8"
         static let runeDrillDownSpriteSheetName4 = "rune-drilldown-spriteSheet4"
     }
+
+    let foreground: SKNode?
+    let tileSize: CGFloat?
+    let typeAdvancesLevelGoal: ((TileType) -> CGPoint?)?
     
     lazy var numberTextures: [NumberTextures] = {
         var array: [NumberTextures] = []
@@ -34,22 +38,16 @@ struct Animator {
         return array
     }()
     
-    let foreground: SKNode?
-    let tileSize: CGFloat?
-    
     var tileCGSize: CGSize {
         return CGSize(widthHeight: tileSize ?? .zero)
     }
-    
-    
     
     var poisonDropAnimation: SKAction {
         let posionTexture = SpriteSheet(texture: SKTexture(imageNamed: Constants.poisonDropSpriteSheetName), rows: 1, columns: 8).animationFrames()
         let poisonAnimation = SKAction.animate(with: posionTexture, timePerFrame: 0.07)
         return poisonAnimation
     }
-    
-    
+
     var smokeAnimation: SKAction {
         let smokeTexture = SpriteSheet(texture: SKTexture(imageNamed: "smokeAnimation"), rows: 1, columns: 6).animationFrames()
         let smokeAnimation = SKAction.animate(with: smokeTexture, timePerFrame: 0.07)
@@ -62,12 +60,29 @@ struct Animator {
         return drillAnimation
     }
     
-    init(foreground: SKNode? = nil, tileSize: CGFloat? = nil) {
+    init(foreground: SKNode? = nil,
+         tileSize: CGFloat? = nil,
+         tileTypeAdvancesLevelGoal: ((TileType) -> CGPoint?)? = nil
+    ) {
         self.foreground = foreground
         self.tileSize = tileSize
+        self.typeAdvancesLevelGoal = tileTypeAdvancesLevelGoal
     }
     
-    
+    func createMonsterDyingAnimation(sprite: DFTileSpriteNode, durationWaitBefore: Double) -> SpriteAction {
+        var actions: [SKAction] = []
+        if let dying = sprite.dyingAnimation(durationWaitBefore: durationWaitBefore) {
+            actions.append(dying.action)
+        }
+        
+        if let targetPoint = typeAdvancesLevelGoal?(sprite.type) {
+            let animation = createAnimationCompletingGoals(sprite: sprite, to: targetPoint)
+            actions.append(animation.action)
+        }
+        
+        let seq = SKAction.sequence(actions)
+        return .init(sprite, seq)
+    }
     
     func playerCoord(_ sprites: [[DFTileSpriteNode]]) -> TileCoord? {
         return tileCoords(for: sprites, of: .player(.playerZero)).first
@@ -141,9 +156,9 @@ struct Animator {
                     spriteActions.append(screenShake)
                 }
                 
-                if case TileType.monster = sprites[target].type,
-                   let dying = sprites[target].dyingAnimation(durationWaitBefore: fireballDuration) {
-                    spriteActions.append(dying)
+                if case TileType.monster = sprites[target].type {
+                    let spriteAction = createMonsterDyingAnimation(sprite: sprites[target], durationWaitBefore: fireballDuration)
+                    spriteActions.append(spriteAction)   
                 }
                 
                 spriteActions.append(fireballAnimation)
@@ -344,18 +359,15 @@ struct Animator {
                 
             }
             
-//            let (fireballDuration, fireballAnimation) = createFireballAnimation(sprites: sprites, from: playerCoord, to: targetCoord, delayBeforeShoot: delayBeforeShoot, spriteForeground: spriteForeground, runeAnimation: runeAnimation)
-            
             if let screenShake = shakeScreen(duration: 0.25, ampX: 15, ampY: 15, delayBefore: fireballDuration) {
                 spriteActions.append(screenShake)
             }
             
-            if case TileType.monster = sprites[targetCoord].type,
-               let dying = sprites[targetCoord].dyingAnimation(durationWaitBefore: fireballDuration) {
-                spriteActions.append(dying)
+            if case TileType.monster = sprites[targetCoord].type {
+                let monsterSpriteAction = createMonsterDyingAnimation(sprite: sprites[targetCoord], durationWaitBefore: fireballDuration)
+                spriteActions.append(monsterSpriteAction)
             }
             
-//            spriteActions.append(fireballAnimation)
             
             delayBeforeShoot += 0.5
                         
@@ -398,9 +410,8 @@ struct Animator {
             // show the thing dying or exploding
             switch destroyedSprite.type {
             case .monster:
-                if let dying = destroyedSprite.dyingAnimation(durationWaitBefore: waitDuration) {
-                    spriteActions.append(dying)
-                }
+                let dying = createMonsterDyingAnimation(sprite: destroyedSprite, durationWaitBefore: waitDuration)
+                spriteActions.append(dying)
             case .rock:
                 if let crumble = destroyedSprite.crumble() {
                     spriteActions.append(crumble)
@@ -658,7 +669,10 @@ struct Animator {
         let scaleDown = SKAction.scale(by: scaleDownRange, duration: AnimationSettings.Board.workingTowardsGoal/4*3)
         scaleDown.timingMode = .easeIn
         
-        let moveToAction = SKAction.move(to: targetPosition, duration: Double.random(in: AnimationSettings.Board.workingTowardsGoal-0.15...AnimationSettings.Board.workingTowardsGoal+0.15))
+        let speed = CGFloat.random(in: 1000...1100)
+        let distance = targetPosition - sprite.position
+        let duration = distance.length / speed
+        let moveToAction = SKAction.move(to: targetPosition, duration: duration)
         moveToAction.timingMode = .easeIn
         
         let changeZPosition = SKAction.run {
@@ -1100,6 +1114,7 @@ struct Animator {
             
             let durationBeforeMonsterTakesDamage = waitBeforeAdditionalTargets + (durationForMovement/2)
             
+            // The mineral spirits' kills dont count for the player
             if let takeDamageAnimation = sprites[coord].dyingAnimation() {
                 let (sprite, animation) = takeDamageAnimation.tuple
                 let waitBefore = SKAction.wait(forDuration: durationBeforeMonsterTakesDamage)

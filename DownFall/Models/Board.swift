@@ -878,6 +878,7 @@ class Board: Equatable {
         var maxRightCoord: TileCoord = playerCoord
         var maxTopCoord: TileCoord = playerCoord
         var minBottomCoord: TileCoord = playerCoord
+        var monstersKilled: [MonsterDies] = []
         
         // gets the most left, right, top and bottom coords
         // also kills each monster
@@ -898,6 +899,7 @@ class Board: Equatable {
             }
             
             if case TileType.monster = tiles[tileCoord].type {
+                monstersKilled.append(.init(tileType: tiles[tileCoord].type, tileCoord: tileCoord))
                 newTiles[tileCoord.row][tileCoord.col] = .empty
             }
         }
@@ -908,7 +910,7 @@ class Board: Equatable {
             .filter { $0 != playerCoord }
             .map { TileTransformation($0, $0) }
         
-        let trans = Transformation(transformation: tileTransformations, inputType: input.type, endTiles: self.tiles)
+        let trans = Transformation(transformation: tileTransformations, inputType: input.type, endTiles: self.tiles, monstersDies: monstersKilled.isEmpty ? nil : monstersKilled)
         
         return [trans]
         
@@ -929,11 +931,16 @@ class Board: Equatable {
         // keep track of which tiles have been transformed upon
         // only destroy monsters and rocks
         var tilesToBeDestroyed: [TileCoord] = []
+        var monstersKilled: [MonsterDies] = []
         var stoppedByNonDestructible = false
         for coord in affectedTiles {
             if !stoppedByNonDestructible {
                 switch tiles[coord].type {
-                case .monster, .rock:
+                case .monster:
+                    monstersKilled.append(.init(tileType: tiles[coord].type, tileCoord: coord))
+                    tilesToBeDestroyed.append(coord)
+                    newTiles[coord.row][coord.col] = .empty
+                case .rock:
                     tilesToBeDestroyed.append(coord)
                     newTiles[coord.row][coord.col] = .empty
                 case .gem, .dynamite, .exit, .item, .pillar, .offer:
@@ -953,14 +960,11 @@ class Board: Equatable {
         // the player will fall from their original coord to the lowest coord of the tiles that were destroyed
         tileTransformation.append(TileTransformation(playerCoord, minCoord))
         
-        // we dont need to destroy this rock/monster any more when we go to remove and replace
-        tilesToBeDestroyed.removeFirst(where: { $0 == minCoord })
-        tilesToBeDestroyed.append(playerCoord)
         newTiles[playerCoord.row][playerCoord.col] = Tile(type: .empty)
         newTiles[minCoord.row][minCoord.col] = Tile(type: .player(playerData))
         self.tiles = newTiles
         
-        let trans = Transformation(transformation: tileTransformation, inputType: input.type, endTiles: tiles)
+        let trans = Transformation(transformation: tileTransformation, inputType: input.type, endTiles: tiles, monstersDies: monstersKilled.isEmpty ? nil : monstersKilled)
         
         
         // return an array of transformations
@@ -989,7 +993,7 @@ class Board: Equatable {
         return Transformation(transformation: [TileTransformation(.zero, .zero)], inputType: input.type, endTiles: newTiles)
     }
     
-    private func flameWall(tiles:  [[Tile]], targets: [TileCoord], input: Input) -> Transformation {
+    private func flameLine(tiles:  [[Tile]], targets: [TileCoord], input: Input) -> Transformation {
         var newTiles = tiles
         for monster in targets {
             if case TileType.monster(let data) = tiles[monster].type {
@@ -1045,7 +1049,7 @@ extension Board {
                     return nil
                 }
             }
-            return [flameWall(tiles: tiles, targets: monsterCoords, input: input)]
+            return [flameLine(tiles: tiles, targets: monsterCoords, input: input)]
         case .vortex:
             return [vortex(tiles: tiles, targets: targets, input: input)]
             
@@ -1182,6 +1186,7 @@ extension Board {
         return findNeighbors(in: self.tiles, of: coord, killMonsters: killMonsters)
     }
     
+    // MARK: Destroy all rocks of one color
     func massMine(tiles: [[Tile]], color: ShiftShaft_Color, input: Input) -> Transformation {
         var selectedCoords: [TileCoord] = []
         for row in 0..<tiles.count {
@@ -1262,6 +1267,7 @@ extension Board {
         
         // set the tiles to be removed as Empty placeholder
         var intermediateTiles = tiles
+        var monstersKilled: [MonsterDies] = []
         
         var finalSelectedTiles: [TileCoord] = []
         var removedTilesContainGem = false
@@ -1269,13 +1275,18 @@ extension Board {
             // turn the tile into a gem or into an empty
             if case TileType.rock(let color, let holdsGem, _) = tiles[coord].type, holdsGem {
                 intermediateTiles[coord.x][coord.y] = Tile(type: .emptyGem(color, amount: numberOfGemsForGroup(size: selectedTiles.count)))
-                finalSelectedTiles.append(coord)
                 removedTilesContainGem = holdsGem
-            } else {
+            } else if case TileType.monster = tiles[coord].type {
+                // remove the tile
                 intermediateTiles[coord.x][coord.y] = .empty
-                /// keep track of the emptied tiles
-                finalSelectedTiles.append(coord)
+                // keep track of monsters killed
+                monstersKilled.append(.init(tileType: tiles[coord].type, tileCoord: coord))
             }
+            else {
+                intermediateTiles[coord.x][coord.y] = .empty
+            }
+            
+            finalSelectedTiles.append(coord)
         }
         
         // decrement the health of each pillar
@@ -1317,7 +1328,8 @@ extension Board {
                               removed: selectedTilesTransformation,
                               newTiles: newTiles,
                               shiftDown: shiftDown,
-                              removedTilesContainGem: removedTilesContainGem
+                              removedTilesContainGem: removedTilesContainGem,
+                              monstersDies: monstersKilled.isEmpty ? nil : monstersKilled
         )
     }
     
@@ -1332,6 +1344,7 @@ extension Board {
         
         // set the tiles to be removed as Empty placeholder
         var intermediateTiles = tiles
+        var monstersKilled: [MonsterDies] = []
         var removedTilesContainGem = false
         for coord in selectedTiles {
             switch tiles[coord].type {
@@ -1353,7 +1366,11 @@ extension Board {
                 if fuse.count <= 0 {
                     intermediateTiles[coord.x][coord.y] = Tile.empty
                 }
-            case .monster, .offer, .gem, .empty:
+            case .monster:
+                monstersKilled.append(.init(tileType: tiles[coord].type, tileCoord: coord))
+                intermediateTiles[coord.x][coord.y] = Tile.empty
+                
+            case .offer, .gem, .empty:
                 intermediateTiles[coord.x][coord.y] = Tile.empty
             default:
                 preconditionFailure("We should only use this for rocks, pillars and monsters. Dynamite adds a few more items to the list including gems.")
@@ -1385,7 +1402,8 @@ extension Board {
                               removed: selectedTilesTransformation,
                               newTiles: newTiles,
                               shiftDown: shiftDown,
-                              removedTilesContainGem: removedTilesContainGem
+                              removedTilesContainGem: removedTilesContainGem,
+                              monstersDies: monstersKilled.isEmpty ? nil : monstersKilled
         )
     }
     

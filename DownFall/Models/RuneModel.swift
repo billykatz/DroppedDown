@@ -369,7 +369,7 @@ struct Rune: Hashable, Codable {
                 cooldown: 25,
                 rechargeType: [TileType.rock(color: .red, holdsGem: false, groupCount: 0)],
                 rechargeMinimum: 1,
-                rechargeCurrent: isCharged ? 25 : 0,
+                rechargeCurrent: 25,
                 progressColor: .red,
                 maxDistanceBetweenTargets: CGFloat.greatestFiniteMagnitude,
                 animationTextureName: "flameWallSpriteSheet",

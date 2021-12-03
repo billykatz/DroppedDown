@@ -100,7 +100,7 @@ struct Profile: Codable, Equatable {
                                     Pickaxe(runeSlots: 4,
                                                   runes: [
                                                     .rune(for: .fieryRage),
-                                                    .rune(for: .vortex),
+                                                    .rune(for: .flameColumn),
                                                     .rune(for: .fireball),
                                                     .rune(for: .rainEmbers),
                                                   ]

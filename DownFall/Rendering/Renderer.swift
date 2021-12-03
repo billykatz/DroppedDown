@@ -33,11 +33,6 @@ class Renderer: SKSpriteNode {
     private var spriteForeground = SKNode()
     private var menuForeground = SKNode()
     
-    //Animator
-    private lazy var animator = {
-        return Animator(foreground: foreground, tileSize: tileSize)
-    }()
-    
     // Dialog for Tutorial and FTUE
     private var dialogueOverlay: DialogueOverlay?
     
@@ -55,7 +50,7 @@ class Renderer: SKSpriteNode {
         })
     }()
     
-    /// LAZY
+    /// MARK: - LAZY
     private lazy var safeArea: SKSpriteNode = {
         //create safe area
         let safeArea = SKSpriteNode(color: .clear, size: CGSize(width: playableRect.width, height: 75.0))
@@ -92,6 +87,19 @@ class Renderer: SKSpriteNode {
                                                            translatedToBounds: true)
         levelGoalView.zPosition = Precedence.flying.rawValue
         return levelGoalView
+    }()
+    
+    //Animator
+    private lazy var animator = {
+        return Animator(foreground: foreground, tileSize: tileSize) { [weak self] tileType in
+            guard let self = self else { return nil }
+            if let goalIndex = self.levelGoalTracker.typeAdvancesGoal(type: tileType) {
+                let goalOrigin = self.levelGoalView.originForGoalView(index: goalIndex)
+                let targetPosition = self.levelGoalView.convert(goalOrigin, to: self.spriteForeground)
+                return targetPosition
+            }
+            return nil
+        }
     }()
     
     required init?(coder aDecoder: NSCoder) {
@@ -821,8 +829,6 @@ extension Renderer {
                     
                     removedAnimations.append(animation)
                     
-                    
-                    
                 }
                 /// crumble should happen when the rocks are not needed for the goal.
                 else if let crumble = sprites[tileTrans.end.x][tileTrans.end.y].crumble() {
@@ -835,25 +841,14 @@ extension Renderer {
             }
             
             // MARK: Monster died
-            else if case InputType.monsterDies? = transformation.inputType {
-                let tileType = sprites[tileTrans.end.x][tileTrans.end.y].type
+            else if let monstersKilled = transformation.monstersDies,
+                    monstersKilled.contains(where: { $0.tileCoord == tileTrans.initial } ) {
+                sprites[tileTrans.end.x][tileTrans.end.y].zPosition = 100_000
                 
-                // If the monster is the type that advances the level goal
-                if let goalIndex = levelGoalTracker.typeAdvancesGoal(type: tileType) {
-                    let goalOrigin = levelGoalView.originForGoalView(index: goalIndex)
-                    let targetPosition = self.levelGoalView.convert(goalOrigin, to: self.spriteForeground)
-                    
-                    sprites[tileTrans.end.x][tileTrans.end.y].zPosition = 100_000
-                    
-                    let animation = animator.createAnimationCompletingGoals(sprite: sprites[tileTrans.end.x][tileTrans.end.y], to: targetPosition)
-                    
-                    removedAnimations.append(animation)
-                    
-                } else {
-                    // TODO: This is where we want to play the dying animation
-                    // https://trello.com/c/2zeYHAYW
-                }
+                let animation = animator.createMonsterDyingAnimation(sprite: sprites[tileTrans.end.x][tileTrans.end.y], durationWaitBefore: 0.0)
                 
+                removedAnimations.append(animation)
+            
             }
             
             // MARK: Decremt the dynamite fuses and explode

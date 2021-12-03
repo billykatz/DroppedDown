@@ -305,6 +305,7 @@ extension GameScene {
         
         // set the swipe for the duration of this swipe gesture
         let touchIsOnRight = (view?.isOnRight(currentPosition) ?? false)
+        let touchIsOnTop = (view?.isOnTop(currentPosition) ?? false)
         
         if self.swipeDirection == nil {
             let swipeDirection = SwipeDirection(from: vector)
@@ -313,7 +314,7 @@ extension GameScene {
             self.swipeDirection = swipeDirection
             
             /// deteremine which clock rotation to apply
-            let rotateDir = RotateDirection(from: swipeDirection, isOnRight: touchIsOnRight)
+            let rotateDir = RotateDirection(from: swipeDirection, isOnRight: touchIsOnRight, isOnTop: touchIsOnTop)
             
             /// call functions that send rotate input
             switch rotateDir {
@@ -329,10 +330,23 @@ extension GameScene {
             guard let swipeDirection = swipeDirection else { return }
             var distance: CGFloat
             switch swipeDirection {
-            case .up, .down:
-                distance = vector.dy
+            case .up:
+                let dx = touchIsOnRight ? -vector.dx : vector.dx
+                distance = vector.dy + dx
+                distance *= (touchIsOnRight ? 1 : -1)
+            case .down:
+                let dx = touchIsOnRight ? vector.dx : -vector.dx
+                distance = vector.dy + dx
+                distance *= (touchIsOnRight ? 1 : -1)
+            case .left:
+                let dy = touchIsOnTop ? vector.dy : -vector.dy
+                distance = vector.dx + dy
+                distance *= (touchIsOnTop ? -1 : 1)
+            case .right:
+                let dy = touchIsOnTop ? -vector.dy : vector.dy
+                distance = vector.dx + dy
+                distance *= (touchIsOnTop ? -1 : 1)
             }
-            distance *= (touchIsOnRight ? 1 : -1)
             self.rotatePreview?.touchesMoved(distance: distance)
         }
         

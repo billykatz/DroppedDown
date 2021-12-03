@@ -30,7 +30,16 @@ extension SKView {
         if UIDevice.current.userInterfaceIdiom == .pad {
             return point.x > 0
         } else {
-            return point.x > (frame.width)/2
+            return point.x > 0//(frame.width)/2
+        }
+    }
+    
+    func isOnTop(_ point: CGPoint?) -> Bool {
+        guard let point = point else { return false }
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            return point.y > 0
+        } else {
+            return point.y > 0// (frame.height)/2
         }
     }
 

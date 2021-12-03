@@ -11,6 +11,10 @@ import SpriteKit
 
 class Renderer: SKSpriteNode {
     
+    struct Constants {
+        static let rotateVisualCueSize: CGSize = .init(width: 850, height: 170)
+    }
+    
     /// PUBLIC
     public var backpackView: BackpackView
     
@@ -41,6 +45,9 @@ class Renderer: SKSpriteNode {
     
     let gameRecapView: GameRecapView
     let runStatTracker: RunStatTracker
+    
+    // Rotate Visual Cue
+    let rotateVisualCue: SKSpriteNode
     
     // Debug View for Boss
     private var bossDebugView: BossDebugView
@@ -146,6 +153,11 @@ class Renderer: SKSpriteNode {
         self.gameRecapView = GameRecapView(playableRect: playableRect)
         self.runStatTracker = runStatTracker
         
+        // rotate visual cue
+        let rotateVisualCueSprite = SKSpriteNode(texture: SKTexture(imageNamed: "rotate-runes-decorative"), size: Constants.rotateVisualCueSize)
+        self.rotateVisualCue = rotateVisualCueSprite
+        rotateVisualCue.position = CGPoint.position(rotateVisualCue.frame, inside: playableRect, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: 400)
+        
         super.init(texture: nil, color: .clear, size: CGSize.zero)
         
         //        let testBackground = SKSpriteNode(texture: SKTexture(imageNamed: "test-background"), size: CGSize(width: playableRect.size.width, height: playableRect.size.width*2.1))
@@ -166,7 +178,7 @@ class Renderer: SKSpriteNode {
         foreground.position = playableRect.center
         menuForeground.position = playableRect.center
         
-        [spriteForeground, safeArea, hud, levelGoalView, backpackView, bossView].forEach { foreground.addChild($0) }
+        [spriteForeground, safeArea, hud, levelGoalView, backpackView, bossView, self.rotateVisualCue].forEach { foreground.addChild($0) }
         //        [spriteForeground, safeArea, hud, levelGoalView, backpackView, bossDebugView, bossView].forEach { foreground.addChild($0) }
         
         // Register for Dispatch

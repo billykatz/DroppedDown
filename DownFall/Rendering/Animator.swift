@@ -137,12 +137,12 @@ struct Animator {
             for target in affectedTiles {
                 let (fireballDuration, fireballAnimation) = createFireballAnimation(sprites: sprites, from: pp, to: target, delayBeforeShoot: delay, spriteForeground: spriteForeground, runeAnimation: runeAnimation)
                 
-                if let screenShake = shakeScreen(duration: 0.25, ampX: 15, ampY: 15, delayBefore: fireballDuration + delay) {
+                if let screenShake = shakeScreen(duration: 0.25, ampX: 15, ampY: 15, delayBefore: fireballDuration) {
                     spriteActions.append(screenShake)
                 }
                 
                 if case TileType.monster = sprites[target].type,
-                   let dying = sprites[target].dyingAnimation(durationWaitBefore: fireballDuration + delay) {
+                   let dying = sprites[target].dyingAnimation(durationWaitBefore: fireballDuration) {
                     spriteActions.append(dying)
                 }
                 
@@ -279,23 +279,26 @@ struct Animator {
         moveAction.timingMode = .easeIn
         let combinedAction = SKAction.group([fireballAction, moveAction])
         let removeAction = SKAction.removeFromParent()
+        
             
         let sequencedActions = SKAction.sequence([
             rotateAction,
             waitBeforeShoot,
             combinedAction,
             smokeAnimation,
-            removeAction])
+            removeAction
+        ])
+        
         
         let fireballSpriteContainer = SKSpriteNode(color: .clear,
-                                                   size: tileCGSize)
+                                                   size: tileCGSize.scale(by: 2))
             
             
-            //start the fireball from the player
+        //start the fireball from the player
         fireballSpriteContainer.position = startSprite.position
         fireballSpriteContainer.zPosition = Precedence.flying.rawValue
         spriteForeground.addChild(fireballSpriteContainer)
-        return (animationDuration: duration, spriteAction: SpriteAction(sprite: fireballSpriteContainer, action: sequencedActions))
+        return (animationDuration: duration + delayBeforeShoot, spriteAction: SpriteAction(sprite: fireballSpriteContainer, action: sequencedActions))
 
     }
     
@@ -318,18 +321,40 @@ struct Animator {
         for tileTran in tileTrans {
             let targetCoord = tileTran.initial
             
-            let (fireballDuration, fireballAnimation) = createFireballAnimation(sprites: sprites, from: playerCoord, to: targetCoord, delayBeforeShoot: delayBeforeShoot, spriteForeground: spriteForeground, runeAnimation: runeAnimation)
+            // lets create some trailing ghost
+            var fireballDuration: Double = 0.0
+
             
-            if let screenShake = shakeScreen(duration: 0.25, ampX: 15, ampY: 15, delayBefore: fireballDuration + delayBeforeShoot) {
+            var zPosition = Precedence.flying.rawValue
+            var alpha = 1.0
+            var innerDelayBeforeShoot = 0.0
+            for _ in 0..<5 {
+                
+                let (innerFireballDuration, fireballAnimation) = createFireballAnimation(sprites: sprites, from: playerCoord, to: targetCoord, delayBeforeShoot: delayBeforeShoot + innerDelayBeforeShoot, spriteForeground: spriteForeground, runeAnimation: runeAnimation)
+
+                fireballAnimation.sprite.alpha = alpha
+                spriteActions.append(fireballAnimation)
+                
+                zPosition -= 50
+                alpha -= 0.15
+                innerDelayBeforeShoot += 0.02
+                
+                fireballDuration = innerFireballDuration
+                
+            }
+            
+//            let (fireballDuration, fireballAnimation) = createFireballAnimation(sprites: sprites, from: playerCoord, to: targetCoord, delayBeforeShoot: delayBeforeShoot, spriteForeground: spriteForeground, runeAnimation: runeAnimation)
+            
+            if let screenShake = shakeScreen(duration: 0.25, ampX: 15, ampY: 15, delayBefore: fireballDuration) {
                 spriteActions.append(screenShake)
             }
             
             if case TileType.monster = sprites[targetCoord].type,
-               let dying = sprites[targetCoord].dyingAnimation(durationWaitBefore: fireballDuration + delayBeforeShoot) {
+               let dying = sprites[targetCoord].dyingAnimation(durationWaitBefore: fireballDuration) {
                 spriteActions.append(dying)
             }
             
-            spriteActions.append(fireballAnimation)
+//            spriteActions.append(fireballAnimation)
             
             delayBeforeShoot += 0.5
                         

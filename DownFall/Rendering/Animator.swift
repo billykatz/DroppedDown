@@ -88,12 +88,12 @@ struct Animator {
         return tileCoords(for: sprites, of: .player(.playerZero)).first
     }
     
-    func shakeScreen(duration: CGFloat = 0.5, ampX: Int = 10, ampY: Int = 10, delayBefore: Double = 0) -> SpriteAction? {
+    func shakeScreen(duration: CGFloat = 0.5, ampX: Int = 10, ampY: Int = 10, delayBefore: Double = 0, timingMode: SKActionTimingMode = .easeIn) -> SpriteAction? {
         guard let foreground = foreground else { return nil }
         let action = SKAction.shake(duration: duration, amplitudeX: ampX, amplitudeY: ampY)
         let delay = SKAction.wait(forDuration: delayBefore)
         
-        return .init(foreground, .sequence(delay, action, curve: .easeIn))
+        return .init(foreground, .sequence(delay, action, curve: timingMode))
     }
     
     func shakeNode(node: SKNode, duration: CGFloat = 0.5, ampX: Int = 10, ampY: Int = 10, delayBefore: Double = 0, timingMode: SKActionTimingMode = .easeIn) -> SpriteAction {

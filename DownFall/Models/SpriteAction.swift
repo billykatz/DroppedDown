@@ -30,4 +30,8 @@ struct SpriteAction: Hashable {
         self.sprite = sprite
         self.action = action
     }
+    
+    func run() {
+        sprite.run(action)
+    }
 }

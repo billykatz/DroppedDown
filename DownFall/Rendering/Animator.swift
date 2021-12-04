@@ -70,7 +70,7 @@ struct Animator {
     }
     
     func createMonsterDyingAnimation(sprite: DFTileSpriteNode, durationWaitBefore: Double) -> SpriteAction {
-        var actions: [SKAction] = []
+        var actions: [SKAction] = [SKAction.wait(forDuration: 0.0)]
         if let dying = sprite.dyingAnimation(durationWaitBefore: durationWaitBefore) {
             actions.append(dying.action)
         }

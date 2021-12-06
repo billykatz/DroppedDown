@@ -11,6 +11,7 @@ import SpriteKit
 struct SpriteAction: Hashable {
     let sprite: SKNode
     let action: SKAction
+    var duration: Double?
     
     var tuple: (SKNode, SKAction) {
         return (sprite, action)

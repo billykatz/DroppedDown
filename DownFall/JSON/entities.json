@@ -213,6 +213,11 @@
                     "animationType": "idle"
                 },
                 {
+                    "animationFilename": "batDying",
+                    "numberOfFrames": 8,
+                    "animationType": "dying"
+                },
+                {
                     "animationFilename": "batProjectile",
                     "numberOfFrames": 4,
                     "animationType": "projectileStart"

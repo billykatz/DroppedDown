@@ -857,7 +857,20 @@ extension Renderer {
                     monstersKilled.contains(where: { $0.tileCoord == tileTrans.initial } ) {
                 sprites[tileTrans.end.x][tileTrans.end.y].zPosition = 100_000
                 
-                let animation = animator.createMonsterDyingAnimation(sprite: sprites[tileTrans.end.x][tileTrans.end.y], durationWaitBefore: 0.0)
+                var shouldSkipDyingAnimation = false
+                if case InputType.itemUsed(let rune, _)? = transformation.inputType {
+                    switch rune.type {
+                        // these aniamtions take care of the death animation themselves
+                    case .fireball, .rainEmbers, .fieryRage, .drillDown:
+                        shouldSkipDyingAnimation = true
+                    default:
+                        break
+                    }
+                }
+                
+                let animation = animator.createMonsterDyingAnimation(sprite: sprites[tileTrans.end.x][tileTrans.end.y], durationWaitBefore: 0.0, skipDyingAnimation: shouldSkipDyingAnimation)
+                
+                additionalWaiting += (animation.duration ?? 0.0) * 0.55 // dont wait for the entire animation
                 
                 removedAnimations.append(animation)
             

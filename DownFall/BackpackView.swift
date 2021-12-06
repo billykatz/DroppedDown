@@ -183,7 +183,7 @@ class BackpackView: SKSpriteNode {
         runeContainer.position = CGPoint.position(runeContainer.frame, inside: playableRect, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: Style.Padding.most*3)
         
         /// position it high up to catch user interaction
-        runeContainer.zPosition = 10_000
+        runeContainer.zPosition = 10_000_000
         
         /// remove the old rune container
         self.removeChild(with: "runeContainer")
@@ -226,11 +226,17 @@ extension BackpackView {
         guard let touch = touches.first else { return }
         let position = touch.location(in: self)
         
+        var touchWasHandled = false
         for node in self.nodes(at: position) {
             if node.name == targetingAreaName && viewModel.rune != nil && !background.contains(position) {
                 let tileCoord = translatePoint(position)
                 viewModel.didTarget(tileCoord)
+                touchWasHandled = true
             }
+        }
+        
+        if !touchWasHandled {
+//            runeInventoryContainer?.touchesEnded(touches, with: event)
         }
     }
 }

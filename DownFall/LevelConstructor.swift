@@ -509,7 +509,7 @@ struct LevelConstructor {
         case 0, 1:
             let ratRange = RangeModel(lower: 0, upper: 50)
             let alamoRange = ratRange.next(50)
-            return [.rat: ratRange, .alamo: alamoRange]
+            return [.rat: ratRange, .bat: alamoRange]
         case 2:
             let ratRange = RangeModel(lower: 0, upper: 40)
             let alamoRange = ratRange.next(40)

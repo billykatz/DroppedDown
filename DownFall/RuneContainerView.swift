@@ -178,4 +178,10 @@ class RuneContainerView: SKSpriteNode {
 
         }
     }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        for runeSlotView in runeSlotViews {
+            runeSlotView.touchesEnded(touches, with: event)
+        }
+    }
 }

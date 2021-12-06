@@ -69,10 +69,13 @@ struct Animator {
         self.typeAdvancesLevelGoal = tileTypeAdvancesLevelGoal
     }
     
-    func createMonsterDyingAnimation(sprite: DFTileSpriteNode, durationWaitBefore: Double) -> SpriteAction {
+    func createMonsterDyingAnimation(sprite: DFTileSpriteNode, durationWaitBefore: Double, skipDyingAnimation: Bool = false) -> SpriteAction {
         var actions: [SKAction] = [SKAction.wait(forDuration: 0.0)]
-        if let dying = sprite.dyingAnimation(durationWaitBefore: durationWaitBefore) {
+        var durationOfAnimation = 0.0
+        if !skipDyingAnimation,
+            let dying = sprite.dyingAnimation(durationWaitBefore: durationWaitBefore) {
             actions.append(dying.action)
+            durationOfAnimation += dying.duration ?? 0.0
         }
         
         if let targetPoint = typeAdvancesLevelGoal?(sprite.type) {
@@ -80,8 +83,16 @@ struct Animator {
             actions.append(animation.action)
         }
         
+        
+        actions.append(.wait(forDuration: 0.1))
+        
         let seq = SKAction.sequence(actions)
-        return .init(sprite, seq)
+        var spriteAction = SpriteAction.init(sprite, seq)
+        
+        // does not inclue the tiem it takes to fly to the goal
+        spriteAction.duration = durationWaitBefore + durationOfAnimation
+        
+        return spriteAction
     }
     
     func playerCoord(_ sprites: [[DFTileSpriteNode]]) -> TileCoord? {
@@ -313,7 +324,7 @@ struct Animator {
         fireballSpriteContainer.position = startSprite.position
         fireballSpriteContainer.zPosition = Precedence.flying.rawValue
         spriteForeground.addChild(fireballSpriteContainer)
-        return (animationDuration: duration + delayBeforeShoot, spriteAction: SpriteAction(sprite: fireballSpriteContainer, action: sequencedActions))
+        return (animationDuration: duration + delayBeforeShoot + 0.14, spriteAction: SpriteAction(sprite: fireballSpriteContainer, action: sequencedActions)) // a lil extra time for the smoke animation
 
     }
     

@@ -343,12 +343,14 @@ class DFTileSpriteNode: SKSpriteNode {
         switch self.type {
         case .monster(let monsterData):
             switch monsterData.type {
-            case .rat, .alamo:
+            case .rat, .alamo, .bat:
                 let animationModel = monsterData.animations.first { $0.animationType == .dying }
                 let animationFrames = animationModel?.animationTextures ?? []
                 let waitBefore = SKAction.wait(forDuration: durationWaitBefore)
                 let animation = SKAction.animate(with: animationFrames, timePerFrame: 0.07)
-                return .init(self, SKAction.sequence([waitBefore, animation]))
+                var spriteAction: SpriteAction = .init(self, SKAction.sequence([waitBefore, animation]))
+                spriteAction.duration = Double(animationFrames.count) * 0.07
+                return spriteAction
             default:
                 return nil
             }

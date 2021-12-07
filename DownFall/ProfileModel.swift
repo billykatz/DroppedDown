@@ -101,7 +101,7 @@ struct Profile: Codable, Equatable {
                                                   runes: [
                                                     .rune(for: .getSwifty),
                                                     .rune(for: .teleportation),
-                                                    .rune(for: .fireball),
+                                                    .rune(for: .moveEarth),
                                                     .rune(for: .rainEmbers),
                                                   ]
                                            )

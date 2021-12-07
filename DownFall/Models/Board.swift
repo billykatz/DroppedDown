@@ -851,6 +851,8 @@ extension Board {
         case .teleportation:
             return [teleportation(tiles: tiles, allTargets: allTargets, input: input)]
             
+        case .moveEarth:
+            return [moveEarth(tiles: tiles, allTargets: allTargets, input: input)]
             
             
         default: fatalError()
@@ -1081,6 +1083,34 @@ extension Board {
         
         self.tiles = newTiles
         return Transformation(transformation: tileTrans, inputType: input.type, endTiles: self.tiles)
+    }
+    
+    private func moveEarth(tiles: [[Tile]], allTargets: AllTarget, input: Input) -> Transformation {
+        guard allTargets.allTargetCoords.count == 2,
+              let firstRow = allTargets.allTargetCoords.first,
+              let secondRow = allTargets.allTargetCoords.last else {
+                  return Transformation(transformation: nil, inputType: input.type, endTiles: tiles)
+              }
+        var newTiles = tiles
+        var tileTransformations: [TileTransformation] = []
+        
+        let tempRow = tiles[firstRow.x]
+        
+        // move all tiles from the second row to the first row
+        for (column, tile) in tiles[secondRow.row].enumerated() {
+            newTiles[firstRow.x][column] = tile
+            tileTransformations.append(.init(.init(secondRow.row, column), .init(firstRow.row, column)))
+        }
+        
+        // move the tempTiles from the firstrow to the second row
+        for (column, tile) in tempRow.enumerated() {
+            newTiles[secondRow.x][column] = tile
+            tileTransformations.append(.init(.init(firstRow.row, column), .init(secondRow.row, column)))
+        }
+        
+        self.tiles = newTiles
+        
+        return Transformation(transformation: tileTransformations, inputType: input.type, endTiles: self.tiles)
     }
 }
 

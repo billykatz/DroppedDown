@@ -51,6 +51,7 @@ struct Animator {
     var smokeAnimation: SKAction {
         let smokeTexture = SpriteSheet(texture: SKTexture(imageNamed: "smokeAnimation"), rows: 1, columns: 6).animationFrames()
         let smokeAnimation = SKAction.animate(with: smokeTexture, timePerFrame: 0.07)
+        smokeAnimation.duration = 6 * 0.07
         return smokeAnimation
     }
     
@@ -67,6 +68,28 @@ struct Animator {
         self.foreground = foreground
         self.tileSize = tileSize
         self.typeAdvancesLevelGoal = tileTypeAdvancesLevelGoal
+    }
+    
+    func smokeAnimation(addToSprite: SKSpriteNode, scaleBy: CGFloat, durationBefore: Double) -> [SpriteAction] {
+        let emptySprite = SKSpriteNode(color: .clear, size: tileCGSize)
+        let smokeAnimation = smokeAnimation
+        let scale = SKAction.scale(by: scaleBy, duration: 0.0)
+        let wait = SKAction.wait(forDuration: durationBefore)
+        
+        let addTo = SKAction.run {
+            emptySprite.zPosition = -10
+            addToSprite.addChild(emptySprite)
+        }
+        
+        let remove = SKAction.run {
+            emptySprite.removeFromParent()
+        }
+        
+        let mainSpriteAction = SKAction.sequence(wait, addTo)
+        let emptySpriteAction = SKAction.sequence(scale, smokeAnimation, remove)
+        return [.init(addToSprite, mainSpriteAction),
+                .init(emptySprite, emptySpriteAction)]
+        
     }
     
     func createMonsterDyingAnimation(sprite: DFTileSpriteNode, durationWaitBefore: Double, skipDyingAnimation: Bool = false) -> SpriteAction {
@@ -97,6 +120,10 @@ struct Animator {
     
     func playerCoord(_ sprites: [[DFTileSpriteNode]]) -> TileCoord? {
         return tileCoords(for: sprites, of: .player(.playerZero)).first
+    }
+    
+    func shakeScreen(duration: CGFloat = 0.5, amp: Int = 10, delayBefore: Double = 0, timingMode: SKActionTimingMode = .easeIn) -> SpriteAction? {
+        return shakeScreen(duration: duration, ampX: amp, ampY: amp, delayBefore: delayBefore, timingMode: timingMode)
     }
     
     func shakeScreen(duration: CGFloat = 0.5, ampX: Int = 10, ampY: Int = 10, delayBefore: Double = 0, timingMode: SKActionTimingMode = .easeIn) -> SpriteAction? {
@@ -268,8 +295,143 @@ struct Animator {
             }
             animateFieryRage(spriteForeground: spriteForeground, sprites: sprites, transformation: trans, runeAnimation: runeAnimation, completion: completion)
             
+        case .moveEarth:
+            guard let trans = transformations.first,
+                  let tileTrans = trans.tileTransformation else {
+                completion()
+                return
+            }
+            
+            animateMoveEarth(sprites: sprites, tileTransformation: tileTrans, completion: completion)
+            
+            return
+            
         default: break
         }
+    }
+    
+    func animateMoveEarth(sprites: [[DFTileSpriteNode]], tileTransformation: [TileTransformation], completion: @escaping () -> Void) {
+        
+        var spriteActions: [SpriteAction] = []
+        
+        let liftUpDuration = 0.25
+        let moveAwayDuration = 0.33
+        let pausedBetweenActions = 0.25
+        
+        let scaleUpBy: CGFloat = 1.33
+        let scaleDownBy: CGFloat = 1/scaleUpBy
+        let smokeScaleBy: CGFloat = 2.0
+        
+        let shakeDuration = 0.1
+        let shakeAmp = 100
+        
+        // calculate wait duration before screen shake and smoke
+        let timeBeforeFirstScreenShake = liftUpDuration + pausedBetweenActions + moveAwayDuration + pausedBetweenActions + liftUpDuration - shakeDuration
+        let timeBeforeSecondScreenShake = liftUpDuration + pausedBetweenActions + moveAwayDuration + pausedBetweenActions + liftUpDuration + moveAwayDuration + pausedBetweenActions + liftUpDuration - shakeDuration
+        
+        let timeBeforeFirstSmoke = liftUpDuration + pausedBetweenActions + moveAwayDuration + pausedBetweenActions + liftUpDuration - shakeDuration*2
+        let timeBeforeSecondSmoke = liftUpDuration + pausedBetweenActions + moveAwayDuration + pausedBetweenActions + liftUpDuration + moveAwayDuration + pausedBetweenActions + liftUpDuration - shakeDuration*2
+        
+        var positionDictionary: [TileCoord: CGPoint] = [:]
+        let maxRow: Int = tileTransformation.max(by: {
+            $0.initial.row < $1.initial.row
+        })?.initial.row ?? 0
+        
+        // lift up both rows
+        for tileTransformation in tileTransformation {
+            let liftUp = SKAction.scale(by: scaleUpBy, duration: liftUpDuration)
+            liftUp.timingMode = .easeOut
+            
+            
+            let sprite = sprites[tileTransformation.initial]
+            
+            spriteActions.append(.init(sprite, liftUp))
+            
+            // save this position for later
+            positionDictionary[tileTransformation.initial] = sprite.position
+        }
+        
+        // move them away from eachother to make space
+        for tileTransformation in tileTransformation {
+            var actions: [SKAction] = []
+            
+            var moveToPoint: CGPoint = .zero
+            if tileTransformation.initial.row == maxRow {
+                // move up and away from the row
+                let position = positionDictionary[tileTransformation.initial]
+                moveToPoint = CGPoint(x: position?.x ?? 0, y: (position?.y ?? 0) + 300.0)
+            } else {
+                // move to the point
+                let position = positionDictionary[tileTransformation.end]
+                moveToPoint = CGPoint(x: position?.x ?? 0, y: position?.y ?? 0)
+            }
+            
+            let waitDuration = liftUpDuration + pausedBetweenActions
+            let waitAction = SKAction.wait(forDuration: waitDuration)
+            let moveAway = SKAction.move(to: moveToPoint, duration: moveAwayDuration)
+            moveAway.timingMode = .easeOut
+            
+            actions.append(waitAction)
+            actions.append(moveAway)
+            
+            
+            // grab this sprite so we can add the smoke animation
+            let sprite = sprites[tileTransformation.initial]
+            
+            // move one down into the space (then shake screen)
+            // move the other down into the space (then shake screen)
+            let smokeAction: [SpriteAction]
+            if tileTransformation.initial.row == maxRow {
+                // move down to where it should be
+                let position = positionDictionary[tileTransformation.end]
+                let moveTo = CGPoint(x: position?.x ?? 0, y: position?.y ?? 0)
+                
+                let additionalWaitAction = SKAction.wait(forDuration: 2*pausedBetweenActions)
+                let pauseBetweenMoveAndScale = SKAction.wait(forDuration: pausedBetweenActions)
+                let moveAction = SKAction.move(to: moveTo, duration: moveAwayDuration)
+                moveAction.timingMode = .easeOut
+                let scaleDown = SKAction.scale(by: scaleDownBy, duration: liftUpDuration)
+                scaleDown.timingMode = .easeOut
+                
+                actions.append(contentsOf: [additionalWaitAction, moveAction, pauseBetweenMoveAndScale, scaleDown])
+                
+                
+                smokeAction = smokeAnimation(addToSprite: sprite, scaleBy: smokeScaleBy, durationBefore: timeBeforeSecondSmoke)
+                
+            } else {
+                // move down into the board
+                let additionalWaitAction = SKAction.wait(forDuration: pausedBetweenActions)
+                let scaleDown = SKAction.scale(by: scaleDownBy, duration: liftUpDuration)
+                scaleDown.timingMode = .easeOut
+                
+                actions.append(contentsOf: [additionalWaitAction, scaleDown])
+                
+                smokeAction = smokeAnimation(addToSprite: sprite, scaleBy: smokeScaleBy, durationBefore: timeBeforeFirstSmoke)
+                
+            }
+            spriteActions.append(.init(sprite, SKAction.sequence(actions)))
+            spriteActions.append(contentsOf: smokeAction)
+        }
+        
+        
+        // time before the first screen shake
+        if let firstShake = shakeScreen(duration: shakeDuration, amp: shakeAmp, delayBefore: timeBeforeFirstScreenShake, timingMode: .linear) {
+            spriteActions.append(firstShake)
+            
+        }
+        
+        // time before second
+        if let secondShake = shakeScreen(duration: shakeDuration, amp: shakeAmp, delayBefore: timeBeforeSecondScreenShake, timingMode: .linear) {
+            spriteActions.append(secondShake)
+        }
+        
+        // shake the entire board
+//        for sprite in sprites.flatMap({ $0 }) {
+//            let shake = shakeNode(node: sprite, duration: timeBeforeSecondScreenShake, ampX: 5, ampY: 5, delayBefore: 0.0, timingMode: .linear)
+//            spriteActions.append(shake)
+//        }
+        
+        animate(spriteActions, completion: completion)
     }
     
     func createFireballAnimation(sprites: [[DFTileSpriteNode]], from startcoord: TileCoord, to targetCoord: TileCoord, delayBeforeShoot: Double, spriteForeground: SKNode, runeAnimation: SpriteSheet) -> (animationDuration: Double, spriteAction: SpriteAction) {

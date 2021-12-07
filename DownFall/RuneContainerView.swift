@@ -114,6 +114,8 @@ class RuneContainerView: SKSpriteNode {
                                                                           ),
                                             size: size)
         runeDetailView.name = Constants.runeDetailViewName
+        runeDetailView.isUserInteractionEnabled = true
+//        runeDetailView.zPosition = 100_000_000
         addChild(runeDetailView)
         self.runeDetailView = runeDetailView
     }

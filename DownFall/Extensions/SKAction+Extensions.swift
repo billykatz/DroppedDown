@@ -11,7 +11,7 @@ import SpriteKit
 extension SKAction {
     static let zero = SKAction.wait(forDuration: 0.0)
     
-    static func sequence(_ seq: SKAction..., curve: SKActionTimingMode) -> SKAction {
+    static func sequence(_ seq: SKAction..., curve: SKActionTimingMode = .linear) -> SKAction {
         let action = SKAction.sequence(seq)
         action.timingMode = curve
         return action

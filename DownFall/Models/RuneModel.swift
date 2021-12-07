@@ -10,6 +10,24 @@ import Foundation
 import CoreGraphics
 import SpriteKit
 
+extension TileType {
+    static var runeAllCases: [TileType] = [.rock(color: .blue, holdsGem: false, groupCount: 0),
+                                           .rock(color: .red, holdsGem: false, groupCount: 0),
+                                           .rock(color: .purple, holdsGem: false, groupCount: 0),
+                                           .rock(color: .brown, holdsGem: false, groupCount: 0),
+                                           .player(.playerZero),
+                                           .monster(.zero),
+                                           .dynamite(.standardFuse),
+                                           .offer(.zero),
+                                           .item(.gem),
+                                           .pillar(.random),
+                                           .exit(blocked: false),
+                                           .empty,
+                                           .emptyGem(.blue, amount: 1),
+    
+    ]
+}
+
 enum RuneType: String, Codable, Hashable, CaseIterable {
     case rainEmbers
     case getSwifty
@@ -525,22 +543,22 @@ struct Rune: Hashable, Codable {
         case .moveEarth:
             return Rune(
                 type: .moveEarth,
-                textureName: "rune-moveearth-off",
+                textureName: "rune-moveearth-on",
                 cost: 0,
                 currency: .gem,
-                description: "Swap your row with another.",
+                description: "Swap your row with another row.",
                 flavorText: "Marv the Earthmover loved mead so much that he created the world's first bar with the flick of his wrist.",
-                targets: 1,
-                targetTypes: TileType.rockCases,
+                targets: 2,
+                targetTypes: TileType.runeAllCases,
                 constrainedTargets: nil,
-                affectSlopes: [],
+                affectSlopes: [AttackSlope(over: 1, up: 0), AttackSlope(over: -1, up: 0)],
                 affectRange: Int.max,
                 stopsEffectTypes: nil,
                 heal: 0,
-                cooldown: 25,
+                cooldown: 5,
                 rechargeType: [TileType.rock(color: .purple, holdsGem: false, groupCount: 0)],
                 rechargeMinimum: 1,
-                rechargeCurrent: 0,
+                rechargeCurrent: 5,
                 progressColor: .purple,
                 maxDistanceBetweenTargets: CGFloat.greatestFiniteMagnitude,
                 animationTextureName: "",
@@ -631,7 +649,7 @@ struct Rune: Hashable, Codable {
                 animationTextureName: "getSwiftySpriteSheet",
                 animationColumns: 6
             )
-            
         }
+        
     }
 }

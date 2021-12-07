@@ -234,9 +234,5 @@ extension BackpackView {
                 touchWasHandled = true
             }
         }
-        
-        if !touchWasHandled {
-//            runeInventoryContainer?.touchesEnded(touches, with: event)
-        }
     }
 }

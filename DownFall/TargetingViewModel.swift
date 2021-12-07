@@ -226,29 +226,50 @@ class TargetingViewModel: Targeting {
         /// If needsToTargetPlayer == true, then we need to check if we have the player targeted in set of targets
         guard needsToTargetPlayer == hasPlayerTargeted else { return false }
         
-        /// ensure that the targets are within the correct distance of each other
-        let targetDistance = rune?.maxDistanceBetweenTargets ?? CGFloat.greatestFiniteMagnitude
         
-        /// we may never append anything to this but thats okay.
-        var results: [Bool] = []
-        
-        for (outIdx, outerElement) in coords.enumerated() {
-            for (inIdx, innerElement) in coords.enumerated() {
-                if outIdx == inIdx { continue }
-                results.append(outerElement.distance(to: innerElement) <= targetDistance)
-                results.append(outerElement.distance(to: innerElement) <= targetDistance)
+        if let constrainedTargets = rune?.constrainedTargets,
+           let tiles = tiles {
+            var legality = true
+            for coord in coords {
+                if !legality { return false }
+                let targetType = tiles[coord].type
+                if constrainedTargets.constraintedTypes.contains(where: { TileType.fuzzyEquals($0, targetType) }) {
+                    // check to see if this is within the max distance to the near by type
+                    let maxDistance = constrainedTargets.maxDistance
+                    if let mustBeNearbyCoord = tileCoords(for: tiles, of: constrainedTargets.nearByType).first {
+                        let distance = coord.distance(to: mustBeNearbyCoord)
+                        legality = distance <= maxDistance
+                    }
+                }
+                
             }
+            return legality
         }
-        
-        /// If every single target is within the targetDistance then every entry in results will be true
-        /// Return false when results contains 1 or more elements of `false`
-        return !results.contains(false)
+        else {
+            /// ensure that the targets are within the correct distance of each other
+            let targetDistance = rune?.maxDistanceBetweenTargets ?? CGFloat.greatestFiniteMagnitude
+            
+            /// we may never append anything to this but thats okay.
+            var results: [Bool] = []
+            
+            for (outIdx, outerElement) in coords.enumerated() {
+                for (inIdx, innerElement) in coords.enumerated() {
+                    if outIdx == inIdx { continue }
+                    results.append(outerElement.distance(to: innerElement) <= targetDistance)
+                }
+            }
+            
+            /// If every single target is within the targetDistance then every entry in results will be true
+            /// Return false when results contains 1 or more elements of `false`
+            return !results.contains(false)
+            
+        }
         
     }
     
     private func isTargetLegal(_ coord: TileCoord) -> Bool {
         guard let tiles = tiles else { return false }
-        if typesOfTargets.isEmpty || typesOfTargets.contains(tiles[coord].type) {
+        if typesOfTargets.isEmpty || typesOfTargets.contains(where: { TileType.fuzzyEquals(tiles[coord].type, $0) }) {
             return true
         }
         return false
@@ -309,7 +330,7 @@ class TargetingViewModel: Targeting {
     func targets(given coord: TileCoord, withRune rune: Rune) -> AllTarget {
         var allTarget: AllTarget = .init(targets: [], areLegal: false)
         if currentTargets.allTargetCoords.contains(coord) {
-            if needsToTargetPlayer { return  currentTargets }
+            if needsToTargetPlayer { return currentTargets }
             
             var newTargets: [Target] = []
             for target in currentTargets.targets {
@@ -397,16 +418,12 @@ class TargetingViewModel: Targeting {
             // the player has tapped on a tile that is already targeted. So remove the tile coord
             if currentTargets.targets.contains(where: { return $0.coord == coord } ) {
                 
-                // dont let them unhighlight the player
+                // dont let them unhighlight the player when a rune needs to target the player
                 if needsToTargetPlayer,
                    let playerCoord = playerCoord,
-                   playerCoord != coord {
+                   playerCoord == coord {
                     return
                 }
-//                guard let playerCoord = playerCoord,
-//                    (needsToTargetPlayer && playerCoord != coord) else {
-//                     return
-//                }
                 
                 // otherwise, remove the targeting
                 currentTargets.targets.removeAll(where: { return $0.coord == coord })

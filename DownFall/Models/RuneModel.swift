@@ -26,6 +26,7 @@ enum RuneType: String, Codable, Hashable, CaseIterable {
     case moveEarth
     case phoenix
     case fieryRage
+    case teleportation
     
     var humanReadable: String {
         switch self {
@@ -59,6 +60,8 @@ enum RuneType: String, Codable, Hashable, CaseIterable {
             return "Phoenix"
         case .fieryRage:
             return "Fiery Rage"
+        case .teleportation:
+            return "Teleportation to Exit"
         }
     }
 }
@@ -74,6 +77,12 @@ struct EndEffectTile: Hashable, Codable {
     let inclusive: Bool
 }
 
+struct ConstrainedTargets: Hashable, Codable {
+    let constraintedTypes: [TileType]
+    let nearByType: [TileType]
+    let maxDistance: CGFloat
+}
+
 struct Rune: Hashable, Codable {
     var type: RuneType
     var textureName: String
@@ -83,6 +92,7 @@ struct Rune: Hashable, Codable {
     var flavorText: String?
     var targets: Int?
     var targetTypes: [TileType]?
+    var constrainedTargets: ConstrainedTargets?
     var affectSlopes: [AttackSlope]
     var affectRange: Int
     var stopsEffectTypes: EndEffectTile?
@@ -127,6 +137,7 @@ struct Rune: Hashable, Codable {
                 flavorText: String? = nil,
                 targets: Int? = nil,
                 targetTypes: [TileType]? = nil,
+                constrainedTargets: ConstrainedTargets? = nil,
                 affectSlopes: [AttackSlope]? = nil,
                 affectRange: Int? = nil,
                 stopsEffectTypes: EndEffectTile? = nil,
@@ -138,27 +149,54 @@ struct Rune: Hashable, Codable {
                 maxDistanceBetweenTargets: CGFloat? = nil,
                 animationTextureName: String? = nil,
                 animationColumns: Int? = nil) -> Rune {
-        return Rune(type: type ?? self.type,
-                    textureName: textureName ?? self.textureName,
-                    cost: cost ?? self.cost,
-                    currency: currency ?? self.currency,
-                    description: description ?? self.description,
-                    flavorText: flavorText ?? self.flavorText,
-                    targets: targets ?? self.targets,
-                    targetTypes: targetTypes ?? self.targetTypes,
-                    affectSlopes: affectSlopes ?? self.affectSlopes,
-                    affectRange: affectRange ?? self.affectRange,
-                    stopsEffectTypes: stopsEffectTypes ?? self.stopsEffectTypes,
-                    heal: heal ?? self.heal,
-                    cooldown: cooldown ?? self.cooldown,
-                    rechargeType: rechargeType ?? self.rechargeType,
-                    rechargeMinimum: rechargeMinimum ?? self.rechargeMinimum,
-                    rechargeCurrent: rechargeCurrent ?? self.rechargeCurrent,
-                    progressColor: progressColor ?? self.progressColor,
-                    maxDistanceBetweenTargets: maxDistanceBetweenTargets ?? self.maxDistanceBetweenTargets,
-                    recordedProgress: recordedProgress ?? self.recordedProgress,
-                    animationTextureName: animationTextureName ?? self.animationTextureName,
-                    animationColumns: animationColumns ?? self.animationColumns)
+        
+        let type = type ?? self.type
+        let textureName = textureName ?? self.textureName
+        let cost = cost ?? self.cost
+        let currency = currency ?? self.currency
+        let description = description ?? self.description
+        let flavorText = flavorText ?? self.flavorText
+        let targets = targets ?? self.targets
+        let targetTypes = targetTypes ?? self.targetTypes
+        let constrainedTypes = constrainedTargets ?? self.constrainedTargets
+        let affectSlopes = affectSlopes ?? self.affectSlopes
+        let affectRange = affectRange ?? self.affectRange
+        let stopsEffectTypes = stopsEffectTypes ?? self.stopsEffectTypes
+        let heal = heal ?? self.heal
+        let cooldown = cooldown ?? self.cooldown
+        let rechargeType = rechargeType ?? self.rechargeType
+        let rechargeMinimum = rechargeMinimum ?? self.rechargeMinimum
+        let rechargeCurrent = rechargeCurrent ?? self.rechargeCurrent
+        let progressColor = progressColor ?? self.progressColor
+        let maxDistanceBetweenTargets = maxDistanceBetweenTargets ?? self.maxDistanceBetweenTargets
+        let recordedProgress = recordedProgress ?? self.recordedProgress
+        let animationTextureName = animationTextureName ?? self.animationTextureName
+        let animationColumns = animationColumns ?? self.animationColumns
+        
+        
+        return Rune(type: type,
+                    textureName: textureName,
+                    cost: cost,
+                    currency: currency,
+                    description: description,
+                    flavorText: flavorText,
+                    targets: targets,
+                    targetTypes: targetTypes,
+                    constrainedTargets: constrainedTypes,
+                    affectSlopes: affectSlopes,
+                    affectRange: affectRange,
+                    stopsEffectTypes: stopsEffectTypes,
+                    heal: heal,
+                    cooldown: cooldown,
+                    rechargeType: rechargeType,
+                    rechargeMinimum: rechargeMinimum,
+                    rechargeCurrent: rechargeCurrent,
+                    progressColor: progressColor,
+                    maxDistanceBetweenTargets: maxDistanceBetweenTargets,
+                    recordedProgress: recordedProgress,
+                    animationTextureName: animationTextureName,
+                    animationColumns: animationColumns
+                )
         
     }
     
@@ -191,6 +229,7 @@ struct Rune: Hashable, Codable {
                         flavorText: "Show them the meaning of swift.",
                         targets: 2,
                         targetTypes: cases,
+                        constrainedTargets: ConstrainedTargets(constraintedTypes: TileType.rockCases, nearByType: [.player(.playerZero)], maxDistance: 1),
                         affectSlopes: [],
                         affectRange: 0,
                         stopsEffectTypes: nil,
@@ -214,6 +253,7 @@ struct Rune: Hashable, Codable {
                         flavorText: "Barney was a red dinosaur before running into me. - Durham the Dwarf",
                         targets: 3,
                         targetTypes: TileType.rockCases,
+                        constrainedTargets: nil,
                         affectSlopes: [],
                         affectRange: 0,
                         stopsEffectTypes: nil,
@@ -236,6 +276,7 @@ struct Rune: Hashable, Codable {
                         flavorText: "Fire is my second favorite word, second only to `combustion.` - Mack the Wizard",
                         targets: 2,
                         targetTypes: [TileType.monster(.zero)],
+                        constrainedTargets: nil,
                         affectSlopes: [],
                         affectRange: 0,
                         stopsEffectTypes: nil,
@@ -259,6 +300,7 @@ struct Rune: Hashable, Codable {
                 flavorText: "Kill them all",
                 targets: 1,
                 targetTypes: [],
+                constrainedTargets: nil,
                 affectSlopes: [AttackSlope(over: -1, up: 0), AttackSlope(over: 1, up: 0)],
                 affectRange: Int.max,
                 stopsEffectTypes: nil,
@@ -283,6 +325,7 @@ struct Rune: Hashable, Codable {
                 flavorText: "You bumped into the ceiling which now has to be washed and sterilized, so you get nothing, good day sir!",
                 targets: 1,
                 targetTypes: [.player(.playerZero)],
+                constrainedTargets: nil,
                 affectSlopes: [AttackSlope(over: 0, up: 1)],
                 affectRange: Int.max,
                 stopsEffectTypes: nil,
@@ -311,6 +354,7 @@ struct Rune: Hashable, Codable {
                 ,
                 targets: 1,
                 targetTypes: [],
+                constrainedTargets: nil,
                 affectSlopes: AttackSlope.allDirections,
                 affectRange: 1,
                 stopsEffectTypes: nil,
@@ -339,6 +383,7 @@ struct Rune: Hashable, Codable {
                 ,
                 targets: 0,
                 targetTypes: [],
+                constrainedTargets: nil,
                 affectSlopes: [],
                 affectRange: 1,
                 stopsEffectTypes: nil,
@@ -362,6 +407,7 @@ struct Rune: Hashable, Codable {
                 flavorText: "Careful where you stand",
                 targets: 1,
                 targetTypes: [],
+                constrainedTargets: nil,
                 affectSlopes: [AttackSlope(over: 0, up: 1), AttackSlope(over: 0, up: -1)],
                 affectRange: Int.max,
                 stopsEffectTypes: nil,
@@ -386,6 +432,7 @@ struct Rune: Hashable, Codable {
                 flavorText: "The only thing worse than fire is a pyro who loves fires.",
                 targets: 1,
                 targetTypes: [TileType.monster(.zero)],
+                constrainedTargets: nil,
                 affectSlopes: [],
                 affectRange: 0,
                 stopsEffectTypes: nil,
@@ -410,6 +457,7 @@ struct Rune: Hashable, Codable {
                 flavorText: "A straight line isn't always the fastest way to the bottom, but in this case it is.",
                 targets: 1,
                 targetTypes: [.player(.playerZero)],
+                constrainedTargets: nil,
                 affectSlopes: [AttackSlope(over: 0, up: -1)],
                 affectRange: Int.max,
                 stopsEffectTypes: EndEffectTile(tileTypes: [.exit(blocked: false), .exit(blocked: true), .item(.zero), .gem, .pillar(.random), .dynamite(.standardFuse), .offer(.zero)], inclusive: false),
@@ -435,6 +483,7 @@ struct Rune: Hashable, Codable {
                 flavorText: "Hold my mead, I'm gonna try something crazy - Marv the Earthmover",
                 targets: 1,
                 targetTypes: [],
+                constrainedTargets: nil,
                 affectSlopes: [],
                 affectRange: Int.max,
                 stopsEffectTypes: nil,
@@ -459,6 +508,7 @@ struct Rune: Hashable, Codable {
                 flavorText: "The dwarf queen, Emeralelda, bestowed the first rune of its kind to her first born daughter, Gemma.",
                 targets: 1,
                 targetTypes: TileType.rockCases,
+                constrainedTargets: nil,
                 affectSlopes: [],
                 affectRange: Int.max,
                 stopsEffectTypes: nil,
@@ -482,6 +532,7 @@ struct Rune: Hashable, Codable {
                 flavorText: "Marv the Earthmover loved mead so much that he created the world's first bar with the flick of his wrist.",
                 targets: 1,
                 targetTypes: TileType.rockCases,
+                constrainedTargets: nil,
                 affectSlopes: [],
                 affectRange: Int.max,
                 stopsEffectTypes: nil,
@@ -506,6 +557,7 @@ struct Rune: Hashable, Codable {
                 flavorText: "Life and death are partners.",
                 targets: 1,
                 targetTypes: [.player(.playerZero)],
+                constrainedTargets: nil,
                 affectSlopes: [],
                 affectRange: Int.max,
                 stopsEffectTypes: nil,
@@ -530,6 +582,7 @@ struct Rune: Hashable, Codable {
                 flavorText: "I discovered move by accident after losing a match of Cave Chess. - Margarey The Hothead ",
                 targets: 1,
                 targetTypes: [.player(.playerZero)],
+                constrainedTargets: nil,
                 affectSlopes: AttackSlope.orthogonalDirectionAttacks,
                 affectRange: Int.max,
                 stopsEffectTypes: EndEffectTile(tileTypes: [.monster(.zero)], inclusive: true),
@@ -544,8 +597,41 @@ struct Rune: Hashable, Codable {
                 animationColumns: 5
             )
             
+        case .teleportation:
+            var constrainedTypes = TileType.rockCases
+            constrainedTypes.append(.monster(.zero))
+            constrainedTypes.append(.dynamite(.standardFuse))
+            constrainedTypes.append(.offer(.zero))
+            constrainedTypes.append(.item(.gem))
+            let constrained = ConstrainedTargets.init(constraintedTypes: constrainedTypes, nearByType: [.exit(blocked: false), .exit(blocked: true)], maxDistance: 1)
+            
+            var targets = constrainedTypes
+            targets.append(TileType.player(.playerZero))
+            
+            return Rune(
+                type: .teleportation,
+                textureName: "rune-teleport-enabled",
+                cost: 0,
+                currency: .gem,
+                description: "Swap places with a tile adjacent to the exit",
+                flavorText: "[Olivia the Cunning]",
+                targets: 2,
+                targetTypes: targets,
+                constrainedTargets: constrained,
+                affectSlopes: [],
+                affectRange: Int.max,
+                stopsEffectTypes: nil,
+                heal: 0,
+                cooldown: 5,
+                rechargeType: [.rock(color: .blue, holdsGem: false, groupCount: 0)],
+                rechargeMinimum: 1,
+                rechargeCurrent: 5,
+                progressColor: .blue,
+                maxDistanceBetweenTargets: CGFloat.greatestFiniteMagnitude,
+                animationTextureName: "getSwiftySpriteSheet",
+                animationColumns: 6
+            )
+            
         }
-        
-        
     }
 }

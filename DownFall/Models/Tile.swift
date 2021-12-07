@@ -476,8 +476,8 @@ enum TileType: Hashable, CaseIterable, Codable {
             return true
         case (.pillar, pillar):
             return true
-        case (.rock, rock):
-            return true
+        case (.rock(let lhsColor, _, _), rock(let rhsColor, _, _)):
+            return lhsColor == rhsColor
         case (.dynamite, dynamite):
             return true
         default:

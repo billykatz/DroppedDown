@@ -26,6 +26,16 @@ func tileCoords(for sprites: [[DFTileSpriteNode]], of type: TileType) -> [TileCo
     return tileCoords
 }
 
+func tileCoords(for tiles: [[Tile]], of types: [TileType]) -> [TileCoord] {
+    var tileCoords: [TileCoord] = []
+    for (i, _) in tiles.enumerated() {
+        for (j, _) in tiles[i].enumerated() {
+            types.contains(where: { tiles[i][j].type == $0 }) ? tileCoords.append(TileCoord(i, j)) : ()
+        }
+    }
+    return tileCoords
+}
+
 func tileCoords(for tiles: [[Tile]], of type: TileType) -> [TileCoord] {
     var tileCoords: [TileCoord] = []
     for (i, _) in tiles.enumerated() {

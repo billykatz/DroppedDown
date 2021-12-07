@@ -135,7 +135,7 @@ struct Animator {
         
         switch rune.type {
             
-        case .getSwifty:
+        case .getSwifty, .teleportation:
             var spriteActions: [SpriteAction] = []
             for tileTrans in tileTransformation {
                 let start = tileTrans.initial

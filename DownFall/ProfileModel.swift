@@ -99,8 +99,8 @@ struct Profile: Codable, Equatable {
         return testPlayer.update(pickaxe:
                                     Pickaxe(runeSlots: 4,
                                                   runes: [
-                                                    .rune(for: .fieryRage),
-                                                    .rune(for: .flameColumn),
+                                                    .rune(for: .getSwifty),
+                                                    .rune(for: .teleportation),
                                                     .rune(for: .fireball),
                                                     .rune(for: .rainEmbers),
                                                   ]

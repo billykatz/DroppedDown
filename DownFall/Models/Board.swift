@@ -798,6 +798,65 @@ class Board: Equatable {
         }
         return nil
     }
+}
+
+//MARK: - Use Rune
+
+extension Board {
+    
+    private func useRune(_ rune: Rune, on allTargets: AllTarget, input: Input) -> [Transformation] {
+        guard let playerData = playerEntityData,
+              let pp = playerPosition else {
+            /// no update for the player is needed
+            preconditionFailure("Failed")
+        }
+        
+        /// by doing this we have recorded the progress of the runes.
+        let updatedPlayer = playerData.useRune(rune)
+        tiles[pp.row][pp.column] = Tile(type: .player(updatedPlayer))
+        
+        let targets = allTargets.allTargetAssociatedCoords
+        switch rune.type {
+        case .rainEmbers, .fireball:
+            return [removeAndReplaces(from: tiles, specificCoord: targets, input: input)]
+            
+        case .getSwifty:
+            guard let firstTarget = targets.first, targets.count == 2 else {
+                return [Transformation(transformation: nil, inputType: input.type, endTiles: tiles)]
+            }
+            return [swap(firstTarget, with: targets.last!, input: input)]
+            
+        case .transformRock:
+            return [transform(targets, into: TileType.rock(color: .purple, holdsGem: false, groupCount: 0), input: input)]
+        case .bubbleUp:
+            return [bubbleUp(targets.first!, input: input)]
+        case .flameWall, .flameColumn:
+            let monsterCoords = targets.compactMap { coord -> TileCoord? in
+                if case TileType.monster = tiles[coord].type {
+                    return coord
+                } else {
+                    return nil
+                }
+            }
+            return [flameLine(tiles: tiles, targets: monsterCoords, input: input)]
+        case .vortex:
+            return [vortex(tiles: tiles, targets: targets, input: input)]
+            
+        case .drillDown:
+            return drillDown(allTarget: allTargets, input: input)
+            
+        case .fieryRage:
+            return fieryRage(allTarget: allTargets, input: input)
+            
+        case .teleportation:
+            return [teleportation(tiles: tiles, allTargets: allTargets, input: input)]
+            
+            
+            
+        default: fatalError()
+        }
+        
+    }
     
     private func transform(_ coords: [TileCoord], into type: TileType, input: Input) -> Transformation {
         
@@ -1006,66 +1065,24 @@ class Board: Equatable {
         /// create a "dummy" transformation because apparently we ignore things unless there is a
         return Transformation(transformation: [TileTransformation(.zero, .zero)], inputType: input.type, endTiles: newTiles)
         
-        
     }
-}
-
-
-//MARK: - Use Rune
-
-extension Board {
     
-    private func useRune(_ rune: Rune, on allTargets: AllTarget, input: Input) -> [Transformation] {
-        guard let playerData = playerEntityData,
-              let pp = playerPosition else {
-            /// no update for the player is needed
-            preconditionFailure("Failed")
+    private func teleportation(tiles: [[Tile]], allTargets: AllTarget, input: Input) -> Transformation {
+        guard allTargets.allTargetCoords.count == 2, let first = allTargets.allTargetCoords.first, let second = allTargets.allTargetCoords.last else {
+            return Transformation(transformation: nil, inputType: input.type, endTiles: tiles)
         }
+        var newTiles = tiles
         
-        /// by doing this we have recorded the progress of the runes.
-        let updatedPlayer = playerData.useRune(rune)
-        tiles[pp.row][pp.column] = Tile(type: .player(updatedPlayer))
+        let tempTile = tiles[first]
+        newTiles[first.x][first.y] = newTiles[second.x][second.y]
+        newTiles[second.x][second.y] = tempTile
         
-        let targets = allTargets.allTargetAssociatedCoords
-        switch rune.type {
-        case .rainEmbers, .fireball:
-            return [removeAndReplaces(from: tiles, specificCoord: targets, input: input)]
-            
-        case .getSwifty:
-            guard let firstTarget = targets.first, targets.count == 2 else {
-                return [Transformation(transformation: nil, inputType: input.type, endTiles: tiles)]
-            }
-            return [swap(firstTarget, with: targets.last!, input: input)]
-            
-        case .transformRock:
-            return [transform(targets, into: TileType.rock(color: .purple, holdsGem: false, groupCount: 0), input: input)]
-        case .bubbleUp:
-            return [bubbleUp(targets.first!, input: input)]
-        case .flameWall, .flameColumn:
-            let monsterCoords = targets.compactMap { coord -> TileCoord? in
-                if case TileType.monster = tiles[coord].type {
-                    return coord
-                } else {
-                    return nil
-                }
-            }
-            return [flameLine(tiles: tiles, targets: monsterCoords, input: input)]
-        case .vortex:
-            return [vortex(tiles: tiles, targets: targets, input: input)]
-            
-        case .drillDown:
-            return drillDown(allTarget: allTargets, input: input)
-            
-        case .fieryRage:
-            return fieryRage(allTarget: allTargets, input: input)
-            
-            
-        default: fatalError()
-        }
+        let tileTrans = [TileTransformation(first, second), TileTransformation(second, first)]
         
+        self.tiles = newTiles
+        return Transformation(transformation: tileTrans, inputType: input.type, endTiles: self.tiles)
     }
 }
-
 
 // MARK: - Find Neighbors Remove and Replace
 

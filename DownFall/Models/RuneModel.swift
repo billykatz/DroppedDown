@@ -45,6 +45,7 @@ enum RuneType: String, Codable, Hashable, CaseIterable {
     case phoenix
     case fieryRage
     case teleportation
+    case monsterBrawl
     
     var humanReadable: String {
         switch self {
@@ -80,6 +81,8 @@ enum RuneType: String, Codable, Hashable, CaseIterable {
             return "Fiery Rage"
         case .teleportation:
             return "Teleportation to Exit"
+        case .monsterBrawl:
+            return "Monster Brawl"
         }
     }
 }
@@ -649,6 +652,33 @@ struct Rune: Hashable, Codable {
                 animationTextureName: "getSwiftySpriteSheet",
                 animationColumns: 6
             )
+            
+        case .monsterBrawl:
+//            rune-monster-brawl-on
+            return Rune(
+                type: .monsterBrawl,
+                textureName: "rune-monster-brawl-on",
+                cost: 0,
+                currency: .gem,
+                description: "Force all monsters to attack and hurt eachother.",
+                flavorText: "I've found the easiest way to dispatch multiple monsters at once is to do nothing at all",
+                targets: Int.max,
+                targetTypes: [.monster(.zero)],
+                constrainedTargets: nil,
+                affectSlopes: [],
+                affectRange: 0,
+                stopsEffectTypes: nil,
+                heal: 0,
+                cooldown: 1,
+                rechargeType: [TileType.monster(.zero)],
+                rechargeMinimum: 1,
+                rechargeCurrent: 1,
+                progressColor: .blood,
+                maxDistanceBetweenTargets: CGFloat.greatestFiniteMagnitude,
+                animationTextureName: "",
+                animationColumns: 0
+            )
+
         }
         
     }

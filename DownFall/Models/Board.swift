@@ -1112,6 +1112,10 @@ extension Board {
         
         return Transformation(transformation: tileTransformations, inputType: input.type, endTiles: self.tiles)
     }
+    
+    private func monsterBrawl(tiles: [[Tile]], allTarget: AllTarget, input: Input) -> Transformation {
+        fatalError("Implement")
+    }
 }
 
 // MARK: - Find Neighbors Remove and Replace

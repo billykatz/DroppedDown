@@ -63,6 +63,7 @@ enum RuneType: String, Codable, Hashable, CaseIterable {
     case teleportation
     case monsterBrawl
     case monsterCrush
+    case monsterDrain
     
     var humanReadable: String {
         switch self {
@@ -102,6 +103,8 @@ enum RuneType: String, Codable, Hashable, CaseIterable {
             return "Brawl"
         case .monsterCrush:
             return "Crush"
+        case .monsterDrain:
+            return "Drain"
         }
     }
 }
@@ -743,6 +746,33 @@ struct Rune: Hashable, Codable {
                 animationTextureName: "rune-destroy-monsters-on-board-animation-sprite-sheett 1",
                 animationColumns: 7
             )
+            
+        case .monsterDrain:
+            return Rune(
+                type: .monsterDrain,
+                textureName: "rune-monster-drain-on",
+                cost: 0,
+                currency: .gem,
+                description: "Destroy a monster and gain 1 hp.",
+                flavorText: "",
+                targets: 1,
+                targetTypes: [.monster(.zero)],
+                constrainedTargets: nil,
+                targetsGroupOfMonsters: false,
+                affectSlopes: [],
+                affectRange: 0,
+                stopsEffectTypes: nil,
+                heal: 0,
+                cooldown: 1,
+                rechargeType: [TileType.monster(.zero)],
+                rechargeMinimum: 1,
+                rechargeCurrent: 1,
+                progressColor: .blood,
+                maxDistanceBetweenTargets: CGFloat.greatestFiniteMagnitude,
+                animationTextureName: "blood-drop-sprite-sheet-6",
+                animationColumns: 6
+            )
+
             
         }
         

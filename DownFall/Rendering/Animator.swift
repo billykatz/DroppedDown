@@ -21,6 +21,7 @@ struct Animator {
         static let poisonDropSpriteName = "poison-drop"
         static let poisonDropSpriteSheetName = "poison-drop-sprite-sheet-8"
         static let runeDrillDownSpriteSheetName4 = "rune-drilldown-spriteSheet4"
+        static let monsterCrushSpriteName = "rune-monsterCrush-frame-1"
     }
 
     let foreground: SKNode?
@@ -306,8 +307,62 @@ struct Animator {
             
             return
             
+        case .monsterCrush:
+            guard let trans = transformations.first
+            else {
+                completion()
+                return
+            }
+            animateMonsterCrush(sprites: sprites, transformation: trans, runeSpriteSheet: runeAnimation, completion: completion)
+            
         default: break
         }
+    }
+    
+    func animateMonsterCrush(sprites: [[DFTileSpriteNode]], transformation: Transformation, runeSpriteSheet: SpriteSheet, completion: @escaping () -> Void) {
+        guard let monsterCoords = transformation.monstersDies?.map({ $0.tileCoord }) else {
+            completion()
+            return
+        }
+        
+        var spriteActions: [SpriteAction] = []
+        let fadeDuration = 0.2
+        let waitBeforeKill = 0.2
+        let scaleBy: CGFloat = 1.5
+        let fadeTo: CGFloat = 0.9
+        
+        for coord in monsterCoords {
+            let sprite = sprites[coord]
+            
+            let emptySprite = SKSpriteNode(texture: SKTexture(imageNamed:Constants.monsterCrushSpriteName), size: tileCGSize)
+            let addTo = SKAction.run {
+                emptySprite.zPosition = 100
+                emptySprite.alpha = 0.5
+                sprite.addChild(emptySprite)
+            }
+            
+            let waitAction = SKAction.wait(forDuration: waitBeforeKill)
+            let fadeIn = SKAction.fadeAlpha(to: fadeTo, duration: fadeDuration)
+            let scale = SKAction.scale(by: scaleBy, duration: fadeDuration)
+            let fadeAndScale = SKAction.group(fadeIn, scale, curve: .easeIn)
+            let playAnimation = SKAction.animate(with: runeSpriteSheet.animationFrames(), timePerFrame: timePerFrame())
+            let emptyAllAction = SKAction.sequence(fadeAndScale, waitAction, playAnimation, waitAction, .removeFromParent())
+            
+            // add the sprite to the monster sprite
+            
+            spriteActions.append(.init(sprite, addTo))
+            // play the animation for the monster crush
+            
+            spriteActions.append(.init(emptySprite, emptyAllAction))
+            // append the dying animation if needed
+            if let dyingAnimation = sprite.dyingAnimation(durationWaitBefore: waitBeforeKill + fadeDuration) {
+                spriteActions.append(dyingAnimation)
+            }
+            
+        }
+        
+        animate(spriteActions, completion: completion)
+        
     }
     
     func animateMoveEarth(sprites: [[DFTileSpriteNode]], tileTransformation: [TileTransformation], completion: @escaping () -> Void) {

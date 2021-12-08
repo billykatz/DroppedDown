@@ -40,11 +40,20 @@ struct LevelConstructor {
     
     static func potentialItems(depth: Depth, unlockables: [Unlockable], startingUnlockables: [Unlockable], playerData: EntityModel, randomSource: GKLinearCongruentialRandomSource, isTutorial: Bool) -> [StoreOffer] {
         
-        if (depth == 0 && isTutorial) || (depth == testLevelDepthNumber) {
+        if depth == 0 && isTutorial {
             return [
                 StoreOffer.offer(type: .gems(amount: 15), tier: 1),
                 StoreOffer.offer(type: .plusOneMaxHealth, tier: 1)
             ]
+        } else if depth == testLevelDepthNumber {
+            return [
+                StoreOffer.offer(type: .gems(amount: 15), tier: 1),
+                StoreOffer.offer(type: .plusOneMaxHealth, tier: 1),
+                StoreOffer.offer(type: .gems(amount: 15), tier: 2),
+                StoreOffer.offer(type: .plusOneMaxHealth, tier: 2)
+
+            ]
+
         }
         
         var offers = [StoreOffer]()
@@ -275,7 +284,7 @@ struct LevelConstructor {
         case 5...Int.max:
             return 9
         case testLevelDepthNumber:
-            return 6
+            return 8
         default:
             fatalError()
         }
@@ -335,10 +344,11 @@ struct LevelConstructor {
         case testLevelDepthNumber:
             let chances = TileTypeChanceModel(
                 chances: [
-                    .rock(color: .red, holdsGem: false, groupCount: 0): 25,
-                    .rock(color: .blue, holdsGem: false, groupCount: 0): 25,
-                    .rock(color: .purple, holdsGem: false, groupCount: 0): 25,
-                    .rock(color: .brown, holdsGem: false, groupCount: 0): 25]
+                    .rock(color: .red, holdsGem: false, groupCount: 0): 33,
+                    .rock(color: .blue, holdsGem: false, groupCount: 0): 33,
+                    .rock(color: .purple, holdsGem: false, groupCount: 0): 33,
+//                    .rock(color: .brown, holdsGem: false, groupCount: 0): 25
+                ]
             )
             return chances
         default:
@@ -487,6 +497,7 @@ struct LevelConstructor {
     
     
     static func monsterCountStart(depth: Depth) -> Int {
+        if depth == testLevelDepthNumber { return 20 }
         if depth == bossLevelDepthNumber { return 0 }
         return min(boardSize(depth: depth), depth + 2)
     }

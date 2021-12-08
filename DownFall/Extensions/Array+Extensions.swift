@@ -86,3 +86,11 @@ extension Array {
         }
     }
 }
+
+
+extension Array where Element: Collection, Element.Index == Int {
+    subscript(tileCoord: TileCoord) -> Element.Iterator.Element {
+        return self[tileCoord.x][tileCoord.y]
+    }
+}
+

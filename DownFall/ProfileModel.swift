@@ -102,7 +102,7 @@ struct Profile: Codable, Equatable {
                                                     .rune(for: .getSwifty),
                                                     .rune(for: .teleportation),
                                                     .rune(for: .moveEarth),
-                                                    .rune(for: .monsterBrawl),
+                                                    .rune(for: .monsterCrush),
                                                   ]
                                            )
         )

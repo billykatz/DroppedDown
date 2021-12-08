@@ -338,25 +338,25 @@ class TileCreator: TileStrategy {
             return (newTutorialBoard, true)
         }
         
-        if level.depth == testLevelDepthNumber {
-            var newTutorialBoard: [[Tile]] = Array.init(repeating: Array.init(repeating: .empty, count: level.boardSize), count: level.boardSize)
-            
-            for row in 0..<TileCreator.testBoard.count {
-                for col in 0..<TileCreator.testBoard.count {
-                    if TileCreator.testBoard[row][col].type == .player(.zero) {
-                        newTutorialBoard[row][col] = Tile(type: .player(playerData))
-                    } else if TileCreator.testBoard[row][col].type == .monster(.ratZero) {
-                        newTutorialBoard[row][col] = Tile(type: .monster(entities.entity(with: .rat)!))
-                    }
-                    else {
-                        newTutorialBoard[row][col] = TileCreator.testBoard[row][col]
-                    }
-                }
-            }
-            
-            return (newTutorialBoard, true)
-
-        }
+//        if level.depth == testLevelDepthNumber {
+//            var newTutorialBoard: [[Tile]] = Array.init(repeating: Array.init(repeating: .empty, count: level.boardSize), count: level.boardSize)
+//            
+//            for row in 0..<TileCreator.testBoard.count {
+//                for col in 0..<TileCreator.testBoard.count {
+//                    if TileCreator.testBoard[row][col].type == .player(.zero) {
+//                        newTutorialBoard[row][col] = Tile(type: .player(playerData))
+//                    } else if TileCreator.testBoard[row][col].type == .monster(.ratZero) {
+//                        newTutorialBoard[row][col] = Tile(type: .monster(entities.entity(with: .rat)!))
+//                    }
+//                    else {
+//                        newTutorialBoard[row][col] = TileCreator.testBoard[row][col]
+//                    }
+//                }
+//            }
+//            
+//            return (newTutorialBoard, true)
+//
+//        }
         
         // early return to load the load tiles we have loaded
         if let loadedTiles = self.loadedTiles, loadedTiles.count > 0 {

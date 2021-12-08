@@ -385,17 +385,26 @@ class TargetingViewModel: Targeting {
             let range = min(boardSize-1, rune.affectRange)
             
             /// calculate the associated coords
-            let associatedCoords: [TileCoord] = affectedTiles(affectSlope: rune.affectSlopes,
-                                                              range: RangeModel(lower: 1, upper: range),
-                                                              from: coord,
-                                                              tiles: tiles,
-                                                              stopsTileTypes: rune.stopsEffectTypes)
+            let associatedCoords: [TileCoord]
+            if rune.targetsGroupOfMonsters,
+               let tiles = tiles {
+                associatedCoords = findNeighbors(in: tiles, of: coord, boardSize: tiles.count, killMonsters: true).0
+            } else {
+                associatedCoords = affectedTiles(affectSlope: rune.affectSlopes,
+                                                 range: RangeModel(lower: 1, upper: range),
+                                                 from: coord,
+                                                 tiles: tiles,
+                                                 stopsTileTypes: rune.stopsEffectTypes)
+            }
             
             /// add the new target
             targets.append(Target(coord: coord,
                                   associatedCoord: associatedCoords,
                                   isLegal: isTargetLegal(coord)))
-            let areLegal = areTargetsLegal(inTargets: targets)
+            var areLegal: Bool = areTargetsLegal(inTargets: targets)
+            if rune.targetsGroupOfMonsters {
+                areLegal = areLegal && associatedCoords.count >= 3
+            }
             allTarget = AllTarget(targets: targets, areLegal: areLegal)
         }
         return allTarget
@@ -516,4 +525,6 @@ class TargetingViewModel: Targeting {
             currentTargets = AllTarget(targets: targets, areLegal: areLegal)
         }
     }
+    
+    
 }

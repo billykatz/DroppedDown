@@ -861,7 +861,7 @@ extension Renderer {
                 if case InputType.itemUsed(let rune, _)? = transformation.inputType {
                     switch rune.type {
                         // these aniamtions take care of the death animation themselves
-                    case .fireball, .rainEmbers, .fieryRage, .drillDown:
+                    case .fireball, .rainEmbers, .fieryRage, .drillDown, .monsterCrush:
                         shouldSkipDyingAnimation = true
                     default:
                         break

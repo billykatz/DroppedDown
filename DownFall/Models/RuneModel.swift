@@ -24,8 +24,24 @@ extension TileType {
                                            .exit(blocked: false),
                                            .empty,
                                            .emptyGem(.blue, amount: 1),
-    
+                                           
     ]
+    
+    static var runeAllButMonsters: [TileType] = [.rock(color: .blue, holdsGem: false, groupCount: 0),
+                                                 .rock(color: .red, holdsGem: false, groupCount: 0),
+                                                 .rock(color: .purple, holdsGem: false, groupCount: 0),
+                                                 .rock(color: .brown, holdsGem: false, groupCount: 0),
+                                                 .player(.playerZero),
+                                                 .dynamite(.standardFuse),
+                                                 .offer(.zero),
+                                                 .item(.gem),
+                                                 .pillar(.random),
+                                                 .exit(blocked: false),
+                                                 .empty,
+                                                 .emptyGem(.blue, amount: 1),
+                                                 
+    ]
+    
 }
 
 enum RuneType: String, Codable, Hashable, CaseIterable {
@@ -46,6 +62,7 @@ enum RuneType: String, Codable, Hashable, CaseIterable {
     case fieryRage
     case teleportation
     case monsterBrawl
+    case monsterCrush
     
     var humanReadable: String {
         switch self {
@@ -82,7 +99,9 @@ enum RuneType: String, Codable, Hashable, CaseIterable {
         case .teleportation:
             return "Teleportation to Exit"
         case .monsterBrawl:
-            return "Monster Brawl"
+            return "Brawl"
+        case .monsterCrush:
+            return "Crush"
         }
     }
 }
@@ -114,6 +133,7 @@ struct Rune: Hashable, Codable {
     var targets: Int?
     var targetTypes: [TileType]?
     var constrainedTargets: ConstrainedTargets?
+    var targetsGroupOfMonsters: Bool
     var affectSlopes: [AttackSlope]
     var affectRange: Int
     var stopsEffectTypes: EndEffectTile?
@@ -159,6 +179,7 @@ struct Rune: Hashable, Codable {
                 targets: Int? = nil,
                 targetTypes: [TileType]? = nil,
                 constrainedTargets: ConstrainedTargets? = nil,
+                targetsGroupOfMonsters: Bool? = nil,
                 affectSlopes: [AttackSlope]? = nil,
                 affectRange: Int? = nil,
                 stopsEffectTypes: EndEffectTile? = nil,
@@ -180,6 +201,7 @@ struct Rune: Hashable, Codable {
         let targets = targets ?? self.targets
         let targetTypes = targetTypes ?? self.targetTypes
         let constrainedTypes = constrainedTargets ?? self.constrainedTargets
+        let targetsGroupOfMonsters = targetsGroupOfMonsters ?? self.targetsGroupOfMonsters
         let affectSlopes = affectSlopes ?? self.affectSlopes
         let affectRange = affectRange ?? self.affectRange
         let stopsEffectTypes = stopsEffectTypes ?? self.stopsEffectTypes
@@ -204,6 +226,7 @@ struct Rune: Hashable, Codable {
                     targets: targets,
                     targetTypes: targetTypes,
                     constrainedTargets: constrainedTypes,
+                    targetsGroupOfMonsters: targetsGroupOfMonsters,
                     affectSlopes: affectSlopes,
                     affectRange: affectRange,
                     stopsEffectTypes: stopsEffectTypes,
@@ -217,7 +240,7 @@ struct Rune: Hashable, Codable {
                     recordedProgress: recordedProgress,
                     animationTextureName: animationTextureName,
                     animationColumns: animationColumns
-                )
+        )
         
     }
     
@@ -234,7 +257,7 @@ struct Rune: Hashable, Codable {
         return  textureName + "-enabled"
     }
     
-    static let zero = Rune(type: .getSwifty, textureName: "", cost: 0, currency: .gem, description: "", flavorText: "", targets: 0, targetTypes: [], affectSlopes: [], affectRange: 0, heal: 0, cooldown: 0, rechargeType: [], rechargeMinimum: 0, rechargeCurrent: 0, progressColor: .red, maxDistanceBetweenTargets: 0, animationTextureName: "", animationColumns: 0)
+    static let zero = Rune(type: .getSwifty, textureName: "", cost: 0, currency: .gem, description: "", flavorText: "", targets: 0, targetTypes: [], targetsGroupOfMonsters: false, affectSlopes: [], affectRange: 0, heal: 0, cooldown: 0, rechargeType: [], rechargeMinimum: 0, rechargeCurrent: 0, progressColor: .red, maxDistanceBetweenTargets: 0, animationTextureName: "", animationColumns: 0)
     
     static func rune(for type: RuneType, isCharged: Bool = false) -> Rune {
         switch type {
@@ -251,11 +274,12 @@ struct Rune: Hashable, Codable {
                         targets: 2,
                         targetTypes: cases,
                         constrainedTargets: ConstrainedTargets(constraintedTypes: TileType.rockCases, nearByType: [.player(.playerZero)], maxDistance: 1),
+                        targetsGroupOfMonsters: false,
                         affectSlopes: [],
                         affectRange: 0,
                         stopsEffectTypes: nil,
                         heal: 0,
-//                cooldown: 25,
+                        //                cooldown: 25,
                         cooldown: 5,
                         rechargeType: [TileType.rock(color: .blue, holdsGem: false, groupCount: 0)],
                         rechargeMinimum: 1,
@@ -275,6 +299,7 @@ struct Rune: Hashable, Codable {
                         targets: 3,
                         targetTypes: TileType.rockCases,
                         constrainedTargets: nil,
+                        targetsGroupOfMonsters: false,
                         affectSlopes: [],
                         affectRange: 0,
                         stopsEffectTypes: nil,
@@ -298,6 +323,7 @@ struct Rune: Hashable, Codable {
                         targets: 2,
                         targetTypes: [TileType.monster(.zero)],
                         constrainedTargets: nil,
+                        targetsGroupOfMonsters: false,
                         affectSlopes: [],
                         affectRange: 0,
                         stopsEffectTypes: nil,
@@ -322,6 +348,7 @@ struct Rune: Hashable, Codable {
                 targets: 1,
                 targetTypes: [],
                 constrainedTargets: nil,
+                targetsGroupOfMonsters: false,
                 affectSlopes: [AttackSlope(over: -1, up: 0), AttackSlope(over: 1, up: 0)],
                 affectRange: Int.max,
                 stopsEffectTypes: nil,
@@ -347,6 +374,7 @@ struct Rune: Hashable, Codable {
                 targets: 1,
                 targetTypes: [.player(.playerZero)],
                 constrainedTargets: nil,
+                targetsGroupOfMonsters: false,
                 affectSlopes: [AttackSlope(over: 0, up: 1)],
                 affectRange: Int.max,
                 stopsEffectTypes: nil,
@@ -376,6 +404,7 @@ struct Rune: Hashable, Codable {
                 targets: 1,
                 targetTypes: [],
                 constrainedTargets: nil,
+                targetsGroupOfMonsters: false,
                 affectSlopes: AttackSlope.allDirections,
                 affectRange: 1,
                 stopsEffectTypes: nil,
@@ -405,6 +434,7 @@ struct Rune: Hashable, Codable {
                 targets: 0,
                 targetTypes: [],
                 constrainedTargets: nil,
+                targetsGroupOfMonsters: false,
                 affectSlopes: [],
                 affectRange: 1,
                 stopsEffectTypes: nil,
@@ -429,6 +459,7 @@ struct Rune: Hashable, Codable {
                 targets: 1,
                 targetTypes: [],
                 constrainedTargets: nil,
+                targetsGroupOfMonsters: false,
                 affectSlopes: [AttackSlope(over: 0, up: 1), AttackSlope(over: 0, up: -1)],
                 affectRange: Int.max,
                 stopsEffectTypes: nil,
@@ -454,6 +485,7 @@ struct Rune: Hashable, Codable {
                 targets: 1,
                 targetTypes: [TileType.monster(.zero)],
                 constrainedTargets: nil,
+                targetsGroupOfMonsters: false,
                 affectSlopes: [],
                 affectRange: 0,
                 stopsEffectTypes: nil,
@@ -479,11 +511,12 @@ struct Rune: Hashable, Codable {
                 targets: 1,
                 targetTypes: [.player(.playerZero)],
                 constrainedTargets: nil,
+                targetsGroupOfMonsters: false,
                 affectSlopes: [AttackSlope(over: 0, up: -1)],
                 affectRange: Int.max,
                 stopsEffectTypes: EndEffectTile(tileTypes: [.exit(blocked: false), .exit(blocked: true), .item(.zero), .gem, .pillar(.random), .dynamite(.standardFuse), .offer(.zero)], inclusive: false),
                 heal: 0,
-//                cooldown: 25,
+                //                cooldown: 25,
                 cooldown: 5,
                 rechargeType: [TileType.rock(color: .red, holdsGem: false, groupCount: 0)],
                 rechargeMinimum: 1,
@@ -505,6 +538,7 @@ struct Rune: Hashable, Codable {
                 targets: 1,
                 targetTypes: [],
                 constrainedTargets: nil,
+                targetsGroupOfMonsters: false,
                 affectSlopes: [],
                 affectRange: Int.max,
                 stopsEffectTypes: nil,
@@ -530,6 +564,7 @@ struct Rune: Hashable, Codable {
                 targets: 1,
                 targetTypes: TileType.rockCases,
                 constrainedTargets: nil,
+                targetsGroupOfMonsters: false,
                 affectSlopes: [],
                 affectRange: Int.max,
                 stopsEffectTypes: nil,
@@ -554,6 +589,7 @@ struct Rune: Hashable, Codable {
                 targets: 2,
                 targetTypes: TileType.runeAllCases,
                 constrainedTargets: nil,
+                targetsGroupOfMonsters: false,
                 affectSlopes: [AttackSlope(over: 1, up: 0), AttackSlope(over: -1, up: 0)],
                 affectRange: Int.max,
                 stopsEffectTypes: nil,
@@ -579,6 +615,7 @@ struct Rune: Hashable, Codable {
                 targets: 1,
                 targetTypes: [.player(.playerZero)],
                 constrainedTargets: nil,
+                targetsGroupOfMonsters: false,
                 affectSlopes: [],
                 affectRange: Int.max,
                 stopsEffectTypes: nil,
@@ -604,6 +641,7 @@ struct Rune: Hashable, Codable {
                 targets: 1,
                 targetTypes: [.player(.playerZero)],
                 constrainedTargets: nil,
+                targetsGroupOfMonsters: false,
                 affectSlopes: AttackSlope.orthogonalDirectionAttacks,
                 affectRange: Int.max,
                 stopsEffectTypes: EndEffectTile(tileTypes: [.monster(.zero)], inclusive: true),
@@ -639,6 +677,7 @@ struct Rune: Hashable, Codable {
                 targets: 2,
                 targetTypes: targets,
                 constrainedTargets: constrained,
+                targetsGroupOfMonsters: false,
                 affectSlopes: [],
                 affectRange: Int.max,
                 stopsEffectTypes: nil,
@@ -654,7 +693,6 @@ struct Rune: Hashable, Codable {
             )
             
         case .monsterBrawl:
-//            rune-monster-brawl-on
             return Rune(
                 type: .monsterBrawl,
                 textureName: "rune-monster-brawl-on",
@@ -665,6 +703,7 @@ struct Rune: Hashable, Codable {
                 targets: Int.max,
                 targetTypes: [.monster(.zero)],
                 constrainedTargets: nil,
+                targetsGroupOfMonsters: false,
                 affectSlopes: [],
                 affectRange: 0,
                 stopsEffectTypes: nil,
@@ -678,7 +717,33 @@ struct Rune: Hashable, Codable {
                 animationTextureName: "",
                 animationColumns: 0
             )
-
+            
+        case .monsterCrush:
+            return Rune(
+                type: .monsterCrush,
+                textureName: "rune-destroy-monsters-on",
+                cost: 0,
+                currency: .gem,
+                description: "Destroy a group of 3 or more monsters.",
+                flavorText: "And if you reverse the pickaxe polairization then it will work... at least I think it should. Dunvain the Careless",
+                targets: 1,
+                targetTypes: [.monster(.zero)],
+                constrainedTargets: nil,
+                targetsGroupOfMonsters: true,
+                affectSlopes: AttackSlope.allDirections,
+                affectRange: 0,
+                stopsEffectTypes: nil,
+                heal: 0,
+                cooldown: 1,
+                rechargeType: [TileType.monster(.zero)],
+                rechargeMinimum: 1,
+                rechargeCurrent: 1,
+                progressColor: .blood,
+                maxDistanceBetweenTargets: CGFloat.greatestFiniteMagnitude,
+                animationTextureName: "rune-destroy-monsters-on-board-animation-sprite-sheett 1",
+                animationColumns: 7
+            )
+            
         }
         
     }

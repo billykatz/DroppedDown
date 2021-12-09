@@ -75,8 +75,8 @@ class RuneContainerView: SKSpriteNode {
     }
     
     
-    public func enableButton(_ enabled: Bool) {
-        runeDetailView?.enableButton(enabled)
+    public func enableButton(_ enabled: Bool, targets: AllTarget) {
+        runeDetailView?.enableButton(enabled, targets: targets)
     }
     
     private func runeWasTapped(rune: Rune?, progress: Int) {

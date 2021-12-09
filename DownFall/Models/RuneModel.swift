@@ -597,10 +597,10 @@ struct Rune: Hashable, Codable {
                 affectRange: Int.max,
                 stopsEffectTypes: nil,
                 heal: 0,
-                cooldown: 5,
+                cooldown: 25,
                 rechargeType: [TileType.rock(color: .purple, holdsGem: false, groupCount: 0)],
                 rechargeMinimum: 1,
-                rechargeCurrent: 5,
+                rechargeCurrent: 25,
                 progressColor: .purple,
                 maxDistanceBetweenTargets: CGFloat.greatestFiniteMagnitude,
                 animationTextureName: "",
@@ -743,7 +743,7 @@ struct Rune: Hashable, Codable {
                 rechargeCurrent: 1,
                 progressColor: .blood,
                 maxDistanceBetweenTargets: CGFloat.greatestFiniteMagnitude,
-                animationTextureName: "rune-destroy-monsters-on-board-animation-sprite-sheett 1",
+                animationTextureName: "rune-destroy-monsters-on-board-animation-sprite-sheet",
                 animationColumns: 7
             )
             

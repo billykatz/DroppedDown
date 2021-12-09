@@ -329,8 +329,17 @@ class TargetingViewModel: Targeting {
     
     func targets(given coord: TileCoord, withRune rune: Rune) -> AllTarget {
         var allTarget: AllTarget = .init(targets: [], areLegal: false)
-        if currentTargets.allTargetCoords.contains(coord) {
-            if needsToTargetPlayer { return currentTargets }
+        if currentTargets.allTargetAssociatedCoords.contains(coord) {
+            if needsToTargetPlayer{
+                if rune.targets == 1 { return currentTargets }
+                
+                
+                if let playerCoord = playerCoord,
+                   let playerTarget = currentTargets.targetContaining(playerCoord: playerCoord),
+                   playerTarget.all.contains(where: {$0 == coord}) {
+                    return currentTargets
+                }
+            }
             
             var newTargets: [Target] = []
             for target in currentTargets.targets {

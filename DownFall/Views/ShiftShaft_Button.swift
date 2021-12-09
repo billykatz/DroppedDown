@@ -59,6 +59,13 @@ class ShiftShaft_Button: SKShapeNode {
     /// Identifier passed in on init that ids the button on press
     public var identifier: ButtonIdentifier
     
+    /// view that is the visual button
+    private var buttonView: SKShapeNode?
+    private var grayOutButtonView: SKShapeNode?
+    
+    // set thru init or `enable()`
+    private var isDisabled: Bool = false
+    
     /// view to expand touch region of button
     private lazy var touchTargetExpandingView: SKSpriteNode = {
         let view = SKSpriteNode(texture: nil, color: .clear, size: self.frame.scale(by: Style.Button.touchzone, andYAmount: Style.Button.touchzone).size)
@@ -69,19 +76,12 @@ class ShiftShaft_Button: SKShapeNode {
         return view
     }()
     
-    /// view that is the visual button
-    private var buttonView: SKShapeNode?
-    private var grayOutButtonView: SKShapeNode?
-    
-    // set thru init or `enable()`
-    private var isDisabled: Bool = false
-    
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    
+
     /// Creates a button with a image represented in a SKSpriteNode
     init(size: CGSize,
          delegate: ButtonDelegate,

@@ -157,6 +157,7 @@ class Renderer: SKSpriteNode {
         let rotateVisualCueSprite = SKSpriteNode(texture: SKTexture(imageNamed: "rotate-runes-decorative"), size: Constants.rotateVisualCueSize)
         self.rotateVisualCue = rotateVisualCueSprite
         rotateVisualCue.position = CGPoint.position(rotateVisualCue.frame, inside: playableRect, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: 400)
+        rotateVisualCue.zPosition = -1
         
         super.init(texture: nil, color: .clear, size: CGSize.zero)
         

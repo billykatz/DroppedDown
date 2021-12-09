@@ -36,10 +36,15 @@ enum ButtonIdentifier: String {
     case purchase
     case sell
     case close
+    
+    // MARK:- Rune Use
     case backpack
     case backpackSelect
     case backpackCancel
     case backpackConfirm
+    case runeUseConfirmBeforeReady
+    
+    
     case mainMenu
     case pausedExitToMainMenu
     case tutorialPausedExitToMainMenu
@@ -203,7 +208,7 @@ enum ButtonIdentifier: String {
             return "Offer 25% of gems"
             
         
-        case .wallet, .infoPopup, .storeItem, .backpack, .sellHealth, .buyHealth, .sellDodge, .buyDodge, .sellLuck, .buyLuck, .buyRuneSlot, .sellRuneSlot, .runeReplacementCancel:
+        case .wallet, .infoPopup, .storeItem, .backpack, .sellHealth, .buyHealth, .sellDodge, .buyDodge, .sellLuck, .buyLuck, .buyRuneSlot, .sellRuneSlot, .runeReplacementCancel, .runeUseConfirmBeforeReady:
             return ""
         }
     }

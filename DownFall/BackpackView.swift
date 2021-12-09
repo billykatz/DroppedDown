@@ -21,6 +21,7 @@ class BackpackView: SKSpriteNode {
     
     private struct Constants {
         static let tag = String(describing: BackpackView.self)
+        static let runeUseMaskSpriteName = "rune-use-mask"
     }
     
     // view model
@@ -47,6 +48,13 @@ class BackpackView: SKSpriteNode {
     
     // dispose bag
     private var disposables = Set<AnyCancellable>()
+    
+    // targeting mask use
+    private lazy var runeUseMask: SKSpriteNode = {
+        let sprite = SKSpriteNode(texture: SKTexture(imageNamed: Constants.runeUseMaskSpriteName), size: CGSize(width: playableRect.width, height: playableRect.height))
+        sprite.zPosition = 100
+        return sprite
+    }()
     
     init(playableRect: CGRect, viewModel: TargetingViewModel, levelSize: Int) {
         self.playableRect = playableRect
@@ -139,8 +147,11 @@ class BackpackView: SKSpriteNode {
         /// else add the tareting area
         if viewModel.rune == nil {
             targetingArea.removeFromParent()
+            runeUseMask.removeFromParent()
         } else {
             addChildSafely(targetingArea)
+            runeUseMask.isUserInteractionEnabled = false
+            addChildSafely(runeUseMask)
         }
         
         targetingArea.removeAllChildren()
@@ -157,11 +168,11 @@ class BackpackView: SKSpriteNode {
             }
         }
         
-        runeInventoryContainer?.enableButton(areLegal)
+        runeInventoryContainer?.enableButton(areLegal, targets: viewModel.currentTargets)
     }
     
     
-    //MARK: - private functions
+    // MARK: - private functions
     // TODO: should this be updated?
     private func runeSlotsUpdated(_ runeSlots: Int, _ runes: [Rune]) {
         
@@ -226,12 +237,10 @@ extension BackpackView {
         guard let touch = touches.first else { return }
         let position = touch.location(in: self)
         
-        var touchWasHandled = false
         for node in self.nodes(at: position) {
             if node.name == targetingAreaName && viewModel.rune != nil && !background.contains(position) {
                 let tileCoord = translatePoint(position)
                 viewModel.didTarget(tileCoord)
-                touchWasHandled = true
             }
         }
     }

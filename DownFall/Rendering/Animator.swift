@@ -135,11 +135,26 @@ struct Animator {
         return .init(foreground, .sequence(delay, action, curve: timingMode))
     }
     
+    
+    func shakeNode(node: SKNode, duration: CGFloat = 0.5, amp: Int = 10, delayBefore: Double = 0, timingMode: SKActionTimingMode = .easeIn) -> SpriteAction {
+        return self.shakeNode(node: node, duration: duration, ampX: amp, ampY: amp, delayBefore: delayBefore, timingMode: timingMode)
+    }
     func shakeNode(node: SKNode, duration: CGFloat = 0.5, ampX: Int = 10, ampY: Int = 10, delayBefore: Double = 0, timingMode: SKActionTimingMode = .easeIn) -> SpriteAction {
         let action = SKAction.shake(duration: duration, amplitudeX: ampX, amplitudeY: ampY)
         let delay = SKAction.wait(forDuration: delayBefore)
         
         return .init(node, .sequence(delay, action, curve: timingMode))
+    }
+    
+    func blinkNode(node: SKNode, delayBefore: Double = 0) -> SpriteAction {
+        let duration = 0.02
+        let alphaOff = SKAction.fadeAlpha(to: 0.0, duration: duration)
+        let alphaOn = SKAction.fadeAlpha(to: 1.0, duration: duration)
+        let delay = SKAction.wait(forDuration: delayBefore)
+        
+        var action = SpriteAction.init(node, .sequence(delay, alphaOff, alphaOn))
+        action.duration = duration*2
+        return action
     }
     
     

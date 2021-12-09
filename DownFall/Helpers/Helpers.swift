@@ -157,9 +157,16 @@ func findNeighbors(in tiles: [[Tile]], of coord: TileCoord, boardSize: Int, kill
         y >= 0,
         y < boardSize else { return ([], []) }
     
-    if case TileType.monster(_) = tiles[x][y].type, !killMonsters { return ([],[]) }
+    if case TileType.monster = tiles[x][y].type, !killMonsters { return ([],[]) }
     if case TileType.pillar = tiles[x][y].type { return ([],[]) }
     var queue = [TileCoord(x, y)]
+//    if killMonsters {
+//        if case TileType.monster = tiles[x][y].type {
+//            queue.append(TileCoord(x, y))
+//        }
+//    } else {
+//        queue.append(TileCoord(x, y))
+//    }
     var tileCoordSet = Set(queue)
     var head = 0
     var pillars = Set<TileCoord>()
@@ -177,7 +184,8 @@ func findNeighbors(in tiles: [[Tile]], of coord: TileCoord, boardSize: Int, kill
                     guard
                         valid(neighbor: TileCoord(i,j), for: TileCoord(tileRow, tileCol), boardSize: tiles.count),
                         !tileCoordSet.contains(TileCoord(i,j)) else { continue }
-                    if case .monster = tiles[i][j].type {
+                    if case .monster = tiles[i][j].type,
+                       case .monster = currTile.type {
                         queue.append(TileCoord(i,j))
                         tileCoordSet.insert(TileCoord(row: i, column: j))
                     }

@@ -44,7 +44,7 @@ class GameScene: SKScene {
     private var renderer: Renderer?
     
     //Generator
-    private var generator: HapticGenerator?
+    private var generator: HapticGenerator = HapticGenerator.shared
     
     //swipe recognizer view
     private var swipeRecognizerView: SwipeRecognizerView?
@@ -118,9 +118,6 @@ class GameScene: SKScene {
         //board
         board = Board.build(tileCreator: tileCreator, difficulty: difficulty, level: level, tutorialConductor: tutorialConductor)
         self.boardSize = boardSize
-        
-        // create haptic generator
-        generator = HapticGenerator()
         
         // create the audio listener
         let audioManager = AudioManager(sceneNode: foreground)
@@ -221,6 +218,8 @@ class GameScene: SKScene {
 
         //Turn watcher
         TurnWatcher.shared.register()
+        // create haptic generator
+        generator.register()
         
     }
     
@@ -229,7 +228,7 @@ class GameScene: SKScene {
         renderer = nil
         foreground = nil
         gameSceneDelegate = nil
-        generator = nil
+//        generator = nil
         rotatePreview = nil
         audioListener = nil
         runStatTracker = nil

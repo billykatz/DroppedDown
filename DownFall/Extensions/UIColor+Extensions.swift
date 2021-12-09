@@ -66,8 +66,9 @@ extension UIColor {
     static let goldOutlineBright = UIColor(rgb: 0xFDD300)
     static let runeBackgroundColor = UIColor(rgb: 0x522B28)
     
-    /// Rune Deteail color
-    static let runeDetailColor = UIColor(rgb: 0x572d29)
+    /// Rune Detail color
+    static let runeDetailFillColor = UIColor(rgb: 0x572d29)
+    static let runeDetailBorderColor = UIColor(rgb: 0x512F2A)
     
     /// Confirmation button
     static let confirmButtonColor = UIColor(rgb: 0x177a31)
@@ -87,6 +88,10 @@ extension UIColor {
     static let runeReplacementBackgroundFillBlue = UIColor(rgb: 0x314768)
     static let runeReplacementBackgroundStrokeBlue = UIColor(rgb: 0x8091AB)
     static let runeReplacementEmptyPanelBackground = UIColor(rgb: 0x182334)
+    
+    // Rune Use colors
+    static let runeChargedYellow = UIColor(rgb: 0xFDD300)
+    static let runeIllegalTargetsRed = UIColor(rgb: 0xFF0909)
     
     
     // Dialogue

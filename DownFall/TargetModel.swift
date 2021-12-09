@@ -28,4 +28,13 @@ struct AllTarget: Codable, Hashable {
     var allTargetAssociatedCoords: [TileCoord] {
         return targets.flatMap { $0.all }
     }
+    
+    func targetContaining(playerCoord: TileCoord) -> Target? {
+        for target in targets {
+            if target.all.contains(where: { $0 == playerCoord }) {
+                return target
+            }
+        }
+        return nil
+    }
 }

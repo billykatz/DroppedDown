@@ -56,6 +56,7 @@
 		28D6CE0D271F2A1D00532150 /* Dialogue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D6CE0C271F2A1D00532150 /* Dialogue.swift */; };
 		28D6CE0F271F2A3200532150 /* TutorialPhase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D6CE0E271F2A3200532150 /* TutorialPhase.swift */; };
 		28DCCB7E27616809004E70A8 /* RuneDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28DCCB7D27616809004E70A8 /* RuneDetailViewModel.swift */; };
+		28DCCB802762C649004E70A8 /* AnimatorCombat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28DCCB7F2762C649004E70A8 /* AnimatorCombat.swift */; };
 		28FA8974275809A700E6D57F /* TargetModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FA8973275809A700E6D57F /* TargetModel.swift */; };
 		28FA8976275809CB00E6D57F /* TargetingProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FA8975275809CB00E6D57F /* TargetingProtocol.swift */; };
 		3D00A0F923AAC813007E2D8B /* Identifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D00A0F823AAC813007E2D8B /* Identifiers.swift */; };
@@ -271,6 +272,7 @@
 		28D6CE0C271F2A1D00532150 /* Dialogue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dialogue.swift; sourceTree = "<group>"; };
 		28D6CE0E271F2A3200532150 /* TutorialPhase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialPhase.swift; sourceTree = "<group>"; };
 		28DCCB7D27616809004E70A8 /* RuneDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneDetailViewModel.swift; sourceTree = "<group>"; };
+		28DCCB7F2762C649004E70A8 /* AnimatorCombat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatorCombat.swift; sourceTree = "<group>"; };
 		28FA8973275809A700E6D57F /* TargetModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetModel.swift; sourceTree = "<group>"; };
 		28FA8975275809CB00E6D57F /* TargetingProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetingProtocol.swift; sourceTree = "<group>"; };
 		3D00A0F823AAC813007E2D8B /* Identifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identifiers.swift; sourceTree = "<group>"; };
@@ -563,6 +565,7 @@
 				3D9C505F21FE206000A2210D /* Renderer.swift */,
 				283DC7792718A831002A499A /* DialogueOverlay.swift */,
 				3D106097232E9A0200ECE7E6 /* Animator.swift */,
+				28DCCB7F2762C649004E70A8 /* AnimatorCombat.swift */,
 			);
 			path = Rendering;
 			sourceTree = "<group>";
@@ -1289,6 +1292,7 @@
 				3DE87C8E2235D05300D750CF /* MenuSpriteNode.swift in Sources */,
 				28CAFA7B26A0F2F000151CA8 /* CodexItemAnimatingView.swift in Sources */,
 				3D6AACE1222C997800C77B24 /* Header.swift in Sources */,
+				28DCCB802762C649004E70A8 /* AnimatorCombat.swift in Sources */,
 				2886E84326F031050014FA5D /* SettingsView.swift in Sources */,
 				2886E83E26F0303B0014FA5D /* SettingsCoordinator.swift in Sources */,
 				284F2EC32731DB3C00032088 /* FTUEConductor.swift in Sources */,
@@ -1555,6 +1559,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.williamKatz.DroppedDown;
 				PRODUCT_NAME = "Shift Shaft";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

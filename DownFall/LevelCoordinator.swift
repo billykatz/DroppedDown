@@ -79,11 +79,15 @@ class LevelCoordinator: LevelCoordinating {
         let seed = UInt64.random(in: .min ... .max)
         
         // no saved tiles for fresh run
-        let freshRunModel = RunModel(player: profile.runPlayer, seed: seed, savedTiles: nil, areas: [], goalTracking: [], stats: [], unlockables: profile.unlockables, startingUnlockables: profile.startingUnlockbles, isTutorial: { return tutorialConductor.isTutorial })
+        var playerData = profile.runPlayer
+        #if DEBUG
+        playerData = ProfileViewModel.runPlayer(playerData: playerData)
+        #endif
+        let freshRunModel = RunModel(player: playerData, seed: seed, savedTiles: nil, areas: [], goalTracking: [], stats: [], unlockables: profile.unlockables, startingUnlockables: profile.startingUnlockbles, isTutorial: { return tutorialConductor.isTutorial })
         
         self.runModel = runModel ?? freshRunModel
         RunScope.deepestDepth = profile.stats.filter( { $0.statType == .lowestDepthReached }).map { $0.amount }.first ?? 0
-        presentCurrentArea(updatedPlayerData: profile.runPlayer)
+        presentCurrentArea(updatedPlayerData: playerData)
     }
     
     /// This should be used when you want load the run from the last part

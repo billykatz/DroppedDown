@@ -25,6 +25,47 @@ struct StatButton: View {
     }
 }
 
+struct RuneView: View {
+    let runeType: RuneType
+    @State var isCharged = true
+    @State var cooldown = 5
+    
+    var body: some View {
+        VStack(alignment: .center) {
+            Text(runeType.humanReadable)
+            HStack {
+                StatButton(add: false).onTapGesture(perform: {
+                    cooldown -= 5
+                    cooldown = max(cooldown, 1)
+                })
+                Text("Cooldown: \(cooldown)")
+                StatButton(add: true).onTapGesture(perform: {
+                    if cooldown == 1 {
+                        cooldown += 4
+                    } else {
+                        cooldown += 5
+                    }
+                })
+            }
+            HStack {
+                StatButton(add: false).onTapGesture(perform: {
+                    isCharged = false
+                })
+                Text("isCharged: \(isCharged.description)")
+                StatButton(add: true).onTapGesture(perform: {
+                    isCharged = true
+                })
+            }
+            Button {
+                ProfileViewModel.addRuneToPlayer(runeType: runeType, charged: isCharged, cooldown: cooldown)
+            } label: {
+                Text("Add")
+            }
+        }.border(.blue, width: 2.0)
+            .padding(10)
+    }
+}
+
 
 struct StatView: View {
     let viewModel: ProfileViewModel
@@ -71,6 +112,14 @@ struct PlayerStatsView: View {
     
     var body: some View {
         ScrollView{
+            #if DEBUG
+            LazyVGrid(columns: [.init(.flexible(minimum: 250), alignment: .center), .init(.flexible(minimum: 250), alignment: .center)
+                               ], spacing: 20) {
+                ForEach(RuneType.allCases) { rune in
+                    RuneView(runeType: rune)
+                }
+            }.padding()
+            #endif
             HStack {
                 CodexWalletView(gemAmount: gemAmount)
                 #if DEBUG

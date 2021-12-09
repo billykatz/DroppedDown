@@ -55,7 +55,7 @@ class RuneDetailViewModel: RuneDetailViewModelable {
                 }
             case .monster:
                 let moreToKill = rune.cooldown - rune.rechargeCurrent
-                let charge = "Kill \(moreToKill) more monster\(moreToKill > 1 ? "s" : "") to charge"
+                let charge = "Kill \(moreToKill) more monster\(moreToKill > 1 ? "s" : "") with your pickaxe"
                 strings.append(charge)
             default:
                 break

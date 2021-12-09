@@ -44,7 +44,7 @@ extension TileType {
     
 }
 
-enum RuneType: String, Codable, Hashable, CaseIterable {
+enum RuneType: String, Codable, Hashable, CaseIterable, Identifiable {
     case rainEmbers
     case getSwifty
     case transformRock
@@ -64,6 +64,11 @@ enum RuneType: String, Codable, Hashable, CaseIterable {
     case monsterBrawl
     case monsterCrush
     case monsterDrain
+    
+    
+    var id: String {
+        return self.rawValue
+    }
     
     var humanReadable: String {
         switch self {

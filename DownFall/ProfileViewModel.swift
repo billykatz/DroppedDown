@@ -17,6 +17,22 @@ class ProfileViewModel {
     
     private var cancellables = Set<AnyCancellable>()
     
+    private static var debugRunesToAddToPlayer: [Rune] = [.rune(for: .drillDown)]
+    
+    static func addRuneToPlayer(runeType: RuneType, charged: Bool, cooldown: Int) {
+        var rune = Rune.rune(for: runeType)
+        rune.rechargeCurrent = charged ? cooldown : 0
+        rune.cooldown = cooldown
+        debugRunesToAddToPlayer.append(rune)
+        if debugRunesToAddToPlayer.count > 4 {
+            debugRunesToAddToPlayer = Array(debugRunesToAddToPlayer.dropFirst())
+        }
+    }
+    
+    static func runPlayer(playerData: EntityModel) -> EntityModel {
+        return playerData.update(pickaxe: Pickaxe(runeSlots: 4, runes: debugRunesToAddToPlayer))
+    }
+    
     var profile: Profile {
         profileSubject.value
     }
@@ -186,7 +202,7 @@ class ProfileViewModel {
             newProfile = newProfile.updateStatistic(stat, amount: stat.amount, overwriteIfLarger: overwrite)
         }
         
-        /// when a palyer abandon's a run (and we hit this coe path)
+        /// when a palyer abandon's a run (and we hit this code path)
         /// we want to nil out the player's current run.
         newProfile = newProfile.updateRunModel(nil)
         

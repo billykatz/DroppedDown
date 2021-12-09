@@ -80,6 +80,8 @@ class RuneContainerView: SKSpriteNode {
     }
     
     private func runeWasTapped(rune: Rune?, progress: Int) {
+        setupRuneDetailView(rune: rune, progress: progress)
+        
         /// They have tapped on a rune slot, it maybe empty or have a rune
         if let rune = rune {
             // The player tapped on a full rune slot.  Let someone know that we should etner targeting move
@@ -89,7 +91,6 @@ class RuneContainerView: SKSpriteNode {
         // TODO: I dont like that we have to set this flag.  Butttt, it is simple.  Potential refactor may be necessary
         if viewModel.disableDetailView { return }
         
-        setupRuneDetailView(rune: rune, progress: progress)
         toggleRuneSlots()
     }
     

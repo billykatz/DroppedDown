@@ -7,8 +7,8 @@
 //
 
 import Foundation
-
 struct Profile: Codable, Equatable {
+
     static var debugProfile = Profile(name: "debug", player: .lotsOfCash, currentRun: nil, stats: Statistics.startingStats, unlockables: Unlockable.unlockables, startingUnlockbles: [])
     
     static var zero = Profile(name: "zero", player: .zero, currentRun: nil, stats: [], unlockables: [], startingUnlockbles: [])

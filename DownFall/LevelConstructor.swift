@@ -10,7 +10,7 @@ import Foundation
 import GameplayKit
 
 typealias Depth = Int
-let bossLevelDepthNumber = 9
+let bossLevelDepthNumber = 99
 let testLevelDepthNumber = -1
 
 struct LevelConstructor {

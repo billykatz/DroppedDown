@@ -8,7 +8,15 @@
 
 import Foundation
 
+enum MonsterDeathType: String, Codable, Hashable {
+    case player
+    case rune
+    case dynamite
+    case mineralSpirits
+}
+
 struct MonsterDies: Codable, Hashable {
     let tileType: TileType
     let tileCoord: TileCoord
+    let deathType: MonsterDeathType
 }

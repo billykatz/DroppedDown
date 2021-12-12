@@ -12,11 +12,12 @@ struct StatButton: View {
     let textColor: UIColor = .white
     let font: Font = .titleCodexFont
     let add: Bool
+    let frame: CGSize
     
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 15.0)
-                .frame(width: 50, height: 50, alignment: .center)
+                .frame(width: frame.width, height: frame.height, alignment: .center)
             Text(add ? " +" : " -")
                 .font(font)
                 .foregroundColor(Color(textColor))
@@ -29,17 +30,18 @@ struct RuneView: View {
     let runeType: RuneType
     @State var isCharged = true
     @State var cooldown = 5
+    let buttonFrame = CGSize(widthHeight: 25.0)
     
     var body: some View {
         VStack(alignment: .center) {
             Text(runeType.humanReadable)
             HStack {
-                StatButton(add: false).onTapGesture(perform: {
+                StatButton(add: false, frame: buttonFrame).onTapGesture(perform: {
                     cooldown -= 5
                     cooldown = max(cooldown, 1)
                 })
                 Text("Cooldown: \(cooldown)")
-                StatButton(add: true).onTapGesture(perform: {
+                StatButton(add: true, frame: buttonFrame).onTapGesture(perform: {
                     if cooldown == 1 {
                         cooldown += 4
                     } else {
@@ -48,11 +50,11 @@ struct RuneView: View {
                 })
             }
             HStack {
-                StatButton(add: false).onTapGesture(perform: {
+                StatButton(add: false, frame: buttonFrame).onTapGesture(perform: {
                     isCharged = false
                 })
                 Text("isCharged: \(isCharged.description)")
-                StatButton(add: true).onTapGesture(perform: {
+                StatButton(add: true, frame: buttonFrame).onTapGesture(perform: {
                     isCharged = true
                 })
             }
@@ -81,10 +83,10 @@ struct StatView: View {
     var body: some View {
         HStack {
             #if DEBUG
-            StatButton(add: false).onTapGesture(perform: {
+            StatButton(add: false, frame: .fifty).onTapGesture(perform: {
                 viewModel.updateStat(amount: -50, stat: stat)
             })
-            StatButton(add: true).onTapGesture(perform: {
+            StatButton(add: true, frame: .fifty).onTapGesture(perform: {
                 viewModel.updateStat(amount: 50, stat: stat)
             })
             #endif
@@ -113,8 +115,8 @@ struct PlayerStatsView: View {
     var body: some View {
         ScrollView{
             #if DEBUG
-            LazyVGrid(columns: [.init(.flexible(minimum: 250), alignment: .center), .init(.flexible(minimum: 250), alignment: .center)
-                               ], spacing: 20) {
+            LazyVGrid(columns: [.init(.flexible(minimum: 200), alignment: .center), .init(.flexible(minimum: 200), alignment: .center)
+                               ], spacing: 0) {
                 ForEach(RuneType.allCases) { rune in
                     RuneView(runeType: rune)
                 }
@@ -127,12 +129,12 @@ struct PlayerStatsView: View {
                 Button(action: {
                     viewModel.updateGems(amount: -50)
                 }) {
-                    StatButton(add: false)
+                    StatButton(add: false, frame: .fifty)
                 }
                 Button(action: {
                     viewModel.updateGems(amount: 50)
                 }) {
-                    StatButton(add: true)
+                    StatButton(add: true, frame: .fifty)
                 }
                 
                 #endif

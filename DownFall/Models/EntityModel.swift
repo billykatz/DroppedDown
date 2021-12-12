@@ -181,18 +181,6 @@ struct EntityModel: Equatable, Codable {
         return attack.attacksPerTurn - attack.attacksThisTurn > 0
     }
     
-    func recordRuneProgress(_ progressDictionary: [Rune: CGFloat]) -> EntityModel {
-        var newRunes: [Rune] = []
-        for rune in self.pickaxe?.runes ?? [] {
-            var newRune = rune
-            newRune.recordedProgress = progressDictionary[rune]
-            newRunes.append(newRune)
-        }
-        
-        let newPick = Pickaxe(runeSlots: self.pickaxe?.runeSlots ?? 0, runes: newRunes)
-        return update(pickaxe: newPick)
-    }
-    
     func animation(of animationType: AnimationType) -> [SKTexture]? {
         guard let animations = animations.first(where: { $0.animationType == animationType })?.animationTextures else { return nil }
         return animations

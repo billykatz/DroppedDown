@@ -300,7 +300,11 @@ class Referee {
                 for (j, _) in row.enumerated() {
                     if case TileType.monster(let data) = tiles[TileCoord(i,j)].type {
                         if data.hp <= 0 {
-                            return Input(.monsterDies(TileCoord(i,j), data.type))
+                            var deathBy: MonsterDeathType = .rune
+                            if case EntityModel.EntityType.player? = data.killedBy {
+                                deathBy = .player
+                            }
+                            return Input(.monsterDies(TileCoord(i,j), data.type, deathType: deathBy))
                         }
                     }
                 }

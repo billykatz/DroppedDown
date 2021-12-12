@@ -37,7 +37,7 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
                                                 dodged: false,
                                                 attackerIsPlayer: false
                                         ),
-                                        .monsterDies(TileCoord(0,0), .wizard),
+                                        .monsterDies(TileCoord(0,0), .wizard, deathType: .player),
                                         .gameWin(0),
                                         .gameLose(killedBy: .alamo),
                                         .play,
@@ -74,7 +74,7 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
     case touch(_ position: TileCoord, _ tileType: TileType)
     case rotateCounterClockwise(preview: Bool)
     case rotateClockwise(preview: Bool)
-    case monsterDies(TileCoord, EntityModel.EntityType)
+    case monsterDies(TileCoord, EntityModel.EntityType, deathType: MonsterDeathType)
     case attack(attackType: AttackType, attacker: TileCoord, defender: TileCoord?, affectedTiles: [TileCoord], dodged: Bool, attackerIsPlayer: Bool)
     case gameWin(_ goalsCompleted: Int)
     case gameLose(killedBy: EntityModel.EntityType?)

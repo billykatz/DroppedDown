@@ -282,30 +282,13 @@ struct Animator {
             animate(spriteActions) { completion() }
             
         case .flameWall, .flameColumn:
-            var spriteActions: [SpriteAction] = []
-            for coord in affectedTiles {
-                let tileSprite = sprites[coord]
-                
-                let emptySprite = SKSpriteNode(imageNamed: "empty")
-                emptySprite.size = tileSprite.size
-                emptySprite.position = tileSprite.position
-                emptySprite.zPosition = tileSprite.zPosition + 1
-                
-                /// add the sprite to the scene
-                spriteForeground.addChild(emptySprite)
-                
-                /// do the animation
-                let runeAnimationAction = SKAction.animate(with: runeAnimation.animationFrames(), timePerFrame: 0.07)
-                
-                // remove the sprite from the scene
-                let removeAction = SKAction.removeFromParent()
-                let sequence = SKAction.sequence([runeAnimationAction, runeAnimationAction.reversed(), removeAction])
-                
-                let spriteAction = SpriteAction(sprite: emptySprite, action: sequence)
-                spriteActions.append(spriteAction)
+            guard let trans = transformations.first else {
+                completion()
+                return
             }
-            animate(spriteActions) { completion() }
             
+            animateFlameLine(spriteForeground: spriteForeground, sprites: sprites, transformation: trans, runeSpriteSheet: runeAnimation, completion: completion)
+                        
         case .vortex:
             var spriteActions: [SpriteAction] = []
             for tileCoord in affectedTiles {
@@ -353,6 +336,45 @@ struct Animator {
             
         default: break
         }
+    }
+    
+    func animateFlameLine(spriteForeground: SKNode, sprites: [[DFTileSpriteNode]], transformation: Transformation, runeSpriteSheet: SpriteSheet, completion: @escaping () -> Void) {
+        var spriteActions: [SpriteAction] = []
+        let monstersDies: [MonsterDies] = transformation.monstersDies ?? []
+        let affectedTiles: [TileCoord] = transformation.tileTransformation?.map( { $0.initial }) ?? []
+        for coord in affectedTiles {
+            let tileSprite = sprites[coord]
+            
+            let emptySprite = SKSpriteNode(imageNamed: "empty")
+            emptySprite.size = tileSprite.size
+            emptySprite.position = tileSprite.position
+            emptySprite.zPosition = tileSprite.zPosition + 1
+            
+            /// add the sprite to the scene
+            spriteForeground.addChild(emptySprite)
+            
+            /// do the animation
+            let runeAnimationFrames = runeSpriteSheet.animationFrames()
+            let duration = Double(runeAnimationFrames.count) * timePerFrame()
+            let runeAnimationAction = SKAction.animate(with: runeAnimationFrames, timePerFrame: timePerFrame())
+            
+            // add the dying animtion if the rune killed a monster
+            if monstersDies.contains(where: { $0.tileCoord == coord }) {
+                let dyingAnimation = createMonsterDyingAnimation(sprite: tileSprite, durationWaitBefore: duration * 1.75)
+                spriteActions.append(dyingAnimation)
+                
+            }
+            // remove the sprite from the scene
+            let removeAction = SKAction.removeFromParent()
+            let sequence: SKAction =  SKAction.sequence([runeAnimationAction, runeAnimationAction.reversed(), removeAction])
+            
+            let spriteAction = SpriteAction(sprite: emptySprite, action: sequence)
+            spriteActions.append(spriteAction)
+        }
+        animate(spriteActions) { completion() }
+
+    
+    
     }
     
     func animateMonsterCrush(sprites: [[DFTileSpriteNode]], transformation: Transformation, runeSpriteSheet: SpriteSheet, completion: @escaping () -> Void) {

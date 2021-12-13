@@ -244,6 +244,10 @@ struct LevelConstructor {
             
             goals = [rockGoal, monsterGoal]
             
+        case bossLevelDepthNumber:
+            
+            goals = [LevelGoal.bossGoal()]
+            
         case 8, 9:
             let monsterAmount = 8
             let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 55)
@@ -251,9 +255,6 @@ struct LevelConstructor {
             
             goals = [rockGoal, monsterGoal]
             
-        case bossLevelDepthNumber:
-            
-            goals = [LevelGoal.bossGoal()]
             
         case 10...Int.max:
             let monsterAmount = Int.random(in: 10...15)
@@ -334,12 +335,12 @@ struct LevelConstructor {
             //                                                        .rock(color: .brown, holdsGem: false, groupCount: 0): 10])
             //            return chances
             //
-            //        case 10...Int.max:
-            //            let chances = TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false, groupCount: 0): 29,
-            //                                                        .rock(color: .blue, holdsGem: false, groupCount: 0): 29,
-            //                                                        .rock(color: .purple, holdsGem: false, groupCount: 0): 29,
-            //                                                        .rock(color: .brown, holdsGem: false, groupCount: 0): 13])
-            //            return chances
+        case 10...Int.max:
+            let chances = TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false, groupCount: 0): 25,
+                                                        .rock(color: .blue, holdsGem: false, groupCount: 0): 25,
+                                                        .rock(color: .purple, holdsGem: false, groupCount: 0): 25,
+                                                        .rock(color: .brown, holdsGem: false, groupCount: 0): 25])
+            return chances
         case testLevelDepthNumber:
             let chances = TileTypeChanceModel(
                 chances: [
@@ -614,36 +615,42 @@ struct LevelConstructor {
             let ratRange = RangeModel(lower: 0, upper: 50)
             let alamoRange = ratRange.next(50)
             return [.rat: ratRange, .alamo: alamoRange]
+            
         case 2, 3:
             let ratRange = RangeModel(lower: 0, upper: 40)
             let alamoRange = ratRange.next(40)
             let batRange = alamoRange.next(20)
             return [.rat: ratRange, .alamo: alamoRange, .bat: batRange]
+            
         case 4, 5:
             let alamoRange = RangeModel(lower: 0, upper: 33)
             let ratRange = alamoRange.next(33)
             let batRange = ratRange.next(33)
             return [.alamo: alamoRange, .rat: ratRange, .bat: batRange]
+            
         case 6:
             let alamoRange = RangeModel(lower: 0, upper: 21)
             let dragonRange = alamoRange.next(25)
             let batRange = dragonRange.next(21)
             let ratRange = batRange.next(30)
             return [.rat: ratRange, .alamo: alamoRange, .dragon: dragonRange, .bat: batRange]
+            
         case 7:
             let alamoRange = RangeModel(lower: 0, upper: 20)
             let dragonRange = alamoRange.next(33)
             let batRange = dragonRange.next(20)
             let ratRange = batRange.next(25)
             return [.rat: ratRange, .alamo: alamoRange, .dragon: dragonRange, .bat: batRange]
+            
+        case bossLevelDepthNumber:
+            return [:]
+            
         case 8, 9:
             let alamoRange = RangeModel(lower: 0, upper: 20)
             let dragonRange = alamoRange.next(33)
             let batRange = dragonRange.next(18)
             let ratRange = batRange.next(20)
             return [.rat: ratRange, .alamo: alamoRange, .dragon: dragonRange, .bat: batRange]
-        case bossLevelDepthNumber:
-            return [:]
         case 10:
             let alamoRange = RangeModel(lower: 0, upper: 16)
             let dragonRange = alamoRange.next(20)
@@ -651,6 +658,7 @@ struct LevelConstructor {
             let ratRange = batRange.next(15)
             let sallyRange = ratRange.next(15)
             return [.rat: ratRange, .alamo: alamoRange, .dragon: dragonRange, .bat: batRange, .sally: sallyRange]
+            
         case 11:
             let alamoRange = RangeModel(lower: 0, upper: 15)
             let dragonRange = alamoRange.next(20)
@@ -658,6 +666,7 @@ struct LevelConstructor {
             let ratRange = batRange.next(10)
             let sallyRange = ratRange.next(15)
             return [.rat: ratRange, .alamo: alamoRange, .dragon: dragonRange, .bat: batRange, .sally: sallyRange]
+            
         case 12:
             let alamoRange = RangeModel(lower: 0, upper: 15)
             let dragonRange = alamoRange.next(20)
@@ -665,18 +674,21 @@ struct LevelConstructor {
             let ratRange = batRange.next(5)
             let sallyRange = ratRange.next(25)
             return [.rat: ratRange, .alamo: alamoRange, .dragon: dragonRange, .bat: batRange, .sally: sallyRange]
+            
         case 13:
             let alamoRange = RangeModel(lower: 0, upper: 15)
             let dragonRange = alamoRange.next(15)
             let batRange = dragonRange.next(15)
             let sallyRange = batRange.next(25)
             return [.alamo: alamoRange, .dragon: dragonRange, .bat: batRange, .sally: sallyRange]
+            
         case 14:
             let alamoRange = RangeModel(lower: 0, upper: 15)
             let dragonRange = alamoRange.next(15)
             let batRange = dragonRange.next(10)
             let sallyRange = batRange.next(30)
             return [.alamo: alamoRange, .dragon: dragonRange, .bat: batRange, .sally: sallyRange]
+            
         case 15...Int.max:
             let alamoRange = RangeModel(lower: 0, upper: 15)
             let dragonRange = alamoRange.next(15)

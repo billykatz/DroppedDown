@@ -163,7 +163,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
                 bodyText = "I'm so happy you like Shift Shaft. Please share it with your friends."
             } else if (level?.depth ?? 0) == 24 {
                 titleText = "Bravo"
-                bodyText = "Please send a screenshot to me and I'll give you a gift. \(UUID())"
+                bodyText = "Please send a screenshot to me and I'll send you a gift. \(UUID())"
             }
             
             

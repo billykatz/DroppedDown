@@ -301,7 +301,6 @@ class BossController {
     
     
     var isBossLevel: Bool {
-        // 9 is actually "10"
         return level.depth == bossLevelDepthNumber
     }
     

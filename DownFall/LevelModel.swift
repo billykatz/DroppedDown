@@ -144,31 +144,32 @@ class Level: Codable, Hashable {
             if tilesSinceMonsterKilled < 20 {
                 return -1
             } else if tilesSinceMonsterKilled < 45 {
-                return 4
+                return 5
             } else {
                 return 15
             }
             
         case 5, 6:
-            if tilesSinceMonsterKilled < 25 {
+            if tilesSinceMonsterKilled < 18 {
                 return -1
-            } else if tilesSinceMonsterKilled < 40 {
-                return 4
+            } else if tilesSinceMonsterKilled < 36 {
+                return 6
             } else {
                 return 17
             }
             
-        case 7,8:
-            if tilesSinceMonsterKilled < 25 {
+        case bossLevelDepthNumber:
+            return -1
+            
+        case 7,8...Int.max:
+            if tilesSinceMonsterKilled < 15 {
                 return -1
-            } else if tilesSinceMonsterKilled < 40 {
-                return 4
+            } else if tilesSinceMonsterKilled < 30 {
+                return 7
             } else {
                 return 20
             }
 
-        case bossLevelDepthNumber:
-            return -1
             
         default:
             return -1

@@ -172,7 +172,7 @@ class Renderer: SKSpriteNode {
         
         // tile detail view
         self.tileDetailView = TileDetailView(foreground: foreground, playableRect: playableRect, alignedTo: hud.frame, levelSize: level.boardSize)
-        tileDetailView?.zPosition = Precedence.flying.rawValue
+        tileDetailView?.zPosition = 2_000_000
         
         self.isUserInteractionEnabled = true
         

@@ -13,21 +13,19 @@ class TileCreator: TileStrategy {
     
     static let tutorialBoard: [[Tile]] =
     [
-        [.purpleRock, .blueRock, .redRock, .blueRock, .redRock, .purpleRock, .blueRock, .redRock],
+        [.blueRock, .redRock, .blueRock, .redRock, .purpleRock, .blueRock, .redRock],
         
-        [.blueRock, .purpleRock, .blueRock, .redRock, .purpleRock, .redRock, .blueRock, .redRock],
+        [.purpleRock, .blueRock, .redRock, .purpleRock, .redRock, .blueRock, .redRock],
         
-        [.blueRock, .purpleRock, .purpleRock, Tile(type: .rock(color: .purple, holdsGem: true, groupCount: 7)), .purpleRock, .blueRock, .redRock, .blueRock],
+        [.purpleRock, .purpleRock, Tile(type: .rock(color: .purple, holdsGem: true, groupCount: 7)), .purpleRock, .blueRock, .redRock, .blueRock],
         
-        [.purpleRock, .redRock, .blueRock, .redRock, .purpleRock, .redRock, Tile(type: .exit(blocked: true)), .redRock],
+        [.redRock, .blueRock, .redRock, .purpleRock, .redRock, Tile(type: .exit(blocked: true)), .redRock],
         
-        [.blueRock, .blueRock, .redRock, .purpleRock, .redRock, .purpleRock, .redRock, .blueRock],
+        [.blueRock, .redRock, .purpleRock, .redRock, .purpleRock, .redRock, .blueRock],
         
-        [.purpleRock, .redRock, .purpleRock, .blueRock, .player, .blueRock, .redRock, .purpleRock],
+        [.redRock, .purpleRock, .blueRock, .player, .blueRock, .redRock, .purpleRock],
         
-        [.blueRock, .purpleRock, .redRock, .purpleRock, .blueRock, .redRock, .purpleRock, .blueRock],
-        
-        [.blueRock, .purpleRock, .redRock, .blueRock, .redRock, .purpleRock, .redRock, .purpleRock]
+        [.purpleRock, .redRock, .purpleRock, .blueRock, .redRock, .purpleRock, .blueRock]
     ]
     
     
@@ -323,7 +321,7 @@ class TileCreator: TileStrategy {
         
         
         if tutorialConductor.isTutorial {
-            var newTutorialBoard: [[Tile]] = Array.init(repeating: Array.init(repeating: .empty, count: 8), count: 8)
+            var newTutorialBoard: [[Tile]] = Array.init(repeating: Array.init(repeating: .empty, count: 7), count: 7)
             
             for row in 0..<TileCreator.tutorialBoard.count {
                 for col in 0..<TileCreator.tutorialBoard.count {

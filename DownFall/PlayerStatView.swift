@@ -171,8 +171,8 @@ struct RuneView: View {
             }
         }
         .border(.blue, width: 2.0)
-        .cornerRadius(5.0)
-        .padding(20)
+        .cornerRadius(15.0)
+        .padding(2)
     }
 }
 
@@ -276,14 +276,9 @@ struct PlayerStatsView: View {
             PickaxeView()
             #endif
             #if DEBUG
-            LazyVGrid(columns: [
-                .init(.flexible(minimum: 200, maximum: 300), alignment: .center),
-                .init(.flexible(minimum: 200, maximum: 300), alignment: .center)
-                               ], spacing: 0) {
-                ForEach(RuneType.allCases) { rune in
-                    RuneView(runeType: rune)
-                }
-            }.padding()
+            ForEach(RuneType.allCases) { rune in
+                RuneView(runeType: rune)
+            }
             #endif
             HStack {
                 CodexWalletView(gemAmount: gemAmount)
@@ -304,7 +299,7 @@ struct PlayerStatsView: View {
             }.background(Color(UIColor.backgroundGray))
             ForEach(playerStatistics) {  stat in
                 StatView(viewModel: viewModel, stat: stat)
-                    .padding(EdgeInsets(top: 0.0, leading: 50.0, bottom: 0.0, trailing: 50.0))
+                    .padding(EdgeInsets(top: 0.0, leading: 4.0, bottom: 0.0, trailing: 20.0))
             }.onReceive(viewModel.profilePublisher, perform: { profile in
                 playerStatistics = profile.stats
                 gemAmount = viewModel.gemAmount

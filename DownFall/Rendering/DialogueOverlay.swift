@@ -213,11 +213,16 @@ class DialogueOverlay: SKSpriteNode {
         
         let dialogueView = DialogueView(dialogue: tutorialPhase.dialogue)
         dialogueView.zPosition = 200_000_000_000
+        
+        // we need these set for some UI code
+        let fauxBackpackView = SKSpriteNode(color: .clear, size: CGSize(width: playableRect.width, height: playableRect.height * 0.2))
+        let backpackposition = CGPoint.position(this: fauxBackpackView.frame, centeredInBottomOf: playableRect)
+        fauxBackpackView.position = backpackposition
+        
         if (tutorialPhase.showAbovePickaxe) {
-            let fauxBackpackView = SKSpriteNode(color: .clear, size: CGSize(width: playableRect.width, height: playableRect.height * 0.2))
-            let backpackposition = CGPoint.position(this: fauxBackpackView.frame, centeredInBottomOf: playableRect)
-            fauxBackpackView.position = backpackposition
             dialogueView.position = CGPoint.alignHorizontally(dialogueView.frame, relativeTo: fauxBackpackView.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: 200.0, translatedToBounds: true)
+        } else if tutorialPhase.shouldShowRotateFinger {
+            dialogueView.position = CGPoint.alignHorizontally(dialogueView.frame, relativeTo: fauxBackpackView.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: 500.0, translatedToBounds: true)
             
         } else {
             dialogueView.position = CGPoint.position(dialogueView.frame, inside: playableRect, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: 275)
@@ -251,6 +256,11 @@ class DialogueOverlay: SKSpriteNode {
         
         if tutorialPhase.shouldShowRotateFinger {
             showRotateFinger(playableRect: playableRect)
+            let fakeFrame = CGRect(origin: .zero, size: CGSize(width: playableRect.width, height: playableRect.height * 0.2))
+            levelGoalsHighlight.position = CGPoint.position(this: fakeFrame, centeredInBottomOf: playableRect, verticalPadding: 275)
+            levelGoalsHighlight.setScale(1.1)
+            levelGoalsHighlight.alpha = 0.75
+            self.addChild(levelGoalsHighlight)
         }
         
         if tutorialPhase.showAbovePickaxe {
@@ -258,6 +268,7 @@ class DialogueOverlay: SKSpriteNode {
             levelGoalsHighlight.setScale(1.1)
             self.addChild(levelGoalsHighlight)
         }
+            
 
         self.addChild(dialogueView)
     }
@@ -268,33 +279,63 @@ class DialogueOverlay: SKSpriteNode {
         maskHighlightNode.position = position
         maskHighlightNode.alpha = 0.5
         self.addChild(maskHighlightNode)
+        
+        let fingerSize = CGSize(widthHeight: 125.0)
+        let fingerContainerSprite = SKSpriteNode(color: .clear, size: fingerSize)
 
+        // create sprites
+        let fingerUnpressed = SKSpriteNode(texture: SKTexture(imageNamed: "finger"), size: fingerSize)
+        let fingerPressed = SKSpriteNode(texture: SKTexture(imageNamed: "finger-pressed"), size: fingerSize)
+        let fingerSwiping = SKSpriteNode(texture: SKTexture(imageNamed: "finger-swiping"), size: fingerSize)
         
+        // create start and end positions
+        let fingerY = CGFloat(380)
+        let fingerStartPosition = CGPoint.position(fingerContainerSprite.frame, inside: playableRect, verticalAlign: .bottom, horizontalAnchor: .left, xOffset: 50, yOffset: fingerY)
+        let fingerEndPosition = CGPoint.position(fingerContainerSprite.frame, inside: playableRect, verticalAlign: .bottom, horizontalAnchor: .right, xOffset: 40, yOffset: fingerY)
         
-        let finger = SKSpriteNode(texture: SKTexture(imageNamed: "finger"), size: CGSize(width: 125.0, height: 125.0))
-        let fingerStartPosition = CGPoint.position(finger.frame, inside: playableRect, verticalAlign: .bottom, horizontalAnchor: .right, xOffset: 50, yOffset: 475)
-        let fingerEndPosition = CGPoint.position(finger.frame, inside: playableRect, verticalAlign: .bottom, horizontalAnchor: .right, xOffset: 50, yOffset: 1475)
-        
-        finger.position = fingerStartPosition
+        fingerContainerSprite.position = fingerStartPosition
 
+        // show finger (unpressed)
+        let showFingerUnpressed = SKAction.run {
+            fingerUnpressed.alpha = 1.0
+            fingerPressed.alpha = 0.0
+            fingerSwiping.alpha = 0.0
+        }
         
-        let moveUp = SKAction.move(to: fingerEndPosition, duration: 1.25)
-//        let fingerSwivel = SKAction.rotate(toAngle: -180, duration: 0.5)
+        let showFingerPressed = SKAction.run {
+            fingerUnpressed.alpha = 0.0
+            fingerPressed.alpha = 1.0
+            fingerSwiping.alpha = 0.0
+        }
         
-//        let returnFingerSwivel = SKAction.rotate(toAngle: -180, duration: 0)
-        let returnAction = SKAction.move(to: fingerStartPosition, duration: 0)
+        let showFingerSwiping = SKAction.run {
+            fingerUnpressed.alpha = 0.0
+            fingerPressed.alpha = 0.0
+            fingerSwiping.alpha = 1.0
+        }
+        // show finger pressed
+        // show finger moving
+        // and show finger swiping
+        // show finger pressed
+        // show finger unpress
+        // move back to start
+        let shortPause = SKAction.wait(forDuration: 0.2)
+        let longPause = SKAction.wait(forDuration: 0.5)
+        let moveLeftToRight = SKAction.move(to: fingerEndPosition, duration: 0.75)
+        let moveUpJustABit = SKAction.moveBy(x: 0.0, y: 15.0, duration: 0.0)
+        let moveDownJustABit = moveUpJustABit.reversed()
+        moveLeftToRight.timingMode = .easeInEaseOut
+        let moveBackToBeginning = SKAction.move(to: fingerStartPosition, duration: 0.5)
+        moveBackToBeginning.timingMode = .easeInEaseOut
         
-        let pause = SKAction.wait(forDuration: 0.5)
+        let seq = SKAction.sequence(showFingerUnpressed, shortPause, moveUpJustABit, showFingerPressed, shortPause, showFingerSwiping, moveLeftToRight, moveDownJustABit, showFingerUnpressed, longPause, moveBackToBeginning)
         
-        let groupFirst = SKAction.group([moveUp])
-        let groupSecond = SKAction.group([returnAction])
-        let seq = SKAction.sequence([pause, groupFirst, pause, groupSecond])
-        let runForever = SKAction.repeatForever(seq)
-        runForever.timingMode = .easeInEaseOut
+        fingerContainerSprite.addChild(fingerUnpressed)
+        fingerContainerSprite.addChild(fingerPressed)
+        fingerContainerSprite.addChild(fingerSwiping)
+        addChild(fingerContainerSprite)
         
-        addChild(finger)
-        
-        finger.run(runForever)
+        fingerContainerSprite.run(SKAction.repeatForever(seq))
         
         
         

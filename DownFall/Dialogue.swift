@@ -63,8 +63,8 @@ extension Dialogue {
     
     static let youCanRotate: Dialogue = .init(sentences:
                                                             [
-                                                                Sentence(text: "You saw how things move down from the top when you mine?", emotion: .content),
-                                                                Sentence(text: "You can also rotate the level by dragging it to affect how the board shifts.", emotion: .content),
+                                                                Sentence(text: "Amazing! Now rotate the board to get those gems.", emotion: .surprised),
+                                                                Sentence(text: "Use the power of the anicent cave hieroglyphics to rotate the board.", emotion: .content),
                                                                 
                                                             ],
                                                           character: .teri,
@@ -72,8 +72,8 @@ extension Dialogue {
     
     static let youCanRotateAgain: Dialogue = .init(sentences:
                                                             [
-                                                                Sentence(text: "You know you can rotate the board right?", emotion: .skeptical),
-                                                                Sentence(text: "Try swiping up or down to rotate.", emotion: .skeptical),
+                                                                Sentence(text: "You won't get very far without rotating the board", emotion: .skeptical),
+                                                                Sentence(text: "Swipe your finger across the screen to rotate the board.", emotion: .skeptical),
                                                                 
                                                             ],
                                                           character: .teri,
@@ -119,11 +119,7 @@ extension Dialogue {
                                                 [
                                                     Sentence(text: "When you complete all the level goals you unblock the exit", emotion: .content),
                                                     Sentence(text: "Not only that, but each completed goal grants you the choice between two items.", emotion: .content),
-                                                    Sentence(text: "When you collect one the other one disappears...", emotion: .content),
-                                                    Sentence(text: "... no one knows what happens to the other item, some say the Mineral Spirits feed off it.", emotion: .skeptical),
-                                                    
-                                                    
-                                                    
+                                                    Sentence(text: "When you collect one the other one disappears as an offering to the Mineral Sprits", emotion: .content)
                                                 ],
                                               character: .teri,
                                               delayBeforeTyping: 0.25)

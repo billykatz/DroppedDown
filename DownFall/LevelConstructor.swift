@@ -244,7 +244,7 @@ struct LevelConstructor {
             
             goals = [rockGoal, monsterGoal]
             
-        case 8:
+        case 8, 9:
             let monsterAmount = 8
             let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 55)
             let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
@@ -357,55 +357,149 @@ struct LevelConstructor {
     
     /// Randomly creates 0 up to a max of boardsize/8 pillar coordinates
     static func pillars(depth: Depth, randomSource: GKLinearCongruentialRandomSource) -> [PillarCoorindates] {
-        
-        func randomPillar(notIn set: Set<ShiftShaft_Color>) -> TileType {
-            var color = ShiftShaft_Color.pillarCases.randomElement()!
-            while set.contains(color) {
-                color = ShiftShaft_Color.pillarCases.randomElement()!
-            }
-            return TileType.pillar(PillarData(color: color, health: 3))
-        }
-        
-        func randomPillar() -> TileType {
-            return randomPillar(notIn: [.brown, .green])
-        }
-        
-        
-        
-        //        =FLOOR( MIN(M3 - (2 - MOD(RAND() * 10, 2)),  (AD3 + RANDBETWEEN(-1,1) ) ))
-        /// no pillars in first 5 levels
-        //        let depthDivided = self.depthDivided(depth)
-        let numPillarsBasedOnDepth: Int
         switch depth {
-        case 1, 2, 3, 4:
-            numPillarsBasedOnDepth = 0
+        case 0, 1, 2:
+            return []
+        case 3, 4:
+            return lowLevelPillars()
         case 5, 6:
-            numPillarsBasedOnDepth = 3 + (randomSource.positiveNextInt % 2 == 0 ? -1 : 1)
-        case 7, 8:
-            numPillarsBasedOnDepth = 5 + (randomSource.positiveNextInt % 2 == 0 ? -1 : 1)
+            return midLevelPillars()
         case bossLevelDepthNumber:
-            //            numPillarsBasedOnDepth = 1
             return bossPillars()
-        case 10...Int.max:
-            numPillarsBasedOnDepth = 3 + (randomSource.positiveNextInt % 2 == 0 ? -1 : 1)
+        case 7, 8, 9...Int.max:
+            return highLevelPillars()
         default:
-            numPillarsBasedOnDepth = 0
+            return []
         }
-        
-        let numberPillars = min(boardSize(depth: depth) - (2 - randomSource.positiveNextInt % 2), numPillarsBasedOnDepth)
-        
-        var coord: [TileCoord] = []
-        var pillars: [PillarCoorindates] = []
-        for _ in 0..<numberPillars {
-            let pillar = randomPillar()
-            let coordinate = TileCoord.random(boardSize(depth: depth), notInReservedCoords: coord)
-            
-            coord.append(coordinate)
-            pillars.append(PillarCoorindates((pillar, coordinate)))
-        }
-        
-        return pillars
     }
+    
+    static func lowLevelPillars() -> [PillarCoorindates] {
+        let pillarColors: [ShiftShaft_Color] = [.blue, .red]
+        let coords: [TileCoord] = [
+            TileCoord(5, 4), TileCoord(3, 4),
+        ]
+        
+        let pillarColors2: [ShiftShaft_Color] = [.red, .purple]
+        let coords2: [TileCoord] = [
+            TileCoord(1, 1), TileCoord(6, 6)
+        ]
+        
+        let pillarColors3: [ShiftShaft_Color] = [.blue, .purple]
+        let coords3: [TileCoord] = [
+            TileCoord(4, 1), TileCoord(3, 6)
+        ]
+        
+        let pillarColors4: [ShiftShaft_Color] = [.red, .purple]
+        let coords4: [TileCoord] = [
+            TileCoord(3, 4), TileCoord(4, 3),
+        ]
+        
+        let pillarColors5: [ShiftShaft_Color] = [.blue, .red]
+        let coords5: [TileCoord] = [
+            TileCoord(4, 0), TileCoord(3, 7),
+        ]
+    
+        
+        let chosenColors = [pillarColors, pillarColors2, pillarColors3, pillarColors4, pillarColors5]
+        let chosenCoords = [coords, coords2, coords3, coords4, coords5]
+        let randomIdx = Int.random(chosenColors.count)
+        return matchupPillarsRandomly(colors: chosenColors[randomIdx], coordinatess: chosenCoords[randomIdx])
+    }
+    
+    static func midLevelPillars() -> [PillarCoorindates] {
+        let pillarColors: [ShiftShaft_Color] = [.blue, .red, .purple, .randomColor]
+        let coords: [TileCoord] = [
+            TileCoord(3, 3), TileCoord(5, 3),
+            TileCoord(3, 5), TileCoord(5, 5)
+        ]
+        
+        let pillarColors2: [ShiftShaft_Color] = [.blue, .red, .purple, .randomColor]
+        let coords2: [TileCoord] = [
+            TileCoord(1, 4), TileCoord(3, 4), TileCoord(5, 4), TileCoord(7, 4)
+        ]
+        
+        let pillarColors3: [ShiftShaft_Color] = [.blue, .red, .purple, .randomColor, .randomColor]
+        let coords3: [TileCoord] = [
+            TileCoord(7, 1), TileCoord(1, 1),
+            TileCoord(4, 4),
+            TileCoord(7, 7), TileCoord(1, 7)
+        ]
+        
+        let pillarColors4: [ShiftShaft_Color] = [.blue, .red, .purple, .randomColor, .randomColor]
+        let coords4: [TileCoord] = [
+            TileCoord(8, 4), TileCoord(4, 8),
+            TileCoord(4, 4),
+            TileCoord(0, 4), TileCoord(4, 0)
+        ]
+        
+        let pillarColors5: [ShiftShaft_Color] = [.blue, .red, .purple, .randomColor]
+        let coords5: [TileCoord] = [
+            TileCoord(6, 2), TileCoord(2, 2),
+            TileCoord(2, 6), TileCoord(6, 6)
+        ]
+        
+        let pillarColors6: [ShiftShaft_Color] = [.blue, .red, .purple, .randomColor]
+        let coords6: [TileCoord] = [
+            TileCoord(8, 3), TileCoord(8, 5),
+            TileCoord(0, 3), TileCoord(0, 5)
+        ]
+    
+        
+        let chosenColors = [pillarColors, pillarColors2, pillarColors3, pillarColors4, pillarColors5, pillarColors6]
+        let chosenCoords = [coords, coords2, coords3, coords4, coords5, coords6]
+        let randomIdx = Int.random(chosenColors.count)
+        return matchupPillarsRandomly(colors: chosenColors[randomIdx], coordinatess: chosenCoords[randomIdx])
+    }
+    
+    static func highLevelPillars() -> [PillarCoorindates] {
+        let pillarColors: [ShiftShaft_Color] = [.blue, .red, .purple, .randomColor, .randomColor, .randomColor]
+        let coords: [TileCoord] = [
+            TileCoord(1, 8), TileCoord(0, 7), TileCoord(0, 8),
+            TileCoord(8, 0), TileCoord(7, 0), TileCoord(8, 1)
+        ]
+        
+        let pillarColors2: [ShiftShaft_Color] = [.blue, .red, .purple, .randomColor, .randomColor, .randomColor]
+        let coords2: [TileCoord] = [
+            TileCoord(3, 0), TileCoord(4, 0), TileCoord(5, 0),
+            TileCoord(3, 8), TileCoord(4, 8), TileCoord(5, 8)
+        ]
+        
+        let pillarColors3: [ShiftShaft_Color] = [.blue, .red, .purple, .randomColor, .randomColor, .randomColor]
+        let coords3: [TileCoord] = [
+            TileCoord(7, 3), TileCoord(6, 4), TileCoord(7, 5),
+            TileCoord(1, 3), TileCoord(2, 4), TileCoord(1, 5),
+        ]
+        
+        let pillarColors4: [ShiftShaft_Color] = [.blue, .red, .purple, .randomColor, .randomColor, .randomColor, .randomColor]
+        let coords4: [TileCoord] = [
+            TileCoord(5, 3), TileCoord(5, 4),TileCoord(5, 5),
+            TileCoord(4, 4),
+            TileCoord(3, 3), TileCoord(3, 4),TileCoord(3, 5),
+        ]
+        
+        let pillarColors5: [ShiftShaft_Color] = [.blue, .red, .purple, .randomColor, .randomColor, .randomColor, .randomColor]
+        let coords5: [TileCoord] = [
+            TileCoord(4, 3), TileCoord(4, 4), TileCoord(4, 5),
+            TileCoord(8, 4), TileCoord(7, 4),
+            TileCoord(0, 4), TileCoord(1, 4),
+        ]
+        
+        let pillarColors6: [ShiftShaft_Color] = [.blue, .red, .purple, .randomColor, .randomColor, .randomColor, .randomColor, .randomColor]
+        let coords6: [TileCoord] = [
+            TileCoord(8, 0), TileCoord(7, 1),
+            TileCoord(0, 0), TileCoord(1, 1),
+            TileCoord(1, 7), TileCoord(0, 8),
+            TileCoord(7, 7), TileCoord(8, 8),
+        ]
+    
+        
+        let chosenColors = [pillarColors, pillarColors2, pillarColors3, pillarColors4, pillarColors5, pillarColors6]
+        let chosenCoords = [coords, coords2, coords3, coords4, coords5, coords6]
+        let randomIdx = Int.random(chosenColors.count)
+        return matchupPillarsRandomly(colors: chosenColors[randomIdx], coordinatess: chosenCoords[randomIdx])
+        
+    }
+
     
     static func bossPillars() -> [PillarCoorindates] {
         let pillarColors: [ShiftShaft_Color] = [.blue, .blue, .blue, .purple, .purple, .purple, .red, .red, .red]
@@ -519,13 +613,13 @@ struct LevelConstructor {
         case 0, 1:
             let ratRange = RangeModel(lower: 0, upper: 50)
             let alamoRange = ratRange.next(50)
-            return [.rat: ratRange, .bat: alamoRange]
-        case 2:
+            return [.rat: ratRange, .alamo: alamoRange]
+        case 2, 3:
             let ratRange = RangeModel(lower: 0, upper: 40)
             let alamoRange = ratRange.next(40)
             let batRange = alamoRange.next(20)
             return [.rat: ratRange, .alamo: alamoRange, .bat: batRange]
-        case 3, 4, 5:
+        case 4, 5:
             let alamoRange = RangeModel(lower: 0, upper: 33)
             let ratRange = alamoRange.next(33)
             let batRange = ratRange.next(33)
@@ -534,69 +628,61 @@ struct LevelConstructor {
             let alamoRange = RangeModel(lower: 0, upper: 21)
             let dragonRange = alamoRange.next(25)
             let batRange = dragonRange.next(21)
-            let ratRange = batRange.next(33)
+            let ratRange = batRange.next(30)
             return [.rat: ratRange, .alamo: alamoRange, .dragon: dragonRange, .bat: batRange]
         case 7:
             let alamoRange = RangeModel(lower: 0, upper: 20)
             let dragonRange = alamoRange.next(33)
             let batRange = dragonRange.next(20)
-            let ratRange = batRange.next(27)
+            let ratRange = batRange.next(25)
             return [.rat: ratRange, .alamo: alamoRange, .dragon: dragonRange, .bat: batRange]
-        case 8:
+        case 8, 9:
             let alamoRange = RangeModel(lower: 0, upper: 20)
             let dragonRange = alamoRange.next(33)
             let batRange = dragonRange.next(18)
-            let ratRange = batRange.next(30)
+            let ratRange = batRange.next(20)
             return [.rat: ratRange, .alamo: alamoRange, .dragon: dragonRange, .bat: batRange]
         case bossLevelDepthNumber:
             return [:]
-            let alamoRange = RangeModel(lower: 0, upper: 20)
-            let dragonRange = alamoRange.next(25)
-            let batRange = dragonRange.next(25)
-            let ratRange = batRange.next(30)
-            return [.rat: ratRange, .alamo: alamoRange, .dragon: dragonRange, .bat: batRange]
         case 10:
             let alamoRange = RangeModel(lower: 0, upper: 16)
             let dragonRange = alamoRange.next(20)
             let batRange = dragonRange.next(16)
-            let ratRange = batRange.next(33)
+            let ratRange = batRange.next(15)
             let sallyRange = ratRange.next(15)
             return [.rat: ratRange, .alamo: alamoRange, .dragon: dragonRange, .bat: batRange, .sally: sallyRange]
         case 11:
             let alamoRange = RangeModel(lower: 0, upper: 15)
             let dragonRange = alamoRange.next(20)
             let batRange = dragonRange.next(20)
-            let ratRange = batRange.next(30)
+            let ratRange = batRange.next(10)
             let sallyRange = ratRange.next(15)
             return [.rat: ratRange, .alamo: alamoRange, .dragon: dragonRange, .bat: batRange, .sally: sallyRange]
         case 12:
             let alamoRange = RangeModel(lower: 0, upper: 15)
             let dragonRange = alamoRange.next(20)
             let batRange = dragonRange.next(15)
-            let ratRange = batRange.next(25)
+            let ratRange = batRange.next(5)
             let sallyRange = ratRange.next(25)
             return [.rat: ratRange, .alamo: alamoRange, .dragon: dragonRange, .bat: batRange, .sally: sallyRange]
         case 13:
             let alamoRange = RangeModel(lower: 0, upper: 15)
             let dragonRange = alamoRange.next(15)
             let batRange = dragonRange.next(15)
-            let ratRange = batRange.next(30)
-            let sallyRange = ratRange.next(25)
-            return [.rat: ratRange, .alamo: alamoRange, .dragon: dragonRange, .bat: batRange, .sally: sallyRange]
+            let sallyRange = batRange.next(25)
+            return [.alamo: alamoRange, .dragon: dragonRange, .bat: batRange, .sally: sallyRange]
         case 14:
             let alamoRange = RangeModel(lower: 0, upper: 15)
             let dragonRange = alamoRange.next(15)
             let batRange = dragonRange.next(10)
-            let ratRange = batRange.next(30)
-            let sallyRange = ratRange.next(30)
-            return [.rat: ratRange, .alamo: alamoRange, .dragon: dragonRange, .bat: batRange, .sally: sallyRange]
+            let sallyRange = batRange.next(30)
+            return [.alamo: alamoRange, .dragon: dragonRange, .bat: batRange, .sally: sallyRange]
         case 15...Int.max:
             let alamoRange = RangeModel(lower: 0, upper: 15)
             let dragonRange = alamoRange.next(15)
             let batRange = dragonRange.next(10)
-            let ratRange = batRange.next(30)
-            let sallyRange = ratRange.next(30)
-            return [.rat: ratRange, .alamo: alamoRange, .dragon: dragonRange, .bat: batRange, .sally: sallyRange]
+            let sallyRange = batRange.next(30)
+            return [.alamo: alamoRange, .dragon: dragonRange, .bat: batRange, .sally: sallyRange]
             
         case testLevelDepthNumber:
             let ratRange = RangeModel(lower: 0, upper: 50)

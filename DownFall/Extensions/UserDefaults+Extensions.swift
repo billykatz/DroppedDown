@@ -68,4 +68,7 @@ extension UserDefaults {
     static let hasSeenMinedFirstGemFTUEKey = "hasSeenMinedFirstGemFTUE"
     static let hasSeenRuneChargedForTheFirstTimeFTUEKey = "hasSeenRuneChargedForTheFirstTimeFTUE"
     
+    // MARK: DEBUG flags
+    static let startingDepthLevelKey = "startingDepthLevelKey"
+    
 }

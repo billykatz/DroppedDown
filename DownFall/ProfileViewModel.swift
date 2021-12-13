@@ -17,20 +17,37 @@ class ProfileViewModel {
     
     private var cancellables = Set<AnyCancellable>()
     
-    private static var debugRunesToAddToPlayer: [Rune] = [.rune(for: .drillDown)]
+    private static var debugNumberRuneSlots: Int = 1
+    private static var debugRunesToAddToPlayer: [Rune] = []
     
     static func addRuneToPlayer(runeType: RuneType, charged: Bool, cooldown: Int) {
         var rune = Rune.rune(for: runeType)
         rune.rechargeCurrent = charged ? cooldown : 0
         rune.cooldown = cooldown
         debugRunesToAddToPlayer.append(rune)
-        if debugRunesToAddToPlayer.count > 4 {
+        if debugRunesToAddToPlayer.count > debugNumberRuneSlots {
             debugRunesToAddToPlayer = Array(debugRunesToAddToPlayer.dropFirst())
         }
     }
     
+    static func deleteStartingRunes() {
+        debugRunesToAddToPlayer = []
+    }
+
+    
+    static func updateRuneSlots(numberRuneSlots: Int) {
+        debugNumberRuneSlots = numberRuneSlots
+        let endIndex = debugRunesToAddToPlayer.startIndex.advanced(by: numberRuneSlots)
+        guard debugRunesToAddToPlayer.count > numberRuneSlots else { return }
+        debugRunesToAddToPlayer = Array(debugRunesToAddToPlayer[0..<endIndex])
+    }
+    
     static func runPlayer(playerData: EntityModel) -> EntityModel {
-        return playerData.update(pickaxe: Pickaxe(runeSlots: 4, runes: debugRunesToAddToPlayer))
+        if debugRunesToAddToPlayer.count > debugNumberRuneSlots {
+            let endIndex = debugRunesToAddToPlayer.startIndex.advanced(by: debugNumberRuneSlots)
+            debugRunesToAddToPlayer = Array(debugRunesToAddToPlayer[0..<endIndex])
+        }
+        return playerData.update(pickaxe: Pickaxe(runeSlots: debugNumberRuneSlots, runes: debugRunesToAddToPlayer))
     }
     
     var profile: Profile {

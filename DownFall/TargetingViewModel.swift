@@ -530,7 +530,11 @@ class TargetingViewModel: Targeting {
         // if the number of legal targets it less than or equal to the number of total possible targets for this rune then auto target them.
         else if targetCoords.count <= numberOfTargets {
             let targets = targetCoords.map { Target(coord: $0, associatedCoord: [], isLegal: true) }
-            let areLegal = areTargetsLegal(inTargets: targets)
+            var areLegal = areTargetsLegal(inTargets: targets)
+            if rune?.targetsGroupOfMonsters ?? false {
+                areLegal = false
+            }
+
             currentTargets = AllTarget(targets: targets, areLegal: areLegal)
         }
     }

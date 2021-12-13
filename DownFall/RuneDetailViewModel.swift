@@ -40,7 +40,7 @@ class RuneDetailViewModel: RuneDetailViewModelable {
     /// returns a string to display to players that describes how to recahrge the rune
     var chargeDescription: String? {
         guard let rune = rune else { return nil }
-        if rune.isCharged { return "Ready to use" }
+        if rune.isCharged { return "Fully charged. Choose targets." }
         var strings: [String] = []
         for type in rune.rechargeType {
             switch type {

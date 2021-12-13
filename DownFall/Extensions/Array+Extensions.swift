@@ -94,3 +94,13 @@ extension Array where Element: Collection, Element.Index == Int {
     }
 }
 
+
+extension Array {
+    func randomElement(favorWhere: (Element) -> Bool) -> Element? {
+        if let firstIndex = self.firstIndex(where: favorWhere) {
+            return self[firstIndex]
+        } else {
+            return randomElement()
+        }
+    }
+}

@@ -88,6 +88,7 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
     
     func loadedProfile(_ profile: Profile, hasLaunchedBefore: Bool) {
         self.profileViewModel = ProfileViewModel(profile: profile)
+        levelCoordinator.profileViewModel = profileViewModel
         if hasLaunchedBefore {
             presentMainMenu()
         } else {

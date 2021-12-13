@@ -172,7 +172,7 @@ class Renderer: SKSpriteNode {
         
         // tile detail view
         self.tileDetailView = TileDetailView(foreground: foreground, playableRect: playableRect, alignedTo: hud.frame, levelSize: level.boardSize)
-        tileDetailView?.zPosition = 2_000_000
+        tileDetailView?.zPosition = 1_000_000
         
         self.isUserInteractionEnabled = true
         
@@ -655,14 +655,15 @@ extension Renderer {
             }
             
             else if let endTiles = trans.first?.endTiles,
-                    let playerCoord = getTilePosition(.player(.zero), tiles: endTiles),
-                    case TileType.player(let data) = endTiles[playerCoord].type {
+//                    let playerCoord = getTilePosition(.player(.zero), tiles: endTiles),
+                    let oldPlayerCoord = getTilePosition(.player(.zero), sprites: self.sprites),
+                    case TileType.player(let data) = sprites[oldPlayerCoord].type {
                 // animate received the health, dodge or luck and then compute the new board
                 let targetSprite = hud.targetSprite(for: offer.type)
                 let targetPoint = hud.convert(targetSprite?.frame.center ?? .zero, to: foreground)// ?? .zero
                 let sprite = sprites[atTilecoord.x][atTilecoord.y]
                 animator.animateCollectOffer(offerType: offer.type, offerSprite: sprite, targetPosition: targetPoint, to: hud, updatedPlayerData: data) { [weak self] in
-                    self?.computeNewBoard(for: trans.first) { [weak self] in self?.animationsFinished(endTiles: trans.first?.endTiles) }
+                    self?.computeNewBoard(for: trans.first) { [weak self] in self?.animationsFinished(endTiles: endTiles) }
                 }
                 
                 return

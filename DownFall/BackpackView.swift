@@ -194,7 +194,7 @@ class BackpackView: SKSpriteNode {
         runeContainer.position = CGPoint.position(runeContainer.frame, inside: playableRect, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: Style.Padding.most*3)
         
         /// position it high up to catch user interaction
-        runeContainer.zPosition = 1_000_000
+        runeContainer.zPosition = 2_000_000
         
         /// remove the old rune container
         self.removeChild(with: "runeContainer")

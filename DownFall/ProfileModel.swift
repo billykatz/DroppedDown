@@ -7,7 +7,12 @@
 //
 
 import Foundation
-struct Profile: Codable, Equatable {
+
+class Profile: Codable, Equatable {
+    
+    static func ==(_ lhs: Profile, _ rhs: Profile) -> Bool {
+        return lhs.name == rhs.name
+    }
 
     static var debugProfile = Profile(name: "debug", player: .lotsOfCash, currentRun: nil, stats: Statistics.startingStats, unlockables: Unlockable.unlockables, startingUnlockbles: [])
     
@@ -58,7 +63,7 @@ struct Profile: Codable, Equatable {
         try container.encode(startingUnlockbles, forKey: .startingUnlockables)
     }
 
-    init(from decoder: Decoder) throws {
+    required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         name = try container.decode(String.self, forKey: .name)
@@ -173,9 +178,33 @@ struct Profile: Codable, Equatable {
     }
     
     // just for debug purposes
-    public mutating func givePlayerARandomRune() {
+    public func givePlayerARandomRune() {
         let runeType = RuneType.allCases.randomElement()!
         randomRune = Rune.rune(for: runeType)
     }
     
+    
+    public func updateUnlockables() -> Profile {
+        var newUnlockables = Unlockable.unlockables
+        for unlockable in unlockables {
+            if let index = newUnlockables.firstIndex(of: unlockable) {
+                newUnlockables[index] = unlockable
+            }
+        }
+        
+        return self.updateAllUnlockables(newUnlockables)
+    }
+    
+    public func updateUnlockablesHasSpawn(offers: [StoreOffer]) -> Profile {
+        var newUnlockables: [Unlockable] = []
+        for unlockable in self.unlockables {
+            var newUnlock = unlockable
+            if offers.contains(unlockable.item) {
+                newUnlock.recentlyPurchasedAndHasntSpawnedYet = false
+            }
+            newUnlockables.append(newUnlock)
+        }
+        
+        return self.updateAllUnlockables(newUnlockables)
+    }
 }

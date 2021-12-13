@@ -151,6 +151,7 @@ class TileDetailView: SKSpriteNode {
                 self.contentView.alpha = 0
                 self.addChildSafely(self.contentView)
                 self.contentView.run(self.menuFadeInAction)
+                self.zPosition = 3_000_000
             case .levelGoalDetail(let updatedGoals):
                 self.detailType = .levelGoals
                 self.levelGoals = updatedGoals
@@ -500,6 +501,7 @@ extension TileDetailView {
             self?.tileAttacks = []
             self?.levelGoals = nil
             self?.isUserInteractionEnabled = false
+            self?.zPosition = 1_000_000
             completion?()
         }
     }

@@ -77,6 +77,9 @@ class GameScene: SKScene {
     // referee
     private var referee: Referee?
     
+    // profile view model
+    private var profileViewModel: ProfileViewModel?
+    
     required init?(coder aDecoder: NSCoder) { super.init(coder: aDecoder) }
     
     /// Creates an instance of board and does preparation neccessary for didMove(to:) to be called
@@ -88,9 +91,11 @@ class GameScene: SKScene {
                            randomSource: GKLinearCongruentialRandomSource?,
                            stats: [Statistics],
                            loadedTiles: [[Tile]]? = [],
-                           tutorialConductor: TutorialConductor) {
+                           tutorialConductor: TutorialConductor,
+                           profileViewModel: ProfileViewModel?
+    ) {
         
-//        self.backgroundColor = .backgroundGray
+        self.profileViewModel = profileViewModel
         
         // create the tutorial conductor
         self.tutorialConductor = tutorialConductor
@@ -159,61 +164,7 @@ class GameScene: SKScene {
         
         // Register for inputs we care about
         Dispatch.shared.register { [weak self] input in
-            if input.type == .playAgain {
-                guard let self = self,
-                      let board = self.board,
-                let playerIndex = tileIndices(of: .player(.zero), in: board.tiles).first
-                else { return }
-                
-                // sets the tutorial flag if the player skips the tutorial from the pause menu
-                self.tutorialConductor?.setTutorialSkipped()
-                
-                self.foreground.removeAllChildren()
-                if case let TileType.player(data) = board.tiles[playerIndex].type {
-                    self.removeFromParent()
-                    self.swipeRecognizerView?.removeFromSuperview()
-                    self.gameSceneDelegate?.navigateToMainMenu(self, playerData: data)
-                }
-            } else if case InputType.visitStore = input.type {
-                
-                guard let self = self,
-                      let board = self.board,
-                      let playerIndex = tileIndices(of: .player(.zero), in: board.tiles).first,
-                    case let TileType.player(data) = board.tiles[playerIndex].type else { return }
-                self.foreground.removeAllChildren()
-                self.removeFromParent()
-                self.swipeRecognizerView?.removeFromSuperview()
-                
-                self.gameSceneDelegate?.goToNextArea(updatedPlayerData: data)
-            
-            } else if case InputType.gameWin(_) = input.type {
-                guard let self = self else { return }
-                // this is to save the state at the end of the level.  
-                self.gameSceneDelegate?.saveState()
-                
-                self.tutorialConductor?.setTutorialCompleted(playerDied: false)
-                
-            } else if case InputType.gameLose = input.type {
-                guard let self = self else { return }
-                
-                self.tutorialConductor?.setTutorialCompleted(playerDied: true)
-                
-                // set this so the player sees the FTUE for dying
-                UserDefaults.standard.setValue(true, forKey: UserDefaults.shouldSeeDiedForTheFirstTimeKey)
-            } else if case InputType.loseAndGoToStore = input.type {
-                guard let self = self,
-                      let board = self.board,
-                let playerIndex = tileIndices(of: .player(.zero), in: board.tiles).first
-                else { return }
-                
-                self.foreground.removeAllChildren()
-                if case let TileType.player(data) = board.tiles[playerIndex].type {
-                    self.removeFromParent()
-                    self.swipeRecognizerView?.removeFromSuperview()
-                    self.gameSceneDelegate?.navigateToTheStore(self, playerData: data)
-                }
-
-            }
+            self?.handleInput(input: input)
         }
 
         //Turn watcher
@@ -221,6 +172,62 @@ class GameScene: SKScene {
         // create haptic generator
         generator.register()
         
+    }
+    
+    func handleInput(input: Input) {
+        if input.type == .playAgain {
+            guard let board = self.board,
+            let playerIndex = tileIndices(of: .player(.zero), in: board.tiles).first
+            else { return }
+            
+            // sets the tutorial flag if the player skips the tutorial from the pause menu
+            self.tutorialConductor?.setTutorialSkipped()
+            
+            self.foreground.removeAllChildren()
+            if case let TileType.player(data) = board.tiles[playerIndex].type {
+                self.removeFromParent()
+                self.swipeRecognizerView?.removeFromSuperview()
+                self.gameSceneDelegate?.navigateToMainMenu(self, playerData: data)
+            }
+        } else if case InputType.visitStore = input.type {
+            
+            guard let board = self.board,
+                  let playerIndex = tileIndices(of: .player(.zero), in: board.tiles).first,
+                case let TileType.player(data) = board.tiles[playerIndex].type else { return }
+            self.foreground.removeAllChildren()
+            self.removeFromParent()
+            self.swipeRecognizerView?.removeFromSuperview()
+            
+            self.gameSceneDelegate?.goToNextArea(updatedPlayerData: data)
+        
+        } else if case InputType.gameWin(_) = input.type {
+            // this is to save the state at the end of the level.
+            self.gameSceneDelegate?.saveState()
+            
+            self.tutorialConductor?.setTutorialCompleted(playerDied: false)
+            
+        } else if case InputType.gameLose = input.type {
+            
+            self.tutorialConductor?.setTutorialCompleted(playerDied: true)
+            
+            // set this so the player sees the FTUE for dying
+            UserDefaults.standard.setValue(true, forKey: UserDefaults.shouldSeeDiedForTheFirstTimeKey)
+        } else if case InputType.loseAndGoToStore = input.type {
+            guard let board = self.board,
+            let playerIndex = tileIndices(of: .player(.zero), in: board.tiles).first
+            else { return }
+            
+            self.foreground.removeAllChildren()
+            if case let TileType.player(data) = board.tiles[playerIndex].type {
+                self.removeFromParent()
+                self.swipeRecognizerView?.removeFromSuperview()
+                self.gameSceneDelegate?.navigateToTheStore(self, playerData: data)
+            }
+        } else if case InputType.transformation(let trans) = input.type {
+            if let offers = trans.first?.offers {
+                profileViewModel?.updateUnlockablesHaveSpawned(offers: offers)
+            }
+        }
     }
     
     public func prepareForReuse() {

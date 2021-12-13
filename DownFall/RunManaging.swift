@@ -15,7 +15,7 @@ class RunModel: Codable, Equatable {
         return lhs.seed == rhs.seed
     }
     
-    static let zero = RunModel(player: .zero, seed: 0, savedTiles: nil, areas: [], goalTracking: [], stats: [], unlockables: [], startingUnlockables: [], isTutorial: { false })
+    static let zero = RunModel(player: .zero, seed: 0, savedTiles: nil, areas: [], goalTracking: [], stats: [], startingUnlockables: [], isTutorial: { false })
     
     let seed: UInt64
     var player: EntityModel
@@ -29,7 +29,6 @@ class RunModel: Codable, Equatable {
     
     var stats: [Statistics] = []
     
-    var unlockables: [Unlockable]
     var startingUnlockables: [Unlockable]
     
     //tutorial
@@ -44,14 +43,13 @@ class RunModel: Codable, Equatable {
     }
     
     
-    init(player: EntityModel, seed: UInt64, savedTiles: [[Tile]]?, areas: [Area], goalTracking: [GoalTracking], stats: [Statistics], unlockables: [Unlockable], startingUnlockables: [Unlockable], isTutorial: () -> Bool) {
+    init(player: EntityModel, seed: UInt64, savedTiles: [[Tile]]?, areas: [Area], goalTracking: [GoalTracking], stats: [Statistics], startingUnlockables: [Unlockable], isTutorial: () -> Bool) {
         self.player = player
         self.seed = seed
         self.savedTiles = savedTiles
         self.areas = areas
         self.goalTracking = goalTracking
         self.stats = stats
-        self.unlockables = unlockables
         self.startingUnlockables = startingUnlockables
         self.isTutorial = isTutorial()
     }
@@ -62,7 +60,7 @@ class RunModel: Codable, Equatable {
         /// update the last area with the goal tracking
         if let lastArea = areas.last,
            let lastAreaIndex = areas.lastIndex(of: lastArea),
-           case var AreaType.level(level) = lastArea.type {
+           case let AreaType.level(level) = lastArea.type {
             
             /// save the goal progress
             level.goalProgress = goalTracking
@@ -80,7 +78,7 @@ class RunModel: Codable, Equatable {
         /// update the last area with the goal tracking
         if let lastArea = areas.last,
            let lastAreaIndex = areas.lastIndex(of: lastArea),
-           case var AreaType.level(level) = lastArea.type {
+           case let AreaType.level(level) = lastArea.type {
             
             /// save the goal progress
             level.savedBossPhase = phase
@@ -96,10 +94,10 @@ class RunModel: Codable, Equatable {
     
     /// Return the level that corresponds with the depth
     /// If that level has not been built yet, then build it, append it to our private level store, and return the newly built level
-    func currentArea(updatedPlayerData: EntityModel) -> Area {
+    func currentArea(updatedPlayerData: EntityModel, unlockables: [Unlockable]) -> Area {
         self.player = updatedPlayerData
         guard areas.count > 0, let currentArea = areas.last else {
-            return nextArea(updatedPlayerData: updatedPlayerData)
+            return nextArea(updatedPlayerData: updatedPlayerData, unlockables: unlockables)
         }
         return currentArea
     }
@@ -108,10 +106,9 @@ class RunModel: Codable, Equatable {
     /// Creates a new area and appends to the internal array of Areas
     /// There is no more store so this always returns a level
     /// If there was no last level, it is a fresh run, so we return a store, for now.
-    func nextArea(updatedPlayerData: EntityModel) -> Area {
+    func nextArea(updatedPlayerData: EntityModel, unlockables: [Unlockable]) -> Area {
         self.player = updatedPlayerData
         let nextDepth: Int
-        #warning("Debugging boss level")
         if let last = areas.last { nextDepth = last.depth + 1 }
         else {
             var nextDepthNumber = 0

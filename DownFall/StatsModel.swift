@@ -263,6 +263,7 @@ extension Statistics {
     static var ratKilled10 = Self.init(monsterType: .rat, amount: 10, statType: .monstersKilled)
     
     static var monstersKilled100 = Self.init(amount: 100, statType: .totalMonstersKilled)
+    static var monstersKilled250 = Self.init(amount: 250, statType: .totalMonstersKilled)
     
     // runes
     static var flameColumnUsed100 = Self.init(runeType: .flameColumn, amount: 100, statType: .runeUses)

@@ -114,7 +114,7 @@ class ProfileViewModel {
     func checkUnlockables() {
         var newUnlockables : [Unlockable] = []
         for unlockable in profile.unlockables {
-            let new = Unlockable(stat: unlockable.stat, item: unlockable.item, purchaseAmount: unlockable.purchaseAmount, isPurchased: unlockable.isPurchased, isUnlocked: isUnlocked(unlockableStat: unlockable.stat, playerStats: profile.stats), applysToBasePlayer: unlockable.applysToBasePlayer)
+            let new = Unlockable(stat: unlockable.stat, item: unlockable.item, purchaseAmount: unlockable.purchaseAmount, isPurchased: unlockable.isPurchased, isUnlocked: isUnlocked(unlockableStat: unlockable.stat, playerStats: profile.stats), applysToBasePlayer: unlockable.applysToBasePlayer, recentlyPurchasedAndHasntSpawnedYet: unlockable.recentlyPurchasedAndHasntSpawnedYet)
             
             newUnlockables.append(new)
         }
@@ -227,6 +227,12 @@ class ProfileViewModel {
         newProfile = newProfile.updateStatistic(.lowestDepthReached, amount: currentRun.depth, overwriteIfLarger: true)
         
         // save profile
+        saveProfile(newProfile)
+    }
+    
+    func updateUnlockablesHaveSpawned(offers: [StoreOffer]) {
+        let newProfile = profile.updateUnlockablesHasSpawn(offers: offers)
+        
         saveProfile(newProfile)
     }
 

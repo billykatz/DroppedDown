@@ -11,6 +11,7 @@ import SpriteKit
 import GameplayKit
 
 protocol LevelCoordinating: GameSceneCoordinatingDelegate {
+    var profileViewModel: ProfileViewModel? { get set }
     var gameSceneNode: GameScene? { get set }
     var entities: EntitiesModel? { get set }
     var delegate: MenuCoordinating? { get set }
@@ -33,6 +34,8 @@ class LevelCoordinator: LevelCoordinating {
     var entities: EntitiesModel?
     let tutorialConductor: TutorialConductor
     let view: SKView
+    
+    var profileViewModel: ProfileViewModel?
     
     /// Set default so we dont have to deal with optionality
     private(set) var runModel: RunModel = .zero
@@ -60,7 +63,8 @@ class LevelCoordinator: LevelCoordinating {
                                       randomSource: runModel.randomSource,
                                       stats: runModel.stats,
                                       loadedTiles: savedTiles,
-                                      tutorialConductor: tutorialConductor)
+                                      tutorialConductor: tutorialConductor,
+                                      profileViewModel: profileViewModel)
             
             view.presentScene(gameSceneNode)
             view.ignoresSiblingOrder = true
@@ -83,7 +87,7 @@ class LevelCoordinator: LevelCoordinating {
         #if DEBUG
         playerData = ProfileViewModel.runPlayer(playerData: playerData)
         #endif
-        let freshRunModel = RunModel(player: playerData, seed: seed, savedTiles: nil, areas: [], goalTracking: [], stats: [], unlockables: profile.unlockables, startingUnlockables: profile.startingUnlockbles, isTutorial: { return tutorialConductor.isTutorial })
+        let freshRunModel = RunModel(player: playerData, seed: seed, savedTiles: nil, areas: [], goalTracking: [], stats: [], startingUnlockables: profile.startingUnlockbles, isTutorial: { return tutorialConductor.isTutorial })
         
         self.runModel = runModel ?? freshRunModel
         RunScope.deepestDepth = profile.stats.filter( { $0.statType == .lowestDepthReached }).map { $0.amount }.first ?? 0
@@ -92,7 +96,8 @@ class LevelCoordinator: LevelCoordinating {
     
     /// This should be used when you want load the run from the last part
     func presentCurrentArea(updatedPlayerData: EntityModel) {
-        let nextArea = runModel.currentArea(updatedPlayerData: updatedPlayerData)
+        guard let unlockables = profileViewModel?.profile.unlockables else { fatalError() }
+        let nextArea = runModel.currentArea(updatedPlayerData: updatedPlayerData, unlockables: unlockables)
         switch nextArea.type {
         case .level(let level):
             presentNextLevel(level, playerData: runModel.player, savedTiles: runModel.savedTiles)
@@ -101,7 +106,8 @@ class LevelCoordinator: LevelCoordinating {
     
     /// This should be used most of the the time.  When ever you want to proceed in the run, you should call this function.
     func presentNextArea(updatedPlayerData: EntityModel, isTutorial: Bool) {
-        let nextArea = runModel.nextArea(updatedPlayerData: updatedPlayerData)
+        guard let unlockables = profileViewModel?.profile.unlockables else { fatalError() }
+        let nextArea = runModel.nextArea(updatedPlayerData: updatedPlayerData, unlockables: unlockables)
         switch nextArea.type {
         case .level(let level):
             presentNextLevel(level, playerData: runModel.player)
@@ -182,7 +188,7 @@ class LevelCoordinator: LevelCoordinating {
     
     // MARK: Utility functions
     fileprivate func saveTiles(_ savedTiles: [[Tile]]) -> RunModel {
-        return RunModel(player: runModel.player, seed: runModel.seed, savedTiles: savedTiles, areas: runModel.areas, goalTracking: runModel.goalTracking, stats: runModel.stats, unlockables: runModel.unlockables, startingUnlockables: runModel.startingUnlockables, isTutorial: { runModel.isTutorial })
+        return RunModel(player: runModel.player, seed: runModel.seed, savedTiles: savedTiles, areas: runModel.areas, goalTracking: runModel.goalTracking, stats: runModel.stats, startingUnlockables: runModel.startingUnlockables, isTutorial: { runModel.isTutorial })
     }
     
 }

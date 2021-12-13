@@ -103,7 +103,7 @@ enum RuneType: String, Codable, Hashable, CaseIterable, Identifiable {
         case .fieryRage:
             return "Fiery Rage"
         case .teleportation:
-            return "Teleportation to Exit"
+            return "Teleport"
         case .monsterBrawl:
             return "Brawl"
         case .monsterCrush:

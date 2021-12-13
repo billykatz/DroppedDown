@@ -19,8 +19,7 @@ struct LevelConstructor {
         let pillars = pillars(depth: depth, randomSource: randomSource)
         let gemsAtDepth = maxSpawnGems(depth: depth)
         
-        return
-        Level(
+        return Level(
             depth: depth,
             monsterTypeRatio: monsterTypes(depth: depth),
             monsterCountStart: monsterCountStart(depth: depth),
@@ -51,9 +50,9 @@ struct LevelConstructor {
                 StoreOffer.offer(type: .plusOneMaxHealth, tier: 1),
                 StoreOffer.offer(type: .gems(amount: 15), tier: 2),
                 StoreOffer.offer(type: .plusOneMaxHealth, tier: 2)
-
+                
             ]
-
+            
         }
         
         var offers = [StoreOffer]()
@@ -88,7 +87,7 @@ struct LevelConstructor {
                     return unlockable.canAppearInRun && unlockable.item.tier == tier && (unlockable.item.type == .lesserHeal || unlockable.item.type == .greaterHeal)
                 }
             
-            guard let healingOption = healingOptions.randomElement() else { preconditionFailure("There must always be at least 1 unlockable at tier 1 for healing")}
+            guard let healingOption = healingOptions.randomElement(favorWhere: { $0.recentlyPurchasedAndHasntSpawnedYet }) else { preconditionFailure("There must always be at least 1 unlockable at tier 1 for healing")}
             
             let otherOptions =
             unlockables
@@ -96,7 +95,7 @@ struct LevelConstructor {
                     return !healingOptions.contains(unlockable) && unlockable.canAppearInRun && unlockable.item.tier == tier
                 }
             
-            guard let otherOption = otherOptions.randomElement() else {  preconditionFailure("There must always be at least 1 other unlockable at tier 1 that isn't healing")}
+            guard let otherOption = otherOptions.randomElement(favorWhere: { $0.recentlyPurchasedAndHasntSpawnedYet }) else {  preconditionFailure("There must always be at least 1 other unlockable at tier 1 that isn't healing")}
             
             return [healingOption.item, otherOption.item]
             
@@ -132,7 +131,7 @@ struct LevelConstructor {
                         }
                     }
                     
-                    guard let option = runeOptions.randomElement() else { continue }
+                    guard let option = runeOptions.randomElement(favorWhere: { $0.recentlyPurchasedAndHasntSpawnedYet }) else { continue }
                     
                     options.append(option)
                     
@@ -143,7 +142,7 @@ struct LevelConstructor {
                         return unlockable.canAppearInRun && unlockable.item.tier == tier && unlockable.item.type == .runeSlot
                     }
                     
-                    guard let option = runeSlotOptions.randomElement() else { continue }
+                    guard let option = runeSlotOptions.randomElement(favorWhere: { $0.recentlyPurchasedAndHasntSpawnedYet }) else { continue }
                     
                     options.append(option)
                     
@@ -159,7 +158,7 @@ struct LevelConstructor {
                         return !options.contains(unlockable) && unlockable.canAppearInRun && unlockable.item.tier == tier && unlockable.item.type != .runeSlot
                     }
                     
-                    guard let option = otherOptions.randomElement() else { continue }
+                    guard let option = otherOptions.randomElement(favorWhere: { $0.recentlyPurchasedAndHasntSpawnedYet }) else { continue }
                     
                     options.append(option)
                 }
@@ -299,10 +298,10 @@ struct LevelConstructor {
         
         switch depth {
             // just for testing
-//            case 0:
-//                return TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false, groupCount: 0): 50,
-//                                                     .rock(color: .blue, holdsGem: false, groupCount: 0): 50  ,
-//                                                            ])
+            //            case 0:
+            //                return TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false, groupCount: 0): 50,
+            //                                                     .rock(color: .blue, holdsGem: false, groupCount: 0): 50  ,
+            //                                                            ])
         case 0, 1, 2, 3, 4:
             let chances = TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false, groupCount: 0): 33,
                                                         .rock(color: .blue, holdsGem: false, groupCount: 0): 33,
@@ -347,7 +346,7 @@ struct LevelConstructor {
                     .rock(color: .red, holdsGem: false, groupCount: 0): 33,
                     .rock(color: .blue, holdsGem: false, groupCount: 0): 33,
                     .rock(color: .purple, holdsGem: false, groupCount: 0): 33,
-//                    .rock(color: .brown, holdsGem: false, groupCount: 0): 25
+                    //                    .rock(color: .brown, holdsGem: false, groupCount: 0): 25
                 ]
             )
             return chances

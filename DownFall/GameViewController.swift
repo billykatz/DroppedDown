@@ -26,11 +26,14 @@ class GameViewController: UIViewController {
     private var tutorialConductor: TutorialConductor?
     private var ftueMetagameConductor: FTUEConductor?
     
-    public var profile: Profile? = nil {
+    private var profileHasLoaded: Bool = false
+    
+    private var profile: Profile? = nil {
         didSet {
             guard let profile = profile else {
                 return
             }
+            profileHasLoaded = true
             loadingSceneNode?.fadeOut {
                 let hasLaunchedBefore = UserDefaults.standard.bool(forKey: UserDefaults.hasLaunchedBeforeKey)
                 self.menuCoordinator?.loadedProfile(profile, hasLaunchedBefore: hasLaunchedBefore)
@@ -121,7 +124,9 @@ class GameViewController: UIViewController {
     
     // save the current run if there is one
     // add it to the profile then returns the profile
-    func applicationDidEnterBackground() -> Profile {
+    func applicationDidEnterBackground() -> Profile? {
+        guard profileHasLoaded else { return nil }
+        
         GameLogger.shared.log(prefix: Constants.tag, message: "Saving the profile")
         
         guard var profile = menuCoordinator?.profileViewModel?.profile else {

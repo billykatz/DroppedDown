@@ -159,6 +159,7 @@ class TileDetailView: SKSpriteNode {
                 self.contentView.alpha = 0
                 self.addChildSafely(self.contentView)
                 self.contentView.run(self.menuFadeInAction)
+                self.zPosition = 3_000_000
             case .tutorialPhaseEnd(let phase):
                 if phase == .theseAreLevelGoals {
                     self.resetTileDetailView(completion: nil)

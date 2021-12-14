@@ -1116,7 +1116,7 @@ extension Board {
     }
     
     private func monsterCrush(tiles: [[Tile]], allTarget: AllTarget, input: Input) -> Transformation {
-        let transformation = removeAndReplace(from: tiles, tileCoord: allTarget.targets.first!.coord, input: input, killMonsters: true)
+        let transformation = removeAndReplace(from: tiles, tileCoord: allTarget.targets.first!.coord, input: input, killMonsters: true, monsterDeathType: .rune)
         return transformation
     }
     

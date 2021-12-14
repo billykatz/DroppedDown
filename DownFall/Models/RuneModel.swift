@@ -767,7 +767,7 @@ struct Rune: Hashable, Codable {
                 affectRange: 0,
                 stopsEffectTypes: nil,
                 heal: 0,
-                cooldown: 1,
+                cooldown: 5,
                 rechargeType: [TileType.monster(.zero)],
                 rechargeMinimum: 1,
                 rechargeCurrent: 0,

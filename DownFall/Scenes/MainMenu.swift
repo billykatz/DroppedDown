@@ -14,6 +14,7 @@ protocol MainMenuDelegate: AnyObject {
     func continueRun()
     func menuStore()
     func abandonRun()
+    func goToTestScene()
 }
 
 class MainMenu: SKScene {
@@ -273,8 +274,10 @@ extension MainMenu: ButtonDelegate {
             }
             
         case .mainMenuFeedback:
-            let url = URL(string: Constants.feedbackFormURLString)!
-            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            #warning("Change back for production build")
+            mainMenuDelegate?.goToTestScene()
+//            let url = URL(string: Constants.feedbackFormURLString)!
+//            UIApplication.shared.open(url, options: [:], completionHandler: nil)
             
         default:
             ()

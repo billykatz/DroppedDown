@@ -17,6 +17,7 @@ class BossView: SKSpriteNode {
         static let poisonReticleSize = CGSize(width: 34, height: 292)
     }
     
+    public let bossSprite: BossSprite
     private let tileSize: CGFloat
     private let playableRect: CGRect
     private let spriteProvider: () -> [[DFTileSpriteNode]]
@@ -40,11 +41,18 @@ class BossView: SKSpriteNode {
         self.containerView = SKSpriteNode(color: .clear, size: playableRect.size)
         containerView.zPosition = 5_000
         
+        self.bossSprite = BossSprite(playableRect: playableRect)
+        bossSprite.zPosition = 10_000
+        
+        bossSprite.position = CGPoint.position(bossSprite.frame, inside: playableRect, verticalAlign: .top, horizontalAnchor: .center, yOffset: 400)
+        bossSprite.zPosition = 100_000
+        
         super.init(texture: nil, color: .clear, size: playableRect.size)
         
         self.isUserInteractionEnabled = false
         
         addChild(containerView)
+        containerView.addChild(bossSprite)
         
         Dispatch.shared.register { [weak self] input in
             self?.handleInput(input)

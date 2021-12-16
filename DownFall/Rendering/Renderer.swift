@@ -98,7 +98,7 @@ class Renderer: SKSpriteNode {
     
     //Animator
     private lazy var animator = {
-        return Animator(foreground: foreground, tileSize: tileSize) { [weak self] tileType in
+        return Animator(foreground: foreground, tileSize: tileSize, bossSprite: bossView.bossSprite) { [weak self] tileType in
             guard let self = self else { return nil }
             if let goalIndex = self.levelGoalTracker.typeAdvancesGoal(type: tileType) {
                 let goalOrigin = self.levelGoalView.originForGoalView(index: goalIndex)
@@ -180,7 +180,10 @@ class Renderer: SKSpriteNode {
         menuForeground.position = playableRect.center
         
         [spriteForeground, safeArea, hud, levelGoalView, backpackView, bossView, self.rotateVisualCue].forEach { foreground.addChild($0) }
-        //        [spriteForeground, safeArea, hud, levelGoalView, backpackView, bossDebugView, bossView].forEach { foreground.addChild($0) }
+        
+        #if DEBUG
+        foreground.addChild(bossDebugView)
+        #endif
         
         // Register for Dispatch
         Dispatch.shared.register { [weak self] input in
@@ -299,24 +302,28 @@ class Renderer: SKSpriteNode {
                 }
                 
             case .bossTurnStart(let phase):
-                switch phase.bossState.stateType {
-                case .eats:
-                    if trans.newTiles != nil {
-                        computeNewBoard(for: trans)
+                animator.animateEchoEffect { [weak self] in
+                    guard let self = self else { return }
+                    
+                    switch phase.bossState.stateType {
+                    case .eats:
+                        if trans.newTiles != nil {
+                            self.computeNewBoard(for: trans)
+                        }
+                        
+                    case .targetEat:
+                        self.animationsFinished(endTiles: trans.endTiles)
+                        
+                    case .targetAttack:
+                        self.animationsFinished(endTiles: trans.endTiles)
+                        
+                    case .attack:
+                        self.showBossAttacks(in: transformations, bossPhase: phase)
+                        
+                    case .rests, .phaseChange, .superAttack, .targetSuperAttack:
+                        //                    showBossPhaseChangeAttacks(in: trans, bossPhase: BossPhase)
+                        self.animationsFinished(endTiles: trans.endTiles)
                     }
-                    
-                case .targetEat:
-                    animationsFinished(endTiles: trans.endTiles)
-                    
-                case .targetAttack:
-                    animationsFinished(endTiles: trans.endTiles)
-                    
-                case .attack:
-                    showBossAttacks(in: transformations, bossPhase: phase)
-                    
-                case .rests, .phaseChange, .superAttack, .targetSuperAttack:
-                    //                    showBossPhaseChangeAttacks(in: trans, bossPhase: BossPhase)
-                    animationsFinished(endTiles: trans.endTiles)
                 }
                 
             case .bossPhaseStart(let phase):

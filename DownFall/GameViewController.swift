@@ -28,7 +28,7 @@ class GameViewController: UIViewController {
     
     private var profileHasLoaded: Bool = false
     
-    private var profile: Profile? = nil {
+    public var profile: Profile? = nil {
         didSet {
             guard let profile = profile else {
                 return

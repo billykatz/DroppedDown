@@ -115,7 +115,7 @@ class BackpackView: SKSpriteNode {
             let view = RuneReplacementView(size: CGSize(width: playableRect.width, height: height),
                                            playableRect: playableRect,
                                            viewModel: viewModel)
-            view.zPosition = 20_000
+            view.zPosition = 40_000_000
             view.position = .zero // centered 
             view.name = "runeReplacement"
             self?.removeChild(with: "runeReplacement")

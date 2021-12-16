@@ -80,6 +80,20 @@ class RuneContainerView: SKSpriteNode {
     }
     
     private func runeWasTapped(rune: Rune?, progress: Int) {
+        /// WEIRD HACK
+        /// Order matters. When disableDetailView is set to false.  We only want to call the viewModel.runeWasTapped method
+        if viewModel.disableDetailView {
+            /// They have tapped on a rune slot, it maybe empty or have a rune
+            if let rune = rune {
+                // The player tapped on a full rune slot.  Let someone know that we should etner targeting move
+                viewModel.runeWasTapped?(rune)
+            }
+            return
+            
+        }
+        
+        /// WEIRD HACK cont...
+        /// Otherwise we want to first set up the rune detail view and then call rune was tapped so that the view gets info regarding the targeting. 
         setupRuneDetailView(rune: rune, progress: progress)
         
         /// They have tapped on a rune slot, it maybe empty or have a rune
@@ -87,9 +101,6 @@ class RuneContainerView: SKSpriteNode {
             // The player tapped on a full rune slot.  Let someone know that we should etner targeting move
             viewModel.runeWasTapped?(rune)
         }
-        
-        // TODO: I dont like that we have to set this flag.  Butttt, it is simple.  Potential refactor may be necessary
-        if viewModel.disableDetailView { return }
         
         toggleRuneSlots()
     }
@@ -116,7 +127,7 @@ class RuneContainerView: SKSpriteNode {
                                             size: size)
         runeDetailView.name = Constants.runeDetailViewName
         runeDetailView.isUserInteractionEnabled = true
-//        runeDetailView.zPosition = 100_000_000
+//        runeDetailView.zPosition = 10_000_000
         addChild(runeDetailView)
         self.runeDetailView = runeDetailView
     }

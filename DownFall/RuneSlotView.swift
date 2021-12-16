@@ -57,7 +57,7 @@ class RuneSlotView: SKSpriteNode {
     private var background: SKShapeNode {
         let background = SKShapeNode(rectOf: outline.frame.size.scale(by: Constants.backgroundScale))
         background.color = .runeBackgroundColor
-        background.zPosition = 1
+        background.zPosition = 5
         
         return background
     }

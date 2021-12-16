@@ -9,7 +9,7 @@
 import UIKit
 import SpriteKit
 
-class RuneInfoViewModel{
+class RuneInfoViewModel {
     
     let rune: Rune
     let playerHasRune: Bool

@@ -26,6 +26,7 @@ struct Animator {
 
     let foreground: SKNode?
     let tileSize: CGFloat?
+    let bossSprite: BossSprite?
     let typeAdvancesLevelGoal: ((TileType) -> CGPoint?)?
     
     lazy var numberTextures: [NumberTextures] = {
@@ -64,10 +65,12 @@ struct Animator {
     
     init(foreground: SKNode? = nil,
          tileSize: CGFloat? = nil,
+         bossSprite: BossSprite? = nil,
          tileTypeAdvancesLevelGoal: ((TileType) -> CGPoint?)? = nil
     ) {
         self.foreground = foreground
         self.tileSize = tileSize
+        self.bossSprite = bossSprite
         self.typeAdvancesLevelGoal = tileTypeAdvancesLevelGoal
     }
     

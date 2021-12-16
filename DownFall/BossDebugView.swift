@@ -21,8 +21,8 @@ class BossDebugView: SKSpriteNode {
         super.init(texture: nil, color: .clear, size: playableRect.size)
         
         self.addChild(containerView)
-        containerView.zPosition = 100_000_000_000
-        containerView.position = CGPoint.position(containerView.frame, inside: playableRect, verticalAlign: .top, horizontalAnchor: .center, yOffset: 275)
+        containerView.zPosition = 10_000
+        containerView.position = CGPoint.position(containerView.frame, inside: playableRect, verticalAlign: .top, horizontalAnchor: .center, yOffset: 10)
         
         
         // Testing the spider art

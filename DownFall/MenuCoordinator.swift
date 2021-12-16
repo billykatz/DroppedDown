@@ -133,4 +133,14 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
         playerTappedOnStore = true
         codexCoordinator.presentCodexView(profileViewModel: profileViewModel)
     }
+    
+    func goToTestScene() {
+        // GKScene(fileNamed: "LoadingScene")!.rootNode as? LoadingScene
+        if let scene = GKScene(fileNamed: "BossTestScene")!.rootNode as? BossTestScene {
+            scene.scaleMode = .aspectFill
+            scene.commonInit()
+            view.presentScene(scene)
+
+        }
+    }
 }

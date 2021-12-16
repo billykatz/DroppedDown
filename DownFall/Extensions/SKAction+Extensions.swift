@@ -40,3 +40,20 @@ extension SKAction {
         return SKAction.sequence(actionsArray)
     }
 }
+
+extension SKAction {
+    static func removeFromParent(afterDelay delay: TimeInterval) -> SKAction {
+        let waitAction = SKAction.wait(forDuration: delay)
+        let remove = SKAction.removeFromParent()
+        return SKAction.sequence([waitAction, remove])
+    }
+
+}
+
+extension SKAction {
+    func waitBefore(delay: TimeInterval) -> SKAction {
+        let wait = SKAction.wait(forDuration: delay)
+        return SKAction.sequence([wait, self])
+    }
+    
+}

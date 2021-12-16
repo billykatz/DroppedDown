@@ -53,6 +53,7 @@ class RuneReplacementView: SKSpriteNode, ButtonDelegate {
         
         runeInfoView.position = CGPoint.position(runeInfoView.frame, inside: runeReplacementContainer.frame, verticalAlign: .top, horizontalAnchor: .left, xOffset: 50, yOffset: 260)
         emptyPanelView.position = CGPoint.alignHorizontally(emptyPanelView.frame, relativeTo: runeInfoView.frame, horizontalAnchor: .left, verticalAlign: .bottom, verticalPadding: 60.0, translatedToBounds: true)
+        emptyPanelView.zPosition = 5_000
         
         addChild(emptyPanelView)
         addChild(runeInfoView)
@@ -63,8 +64,8 @@ class RuneReplacementView: SKSpriteNode, ButtonDelegate {
         
         title.position = CGPoint.position(title.frame, inside: runeReplacementContainer.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: 48, translatedToBounds: true)
         subtitle.position = CGPoint.alignHorizontally(subtitle.frame, relativeTo: title.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: 20, translatedToBounds: true)
-        title.zPosition = 1000
-        subtitle.zPosition = 1000
+        title.zPosition = 10_000
+        subtitle.zPosition = 10_000
         
         addChild(title)
         addChild(subtitle)
@@ -84,6 +85,9 @@ class RuneReplacementView: SKSpriteNode, ButtonDelegate {
     }
     
     private func addRuneContainerView() {
+        /// remove the old rune container
+        self.removeChild(with: "runeContainer")
+        
         /// Routes Rune container outputs to TargetingViewModel input
         let runeContainverViewModel = RuneContainerViewModel(runes: viewModel.pickaxe.runes,
                                                              numberOfRuneSlots: viewModel.pickaxe.runeSlots,
@@ -103,10 +107,7 @@ class RuneReplacementView: SKSpriteNode, ButtonDelegate {
         runeContainer.position = CGPoint.position(runeContainer.frame, inside: playableRect, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: Style.Padding.most*3)
         
         /// position it high up to catch user interaction
-        runeContainer.zPosition = 10_000_000
-        
-        /// remove the old rune container
-        self.removeChild(with: "runeContainer")
+        runeContainer.zPosition = 50_000_000
         
         /// update our variable
         runeInventoryContainer = runeContainer
@@ -127,7 +128,7 @@ class RuneReplacementView: SKSpriteNode, ButtonDelegate {
         
         viewModel.runeToSwap = rune
         
-        runeInfoView.zPosition = 10000
+        runeInfoView.zPosition = 100_000_000
         
         addChild(swapRunesButton!)
         addChild(runeInfoView)

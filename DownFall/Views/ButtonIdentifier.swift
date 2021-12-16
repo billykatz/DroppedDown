@@ -96,6 +96,11 @@ enum ButtonIdentifier: String {
     case confirmShufflePay2Hearts
     case confirmShufflePay25Percent
     
+    
+    // Boss test scene buttons
+    case echoEffect
+    case walkEffect
+    
     var title: String {
         switch self {
         case .resume:
@@ -210,6 +215,13 @@ enum ButtonIdentifier: String {
         
         case .wallet, .infoPopup, .storeItem, .backpack, .sellHealth, .buyHealth, .sellDodge, .buyDodge, .sellLuck, .buyLuck, .buyRuneSlot, .sellRuneSlot, .runeReplacementCancel, .runeUseConfirmBeforeReady:
             return ""
+            
+            
+        // Boss Test Scene Button cases
+        case .echoEffect:
+            return "Echo"
+        case .walkEffect:
+            return "Walk"
         }
     }
 }

@@ -117,9 +117,8 @@ class RuneDetailView: SKSpriteNode, ButtonDelegate {
         setupRuneView()
         setupButtons()
         addTargetsView(allTargets: nil)
+        
     }
-    
-    
     
     private func setupDetailView() {
 

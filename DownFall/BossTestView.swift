@@ -54,6 +54,12 @@ class BossTestView: ButtonDelegate {
         tootleBiteButton.position = CGPoint.alignHorizontally(tootleBiteButton.frame, relativeTo: toothChompButton.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: verticalPadding, translatedToBounds: true)
         tootleBiteButton.zPosition = buttonZPosition
         foreground.addChild(tootleBiteButton)
+
+
+        let angryEyelid = ShiftShaft_Button(size: buttonSize, delegate: self, identifier: .angryEyes, fontSize: fontSize)
+        angryEyelid.position = CGPoint.alignHorizontally(angryEyelid.frame, relativeTo: tootleBiteButton.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: verticalPadding, translatedToBounds: true)
+        angryEyelid.zPosition = buttonZPosition
+        foreground.addChild(angryEyelid)
     }
     
     func buttonTapped(_ button: ShiftShaft_Button) {
@@ -68,6 +74,8 @@ class BossTestView: ButtonDelegate {
             animator.animateToothChomp { }
         case .lightBite:
             animator.animateToothClose { }
+        case .angryEyes:
+            animator.animateAngryEyelids { }
         default:
             fatalError()
         }

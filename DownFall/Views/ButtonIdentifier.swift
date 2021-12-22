@@ -103,6 +103,7 @@ enum ButtonIdentifier: String {
     case tiltHead
     case chompTeeth
     case lightBite
+    case angryEyes
     
     var title: String {
         switch self {
@@ -231,6 +232,8 @@ enum ButtonIdentifier: String {
             return "Chomp"
         case .lightBite:
             return "Bite"
+        case .angryEyes:
+            return "Angry Eyes"
         }
     }
 }

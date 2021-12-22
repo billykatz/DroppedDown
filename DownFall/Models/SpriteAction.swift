@@ -41,4 +41,10 @@ struct SpriteAction: Hashable {
         newSpriteAction.duration = self.duration
         return newSpriteAction
     }
+    
+    var reversed: SpriteAction {
+        var newSpriteAction = SpriteAction.init(sprite, action.reversed())
+        newSpriteAction.duration = self.duration
+        return newSpriteAction
+    }
 }

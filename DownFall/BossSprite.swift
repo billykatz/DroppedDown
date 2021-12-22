@@ -25,6 +25,9 @@ class BossSprite: SKSpriteNode {
         
         static let bossToothName = "boss-spider-tooth"
         
+        static let bossSparkleEffect = "boss-spider-sparkler-effect"
+        static let bossEyelids = "boss-spider-eyelids"
+        
         static let bossBodyName = "boss-body"
         
         static let artworkDimensions = CGSize(width: 280, height: 112)
@@ -163,10 +166,24 @@ class BossSprite: SKSpriteNode {
     lazy var spiderTooth: SKSpriteNode = {
         let toothTexture = SKTexture(imageNamed: Constants.bossToothName)
         let sprite = SKSpriteNode(texture: toothTexture, size: scaleBodyPart(originalSize: toothTexture.size()))
-        sprite.zPosition = 2_000_000
+        sprite.zPosition = 1_200_000
         return sprite
     }()
 
+    
+    lazy var spiderSparkle: SKSpriteNode = {
+        let toothTexture = SKTexture(imageNamed: Constants.bossSparkleEffect)
+        let sprite = SKSpriteNode(texture: toothTexture, size: scaleBodyPart(originalSize: toothTexture.size()))
+        sprite.zPosition = 1_200_000
+        return sprite
+    }()
+    
+    lazy var spiderEyelids: SKSpriteNode = {
+        let toothTexture = SKTexture(imageNamed: Constants.bossEyelids)
+        let sprite = SKSpriteNode(texture: toothTexture, size: scaleBodyPart(originalSize: toothTexture.size()))
+        sprite.zPosition = 1_100_000
+        return sprite
+    }()
     
     init(playableRect: CGRect) {
         self.playableRect = playableRect
@@ -182,10 +199,13 @@ class BossSprite: SKSpriteNode {
         rightLeg3.position = CGPoint.position(rightLeg3.frame, inside: spiderHead.frame, verticalAnchor: .center, yOffset: 30, horizontalAnchor: .center, xOffset: 120, translatedToBounds: true)
         rightLeg4.position = CGPoint.position(rightLeg4.frame, inside: spiderHead.frame, verticalAnchor: .center, yOffset: 55, horizontalAnchor: .center, xOffset: 110, translatedToBounds: true)
         
-        spiderBody.position = CGPoint.position(spiderBody.frame, inside: spiderHead.frame, verticalAnchor: .center, yOffset: 105, horizontalAnchor: .center, translatedToBounds: true)
+        spiderBody.position = CGPoint.position(spiderBody.frame, inside: spiderHead.frame, verticalAnchor: .center, yOffset: 0, horizontalAnchor: .center, translatedToBounds: true)
         
-        spiderTooth.position = CGPoint.position(spiderBody.frame, inside: spiderHead.frame, verticalAnchor: .center, yOffset: 0, horizontalAnchor: .center, xOffset: 0, translatedToBounds: true)
+        spiderTooth.position = CGPoint.position(spiderTooth.frame, inside: spiderHead.frame, verticalAnchor: .center, yOffset: 0, horizontalAnchor: .center, xOffset: 0, translatedToBounds: true)
         
+        spiderSparkle.position = CGPoint.position(spiderSparkle.frame, inside: spiderHead.frame, verticalAnchor: .center, yOffset: 0, horizontalAnchor: .center, translatedToBounds: true)
+        
+        spiderEyelids.position = CGPoint.position(spiderEyelids.frame, inside: spiderHead.frame, verticalAnchor: .center, yOffset: 0, horizontalAnchor: .center, xOffset: 0, translatedToBounds: true)
         
         self.addChild(spiderHead)
         self.addChild(leftLeg1)
@@ -199,8 +219,10 @@ class BossSprite: SKSpriteNode {
         self.addChild(rightLeg4)
         
         self.addChild(spiderBody)
+        self.addChild(spiderSparkle)
         
         spiderHead.addChild(spiderTooth)
+        spiderHead.addChild(spiderEyelids)
     }
     
     override init(texture: SKTexture?, color: UIColor, size: CGSize) {

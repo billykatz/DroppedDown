@@ -75,9 +75,42 @@ extension Animator {
         
         return toothAnimation
     }
+    
+    func createAngryEyelidAnimation(reverse: Bool, waitBeforeDelay: TimeInterval) -> SpriteAction? {
+        guard let bossSprite = bossSprite else { return nil }
+        
+        let animationName = "boss-spider-angry-eyelids"
+        let spriteSheet = SpriteSheet(textureName: animationName, columns: 7)
+        let animate = SKAction.animate(with: spriteSheet.animationFrames(), timePerFrame: timePerFrame())
+        
+        var action = reverse ? SKAction.sequence(animate).reversed() : SKAction.sequence(animate)
+        action = action.waitBefore(delay: waitBeforeDelay)
+        var eyelidAnimation: SpriteAction = .init(bossSprite.spiderEyelids, action)
+        eyelidAnimation.duration = Double(spriteSheet.animationFrames().count) * timePerFrame()
+        
+        return eyelidAnimation
+        
+        
+        
+    }
 
     
     // MARK: Functions that actually animate
+    
+    func animateAngryEyelids(completion: @escaping () -> Void) {
+        if let animation = createAngryEyelidAnimation(reverse: false, waitBeforeDelay: 0.0) {
+            
+            if let animation2 = createAngryEyelidAnimation(reverse: true, waitBeforeDelay: 2.0) {
+                let animations = [animation, animation2]
+                animate(animations, completion: completion)
+            }
+            
+            
+        } else {
+            completion()
+        }
+        
+    }
     
     func animateTwistingHead(completion: @escaping () -> Void) {
         guard let bossSprite = bossSprite else { return }
@@ -367,5 +400,7 @@ extension Animator {
         /// call the completion
         animate(spriteActions, completion: completion)
     }
+    
+    
 
 }

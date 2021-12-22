@@ -1310,8 +1310,10 @@ extension Board {
         }
         
         // decrement the health of each pillar
+        var pillarsThatTakeDamage: [PillarTakesDamage] = []
         for pillarCoord in selectedPillars {
             if case let .pillar(data) = intermediateTiles[pillarCoord.x][pillarCoord.y].type {
+                pillarsThatTakeDamage.append(.init(tileType: TileType.pillar(data), tileCoord: pillarCoord))
                 if data.health == 1 {
                     // remove the pillar from the board
                     intermediateTiles[pillarCoord.x][pillarCoord.y] = .empty
@@ -1349,7 +1351,8 @@ extension Board {
                               newTiles: newTiles,
                               shiftDown: shiftDown,
                               removedTilesContainGem: removedTilesContainGem,
-                              monstersDies: monstersKilled.isEmpty ? nil : monstersKilled
+                              monstersDies: monstersKilled.isEmpty ? nil : monstersKilled,
+                              pillarsTakeDamage: pillarsThatTakeDamage.isEmpty ? nil : pillarsThatTakeDamage
         )
     }
     
@@ -1366,10 +1369,12 @@ extension Board {
         // set the tiles to be removed as Empty placeholder
         var intermediateTiles = tiles
         var monstersKilled: [MonsterDies] = []
+        var pillarsThatTakeDamage: [PillarTakesDamage] = []
         var removedTilesContainGem = false
         for coord in selectedTiles {
             switch tiles[coord].type {
             case let .pillar(data):
+                pillarsThatTakeDamage.append(.init(tileType: .pillar(data), tileCoord: coord))
                 if data.health == 1 {
                     // remove the pillar from the board
                     intermediateTiles[coord.x][coord.y] = Tile.empty
@@ -1426,7 +1431,8 @@ extension Board {
                               newTiles: newTiles,
                               shiftDown: shiftDown,
                               removedTilesContainGem: removedTilesContainGem,
-                              monstersDies: monstersKilled.isEmpty ? nil : monstersKilled
+                              monstersDies: monstersKilled.isEmpty ? nil : monstersKilled,
+                              pillarsTakeDamage: pillarsThatTakeDamage.isEmpty ? nil : pillarsThatTakeDamage
         )
     }
     
@@ -1856,6 +1862,7 @@ extension Board {
         var defender: EntityModel
         var dodged = false
         var attackerIsPlayer = false
+        var pillarsThatTakeDamage: [PillarTakesDamage] = []
         
         
         //TODO: DRY, extract and shorten this code
@@ -1915,6 +1922,7 @@ extension Board {
             //just note that the monster attacked
             // and the pillar takes one damage
             tiles[attackerPosition.x][attackerPosition.y] = Tile(type: TileType.monster(monsterModel.didAttack()))
+            pillarsThatTakeDamage.append(.init(tileType: .pillar(data), tileCoord: defenderPosition))
             if data.health == 1 {
                 tiles[defenderPosition.x][defenderPosition.y] = Tile.empty
             } else {
@@ -1934,7 +1942,8 @@ extension Board {
                                                           dodged: dodged,
                                                           attackerIsPlayer: attackerIsPlayer
         ),
-        endTiles: self.tiles)
+        endTiles: self.tiles,
+                              pillarsTakeDamage: pillarsThatTakeDamage.isEmpty ? nil : pillarsThatTakeDamage )
     }
 }
 

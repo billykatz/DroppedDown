@@ -20,3 +20,8 @@ struct MonsterDies: Codable, Hashable {
     let tileCoord: TileCoord
     let deathType: MonsterDeathType
 }
+
+struct PillarTakesDamage: Codable, Hashable {
+    let tileType: TileType
+    let tileCoord: TileCoord
+}

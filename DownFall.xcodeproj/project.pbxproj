@@ -62,6 +62,7 @@
 		28D6CE0F271F2A3200532150 /* TutorialPhase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D6CE0E271F2A3200532150 /* TutorialPhase.swift */; };
 		28DCCB7E27616809004E70A8 /* RuneDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28DCCB7D27616809004E70A8 /* RuneDetailViewModel.swift */; };
 		28DCCB802762C649004E70A8 /* AnimatorCombat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28DCCB7F2762C649004E70A8 /* AnimatorCombat.swift */; };
+		28DF00882772B5140071E384 /* Animator+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28DF00872772B5140071E384 /* Animator+Extensions.swift */; };
 		28FA8974275809A700E6D57F /* TargetModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FA8973275809A700E6D57F /* TargetModel.swift */; };
 		28FA8976275809CB00E6D57F /* TargetingProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FA8975275809CB00E6D57F /* TargetingProtocol.swift */; };
 		3D00A0F923AAC813007E2D8B /* Identifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D00A0F823AAC813007E2D8B /* Identifiers.swift */; };
@@ -282,6 +283,7 @@
 		28D6CE0E271F2A3200532150 /* TutorialPhase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialPhase.swift; sourceTree = "<group>"; };
 		28DCCB7D27616809004E70A8 /* RuneDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneDetailViewModel.swift; sourceTree = "<group>"; };
 		28DCCB7F2762C649004E70A8 /* AnimatorCombat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatorCombat.swift; sourceTree = "<group>"; };
+		28DF00872772B5140071E384 /* Animator+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Animator+Extensions.swift"; sourceTree = "<group>"; };
 		28FA8973275809A700E6D57F /* TargetModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetModel.swift; sourceTree = "<group>"; };
 		28FA8975275809CB00E6D57F /* TargetingProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetingProtocol.swift; sourceTree = "<group>"; };
 		3D00A0F823AAC813007E2D8B /* Identifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identifiers.swift; sourceTree = "<group>"; };
@@ -587,6 +589,7 @@
 				3D9C505F21FE206000A2210D /* Renderer.swift */,
 				283DC7792718A831002A499A /* DialogueOverlay.swift */,
 				3D106097232E9A0200ECE7E6 /* Animator.swift */,
+				28DF00872772B5140071E384 /* Animator+Extensions.swift */,
 				28DCCB7F2762C649004E70A8 /* AnimatorCombat.swift */,
 			);
 			path = Rendering;
@@ -1368,6 +1371,7 @@
 				3D674C9522C9D6640003AEB4 /* MainMenu.swift in Sources */,
 				58A4B91D2472E5620011624A /* ChanceModel.swift in Sources */,
 				2842BABF26A0EC740021CD0B /* CodexItemView.swift in Sources */,
+				28DF00882772B5140071E384 /* Animator+Extensions.swift in Sources */,
 				283DC778271892BC002A499A /* TutorialConductor.swift in Sources */,
 				5881DBF4244FEE440053A690 /* RuneSlotView.swift in Sources */,
 				58383643242D7A6E004CA026 /* Array+Extensions.swift in Sources */,

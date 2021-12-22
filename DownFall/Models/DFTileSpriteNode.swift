@@ -257,6 +257,34 @@ class DFTileSpriteNode: SKSpriteNode {
         return SpriteAction(sprite: self, action: sequence)
     }
     
+    func pillarCrumble(_ removeFromParent: Bool = true, delayBefore: Double = 0.0) -> (SpriteAction)? {
+        var animationFrames: [SKTexture] = []
+        switch self.type {
+        case .pillar(let data):
+            let health = data.health
+            switch data.color {
+            case .blue, .purple, .red:
+                let textureName = "\(data.color.humanReadable.lowercased())Pillar\(health)HealthTakeDamage8"
+                animationFrames = SpriteSheet(textureName: textureName, columns: 8).animationFrames()
+                
+            default:
+                return nil
+            }
+        default:
+            return nil
+        }
+
+        let animateCrumble = SKAction.animate(with: animationFrames, timePerFrame: 0.07)
+        let remove = SKAction.removeFromParent()
+        let wait = SKAction.wait(forDuration: delayBefore)
+        let sequencedActions: [SKAction] = removeFromParent ? [wait, animateCrumble, remove] : [wait, animateCrumble]
+        let sequence = SKAction.sequence(sequencedActions)
+        
+        return SpriteAction(sprite: self, action: sequence)
+    
+    }
+
+    
     func crumble(_ removeFromParent: Bool = true, delayBefore: Double = 0.0) -> (SpriteAction)? {
         var animationFrames: [SKTexture] = []
         switch self.type {

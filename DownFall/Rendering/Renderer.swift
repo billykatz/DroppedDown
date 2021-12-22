@@ -910,6 +910,10 @@ extension Renderer {
             }
         }
         
+        if let pillarsThatTakeDamage = transformation.pillarsTakeDamage {
+            removedAnimations.append(contentsOf: animator.createPillarTakingDamage(sprites: sprites, pillarsThatTakeDamage: pillarsThatTakeDamage))
+        }
+        
         // MARK: Add gem sprites to the board
         // add the gems after everything else has been animated for removal
         for coord in tilesWithGem {

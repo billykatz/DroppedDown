@@ -100,6 +100,9 @@ enum ButtonIdentifier: String {
     // Boss test scene buttons
     case echoEffect
     case walkEffect
+    case tiltHead
+    case chompTeeth
+    case lightBite
     
     var title: String {
         switch self {
@@ -222,6 +225,12 @@ enum ButtonIdentifier: String {
             return "Echo"
         case .walkEffect:
             return "Walk"
+        case .tiltHead:
+            return "Tilt"
+        case .chompTeeth:
+            return "Chomp"
+        case .lightBite:
+            return "Bite"
         }
     }
 }

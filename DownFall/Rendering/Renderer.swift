@@ -302,28 +302,23 @@ class Renderer: SKSpriteNode {
                 }
                 
             case .bossTurnStart(let phase):
-                animator.animateEchoEffect { [weak self] in
-                    guard let self = self else { return }
+                
+                switch phase.bossState.stateType {
+                case .eats:
+                    showBossEatsRocks(in: transformations, bossPhase: phase)
                     
-                    switch phase.bossState.stateType {
-                    case .eats:
-                        if trans.newTiles != nil {
-                            self.computeNewBoard(for: trans)
-                        }
-                        
-                    case .targetEat:
-                        self.animationsFinished(endTiles: trans.endTiles)
-                        
-                    case .targetAttack:
-                        self.animationsFinished(endTiles: trans.endTiles)
-                        
-                    case .attack:
-                        self.showBossAttacks(in: transformations, bossPhase: phase)
-                        
-                    case .rests, .phaseChange, .superAttack, .targetSuperAttack:
-                        //                    showBossPhaseChangeAttacks(in: trans, bossPhase: BossPhase)
-                        self.animationsFinished(endTiles: trans.endTiles)
-                    }
+                case .targetEat:
+                    self.animationsFinished(endTiles: trans.endTiles)
+                    
+                case .targetAttack:
+                    self.animationsFinished(endTiles: trans.endTiles)
+                    
+                case .attack:
+                    self.showBossAttacks(in: transformations, bossPhase: phase)
+                    
+                case .rests, .phaseChange, .superAttack, .targetSuperAttack:
+                    //                    showBossPhaseChangeAttacks(in: trans, bossPhase: BossPhase)
+                    self.animationsFinished(endTiles: trans.endTiles)
                 }
                 
             case .bossPhaseStart(let phase):
@@ -640,6 +635,8 @@ class Renderer: SKSpriteNode {
     }
 }
 
+ 
+// MARK:  - Collecting and Offer
 extension Renderer {
     
     /// Renders and delegates animation of collecting store offers
@@ -766,7 +763,7 @@ extension Renderer {
         
     }
     
-    //MARK: Compute New Board Logic
+    //MARK: - Compute New Board Logic
     
     /// Recursive wrapper for chaining animated transformations
     private func computeNewBoard(for transformations: [Transformation]) {
@@ -1068,6 +1065,19 @@ extension Renderer {
 
 extension Renderer {
     
+    private func showBossEatsRocks(in transformation: [Transformation], bossPhase: BossPhase) {
+        guard let rockEatTrans = transformation.first,
+                let removeAndReplace = transformation.last else {
+            animationsFinished(endTiles: transformation.last?.endTiles)
+            return
+        }
+        
+        animator.animateBossEatingRocks(sprites: sprites, foreground: spriteForeground, transformation: rockEatTrans) { [weak self] in
+            self?.computeNewBoard(for: removeAndReplace)
+        }
+        
+        
+    }
     
     private func showBossPhaseChangeAttacks(in transformation: Transformation, bossPhase: BossPhase) {
         guard let grownPillars = bossPhase.phaseChangeTagets.createPillars else {

@@ -35,4 +35,10 @@ struct SpriteAction: Hashable {
     func run() {
         sprite.run(action)
     }
+    
+    func waitBefore(delay: TimeInterval) -> SpriteAction {
+        var newSpriteAction = SpriteAction.init(sprite, action.waitBefore(delay: delay))
+        newSpriteAction.duration = self.duration
+        return newSpriteAction
+    }
 }

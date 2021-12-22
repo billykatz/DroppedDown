@@ -17,15 +17,31 @@ class BossSprite: SKSpriteNode {
         static let bossLeftLeg2Name = "boss-left-leg-2"
         static let bossLeftLeg3Name = "boss-left-leg-3"
         static let bossLeftLeg4Name = "boss-left-leg-4"
+        
+        static let bossRightLeg1Name = "boss-right-leg-1"
+        static let bossRightLeg2Name = "boss-right-leg-2"
+        static let bossRightLeg3Name = "boss-right-leg-3"
+        static let bossRightLeg4Name = "boss-right-leg-4"
+        
+        static let bossToothName = "boss-spider-tooth"
+        
+        static let bossBodyName = "boss-body"
+        
         static let artworkDimensions = CGSize(width: 280, height: 112)
         static let leftLeft1AnchorPoint = CGPoint(x: 75, y: 49)
         static let leftLeft2AnchorPoint = CGPoint(x: 81, y: 41)
         static let leftLeft3AnchorPoint = CGPoint(x: 88, y: 5)
         static let leftLeft4AnchorPoint = CGPoint(x: 74, y: 5)
+        
+        static let rightLeg1AnchorPoint = CGPoint(x: 4, y: 47)
+        static let rightLeg2AnchorPoint = CGPoint(x: 5, y: 24)
+        static let rightLeg3AnchorPoint = CGPoint(x: 5, y: 6)
+        static let rightLeg4AnchorPoint = CGPoint(x: 4, y: 8)
     }
     
     let playableRect: CGRect
     let spiderRatio: CGFloat = 35.0/14.0
+    
     lazy var spiderWidth: CGFloat = {
         playableRect.width*0.9
     }()
@@ -74,29 +90,117 @@ class BossSprite: SKSpriteNode {
         return sprite
     }()
     
+    lazy var rightLeg1: SKSpriteNode = {
+        let spiderLegTexture = SKTexture(imageNamed: Constants.bossRightLeg1Name)
+        let sprite = SKSpriteNode(texture: spiderLegTexture, size: scaleBodyPart(originalSize: spiderLegTexture.size()))
+        let anchorPoint = Constants.rightLeg1AnchorPoint
+        let originalSize = spiderLegTexture.size()
+        sprite.anchorPoint = convertPoint(from: anchorPoint, in: originalSize)
+        sprite.zPosition = 900_000
+        return sprite
+    }()
+    
+    lazy var rightLeg2: SKSpriteNode = {
+        let spiderLegTexture = SKTexture(imageNamed: Constants.bossRightLeg2Name)
+        let sprite = SKSpriteNode(texture: spiderLegTexture, size: scaleBodyPart(originalSize: spiderLegTexture.size()))
+        let anchorPoint = Constants.rightLeg2AnchorPoint
+        let originalSize = spiderLegTexture.size()
+        sprite.anchorPoint = convertPoint(from: anchorPoint, in: originalSize)
+        sprite.zPosition = 700_000
+        return sprite
+    }()
+    
+    lazy var rightLeg3: SKSpriteNode = {
+        let spiderLegTexture = SKTexture(imageNamed: Constants.bossRightLeg3Name)
+        let sprite = SKSpriteNode(texture: spiderLegTexture, size: scaleBodyPart(originalSize: spiderLegTexture.size()))
+        let anchorPoint = Constants.rightLeg3AnchorPoint
+        let originalSize = spiderLegTexture.size()
+        sprite.anchorPoint = convertPoint(from: anchorPoint, in: originalSize)
+        sprite.zPosition = 500_000
+        return sprite
+    }()
+    
+    lazy var rightLeg4: SKSpriteNode = {
+        let spiderLegTexture = SKTexture(imageNamed: Constants.bossRightLeg4Name)
+        let sprite = SKSpriteNode(texture: spiderLegTexture, size: scaleBodyPart(originalSize: spiderLegTexture.size()))
+        let anchorPoint = Constants.rightLeg4AnchorPoint
+        let originalSize = spiderLegTexture.size()
+        sprite.anchorPoint = convertPoint(from: anchorPoint, in: originalSize)
+        sprite.zPosition = 300_000
+        return sprite
+    }()
+    
+    lazy var spiderBody: SKSpriteNode = {
+        let spiderBodyTexture = SKTexture(imageNamed: Constants.bossBodyName)
+        let sprite = SKSpriteNode(texture: spiderBodyTexture, size: scaleBodyPart(originalSize: spiderBodyTexture.size()))
+        sprite.zPosition = 200_000
+        return sprite
+    }()
+    
     lazy var leftLegs: [SKSpriteNode] = {
         [leftLeg1, leftLeg2, leftLeg3, leftLeg4]
     }()
     
-    init(playableRect: CGRect) {
-        self.playableRect = playableRect
-        super.init(texture: nil, color: .clear, size: CGSize(width: 250, height: 250))
-        
+    lazy var rightLegs: [SKSpriteNode] = {
+        [rightLeg1, rightLeg2, rightLeg3, rightLeg4]
+    }()
+    
+    lazy var walkingPairsA: [SKSpriteNode] = {
+        [leftLeg1, rightLeg2, leftLeg3, rightLeg4]
+    }()
+    
+    lazy var walkingPairsB: [SKSpriteNode] = {
+        [rightLeg1, leftLeg2, rightLeg3, rightLeg4]
+    }()
+    
+    lazy var spiderHead: SKSpriteNode = {
         let bossSpriteSize = CGSize(width: spiderWidth, height: spiderHeight)
         let spider = SKSpriteNode(texture: SKTexture(imageNamed: Constants.bossSpriteName), color: .clear, size: bossSpriteSize)
-        spider.zPosition = 1000000
+        spider.zPosition = 1_000_000
+        return spider
+    }()
+    
+    lazy var spiderTooth: SKSpriteNode = {
+        let toothTexture = SKTexture(imageNamed: Constants.bossToothName)
+        let sprite = SKSpriteNode(texture: toothTexture, size: scaleBodyPart(originalSize: toothTexture.size()))
+        sprite.zPosition = 2_000_000
+        return sprite
+    }()
+
+    
+    init(playableRect: CGRect) {
+        self.playableRect = playableRect
+        super.init(texture: nil, color: .clear, size: CGSize(width: playableRect.width*0.9, height: playableRect.width*0.9/spiderRatio))
+        
+        leftLeg1.position = CGPoint.position(leftLeg1.frame, inside: spiderHead.frame, verticalAnchor: .center, yOffset: -35, horizontalAnchor: .center, xOffset: -100, translatedToBounds: true)
+        leftLeg2.position = CGPoint.position(leftLeg2.frame, inside: spiderHead.frame, verticalAnchor: .center, yOffset: 0, horizontalAnchor: .center, xOffset: -120, translatedToBounds: true)
+        leftLeg3.position = CGPoint.position(leftLeg3.frame, inside: spiderHead.frame, verticalAnchor: .center, yOffset: 20, horizontalAnchor: .center, xOffset: -100, translatedToBounds: true)
+        leftLeg4.position = CGPoint.position(leftLeg4.frame, inside: spiderHead.frame, verticalAnchor: .center, yOffset: 60, horizontalAnchor: .center, xOffset: -100, translatedToBounds: true)
+        
+        rightLeg1.position = CGPoint.position(rightLeg1.frame, inside: spiderHead.frame, verticalAnchor: .center, yOffset: -30, horizontalAnchor: .center, xOffset: 110, translatedToBounds: true)
+        rightLeg2.position = CGPoint.position(rightLeg2.frame, inside: spiderHead.frame, verticalAnchor: .center, yOffset: 8, horizontalAnchor: .center, xOffset: 120, translatedToBounds: true)
+        rightLeg3.position = CGPoint.position(rightLeg3.frame, inside: spiderHead.frame, verticalAnchor: .center, yOffset: 30, horizontalAnchor: .center, xOffset: 120, translatedToBounds: true)
+        rightLeg4.position = CGPoint.position(rightLeg4.frame, inside: spiderHead.frame, verticalAnchor: .center, yOffset: 55, horizontalAnchor: .center, xOffset: 110, translatedToBounds: true)
+        
+        spiderBody.position = CGPoint.position(spiderBody.frame, inside: spiderHead.frame, verticalAnchor: .center, yOffset: 105, horizontalAnchor: .center, translatedToBounds: true)
+        
+        spiderTooth.position = CGPoint.position(spiderBody.frame, inside: spiderHead.frame, verticalAnchor: .center, yOffset: 0, horizontalAnchor: .center, xOffset: 0, translatedToBounds: true)
         
         
-        leftLeg1.position = CGPoint.position(leftLeg1.frame, inside: spider.frame, verticalAnchor: .center, yOffset: -20, horizontalAnchor: .center, xOffset: -60)
-        leftLeg2.position = CGPoint.position(leftLeg2.frame, inside: spider.frame, verticalAnchor: .center, yOffset: 0, horizontalAnchor: .center, xOffset: -75)
-        leftLeg3.position = CGPoint.position(leftLeg3.frame, inside: spider.frame, verticalAnchor: .center, yOffset: 10, horizontalAnchor: .center, xOffset: -60)
-        leftLeg4.position = CGPoint.position(leftLeg4.frame, inside: spider.frame, verticalAnchor: .center, yOffset: 40, horizontalAnchor: .center, xOffset: -60)
-        
-        self.addChild(spider)
+        self.addChild(spiderHead)
         self.addChild(leftLeg1)
         self.addChild(leftLeg2)
         self.addChild(leftLeg3)
         self.addChild(leftLeg4)
+        
+        self.addChild(rightLeg1)
+        self.addChild(rightLeg2)
+        self.addChild(rightLeg3)
+        self.addChild(rightLeg4)
+        
+        self.addChild(spiderBody)
+        
+        spiderHead.addChild(spiderTooth)
     }
     
     override init(texture: SKTexture?, color: UIColor, size: CGSize) {

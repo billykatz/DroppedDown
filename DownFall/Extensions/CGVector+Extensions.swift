@@ -12,4 +12,8 @@ extension CGVector {
     var length: CGFloat {
         return sqrt(dx*dx + dy*dy)
     }
+    
+    var max: CGFloat {
+        return Swift.max(abs(dx), abs(dy))
+    }
 }

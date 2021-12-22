@@ -285,8 +285,12 @@ class Board: Equatable {
                 transformation = self.bossTargetsWhatToEat(input: input)
                 
             case .eats:
-                let targets = phase.bossState.targets.eats ?? []
-                transformation = self.removeAndReplaces(from: tiles, specificCoord: targets, input: input)
+//                let targets = phase.bossState.targets.eats ?? []
+//                transformation = self.removeAndReplaces(from: tiles, specificCoord: targets, input: input)
+//
+                let trans = bossEatsRocks(input: input)
+                InputQueue.append(Input(.transformation(trans)))
+                return
                 
             case .targetAttack:
                 transformation = self.bossTargetsWhatToAttack(input: input)
@@ -312,7 +316,7 @@ class Board: Equatable {
              .newTurn,
              .visitStore, .loseAndGoToStore,
              .itemUseCanceled, .itemCanBeUsed, .rotatePreview, .tileDetail, .levelGoalDetail, .runeReplacement,
-             .tutorialPhaseStart, .tutorialPhaseEnd, .noMoreMoves:
+             .tutorialPhaseStart, .tutorialPhaseEnd:
             transformation = nil
         }
         
@@ -355,6 +359,25 @@ class Board: Equatable {
             }
         }
         return Transformation(transformation: nil, inputType: .bossTurnStart(phase), endTiles: self.tiles)
+        
+    }
+    
+    private func bossEatsRocks(input: Input) -> [Transformation] {
+        guard case let InputType.bossTurnStart(phase) = input.type else { return [.zero] }
+        
+        var tileTrans: [TileTransformation] = []
+        
+        if let coords = phase.bossState.targets.eats {
+            coords.forEach { coord in
+                tileTrans.append(.init(coord, coord))
+            }
+        }
+        
+        let eatRocksTrans = Transformation(transformation: tileTrans.isEmpty ? nil : tileTrans, inputType: input.type, endTiles: tiles)
+        let targets = phase.bossState.targets.eats ?? []
+        let removeAndReplaceTransformation = self.removeAndReplaces(from: tiles, specificCoord: targets, input: input)
+        
+        return [eatRocksTrans, removeAndReplaceTransformation]
         
     }
     

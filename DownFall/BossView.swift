@@ -33,7 +33,7 @@ class BossView: SKSpriteNode {
     private var poisonColumnsTargetToAttack: [SKSpriteNode] = []
     private var spawnSpiderTargetToAttack: [SKSpriteNode] = []
     
-    init(playableRect: CGRect,tileSize: CGFloat, spriteProvider: @escaping () -> [[DFTileSpriteNode]]) {
+    init(playableRect: CGRect, tileSize: CGFloat, spriteProvider: @escaping () -> [[DFTileSpriteNode]]) {
         self.playableRect = playableRect
         self.spriteProvider = spriteProvider
         self.tileSize = tileSize
@@ -42,9 +42,8 @@ class BossView: SKSpriteNode {
         containerView.zPosition = 5_000
         
         self.bossSprite = BossSprite(playableRect: playableRect)
-        bossSprite.zPosition = 10_000
         
-        bossSprite.position = CGPoint.position(bossSprite.frame, inside: playableRect, verticalAlign: .top, horizontalAnchor: .center, yOffset: 400)
+        bossSprite.position = CGPoint.position(bossSprite.frame, inside: playableRect, verticalAlign: .top, horizontalAnchor: .center, yOffset: 250)
         bossSprite.zPosition = 100_000
         
         super.init(texture: nil, color: .clear, size: playableRect.size)

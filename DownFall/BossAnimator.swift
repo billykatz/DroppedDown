@@ -15,6 +15,20 @@ extension Animator {
     
     // MARK: - Functions to create SpirteActions
     
+    func createBlinkAnimation(reverse: Bool, delayBefore: TimeInterval) -> SpriteAction? {
+        guard let eyelids = bossSprite?.spiderEyelids else { return nil }
+        
+        let animationName = "boss-spider-blink-4"
+        let spriteSheet = SpriteSheet(textureName: animationName, columns: 4)
+        let forardAnimation = SKAction.animate(with: spriteSheet.animationFrames(), timePerFrame: timePerFrame())
+        let animation = reverse ? forardAnimation.reversed() : forardAnimation
+        
+        var spriteAction: SpriteAction = .init(eyelids, animation.waitBefore(delay: delayBefore))
+        spriteAction.duration = Double(spriteSheet.animationFrames().count) * timePerFrame()
+        
+        return spriteAction
+    }
+    
     func createToothAnimation(delayBefore: TimeInterval) -> SpriteAction? {
         guard let toothSprite = bossSprite?.spiderTooth else { return nil }
         
@@ -93,19 +107,33 @@ extension Animator {
         
         
     }
+    
+    func createAngryEyebrows(reverse: Bool, waitBeforeDelay: TimeInterval) -> SpriteAction? {
+        guard let bossSprite = bossSprite else { return nil }
+        
+        let animationName = "boss-spider-angry-crystal-eyebrows"
+        let spriteSheet = SpriteSheet(textureName: animationName, columns: 7)
+        let animate = SKAction.animate(with: spriteSheet.animationFrames(), timePerFrame: timePerFrame())
+        
+        var action = reverse ? SKAction.sequence(animate).reversed() : SKAction.sequence(animate)
+        action = action.waitBefore(delay: waitBeforeDelay)
+        var eyebrowAnimation: SpriteAction = .init(bossSprite.spiderEyebrowCrystals, action)
+        eyebrowAnimation.duration = Double(spriteSheet.animationFrames().count) * timePerFrame()
+        
+        return eyebrowAnimation
+    }
 
     
     // MARK: Functions that actually animate
     
-    func animateAngryEyelids(completion: @escaping () -> Void) {
-        if let animation = createAngryEyelidAnimation(reverse: false, waitBeforeDelay: 0.0) {
-            
-            if let animation2 = createAngryEyelidAnimation(reverse: true, waitBeforeDelay: 2.0) {
-                let animations = [animation, animation2]
-                animate(animations, completion: completion)
-            }
-            
-            
+    func animateAngryFace(completion: @escaping () -> Void) {
+        let animationDelay: TimeInterval = 2.0
+        if let eyeLidStartAnimation = createAngryEyelidAnimation(reverse: false, waitBeforeDelay: 0.0),
+           let eyeLidEndAnimation = createAngryEyelidAnimation(reverse: true, waitBeforeDelay: animationDelay),
+           let eyeBrowStartAnimation = createAngryEyebrows(reverse: false, waitBeforeDelay: 0.0),
+           let eyeBrowEndAnimation = createAngryEyebrows(reverse: true, waitBeforeDelay: animationDelay)
+         {
+            animate([eyeLidStartAnimation, eyeLidEndAnimation, eyeBrowStartAnimation, eyeBrowEndAnimation], completion: completion)
         } else {
             completion()
         }
@@ -398,6 +426,18 @@ extension Animator {
         }
         
         /// call the completion
+        animate(spriteActions, completion: completion)
+    }
+    
+    func animateIdlePhase1(timerBeforeDelay: TimeInterval, completion: @escaping () -> Void) {
+        var spriteActions: [SpriteAction] = []
+        
+        if let blinkDown = createBlinkAnimation(reverse: false, delayBefore: 0.0),
+           let blinkUp = createBlinkAnimation(reverse: true, delayBefore: blinkDown.duration ?? 0.0) {
+            spriteActions.append(contentsOf: [blinkDown, blinkUp])
+        }
+           
+        
         animate(spriteActions, completion: completion)
     }
     

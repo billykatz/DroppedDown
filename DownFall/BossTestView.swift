@@ -60,6 +60,12 @@ class BossTestView: ButtonDelegate {
         angryEyelid.position = CGPoint.alignHorizontally(angryEyelid.frame, relativeTo: tootleBiteButton.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: verticalPadding, translatedToBounds: true)
         angryEyelid.zPosition = buttonZPosition
         foreground.addChild(angryEyelid)
+        
+        // Left column buttons
+        let idlePhase1 = ShiftShaft_Button(size: buttonSize, delegate: self, identifier: .idlePhase1, fontSize: fontSize)
+        idlePhase1.position = CGPoint.alignVertically(idlePhase1.frame, relativeTo: echoEffectButton.frame, horizontalAnchor: .left, verticalAlign: .center, verticalPadding: 0.0, horizontalPadding: 20.0, translatedToBounds: true)
+        idlePhase1.zPosition = buttonZPosition
+        foreground.addChild(idlePhase1)
     }
     
     func buttonTapped(_ button: ShiftShaft_Button) {
@@ -75,7 +81,9 @@ class BossTestView: ButtonDelegate {
         case .lightBite:
             animator.animateToothClose { }
         case .angryEyes:
-            animator.animateAngryEyelids { }
+            animator.animateAngryFace { }
+        case .idlePhase1:
+            animator.animateIdlePhase1(timerBeforeDelay: 0.0) { }
         default:
             fatalError()
         }

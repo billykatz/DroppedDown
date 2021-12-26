@@ -27,6 +27,8 @@ class BossSprite: SKSpriteNode {
         
         static let bossSparkleEffect = "boss-spider-sparkler-effect"
         static let bossEyelids = "boss-spider-eyelids"
+        static let bossEye = "boss-spider-eyes"
+        static let bossHeadCrystals = "boss-spider-head-crystals"
         
         static let bossBodyName = "boss-body"
         
@@ -174,14 +176,28 @@ class BossSprite: SKSpriteNode {
     lazy var spiderSparkle: SKSpriteNode = {
         let toothTexture = SKTexture(imageNamed: Constants.bossSparkleEffect)
         let sprite = SKSpriteNode(texture: toothTexture, size: scaleBodyPart(originalSize: toothTexture.size()))
-        sprite.zPosition = 1_200_000
+        sprite.zPosition = 1_500_000
         return sprite
     }()
     
     lazy var spiderEyelids: SKSpriteNode = {
         let toothTexture = SKTexture(imageNamed: Constants.bossEyelids)
         let sprite = SKSpriteNode(texture: toothTexture, size: scaleBodyPart(originalSize: toothTexture.size()))
+        sprite.zPosition = 1_200_000
+        return sprite
+    }()
+    
+    lazy var spiderEyes: SKSpriteNode = {
+        let toothTexture = SKTexture(imageNamed: Constants.bossEye)
+        let sprite = SKSpriteNode(texture: toothTexture, size: scaleBodyPart(originalSize: toothTexture.size()))
         sprite.zPosition = 1_100_000
+        return sprite
+    }()
+    
+    lazy var spiderEyebrowCrystals: SKSpriteNode = {
+        let toothTexture = SKTexture(imageNamed: Constants.bossHeadCrystals)
+        let sprite = SKSpriteNode(texture: toothTexture, size: scaleBodyPart(originalSize: toothTexture.size()))
+        sprite.zPosition = 1_200_000
         return sprite
     }()
     
@@ -206,6 +222,8 @@ class BossSprite: SKSpriteNode {
         spiderSparkle.position = CGPoint.position(spiderSparkle.frame, inside: spiderHead.frame, verticalAnchor: .center, yOffset: 0, horizontalAnchor: .center, translatedToBounds: true)
         
         spiderEyelids.position = CGPoint.position(spiderEyelids.frame, inside: spiderHead.frame, verticalAnchor: .center, yOffset: 0, horizontalAnchor: .center, xOffset: 0, translatedToBounds: true)
+        spiderEyes.position = CGPoint.position(spiderEyes.frame, inside: spiderHead.frame, verticalAnchor: .center, yOffset: 0, horizontalAnchor: .center, xOffset: 0, translatedToBounds: true)
+        spiderEyebrowCrystals.position = CGPoint.position(spiderEyebrowCrystals.frame, inside: spiderHead.frame, verticalAnchor: .center, yOffset: 0, horizontalAnchor: .center, xOffset: 0, translatedToBounds: true)
         
         self.addChild(spiderHead)
         self.addChild(leftLeg1)
@@ -223,6 +241,8 @@ class BossSprite: SKSpriteNode {
         
         spiderHead.addChild(spiderTooth)
         spiderHead.addChild(spiderEyelids)
+        spiderHead.addChild(spiderEyes)
+        spiderHead.addChild(spiderEyebrowCrystals)
     }
     
     override init(texture: SKTexture?, color: UIColor, size: CGSize) {

@@ -103,9 +103,6 @@ extension Animator {
         eyelidAnimation.duration = Double(spriteSheet.animationFrames().count) * timePerFrame()
         
         return eyelidAnimation
-        
-        
-        
     }
     
     func createAngryEyebrows(reverse: Bool, waitBeforeDelay: TimeInterval) -> SpriteAction? {
@@ -122,7 +119,94 @@ extension Animator {
         
         return eyebrowAnimation
     }
-
+    
+    func createIndividualLegMovement(legSprite: SKSpriteNode, rotateAngle: CGFloat, rotateSpeed: CGFloat, delayBefore: Double) -> SpriteAction {
+        let rotateDuration = abs(rotateAngle) / rotateSpeed
+        let rotateAction = SKAction.rotate(byAngle: rotateAngle, duration: rotateDuration)
+        rotateAction.timingMode = .easeInEaseOut
+        let reverse = rotateAction.reversed()
+        reverse.timingMode = .easeInEaseOut
+        let randomWaitAction = SKAction.wait(forDuration: delayBefore)
+        let action = SKAction.sequence([randomWaitAction, rotateAction, reverse])
+        var spriteAction = SpriteAction.init(legSprite, action)
+        spriteAction.duration = (rotateDuration * 2) + delayBefore
+        return spriteAction
+    }
+    
+    func createLegMovement(delayBefore: Double, forceEachLeg: Bool) -> [SpriteAction]? {
+        guard let bossSprite = bossSprite else { return nil }
+        
+        var spriteActions: [SpriteAction] = []
+        
+        let rotateSpeed: CGFloat = .pi/2
+        let minAngle: CGFloat = CGFloat.pi/32
+        let maxAngle: CGFloat = 3*CGFloat.pi/32
+        let waitActionDuration = Double.random(in: 0.0...0.5)
+        func randomRange() -> CGFloat { return CGFloat.random(in: minAngle...maxAngle) }
+        let evenLegs = Bool.random()
+        // left leg steps
+        for (idx, legSprite) in bossSprite.leftLegs.enumerated() {
+            if forceEachLeg || (evenLegs && idx.isMultiple(of: 2)) || (!evenLegs && !idx.isMultiple(of: 2)) {
+                let rotateAngle: CGFloat = -1 * randomRange()
+                let legAction = createIndividualLegMovement(legSprite: legSprite, rotateAngle: rotateAngle, rotateSpeed: rotateSpeed, delayBefore: waitActionDuration)
+                spriteActions.append(legAction.waitBefore(delay: delayBefore))
+                
+            }
+        }
+        
+        // right leg steps
+        for (idx, legSprite) in bossSprite.rightLegs.enumerated() {
+            // boolean test reversed on the right side
+            if forceEachLeg || (!evenLegs && idx.isMultiple(of: 2)) || (evenLegs && !idx.isMultiple(of: 2)) {
+                let rotateAngle: CGFloat = randomRange()
+                let legAction = createIndividualLegMovement(legSprite: legSprite, rotateAngle: rotateAngle, rotateSpeed: rotateSpeed, delayBefore: waitActionDuration)
+                spriteActions.append(legAction.waitBefore(delay: delayBefore))
+            }
+        }
+        
+        return spriteActions
+    }
+    
+    func createBodyShifts(numberOfShifts: Int, delayBefore: Double) -> [SpriteAction]? {
+        guard let bossSprite = bossSprite else { return nil }
+        var spriteActions: [SpriteAction] = []
+        
+        var bodyWaitBefore = delayBefore
+        for  _ in 0..<numberOfShifts {
+            
+            // move the body up and down
+            var bodyMoveXDistance: CGFloat = CGFloat.random(in: 0.0...0.0)
+            var bodyMoveYDistance: CGFloat = CGFloat.random(in: 4.0...8.0)
+            let up = Bool.random()
+            bodyMoveYDistance *= (up ? 1 : -1)
+            bodyMoveXDistance *= (up ? 1 : -1)
+            let headMoveXDistance: CGFloat = bodyMoveXDistance * 1.75
+            let headMoveYDistance: CGFloat = bodyMoveYDistance * 1.75
+            let bodyMoveDuration: TimeInterval = 0.10
+            let headMoveDuration: TimeInterval = 0.10
+            let waitBeforeBodyDown: TimeInterval = bodyMoveDuration + 0.2
+            let bodyMoveUpAction = SKAction.moveBy(x: bodyMoveXDistance, y: bodyMoveYDistance, duration: bodyMoveDuration)
+            let headMoveAction = SKAction.moveBy(x: headMoveXDistance, y: headMoveYDistance, duration: headMoveDuration)
+            let bodyMoveUpReverse = bodyMoveUpAction.reversed().waitBefore(delay: waitBeforeBodyDown)
+            let headMoveActionReverse = headMoveAction.reversed().waitBefore(delay: waitBeforeBodyDown)
+            let bodyMoveUp: SpriteAction = .init(bossSprite.spiderBody, bodyMoveUpAction.waitBefore(delay: bodyWaitBefore))
+            let headMoveUp: SpriteAction = .init(bossSprite.spiderHead, headMoveAction.waitBefore(delay: bodyWaitBefore))
+            let bodyMoveDown: SpriteAction = .init(bossSprite.spiderBody, bodyMoveUpReverse.waitBefore(delay: bodyWaitBefore))
+            let headMoveDown: SpriteAction = .init(bossSprite.spiderHead, headMoveActionReverse.waitBefore(delay: bodyWaitBefore))
+            
+            spriteActions.append(bodyMoveUp)
+            spriteActions.append(headMoveUp)
+            spriteActions.append(bodyMoveDown)
+            spriteActions.append(headMoveDown)
+            
+            // wait for the next set
+            bodyWaitBefore += bodyMoveDuration + waitBeforeBodyDown + 0.2
+            
+        }
+        
+        return spriteActions
+    }
+    
     
     // MARK: Functions that actually animate
     
@@ -132,7 +216,7 @@ extension Animator {
            let eyeLidEndAnimation = createAngryEyelidAnimation(reverse: true, waitBeforeDelay: animationDelay),
            let eyeBrowStartAnimation = createAngryEyebrows(reverse: false, waitBeforeDelay: 0.0),
            let eyeBrowEndAnimation = createAngryEyebrows(reverse: true, waitBeforeDelay: animationDelay)
-         {
+        {
             animate([eyeLidStartAnimation, eyeLidEndAnimation, eyeBrowStartAnimation, eyeBrowEndAnimation], completion: completion)
         } else {
             completion()
@@ -240,6 +324,8 @@ extension Animator {
         
     }
     
+    
+    
     func animateWalkingAnimation(moveVector: CGVector) -> [SpriteAction] {
         guard let bossSprite = bossSprite else { return [] }
         var spriteActions: [SpriteAction] = []
@@ -300,7 +386,7 @@ extension Animator {
         }
         
         averageRotateDuration = averageRotateDuration/Double(bossSprite.leftLegs.count*numberOfSteps)
-
+        
         let moveVector = CGVector(dx: moveVector.dx/CGFloat(numberOfSteps*2), dy: moveVector.dy/CGFloat(numberOfSteps*2))
         let bodyDuration = 0.25
         var bodyWaitBefore = 0.0
@@ -344,26 +430,33 @@ extension Animator {
     }
     
     func animateToothChomp(completion: @escaping () -> Void) {
-//        guard let bossSprite = bossSprite else { return }
         var spriteActions: [SpriteAction] = []
         
         if let chomp = createToothChompAnimation(delayBefore: 0.0) {
             spriteActions.append(chomp)
         }
         
-        animate(spriteActions, completion: completion)
+        bossSprite?.spiderToothSaliva.alpha = 0.0
+        animate(spriteActions, completion: {
+            bossSprite?.spiderToothSaliva.alpha = 1.0
+            completion()
+        })
+        
         
     }
     
     func animateToothClose(completion: @escaping () -> Void) {
-//        guard let bossSprite = bossSprite else { return }
         var spriteActions: [SpriteAction] = []
         
         if let chomp = createToothAnimation(delayBefore: 0.0) {
             spriteActions.append(chomp)
         }
         
-        animate(spriteActions, completion: completion)
+        bossSprite?.spiderToothSaliva.alpha = 0.0
+        animate(spriteActions, completion: {
+            bossSprite?.spiderToothSaliva.alpha = 1.0
+            completion()
+        })
         
     }
     
@@ -371,9 +464,9 @@ extension Animator {
         guard let bossSprite = bossSprite,
               let firstHalfteethChomp = createToothChompFirstHalfAnimation(delayBefore: 0.0),
               let secondHalfTeethChomp = createToothChompSecondHalfAnimation(delayBefore: 0.0) else {
-            completion()
-            return
-        }
+                  completion()
+                  return
+              }
         
         var spriteActions: [SpriteAction] = []
         
@@ -412,7 +505,7 @@ extension Animator {
                 let spinAndMove = SKAction.group(spin, move, curve: .easeIn)
                 
                 spriteActions.append(.init(newSprite, spinAndMove.waitBefore(delay: currentStagger)))
-                                
+                
                 let delayedTeethChompSecondHalf = secondHalfTeethChomp.waitBefore(delay: currentStagger + moveDuration)
                 spriteActions.append(delayedTeethChompSecondHalf)
                 
@@ -432,15 +525,28 @@ extension Animator {
     func animateIdlePhase1(timerBeforeDelay: TimeInterval, completion: @escaping () -> Void) {
         var spriteActions: [SpriteAction] = []
         
-        if let blinkDown = createBlinkAnimation(reverse: false, delayBefore: 0.0),
+        if let blinkDown = createBlinkAnimation(reverse: false, delayBefore: timerBeforeDelay),
            let blinkUp = createBlinkAnimation(reverse: true, delayBefore: blinkDown.duration ?? 0.0) {
             spriteActions.append(contentsOf: [blinkDown, blinkUp])
         }
-           
+        
+        if let legMoves = createLegMovement(delayBefore: timerBeforeDelay, forceEachLeg: false) {
+            if let legMoves2 = createLegMovement(delayBefore: timerBeforeDelay + legMoves.maxDuration(), forceEachLeg: false) {
+                if let legMoves3 = createLegMovement(delayBefore: timerBeforeDelay + legMoves.maxDuration() + legMoves2.maxDuration(), forceEachLeg: false) {
+                    spriteActions.append(contentsOf: legMoves)
+                    spriteActions.append(contentsOf: legMoves2)
+                    spriteActions.append(contentsOf: legMoves3)
+                }
+            }
+        }
+        
+        if let bodyShifts = createBodyShifts(numberOfShifts: 2, delayBefore: timerBeforeDelay) {
+            spriteActions.append(contentsOf: bodyShifts)
+        }
         
         animate(spriteActions, completion: completion)
     }
     
     
-
+    
 }

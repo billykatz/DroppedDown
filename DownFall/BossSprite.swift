@@ -24,6 +24,7 @@ class BossSprite: SKSpriteNode {
         static let bossRightLeg4Name = "boss-right-leg-4"
         
         static let bossToothName = "boss-spider-tooth"
+        static let bossSalivaName = "boss-spider-tooth-saliva"
         
         static let bossSparkleEffect = "boss-spider-sparkler-effect"
         static let bossEyelids = "boss-spider-eyelids"
@@ -171,6 +172,13 @@ class BossSprite: SKSpriteNode {
         sprite.zPosition = 1_200_000
         return sprite
     }()
+    
+    lazy var spiderToothSaliva: SKSpriteNode = {
+        let toothTexture = SKTexture(imageNamed: Constants.bossSalivaName)
+        let sprite = SKSpriteNode(texture: toothTexture, size: scaleBodyPart(originalSize: toothTexture.size()))
+        sprite.zPosition = 1_300_000
+        return sprite
+    }()
 
     
     lazy var spiderSparkle: SKSpriteNode = {
@@ -237,9 +245,10 @@ class BossSprite: SKSpriteNode {
         self.addChild(rightLeg4)
         
         self.addChild(spiderBody)
-        self.addChild(spiderSparkle)
+//        self.addChild(spiderSparkle)
         
         spiderHead.addChild(spiderTooth)
+        spiderHead.addChild(spiderToothSaliva)
         spiderHead.addChild(spiderEyelids)
         spiderHead.addChild(spiderEyes)
         spiderHead.addChild(spiderEyebrowCrystals)

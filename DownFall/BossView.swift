@@ -12,10 +12,8 @@ class BossView: SKSpriteNode {
     
     struct Constants {
         static let yellowReticleName = "yellowReticle"
-        static let redReticleName = "redReticle"
         static let dynamiteReticleName = "target-dynamite"
-        static let poisonReticleName = "poisonReticle"
-        static let poisonReticleSize = CGSize(width: 34, height: 292)
+        static let poisonReticleName = "target-poison"
     }
     
     public let bossSprite: BossSprite
@@ -134,10 +132,11 @@ class BossView: SKSpriteNode {
     
     func showPoisonReticles(_ poisonColumns: [Int]) {
         for column in poisonColumns {
-            let poisonReticle = SKSpriteNode(texture: SKTexture(imageNamed: Constants.poisonReticleName), size: Constants.poisonReticleSize.scale(by: tileSize/32))
-            let bottomSprite = sprites[0][column]
+            let poisonReticleSize = CGSize(width: tileSize, height: 48 / (109/tileSize))
+            let poisonReticle = SKSpriteNode(texture: SKTexture(imageNamed: Constants.poisonReticleName), size: poisonReticleSize)
+            let topSprite = sprites[sprites.count-1][column]
             
-            poisonReticle.position = CGPoint.position(poisonReticle.frame, inside: bottomSprite.frame, verticalAlign: .bottom, horizontalAnchor: .left, translatedToBounds: true)
+            poisonReticle.position = CGPoint.position(poisonReticle.frame, inside: topSprite.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: 40, translatedToBounds: true)
             
             poisonColumnsTargetToAttack.append(poisonReticle)
             containerView.addChild(poisonReticle)

@@ -37,7 +37,7 @@ fileprivate var sparkleAnimations = [sparkleAnimation1, sparkleAnimation2, spark
 extension Animator {
     
     // MARK: - Functions to create SpirteActions
-    func createDynamiteFlyingIn(delayBefore: TimeInterval, startingPosition: CGPoint, targetPosition: CGPoint, targetSprite: DFTileSpriteNode, tileType: TileType, spriteForeground: SKNode) -> SpriteAction? {
+    func createDynamiteFlyingIn(delayBefore: TimeInterval, startingPosition: CGPoint, targetPosition: CGPoint, targetSprite: DFTileSpriteNode, tileType: TileType, spriteForeground: SKNode) -> [SpriteAction]? {
         guard let tileSize = tileSize else { return nil }
         var spriteActions: [SpriteAction] = []
         
@@ -85,13 +85,15 @@ extension Animator {
             let waitBeforeCrumble = SKAction.wait(forDuration: duration)
             let crumbleAction = crumble.action
             let sequence = SKAction.sequence([waitBeforeCrumble, crumbleAction])
-            sequence.timingMode = .easeIn
             spriteActions.append(.init(spriteToRemoveOnLanding, sequence))
         }
         
         
         
-        return .init(attackSprite, sequence.waitBefore(delay: delayBefore))
+        let attackAction: SpriteAction = .init(attackSprite, sequence.waitBefore(delay: delayBefore))
+        
+        spriteActions.append(attackAction)
+        return spriteActions
         
     }
 
@@ -944,7 +946,7 @@ extension Animator {
             let targetSprite = targetSprites[idx]
             let tileType = tileTypes[idx]
             if let dynamiteThrow = createDynamiteFlyingIn(delayBefore: delayBefore + staggerDyanmite, startingPosition: startPosition1, targetPosition: targetPosition, targetSprite: targetSprite, tileType: tileType, spriteForeground: spriteForeground) {
-                spriteActions.append(dynamiteThrow)
+                spriteActions.append(contentsOf: dynamiteThrow)
             }
             
             // animate 1 ground pound

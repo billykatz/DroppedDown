@@ -1,15 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "boss-spider-teeth-saliva-composite.png",
+      "filename" : "target-eat.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "target-eat@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "target-eat@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

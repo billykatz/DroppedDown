@@ -33,6 +33,8 @@ class BossSprite: SKSpriteNode {
         
         static let bossBodyName = "boss-body"
         
+        static let dynamiteTrain = "boss-dynamite-train"
+        
         static let artworkDimensions = CGSize(width: 280, height: 112)
         static let leftLeft1AnchorPoint = CGPoint(x: 75, y: 49)
         static let leftLeft2AnchorPoint = CGPoint(x: 81, y: 41)
@@ -209,6 +211,20 @@ class BossSprite: SKSpriteNode {
         return sprite
     }()
     
+    lazy var originalSpiderTrainPosition: CGPoint = {
+        let sprite = SKSpriteNode(texture: SKTexture(imageNamed: Constants.dynamiteTrain), size: CGSize(width: 400, height: 200))
+        let initialPosition = CGPoint.alignVertically(sprite.frame, relativeTo: self.frame, horizontalAnchor: .left, verticalAlign: .bottom, verticalPadding: -25.0, horizontalPadding: 100.0, translatedToBounds: true)
+        return initialPosition
+    }()
+    
+    lazy var spiderDynamiteTrain: SKSpriteNode = {
+        let sprite = SKSpriteNode(texture: SKTexture(imageNamed: Constants.dynamiteTrain), size: CGSize(width: 400, height: 200))
+        let initialPosition = originalSpiderTrainPosition
+        sprite.position = initialPosition
+        sprite.zPosition = 2_200_000
+        return sprite
+    }()
+    
     init(playableRect: CGRect) {
         self.playableRect = playableRect
         super.init(texture: nil, color: .clear, size: CGSize(width: playableRect.width*0.9, height: playableRect.width*0.9/spiderRatio))
@@ -245,13 +261,33 @@ class BossSprite: SKSpriteNode {
         self.addChild(rightLeg4)
         
         self.addChild(spiderBody)
-//        self.addChild(spiderSparkle)
+        self.addChild(spiderSparkle)
+        
+        self.addChild(spiderDynamiteTrain)
         
         spiderHead.addChild(spiderTooth)
-        spiderHead.addChild(spiderToothSaliva)
+        
         spiderHead.addChild(spiderEyelids)
         spiderHead.addChild(spiderEyes)
         spiderHead.addChild(spiderEyebrowCrystals)
+        
+        buildOriginalPositions()
+    }
+    
+    struct OriginalPositions {
+        let position: CGPoint
+        let zPosition: CGFloat
+        let rotation: CGFloat
+    }
+    var originalPositions: [(SKSpriteNode, OriginalPositions)] = []
+    
+    func buildOriginalPositions() {
+        originalPositions = self.children.compactMap( { $0 as? SKSpriteNode }).map { child in return (child, OriginalPositions(position: child.position, zPosition: child.zPosition, rotation: child.zRotation)) }
+        
+        let bossHeadChildren = spiderHead.children.compactMap( { $0 as? SKSpriteNode }).map { child in return (child, OriginalPositions(position: child.position, zPosition: child.zPosition, rotation: child.zRotation)) }
+        
+        originalPositions.append(contentsOf: bossHeadChildren)
+
     }
     
     override init(texture: SKTexture?, color: UIColor, size: CGSize) {

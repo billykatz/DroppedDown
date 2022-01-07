@@ -105,6 +105,10 @@ enum ButtonIdentifier: String {
     case lightBite
     case angryEyes
     case idlePhase1
+    case rockTrio
+    case rearUp
+    case groundPound
+    case resetPositions
     
     var title: String {
         switch self {
@@ -237,6 +241,14 @@ enum ButtonIdentifier: String {
             return "Angry Eyes"
         case .idlePhase1:
             return "Idle Phase 1"
+        case .rockTrio:
+            return "Rock Trio"
+        case .rearUp:
+            return "Rear Up"
+        case .groundPound:
+            return "Ground Pound"
+        case .resetPositions:
+            return "Reset Positions"
         }
     }
 }

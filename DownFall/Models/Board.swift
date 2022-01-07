@@ -285,9 +285,6 @@ class Board: Equatable {
                 transformation = self.bossTargetsWhatToEat(input: input)
                 
             case .eats:
-//                let targets = phase.bossState.targets.eats ?? []
-//                transformation = self.removeAndReplaces(from: tiles, specificCoord: targets, input: input)
-//
                 let trans = bossEatsRocks(input: input)
                 InputQueue.append(Input(.transformation(trans)))
                 return
@@ -295,8 +292,8 @@ class Board: Equatable {
             case .targetAttack:
                 transformation = self.bossTargetsWhatToAttack(input: input)
                 
-            case .attack:
-                transformation = self.bossExecutesAttacks(input: input)
+            case let .attack(type: type):
+                transformation = self.bossExecutesAttacks(input: input, attackType: type)
                 
             case .rests, .phaseChange, .superAttack, .targetSuperAttack:
                 transformation = self.resetBossFlags(input: input)
@@ -387,14 +384,17 @@ class Board: Equatable {
         
     }
     
-    private func bossExecutesAttacks(input: Input) -> Transformation {
+    // Only excutes attacks for the single AttackType that is past in. 
+    private func bossExecutesAttacks(input: Input, attackType executeAttackType: BossAttackType) -> Transformation {
         guard case let InputType.bossTurnStart(phase) = input.type else { return .zero }
         var tileTransformations: [TileTransformation] = []
         
         // posion attack
         // dealt with separately because we need to understand the relationship of the tiles to the ones above it because pillars block the poison damage
         
-        if let attackedColumns = phase.bossState.poisonAttackColumns {
+        if let attackedColumns = phase.bossState.poisonAttackColumns,
+           executeAttackType == .poison
+        {
             for col in attackedColumns {
                 var hitPillarShouldStop = false
                 for row in (0..<tiles.count).reversed() {
@@ -421,17 +421,16 @@ class Board: Equatable {
         // dynamite and spawning stuff
         if let bossAttackDict = phase.bossState.targets.attack {
             bossAttackDict.forEach { (attackType, coords) in
-                var count = 0
                 coords.forEach { coord in
-                    if attackType == .dynamite {
-                        tiles[coord.row][coord.column] = Tile(type: .dynamite(.init(count: 3+count, hasBeenDecremented: false)))
-//                        count += 1
-                    } else if attackType == .spawnSpider, let tile = tileCreator.monsterWithType(.spider) {
+                    if attackType == .dynamite, executeAttackType == .dynamite {
+                        tiles[coord.row][coord.column] = Tile(type: .dynamite(.init(count: 3, hasBeenDecremented: false)))
+                    } else if attackType == .spawnSpider, executeAttackType == .spawnSpider, let tile = tileCreator.monsterWithType(.spider) {
                         tiles[coord.row][coord.column] = tile
                     }
                 }
             }
         }
+        
         return Transformation(transformation: tileTransformations.isEmpty ? nil : tileTransformations, inputType: .bossTurnStart(phase), endTiles: self.tiles)
         
     }

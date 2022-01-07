@@ -179,7 +179,12 @@ class Renderer: SKSpriteNode {
         foreground.position = playableRect.center
         menuForeground.position = playableRect.center
         
-        [spriteForeground, safeArea, hud, levelGoalView, backpackView, bossView, self.rotateVisualCue].forEach { foreground.addChild($0) }
+        
+        if level.isBossLevel {
+            [spriteForeground, safeArea, hud, backpackView, bossView, rotateVisualCue].forEach { foreground.addChild($0) }
+        } else {
+            [spriteForeground, safeArea, hud, levelGoalView, backpackView, rotateVisualCue].forEach { foreground.addChild($0) }
+        }
         
         #if DEBUG
         foreground.addChild(bossDebugView)
@@ -304,17 +309,17 @@ class Renderer: SKSpriteNode {
             case .bossTurnStart(let phase):
                 
                 switch phase.bossState.stateType {
+                case .targetEat:
+                    showBossTargetsToEat(in: transformations, bossPhase: phase)
+                    
                 case .eats:
                     showBossEatsRocks(in: transformations, bossPhase: phase)
                     
-                case .targetEat:
-                    self.animationsFinished(endTiles: trans.endTiles)
+                case .targetAttack(type: let type):
+                    showBossTargetsWhatToAttack(in: transformations, bossPhase: phase, attackType: type)
                     
-                case .targetAttack:
-                    self.animationsFinished(endTiles: trans.endTiles)
-                    
-                case .attack:
-                    self.showBossAttacks(in: transformations, bossPhase: phase)
+                case .attack(type: let attackType):
+                    self.showBossAttacks(in: transformations, bossPhase: phase, attackType: attackType)
                     
                 case .rests, .phaseChange, .superAttack, .targetSuperAttack:
                     //                    showBossPhaseChangeAttacks(in: trans, bossPhase: BossPhase)
@@ -1069,6 +1074,13 @@ extension Renderer {
 
 extension Renderer {
     
+    private func showBossTargetsToEat(in transformation: [Transformation], bossPhase: BossPhase) {
+        animator.animateWaitingToEat(delayBefore: 0.0) { [weak self] in
+            self?.animationsFinished(endTiles: transformation.first?.endTiles)
+        }
+    }
+
+    
     private func showBossEatsRocks(in transformation: [Transformation], bossPhase: BossPhase) {
         guard let rockEatTrans = transformation.first,
                 let removeAndReplace = transformation.last else {
@@ -1077,10 +1089,30 @@ extension Renderer {
         }
         
         animator.animateBossEatingRocks(sprites: sprites, foreground: spriteForeground, transformation: rockEatTrans) { [weak self] in
-            self?.computeNewBoard(for: removeAndReplace)
+            self?.animator.animateBossGettingReadyToAttack(delayBefore: 0.0, completion: { [weak self] in
+                self?.computeNewBoard(for: removeAndReplace)
+            })
         }
         
         
+    }
+    
+    private func showBossTargetsWhatToAttack(in transformation: [Transformation], bossPhase: BossPhase, attackType: BossAttackType) {
+        // get the correct targets from the BossPhase
+        // update (Cori's) and show the retices on the screen
+        guard let trans = transformation.first,
+                let attackTargets = bossPhase.bossState.targets.whatToAttack?[attackType] else {
+            animationsFinished(endTiles: transformation.first?.endTiles)
+            return
+        }
+        
+        if attackType == .dynamite {
+            animator.animateBossRearingUp(delayBefore: 0.0, reversed: false) { [weak self] in
+                self?.animationsFinished(endTiles: trans.endTiles)
+            }
+        } else {
+            animationsFinished(endTiles: trans.endTiles)
+        }
     }
     
     private func showBossPhaseChangeAttacks(in transformation: Transformation, bossPhase: BossPhase) {
@@ -1095,11 +1127,12 @@ extension Renderer {
         
     }
     
-    private func showBossAttacks(in transformation: [Transformation], bossPhase: BossPhase) {
+    private func showBossAttacks(in transformation: [Transformation], bossPhase: BossPhase, attackType: BossAttackType) {
         guard let trans = transformation.first, let endTiles = trans.endTiles else {
             animationsFinished(endTiles: transformation.first?.endTiles)
             return
         }
+        
         
         func animateDyamiate(completion:  @escaping () -> Void) {
             if let dynamiteAttacks = bossPhase.bossState.targets.attack?[.dynamite] {
@@ -1108,7 +1141,13 @@ extension Renderer {
                 
                 let targetSprites = dynamiteAttacks.map { [sprites] in sprites[$0] }
                 
-                animator.animateBossSingleTargetAttack(foreground: spriteForeground, tileTypes: dynaTypes, tileSize: tileSize, startingPosition: bossDebugView.center, targetPositions: targets, targetSprites: targetSprites, completion: completion)
+                animator.animateDynamiteFlyingIn(delayBefore: 0.0, targetPositions: targets, targetSprites: targetSprites, tileTypes: dynaTypes, spriteForeground: spriteForeground) { [weak self] in
+                    self?.animator.animateBossRearingUp(delayBefore: 0.0, reversed: true, completion: { [weak self] in
+                        self?.animationsFinished(endTiles: trans.endTiles)
+                    })
+                }
+                
+//                animator.animateBossSingleTargetAttack(foreground: spriteForeground, tileTypes: dynaTypes, tileSize: tileSize, startingPosition: bossDebugView.center, targetPositions: targets, targetSprites: targetSprites, completion: completion)
             } else { completion() }
         }
         
@@ -1140,15 +1179,19 @@ extension Renderer {
             } else { completion() }
         }
         
-        
-        /// First drop poison
-        animatePoison {
-            /// Then spiders
-            animateSpawnSpider {
-                /// Then dynamites
-                animateDyamiate { [weak self] in
-                    self?.animationsFinished(endTiles: transformation.first?.endTiles)
-                }
+        switch attackType {
+        case .dynamite:
+            animateDyamiate { [weak self] in
+                self?.animationsFinished(endTiles: transformation.first?.endTiles)
+            }
+        case .poison:
+            animatePoison { [weak self] in
+                self?.animationsFinished(endTiles: transformation.first?.endTiles)
+            }
+        case .spawnSpider:
+            animateSpawnSpider { [weak self] in
+                self?.animationsFinished(endTiles: transformation.first?.endTiles)
+                
             }
         }
     }

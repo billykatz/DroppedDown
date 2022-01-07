@@ -11,7 +11,15 @@ import SpriteKit
 struct SpriteAction: Hashable {
     let sprite: SKNode
     let action: SKAction
-    var duration: Double?
+    private var _duration: Double?
+    var duration: Double {
+        get {
+            return _duration ?? 0.0
+        }
+        set {
+            _duration = newValue
+        }
+    }
     
     var tuple: (SKNode, SKAction) {
         return (sprite, action)
@@ -46,5 +54,15 @@ struct SpriteAction: Hashable {
         var newSpriteAction = SpriteAction.init(sprite, action.reversed())
         newSpriteAction.duration = self.duration
         return newSpriteAction
+    }
+    
+    func reverseAnimation(reverse: Bool) -> SpriteAction {
+        if reverse {
+            var newSpriteAction = SpriteAction.init(sprite, action.reversed())
+            newSpriteAction.duration = self.duration
+            return newSpriteAction
+        } else {
+            return self
+        }
     }
 }

@@ -1,15 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "boss-spider-tooth-chomp-first-half-8.png",
+      "filename" : "target-poison.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "target-poison@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "target-poison@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

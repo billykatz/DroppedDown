@@ -22,21 +22,43 @@ enum BossSuperAttackType: String, Codable {
     case web
 }
 
-enum BossAttackType: String, Codable {
+enum BossAttackType: String, Hashable, Codable {
     case dynamite
     case poison
     case spawnSpider
 }
 
-enum BossStateType: String, Codable {
+enum BossStateType: Hashable, Codable, CustomStringConvertible {
     case targetEat
     case eats
-    case targetAttack
-    case attack
+    case targetAttack(type: BossAttackType)
+    case attack(type: BossAttackType)
     case rests
     case phaseChange
     case targetSuperAttack
     case superAttack
+    
+    var description: String {
+        switch self {
+        case .targetEat:
+            return "Target Eats"
+        case .eats:
+            return "Eats"
+        case .targetAttack(let type):
+            return "Target Attack - \(type.rawValue)"
+        case .attack(let type):
+            return "Attacks - \(type.rawValue)"
+        case .rests:
+            return "Rests"
+        case .phaseChange:
+            return "Phase Change"
+        case .targetSuperAttack:
+            return "Target Super Attack"
+        case .superAttack:
+            return "Super Attack"
+        }
+    }
+    
 }
 
 struct BossTargets: Codable, Hashable {
@@ -111,7 +133,7 @@ struct BossState: Codable, Hashable {
             self.targets = BossTargets(
                 whatToEat: nil,
                 eats: nil,
-                whatToAttack: nil,
+                whatToAttack: oldState.targets.whatToAttack,
                 attack: validateAndUpdatePlannedAttacks(in: tiles, plannedAttacks: oldState.targets.whatToAttack)
             )
             
@@ -132,14 +154,46 @@ struct BossState: Codable, Hashable {
             if superAttackIsCharged(eatenRocks: eatenRocks) {
                 return .targetSuperAttack
             } else {
-                return .targetAttack
+                // choose the correct targeting mode to start in
+                if (targets.whatToAttack ?? [:]).keys.contains(where: { $0 == .dynamite }) {
+                    return .targetAttack(type: .dynamite)
+                } else if (targets.whatToAttack ?? [:]).keys.contains(where: { $0 == .poison }) {
+                    return .targetAttack(type: .poison)
+                } else if (targets.whatToAttack ?? [:]).keys.contains(where: { $0 == .spawnSpider }) {
+                    return .targetAttack(type: .spawnSpider)
+                } else {
+                    return.rests
+                }
             }
             
-        case .targetAttack:
-            return .attack
+        case let .targetAttack(type: type):
+            return .attack(type: type)
             
-        case .attack:
-            return .rests
+        case let .attack(type: type):
+            // the attacks are now sequenced
+            // 1. Dyanmite
+            // 2. Poison
+            // 3. Spawn Spider
+            
+            // Depending on what rocks the Boss eats, it may not go in that exact order
+            switch type {
+            case .dynamite:
+                if (targets.whatToAttack ?? [:]).keys.contains(where: { $0 == .poison }) {
+                    return .targetAttack(type: .poison)
+                } else if (targets.whatToAttack ?? [:]).keys.contains(where: { $0 == .spawnSpider }) {
+                    return .targetAttack(type: .spawnSpider)
+                } else {
+                    return.rests
+                }
+            case .poison:
+                if (targets.whatToAttack ?? [:]).keys.contains(where: { $0 == .spawnSpider }) {
+                    return .targetAttack(type: .spawnSpider)
+                } else {
+                    return .rests
+                }
+            case .spawnSpider:
+                return .rests
+            }
             
         case .targetSuperAttack:
             return .superAttack
@@ -226,6 +280,7 @@ struct BossPhase: Codable, Hashable {
         let sendInput = nextBossState.stateType != oldBossState.stateType
         
         // next boss phase might happen
+        // phases are based on the number of pillars
         let nextBossPhaseType = nextPhase(tiles: tiles)
         var nextBossPhase = BossPhase(bossState: nextBossState, bossPhaseType: nextBossPhaseType, numberColumns: Int(numberOfIndividualColumns), eatenRocks: eatenRocks)
         
@@ -337,10 +392,15 @@ class BossController {
         let (newPhase, shouldSendInput) = phase.advance(tiles: tiles)
         let oldPhase = phase
         self.phase = newPhase
+        
+        // move on to the next phase
         if newPhase.bossPhaseType != oldPhase.bossPhaseType {
             InputQueue.append(Input(.bossPhaseStart(newPhase)))
-        } else if (shouldSendInput) {
+        }
+        // move on to the next state within a phase
+        else if (shouldSendInput) {
             if newPhase.bossState.stateType == .eats {
+                // record what we had eaten from the previous
                 self.phase.eatenRocks += newPhase.bossState.targets.eats?.count ?? 0
             } else if newPhase.bossState.stateType == .targetSuperAttack {
                 self.phase.eatenRocks = 0

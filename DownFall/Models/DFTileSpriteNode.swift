@@ -102,47 +102,11 @@ class DFTileSpriteNode: SKSpriteNode {
         self.addChild(xAmountLabel)
     }
     
-    func indicateSpriteWillBeAttacked(by attackType: BossAttackType) {
-        let color: UIColor
-        switch attackType {
-        case .dynamite: color = .red
-        case .poison: color = .green
-        case .spawnSpider: color = .yellow
-        }
-        let indicatorSprite = SKSpriteNode(color: color, size: self.size)
-        indicatorSprite.zPosition = Precedence.background.rawValue
-        indicatorSprite.alpha = 0.25
-        
-        self.addChild(indicatorSprite)
-    }
-    
     func indicateSpriteWillBeEaten() {
-        let indicatorSprite = SKSpriteNode(color: .red, size: self.size)
+        let indicatorSprite = SKSpriteNode(texture: SKTexture(imageNamed: "target-eat"), size: self.size)
         indicatorSprite.zPosition = Precedence.background.rawValue
         indicatorSprite.alpha = 0.5
         self.addChild(indicatorSprite)
-    }
-    
-    func indicateSpriteWillBeBossAttacked() {
-        let indicatorSprite = SKSpriteNode(color: .clayRed, size: self.size)
-        indicatorSprite.zPosition = Precedence.background.rawValue
-        
-        self.addChild(indicatorSprite)
-        
-        let wait = SKAction.wait(forDuration: 5.0)
-        let remove = SKAction.removeFromParent()
-        indicatorSprite.run(SKAction.sequence([wait, remove]))
-    }
-    
-    func indicateSpriteIsBossAttacked() {
-        let indicatorSprite = SKSpriteNode(color: .foregroundBlue, size: self.size)
-        indicatorSprite.zPosition = Precedence.background.rawValue
-        
-        self.addChild(indicatorSprite)
-        
-        let wait = SKAction.wait(forDuration: 5.0)
-        let remove = SKAction.removeFromParent()
-        indicatorSprite.run(SKAction.sequence([wait, remove]))
     }
     
     /**

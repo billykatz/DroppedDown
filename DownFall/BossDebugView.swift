@@ -47,7 +47,7 @@ class BossDebugView: SKSpriteNode {
     func showBossPhaseInfo(_ phase: BossPhase) {
         containerView.removeAllChildren()
         let phaseName = phase.bossPhaseType.rawValue
-        let bossState = phase.bossState.stateType.rawValue
+        let bossState = phase.bossState.stateType.description
         let eatenRocks = phase.eatenRocks
         
         let phaseNameLabel = ParagraphNode(text: "Phase: \(phaseName)", fontSize: .fontLargeSize, fontColor: .white)

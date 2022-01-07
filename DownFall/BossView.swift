@@ -13,6 +13,7 @@ class BossView: SKSpriteNode {
     struct Constants {
         static let yellowReticleName = "yellowReticle"
         static let redReticleName = "redReticle"
+        static let dynamiteReticleName = "target-dynamite"
         static let poisonReticleName = "poisonReticle"
         static let poisonReticleSize = CGSize(width: 34, height: 292)
     }
@@ -84,16 +85,19 @@ class BossView: SKSpriteNode {
     
     func handleBossTurnStart(phase: BossPhase, transformation: Transformation? = nil) {
         switch phase.bossState.stateType {
-        case .targetAttack:
-            if let dynamiteTargets = phase.bossState.targets.whatToAttack?[.dynamite] {
+        case .targetAttack(type: let type):
+            if let dynamiteTargets = phase.bossState.targets.whatToAttack?[.dynamite],
+               type == .dynamite {
                 showDynamiteReticles(dynamiteTargets)
             }
             
-            if let poisonTargets = phase.bossState.poisonAttackColumns {
+            if let poisonTargets = phase.bossState.poisonAttackColumns,
+               type == .poison {
                 showPoisonReticles(poisonTargets)
             }
             
-            if let spawnSpiderTargets = phase.bossState.targets.whatToAttack?[.spawnSpider] {
+            if let spawnSpiderTargets = phase.bossState.targets.whatToAttack?[.spawnSpider],
+                type == .spawnSpider {
                 showSpawnSpiderReticles(spawnSpiderTargets)
             }
             
@@ -120,7 +124,7 @@ class BossView: SKSpriteNode {
     
     func showDynamiteReticles(_ dynamiteTargets: [TileCoord]) {
         for target in dynamiteTargets {
-            let redReticle = SKSpriteNode(texture: SKTexture(imageNamed: Constants.redReticleName), size: CGSize(width: tileSize, height: tileSize))
+            let redReticle = SKSpriteNode(texture: SKTexture(imageNamed: Constants.dynamiteReticleName), size: CGSize(width: tileSize, height: tileSize))
             let targetedTilePosition = sprites[target].position
             redReticle.position = targetedTilePosition
             dynamiteTargetToAttack.append(redReticle)

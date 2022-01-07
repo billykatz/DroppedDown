@@ -66,7 +66,30 @@ class BossTestView: ButtonDelegate {
         idlePhase1.position = CGPoint.alignVertically(idlePhase1.frame, relativeTo: echoEffectButton.frame, horizontalAnchor: .left, verticalAlign: .center, verticalPadding: 0.0, horizontalPadding: 20.0, translatedToBounds: true)
         idlePhase1.zPosition = buttonZPosition
         foreground.addChild(idlePhase1)
+        
+        let rockTrio = ShiftShaft_Button(size: buttonSize, delegate: self, identifier: .rockTrio, fontSize: fontSize)
+        rockTrio.position = CGPoint.alignHorizontally(rockTrio.frame, relativeTo: idlePhase1.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: verticalPadding, translatedToBounds: true)
+        rockTrio.zPosition = buttonZPosition
+        foreground.addChild(rockTrio)
+        
+        let rearUp = ShiftShaft_Button(size: buttonSize, delegate: self, identifier: .rearUp, fontSize: fontSize)
+        rearUp.position = CGPoint.alignHorizontally(rearUp.frame, relativeTo: rockTrio.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: verticalPadding, translatedToBounds: true)
+        rearUp.zPosition = buttonZPosition
+        foreground.addChild(rearUp)
+        
+        let groundPound = ShiftShaft_Button(size: buttonSize, delegate: self, identifier: .groundPound, fontSize: fontSize)
+        groundPound.position = CGPoint.alignHorizontally(groundPound.frame, relativeTo: rearUp.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: verticalPadding, translatedToBounds: true)
+        groundPound.zPosition = buttonZPosition
+        foreground.addChild(groundPound)
+        
+        // right column buttons
+        let resetPositions = ShiftShaft_Button(size: buttonSize, delegate: self, identifier: .resetPositions, fontSize: fontSize)
+        resetPositions.position = CGPoint.alignVertically(resetPositions.frame, relativeTo: echoEffectButton.frame, horizontalAnchor: .right, verticalAlign: .center, verticalPadding: 0.0, horizontalPadding: 20.0, translatedToBounds: true)
+        resetPositions.zPosition = buttonZPosition
+        foreground.addChild(resetPositions)
     }
+    
+    var rearUpToggle = false
     
     func buttonTapped(_ button: ShiftShaft_Button) {
         switch button.identifier {
@@ -79,11 +102,25 @@ class BossTestView: ButtonDelegate {
         case .chompTeeth:
             animator.animateToothChomp { }
         case .lightBite:
-            animator.animateToothClose { }
+            animator.animateToothSmallChomp { }
         case .angryEyes:
             animator.animateAngryFace { }
         case .idlePhase1:
             animator.animateIdlePhase1(timerBeforeDelay: 0.0) { }
+        case .rockTrio:
+            animator.animateWaitingToEat(delayBefore: 0.0) { }
+        case .rearUp:
+            animator.animateBossRearingUp(delayBefore: 0.0, reversed: rearUpToggle) {
+                self.rearUpToggle.toggle()
+            }
+        case .groundPound:
+            animator.animateGroundPound(delayBefore: 0.0) {
+                
+            }
+        case .resetPositions:
+            animator.animateResetToOriginalPositions(delayBefore: 0.0) {
+                
+            }
         default:
             fatalError()
         }

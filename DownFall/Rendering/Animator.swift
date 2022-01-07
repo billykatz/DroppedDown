@@ -743,6 +743,10 @@ struct Animator {
         return 0.07
     }
     
+    var sparkleTimePerFrame: Double {
+        return timePerFrame() * 1.25
+    }
+    
     func projectileTimePerFrame(for monsterType: EntityModel.EntityType) -> Double {
         switch monsterType {
         case .alamo:

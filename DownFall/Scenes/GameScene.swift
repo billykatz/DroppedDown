@@ -125,7 +125,7 @@ class GameScene: SKScene {
         self.boardSize = boardSize
         
         // create the audio listener
-        let audioManager = AudioManager(sceneNode: foreground)
+        let audioManager = AudioManager(sceneNode: foreground, isBossLevel: level.isBossLevel)
         audioListener = AudioEventListener(audioManager: audioManager)
         
         // start the tutorial conductor

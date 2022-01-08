@@ -64,14 +64,14 @@ class AudioManager {
     var backgroundMusicPlayer: AVAudioPlayer?
     
     var observer: NSKeyValueObservation?
-
     
-    init(sceneNode: SKNode) {
+    init(sceneNode: SKNode, isBossLevel: Bool) {
         self.audioNode = SKAudioNode()
         
         backgroundMusicThread.sync { [weak self] in
             do {
-                if let backgroundMusicPath = Bundle.main.path(forResource: "background-music", ofType: "wav") {
+                let resourceName = isBossLevel ? "boss-background-music" : "background-music"
+                if let backgroundMusicPath = Bundle.main.path(forResource: resourceName, ofType: "wav") {
                     let url = URL(fileURLWithPath: backgroundMusicPath)
                     self?.backgroundMusicPlayer = try AVAudioPlayer(contentsOf: url)
                     self?.backgroundMusicPlayer?.prepareToPlay()

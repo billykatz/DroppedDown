@@ -94,9 +94,9 @@ class BossView: SKSpriteNode {
                 showPoisonReticles(poisonTargets)
             }
             
-            if let spawnSpiderTargets = phase.bossState.targets.whatToAttack?[.spawnSpider],
-                type == .spawnSpider {
-                showSpawnSpiderReticles(spawnSpiderTargets)
+            if case BossAttackType.spawnMonster = type {
+                let spawnMonsterTargets = phase.bossState.targets.whereToSpawnMonstersCoordinates
+                showSpawnSpiderReticles(spawnMonsterTargets)
             }
             
         case .attack:

@@ -1173,28 +1173,30 @@ extension Renderer {
                     })
                 }
                 
-//                animator.animateBossSingleTargetAttack(foreground: spriteForeground, tileTypes: dynaTypes, tileSize: tileSize, startingPosition: bossDebugView.center, targetPositions: targets, targetSprites: targetSprites, completion: completion)
             } else { completion() }
         }
         
         func animateSpawnSpider(completion:  @escaping () -> Void) {
-            if let spiderAttacks = bossPhase.bossState.targets.attack?[.spawnSpider] {
-                var spiderTypes: [TileType] = []
+            let spawnMonstersAttacks = bossPhase.bossState.targets.spawnMonsterAttacks
+            var tileTypes: [TileType] = []
+            var attacks: [TileCoord] = []
+            for (_, coords) in spawnMonstersAttacks {
                 for row in 0..<endTiles.count {
                     for col in 0..<endTiles[row].count {
                         let coord = TileCoord(row, col)
-                        if spiderAttacks.contains(coord) {
+                        attacks.append(coord)
+                        if coords.contains(coord) {
                             // this is a new spider
-                            spiderTypes.append(endTiles[coord].type)
+                            tileTypes.append(endTiles[coord].type)
                         }
                     }
                 }
-                let targets = positionsInForeground(at: spiderAttacks)
                 
-                let targetSprites = spiderAttacks.map { [sprites] in sprites[$0] }
-                
-                animator.animateBossSingleTargetAttack(foreground: spriteForeground, tileTypes: spiderTypes, tileSize: tileSize, startingPosition: bossDebugView.center, targetPositions: targets, targetSprites: targetSprites, completion: completion)
-            } else { completion() }
+            }
+            let targets = positionsInForeground(at: attacks)
+            let targetSprites = attacks.map { [sprites] in sprites[$0] }
+            
+            animator.animateBossSingleTargetAttack(foreground: spriteForeground, tileTypes: tileTypes, tileSize: tileSize, startingPosition: bossDebugView.center, targetPositions: targets, targetSprites: targetSprites, completion: completion)
             
         }
         
@@ -1214,7 +1216,7 @@ extension Renderer {
             animatePoison { [weak self] in
                 self?.animationsFinished(endTiles: transformation.first?.endTiles)
             }
-        case .spawnSpider:
+        case .spawnMonster:
             animateSpawnSpider { [weak self] in
                 self?.animationsFinished(endTiles: transformation.first?.endTiles)
                 

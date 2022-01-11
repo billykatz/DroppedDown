@@ -22,10 +22,25 @@ enum BossSuperAttackType: String, Codable {
     case web
 }
 
-enum BossAttackType: String, Hashable, Codable {
+enum BossAttackType: Hashable, Codable, CustomStringConvertible {
     case dynamite
     case poison
-    case spawnSpider
+    case spawnMonster(withType: EntityModel.EntityType)
+    
+    static var defaultSpawnMonster: BossAttackType {
+        return .spawnMonster(withType: .spider)
+    }
+    
+    var description: String {
+        switch self {
+        case .dynamite:
+            return "Dynamite"
+        case .poison:
+            return "Poison"
+        case .spawnMonster(withType: let type):
+            return "Spawn \(type.rawValue)"
+        }
+    }
 }
 
 enum BossStateType: Hashable, Codable, CustomStringConvertible {
@@ -48,9 +63,9 @@ enum BossStateType: Hashable, Codable, CustomStringConvertible {
         case .eats:
             return "Eats"
         case .targetAttack(let type):
-            return "Target Attack - \(type.rawValue)"
+            return "Target Attack - \(type.description)"
         case .attack(let type):
-            return "Attacks - \(type.rawValue)"
+            return "Attacks - \(type.description)"
         case .rests:
             return "Rests"
         case .phaseChange:
@@ -70,6 +85,41 @@ struct BossTargets: Codable, Hashable {
     var whatToAttack: [BossAttackType: [TileCoord]]?
     var attack: [BossAttackType: [TileCoord]]?
     var superAttack: [BossSuperAttackType: [TileCoord]]?
+    
+    var spawnMonsterAttacks: [(BossAttackType, [TileCoord])] {
+        let initalValue: [(BossAttackType, [TileCoord])] = []
+        return (attack ?? [:]).reduce(initalValue, { prev, entry in
+            let (key, value) = entry
+            if case BossAttackType.spawnMonster = key {
+                var newResult = prev
+                newResult.append((key, value))
+                return newResult
+            } else {
+                return prev
+            }
+        })
+    }
+    
+    var whereToSpawnMonstersCoordinates: [TileCoord] {
+        var tileCoords: [TileCoord] = []
+        for (key, value) in whatToAttack ?? [:] {
+            if case BossAttackType.spawnMonster = key {
+                tileCoords.append(contentsOf: value)
+            }
+        }
+        
+        return tileCoords
+    }
+    
+    var whatToAttackContainsSpawnMonster: Bool {
+        return (whatToAttack ?? [:]).keys.contains(where: {
+            if case BossAttackType.spawnMonster = $0 {
+                return true
+            } else {
+                return false
+            }
+        })
+    }
 }
 
 struct BossState: Codable, Hashable, CustomStringConvertible {
@@ -166,8 +216,8 @@ struct BossState: Codable, Hashable, CustomStringConvertible {
                 return .targetAttack(type: .dynamite)
             } else if (targets.whatToAttack ?? [:]).keys.contains(where: { $0 == .poison }) {
                 return .targetAttack(type: .poison)
-            } else if (targets.whatToAttack ?? [:]).keys.contains(where: { $0 == .spawnSpider }) {
-                return .targetAttack(type: .spawnSpider)
+            } else if targets.whatToAttackContainsSpawnMonster {
+                return .targetAttack(type: .defaultSpawnMonster)
             } else {
                 return.rests
             }
@@ -187,18 +237,18 @@ struct BossState: Codable, Hashable, CustomStringConvertible {
             case .dynamite:
                 if (targets.whatToAttack ?? [:]).keys.contains(where: { $0 == .poison }) {
                     return .targetAttack(type: .poison)
-                } else if (targets.whatToAttack ?? [:]).keys.contains(where: { $0 == .spawnSpider }) {
-                    return .targetAttack(type: .spawnSpider)
+                } else if targets.whatToAttackContainsSpawnMonster {
+                    return .targetAttack(type: .defaultSpawnMonster)
                 } else {
                     return.rests
                 }
             case .poison:
-                if (targets.whatToAttack ?? [:]).keys.contains(where: { $0 == .spawnSpider }) {
-                    return .targetAttack(type: .spawnSpider)
+                if targets.whatToAttackContainsSpawnMonster {
+                    return .targetAttack(type: .defaultSpawnMonster)
                 } else {
                     return .rests
                 }
-            case .spawnSpider:
+            case .spawnMonster:
                 return .rests
             }
             

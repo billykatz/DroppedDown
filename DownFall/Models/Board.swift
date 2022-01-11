@@ -403,6 +403,7 @@ class Board: Equatable {
                     let coord = TileCoord(row, col)
                     switch tiles[coord].type {
                     case .pillar:
+                        tileTransformations.append(TileTransformation(coord, coord))
                         hitPillarShouldStop = true
                         
                     case .player(let playerData):
@@ -424,7 +425,10 @@ class Board: Equatable {
                 coords.forEach { coord in
                     if attackType == .dynamite, executeAttackType == .dynamite {
                         tiles[coord.row][coord.column] = Tile(type: .dynamite(.init(count: 3, hasBeenDecremented: false)))
-                    } else if attackType == .spawnSpider, executeAttackType == .spawnSpider, let tile = tileCreator.monsterWithType(.spider) {
+                        
+                    } else if case BossAttackType.spawnMonster = executeAttackType,
+                        case BossAttackType.spawnMonster(withType: let monsterType) = attackType,
+                              let tile = tileCreator.monsterWithType(monsterType) {
                         tiles[coord.row][coord.column] = tile
                     }
                 }

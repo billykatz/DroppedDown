@@ -158,20 +158,20 @@ struct BossState: Codable, Hashable, CustomStringConvertible {
             
         case .eats:
             // after eating, there is a chance the super attack is charge in which case we would advance to super attaack targeting
-            if superAttackIsCharged(eatenRocks: eatenRocks) {
-                return .targetSuperAttack
+//            if superAttackIsCharged(eatenRocks: eatenRocks) {
+//                return .targetSuperAttack
+//            } else {
+            // choose the correct targeting mode to start in
+            if (targets.whatToAttack ?? [:]).keys.contains(where: { $0 == .dynamite }) {
+                return .targetAttack(type: .dynamite)
+            } else if (targets.whatToAttack ?? [:]).keys.contains(where: { $0 == .poison }) {
+                return .targetAttack(type: .poison)
+            } else if (targets.whatToAttack ?? [:]).keys.contains(where: { $0 == .spawnSpider }) {
+                return .targetAttack(type: .spawnSpider)
             } else {
-                // choose the correct targeting mode to start in
-                if (targets.whatToAttack ?? [:]).keys.contains(where: { $0 == .dynamite }) {
-                    return .targetAttack(type: .dynamite)
-                } else if (targets.whatToAttack ?? [:]).keys.contains(where: { $0 == .poison }) {
-                    return .targetAttack(type: .poison)
-                } else if (targets.whatToAttack ?? [:]).keys.contains(where: { $0 == .spawnSpider }) {
-                    return .targetAttack(type: .spawnSpider)
-                } else {
-                    return.rests
-                }
+                return.rests
             }
+//            }
             
         case let .targetAttack(type: type):
             return .attack(type: type)

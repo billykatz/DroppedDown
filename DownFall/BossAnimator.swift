@@ -68,15 +68,6 @@ extension Animator {
         
         return spriteActions
     }
-    
-    func animateSingleEyeBecomingYellow(delayBefore: TimeInterval, eyeNumber: Int, completion: @escaping () -> Void){
-        if let eyeTurnYellow = createEyeAnimation(eyeNumber: eyeNumber, delayBefore: delayBefore, reversed: true) {
-            animate([eyeTurnYellow], completion: completion)
-        } else {
-            completion()
-        }
-    }
-    
     func createTiltingHead(delayBefore: TimeInterval, reversed: Bool) -> [SpriteAction]? {
         guard let bossSprite = bossSprite else { return nil }
         
@@ -1130,6 +1121,17 @@ extension Animator {
         
         animate(spriteActions, completion: completion)
     }
+    
+    
+    
+    func animateSingleEyeBecomingYellow(delayBefore: TimeInterval, eyeNumber: Int, completion: @escaping () -> Void){
+        if let eyeTurnYellow = createEyeAnimation(eyeNumber: eyeNumber, delayBefore: delayBefore, reversed: true) {
+            animate([eyeTurnYellow], completion: completion)
+        } else {
+            completion()
+        }
+    }
+    
     
 }
 

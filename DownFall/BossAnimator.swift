@@ -37,6 +37,46 @@ fileprivate var sparkleAnimations = [sparkleAnimation1, sparkleAnimation2, spark
 extension Animator {
     
     // MARK: - Functions to create SpirteActions
+    func createEyeAnimation(eyeNumber: Int, delayBefore: TimeInterval, reversed: Bool) -> SpriteAction? {
+        guard let bossSprite = bossSprite,
+              eyeNumber >= 1,
+              eyeNumber <= 8
+        else { return nil }
+        
+        let animationName = "boss-glowing-red-eye-\(eyeNumber)"
+        let spriteSheet = SpriteSheet(textureName: animationName, columns: 8)
+        let animation = SKAction.animate(with: spriteSheet.animationFrames(), timePerFrame: timePerFrame())
+        
+        var spriteAction: SpriteAction = .init(bossSprite.spiderIndividualEyes[eyeNumber-1], animation)
+        
+        spriteAction.duration = Double(spriteSheet.animationFrames().count) * timePerFrame()
+        
+        spriteAction = spriteAction.reverseAnimation(reverse: reversed)
+        spriteAction = spriteAction.waitBefore(delay: delayBefore)
+        
+        return spriteAction
+
+    }
+    
+    func createAllEyesRed(delayBefore: TimeInterval, reversed: Bool) -> [SpriteAction] {
+        var spriteActions: [SpriteAction] = []
+        for idx in 1...8 {
+            if let eyeAnimation = createEyeAnimation(eyeNumber: idx, delayBefore: delayBefore, reversed: reversed) {
+                spriteActions.append(eyeAnimation)
+            }
+        }
+        
+        return spriteActions
+    }
+    
+    func animateSingleEyeBecomingYellow(delayBefore: TimeInterval, eyeNumber: Int, completion: @escaping () -> Void){
+        if let eyeTurnYellow = createEyeAnimation(eyeNumber: eyeNumber, delayBefore: delayBefore, reversed: true) {
+            animate([eyeTurnYellow], completion: completion)
+        } else {
+            completion()
+        }
+    }
+    
     func createTiltingHead(delayBefore: TimeInterval, reversed: Bool) -> [SpriteAction]? {
         guard let bossSprite = bossSprite else { return nil }
         
@@ -147,23 +187,6 @@ extension Animator {
         
     }
 
-    
-    // forward turns eyes yellow -> red
-    // reverse turns eyes red -> yellow
-    func createEyesTurnsRed(reverse: Bool, delayBefore: TimeInterval) -> SpriteAction? {
-        guard let bossSprite = bossSprite else { return nil }
-        
-        let animationName = "boss-spider-animation-eyes-turn-red-8"
-        let spriteSheet = SpriteSheet(textureName: animationName, columns: 8)
-        let forardAnimation = SKAction.animate(with: spriteSheet.animationFrames(), timePerFrame: timePerFrame())
-        let animation = reverse ? forardAnimation.reversed() : forardAnimation
-        
-        var spriteAction: SpriteAction = .init(bossSprite.spiderEyes, animation.waitBefore(delay: delayBefore))
-        spriteAction.duration = Double(spriteSheet.animationFrames().count) * timePerFrame()
-        
-        return spriteAction
-        
-    }
     
     func createSparkleAnimation(delayBefore: TimeInterval) -> SpriteAction? {
         guard let bossSprite = bossSprite else { return nil }
@@ -746,9 +769,8 @@ extension Animator {
         extraWait += blink.maxDuration()
         spriteActions.append(contentsOf: blink)
         
-        if let eyesTurnsRed = createEyesTurnsRed(reverse: false, delayBefore: extraWait + delayBefore) {
-            spriteActions.append(eyesTurnsRed)
-        }
+        let eyesTurnsRed = createAllEyesRed(delayBefore: extraWait + delayBefore, reversed: false)
+        spriteActions.append(contentsOf: eyesTurnsRed)
         
         animate(spriteActions, completion: completion)
     }

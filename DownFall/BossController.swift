@@ -29,6 +29,7 @@ enum BossAttackType: String, Hashable, Codable {
 }
 
 enum BossStateType: Hashable, Codable, CustomStringConvertible {
+    case intro
     case targetEat
     case eats
     case targetAttack(type: BossAttackType)
@@ -40,6 +41,8 @@ enum BossStateType: Hashable, Codable, CustomStringConvertible {
     
     var description: String {
         switch self {
+        case .intro:
+            return "Intro"
         case .targetEat:
             return "Target Eats"
         case .eats:
@@ -69,7 +72,7 @@ struct BossTargets: Codable, Hashable {
     var superAttack: [BossSuperAttackType: [TileCoord]]?
 }
 
-struct BossState: Codable, Hashable {
+struct BossState: Codable, Hashable, CustomStringConvertible {
     let stateType: BossStateType
     let turnsLeftInState: Int
     var targets: BossTargets
@@ -105,6 +108,10 @@ struct BossState: Codable, Hashable {
         }
     }
     
+    var description: String {
+        return "\(stateType.description) - \(turnsLeftInState)"
+    }
+    
     
     // This function is called when we enter a new boss state
     // It is primarily responsible for initializing the BossTargets
@@ -137,7 +144,7 @@ struct BossState: Codable, Hashable {
                 attack: validateAndUpdatePlannedAttacks(in: tiles, plannedAttacks: oldState.targets.whatToAttack)
             )
             
-        case .rests, .phaseChange, .superAttack, .targetSuperAttack:
+        case .intro, .rests, .phaseChange, .superAttack, .targetSuperAttack:
             break
         }
     }
@@ -201,7 +208,7 @@ struct BossState: Codable, Hashable {
         case .superAttack:
             return .rests
             
-        case .rests, .phaseChange:
+        case .intro, .rests, .phaseChange:
             if superAttackIsCharged(eatenRocks: eatenRocks) { return  .targetSuperAttack }
             else { return .targetEat }
             
@@ -258,7 +265,7 @@ struct BossPhase: Codable, Hashable {
     var eatenRocks: Int
     
     public init(numberOfColumns: Int = 0) {
-        let initialState = BossState(stateType: .rests, turnsLeftInState: turnsInState(.rests), targets: BossTargets())
+        let initialState = BossState(stateType: .intro, turnsLeftInState: turnsInState(.intro), targets: BossTargets())
         self.init(bossState: initialState, bossPhaseType: .first, numberColumns: numberOfColumns, eatenRocks: 0)
     }
     
@@ -277,7 +284,9 @@ struct BossPhase: Codable, Hashable {
         
         // this sets the next state's number of turns.  If the state doesnt advnace then it is ignored
         let nextBossState = bossState.advance(tiles: tiles, turnsInState: nextStateTurns, nummberOfRocksToEat: bossPhaseType.rocksToEat, eatenRocks: eatenRocks)
-        let sendInput = nextBossState.stateType != oldBossState.stateType
+        
+        // send input on all state changes AND also when the state is rest so we can animate the eyes
+        let sendInput = (nextBossState.stateType != oldBossState.stateType) || nextBossState.stateType == .rests
         
         // next boss phase might happen
         // phases are based on the number of pillars

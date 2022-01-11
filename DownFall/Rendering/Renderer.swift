@@ -322,7 +322,10 @@ class Renderer: SKSpriteNode {
                 case .attack(type: let attackType):
                     self.showBossAttacks(in: transformations, bossPhase: phase, attackType: attackType)
                     
-                case .rests, .phaseChange, .superAttack, .targetSuperAttack:
+                case .rests:
+                    showBossRest(in: transformations, bossPhase: phase)
+                    
+                case .intro, .phaseChange, .superAttack, .targetSuperAttack:
                     //                    showBossPhaseChangeAttacks(in: trans, bossPhase: BossPhase)
                     self.animationsFinished(endTiles: trans.endTiles)
                 }
@@ -1130,6 +1133,22 @@ extension Renderer {
         
         animator.showPillarsGrowing(sprites: sprites, spriteForeground: spriteForeground, bossTileAttacks: grownPillars, tileSize: tileSize) { [weak self] in
             self?.animationsFinished(endTiles: transformation.endTiles)
+        }
+        
+    }
+    
+    private func showBossRest(in transformation: [Transformation], bossPhase: BossPhase) {
+        guard let trans = transformation.first else {
+            animationsFinished(endTiles: transformation.first?.endTiles)
+            return
+        }
+        
+        // show the boss's eyes becoming yellow
+        let turnsLeft = bossPhase.bossState.turnsLeftInState
+        let convertedIndex = 8 - turnsLeft
+        
+        animator.animateSingleEyeBecomingYellow(delayBefore: 0.0, eyeNumber: convertedIndex) { [weak self] in
+            self?.animationsFinished(endTiles: trans.endTiles)
         }
         
     }

@@ -204,6 +204,17 @@ class BossSprite: SKSpriteNode {
         return sprite
     }()
     
+    lazy var spiderIndividualEyes: [SKSpriteNode] = {
+        var eyeSprites: [SKSpriteNode] = []
+        for idx in 1...8 {
+            let eyeTexture = SKTexture(imageNamed: "boss-spider-eye-\(idx)")
+            let sprite = SKSpriteNode(texture: eyeTexture, size: scaleBodyPart(originalSize: eyeTexture.size()))
+            sprite.zPosition = 1_100_000
+            eyeSprites.append(sprite)
+        }
+        return eyeSprites
+    }()
+    
     lazy var spiderEyebrowCrystals: SKSpriteNode = {
         let toothTexture = SKTexture(imageNamed: Constants.bossHeadCrystals)
         let sprite = SKSpriteNode(texture: toothTexture, size: scaleBodyPart(originalSize: toothTexture.size()))
@@ -279,7 +290,10 @@ class BossSprite: SKSpriteNode {
         
         spiderHead.addChild(spiderTooth)
         spiderHead.addChild(spiderEyelids)
-        spiderHead.addChild(spiderEyes)
+        
+        for eye in spiderIndividualEyes {
+            spiderHead.addChild(eye)
+        }
         spiderHead.addChild(spiderEyebrowCrystals)
         spiderHead.addChild(spiderPoisonBeam)
         

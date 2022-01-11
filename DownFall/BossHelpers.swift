@@ -251,6 +251,8 @@ func newTarget(in tiles: [[Tile]], nearby: TileCoord, nonAttackableCoords: Set<T
 
 func turnsInState(_ state: BossStateType) -> Int {
     switch state {
+    case .intro:
+        return 1
     case .targetEat:
         return 1
     case .eats:
@@ -260,7 +262,7 @@ func turnsInState(_ state: BossStateType) -> Int {
     case .attack:
         return 0
     case .rests:
-        return 1
+        return 8
     case .phaseChange, .superAttack, .targetSuperAttack:
         return 0
     }

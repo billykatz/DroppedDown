@@ -102,7 +102,7 @@ struct Animator {
         if !skipDyingAnimation,
             let dying = sprite.dyingAnimation(durationWaitBefore: durationWaitBefore) {
             actions.append(dying.action)
-            durationOfAnimation += dying.duration ?? 0.0
+            durationOfAnimation += dying.duration
         }
         
         if let targetPoint = typeAdvancesLevelGoal?(sprite.type) {
@@ -1594,8 +1594,69 @@ struct Animator {
         
     }
     
-    func animateBossPoisonAttack(_ spriteForeground: SKNode, targetedColumns: [Int], targetedTiles: [TileTransformation], sprites: [[DFTileSpriteNode]], tileSize: CGFloat, completion: @escaping () -> Void) {
+    func animateBossPoisonAttack(_ spriteForeground: SKNode, targetedColumns: [Int], targetedTiles: [TileTransformation], sprites: [[DFTileSpriteNode]], tileSize: CGFloat, playableRect: CGRect, completion: @escaping () -> Void) {        
+        guard let bossSprite = bossSprite else {
+            completion()
+            return
+        }
+        
         var spriteActions: [SpriteAction] = []
+        var waitBefore: TimeInterval = 0.0
+        
+        /// Recoil Counter Action to make poison beam look strong
+        if let recoil = createBossRecoilFromPoison(delayBefore: waitBefore, reversed: false) {
+            spriteActions.append(contentsOf: recoil)
+        }
+
+        /// POISON BEAM
+        /// also shakes the screen for the duration of the poison beam blast
+        if let poisonBeam = createBeamOfPoisonAnimation(delayBefore: waitBefore) {
+            let unhidePoisonBeam = SKAction.run {
+                bossSprite.spiderPoisonBeam.alpha = 1.0
+            }
+            let unhidePoison = SpriteAction(bossSprite, unhidePoisonBeam)
+
+            let hidePoisonBeam = SKAction.run {
+                bossSprite.spiderPoisonBeam.alpha = 0.0
+            }
+
+            let hidePoison = SpriteAction(bossSprite, hidePoisonBeam)
+
+            spriteActions.append(unhidePoison.waitBefore(delay: waitBefore))
+            spriteActions.append(poisonBeam)
+
+
+            if let shake = shakeScreen(duration: poisonBeam.duration, amp: 35, delayBefore: waitBefore) {
+                spriteActions.append(shake)
+            }
+
+            waitBefore += poisonBeam.duration
+
+            spriteActions.append(hidePoison.waitBefore(delay: waitBefore))
+        }
+        
+        /// UNDO Recoil Counter Action to make poison beam look strong
+        if let recoil = createBossRecoilFromPoison(delayBefore: waitBefore, reversed: true) {
+            spriteActions.append(contentsOf: recoil)
+        }
+
+        // Additional wait after the beam closes
+        waitBefore += 0.1
+
+        /// UNDO mouth
+        if let closeMouth = createToothChompFirstHalfAnimation(delayBefore: 0.0)?.reversed {
+            spriteActions.append(closeMouth.waitBefore(delay: waitBefore))
+        }
+
+        /// UNDO HEAD
+        if let tiltHead = createTiltingHead(delayBefore: waitBefore, reversed: true) {
+            spriteActions.append(contentsOf: tiltHead)
+        }
+
+        /// UNDO Face
+        let undoAngryFace = createAngryFace(reverse: true, waitBeforeDelay: waitBefore)
+        spriteActions.append(contentsOf: undoAngryFace)
+
         
         for column in targetedColumns {
             
@@ -1605,9 +1666,10 @@ struct Animator {
             // position it at the top and center of the attacked column
             let boardSize = sprites.count
             let topSpriteInColumn = sprites[boardSize-1][column]
-            let poisonSpritePosition = CGPoint.alignHorizontally(poisonSprite.frame, relativeTo: topSpriteInColumn.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: Style.Padding.normal, translatedToBounds: true)
+            let poisonSpritePosition = CGPoint.alignHorizontally(poisonSprite.frame, relativeTo: playableRect, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: Style.Padding.normal, translatedToBounds: true)
             poisonSprite.position = poisonSpritePosition
-            poisonSprite.zPosition = 1_000
+            poisonSprite.position.x = topSpriteInColumn.position.x
+            poisonSprite.zPosition = 100_000_000
             
             // add to the sprite foreground which will auto remove it after animations are finishied
             spriteForeground.addChild(poisonSprite)
@@ -1633,13 +1695,13 @@ struct Animator {
                 let splashAnimation = self.poisonDropAnimation
                 let sequence = SKAction.sequence([moveAction, splashAnimation, .removeFromParent()])
                 
-                spriteActions.append(.init(poisonSprite, sequence))
+                spriteActions.append(SpriteAction.init(poisonSprite, sequence.waitBefore(delay: waitBefore)))
             } else {
                 // after passing the final tile, then you in the splash zone
                 let splashAnimation = self.poisonDropAnimation
                 let sequence = SKAction.sequence([splashAnimation, .removeFromParent()])
                 
-                spriteActions.append(.init(poisonSprite, sequence))
+                spriteActions.append(SpriteAction.init(poisonSprite, sequence.waitBefore(delay: waitBefore)))
             }
         }
         

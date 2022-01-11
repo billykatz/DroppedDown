@@ -109,6 +109,7 @@ enum ButtonIdentifier: String {
     case rearUp
     case groundPound
     case resetPositions
+    case poisonBeamAttack
     
     var title: String {
         switch self {
@@ -249,6 +250,8 @@ enum ButtonIdentifier: String {
             return "Ground Pound"
         case .resetPositions:
             return "Reset Positions"
+        case .poisonBeamAttack:
+            return "Poison Beam"
         }
     }
 }

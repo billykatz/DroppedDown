@@ -351,8 +351,7 @@ extension Animator {
             }
             
             dispatchGroup.enter()
-            return
-            SKAction.run {
+            return SKAction.run {
                 sprites[position].run(animation) {
                     dispatchGroup.leave()
                 }

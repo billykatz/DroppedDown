@@ -186,7 +186,7 @@ class RuneDetailView: SKSpriteNode, ButtonDelegate {
     private func shakeTargetsView() {
         guard let targetsView = self.childNode(withName: Constants.targetsViewContainerName) else { return }
         let blinkNode = Animator().blinkNode(node: targetsView)
-        let shake = Animator().shakeNode(node: targetsView, duration: 0.5, amp: 10, delayBefore: blinkNode.duration ?? 0)
+        let shake = Animator().shakeNode(node: targetsView, duration: 0.5, amp: 10, delayBefore: blinkNode.duration)
         blinkNode.run()
         shake.run()
     }

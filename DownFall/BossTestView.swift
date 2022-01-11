@@ -82,6 +82,11 @@ class BossTestView: ButtonDelegate {
         groundPound.zPosition = buttonZPosition
         foreground.addChild(groundPound)
         
+        let poisonBeamAttack = ShiftShaft_Button(size: buttonSize, delegate: self, identifier: .poisonBeamAttack, fontSize: fontSize)
+        poisonBeamAttack.position = CGPoint.alignHorizontally(poisonBeamAttack.frame, relativeTo: groundPound.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: verticalPadding, translatedToBounds: true)
+        poisonBeamAttack.zPosition = buttonZPosition
+        foreground.addChild(poisonBeamAttack)
+        
         // right column buttons
         let resetPositions = ShiftShaft_Button(size: buttonSize, delegate: self, identifier: .resetPositions, fontSize: fontSize)
         resetPositions.position = CGPoint.alignVertically(resetPositions.frame, relativeTo: echoEffectButton.frame, horizontalAnchor: .right, verticalAlign: .center, verticalPadding: 0.0, horizontalPadding: 20.0, translatedToBounds: true)
@@ -119,6 +124,11 @@ class BossTestView: ButtonDelegate {
             }
         case .resetPositions:
             animator.animateResetToOriginalPositions(delayBefore: 0.0) {
+                
+            }
+            
+        case .poisonBeamAttack:
+            animator.animateGettingReadyToPoisonAttack(delayBefore: 0.0) {
                 
             }
         default:

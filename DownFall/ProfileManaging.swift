@@ -307,8 +307,7 @@ func saveProfileLocallyAndRemotely(_ profile: Profile, localPlayer: PlayerClient
             }
         }
     
-    return
-    Publishers.Merge(
+    return Publishers.Merge(
         saveProfileLocally(profile, uuidKey: uuidKey, userDefaultsClient: userDefaultsClient, fileManagerClient: fileManagerClient),
         ignoreUnauthenicatedGameCenter
     )

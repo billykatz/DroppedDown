@@ -136,7 +136,7 @@ class BossView: SKSpriteNode {
             let poisonReticle = SKSpriteNode(texture: SKTexture(imageNamed: Constants.poisonReticleName), size: poisonReticleSize)
             let topSprite = sprites[sprites.count-1][column]
             
-            poisonReticle.position = CGPoint.position(poisonReticle.frame, inside: topSprite.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: 40, translatedToBounds: true)
+            poisonReticle.position = CGPoint.position(poisonReticle.frame, inside: topSprite.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: -20, translatedToBounds: true)
             
             poisonColumnsTargetToAttack.append(poisonReticle)
             containerView.addChild(poisonReticle)

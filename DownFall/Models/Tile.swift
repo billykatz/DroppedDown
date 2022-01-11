@@ -23,7 +23,6 @@ struct PillarData: Codable, Hashable {
     
     static var random: PillarData {
         let availableColors: [ShiftShaft_Color] = [.red, .blue, .purple]
-        let health = 3
         return PillarData(color: availableColors.randomElement()!, health: 3)
     }
 }

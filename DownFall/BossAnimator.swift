@@ -37,6 +37,56 @@ fileprivate var sparkleAnimations = [sparkleAnimation1, sparkleAnimation2, spark
 extension Animator {
     
     // MARK: - Functions to create SpirteActions
+    func createTiltingHead(delayBefore: TimeInterval, reversed: Bool) -> [SpriteAction]? {
+        guard let bossSprite = bossSprite else { return nil }
+        
+        var spriteActions: [SpriteAction] = []
+        
+        let rotateAngle: CGFloat = .pi
+        let rotateSpeed: CGFloat = .pi
+        let rotateDuration = rotateAngle/rotateSpeed
+        
+        let counterRotateCoeffcient: CGFloat  = 1 / 8
+        let counterRotateAmount = -rotateAngle * counterRotateCoeffcient
+        let counterRotateDuration = rotateDuration * counterRotateCoeffcient
+        
+        
+        let counterRotateAction = SKAction.rotate(byAngle: counterRotateAmount, duration: counterRotateDuration)
+        counterRotateAction.timingMode = .easeInEaseOut
+
+        let normalRotateAction = SKAction.rotate(byAngle: rotateAngle + abs(counterRotateAmount), duration: rotateDuration)
+        normalRotateAction.timingMode = .easeInEaseOut
+        
+        let seq = SKAction.sequence(counterRotateAction, normalRotateAction)
+        var spriteAction = SpriteAction(bossSprite.spiderHead, seq)
+        spriteAction.duration = rotateDuration + counterRotateDuration
+        spriteActions.append(spriteAction)
+        
+        spriteActions = reverseAndDelayActions(actions: spriteActions, reversed: reversed, delay: delayBefore)
+        
+        return spriteActions
+        
+    }
+    
+    func createBeamOfPoisonAnimation(delayBefore: TimeInterval) -> SpriteAction? {
+        guard let bossSprite = bossSprite else {
+            return nil
+        }
+        
+        let animationName = "boss-animation-posion-beam"
+        let spriteSheet = SpriteSheet(textureName: animationName, columns: 6)
+        let speedCoefficient: Double = 1
+        let animation = SKAction.animate(with: spriteSheet.animationFrames(), timePerFrame: speedCoefficient * timePerFrame())
+        let repeatCount = 4
+        let loopAnimation = SKAction.repeat(animation, count: repeatCount)
+        
+        var spriteAction: SpriteAction = .init(bossSprite.spiderPoisonBeam, loopAnimation.waitBefore(delay: delayBefore))
+        spriteAction.duration = (Double(spriteSheet.animationFrames().count) * (timePerFrame()*speedCoefficient)) * Double(repeatCount)
+        
+        return spriteAction
+        
+    }
+    
     func createDynamiteFlyingIn(delayBefore: TimeInterval, startingPosition: CGPoint, targetPosition: CGPoint, targetSprite: DFTileSpriteNode, tileType: TileType, spriteForeground: SKNode) -> [SpriteAction]? {
         guard let tileSize = tileSize else { return nil }
         var spriteActions: [SpriteAction] = []
@@ -707,7 +757,7 @@ extension Animator {
         var spriteActions: [SpriteAction] = []
         
         if let blinkDown = createBlinkAnimation(reverse: false, delayBefore: timerBeforeDelay),
-           let blinkUp = createBlinkAnimation(reverse: true, delayBefore: blinkDown.duration ?? 0.0) {
+           let blinkUp = createBlinkAnimation(reverse: true, delayBefore: blinkDown.duration) {
             spriteActions.append(contentsOf: [blinkDown, blinkUp])
         }
         
@@ -827,6 +877,38 @@ extension Animator {
         return reverseAndDelayActions(actions: spriteActions, reversed: reversed, delay: delayBefore)
     }
     
+    func createBossRecoilFromPoison(delayBefore: TimeInterval, reversed: Bool) -> [SpriteAction]? {
+        guard let bossSprite = bossSprite else { return nil }
+        var spriteActions: [SpriteAction] = []
+        
+        
+        /// BODY MOVEMENT
+        // body and head move down quickly.
+        let moveDuration: TimeInterval = 0.1
+        let bodyMoveDistance: CGFloat = -5.0
+        let headMoveDistance: CGFloat = -10.0
+        let bodyMoveDown = SKAction.moveBy(x: 0.0 ,y: bodyMoveDistance, duration: moveDuration)
+        let headMoveDown = SKAction.moveBy(x: 0.0, y: headMoveDistance, duration: moveDuration)
+        spriteActions.append(.init(bossSprite.spiderBody, bodyMoveDown).reverseAnimation(reverse: reversed).waitBefore(delay: delayBefore))
+        spriteActions.append(.init(bossSprite.spiderHead, headMoveDown).reverseAnimation(reverse: reversed).waitBefore(delay: delayBefore))
+    
+        
+        // legs rotate away from the body and move down with body/head
+        // animate the squatting quickly because of poison beam recoil
+        let rotateSpeed: CGFloat = .pi
+        let frontLegAngles: CGFloat = .pi / 16
+        let backLegAngles: CGFloat = .pi / 16
+        let legMoveDistance: CGFloat = headMoveDistance / 2
+        
+        if let legsActions = createLegRotateAndMove(delayBefore: delayBefore, reversed: reversed, frontRotateSpeed: rotateSpeed, frontRotateAngle: frontLegAngles, backRotateSpeed: rotateSpeed, backRotateAngle: backLegAngles, frontMoveX: 0.0, frontMoveY: legMoveDistance, backMoveX: 0.0, backMoveY: 0.0, moveDuration: moveDuration)
+        {
+            spriteActions.append(contentsOf: legsActions)
+        }
+        
+        return spriteActions
+        
+    }
+    
     ///
     /// Doees not reverse itself.
     /// We end up in a pose where we are ready to ground pound.
@@ -913,14 +995,11 @@ extension Animator {
         
         return spriteActions
     }
-    ///
+    
+    
     /// Reverses itself.
     /// Meant to be called AFTER rear up has been called
     func animateGroundPound(delayBefore: TimeInterval,  completion: @escaping () -> Void) {
-        guard let bossSprite = bossSprite else {
-            completion();
-            return
-        }
         var spriteActions: [SpriteAction] = []
         
         if let groundPound = createGroundPound(delayBefore: delayBefore) {
@@ -984,6 +1063,30 @@ extension Animator {
         }
         
         return spriteActions
+    }
+    
+    func animateGettingReadyToPoisonAttack(delayBefore: TimeInterval, completion: @escaping () -> Void) {
+        var spriteActions: [SpriteAction] = []
+        var waitBefore: TimeInterval = delayBefore
+        
+        /// FACE
+        // make angry face
+        let angryFace = createAngryFace(reverse: false, waitBeforeDelay: waitBefore)
+        spriteActions.append(contentsOf: angryFace)
+        
+        /// HEAD TILT
+        // tilt the head 180 degress
+        if let tiltHead = createTiltingHead(delayBefore: waitBefore, reversed: false) {
+            spriteActions.append(contentsOf: tiltHead)
+            waitBefore += tiltHead.maxDuration()
+        }
+        
+        if let openMouth = createToothChompFirstHalfAnimation(delayBefore: waitBefore) {
+            spriteActions.append(openMouth)
+            waitBefore += openMouth.duration
+        }
+        
+        animate(spriteActions, completion: completion)
     }
     
     func animateResetToOriginalPositions(delayBefore: TimeInterval, completion: @escaping () -> Void) {

@@ -225,6 +225,18 @@ class BossSprite: SKSpriteNode {
         return sprite
     }()
     
+    lazy var spiderPoisonBeam: SKSpriteNode = {
+        let spiderPoisonBeamTexture = SKTexture(imageNamed: "poison-beam-sprite")
+        let sprite = SKSpriteNode(texture: spiderPoisonBeamTexture, size: scaleBodyPart(originalSize: spiderPoisonBeamTexture.size()))
+        let initialPosition = CGPoint.alignHorizontally(sprite.frame, relativeTo: spiderHead.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: -100.0, horizontalPadding: 0.0, translatedToBounds: true)
+        
+        sprite.yScale = -1
+        sprite.position = initialPosition
+        sprite.zPosition = 2_200_000
+        sprite.alpha = 0.0
+        return sprite
+    }()
+    
     init(playableRect: CGRect) {
         self.playableRect = playableRect
         super.init(texture: nil, color: .clear, size: CGSize(width: playableRect.width*0.9, height: playableRect.width*0.9/spiderRatio))
@@ -266,10 +278,10 @@ class BossSprite: SKSpriteNode {
         self.addChild(spiderDynamiteTrain)
         
         spiderHead.addChild(spiderTooth)
-        
         spiderHead.addChild(spiderEyelids)
         spiderHead.addChild(spiderEyes)
         spiderHead.addChild(spiderEyebrowCrystals)
+        spiderHead.addChild(spiderPoisonBeam)
         
         buildOriginalPositions()
     }

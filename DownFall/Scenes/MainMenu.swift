@@ -274,10 +274,12 @@ extension MainMenu: ButtonDelegate {
             }
             
         case .mainMenuFeedback:
-            #warning("Change back for production build")
+            #if DEBUG
             mainMenuDelegate?.goToTestScene()
-//            let url = URL(string: Constants.feedbackFormURLString)!
-//            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            #else
+            let url = URL(string: Constants.feedbackFormURLString)!
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            #endif
             
         default:
             ()

@@ -108,7 +108,7 @@ extension Array {
 extension Array where Element == SpriteAction {
     func maxDuration() -> Double {
         return (self.max(by: { lhsSpriteAction, rhsSpriteActions in
-            return lhsSpriteAction.duration ?? 0.0 > rhsSpriteActions.duration ?? 0.0
+            return lhsSpriteAction.duration > rhsSpriteActions.duration
         }))?.duration ?? 0.0
     }
 }

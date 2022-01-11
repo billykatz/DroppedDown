@@ -8,6 +8,7 @@
 
 import Foundation
 import SpriteKit
+import AVFoundation
 
 class Renderer: SKSpriteNode {
     
@@ -881,7 +882,7 @@ extension Renderer {
                 
                 let animation = animator.createMonsterDyingAnimation(sprite: sprites[tileTrans.end.x][tileTrans.end.y], durationWaitBefore: 0.0, skipDyingAnimation: shouldSkipDyingAnimation)
                 
-                additionalWaiting += (animation.duration ?? 0.0) * 0.55 // dont wait for the entire animation
+                additionalWaiting += animation.duration * 0.55 // dont wait for the entire animation
                 
                 removedAnimations.append(animation)
             
@@ -1101,7 +1102,7 @@ extension Renderer {
         // get the correct targets from the BossPhase
         // update (Cori's) and show the retices on the screen
         guard let trans = transformation.first,
-                let attackTargets = bossPhase.bossState.targets.whatToAttack?[attackType] else {
+                let _ = bossPhase.bossState.targets.whatToAttack?[attackType] else {
             animationsFinished(endTiles: transformation.first?.endTiles)
             return
         }
@@ -1110,7 +1111,13 @@ extension Renderer {
             animator.animateBossRearingUp(delayBefore: 0.0, reversed: false) { [weak self] in
                 self?.animationsFinished(endTiles: trans.endTiles)
             }
-        } else {
+        } else if attackType == .poison {
+            animator.animateGettingReadyToPoisonAttack(delayBefore: 0.0) { [weak self] in
+                self?.animationsFinished(endTiles: trans.endTiles)
+            }
+        }
+        
+        else {
             animationsFinished(endTiles: trans.endTiles)
         }
     }
@@ -1175,7 +1182,7 @@ extension Renderer {
         func animatePoison(completion: @escaping () -> Void) {
             if let attackedColumns = bossPhase.bossState.poisonAttackColumns,
                let affectedTiles = trans.tileTransformation {
-                animator.animateBossPoisonAttack(spriteForeground, targetedColumns: attackedColumns, targetedTiles: affectedTiles, sprites: sprites, tileSize: tileSize, completion: completion)
+                animator.animateBossPoisonAttack(spriteForeground, targetedColumns: attackedColumns, targetedTiles: affectedTiles, sprites: sprites, tileSize: tileSize, playableRect: playableRect, completion: completion)
             } else { completion() }
         }
         

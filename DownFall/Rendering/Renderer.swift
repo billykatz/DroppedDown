@@ -1178,7 +1178,7 @@ extension Renderer {
         }
         
         func animateSpawnSpider(completion:  @escaping () -> Void) {
-            if let spiderAttacks = bossPhase.bossState.targets.attack?[.spawnMonster] {
+            if let spiderAttacks = bossPhase.bossState.targets.attack?[.spawnSpider] {
                 var spiderTypes: [TileType] = []
                 for row in 0..<endTiles.count {
                     for col in 0..<endTiles[row].count {
@@ -1214,7 +1214,7 @@ extension Renderer {
             animatePoison { [weak self] in
                 self?.animationsFinished(endTiles: transformation.first?.endTiles)
             }
-        case .spawnMonster:
+        case .spawnSpider:
             animateSpawnSpider { [weak self] in
                 self?.animationsFinished(endTiles: transformation.first?.endTiles)
                 

@@ -98,7 +98,7 @@ func attack(basedOnRocks rocksEaten: [TileCoord]?, in tiles: [[Tile]]) -> [BossA
         case .blue:
             return .poison
         case .purple:
-            return .spawnMonster
+            return .spawnSpider
         default:
             return .dynamite
         }
@@ -169,7 +169,7 @@ func attacked(tiles: [[Tile]], by attacks: [BossAttackType]) -> [BossAttackType:
             // each posion attack spawns two attacked columns, that's why we did this twice
             columnsAttacked.insert(Int.random(tiles.count, notInSet: columnsAttacked))
             columnsAttacked.insert(Int.random(tiles.count, notInSet: columnsAttacked))
-        case .spawnMonster:
+        case .spawnSpider:
             let nonTargetable = bombsSpawned.union(monstersSpawned).union(untargetable)
             monstersSpawned.insert(randomCoord(in: tiles, notIn: nonTargetable))
         }
@@ -194,7 +194,7 @@ func attacked(tiles: [[Tile]], by attacks: [BossAttackType]) -> [BossAttackType:
         result[.dynamite] = Array(bombsSpawned)
     }
     if !monstersSpawned.isEmpty {
-        result[.spawnMonster] = Array(monstersSpawned)
+        result[.spawnSpider] = Array(monstersSpawned)
     }
     return result
     
@@ -209,7 +209,7 @@ func validateAndUpdatePlannedAttacks(in tiles: [[Tile]], plannedAttacks: [BossAt
         case .poison:
             // poison will never target something illegally following the players turn
             break
-        case .dynamite, .spawnMonster:
+        case .dynamite, .spawnSpider:
             // dyamite should only ever target a rock
             var newCoords: [TileCoord] = []
             for coord in plannedCoords {

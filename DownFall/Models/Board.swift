@@ -424,7 +424,7 @@ class Board: Equatable {
                 coords.forEach { coord in
                     if attackType == .dynamite, executeAttackType == .dynamite {
                         tiles[coord.row][coord.column] = Tile(type: .dynamite(.init(count: 3, hasBeenDecremented: false)))
-                    } else if attackType == .spawnMonster, executeAttackType == .spawnMonster, let tile = tileCreator.monsterWithType(.spider) {
+                    } else if attackType == .spawnSpider, executeAttackType == .spawnSpider, let tile = tileCreator.monsterWithType(.spider) {
                         tiles[coord.row][coord.column] = tile
                     }
                 }

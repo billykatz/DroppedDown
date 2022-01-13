@@ -85,6 +85,23 @@ extension Array {
             self.remove(at: indexToRemove!)
         }
     }
+    
+    mutating func removeFirstAndReturn(where predicate: (Element) -> Bool) -> Element? {
+        var indexToRemove: Int?
+        for (index, el) in self.enumerated() {
+            if predicate(el) {
+                indexToRemove = index
+                break
+            }
+        }
+        if indexToRemove != nil {
+            let element = self[indexToRemove!]
+            self.remove(at: indexToRemove!)
+            return element
+        } else {
+             return nil
+        }
+    }
 }
 
 

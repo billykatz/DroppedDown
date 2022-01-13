@@ -12,18 +12,31 @@ import SpriteKit
 // MARK: - Boss helpers
 
 
-// It's definitely possible, if not improbable, that the number of rocks to eat is less than the n umber of rocks on the board.  We could run into an infinite loop when calling this function.  Food for thought
+// It's definitely possible, if not improbable, that the number of rocks to eat is less than the number of rocks on the board.  We could run into an infinite loop when calling this function.  Food for thought
 func targetRocksToEat(in tiles: [[Tile]], numberRocksToEat: Int) -> [TileCoord] {
     var targets: [TileCoord] = []
     var notTargetable = unedibleTiles(in: tiles)
-    for _ in 0..<numberRocksToEat {
+    let edibleRockColors: [ShiftShaft_Color] = [.red, .blue, .purple]
+    var eatenColors: [ShiftShaft_Color] = []
+    var numberOfRocksEaten = 0
+    while numberOfRocksEaten < numberRocksToEat {
         
         let newTarget = randomCoord(in: tiles, notIn: notTargetable)
-        // do not target this tile in the next loop
-        notTargetable.insert(newTarget)
         
-        // add this target to the running list of targets
-        targets.append(newTarget)
+        if case TileType.rock(color: let color, _, _) = tiles[newTarget].type {
+            if eatenColors.count == edibleRockColors.count { eatenColors = [] }
+            if !eatenColors.contains(color) {
+                eatenColors.append(color)
+                // do not target this tile in the next loop
+                notTargetable.insert(newTarget)
+                
+                // add this target to the running list of targets
+                targets.append(newTarget)
+                
+                numberOfRocksEaten += 1
+            }
+        }
+        
     }
     return targets
 }
@@ -80,6 +93,7 @@ func randomCoord(in tiles: [[Tile]]?, notIn set: Set<TileCoord>, nearby target: 
     return tileCoord
 }
 
+// seems legit
 func attack(basedOnRocks rocksEaten: [TileCoord]?, in tiles: [[Tile]]) -> [BossAttackType]? {
     guard let rocksEaten = rocksEaten else { return nil }
     var tileTypes: [TileType] = []
@@ -91,6 +105,8 @@ func attack(basedOnRocks rocksEaten: [TileCoord]?, in tiles: [[Tile]]) -> [BossA
         }
     }
     
+    var shuffledMonsters = EntityModel.EntityType.monstersCases.shuffled()
+    
     return tileTypes.map {
         switch $0.color {
         case .red:
@@ -99,7 +115,13 @@ func attack(basedOnRocks rocksEaten: [TileCoord]?, in tiles: [[Tile]]) -> [BossA
             return .poison
         case .purple:
             // TODO: Make it so that we choose a random monster based on other monsters we have chosen and the boss phase
-            return .spawnMonster(withType: .spider)
+            if shuffledMonsters.isEmpty {
+                shuffledMonsters = EntityModel.EntityType.monstersCases.shuffled()
+            }
+            let (newArray, randomMonster) = shuffledMonsters.dropRandom()
+            shuffledMonsters = newArray
+            return .spawnMonster(withType: randomMonster!)
+            
         default:
             return .dynamite
         }
@@ -153,26 +175,34 @@ func nonAttackableCoords(tiles: [[Tile]]) -> Set<TileCoord> {
     return reservedCoords
 }
 
+struct MonsterSpawned: Hashable {
+    let monsterType: EntityModel.EntityType
+    let coord: TileCoord
+}
+
 /// Returns a dictionary with BossAttackTypes as keys with an array of attack targets as the value.
 func attacked(tiles: [[Tile]], by attacks: [BossAttackType]) -> [BossAttackType: [TileCoord]] {
     
     let untargetable: Set<TileCoord> = nonAttackableCoords(tiles: tiles)
     
     var columnsAttacked = Set<Int>()
-    var monstersSpawned = Set<TileCoord>()
+    var monstersSpawned = Set<MonsterSpawned>()
     var bombsSpawned = Set<TileCoord>()
     for attack in attacks {
+        let monstersSpawnedCoord = monstersSpawned.map { $0.coord }
         switch attack {
         case .dynamite:
-            let nonTargetable = bombsSpawned.union(monstersSpawned).union(untargetable)
+            let nonTargetable = bombsSpawned.union(monstersSpawnedCoord).union(untargetable)
             bombsSpawned.insert(randomCoord(in: tiles, notIn: nonTargetable))
         case .poison:
             // each posion attack spawns two attacked columns, that's why we did this twice
             columnsAttacked.insert(Int.random(tiles.count, notInSet: columnsAttacked))
             columnsAttacked.insert(Int.random(tiles.count, notInSet: columnsAttacked))
-        case .spawnMonster:
-            let nonTargetable = bombsSpawned.union(monstersSpawned).union(untargetable)
-            monstersSpawned.insert(randomCoord(in: tiles, notIn: nonTargetable))
+        case .spawnMonster(withType: let monsterType):
+            let nonTargetable = bombsSpawned.union(monstersSpawnedCoord).union(untargetable)
+            let randomCoord = randomCoord(in: tiles, notIn: nonTargetable)
+            let monsterSpawned = MonsterSpawned(monsterType: monsterType, coord: randomCoord)
+            monstersSpawned.insert(monsterSpawned)
         }
     }
     
@@ -196,7 +226,15 @@ func attacked(tiles: [[Tile]], by attacks: [BossAttackType]) -> [BossAttackType:
     }
     if !monstersSpawned.isEmpty {
         // TODO: Make it so that we choose a random monster based on other monsters we have chosen and the boss phase
-        result[.spawnMonster(withType: .spider)] = Array(monstersSpawned)
+        for monstersSpawn in Array(monstersSpawned) {
+            let bossAttack = BossAttackType.spawnMonster(withType: monstersSpawn.monsterType)
+            if var entry = result[bossAttack] {
+                entry.append(monstersSpawn.coord)
+                result[bossAttack] = entry
+            } else {
+                result[bossAttack] = [monstersSpawn.coord]
+            }
+        }
     }
     return result
     

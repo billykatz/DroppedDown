@@ -36,7 +36,7 @@ struct EntityModel: Equatable, Codable {
     static let maxPlayerLuck = 15
     static let maxPlayerDodge = 15
     
-    enum EntityType: String, Codable, CaseIterable {
+    enum EntityType: String, Codable, CaseIterable, Hashable {
         case bat
         case rat
         case dragon
@@ -46,6 +46,10 @@ struct EntityModel: Equatable, Codable {
         case player
         case sally
         case spider
+        
+        static var monstersCases: [EntityType] {
+            return [.bat, .rat, .dragon, .alamo, .sally]
+        }
         
         var humanReadable: String {
             switch self {

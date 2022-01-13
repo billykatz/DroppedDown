@@ -28,6 +28,7 @@ struct Animator {
     let tileSize: CGFloat?
     let bossSprite: BossSprite?
     let typeAdvancesLevelGoal: ((TileType) -> CGPoint?)?
+    let playableRect: CGRect?
     
     lazy var numberTextures: [NumberTextures] = {
         var array: [NumberTextures] = []
@@ -66,11 +67,13 @@ struct Animator {
     init(foreground: SKNode? = nil,
          tileSize: CGFloat? = nil,
          bossSprite: BossSprite? = nil,
+         playableRect: CGRect? = nil,
          tileTypeAdvancesLevelGoal: ((TileType) -> CGPoint?)? = nil
     ) {
         self.foreground = foreground
         self.tileSize = tileSize
         self.bossSprite = bossSprite
+        self.playableRect = playableRect
         self.typeAdvancesLevelGoal = tileTypeAdvancesLevelGoal
     }
     
@@ -1438,10 +1441,14 @@ struct Animator {
     
     // MARK: - Boss Animations
     
-    func animateBossSingleTargetAttack(foreground: SKNode, tileTypes: [TileType], tileSize: CGFloat, startingPosition: CGPoint, targetPositions: [CGPoint], targetSprites: [DFTileSpriteNode], completion: @escaping () -> Void) {
-        
+    func animateSpawnMonstersAttack(foreground: SKNode, tileTypes: [TileType], tileSize: CGFloat, startingPosition: CGPoint, targetPositions: [CGPoint], targetSprites: [DFTileSpriteNode], completion: @escaping () -> Void) {
         var spriteActions: [SpriteAction] = []
         // create a dynamite stick for each dynamiate
+        guard let bossSprite = bossSprite else {
+            completion()
+            return
+        }
+
         var bossAttackSprites: [DFTileSpriteNode] = []
         for tileType in tileTypes {
             let attackSprite = DFTileSpriteNode(type: tileType, height: tileSize, width: tileSize)
@@ -1453,23 +1460,39 @@ struct Animator {
         
         
         // add them to the foreground
+        var spritesAlreadyThere = bossSprite.monstersInWebs
+        
+        // add the monsters to where they already exist on screen
         for sprite in bossAttackSprites {
-            sprite.position = startingPosition
-            sprite.zPosition = 100_000
+            var newStartingPosition = spritesAlreadyThere.removeFirstAndReturn(where: { sprite.type.entityType == $0.0 })?.1.monsterSprite.position ?? startingPosition
+            
+            let newZPosition = spritesAlreadyThere.removeFirstAndReturn(where: { sprite.type.entityType == $0.0 })?.1.monsterSprite.zPosition ?? 100_000
+            
+            newStartingPosition = bossSprite.convert(newStartingPosition, to: foreground)
+            sprite.position = newStartingPosition
+            sprite.zPosition = newZPosition
             foreground.addChild(sprite)
+        }
+        
+        var waitTime = 0.0
+        // remove them from the boss sprite
+        if let ropesPullingUp = createAnimationRopesPullingAway(delayBefore: 0.0) {
+            spriteActions.append(contentsOf: ropesPullingUp)
+            waitTime += 0.5
         }
         
         // make it appear as if they are being thrown onto the screen
         var actions: [SKAction] = []
         //stagger the initial throw of each dynamite
-        var waitTime = 0.0
         for (idx, target) in targetPositions.enumerated() {
             let distance = target - startingPosition
             let speed: Double = 750
             
             // determine the duration based on the distance to the target
-            let duration = waitTime + (Double(distance.length) / speed)
-            waitTime += Double.random(in: 0.25...0.35)
+            let duration = Double(distance.length) / speed
+            
+            // wait before it all for the webs to unfurl
+            let waitAction = SKAction.wait(forDuration: waitTime)
             
             let moveAction = SKAction.move(to: target, duration: duration)
             
@@ -1484,14 +1507,14 @@ struct Animator {
             let moveGrowShrink = SKAction.group([moveAction, growSkrinkSequence])
             
             // run it in sequence
-            let sequence = SKAction.sequence([moveGrowShrink])
+            let sequence = SKAction.sequence([waitAction, moveGrowShrink])
             
             // crumble the rock that gets "hit"
             let spriteToRemoveOnLanding = targetSprites[idx]
             if let crumble = spriteToRemoveOnLanding.crumble() {
                 let waitBeforeCrumble = SKAction.wait(forDuration: duration)
                 let crumbleAction = crumble.action
-                let sequence = SKAction.sequence([waitBeforeCrumble, crumbleAction])
+                let sequence = SKAction.sequence([waitAction, waitBeforeCrumble, crumbleAction])
                 sequence.timingMode = .easeIn
                 spriteActions.append(.init(spriteToRemoveOnLanding, sequence))
             }
@@ -1594,7 +1617,7 @@ struct Animator {
         
     }
     
-    func animateBossPoisonAttack(_ spriteForeground: SKNode, targetedColumns: [Int], targetedTiles: [TileTransformation], sprites: [[DFTileSpriteNode]], tileSize: CGFloat, playableRect: CGRect, completion: @escaping () -> Void) {        
+    func animateBossPoisonAttack(_ spriteForeground: SKNode, targetedColumns: [Int], targetedTiles: [TileTransformation], sprites: [[DFTileSpriteNode]], tileSize: CGFloat, playableRect: CGRect, completion: @escaping () -> Void) {
         guard let bossSprite = bossSprite else {
             completion()
             return

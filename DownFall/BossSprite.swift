@@ -9,6 +9,13 @@
 import SpriteKit
 import UIKit
 
+
+struct CompositeWebSprite {
+    let ropeSprite: SKSpriteNode
+    let webSprite: SKSpriteNode
+    let monsterSprite: SKSpriteNode
+}
+
 class BossSprite: SKSpriteNode {
     
     struct Constants {
@@ -34,6 +41,8 @@ class BossSprite: SKSpriteNode {
         static let bossBodyName = "boss-body"
         
         static let dynamiteTrain = "boss-dynamite-train"
+        
+        static let bossWebAttack = "boss-web-attack-frame-1"
         
         static let artworkDimensions = CGSize(width: 280, height: 112)
         static let leftLeft1AnchorPoint = CGPoint(x: 75, y: 49)
@@ -248,6 +257,24 @@ class BossSprite: SKSpriteNode {
         return sprite
     }()
     
+    lazy var spiderWebAttacks: [SKSpriteNode] = {
+        var sprites: [SKSpriteNode] = []
+        for idx in 0..<3 {
+            let webTexture = SKTexture(imageNamed: Constants.bossWebAttack)
+            let sprite = SKSpriteNode(texture: webTexture, size: scaleBodyPart(originalSize: webTexture.size()))
+            let initialPosition = CGPoint.alignHorizontally(sprite.frame, relativeTo: spiderBody.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: 0.0, horizontalPadding: 0.0, translatedToBounds: true)
+            
+            sprite.position = initialPosition
+            sprite.zPosition = 50_000 // behind the body
+            sprite.alpha = 0.0
+            sprites.append(sprite)
+        }
+        return sprites
+    }()
+    
+    
+    var monstersInWebs: [(EntityModel.EntityType, CompositeWebSprite)] = []
+    
     init(playableRect: CGRect) {
         self.playableRect = playableRect
         super.init(texture: nil, color: .clear, size: CGSize(width: playableRect.width*0.9, height: playableRect.width*0.9/spiderRatio))
@@ -288,14 +315,21 @@ class BossSprite: SKSpriteNode {
         
         self.addChild(spiderDynamiteTrain)
         
+        /// SPIDER HEAD ATTACH
         spiderHead.addChild(spiderTooth)
         spiderHead.addChild(spiderEyelids)
         
         for eye in spiderIndividualEyes {
             spiderHead.addChild(eye)
         }
+        
         spiderHead.addChild(spiderEyebrowCrystals)
         spiderHead.addChild(spiderPoisonBeam)
+        
+        /// SPIDER BODY ATTACH
+        for webAttack in spiderWebAttacks {
+            spiderBody.addChild(webAttack)
+        }
         
         buildOriginalPositions()
     }

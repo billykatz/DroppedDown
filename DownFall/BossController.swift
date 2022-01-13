@@ -100,6 +100,40 @@ struct BossTargets: Codable, Hashable {
         })
     }
     
+    var monsterTypesSpawned: [EntityModel.EntityType] {
+        
+        let initalValue: [(BossAttackType, [TileCoord])] = []
+        let attacks = (whatToAttack ?? [:]).reduce(initalValue, { prev, entry in
+            let (key, value) = entry
+            if case BossAttackType.spawnMonster = key {
+                var newResult = prev
+                newResult.append((key, value))
+                return newResult
+            } else {
+                return prev
+            }
+        })
+        
+        let attackCoord: [(EntityModel.EntityType, TileCoord)] = []
+        let monsterTypeCoords = attacks.reduce(attackCoord) { prev, bossAttack -> [(EntityModel.EntityType, TileCoord)]  in
+            let (attackType, coords) = bossAttack
+            var newArray = prev
+            if case BossAttackType.spawnMonster(withType: let type) = attackType {
+                for coord in coords {
+                    newArray.append((type, coord))
+                }
+                return newArray
+            } else {
+                return prev
+            }
+        }
+        
+        return monsterTypeCoords.sorted { firstMonsterAttack, secondMonsterAttack in
+            return firstMonsterAttack.1.col < secondMonsterAttack.1.col
+        }.map { $0.0 }
+    }
+
+    
     var whereToSpawnMonstersCoordinates: [TileCoord] {
         var tileCoords: [TileCoord] = []
         for (key, value) in whatToAttack ?? [:] {
@@ -259,8 +293,9 @@ struct BossState: Codable, Hashable, CustomStringConvertible {
             return .rests
             
         case .intro, .rests, .phaseChange:
-            if superAttackIsCharged(eatenRocks: eatenRocks) { return  .targetSuperAttack }
-            else { return .targetEat }
+            return .targetEat
+//            if superAttackIsCharged(eatenRocks: eatenRocks) { return  .targetSuperAttack }
+//            else { return .targetEat }
             
         }
     }

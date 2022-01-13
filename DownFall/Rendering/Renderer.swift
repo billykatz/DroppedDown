@@ -99,7 +99,11 @@ class Renderer: SKSpriteNode {
     
     //Animator
     private lazy var animator = {
-        return Animator(foreground: foreground, tileSize: tileSize, bossSprite: bossView.bossSprite) { [weak self] tileType in
+        return Animator(foreground: foreground,
+                        tileSize: tileSize,
+                        bossSprite: bossView.bossSprite,
+                        playableRect: playableRect
+        ) { [weak self] tileType in
             guard let self = self else { return nil }
             if let goalIndex = self.levelGoalTracker.typeAdvancesGoal(type: tileType) {
                 let goalOrigin = self.levelGoalView.originForGoalView(index: goalIndex)
@@ -1104,8 +1108,7 @@ extension Renderer {
     private func showBossTargetsWhatToAttack(in transformation: [Transformation], bossPhase: BossPhase, attackType: BossAttackType) {
         // get the correct targets from the BossPhase
         // update (Cori's) and show the retices on the screen
-        guard let trans = transformation.first,
-                let _ = bossPhase.bossState.targets.whatToAttack?[attackType] else {
+        guard let trans = transformation.first else {
             animationsFinished(endTiles: transformation.first?.endTiles)
             return
         }
@@ -1116,6 +1119,11 @@ extension Renderer {
             }
         } else if attackType == .poison {
             animator.animateGettingReadyToPoisonAttack(delayBefore: 0.0) { [weak self] in
+                self?.animationsFinished(endTiles: trans.endTiles)
+            }
+        } else if case BossAttackType.spawnMonster = attackType {
+            let monstersSpawn = bossPhase.bossState.targets.monsterTypesSpawned
+            animator.animateGettingReadyToSpawnMonsters(delayBefore: 0.0, monsterTypes: monstersSpawn) { [weak self] in
                 self?.animationsFinished(endTiles: trans.endTiles)
             }
         }
@@ -1184,9 +1192,9 @@ extension Renderer {
                 for row in 0..<endTiles.count {
                     for col in 0..<endTiles[row].count {
                         let coord = TileCoord(row, col)
-                        attacks.append(coord)
                         if coords.contains(coord) {
-                            // this is a new spider
+                            // this is a new spawned monster
+                            attacks.append(coord)
                             tileTypes.append(endTiles[coord].type)
                         }
                     }
@@ -1196,7 +1204,7 @@ extension Renderer {
             let targets = positionsInForeground(at: attacks)
             let targetSprites = attacks.map { [sprites] in sprites[$0] }
             
-            animator.animateBossSingleTargetAttack(foreground: spriteForeground, tileTypes: tileTypes, tileSize: tileSize, startingPosition: bossDebugView.center, targetPositions: targets, targetSprites: targetSprites, completion: completion)
+            animator.animateSpawnMonstersAttack(foreground: spriteForeground, tileTypes: tileTypes, tileSize: tileSize, startingPosition: bossDebugView.center, targetPositions: targets, targetSprites: targetSprites, completion: completion)
             
         }
         

@@ -23,6 +23,7 @@ class BossTestScene: SKScene {
         addChild(foreground)
         
         self.backgroundColor = .backgroundGray
+        self.view?.ignoresSiblingOrder = true
 
     }
     

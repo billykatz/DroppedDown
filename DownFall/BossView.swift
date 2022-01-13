@@ -11,7 +11,7 @@ import SpriteKit
 class BossView: SKSpriteNode {
     
     struct Constants {
-        static let yellowReticleName = "yellowReticle"
+        static let yellowReticleName = "target-minion"
         static let dynamiteReticleName = "target-dynamite"
         static let poisonReticleName = "target-poison"
     }

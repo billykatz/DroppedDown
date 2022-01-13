@@ -309,8 +309,9 @@ struct LevelConstructor {
                                                         .rock(color: .purple, holdsGem: false, groupCount: 0): 33])
             return chances
         case bossLevelDepthNumber:
+//            return TileTypeChanceModel(chances: [ .rock(color: .purple, holdsGem: false, groupCount: 0): 100])
             return TileTypeChanceModel(chances: [.rock(color: .red, holdsGem: false, groupCount: 0): 33, .rock(color: .blue, holdsGem: false, groupCount: 0): 33, .rock(color: .purple, holdsGem: false, groupCount: 0): 33])
-            //            return TileTypeChanceModel(chances: [ .rock(color: .blue, holdsGem: false, groupCount: 0): 100])
+//                        return TileTypeChanceModel(chances: [ .rock(color: .blue, holdsGem: false, groupCount: 0): 100])
             //            return TileTypeChanceModel(chances: [
             //                                        .rock(color: .purple, holdsGem: false, groupCount: 0): 100,
             //

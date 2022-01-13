@@ -160,6 +160,14 @@ enum TileType: Hashable, CaseIterable, Codable {
     case rock(color: ShiftShaft_Color, holdsGem: Bool, groupCount: Int)
     case dynamite(DynamiteFuse)
     
+    var entityType: EntityModel.EntityType? {
+        switch self {
+        case .player(let model): return model.type
+        case .monster(let model): return model.type
+        default: return nil
+        }
+    }
+    
     enum CodingKeys: String, CodingKey {
         case base
         case entityData

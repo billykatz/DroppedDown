@@ -37,6 +37,45 @@ fileprivate var sparkleAnimations = [sparkleAnimation1, sparkleAnimation2, spark
 extension Animator {
     
     // MARK: - Functions to create SpirteActions
+    func createWebShootingAniamtion(delayBefore: TimeInterval) -> [SpriteAction]? {
+        guard let bossSprite = bossSprite else { return nil }
+        
+        var spriteActions: [SpriteAction] = []
+        
+        func toggleWebAttack(delayBeforeTime: TimeInterval, sprite: SKSpriteNode, onOff: Bool, onAlpha: CGFloat) -> SKAction {
+            let toggleWebAttack = SKAction.run {
+                sprite.alpha = onOff ? onAlpha : 0.0
+                sprite.xScale = 1
+            }
+            return toggleWebAttack.waitBefore(delay: delayBeforeTime)
+        }
+        
+        let delayBetween = 0.02
+        var slightDelay = delayBefore
+        var yScale: CGFloat = 1.0
+        var horizontalFlip: CGFloat = 1
+        var alpha: CGFloat = 1.0
+        for webAttack in bossSprite.spiderWebAttacks {
+            
+            let frames = SpriteSheet(texture: SKTexture(imageNamed: "boss-web-attack-animation-23"), rows: 1, columns: 23).animationFrames()
+            let animation = SKAction.animate(with: frames, timePerFrame: timePerFrame()).waitBefore(delay: slightDelay)
+            let scale = SKAction.scaleX(by: horizontalFlip, y: yScale, duration: 0.0)
+            let animationDuration = Double(frames.count) * timePerFrame()
+            let showWeb = toggleWebAttack(delayBeforeTime: slightDelay, sprite: webAttack, onOff: true, onAlpha: alpha)
+            let hideWeb = toggleWebAttack(delayBeforeTime: slightDelay + animationDuration, sprite: webAttack, onOff: false, onAlpha: alpha)
+            
+            let seq = SKAction.sequence(showWeb, scale, animation, hideWeb)
+            
+            spriteActions.append(.init(webAttack, seq))
+            
+            horizontalFlip = horizontalFlip * -1
+            alpha -= 0.33
+            slightDelay += delayBetween
+        }
+        
+        return spriteActions
+    }
+    
     func createEyeAnimation(eyeNumber: Int, delayBefore: TimeInterval, reversed: Bool) -> SpriteAction? {
         guard let bossSprite = bossSprite,
               eyeNumber >= 1,
@@ -1102,6 +1141,139 @@ extension Animator {
         animate(spriteActions, completion: completion)
     }
     
+    func createMonstersHangingFromCeiling(delayBefore: TimeInterval, monsterTypes: [EntityModel.EntityType]) -> [SpriteAction]? {
+        guard let bossSprite = bossSprite,
+              let playableRect = playableRect,
+              let tileSize = tileSize else { return nil }
+        var spriteActions: [SpriteAction] = []
+        
+        // choose a random X along the screen to show the monster
+        var xSlots: [CGFloat] = []
+        let monsterTypeCount = monsterTypes.count
+        let zoneSpacing = playableRect.width / CGFloat(monsterTypeCount)
+        for zoneIdx in 0..<monsterTypeCount {
+            let xPosition = playableRect.minX + (CGFloat(zoneIdx) * zoneSpacing) + zoneSpacing/2
+            xSlots.append(xPosition)
+        }
+        
+        // choose a random Y on the screen to show the monster
+        let randomYSlots: [CGFloat] = [5, 10, 16, 8]
+        
+        let staggerBetween: TimeInterval = 0.075
+        var waitBefore = 0.0
+        
+        for (monsterIndex, monsterType) in monsterTypes.enumerated() {
+            let monsterSprite = SKSpriteNode(texture: SKTexture(imageNamed: monsterType.textureString), size: CGSize(widthHeight: tileSize*1.25))
+            let startingYPosition = CGPoint.alignHorizontally(monsterSprite.frame, relativeTo: bossSprite.spiderHead.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: 400, translatedToBounds: true)
+            let startingXPosition = xSlots[monsterIndex]
+            let startPosition = CGPoint(x: startingXPosition, y: startingYPosition.y)
+            
+            let randomPositionY = randomYSlots.randomElement()
+            let endPositionY = CGPoint.alignHorizontally(monsterSprite.frame, relativeTo: bossSprite.spiderHead.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: randomPositionY!, translatedToBounds: true)
+            let endPosition = CGPoint(x: startingXPosition, y: endPositionY.y)
+            
+            // attach the long rope to the back of the monster
+            let ropeSize = CGSize(width: tileSize, height: 400 / (32/tileSize))
+            let ropeSprite = SKSpriteNode(texture: SKTexture(imageNamed: "boss-full-web-strand"), size: ropeSize)
+            let webSize = CGSize(widthHeight: tileSize)
+            let webSprite = SKSpriteNode(texture: SKTexture(imageNamed: "boss-web-spawn-monsters"), size: webSize)
+            
+            ropeSprite.position = startPosition
+            monsterSprite.position = startPosition
+            webSprite.position = startPosition
+            
+            ropeSprite.zPosition = 2_980_000
+            ropeSprite.anchorPoint = CGPoint(x: 0.5, y: 0.05)
+            monsterSprite.zPosition = 3_000_000
+            webSprite.zPosition = 3_020_000
+            webSprite.yScale = 0.8
+            webSprite.xScale = 1.2
+            
+            bossSprite.addChild(ropeSprite)
+            bossSprite.addChild(monsterSprite)
+            bossSprite.addChild(webSprite)
+            
+            bossSprite.monstersInWebs.append((monsterType, CompositeWebSprite(ropeSprite: ropeSprite, webSprite: webSprite, monsterSprite: monsterSprite)))
+               
+            // bounce the monster into position
+            let rateUp: Double = 0.25 / 70
+            let rateDown: Double = 1.0 / 100
+            let moveAction = SKAction.moveTo(y: endPosition.y - 50, duration: 1.0)
+            moveAction.timingMode = .easeInEaseOut
+            let move2Action = SKAction.moveTo(y: endPosition.y + 20, duration: rateUp * 70)
+            move2Action.timingMode = .easeOut
+            let move3Action = SKAction.moveTo(y: endPosition.y - 20, duration: rateDown * 40 * 1.1)
+            move3Action.timingMode = .easeOut
+            let move4Action = SKAction.moveTo(y: endPosition.y + 5, duration: rateUp * 25 * 2)
+            move4Action.timingMode = .easeOut
+            let move5Action = SKAction.moveTo(y: endPosition.y - 10, duration: rateDown * 15 * 1.4)
+            move5Action.timingMode = .easeOut
+            let move6Action = SKAction.moveTo(y: endPosition.y - 3, duration: rateUp * 7 * 1.6)
+            move6Action.timingMode = .easeOut
+            let move7Action = SKAction.moveTo(y: endPosition.y - 8, duration: rateDown * 5 * 1.6)
+            move7Action.timingMode = .easeOut
+            let move8Action = SKAction.moveTo(y: endPosition.y - 5, duration: rateUp * 3 * 1.9)
+            move8Action.timingMode = .easeOut
+            let move9Action = SKAction.moveTo(y: endPosition.y - 7, duration: rateDown * 2 * 1.9)
+            move9Action.timingMode = .easeOut
+            
+            let seq = SKAction.sequence([moveAction, move2Action, move3Action, move4Action, move5Action, move6Action, move7Action, move8Action, move9Action])
+            
+            spriteActions.append(.init(monsterSprite, seq.waitBefore(delay: waitBefore)))
+            spriteActions.append(.init(ropeSprite, seq.waitBefore(delay: waitBefore)))
+            spriteActions.append(.init(webSprite, seq.waitBefore(delay: waitBefore)))
+            waitBefore += staggerBetween
+        }
+        
+        spriteActions = reverseAndDelayActions(actions: spriteActions, reversed: false, delay: delayBefore)
+        
+        return spriteActions
+    }
+    
+    func animateGettingReadyToSpawnMonsters(delayBefore: TimeInterval, monsterTypes: [EntityModel.EntityType], completion: @escaping () -> Void) {
+        var spriteActions: [SpriteAction] = []
+        var waitBefore: TimeInterval = delayBefore
+        
+        /// FACE
+        // make angry face
+        let angryFace = createAngryFace(reverse: false, waitBeforeDelay: waitBefore)
+        spriteActions.append(contentsOf: angryFace)
+        
+        /// MOVE Body
+        /// slight recoil to force of web
+        if let moveBody = createBossRecoilFromPoison(delayBefore: waitBefore, reversed: false) {
+            spriteActions.append(contentsOf: moveBody)
+        }
+        
+        /// WEB
+        /// show web coming out of the butt, hehe
+        if let webShoot = createWebShootingAniamtion(delayBefore: waitBefore) {
+            spriteActions.append(contentsOf: webShoot)
+        }
+        
+        waitBefore += 0.66
+        
+        // show the monsters coming down from the ceiling.
+        /// SHOW MONSTERS
+        if let monstersAppear = createMonstersHangingFromCeiling(delayBefore: waitBefore, monsterTypes: monsterTypes) {
+            spriteActions.append(contentsOf: monstersAppear)
+        }
+        
+        waitBefore += 0.34
+        
+        /// UNDO Body
+        if let undoMoveBody = createBossRecoilFromPoison(delayBefore: waitBefore, reversed: true) {
+            spriteActions.append(contentsOf: undoMoveBody)
+        }
+        
+        /// UNDO face
+        let undoAngryFace = createAngryFace(reverse: true, waitBeforeDelay: waitBefore)
+        spriteActions.append(contentsOf: undoAngryFace)
+        
+        
+        animate(spriteActions, completion: completion)
+    }
+    
     func animateResetToOriginalPositions(delayBefore: TimeInterval, completion: @escaping () -> Void) {
         guard let bossSprite = bossSprite else {
             completion()
@@ -1119,6 +1291,10 @@ extension Animator {
         
         spriteActions.append(contentsOf: undoAngryFace)
         
+        for monsterSprite in bossSprite.monstersInWebs {
+            monsterSprite.1.monsterSprite.removeFromParent()
+        }
+        
         animate(spriteActions, completion: completion)
     }
     
@@ -1130,6 +1306,76 @@ extension Animator {
         } else {
             completion()
         }
+    }
+    
+    func testAnimateShootingWebs(completion: @escaping () -> Void) {
+        var spriteActions: [SpriteAction] = []
+        
+        /// FACE
+        // make angry face
+        let angryFace = createAngryFace(reverse: false, waitBeforeDelay: 0.0)
+        spriteActions.append(contentsOf: angryFace)
+        
+        /// MOVE Body
+        if let moveBody = createBossRecoilFromPoison(delayBefore: 0.0, reversed: false) {
+            spriteActions.append(contentsOf: moveBody)
+        }
+        
+        /// WEB
+        if let webShoot = createWebShootingAniamtion(delayBefore: 0.0) {
+            spriteActions.append(contentsOf: webShoot)
+        }
+        
+        /// SHOW MONSTERS
+        if let monstersAppear = createMonstersHangingFromCeiling(delayBefore: 0.75, monsterTypes: [.sally, .alamo, .rat, .dragon, .alamo]) {
+            spriteActions.append(contentsOf: monstersAppear)
+        }
+        
+        /// UNDO Body
+        if let undoMoveBody = createBossRecoilFromPoison(delayBefore: 1.0, reversed: true) {
+            spriteActions.append(contentsOf: undoMoveBody)
+        }
+        
+        /// UNDO face
+        let undoAngryFace = createAngryFace(reverse: true, waitBeforeDelay: 1.0)
+        spriteActions.append(contentsOf: undoAngryFace)
+        
+        animate(spriteActions, completion: completion)
+    }
+    
+    func createAnimationRopesPullingAway(delayBefore: TimeInterval) -> [SpriteAction]? {
+        guard let bossSprite = bossSprite else {
+            return nil
+        }
+        let compositeSprites = bossSprite.monstersInWebs
+        var spriteActions: [SpriteAction] = []
+        
+        for compositeSprite in compositeSprites {
+                
+            /// play animation
+            let frames = SpriteSheet(texture: SKTexture(imageNamed: "boss-web-destroyed-animation-10"), rows: 1, columns: 10).animationFrames()
+            let webDestroyAnimation = SKAction.animate(with: frames, timePerFrame: timePerFrame())
+            var animationAction = SpriteAction.init(compositeSprite.1.webSprite, webDestroyAnimation)
+            animationAction.duration = Double(frames.count) * timePerFrame()
+            spriteActions.append(animationAction)
+            
+            let hideMonsterSprite = SKAction.fadeOut(withDuration: 0.0)
+            spriteActions.append(.init(compositeSprite.1.monsterSprite, hideMonsterSprite))
+            
+            let ropePullUp = SKAction.move(by: CGVector(dx: 0.0, dy: 500), duration: 1.0)
+            spriteActions.append(.init(compositeSprite.1.ropeSprite, ropePullUp.waitBefore(delay: 0.7)))
+            
+            
+        }
+        
+        let cleanUpAction = SKAction.run {
+            bossSprite.monstersInWebs = []
+        }
+        
+        spriteActions.append(.init(bossSprite, cleanUpAction.waitBefore(delay: 1.0)))
+        
+        return spriteActions
+        
     }
     
     

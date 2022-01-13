@@ -23,7 +23,7 @@ class BossTestView: ButtonDelegate {
         bossView = BossView(playableRect: playableRect, tileSize: 100, spriteProvider: { [] })
         bossView.position = bossView.position.translateVertically(-100)
         
-        self.animator = Animator(foreground: foreground, bossSprite: bossView.bossSprite)
+        self.animator = Animator(foreground: foreground, tileSize: 64, bossSprite: bossView.bossSprite,  playableRect: playableRect)
         let verticalPadding = 20.0
         
         foreground.addChild(bossView)
@@ -87,6 +87,11 @@ class BossTestView: ButtonDelegate {
         poisonBeamAttack.zPosition = buttonZPosition
         foreground.addChild(poisonBeamAttack)
         
+        let webAttack = ShiftShaft_Button(size: buttonSize, delegate: self, identifier: .webAttack, fontSize: fontSize)
+        webAttack.position = CGPoint.alignHorizontally(webAttack.frame, relativeTo: poisonBeamAttack.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: verticalPadding, translatedToBounds: true)
+        webAttack.zPosition = buttonZPosition
+        foreground.addChild(webAttack)
+        
         // right column buttons
         let resetPositions = ShiftShaft_Button(size: buttonSize, delegate: self, identifier: .resetPositions, fontSize: fontSize)
         resetPositions.position = CGPoint.alignVertically(resetPositions.frame, relativeTo: echoEffectButton.frame, horizontalAnchor: .right, verticalAlign: .center, verticalPadding: 0.0, horizontalPadding: 20.0, translatedToBounds: true)
@@ -129,6 +134,11 @@ class BossTestView: ButtonDelegate {
             
         case .poisonBeamAttack:
             animator.animateGettingReadyToPoisonAttack(delayBefore: 0.0) {
+                
+            }
+            
+        case .webAttack:
+            animator.testAnimateShootingWebs {
                 
             }
         default:

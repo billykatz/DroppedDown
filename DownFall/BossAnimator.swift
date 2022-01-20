@@ -52,15 +52,16 @@ extension Animator {
         
         let delayBetween = 0.02
         var slightDelay = delayBefore
-        var yScale: CGFloat = 1.0
+        let yScale: CGFloat = 1.0
         var horizontalFlip: CGFloat = 1
         var alpha: CGFloat = 1.0
+        let timePerFrame: TimeInterval = timePerFrame() / 2 / 2
         for webAttack in bossSprite.spiderWebAttacks {
             
             let frames = SpriteSheet(texture: SKTexture(imageNamed: "boss-web-attack-animation-23"), rows: 1, columns: 23).animationFrames()
-            let animation = SKAction.animate(with: frames, timePerFrame: timePerFrame()).waitBefore(delay: slightDelay)
+            let animation = SKAction.animate(with: frames, timePerFrame: timePerFrame).waitBefore(delay: slightDelay)
             let scale = SKAction.scaleX(by: horizontalFlip, y: yScale, duration: 0.0)
-            let animationDuration = Double(frames.count) * timePerFrame()
+            let animationDuration = Double(frames.count) * timePerFrame
             let showWeb = toggleWebAttack(delayBeforeTime: slightDelay, sprite: webAttack, onOff: true, onAlpha: alpha)
             let hideWeb = toggleWebAttack(delayBeforeTime: slightDelay + animationDuration, sprite: webAttack, onOff: false, onAlpha: alpha)
             
@@ -122,7 +123,7 @@ extension Animator {
         var spriteActions: [SpriteAction] = []
         
         let rotateAngle: CGFloat = .pi
-        let rotateSpeed: CGFloat = .pi
+        let rotateSpeed: CGFloat = .pi * 4
         let rotateDuration = rotateAngle/rotateSpeed
         
         let counterRotateCoeffcient: CGFloat  = 1 / 8
@@ -780,9 +781,9 @@ extension Animator {
         /// get the rock sprites
         /// animate then to move to the spiders mouth
         /// animate them to explode
-        let moveSpeed: CGFloat = 600.0
+        let moveSpeed: CGFloat = 1200.0
         var currentStagger: TimeInterval = 0.0
-        let stagger: TimeInterval = 0.5
+        let stagger: TimeInterval = Double.random(in: 0...0.15)
         if let rockCoords = transformation.tileTransformation?.map({ $0.initial }).sorted(by: { $0.row > $1.row }) {
             
             
@@ -796,6 +797,7 @@ extension Animator {
                 let sprite = sprites[coord.row][coord.col]
                 let newSprite = DFTileSpriteNode(type: sprite.type, height: sprite.frame.height, width: sprite.frame.width)
                 newSprite.position = sprite.position
+                newSprite.zPosition = 1_000_000
                 sprite.removeFromParent()
                 foreground.addChild(newSprite)
                 
@@ -825,6 +827,10 @@ extension Animator {
             }
         }
         
+        let eyesTurnsRed = createAllEyesRed(delayBefore: 0.1, reversed: false)
+        spriteActions.append(contentsOf: eyesTurnsRed)
+        
+        
         /// call the completion
         resetBossThenAnimate(spriteActions, completion: completion)
     }
@@ -833,22 +839,22 @@ extension Animator {
     func animateBossGettingReadyToAttack(delayBefore: TimeInterval, completion: @escaping () -> Void) {
         var spriteActions: [SpriteAction] = []
         
-        var extraWait: TimeInterval = 0.0
-        let undoAngryFace = createAngryFace(reverse: true, waitBeforeDelay: delayBefore)
-        extraWait += undoAngryFace.maxDuration()
-        spriteActions.append(contentsOf: undoAngryFace)
+//        var extraWait: TimeInterval = 0.0
+//        let undoAngryFace = createAngryFace(reverse: true, waitBeforeDelay: delayBefore)
+//        extraWait += undoAngryFace.maxDuration()
+//        spriteActions.append(contentsOf: undoAngryFace)
+//
+//        if let bigChomp = createToothChompFirstHalfAnimation(delayBefore: delayBefore)?.reversed {
+//            spriteActions.append(bigChomp)
+//        }
+//
+//
+//        let blink = createFullBlinkAnimation(delayBefore: delayBefore)
+//        extraWait += blink.maxDuration()
+//        spriteActions.append(contentsOf: blink)
         
-        if let bigChomp = createToothChompFirstHalfAnimation(delayBefore: delayBefore)?.reversed {
-            spriteActions.append(bigChomp)
-        }
-
-        
-        let blink = createFullBlinkAnimation(delayBefore: delayBefore)
-        extraWait += blink.maxDuration()
-        spriteActions.append(contentsOf: blink)
-        
-        let eyesTurnsRed = createAllEyesRed(delayBefore: extraWait + delayBefore, reversed: false)
-        spriteActions.append(contentsOf: eyesTurnsRed)
+//        let eyesTurnsRed = createAllEyesRed(delayBefore: extraWait + delayBefore, reversed: false)
+//        spriteActions.append(contentsOf: eyesTurnsRed)
         
         resetBossThenAnimate(spriteActions, completion: completion)
     }
@@ -927,8 +933,8 @@ extension Animator {
         
         let frames = SpriteSheet(texture: SKTexture(imageNamed: "animate-dynamite-coming-in-animation-6"), rows: 1, columns: 6).animationFrames()
         let animation = SKAction.animate(with: frames, timePerFrame: timePerFrame())
-        let loopedAnimation = SKAction.repeat(animation, count: 4)
-        let trainMoveDuration: TimeInterval = timePerFrame() * 6 * 4
+        let loopedAnimation = SKAction.repeat(animation, count: 4 / 2)
+        let trainMoveDuration: TimeInterval = timePerFrame() * 6 * 4 / 2
         let moveIn = SKAction.move(to: trainTargetPosition, duration: trainMoveDuration)
         moveIn.timingMode = .easeInEaseOut
 
@@ -1023,7 +1029,7 @@ extension Animator {
         
         /// BODY MOVEMENT
         // move the boss's head and body up
-        let moveDuration: TimeInterval = 0.33
+        let moveDuration: TimeInterval = 0.15
         let bodyMoveDistance: CGFloat = -50.0
         let headMoveUpDistance: CGFloat = 100.0
         let bodyMoveDown = SKAction.moveBy(x: 0.0 ,y: bodyMoveDistance, duration: moveDuration)
@@ -1039,7 +1045,7 @@ extension Animator {
         
         /// LEG ANIMATION
         // animate the boss preparing to stamp it's feet
-        let rotateSpeed: CGFloat = .pi/2
+        let rotateSpeed: CGFloat = .pi/2 * 2
         let frontLegAngles: CGFloat = CGFloat.pi/3
         let backLegAngles: CGFloat = -.pi / 8
         
@@ -1053,7 +1059,7 @@ extension Animator {
         }
         
         
-        resetBossThenAnimate(spriteActions, completion: completion)
+        animate(spriteActions, completion: completion)
     }
     
     
@@ -1145,7 +1151,7 @@ extension Animator {
         spriteActions.append(.init(sprite: bossSprite.spiderDynamiteTrain, action: loopedAnimation))
         
         
-        resetBossThenAnimate(spriteActions, completion: completion)
+        animate(spriteActions, completion: completion)
         
         
     }
@@ -1244,9 +1250,9 @@ extension Animator {
             bossSprite.monstersInWebs.append((monsterType, CompositeWebSprite(ropeSprite: ropeSprite, webSprite: webSprite, monsterSprite: monsterSprite)))
                
             // bounce the monster into position
-            let rateUp: Double = 0.25 / 70
-            let rateDown: Double = 1.0 / 100
-            let moveAction = SKAction.moveTo(y: endPosition.y - 50, duration: 1.0)
+            let rateUp: Double = 0.25 / 3 / 70
+            let rateDown: Double = 1.0 / 3  / 100
+            let moveAction = SKAction.moveTo(y: endPosition.y - 50, duration: 1.0 / 3)
             moveAction.timingMode = .easeInEaseOut
             let move2Action = SKAction.moveTo(y: endPosition.y + 20, duration: rateUp * 70)
             move2Action.timingMode = .easeOut
@@ -1256,16 +1262,8 @@ extension Animator {
             move4Action.timingMode = .easeOut
             let move5Action = SKAction.moveTo(y: endPosition.y - 10, duration: rateDown * 15 * 1.4)
             move5Action.timingMode = .easeOut
-            let move6Action = SKAction.moveTo(y: endPosition.y - 3, duration: rateUp * 7 * 1.6)
-            move6Action.timingMode = .easeOut
-            let move7Action = SKAction.moveTo(y: endPosition.y - 8, duration: rateDown * 5 * 1.6)
-            move7Action.timingMode = .easeOut
-            let move8Action = SKAction.moveTo(y: endPosition.y - 5, duration: rateUp * 3 * 1.9)
-            move8Action.timingMode = .easeOut
-            let move9Action = SKAction.moveTo(y: endPosition.y - 7, duration: rateDown * 2 * 1.9)
-            move9Action.timingMode = .easeOut
             
-            let seq = SKAction.sequence([moveAction, move2Action, move3Action, move4Action, move5Action, move6Action, move7Action, move8Action, move9Action])
+            let seq = SKAction.sequence([moveAction, move2Action, move3Action, move4Action, move5Action])
             
             spriteActions.append(.init(monsterSprite, seq.waitBefore(delay: waitBefore)))
             spriteActions.append(.init(ropeSprite, seq.waitBefore(delay: waitBefore)))
@@ -1299,7 +1297,7 @@ extension Animator {
             spriteActions.append(contentsOf: webShoot)
         }
         
-        waitBefore += 0.66
+        waitBefore += 0.1
         
         // show the monsters coming down from the ceiling.
         /// SHOW MONSTERS
@@ -1307,7 +1305,7 @@ extension Animator {
             spriteActions.append(contentsOf: monstersAppear)
         }
         
-        waitBefore += 0.34
+        waitBefore += 0.1
         
         /// UNDO Body
         if let undoMoveBody = createBossRecoilFromPoison(delayBefore: waitBefore, reversed: true) {
@@ -1416,10 +1414,10 @@ extension Animator {
             spriteActions.append(undoChomp)
         }
         
-        for monsterSprite in bossSprite.monstersInWebs {
-            let spriteAction = SpriteAction(monsterSprite.1.monsterSprite, .removeFromParent())
-            spriteActions.append(spriteAction)
-        }
+//        for monsterSprite in bossSprite.monstersInWebs {
+//            let spriteAction = SpriteAction(monsterSprite.1.monsterSprite, .removeFromParent())
+//            spriteActions.append(spriteAction)
+//        }
         
         bossSprite.activeSpriteActions.forEach {
             $0.stop()

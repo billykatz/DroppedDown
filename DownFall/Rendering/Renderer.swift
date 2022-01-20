@@ -1083,9 +1083,10 @@ extension Renderer {
 extension Renderer {
     
     private func showBossTargetsToEat(in transformation: [Transformation], bossPhase: BossPhase) {
-        animator.animateWaitingToEat(delayBefore: 0.0) { [weak self] in
-            self?.animationsFinished(endTiles: transformation.first?.endTiles)
+        animator.animateWaitingToEat(delayBefore: 0.0) {
         }
+        // purpposefully called immediately so this animation can be interupted
+        animationsFinished(endTiles: transformation.first?.endTiles)
     }
 
     
@@ -1097,10 +1098,11 @@ extension Renderer {
         }
         
         animator.animateBossEatingRocks(sprites: sprites, foreground: spriteForeground, transformation: rockEatTrans) { [weak self] in
-            self?.animator.animateBossGettingReadyToAttack(delayBefore: 0.0, completion: { [weak self] in
-                self?.computeNewBoard(for: removeAndReplace)
-            })
+            self?.computeNewBoard(for: removeAndReplace)
+//            self?.animator.animateBossGettingReadyToAttack(delayBefore: 0.0, completion: { [weak self] in
+//            })
         }
+        // purpposefully called immediately so the boss getting ready to attack animation can be interupted
         
         
     }

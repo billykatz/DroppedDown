@@ -1453,9 +1453,6 @@ struct Animator {
         var bossAttackSprites: [DFTileSpriteNode] = []
         for tileType in tileTypes {
             let attackSprite = DFTileSpriteNode(type: tileType, height: tileSize, width: tileSize)
-            if let fuseTiming = tileType.fuseTiming {
-                attackSprite.showFuseTiming(fuseTiming)
-            }
             bossAttackSprites.append(attackSprite)
         }
         
@@ -1479,7 +1476,7 @@ struct Animator {
         // remove them from the boss sprite
         if let ropesPullingUp = createAnimationRopesPullingAway(delayBefore: 0.0) {
             spriteActions.append(contentsOf: ropesPullingUp)
-            waitTime += 0.5
+            waitTime += 0.2
         }
         
         // make it appear as if they are being thrown onto the screen
@@ -1487,7 +1484,7 @@ struct Animator {
         //stagger the initial throw of each dynamite
         for (idx, target) in targetPositions.enumerated() {
             let distance = target - startingPosition
-            let speed: Double = 750
+            let speed: Double = 1500
             
             // determine the duration based on the distance to the target
             let duration = Double(distance.length) / speed
@@ -1614,7 +1611,7 @@ struct Animator {
             }
         }
         
-        resetBossThenAnimate(spriteActions, completion: completion)
+        animate(spriteActions, completion: completion)
         
     }
     
@@ -1650,11 +1647,11 @@ struct Animator {
             spriteActions.append(poisonBeam)
 
 
-            if let shake = shakeScreen(duration: poisonBeam.duration, amp: 35, delayBefore: waitBefore) {
+            if let shake = shakeScreen(duration: poisonBeam.duration / 2, amp: 35, delayBefore: waitBefore) {
                 spriteActions.append(shake)
             }
 
-            waitBefore += poisonBeam.duration
+            waitBefore += (poisonBeam.duration / 2)
 
             spriteActions.append(hidePoison.waitBefore(delay: waitBefore))
         }
@@ -1665,7 +1662,7 @@ struct Animator {
         }
 
         // Additional wait after the beam closes
-        waitBefore += 0.1
+        waitBefore += 0.0
 
         /// UNDO mouth
         if let closeMouth = createToothChompFirstHalfAnimation(delayBefore: 0.0)?.reversed {
@@ -1684,52 +1681,56 @@ struct Animator {
         
         for column in targetedColumns {
             
-            // create 1 poison sprite for each column attack
-            let poisonSprite = SKSpriteNode(texture: SKTexture(imageNamed: Constants.poisonDropSpriteName), size: CGSize(width: tileSize, height: tileSize))
-            
-            // position it at the top and center of the attacked column
-            let boardSize = sprites.count
-            let topSpriteInColumn = sprites[boardSize-1][column]
-            let poisonSpritePosition = CGPoint.alignHorizontally(poisonSprite.frame, relativeTo: playableRect, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: Style.Padding.normal, translatedToBounds: true)
-            poisonSprite.position = poisonSpritePosition
-            poisonSprite.position.x = topSpriteInColumn.position.x
-            poisonSprite.zPosition = 100_000_000
-            
-            // add to the sprite foreground which will auto remove it after animations are finishied
-            spriteForeground.addChild(poisonSprite)
-            
-            // animate it dripping down the column
-            // grab the bottom row in the atttacked column
-            if let finalRowAttacked = targetedTiles.filter({ $0.initial.column == column }).sorted(by: { $0.initial.row < $1.initial.row }).first?.initial {
+            for index in 0..<5 {
+                // create 1 poison sprite for each column attack
+                let poisonSprite = SKSpriteNode(texture: SKTexture(imageNamed: Constants.poisonDropSpriteName), size: CGSize(width: tileSize, height: tileSize))
                 
-                // calculate the target sprite
-                let targetSprite = sprites[finalRowAttacked]
-                let targetPosition = CGPoint.alignVertically(poisonSprite.frame, relativeTo: targetSprite.frame, horizontalAnchor: .center, verticalAlign: .bottom, translatedToBounds: true)
+                // position it at the top and center of the attacked column
+                let boardSize = sprites.count
+                let topSpriteInColumn = sprites[boardSize-1][column]
+                let poisonSpritePosition = CGPoint.alignHorizontally(poisonSprite.frame, relativeTo: playableRect, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: Style.Padding.normal, translatedToBounds: true)
+                poisonSprite.position = poisonSpritePosition
+                poisonSprite.position.y += CGFloat(index * 50)
+                poisonSprite.alpha = 1 - (CGFloat(index) * 0.15)
+                poisonSprite.position.x = topSpriteInColumn.position.x
+                poisonSprite.zPosition = 100_000_000 - CGFloat(index * 100)
                 
+                // add to the sprite foreground which will auto remove it after animations are finishied
+                spriteForeground.addChild(poisonSprite)
                 
-                let distance = targetPosition - poisonSprite.position
-                let speed: Double = 1000
-                
-                // the poison should move at the same speed regardless of the distance to the target
-                let duration = Double(distance.length) / speed
-                
-                let moveAction = SKAction.move(to: targetPosition, duration: duration)
-                
-                // after passing the final tile, then you in the splash zone
-                let splashAnimation = self.poisonDropAnimation
-                let sequence = SKAction.sequence([moveAction, splashAnimation, .removeFromParent()])
-                
-                spriteActions.append(SpriteAction.init(poisonSprite, sequence.waitBefore(delay: waitBefore)))
-            } else {
-                // after passing the final tile, then you in the splash zone
-                let splashAnimation = self.poisonDropAnimation
-                let sequence = SKAction.sequence([splashAnimation, .removeFromParent()])
-                
-                spriteActions.append(SpriteAction.init(poisonSprite, sequence.waitBefore(delay: waitBefore)))
+                // animate it dripping down the column
+                // grab the bottom row in the atttacked column
+                if let finalRowAttacked = targetedTiles.filter({ $0.initial.column == column }).sorted(by: { $0.initial.row < $1.initial.row }).first?.initial {
+                    
+                    // calculate the target sprite
+                    let targetSprite = sprites[finalRowAttacked]
+                    let targetPosition = CGPoint.alignVertically(poisonSprite.frame, relativeTo: targetSprite.frame, horizontalAnchor: .center, verticalAlign: .bottom, translatedToBounds: true)
+                    
+                    
+                    let distance = targetPosition - poisonSprite.position
+                    let speed: Double = 2000
+                    
+                    // the poison should move at the same speed regardless of the distance to the target
+                    let duration = Double(distance.length) / speed
+                    
+                    let moveAction = SKAction.move(to: targetPosition, duration: duration)
+                    
+                    // after passing the final tile, then you in the splash zone
+                    let splashAnimation = self.poisonDropAnimation
+                    let sequence = SKAction.sequence([moveAction, splashAnimation, .removeFromParent()])
+                    
+                    spriteActions.append(SpriteAction.init(poisonSprite, sequence.waitBefore(delay: waitBefore)))
+                } else {
+                    // after passing the final tile, then you in the splash zone
+                    let splashAnimation = self.poisonDropAnimation
+                    let sequence = SKAction.sequence([splashAnimation, .removeFromParent()])
+                    
+                    spriteActions.append(SpriteAction.init(poisonSprite, sequence.waitBefore(delay: waitBefore)))
+                }
             }
         }
         
-        resetBossThenAnimate(spriteActions, completion: completion)
+        animate(spriteActions, completion: completion)
     }
     
     func showPillarsGrowing(sprites: [[DFTileSpriteNode]], spriteForeground: SKNode, bossTileAttacks: [BossTileAttack], tileSize: CGFloat, completion: @escaping () -> Void) {

@@ -59,97 +59,106 @@ class BossSprite: SKSpriteNode {
     let playableRect: CGRect
     let spiderRatio: CGFloat = 35.0/14.0
     
-    lazy var spiderWidth: CGFloat = {
+    var spiderWidth: CGFloat {
         playableRect.width*0.9
-    }()
+    }
     
-    lazy var spiderHeight: CGFloat = {
+    var spiderHeight: CGFloat {
         spiderWidth / spiderRatio
-    }()
+    }
     
     lazy var leftLeg1: SKSpriteNode = {
-        let spiderLegTexture = SKTexture(imageNamed: Constants.bossLeftLeg1Name)
-        let sprite = SKSpriteNode(texture: spiderLegTexture, size: scaleBodyPart(originalSize: spiderLegTexture.size()))
+        let texture = SKTexture(imageNamed: Constants.bossLeftLeg1Name)
+        let size = scaleBodyPart(originalSize: texture.size(), spiderWidth: spiderWidth, spiderHeight: spiderHeight)
+        let sprite = SKSpriteNode(texture: texture, size: size)
         let anchorPoint = Constants.leftLeft1AnchorPoint
-        let originalSize = spiderLegTexture.size()
+        let originalSize = texture.size()
         sprite.anchorPoint = convertPoint(from: anchorPoint, in: originalSize)
         sprite.zPosition = 900_000
         return sprite
     }()
     
     lazy var leftLeg2: SKSpriteNode = {
-        let spiderLegTexture = SKTexture(imageNamed: Constants.bossLeftLeg2Name)
-        let sprite = SKSpriteNode(texture: spiderLegTexture, size: scaleBodyPart(originalSize: spiderLegTexture.size()))
+        let texture = SKTexture(imageNamed: Constants.bossLeftLeg2Name)
+        let size = scaleBodyPart(originalSize: texture.size(), spiderWidth: spiderWidth, spiderHeight: spiderHeight)
+        let sprite = SKSpriteNode(texture: texture, size: size)
         let anchorPoint = Constants.leftLeft2AnchorPoint
-        let originalSize = spiderLegTexture.size()
+        let originalSize = texture.size()
         sprite.anchorPoint = convertPoint(from: anchorPoint, in: originalSize)
         sprite.zPosition = 700_000
         return sprite
     }()
     
     lazy var leftLeg3: SKSpriteNode = {
-        let spiderLegTexture = SKTexture(imageNamed: Constants.bossLeftLeg3Name)
-        let sprite = SKSpriteNode(texture: spiderLegTexture, size: scaleBodyPart(originalSize: spiderLegTexture.size()))
+        let texture = SKTexture(imageNamed: Constants.bossLeftLeg3Name)
+        let size = scaleBodyPart(originalSize: texture.size(), spiderWidth: spiderWidth, spiderHeight: spiderHeight)
+        let sprite = SKSpriteNode(texture: texture, size: size)
         let anchorPoint = Constants.leftLeft3AnchorPoint
-        let originalSize = spiderLegTexture.size()
+        let originalSize = texture.size()
         sprite.anchorPoint = convertPoint(from: anchorPoint, in: originalSize)
         sprite.zPosition = 500_000
         return sprite
     }()
     
     lazy var leftLeg4: SKSpriteNode = {
-        let spiderLegTexture = SKTexture(imageNamed: Constants.bossLeftLeg4Name)
-        let sprite = SKSpriteNode(texture: spiderLegTexture, size: scaleBodyPart(originalSize: spiderLegTexture.size()))
+        let texture = SKTexture(imageNamed: Constants.bossLeftLeg4Name)
+        let size = scaleBodyPart(originalSize: texture.size(), spiderWidth: spiderWidth, spiderHeight: spiderHeight)
+        let sprite = SKSpriteNode(texture: texture, size: size)
         let anchorPoint = Constants.leftLeft4AnchorPoint
-        let originalSize = spiderLegTexture.size()
+        let originalSize = texture.size()
         sprite.anchorPoint = convertPoint(from: anchorPoint, in: originalSize)
         sprite.zPosition = 300_000
         return sprite
     }()
     
     lazy var rightLeg1: SKSpriteNode = {
-        let spiderLegTexture = SKTexture(imageNamed: Constants.bossRightLeg1Name)
-        let sprite = SKSpriteNode(texture: spiderLegTexture, size: scaleBodyPart(originalSize: spiderLegTexture.size()))
+        let texture = SKTexture(imageNamed: Constants.bossRightLeg1Name)
+        let size = scaleBodyPart(originalSize: texture.size(), spiderWidth: spiderWidth, spiderHeight: spiderHeight)
+        let sprite = SKSpriteNode(texture: texture, size: size)
         let anchorPoint = Constants.rightLeg1AnchorPoint
-        let originalSize = spiderLegTexture.size()
+        let originalSize = texture.size()
         sprite.anchorPoint = convertPoint(from: anchorPoint, in: originalSize)
         sprite.zPosition = 900_000
         return sprite
     }()
     
     lazy var rightLeg2: SKSpriteNode = {
-        let spiderLegTexture = SKTexture(imageNamed: Constants.bossRightLeg2Name)
-        let sprite = SKSpriteNode(texture: spiderLegTexture, size: scaleBodyPart(originalSize: spiderLegTexture.size()))
+        let texture = SKTexture(imageNamed: Constants.bossRightLeg2Name)
+        let size = scaleBodyPart(originalSize: texture.size(), spiderWidth: spiderWidth, spiderHeight: spiderHeight)
+        let sprite = SKSpriteNode(texture: texture, size: size)
         let anchorPoint = Constants.rightLeg2AnchorPoint
-        let originalSize = spiderLegTexture.size()
+        let originalSize = texture.size()
         sprite.anchorPoint = convertPoint(from: anchorPoint, in: originalSize)
         sprite.zPosition = 700_000
         return sprite
     }()
     
     lazy var rightLeg3: SKSpriteNode = {
-        let spiderLegTexture = SKTexture(imageNamed: Constants.bossRightLeg3Name)
-        let sprite = SKSpriteNode(texture: spiderLegTexture, size: scaleBodyPart(originalSize: spiderLegTexture.size()))
+        let texture = SKTexture(imageNamed: Constants.bossRightLeg3Name)
+        let size = scaleBodyPart(originalSize: texture.size(), spiderWidth: spiderWidth, spiderHeight: spiderHeight)
+        let sprite = SKSpriteNode(texture: texture, size: size)
         let anchorPoint = Constants.rightLeg3AnchorPoint
-        let originalSize = spiderLegTexture.size()
+        let originalSize = texture.size()
         sprite.anchorPoint = convertPoint(from: anchorPoint, in: originalSize)
         sprite.zPosition = 500_000
         return sprite
     }()
     
     lazy var rightLeg4: SKSpriteNode = {
-        let spiderLegTexture = SKTexture(imageNamed: Constants.bossRightLeg4Name)
-        let sprite = SKSpriteNode(texture: spiderLegTexture, size: scaleBodyPart(originalSize: spiderLegTexture.size()))
+        let texture = SKTexture(imageNamed: Constants.bossRightLeg4Name)
+        let size = scaleBodyPart(originalSize: texture.size(), spiderWidth: spiderWidth, spiderHeight: spiderHeight)
+        let sprite = SKSpriteNode(texture: texture, size: size)
         let anchorPoint = Constants.rightLeg4AnchorPoint
-        let originalSize = spiderLegTexture.size()
+        let originalSize = texture.size()
         sprite.anchorPoint = convertPoint(from: anchorPoint, in: originalSize)
         sprite.zPosition = 300_000
         return sprite
     }()
     
     lazy var spiderBody: SKSpriteNode = {
-        let spiderBodyTexture = SKTexture(imageNamed: Constants.bossBodyName)
-        let sprite = SKSpriteNode(texture: spiderBodyTexture, size: scaleBodyPart(originalSize: spiderBodyTexture.size()))
+        let texture = SKTexture(imageNamed: Constants.bossBodyName)
+        let size = scaleBodyPart(originalSize: texture.size(), spiderWidth: spiderWidth, spiderHeight: spiderHeight)
+        let sprite = SKSpriteNode(texture: texture, size: size)
         sprite.zPosition = 200_000
         return sprite
     }()
@@ -178,37 +187,42 @@ class BossSprite: SKSpriteNode {
     }()
     
     lazy var spiderTooth: SKSpriteNode = {
-        let toothTexture = SKTexture(imageNamed: Constants.bossToothName)
-        let sprite = SKSpriteNode(texture: toothTexture, size: scaleBodyPart(originalSize: toothTexture.size()))
+        let texture = SKTexture(imageNamed: Constants.bossToothName)
+        let size = scaleBodyPart(originalSize: texture.size(), spiderWidth: spiderWidth, spiderHeight: spiderHeight)
+        let sprite = SKSpriteNode(texture: texture, size: size)
         sprite.zPosition = 1_200_000
         return sprite
     }()
     
     lazy var spiderToothSaliva: SKSpriteNode = {
-        let toothTexture = SKTexture(imageNamed: Constants.bossSalivaName)
-        let sprite = SKSpriteNode(texture: toothTexture, size: scaleBodyPart(originalSize: toothTexture.size()))
+        let texture = SKTexture(imageNamed: Constants.bossSalivaName)
+        let size = scaleBodyPart(originalSize: texture.size(), spiderWidth: spiderWidth, spiderHeight: spiderHeight)
+        let sprite = SKSpriteNode(texture: texture, size: size)
         sprite.zPosition = 1_300_000
         return sprite
     }()
 
     
     lazy var spiderSparkle: SKSpriteNode = {
-        let toothTexture = SKTexture(imageNamed: Constants.bossSparkleEffect)
-        let sprite = SKSpriteNode(texture: toothTexture, size: scaleBodyPart(originalSize: toothTexture.size()))
+        let texture = SKTexture(imageNamed: Constants.bossSparkleEffect)
+        let size = scaleBodyPart(originalSize: texture.size(), spiderWidth: spiderWidth, spiderHeight: spiderHeight)
+        let sprite = SKSpriteNode(texture: texture, size: size)
         sprite.zPosition = 1_500_000
         return sprite
     }()
     
     lazy var spiderEyelids: SKSpriteNode = {
-        let toothTexture = SKTexture(imageNamed: Constants.bossEyelids)
-        let sprite = SKSpriteNode(texture: toothTexture, size: scaleBodyPart(originalSize: toothTexture.size()))
+        let texture = SKTexture(imageNamed: Constants.bossEyelids)
+        let size = scaleBodyPart(originalSize: texture.size(), spiderWidth: spiderWidth, spiderHeight: spiderHeight)
+        let sprite = SKSpriteNode(texture: texture, size: size)
         sprite.zPosition = 1_200_000
         return sprite
     }()
     
     lazy var spiderEyes: SKSpriteNode = {
-        let toothTexture = SKTexture(imageNamed: Constants.bossEye)
-        let sprite = SKSpriteNode(texture: toothTexture, size: scaleBodyPart(originalSize: toothTexture.size()))
+        let texture = SKTexture(imageNamed: Constants.bossEye)
+        let size = scaleBodyPart(originalSize: texture.size(), spiderWidth: spiderWidth, spiderHeight: spiderHeight)
+        let sprite = SKSpriteNode(texture: texture, size: size)
         sprite.zPosition = 1_100_000
         return sprite
     }()
@@ -216,8 +230,9 @@ class BossSprite: SKSpriteNode {
     lazy var spiderIndividualEyes: [SKSpriteNode] = {
         var eyeSprites: [SKSpriteNode] = []
         for idx in 1...8 {
-            let eyeTexture = SKTexture(imageNamed: "boss-spider-eye-\(idx)")
-            let sprite = SKSpriteNode(texture: eyeTexture, size: scaleBodyPart(originalSize: eyeTexture.size()))
+            let texture = SKTexture(imageNamed: "boss-spider-eye-\(idx)")
+            let size = scaleBodyPart(originalSize: texture.size(), spiderWidth: spiderWidth, spiderHeight: spiderHeight)
+            let sprite = SKSpriteNode(texture: texture, size: size)
             sprite.zPosition = 1_100_000
             eyeSprites.append(sprite)
         }
@@ -225,8 +240,9 @@ class BossSprite: SKSpriteNode {
     }()
     
     lazy var spiderEyebrowCrystals: SKSpriteNode = {
-        let toothTexture = SKTexture(imageNamed: Constants.bossHeadCrystals)
-        let sprite = SKSpriteNode(texture: toothTexture, size: scaleBodyPart(originalSize: toothTexture.size()))
+        let texture = SKTexture(imageNamed: Constants.bossHeadCrystals)
+        let size = scaleBodyPart(originalSize: texture.size(), spiderWidth: spiderWidth, spiderHeight: spiderHeight)
+        let sprite = SKSpriteNode(texture: texture, size: size)
         sprite.zPosition = 1_200_000
         return sprite
     }()
@@ -247,7 +263,8 @@ class BossSprite: SKSpriteNode {
     
     lazy var spiderPoisonBeam: SKSpriteNode = {
         let spiderPoisonBeamTexture = SKTexture(imageNamed: "poison-beam-sprite")
-        let sprite = SKSpriteNode(texture: spiderPoisonBeamTexture, size: scaleBodyPart(originalSize: spiderPoisonBeamTexture.size()))
+        let size = scaleBodyPart(originalSize: spiderPoisonBeamTexture.size(), spiderWidth: spiderWidth, spiderHeight: spiderHeight)
+        let sprite = SKSpriteNode(texture: spiderPoisonBeamTexture, size: size)
         let initialPosition = CGPoint.alignHorizontally(sprite.frame, relativeTo: spiderHead.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: -100.0, horizontalPadding: 0.0, translatedToBounds: true)
         
         sprite.yScale = -1
@@ -261,7 +278,8 @@ class BossSprite: SKSpriteNode {
         var sprites: [SKSpriteNode] = []
         for idx in 0..<3 {
             let webTexture = SKTexture(imageNamed: Constants.bossWebAttack)
-            let sprite = SKSpriteNode(texture: webTexture, size: scaleBodyPart(originalSize: webTexture.size()))
+            let size = scaleBodyPart(originalSize: webTexture.size(), spiderWidth: spiderWidth, spiderHeight: spiderHeight)
+            let sprite = SKSpriteNode(texture: webTexture, size: size)
             let initialPosition = CGPoint.alignHorizontally(sprite.frame, relativeTo: spiderBody.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: 0.0, horizontalPadding: 0.0, translatedToBounds: true)
             
             sprite.position = initialPosition
@@ -279,6 +297,7 @@ class BossSprite: SKSpriteNode {
         self.playableRect = playableRect
         super.init(texture: nil, color: .clear, size: CGSize(width: playableRect.width*0.9, height: playableRect.width*0.9/spiderRatio))
         
+       
         leftLeg1.position = CGPoint.position(leftLeg1.frame, inside: spiderHead.frame, verticalAnchor: .center, yOffset: -35, horizontalAnchor: .center, xOffset: -100, translatedToBounds: true)
         leftLeg2.position = CGPoint.position(leftLeg2.frame, inside: spiderHead.frame, verticalAnchor: .center, yOffset: 0, horizontalAnchor: .center, xOffset: -120, translatedToBounds: true)
         leftLeg3.position = CGPoint.position(leftLeg3.frame, inside: spiderHead.frame, verticalAnchor: .center, yOffset: 20, horizontalAnchor: .center, xOffset: -100, translatedToBounds: true)
@@ -369,14 +388,28 @@ class BossSprite: SKSpriteNode {
         return CGPoint(x: widthRatio, y: heightRatio)
     }
     
-    func scaleBodyPart(originalSize: CGSize) -> CGSize {
-        let widthRatio = originalSize.width / Constants.artworkDimensions.width
-        let heightRatio = originalSize.height / Constants.artworkDimensions.height
-        
-        let actualWidth = widthRatio * spiderWidth
-        let actualHeight = heightRatio * spiderHeight
-        
-        return CGSize(width: actualWidth, height: actualHeight)
-    }
     
+    var activeSpriteActions: [SpriteAction] = []
+    private var _numberOfRedEyes = 0
+    var numberOfRedEyes: Int {
+        set {
+            _numberOfRedEyes = max(0, newValue)
+        }
+        get {
+            return _numberOfRedEyes
+        }
+    }
+
+    
+}
+
+func scaleBodyPart(originalSize: CGSize, spiderWidth: CGFloat, spiderHeight: CGFloat) -> CGSize {
+    let artworkDimensions = CGSize(width: 280, height: 112)
+    let widthRatio = originalSize.width / artworkDimensions.width
+    let heightRatio = originalSize.height / artworkDimensions.height
+    
+    let actualWidth = widthRatio * spiderWidth
+    let actualHeight = heightRatio * spiderHeight
+    
+    return CGSize(width: actualWidth, height: actualHeight)
 }

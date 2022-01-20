@@ -1154,7 +1154,8 @@ struct Animator {
         
         return spriteActions
     }
-    
+
+
     
     func animate(_ spriteActions: [SpriteAction], completion: @escaping () -> Void) {
         if spriteActions.count == 0 { completion() }
@@ -1533,7 +1534,7 @@ struct Animator {
         }
         
         
-        animate(spriteActions, completion: completion)
+        resetBossThenAnimate(spriteActions, completion: completion)
     }
     
     func animateDynamiteExplosion(dynamiteSprites: [DFTileSpriteNode], dynamiteCoords: [TileCoord], foreground: SKNode, boardSize: Int, sprites: [[DFTileSpriteNode]], positionInForeground: (TileCoord) -> CGPoint, completion: @escaping () -> Void) {
@@ -1613,7 +1614,7 @@ struct Animator {
             }
         }
         
-        animate(spriteActions, completion: completion)
+        resetBossThenAnimate(spriteActions, completion: completion)
         
     }
     
@@ -1728,7 +1729,7 @@ struct Animator {
             }
         }
         
-        animate(spriteActions, completion: completion)
+        resetBossThenAnimate(spriteActions, completion: completion)
     }
     
     func showPillarsGrowing(sprites: [[DFTileSpriteNode]], spriteForeground: SKNode, bossTileAttacks: [BossTileAttack], tileSize: CGFloat, completion: @escaping () -> Void) {

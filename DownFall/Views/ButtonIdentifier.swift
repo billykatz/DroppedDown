@@ -111,6 +111,8 @@ enum ButtonIdentifier: String {
     case resetPositions
     case poisonBeamAttack
     case webAttack
+    case eyesTurnRed
+    case oneEyeTurnsYellow
     
     var title: String {
         switch self {
@@ -255,6 +257,10 @@ enum ButtonIdentifier: String {
             return "Poison Beam"
         case .webAttack:
             return "Web Attack"
+        case .eyesTurnRed:
+            return "Eyes Red"
+        case .oneEyeTurnsYellow:
+            return "1 Eye Yellow"
         }
     }
 }

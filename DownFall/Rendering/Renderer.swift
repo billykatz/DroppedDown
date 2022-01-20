@@ -1151,13 +1151,19 @@ extension Renderer {
             return
         }
         
+        
         // show the boss's eyes becoming yellow
         let turnsLeft = bossPhase.bossState.turnsLeftInState
         let convertedIndex = 8 - turnsLeft
         
-        animator.animateSingleEyeBecomingYellow(delayBefore: 0.0, eyeNumber: convertedIndex) { [weak self] in
-            self?.animationsFinished(endTiles: trans.endTiles)
+        // grab bossSprite
+        let bossSprite = bossView.bossSprite
+        bossSprite.numberOfRedEyes = turnsLeft
+        
+        animator.animateSingleEyeBecomingYellow(delayBefore: 0.0, eyeNumber: convertedIndex) {
+            // purposefully empty because the player and skip through the animation
         }
+        animationsFinished(endTiles: trans.endTiles)
         
     }
     

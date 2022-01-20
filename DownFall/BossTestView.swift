@@ -97,6 +97,16 @@ class BossTestView: ButtonDelegate {
         resetPositions.position = CGPoint.alignVertically(resetPositions.frame, relativeTo: echoEffectButton.frame, horizontalAnchor: .right, verticalAlign: .center, verticalPadding: 0.0, horizontalPadding: 20.0, translatedToBounds: true)
         resetPositions.zPosition = buttonZPosition
         foreground.addChild(resetPositions)
+        
+        let allEyesRed = ShiftShaft_Button(size: buttonSize, delegate: self, identifier: .eyesTurnRed, fontSize: fontSize)
+        allEyesRed.position = CGPoint.alignHorizontally(allEyesRed.frame, relativeTo: resetPositions.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: verticalPadding, translatedToBounds: true)
+        allEyesRed.zPosition = buttonZPosition
+        foreground.addChild(allEyesRed)
+        
+        let oneEyeYellow = ShiftShaft_Button(size: buttonSize, delegate: self, identifier: .oneEyeTurnsYellow, fontSize: fontSize)
+        oneEyeYellow.position = CGPoint.alignHorizontally(oneEyeYellow.frame, relativeTo: allEyesRed.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: verticalPadding, translatedToBounds: true)
+        oneEyeYellow.zPosition = buttonZPosition
+        foreground.addChild(oneEyeYellow)
     }
     
     var rearUpToggle = false
@@ -141,6 +151,22 @@ class BossTestView: ButtonDelegate {
             animator.testAnimateShootingWebs {
                 
             }
+        
+        case .eyesTurnRed:
+            animator.animateBossGettingReadyToAttack(delayBefore: 0.0) { [bossView] in
+                bossView.bossSprite.numberOfRedEyes = 8
+                
+            }
+            
+        case .oneEyeTurnsYellow:
+            bossView.bossSprite.numberOfRedEyes -= 1
+            
+            let eyeIndex = 8 - bossView.bossSprite.numberOfRedEyes
+            animator.animateSingleEyeBecomingYellow(delayBefore: 0.0, eyeNumber: eyeIndex) {
+                
+            }
+            
+        
         default:
             fatalError()
         }

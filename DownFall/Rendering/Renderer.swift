@@ -1141,6 +1141,8 @@ extension Renderer {
             return
         }
         
+        bossView.bossSprite.numberOfRedEyes = 0
+        
         animator.showPillarsGrowing(sprites: sprites, spriteForeground: spriteForeground, bossTileAttacks: grownPillars, tileSize: tileSize) { [weak self] in
             self?.animationsFinished(endTiles: transformation.endTiles)
         }

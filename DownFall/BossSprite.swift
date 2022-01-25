@@ -58,6 +58,19 @@ class BossSprite: SKSpriteNode {
     
     let playableRect: CGRect
     let spiderRatio: CGFloat = 35.0/14.0
+    var monstersInWebs: [(EntityModel.EntityType, CompositeWebSprite)] = []
+    var originalPositions: [(SKSpriteNode, OriginalPositions)] = []
+    var activeSpriteActions: [SpriteAction] = []
+    
+    private var _numberOfRedEyes = 0
+    var numberOfRedEyes: Int {
+        set {
+            _numberOfRedEyes = max(0, newValue)
+        }
+        get {
+            return _numberOfRedEyes
+        }
+    }
     
     var spiderWidth: CGFloat {
         playableRect.width*0.9
@@ -291,7 +304,96 @@ class BossSprite: SKSpriteNode {
     }()
     
     
-    var monstersInWebs: [(EntityModel.EntityType, CompositeWebSprite)] = []
+    private lazy var rockSpritesContainer: SKSpriteNode = {
+        let container = SKSpriteNode(color: .clear, size: CGSize(width: playableRect.width, height: 230.0))
+        return container
+    }()
+    var rockSprites: [SKSpriteNode] = []
+    private var rockZPositionCount: CGFloat = 0
+    enum RockSize {
+        case small
+        case medium
+    }
+    
+    func clearRocks() {
+        rockSprites = []
+        rockZPositionCount = 0
+        rockSpritesContainer.removeAllChildren(exceptChildWithName: largeRockAnimationSpriteName)
+    }
+    
+    func clearLargeRocks() {
+        largeRockAnimationSprite?.removeFromParent()
+        largeRockAnimationSprite = nil
+    }
+    
+    let largeRockAnimationSpriteName = "largeRockAnimationSpriteName"
+    var largeRockAnimationSprite: SKSpriteNode?
+    func createLargeRockAnimation() -> SKSpriteNode {
+        let width: CGFloat = 280
+        let height: CGFloat = 400
+        let spriteSize = CGSize(width: width, height: height)
+        let scaledSize = scaleBodyPart(originalSize: spriteSize, spiderWidth: spiderWidth, spiderHeight: spiderHeight)
+        let sprite = SKSpriteNode(color: .clear, size: scaledSize)
+        
+        sprite.position = CGPoint.position(sprite.frame, inside: rockSpritesContainer.frame, verticalAnchor: .bottom, horizontalAnchor: .center, yOffset: 0.0, xOffset: 0.0, translatedToBounds: true)
+        sprite.zPosition = 4_000_000
+        sprite.name = largeRockAnimationSpriteName
+        
+        rockSprites.append(sprite)
+        rockSpritesContainer.addChild(sprite)
+        largeRockAnimationSprite = sprite
+        
+        return sprite
+
+    }
+    
+    func createRockAnimationContainer(rockSize: RockSize) -> SKSpriteNode {
+        rockZPositionCount += 10
+        // choose a random X offset to place the rock
+        let randomXOffset = (CGFloat(Bool.random() ? -1 : 1)) * CGFloat.random(in: 0...((playableRect.width - 50)/2))
+        
+        // choose a random y offset to give the feeling of depth
+        let randomYOffset = CGFloat.random(in: 0...100)
+        
+        // choose an alpha based on the offset
+        let alpha: CGFloat
+        var scaleFactor: CGFloat
+        let zPosition: CGFloat
+        if randomYOffset < 15 {
+            alpha = 1
+            scaleFactor = 1
+            zPosition = 2_000_000 + rockZPositionCount
+        } else if randomYOffset < 35 {
+            alpha = 0.8
+            scaleFactor = 0.9
+            zPosition = 2_000_000 + rockZPositionCount
+        } else if randomYOffset < 70 {
+            alpha = 0.6
+            scaleFactor = 0.8
+            zPosition = 20_000 + rockZPositionCount
+        } else {
+            alpha = 0.4
+            scaleFactor = 0.7
+            zPosition = 20_000 + rockZPositionCount
+        }
+        
+        // increasing size a bit for animation feel
+        scaleFactor *= 2
+        let width: CGFloat = (rockSize == .small ? 80.0 : 100.0) * scaleFactor
+        let height: CGFloat = 230 * scaleFactor
+        let spriteSize = CGSize(width: width, height: height)
+        let scaledSize = scaleBodyPart(originalSize: spriteSize, spiderWidth: spiderWidth, spiderHeight: spiderHeight)
+        let sprite = SKSpriteNode(color: .clear, size: scaledSize)
+        
+        sprite.position = CGPoint.position(sprite.frame, inside: rockSpritesContainer.frame, verticalAnchor: .bottom, horizontalAnchor: .center, yOffset: randomYOffset, xOffset: randomXOffset, translatedToBounds: true)
+        sprite.alpha = alpha
+        sprite.zPosition = zPosition
+        
+        rockSprites.append(sprite)
+        rockSpritesContainer.addChild(sprite)
+        
+        return sprite
+    }
     
     init(playableRect: CGRect) {
         self.playableRect = playableRect
@@ -334,6 +436,10 @@ class BossSprite: SKSpriteNode {
         
         self.addChild(spiderDynamiteTrain)
         
+        // rock container
+        rockSpritesContainer.position = CGPoint.position(rockSpritesContainer.frame, inside: self.frame, verticalAlign: .bottom, horizontalAnchor: .center, translatedToBounds: true)
+        self.addChild(rockSpritesContainer)
+        
         /// SPIDER HEAD ATTACH
         spiderHead.addChild(spiderTooth)
         spiderHead.addChild(spiderEyelids)
@@ -358,7 +464,6 @@ class BossSprite: SKSpriteNode {
         let zPosition: CGFloat
         let rotation: CGFloat
     }
-    var originalPositions: [(SKSpriteNode, OriginalPositions)] = []
     
     func buildOriginalPositions() {
         originalPositions = self.children.compactMap( { $0 as? SKSpriteNode }).map { child in return (child, OriginalPositions(position: child.position, zPosition: child.zPosition, rotation: child.zRotation)) }
@@ -387,19 +492,6 @@ class BossSprite: SKSpriteNode {
         
         return CGPoint(x: widthRatio, y: heightRatio)
     }
-    
-    
-    var activeSpriteActions: [SpriteAction] = []
-    private var _numberOfRedEyes = 0
-    var numberOfRedEyes: Int {
-        set {
-            _numberOfRedEyes = max(0, newValue)
-        }
-        get {
-            return _numberOfRedEyes
-        }
-    }
-
     
 }
 

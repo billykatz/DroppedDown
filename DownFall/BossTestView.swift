@@ -107,9 +107,15 @@ class BossTestView: ButtonDelegate {
         oneEyeYellow.position = CGPoint.alignHorizontally(oneEyeYellow.frame, relativeTo: allEyesRed.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: verticalPadding, translatedToBounds: true)
         oneEyeYellow.zPosition = buttonZPosition
         foreground.addChild(oneEyeYellow)
+        
+        let bossWorried = ShiftShaft_Button(size: buttonSize, delegate: self, identifier: .worried, fontSize: fontSize)
+        bossWorried.position = CGPoint.alignHorizontally(bossWorried.frame, relativeTo: oneEyeYellow.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: verticalPadding, translatedToBounds: true)
+        bossWorried.zPosition = buttonZPosition
+        foreground.addChild(bossWorried)
     }
     
     var rearUpToggle = false
+    var worriedToggle = false
     
     func buttonTapped(_ button: ShiftShaft_Button) {
         switch button.identifier {
@@ -166,6 +172,13 @@ class BossTestView: ButtonDelegate {
                 
             }
             
+        case .worried:
+            animator.animateBossPhaseChange {
+                
+            }
+//            animator.animateBossWorried(delayBefore: 0.0, reversed: worriedToggle) {
+//                self.worriedToggle.toggle()
+//            }
         
         default:
             fatalError()

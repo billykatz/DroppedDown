@@ -33,10 +33,62 @@ fileprivate var sparkleAnimation5: SpriteSheet = {
 fileprivate var sparkleIndex = 0
 fileprivate var sparkleAnimations = [sparkleAnimation1, sparkleAnimation2, sparkleAnimation3, sparkleAnimation4, sparkleAnimation5].shuffled()
 
+
+fileprivate let eye7Frames = SpriteSheet(textureName: "boss-spider-animation-worried-eye-7-6frames", columns: 6).animationFrames()
+fileprivate let eye8Frames = SpriteSheet(textureName: "boss-spider-animation-worried-eye-8-6frames", columns: 6).animationFrames()
+fileprivate let eyelidFrames = SpriteSheet(textureName: "boss-spider-animation-worried-eyelids-6", columns: 6).animationFrames()
+fileprivate let eyebrowFrames = SpriteSheet(textureName: "boss-spider-animation-worried-eyebrows-6", columns: 6).animationFrames()
+fileprivate let headFrames = SpriteSheet(textureName: "boss-spider-animation-worried-head-6", columns: 6).animationFrames()
+
+/// Small and Medium Rock debris
+fileprivate let smallRockDebrisAnimationNames: [String] = ["blue-rock-falling-animation-14", "purple-rock-falling-animation-14", "red-rock-falling-animation-14"]
+fileprivate let mediumRockDebrisAnimationNames: [String] = ["rock-debris-medium-blue-16", "rock-debris-medium-purple-16", "rock-debris-medium-red-16"]
+
 /// Boss Animations
 extension Animator {
     
     // MARK: - Functions to create SpirteActions
+    func createBossWorriedAnimation(delayBefore: TimeInterval, reversed: Bool) -> [SpriteAction]? {
+        guard let bossSprite = bossSprite else { return nil }
+        
+        var spriteActions: [SpriteAction] = []
+        
+        let animateTimePerFrame = timePerFrame()
+        
+        // create eye-7 animation
+        let eye7Animation = SKAction.animate(with: eye7Frames, timePerFrame: animateTimePerFrame)
+        // eye 7 is 6 in the 0 index array
+        let eye7SpriteAction = SpriteAction.init(bossSprite.spiderIndividualEyes[6], eye7Animation)
+        spriteActions.append(eye7SpriteAction)
+        
+        // create eye-8 animation
+        let eye8Animation = SKAction.animate(with: eye8Frames, timePerFrame: animateTimePerFrame)
+        // eye 8 is 7 in the 0 index array
+        let eye8SpriteAction = SpriteAction.init(bossSprite.spiderIndividualEyes[7], eye8Animation)
+        spriteActions.append(eye8SpriteAction)
+        
+        
+        // create the eyelid animation
+        let eyelidAnimation = SKAction.animate(with: eyelidFrames, timePerFrame: animateTimePerFrame)
+        let eyelidSpriteAction = SpriteAction.init(bossSprite.spiderEyelids, eyelidAnimation)
+        spriteActions.append(eyelidSpriteAction)
+        
+        // create the eyebrow animation
+        let eyebrowAnimation = SKAction.animate(with: eyebrowFrames, timePerFrame: animateTimePerFrame)
+        let eyebrowSpriteAction = SpriteAction.init(bossSprite.spiderEyebrowCrystals, eyebrowAnimation)
+        spriteActions.append(eyebrowSpriteAction)
+        
+        
+        // create the head animation
+        let headAnimation = SKAction.animate(with: headFrames, timePerFrame: animateTimePerFrame)
+        let headSpriteAction = SpriteAction.init(bossSprite.spiderHead, headAnimation)
+        spriteActions.append(headSpriteAction)
+        
+        spriteActions = reverseAndDelayActions(actions: spriteActions, reversed: reversed, delay: delayBefore)
+        
+        return spriteActions
+    }
+    
     func createWebShootingAniamtion(delayBefore: TimeInterval) -> [SpriteAction]? {
         guard let bossSprite = bossSprite else { return nil }
         
@@ -95,7 +147,7 @@ extension Animator {
         spriteAction = spriteAction.waitBefore(delay: delayBefore)
         
         return spriteAction
-
+        
     }
     
     func createAllEyesRed(delayBefore: TimeInterval, reversed: Bool) -> [SpriteAction] {
@@ -133,7 +185,7 @@ extension Animator {
         
         let counterRotateAction = SKAction.rotate(byAngle: counterRotateAmount, duration: counterRotateDuration)
         counterRotateAction.timingMode = .easeInEaseOut
-
+        
         let normalRotateAction = SKAction.rotate(byAngle: rotateAngle + abs(counterRotateAmount), duration: rotateDuration)
         normalRotateAction.timingMode = .easeInEaseOut
         
@@ -226,7 +278,7 @@ extension Animator {
         return spriteActions
         
     }
-
+    
     
     func createSparkleAnimation(delayBefore: TimeInterval) -> SpriteAction? {
         guard let bossSprite = bossSprite else { return nil }
@@ -490,7 +542,7 @@ extension Animator {
         var spriteActions: [SpriteAction] = []
         
         for compositeSprite in compositeSprites {
-                
+            
             /// play animation
             let frames = SpriteSheet(texture: SKTexture(imageNamed: "boss-web-destroyed-animation-10"), rows: 1, columns: 10).animationFrames()
             let webDestroyAnimation = SKAction.animate(with: frames, timePerFrame: timePerFrame())
@@ -583,23 +635,31 @@ extension Animator {
         resetBossThenAnimate(spriteActions, completion: completion)
     }
     
-    func animateEchoEffect(completion: @escaping () -> Void) {
-        guard let bossSprite = bossSprite else { return }
+    func createEchoEffect(delayBefore: TimeInterval) -> [SpriteAction]? {
+        guard let bossSprite = bossSprite else { return nil }
         var spriteActions: [SpriteAction] = []
-        
-        // create 3x copies of the boss sprite
-        var bossSpriteCopies: [SKSpriteNode] = Array(repeating: bossSprite, count: 3)
         
         // add them to the boss sprite
         let startingAlpha = 0.65
+        // create 3x copies of the boss sprite
+        var bossSpriteCopies: [SKSpriteNode] = Array(repeating: bossSprite, count: 3)
         for (idx, sprite) in bossSpriteCopies.enumerated() {
-            let newSprite = sprite.copy() as! SKSpriteNode
+            let newSprite = sprite.copy() as! BossSprite
+            newSprite.clearRocks()
             newSprite.removeFromParent()
             newSprite.position = .zero
             newSprite.alpha = startingAlpha
             bossSpriteCopies[idx] = newSprite
-            bossSprite.addChild(newSprite)
         }
+        
+        let addCopiesAction = SKAction.run { [bossSpriteCopies, bossSprite] in
+            for (idx, sprite) in bossSpriteCopies.enumerated() {
+                bossSprite.addChild(sprite)
+            }
+        }
+        let waitBeforeAdd = SKAction.wait(forDuration: delayBefore)
+        let seq = SKAction.sequence(waitBeforeAdd, addCopiesAction)
+        spriteActions.append(.init(bossSprite, seq))
         
         // animate them scaling to different size and fading out
         let scaleStep: CGFloat = 0.25
@@ -629,7 +689,16 @@ extension Animator {
         
         let fullDuration = delayStart + scaleDuration
         let shakeTheRealSpider = self.shakeNode(node: bossSprite, duration: fullDuration, amp: 10)
+        
         spriteActions.append(shakeTheRealSpider)
+        
+//        spriteActions = reverseAndDelayActions(actions: spriteActions, reversed: false, delay: delayBefore)
+        
+        return spriteActions
+    }
+    
+    func animateEchoEffect(completion: @escaping () -> Void) {
+        guard let spriteActions = createEchoEffect(delayBefore: 0.0) else { return }
         
         resetBossThenAnimate(spriteActions, completion: completion)
         
@@ -730,14 +799,14 @@ extension Animator {
         let moveLeft = animateWalkingAnimation(moveVector: CGVector(dx: -moveAmount, dy: 0))
         resetBossThenAnimate(moveLeft) {
             completion()
-//            let up = animateWalkingAnimation(moveVector: CGVector(dx: 0, dy: moveAmount))
-//            animate(up) {
-//                let right = animateWalkingAnimation(moveVector: CGVector(dx: moveAmount, dy: 0))
-//                animate(right) {
-//                    let down = animateWalkingAnimation(moveVector: CGVector(dx: 0, dy: -moveAmount))
-//                    animate(down, completion: completion)
-//                }
-//            }
+            //            let up = animateWalkingAnimation(moveVector: CGVector(dx: 0, dy: moveAmount))
+            //            animate(up) {
+            //                let right = animateWalkingAnimation(moveVector: CGVector(dx: moveAmount, dy: 0))
+            //                animate(right) {
+            //                    let down = animateWalkingAnimation(moveVector: CGVector(dx: 0, dy: -moveAmount))
+            //                    animate(down, completion: completion)
+            //                }
+            //            }
         }
     }
     
@@ -839,22 +908,22 @@ extension Animator {
     func animateBossGettingReadyToAttack(delayBefore: TimeInterval, completion: @escaping () -> Void) {
         var spriteActions: [SpriteAction] = []
         
-//        var extraWait: TimeInterval = 0.0
-//        let undoAngryFace = createAngryFace(reverse: true, waitBeforeDelay: delayBefore)
-//        extraWait += undoAngryFace.maxDuration()
-//        spriteActions.append(contentsOf: undoAngryFace)
-//
-//        if let bigChomp = createToothChompFirstHalfAnimation(delayBefore: delayBefore)?.reversed {
-//            spriteActions.append(bigChomp)
-//        }
-//
-//
-//        let blink = createFullBlinkAnimation(delayBefore: delayBefore)
-//        extraWait += blink.maxDuration()
-//        spriteActions.append(contentsOf: blink)
+        //        var extraWait: TimeInterval = 0.0
+        //        let undoAngryFace = createAngryFace(reverse: true, waitBeforeDelay: delayBefore)
+        //        extraWait += undoAngryFace.maxDuration()
+        //        spriteActions.append(contentsOf: undoAngryFace)
+        //
+        //        if let bigChomp = createToothChompFirstHalfAnimation(delayBefore: delayBefore)?.reversed {
+        //            spriteActions.append(bigChomp)
+        //        }
+        //
+        //
+        //        let blink = createFullBlinkAnimation(delayBefore: delayBefore)
+        //        extraWait += blink.maxDuration()
+        //        spriteActions.append(contentsOf: blink)
         
-//        let eyesTurnsRed = createAllEyesRed(delayBefore: extraWait + delayBefore, reversed: false)
-//        spriteActions.append(contentsOf: eyesTurnsRed)
+        //        let eyesTurnsRed = createAllEyesRed(delayBefore: extraWait + delayBefore, reversed: false)
+        //        spriteActions.append(contentsOf: eyesTurnsRed)
         
         resetBossThenAnimate(spriteActions, completion: completion)
     }
@@ -912,7 +981,7 @@ extension Animator {
         resetBossThenAnimate(spriteActions, completion: {
             completion()
         })
-
+        
     }
     
     
@@ -920,11 +989,11 @@ extension Animator {
         guard let bossSprite = bossSprite else { return nil }
         
         let trainSprite = bossSprite.spiderDynamiteTrain
-//        let initialPosition = CGPoint.alignVertically(trainSprite.frame, relativeTo: bossSprite.frame, horizontalAnchor: .left, verticalAlign: .bottom, verticalPadding: -25.0, horizontalPadding: -50.0, translatedToBounds: true)
-//        trainSprite.position = initialPosition
+        //        let initialPosition = CGPoint.alignVertically(trainSprite.frame, relativeTo: bossSprite.frame, horizontalAnchor: .left, verticalAlign: .bottom, verticalPadding: -25.0, horizontalPadding: -50.0, translatedToBounds: true)
+        //        trainSprite.position = initialPosition
         
         let trainTargetPosition: CGPoint
-
+        
         if reversed {
             trainTargetPosition = bossSprite.originalSpiderTrainPosition
         } else {
@@ -937,11 +1006,11 @@ extension Animator {
         let trainMoveDuration: TimeInterval = timePerFrame() * 6 * 4 / 2
         let moveIn = SKAction.move(to: trainTargetPosition, duration: trainMoveDuration)
         moveIn.timingMode = .easeInEaseOut
-
+        
         return .init(trainSprite, SKAction.group(loopedAnimation, moveIn).waitBefore(delay: delayBefore))
     }
     
-    func createLegRotateAndMove(delayBefore: TimeInterval, reversed: Bool,  frontRotateSpeed: CGFloat, frontRotateAngle: CGFloat, backRotateSpeed: CGFloat, backRotateAngle: CGFloat, frontMoveX: CGFloat, frontMoveY: CGFloat, backMoveX: CGFloat, backMoveY: CGFloat, moveDuration: TimeInterval) -> [SpriteAction]? {
+    func createLegRotateAndMove(delayBefore: TimeInterval, reversed: Bool,  frontRotateSpeed: CGFloat, frontRotateAngle: CGFloat, backRotateSpeed: CGFloat, backRotateAngle: CGFloat, frontMoveX: CGFloat, frontMoveY: CGFloat, backMoveX: CGFloat, backMoveY: CGFloat, moveDuration: TimeInterval, moveBackLegs: Bool = false) -> [SpriteAction]? {
         guard let bossSprite = bossSprite else { return nil }
         
         var spriteActions: [SpriteAction] = []
@@ -962,6 +1031,9 @@ extension Animator {
                 var legAction = createIndividualLegMovement(legSprite: legSprite, rotateAngle: rotateAngle, rotateSpeed: backRotateSpeed, delayBefore: waitActionDuration, reversed: false)
                 legAction.duration = abs(rotateAngle / backRotateSpeed)
                 spriteActions.append(legAction)
+                if moveBackLegs {
+                    spriteActions.append(.init(legSprite, legMoveAction))
+                }
             }
         }
         
@@ -977,6 +1049,9 @@ extension Animator {
                 var legAction = createIndividualLegMovement(legSprite: legSprite, rotateAngle: rotateAngle, rotateSpeed: backRotateSpeed, delayBefore: waitActionDuration, reversed: false)
                 legAction.duration = abs(rotateAngle / backRotateSpeed)
                 spriteActions.append(legAction)
+                if moveBackLegs {
+                    spriteActions.append(.init(legSprite, legMoveAction))
+                }
             }
         }
         
@@ -997,7 +1072,7 @@ extension Animator {
         let headMoveDown = SKAction.moveBy(x: 0.0, y: headMoveDistance, duration: moveDuration)
         spriteActions.append(.init(bossSprite.spiderBody, bodyMoveDown).reverseAnimation(reverse: reversed).waitBefore(delay: delayBefore))
         spriteActions.append(.init(bossSprite.spiderHead, headMoveDown).reverseAnimation(reverse: reversed).waitBefore(delay: delayBefore))
-    
+        
         
         // legs rotate away from the body and move down with body/head
         // animate the squatting quickly because of poison beam recoil
@@ -1091,7 +1166,7 @@ extension Animator {
             
             spriteActions.append(contentsOf: reversedLegActions)
         }
-
+        
         if let shake = shakeScreen(duration: 0.1, amp: 50, delayBefore: delayBefore + moveDuration) {
             spriteActions.append(shake)
         }
@@ -1165,7 +1240,7 @@ extension Animator {
         }
         
         if delayBefore > 0.0 {
-            spriteActions = spriteActions.map { $0.waitBefore(delay: delayBefore)}
+            spriteActions = spriteActions.map { $0.waitBefore(delay: delayBefore) }
         }
         
         return spriteActions
@@ -1248,7 +1323,7 @@ extension Animator {
             bossSprite.addChild(webSprite)
             
             bossSprite.monstersInWebs.append((monsterType, CompositeWebSprite(ropeSprite: ropeSprite, webSprite: webSprite, monsterSprite: monsterSprite)))
-               
+            
             // bounce the monster into position
             let rateUp: Double = 0.25 / 3 / 70
             let rateDown: Double = 1.0 / 3  / 100
@@ -1325,7 +1400,7 @@ extension Animator {
             completion()
             return
         }
-                
+        
         resetBossThenAnimate(spriteActions, completion: completion)
     }
     
@@ -1342,8 +1417,8 @@ extension Animator {
     func turnEyeCorrectColor(delayBefore: TimeInterval) -> [SpriteAction]? {
         guard let bossSprite = bossSprite,
               bossSprite.numberOfRedEyes > -1 else {
-            return nil
-        }
+                  return nil
+              }
         
         let numberOfRedEyes = bossSprite.numberOfRedEyes
         
@@ -1394,7 +1469,7 @@ extension Animator {
         
         resetBossThenAnimate(spriteActions, completion: completion)
     }
-
+    
     func createResetToOriginalPositionsAnimations(delayBefore: TimeInterval) -> [SpriteAction]? {
         guard let bossSprite = bossSprite else {
             return nil
@@ -1403,21 +1478,22 @@ extension Animator {
         var spriteActions: [SpriteAction] = bossSprite.originalPositions.map { pair -> SpriteAction in
             let moveAction = SKAction.move(to: pair.1.position, duration: 0.0)
             let rotateAction = SKAction.rotate(toAngle: pair.1.rotation, duration: 0.0)
-
+            
             return SpriteAction.init(sprite: pair.0, action: SKAction.group(moveAction, rotateAction))
         }
         
         let undoAngryFace = createAngryFace(reverse: true, waitBeforeDelay: 0.0, animationSpeed: 0.0)
         spriteActions.append(contentsOf: undoAngryFace)
-
+        
         if let undoChomp = createToothChompSecondHalfAnimation(delayBefore: 0.0, animationSpeed: 0.0) {
             spriteActions.append(undoChomp)
         }
         
-//        for monsterSprite in bossSprite.monstersInWebs {
-//            let spriteAction = SpriteAction(monsterSprite.1.monsterSprite, .removeFromParent())
-//            spriteActions.append(spriteAction)
-//        }
+        //        for monsterSprite in bossSprite.monstersInWebs {
+        //            let spriteAction = SpriteAction(monsterSprite.1.monsterSprite, .removeFromParent())
+        //            spriteActions.append(spriteAction)
+        //        }
+        bossSprite.clearRocks()
         
         bossSprite.activeSpriteActions.forEach {
             $0.stop()
@@ -1432,16 +1508,16 @@ extension Animator {
         }
         
         return spriteActions
-
+        
         
     }
     
     func resetBossThenAnimate(_ spriteActions: [SpriteAction], completion: @escaping () -> Void) {
         guard let bossSprite = bossSprite,
-            let resetAnimation = createResetToOriginalPositionsAnimations(delayBefore: 0.0) else {
-            completion()
-            return
-        }
+              let resetAnimation = createResetToOriginalPositionsAnimations(delayBefore: 0.0) else {
+                  completion()
+                  return
+              }
         
         var newSpriteActions = spriteActions
         newSpriteActions.insert(contentsOf: resetAnimation, at: 0)
@@ -1454,6 +1530,271 @@ extension Animator {
         }
     }
     
+    func animateBossWorried(delayBefore: TimeInterval, reversed: Bool, completion: @escaping () -> Void) {
+        if let worriedAnimation = createBossWorriedAnimation(delayBefore: delayBefore, reversed: reversed),
+           let rocksFalling = createRockFallingAnimation(delayBefore: 2.0, numberOfRocks: 10)
+        {
+            var spriteActions = worriedAnimation
+            spriteActions.append(contentsOf: rocksFalling)
+            animate(spriteActions, completion: completion)
+        } else {
+            completion()
+        }
+    }
     
+    func createRockFallingAnimation(delayBefore: TimeInterval, numberOfRocks: Int, rockSize: BossSprite.RockSize? = nil) -> [SpriteAction]? {
+        guard let bossSprite = bossSprite else { return nil }
+        var spriteActions: [SpriteAction] = []
+        
+        for index in 0..<numberOfRocks {
+            let stagger: TimeInterval = Double.random(in: 0...0.0)
+            let newRockSize: BossSprite.RockSize = rockSize ?? (index.isEven ? .medium : .small)
+            let rockSprite = bossSprite.createRockAnimationContainer(rockSize: newRockSize)
+            
+            let rockAnimationName: String
+            let frameNumber: Int
+            switch newRockSize {
+            case .small:
+                rockAnimationName = smallRockDebrisAnimationNames.randomElement()!
+                frameNumber = 14
+            case .medium:
+                rockAnimationName = mediumRockDebrisAnimationNames.randomElement()!
+                frameNumber = 16
+            }
+            
+            let frames = SpriteSheet(textureName: rockAnimationName, columns: frameNumber).animationFrames()
+            let animation = SKAction.animate(with: frames, timePerFrame: timePerFrame())
+            let waitAction = SKAction.wait(forDuration: delayBefore + stagger)
+            let seq = SKAction.sequence(waitAction, animation)
+            let spriteAction = SpriteAction(rockSprite, seq)
+            
+            spriteActions.append(spriteAction)
+            
+        }
+        
+        return spriteActions
+        
+    }
+    
+    func createShakingBuildUp(duration: TimeInterval, targetAmplitiude: Int, delayBefore: TimeInterval) -> [SpriteAction]? {
+        var spriteActions: [SpriteAction] = []
+        
+        let steps: Int = 10
+        let durationSteps = duration / Double(steps)
+        let amplitudeSteps = Double(targetAmplitiude) / Double(steps)
+        
+        for stepIndex in 0..<steps {
+            let duration = durationSteps
+            let amplitudeSteps = amplitudeSteps + (amplitudeSteps * Double(stepIndex))
+            let delayBefore = Double(stepIndex) * durationSteps
+            if let shakeScreen = shakeScreen(duration: duration, amp: Int(amplitudeSteps), delayBefore: delayBefore) {
+                spriteActions.append(shakeScreen)
+            }
+        }
+        
+        return spriteActions
+    }
+    
+    func animateBossPhaseChange(
+        //        sprites: [[DFTileSpriteNode]], spriteForeground: SKNode, bossTileAttacks: [BossTileAttack],
+        completion: @escaping () -> Void) {
+            var spriteActions: [SpriteAction] = []
+            
+            // keep track of waiting
+            var waitBefore: TimeInterval = 0.0
+            
+            // show boss worried
+            if let bossWorried = createBossWorriedAnimation(delayBefore: 0.0, reversed: false) {
+                spriteActions.append(contentsOf: bossWorried)
+            }
+            
+            // start with a show scree shake
+            if let screenShake = createShakingBuildUp(duration: 4.0, targetAmplitiude: 50, delayBefore: 0.0) {
+                spriteActions.append(contentsOf: screenShake)
+            }
+            
+            waitBefore += 1.5
+            
+            // show small rocks falling
+            
+            if let smallRocks = createRockFallingAnimation(delayBefore: waitBefore, numberOfRocks: 10, rockSize: .small) {
+                spriteActions.append(contentsOf: smallRocks)
+            }
+            
+            waitBefore += 1.5
+            
+            if let mediumRocks = createRockFallingAnimation(delayBefore: waitBefore, numberOfRocks: 10, rockSize: .medium) {
+                spriteActions.append(contentsOf: mediumRocks)
+            }
+            
+            waitBefore += 1.0
+            
+            if let largeRocks = createLargeRockFallingAnimation(delayBefore: waitBefore) {
+                spriteActions.append(largeRocks)
+            }
+            
+            waitBefore += 0.2
+            
+            if let bodyCrumbleUnderPressure = createBossBendsUnderPressure(delayBefore: waitBefore, reversed: false) {
+                spriteActions.append(contentsOf: bodyCrumbleUnderPressure)
+            }
+            
+            
+            waitBefore += 1.5
+            
+            // undo worried face
+            if let bossWorried = createBossWorriedAnimation(delayBefore: waitBefore, reversed: true) {
+                spriteActions.append(contentsOf: bossWorried)
+            }
+            
+            
+            waitBefore += 0.5
+
+            // angry face
+            let angryFace = createAngryFace(reverse: false, waitBeforeDelay: waitBefore, animationSpeed: 0.0)
+            spriteActions.append(contentsOf: angryFace)
+            
+            
+            // shake the pile of rocks
+            if let shakeRocks = createShakingRocks(delayBefore: waitBefore, shakeDuration: 0.5) {
+                spriteActions.append(contentsOf: shakeRocks)
+            }
+            
+            waitBefore += 1.5
+            
+            // blow away the rocks!
+            if let blowAwayRocks = createAllRocksCleared(delayBefore: waitBefore) {
+                spriteActions.append(contentsOf: blowAwayRocks)
+            }
+            
+            waitBefore += 0.5
+            
+            if let undoBodyCrumbleUnderPressure = createBossBendsUnderPressure(delayBefore: waitBefore, reversed: true) {
+                spriteActions.append(contentsOf: undoBodyCrumbleUnderPressure)
+            }
+            
+            waitBefore += 0.5
+            
+            // echo
+            if let echo = createEchoEffect(delayBefore: waitBefore) {
+                spriteActions.append(contentsOf: echo)
+            }
+
+
+//            waitBefore += 0.25
+//
+//            // undo angry face
+//            let undoAngryFace = createAngryFace(reverse: true, waitBeforeDelay: waitBefore, animationSpeed: timePerFrame())
+//            spriteActions.append(contentsOf: undoAngryFace)
+
+            animate(spriteActions, completion: completion)
+            
+        }
+    
+    func createShakingRocks(delayBefore: TimeInterval, shakeDuration: TimeInterval) -> [SpriteAction]? {
+        guard let bossSprite = bossSprite else { return nil }
+        var spriteActions: [SpriteAction] = []
+        
+        for rockSprite in bossSprite.rockSprites {
+            let shakeNode0 = shakeNode(node: rockSprite, duration: shakeDuration, amp: 50, delayBefore: delayBefore)
+            let shakeNode1 = shakeNode(node: rockSprite, duration: shakeDuration, amp: 50, delayBefore: delayBefore + 1.0)
+            let shakeNode2 = shakeNode(node: rockSprite, duration: shakeDuration, amp: 50, delayBefore: delayBefore + 2.0)
+            spriteActions.append(shakeNode0)
+            spriteActions.append(shakeNode1)
+            spriteActions.append(shakeNode2)
+        }
+        
+        return spriteActions
+    }
+    
+    func createBossBendsUnderPressure(delayBefore: TimeInterval, reversed: Bool) -> [SpriteAction]? {
+        guard let bossSprite = bossSprite  else { return nil }
+        
+        var spriteActions: [SpriteAction] = []
+        
+        /// BODY MOVEMENT
+        // move the boss's head and body up
+        let moveDuration: TimeInterval = 0.15
+        let bodyMoveDistance: CGFloat = -140.0
+        let headMoveUpDistance: CGFloat = -85.0
+        let bodyMoveDown = SKAction.moveBy(x: 0.0 ,y: bodyMoveDistance, duration: moveDuration)
+        let headMoveUp = SKAction.moveBy(x: 0.0, y: headMoveUpDistance, duration: moveDuration)
+        
+        spriteActions.append(.init(bossSprite.spiderHead, headMoveUp).reverseAnimation(reverse: reversed).waitBefore(delay: delayBefore))
+        spriteActions.append(.init(bossSprite.spiderBody, bodyMoveDown).reverseAnimation(reverse: reversed).waitBefore(delay: delayBefore))
+        
+        /// LEG ANIMATION
+        // animate the boss preparing to stamp it's feet
+        let rotateSpeed: CGFloat = .pi / 2 * 2
+        let frontLegAngles: CGFloat = .pi / 8
+        let backLegAngles: CGFloat = -.pi / 8
+        let backMoveY: CGFloat = -125
+        let frontMoveY: CGFloat = -125
+        
+        if let legsActions = createLegRotateAndMove(delayBefore: delayBefore, reversed: reversed, frontRotateSpeed: rotateSpeed, frontRotateAngle: frontLegAngles, backRotateSpeed: rotateSpeed, backRotateAngle: backLegAngles, frontMoveX: 0.0, frontMoveY: frontMoveY, backMoveX: 0.0, backMoveY: backMoveY, moveDuration: moveDuration, moveBackLegs: true) {
+            spriteActions.append(contentsOf: legsActions)
+        }
+        
+        
+        return spriteActions
+    }
+    
+    func createLargeRockFallingAnimation(delayBefore: TimeInterval) -> SpriteAction? {
+        guard let bossSprite = bossSprite else { return nil }
+        
+        let sprite = bossSprite.createLargeRockAnimation()
+        let frames = SpriteSheet(textureName: "large-rock-debris-13", columns: 13).animationFrames()
+        
+        let wait = SKAction.wait(forDuration: delayBefore)
+        let animation = SKAction.animate(with: frames, timePerFrame: timePerFrame())
+        let seq = SKAction.sequence(wait, animation)
+        
+        return .init(sprite, seq)
+        
+    }
+    
+    func createAllRocksCleared(delayBefore: TimeInterval) -> [SpriteAction]? {
+        guard let bossSprite = bossSprite else { return nil }
+        var spriteActions: [SpriteAction] = []
+        
+        if let rockCleared = createLargeRockCleared(delayBefore: delayBefore) {
+            let clearLargeRocks = SKAction.run { [bossSprite] in
+                bossSprite.clearLargeRocks()
+            }
+            let waitBeforeClearing = SKAction.wait(forDuration: delayBefore + (12.0 * timePerFrame()))
+            let waitThenRemove = SKAction.sequence(waitBeforeClearing, clearLargeRocks)
+            
+            spriteActions.append(rockCleared)
+            spriteActions.append(.init(rockCleared.sprite, waitThenRemove))
+        }
+        
+        let clearSmallAndMediumRocks = SKAction.run { [bossSprite] in
+            bossSprite.clearRocks()
+        }
+        let waitBeforeClearing = SKAction.wait(forDuration: delayBefore + 0.35)
+        let seq = SKAction.sequence(waitBeforeClearing, clearSmallAndMediumRocks)
+        let spriteAction = SpriteAction(bossSprite, seq)
+        
+        spriteActions.append(spriteAction)
+        
+        
+        return spriteActions
+    }
+    
+    func createLargeRockCleared(delayBefore: TimeInterval) -> SpriteAction? {
+        guard let largeRockSprite = bossSprite?.largeRockAnimationSprite else { return nil }
+        
+        let frames = SpriteSheet(textureName: "large-rock-debris-cleared-12", columns: 12).animationFrames()
+        
+        let wait = SKAction.wait(forDuration: delayBefore)
+        let animation = SKAction.animate(with: frames, timePerFrame: timePerFrame())
+        let seq = SKAction.sequence(wait, animation)
+        
+        
+        var spriteAction: SpriteAction = .init(largeRockSprite, seq)
+        spriteAction.duration = 12 * timePerFrame()
+        return spriteAction
+    }
 }
+
 

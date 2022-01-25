@@ -58,5 +58,7 @@ public extension Int {
         return multipleOfInterval * interval
     }
     
-
+    var isEven: Bool {
+        return self.isMultiple(of: 2)
+    }
 }

@@ -925,6 +925,12 @@ extension Renderer {
         
         if let pillarsThatTakeDamage = transformation.pillarsTakeDamage {
             removedAnimations.append(contentsOf: animator.createPillarTakingDamage(sprites: sprites, pillarsThatTakeDamage: pillarsThatTakeDamage))
+            
+            // animate some rocks falling to indicate to the player that the boss doesnt like that
+            if let showRocks = animator.createRockFallingAnimation(delayBefore: 0.0, numberOfRocks: pillarsThatTakeDamage.count, rockSize: nil) {
+                animator.animate(showRocks) {}
+            }
+            
         }
         
         // MARK: Add gem sprites to the board

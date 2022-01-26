@@ -26,8 +26,8 @@ class BossTestView: ButtonDelegate {
         
         testSpriteForeground = SKNode()
         self.foreground.addChild(testSpriteForeground)
-        
         self.animator = Animator(foreground: foreground, tileSize: 64, bossSprite: bossView.bossSprite,  playableRect: playableRect)
+        
         let verticalPadding = 20.0
         
         foreground.addChild(bossView)

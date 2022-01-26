@@ -11,6 +11,7 @@ import SpriteKit
 class BossTestView: ButtonDelegate {
     
     let foreground: SKNode
+    let testSpriteForeground: SKNode
     let playableRect: CGRect
     
     let bossView: BossView
@@ -22,6 +23,9 @@ class BossTestView: ButtonDelegate {
         
         bossView = BossView(playableRect: playableRect, tileSize: 100, spriteProvider: { [] })
         bossView.position = bossView.position.translateVertically(-100)
+        
+        testSpriteForeground = SKNode()
+        self.foreground.addChild(testSpriteForeground)
         
         self.animator = Animator(foreground: foreground, tileSize: 64, bossSprite: bossView.bossSprite,  playableRect: playableRect)
         let verticalPadding = 20.0
@@ -112,6 +116,11 @@ class BossTestView: ButtonDelegate {
         bossWorried.position = CGPoint.alignHorizontally(bossWorried.frame, relativeTo: oneEyeYellow.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: verticalPadding, translatedToBounds: true)
         bossWorried.zPosition = buttonZPosition
         foreground.addChild(bossWorried)
+        
+        let bossStomps = ShiftShaft_Button(size: buttonSize, delegate: self, identifier: .bossStomps, fontSize: fontSize)
+        bossStomps.position = CGPoint.alignHorizontally(bossStomps.frame, relativeTo: bossWorried.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: verticalPadding, translatedToBounds: true)
+        bossStomps.zPosition = buttonZPosition
+        foreground.addChild(bossStomps)
     }
     
     var rearUpToggle = false
@@ -144,6 +153,7 @@ class BossTestView: ButtonDelegate {
                 
             }
         case .resetPositions:
+            testSpriteForeground.removeAllChildren()
             animator.animateResetToOriginalPositions(delayBefore: 0.0) {
                 
             }
@@ -180,6 +190,12 @@ class BossTestView: ButtonDelegate {
 //                self.worriedToggle.toggle()
 //            }
         
+        case .bossStomps:
+            let rockAttacks = [BossTileAttack(.rock(color: .brown, holdsGem: false, groupCount: 1), .zero)]
+            let monsterAttacks = [BossTileAttack(.monster(.monsterWithRandomType()) , .zero)]
+            animator.animateBossPhaseChangeAnimation(spriteForground: testSpriteForeground, sprites: [[DFTileSpriteNode.init(type: .empty, height: 75, width: 75)]], bossPhaseChangeTargets: BossPhaseTargets(createPillars: nil, spawnMonsters: monsterAttacks, throwRocks: rockAttacks), delayBefore: 0.0, positionInForeground: { _ in  return .zero }) {
+                
+            }
         default:
             fatalError()
         }

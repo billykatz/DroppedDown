@@ -42,7 +42,7 @@ class BossView: SKSpriteNode {
         
         self.bossSprite = BossSprite(playableRect: playableRect)
         
-        bossSprite.position = CGPoint.position(bossSprite.frame, inside: playableRect, verticalAlign: .top, horizontalAnchor: .center, yOffset: 250)
+        bossSprite.position = CGPoint.position(bossSprite.frame, inside: playableRect, verticalAlign: .top, horizontalAnchor: .center, yOffset: 240)
         bossSprite.zPosition = 100_000
         
         super.init(texture: nil, color: .clear, size: playableRect.size)

@@ -368,9 +368,20 @@ class TileCreator: TileStrategy {
         }
         
         // place the pillars
-        let pillarCoordinates: Set<TileCoord> = Set(level.pillarCoordinates.map { $0.coord })
+        var pillarCoordinates: Set<TileCoord> = Set(level.pillarCoordinates.map { $0.coord })
         for (pillar) in level.pillarCoordinates {
             tiles[pillar.coord.row][pillar.coord.column] = Tile(type: pillar.pillar)
+        }
+        
+        // reserve special level start tile coords
+        for levelStartTile in level.levelStartTiles {
+            if case TileType.monster(let monster) = levelStartTile.tileType,
+                let entity = entities.entity(with: monster.type) {
+                tiles[levelStartTile.tileCoord.row][levelStartTile.tileCoord.col] = Tile(type: TileType.monster(entity))
+            } else {
+                tiles[levelStartTile.tileCoord.row][levelStartTile.tileCoord.col] = Tile(type: levelStartTile.tileType)
+            }
+            pillarCoordinates.insert(levelStartTile.tileCoord)
         }
         
         // place the player in a quadrant

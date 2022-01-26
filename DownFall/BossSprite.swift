@@ -315,6 +315,18 @@ class BossSprite: SKSpriteNode {
         case medium
     }
     
+    func hideSmallMediumRocks() {
+        rockSpritesContainer.children.forEach { node in
+            if node.name != largeRockAnimationSpriteName {
+                node.alpha = 0.0
+            }
+        }
+    }
+    
+    func hideLargeRock() {
+        rockSpritesContainer.childNode(withName: largeRockAnimationSpriteName)?.alpha = 0.0
+    }
+    
     func clearRocks() {
         rockSprites = []
         rockZPositionCount = 0
@@ -437,7 +449,7 @@ class BossSprite: SKSpriteNode {
         self.addChild(spiderDynamiteTrain)
         
         // rock container
-        rockSpritesContainer.position = CGPoint.position(rockSpritesContainer.frame, inside: self.frame, verticalAlign: .bottom, horizontalAnchor: .center, translatedToBounds: true)
+        rockSpritesContainer.position = CGPoint.position(rockSpritesContainer.frame, inside: self.frame, verticalAlign: .bottom, horizontalAnchor: .center,  xOffset: 0.0, yOffset: 10.0, translatedToBounds: true)
         self.addChild(rockSpritesContainer)
         
         /// SPIDER HEAD ATTACH

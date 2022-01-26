@@ -24,7 +24,13 @@ func targetRocksToEat(in tiles: [[Tile]], numberRocksToEat: Int) -> [TileCoord] 
         let newTarget = randomCoord(in: tiles, notIn: notTargetable)
         
         if case TileType.rock(color: let color, _, _) = tiles[newTarget].type {
+            // reset array of rocks the boss can eat
             if eatenColors.count == edibleRockColors.count { eatenColors = [] }
+            
+            // make sure we only eat red, purple and brown rocks
+            guard edibleRockColors.contains(color) else { continue }
+            
+            // eat the rock if we havent eaten this type of rock already
             if !eatenColors.contains(color) {
                 eatenColors.append(color)
                 // do not target this tile in the next loop
@@ -165,7 +171,13 @@ func nonAttackableCoords(tiles: [[Tile]]) -> Set<TileCoord> {
         for col in 0..<tiles.count {
             let coord = TileCoord(row, col)
             switch tiles[row][col].type {
-            case .monster, .player, .pillar:
+            case .rock(color: let color, _, _):
+                if color == .brown || color == .green {
+                    reservedCoords.insert(coord)
+                } else {
+                    // purposefully left blank
+                }
+            case .monster, .player, .pillar, .offer, .item, .dynamite:
                 reservedCoords.insert(coord)
             default:
                 break
@@ -303,7 +315,9 @@ func turnsInState(_ state: BossStateType) -> Int {
         return 0
     case .rests:
         return 8
-    case .phaseChange, .superAttack, .targetSuperAttack:
+    case .phaseChange:
+        return 1
+    case .superAttack, .targetSuperAttack:
         return 0
     }
 }

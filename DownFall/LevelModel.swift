@@ -53,6 +53,11 @@ struct PillarCoorindates: Codable, Hashable {
     
 }
 
+struct LevelStartTiles: Codable, Hashable {
+    let tileType: TileType
+    let tileCoord: TileCoord
+}
+
 class Level: Codable, Hashable {
     let depth: Depth
     let monsterTypeRatio: [EntityModel.EntityType: RangeModel]
@@ -68,6 +73,7 @@ class Level: Codable, Hashable {
     let potentialItems: [StoreOffer]
     var gemsSpawned: Int
     var monsterSpawnTurnTimer: Int
+    let levelStartTiles: [LevelStartTiles]
     
     init(
         depth: Depth,
@@ -83,7 +89,8 @@ class Level: Codable, Hashable {
         savedBossPhase: BossPhase?,
         potentialItems: [StoreOffer],
         gemsSpawned: Int,
-        monsterSpawnTurnTimer: Int
+        monsterSpawnTurnTimer: Int,
+        levelStartTiles: [LevelStartTiles]
     ) {
         self.depth = depth
         self.monsterTypeRatio = monsterTypeRatio
@@ -99,6 +106,7 @@ class Level: Codable, Hashable {
         self.potentialItems = potentialItems
         self.gemsSpawned = gemsSpawned
         self.monsterSpawnTurnTimer = monsterSpawnTurnTimer
+        self.levelStartTiles = levelStartTiles
     }
     
     static func ==(_ lhs: Level, _ rhs: Level) -> Bool {
@@ -176,5 +184,5 @@ class Level: Codable, Hashable {
         }
     }
         
-    static let zero = Level(depth: 0, monsterTypeRatio: [:], monsterCountStart: 0, maxMonsterOnBoardRatio: 0.0, boardSize: 0, tileTypeChances: TileTypeChanceModel(chances: [.empty: 1]), pillarCoordinates: [], goals: [LevelGoal(type: .unlockExit, tileType: .empty, targetAmount: 0, minimumGroupSize: 0, grouped: false)], maxSpawnGems: 0, goalProgress: [], savedBossPhase: nil, potentialItems: [], gemsSpawned: 0, monsterSpawnTurnTimer: 0)
+    static let zero = Level(depth: 0, monsterTypeRatio: [:], monsterCountStart: 0, maxMonsterOnBoardRatio: 0.0, boardSize: 0, tileTypeChances: TileTypeChanceModel(chances: [.empty: 1]), pillarCoordinates: [], goals: [LevelGoal(type: .unlockExit, tileType: .empty, targetAmount: 0, minimumGroupSize: 0, grouped: false)], maxSpawnGems: 0, goalProgress: [], savedBossPhase: nil, potentialItems: [], gemsSpawned: 0, monsterSpawnTurnTimer: 0, levelStartTiles: [])
 }

@@ -192,7 +192,7 @@ class Renderer: SKSpriteNode {
         }
         
         #if DEBUG
-        foreground.addChild(bossDebugView)
+//        foreground.addChild(bossDebugView)
         #endif
         
         // Register for Dispatch
@@ -1136,15 +1136,23 @@ extension Renderer {
     }
     
     private func showBossPhaseChangeAttacks(in transformation: Transformation, bossPhase: BossPhase) {
-        guard let grownPillars = bossPhase.phaseChangeTagets.createPillars else {
+        guard let _ = bossPhase.phaseChangeTagets.spawnMonsters,
+              let _ = bossPhase.phaseChangeTagets.throwRocks
+        else {
             animationsFinished(endTiles: transformation.endTiles)
             return
         }
         
-        bossView.bossSprite.numberOfRedEyes = 0
+        sprites.forEach{ $0.forEach { $0.removeTargetToEatIndicator() } }
         
-        animator.showPillarsGrowing(sprites: sprites, spriteForeground: spriteForeground, bossTileAttacks: grownPillars, tileSize: tileSize) { [weak self] in
-            self?.animationsFinished(endTiles: transformation.endTiles)
+        bossView.bossSprite.numberOfRedEyes = 0
+        let positionInForeground = self.positionInForeground(at:)
+        
+        animator.animateBossPhaseChange { [weak self, spriteForeground, sprites, positionInForeground] in
+            self?.animator.animateBossPhaseChangeAnimation(spriteForground: spriteForeground, sprites: sprites, bossPhaseChangeTargets: bossPhase.phaseChangeTagets, delayBefore: 0.0, positionInForeground: positionInForeground, completion: { [weak self] in
+                self?.animationsFinished(endTiles: transformation.endTiles)
+            })
+            
         }
         
     }

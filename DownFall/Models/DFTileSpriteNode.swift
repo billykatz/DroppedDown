@@ -102,11 +102,17 @@ class DFTileSpriteNode: SKSpriteNode {
         self.addChild(xAmountLabel)
     }
     
+    let targetToEatIndicatorName = "TargetToEatIndicator"
     func indicateSpriteWillBeEaten() {
         let indicatorSprite = SKSpriteNode(texture: SKTexture(imageNamed: "target-eat"), size: self.size)
         indicatorSprite.zPosition = Precedence.background.rawValue
         indicatorSprite.alpha = 0.5
+        indicatorSprite.name = targetToEatIndicatorName
         self.addChild(indicatorSprite)
+    }
+    
+    func removeTargetToEatIndicator() {
+        self.childNode(withName: targetToEatIndicatorName)?.removeFromParent()
     }
     
     /**

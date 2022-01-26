@@ -33,8 +33,30 @@ struct LevelConstructor {
             savedBossPhase: nil,
             potentialItems: potentialItems(depth: depth, unlockables: unlockables, startingUnlockables: startingUnlockables, playerData: playerData, randomSource: randomSource, isTutorial: isTutorial),
             gemsSpawned: 0,
-            monsterSpawnTurnTimer: 0
+            monsterSpawnTurnTimer: 0,
+            levelStartTiles: createLevelStartTiles(depth: depth)
         )
+    }
+    
+    static func createLevelStartTiles(depth: Depth) -> [LevelStartTiles] {
+        guard depth == bossLevelDepthNumber else { return [] }
+        
+        let toughMonster: EntityModel.EntityType = Bool.random() ? .bat : .sally
+        let goodReward = TileType.item(Item(type: .gem, amount: 100, color: .blue))
+        
+        let coord1 = TileCoord(6, 4)
+        let coord2 = TileCoord(2, 4)
+        let coords = [coord1, coord2]
+        
+        let monsterEntity = EntityModel(originalHp: 1, hp: 1, name: toughMonster.textureString, attack: .zero, type: toughMonster, carry: .zero, animations: [], pickaxe: nil, effects: [], dodge: 0, luck: 0, killedBy: nil)
+        
+        let (newCoords, element) = coords.dropRandom()
+        let monsterStartTile = LevelStartTiles(tileType: TileType.monster(monsterEntity), tileCoord: element!)
+        
+        let rewardStartTile = LevelStartTiles(tileType: goodReward, tileCoord: newCoords.first!)
+        
+        return [monsterStartTile, rewardStartTile]
+        
     }
     
     static func potentialItems(depth: Depth, unlockables: [Unlockable], startingUnlockables: [Unlockable], playerData: EntityModel, randomSource: GKLinearCongruentialRandomSource, isTutorial: Bool) -> [StoreOffer] {
@@ -504,64 +526,71 @@ struct LevelConstructor {
 
     
     static func bossPillars() -> [PillarCoorindates] {
-        let pillarColors: [ShiftShaft_Color] = [.blue, .blue, .blue, .purple, .purple, .purple, .red, .red, .red]
-        let coords: [TileCoord] = [
-            TileCoord(3, 3), TileCoord(4, 3), TileCoord(5, 3),
-            TileCoord(3, 4), TileCoord(4, 4), TileCoord(5, 4),
-            TileCoord(3, 5), TileCoord(4, 5), TileCoord(5, 5)
+        
+        let newPillarColors = [.blue, .blue, .purple, .purple, .red, .red, ShiftShaft_Color.pillarCases.randomElement()!, ShiftShaft_Color.pillarCases.randomElement()!]
+        let newPillarCoords: [TileCoord] = [
+            TileCoord(7, 4), TileCoord(5, 4), TileCoord(6, 3), TileCoord(6, 5),
+            TileCoord(3, 4), TileCoord(1, 4), TileCoord(2, 3), TileCoord(2, 5),
         ]
         
-        let pillarColorsChoice2: [ShiftShaft_Color] = [.blue, .blue, .blue, .blue, .purple, .purple, .purple, .purple, .red, .red, .red, .red]
-        let coordsChoice2: [TileCoord] = [
-            TileCoord(0, 1), TileCoord(0, 0), TileCoord(1, 0),
-            TileCoord(7, 0), TileCoord(8, 0), TileCoord(8, 1),
-            TileCoord(8, 7), TileCoord(8, 8), TileCoord(7, 8),
-            TileCoord(0, 8), TileCoord(0, 7), TileCoord(1, 8)
-        ]
+//        let pillarColors: [ShiftShaft_Color] = [.blue, .blue, .blue, .purple, .purple, .purple, .red, .red, .red]
+//        let coords: [TileCoord] = [
+//            TileCoord(3, 3), TileCoord(4, 3), TileCoord(5, 3),
+//            TileCoord(3, 4), TileCoord(4, 4), TileCoord(5, 4),
+//            TileCoord(3, 5), TileCoord(4, 5), TileCoord(5, 5)
+//        ]
+//
+//        let pillarColorsChoice2: [ShiftShaft_Color] = [.blue, .blue, .blue, .blue, .purple, .purple, .purple, .purple, .red, .red, .red, .red]
+//        let coordsChoice2: [TileCoord] = [
+//            TileCoord(0, 1), TileCoord(0, 0), TileCoord(1, 0),
+//            TileCoord(7, 0), TileCoord(8, 0), TileCoord(8, 1),
+//            TileCoord(8, 7), TileCoord(8, 8), TileCoord(7, 8),
+//            TileCoord(0, 8), TileCoord(0, 7), TileCoord(1, 8)
+//        ]
+//
+//        let pillarColorsChoice3: [ShiftShaft_Color] = [.blue, .blue, .blue, .blue, .blue, .blue, .purple, .purple, .purple, .purple, .purple, .red, .red, .red, .red, .red]
+//        let coordsChoice3: [TileCoord] =    [
+//            TileCoord(6,2),
+//            TileCoord(5,2),
+//            TileCoord(4,2),
+//            TileCoord(3,2),
+//            TileCoord(5,3),
+//            TileCoord(4,3),
+//            TileCoord(3,3),
+//            TileCoord(2,3),
+//            TileCoord(5,5),
+//            TileCoord(4,5),
+//            TileCoord(3,5),
+//            TileCoord(2,5),
+//            TileCoord(6,6),
+//            TileCoord(5,6),
+//            TileCoord(4,6),
+//            TileCoord(3,6),
+//        ]
+//
+//        let pillarColorsChoice4: [ShiftShaft_Color] = [.blue, .blue, .blue, .blue, .purple, .purple, .purple, .purple, .purple, .red, .red, .red, .red, .red]
+//        let coordsChoice4: [TileCoord] =    [
+//            TileCoord(5,2),
+//            TileCoord(4,2),
+//            TileCoord(7,3),
+//            TileCoord(6,3),
+//            TileCoord(5,3),
+//            TileCoord(4,3),
+//            TileCoord(7,4),
+//            TileCoord(6,4),
+//            TileCoord(7,5),
+//            TileCoord(6,5),
+//            TileCoord(5,5),
+//            TileCoord(4,5),
+//            TileCoord(5,6),
+//            TileCoord(4,6),
+//        ]
+//
+//        let chosenColors = [pillarColors, pillarColorsChoice2, pillarColorsChoice3, pillarColorsChoice4]
+//        let chosenCoords = [coords, coordsChoice2, coordsChoice3, coordsChoice4]
+//        let randomIdx = Int.random(chosenColors.count)
         
-        let pillarColorsChoice3: [ShiftShaft_Color] = [.blue, .blue, .blue, .blue, .blue, .blue, .purple, .purple, .purple, .purple, .purple, .red, .red, .red, .red, .red]
-        let coordsChoice3: [TileCoord] =    [
-            TileCoord(6,2),
-            TileCoord(5,2),
-            TileCoord(4,2),
-            TileCoord(3,2),
-            TileCoord(5,3),
-            TileCoord(4,3),
-            TileCoord(3,3),
-            TileCoord(2,3),
-            TileCoord(5,5),
-            TileCoord(4,5),
-            TileCoord(3,5),
-            TileCoord(2,5),
-            TileCoord(6,6),
-            TileCoord(5,6),
-            TileCoord(4,6),
-            TileCoord(3,6),
-        ]
-        
-        let pillarColorsChoice4: [ShiftShaft_Color] = [.blue, .blue, .blue, .blue, .purple, .purple, .purple, .purple, .purple, .red, .red, .red, .red, .red]
-        let coordsChoice4: [TileCoord] =    [
-            TileCoord(5,2),
-            TileCoord(4,2),
-            TileCoord(7,3),
-            TileCoord(6,3),
-            TileCoord(5,3),
-            TileCoord(4,3),
-            TileCoord(7,4),
-            TileCoord(6,4),
-            TileCoord(7,5),
-            TileCoord(6,5),
-            TileCoord(5,5),
-            TileCoord(4,5),
-            TileCoord(5,6),
-            TileCoord(4,6),
-        ]
-        
-        let chosenColors = [pillarColors, pillarColorsChoice2, pillarColorsChoice3, pillarColorsChoice4]
-        let chosenCoords = [coords, coordsChoice2, coordsChoice3, coordsChoice4]
-        let randomIdx = Int.random(chosenColors.count)
-        
-        return matchupPillarsRandomly(colors: chosenColors[randomIdx], coordinatess: chosenCoords[randomIdx])
+        return matchupPillarsRandomly(colors: newPillarColors, coordinatess: newPillarCoords)
     }
     
     static func matchupPillarsRandomly(colors:[ShiftShaft_Color], coordinatess: [TileCoord]) -> [PillarCoorindates] {

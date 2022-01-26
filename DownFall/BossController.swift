@@ -336,10 +336,34 @@ enum BossPhaseType: String, Codable {
         case .dead: return 0
         }
     }
+    
+    var rocksToSpawn: Int {
+        switch self {
+        case .first:
+            return 0
+        case .second:
+            return 4
+        case .third:
+            return 8
+        case .dead:
+            return 0
+        }
+    }
+    
+    var monstersToSpawn: Int {
+        switch self {
+        case .first: return 0
+        case .second: return 2
+        case .third: return 4
+        case .dead: return 0
+        }
+    }
 }
 
 struct BossPhaseTargets: Codable, Hashable {
     let createPillars: [BossTileAttack]?
+    let spawnMonsters: [BossTileAttack]?
+    let throwRocks: [BossTileAttack]?
 }
 
 struct BossPhase: Codable, Hashable {
@@ -358,7 +382,7 @@ struct BossPhase: Codable, Hashable {
         self.bossState = bossState
         self.bossPhaseType = bossPhaseType
         self.numberOfIndividualColumns = Double(numberColumns)
-        self.phaseChangeTagets = bossPhaseChangeTargets ?? BossPhaseTargets(createPillars: nil)
+        self.phaseChangeTagets = bossPhaseChangeTargets ?? BossPhaseTargets(createPillars: nil, spawnMonsters: nil, throwRocks: nil)
         self.eatenRocks = eatenRocks
     }
     
@@ -386,31 +410,54 @@ struct BossPhase: Codable, Hashable {
             let phaseChangeBossState = BossState(stateType: .phaseChange, turnsLeftInState: turnsInState(.phaseChange), targets: BossTargets())
             
             // lets calculate the phase change targets
-            let nextPhaseChangeTagets = BossPhaseTargets(createPillars: calculatePhaseChangeTargets(nextPhase: nextBossPhaseType, tiles: tiles))
+            let nextPhaseChangeTargets: BossPhaseTargets = calculatePhaseChangeTargets(nextPhase: nextBossPhaseType, tiles: tiles)
+//            let nextPhaseChangeTagets = BossPhaseTargets(createPillars: calculatePhaseChangeTargets(nextPhase: nextBossPhaseType, tiles: tiles), spawnMonsters: nil, throwRocks: nil)
             
             // grab the extra number of columns
-            let numberOfAdditionalColumns = (nextPhaseChangeTagets.createPillars?.count ?? 0) * 3
+            let numberOfAdditionalColumns = (nextPhaseChangeTargets.createPillars?.count ?? 0) * 3
             
             // create the next boss phase that will be returned
-            nextBossPhase = BossPhase(bossState: phaseChangeBossState, bossPhaseType: nextBossPhaseType, numberColumns: Int(numberOfIndividualColumns)+numberOfAdditionalColumns, bossPhaseChangeTargets: nextPhaseChangeTagets, eatenRocks: eatenRocks)
+            nextBossPhase = BossPhase(bossState: phaseChangeBossState, bossPhaseType: nextBossPhaseType, numberColumns: Int(numberOfIndividualColumns)+numberOfAdditionalColumns, bossPhaseChangeTargets: nextPhaseChangeTargets, eatenRocks: eatenRocks)
             
         }
         
         return (nextBossPhase, sendInput)
     }
     
-    func calculatePhaseChangeTargets(nextPhase: BossPhaseType, tiles: [[Tile]]) -> [BossTileAttack] {
-        var growColumnsCoord = Set<BossTileAttack>()
+    func calculatePhaseChangeTargets(nextPhase: BossPhaseType, tiles: [[Tile]]) -> BossPhaseTargets {
+        var rocksThrown = Set<BossTileAttack>()
+        var monstersSpawned = Set<BossTileAttack>()
         
-        let nonTargetable = nonGrowableCoords(tiles: tiles)
-        while growColumnsCoord.count < nextPhase.columnsToGrow {
+        var nonTargetable = nonGrowableCoords(tiles: tiles)
+        var maxCount = 100
+        while (rocksThrown.count < nextPhase.rocksToSpawn) || maxCount <= 0 {
             let randomCoord = randomCoord(in: tiles, notIn: nonTargetable)
-            growColumnsCoord.insert(BossTileAttack(TileType.pillar(.random), randomCoord))
+            rocksThrown.insert(BossTileAttack(TileType.rock(color: .brown, holdsGem: false, groupCount: 1), randomCoord))
+            nonTargetable.insert(randomCoord)
+            maxCount -= 1
         }
         
-        return Array(growColumnsCoord)
+        maxCount = 100
+        while (monstersSpawned.count < nextPhase.monstersToSpawn) || (maxCount <= 0) {
+            let randomCoord = randomCoord(in: tiles, notIn: nonTargetable)
+            let randomMonster = EntityModel.monsterWithRandomType()
+            let alreadySpawnedThisTypeOfMonster = monstersSpawned.contains(where: { bossTileAttack in
+                if case TileType.monster(let monster) =  bossTileAttack.tileType {
+                    return randomMonster.type == monster.type
+                } else {
+                    return false
+                }
+            })
+            if !alreadySpawnedThisTypeOfMonster {
+                monstersSpawned.insert(BossTileAttack(TileType.monster(randomMonster), randomCoord))
+                nonTargetable.insert(randomCoord)
+            }
+            maxCount -= 1
+        }
         
+        return BossPhaseTargets(createPillars: nil, spawnMonsters: Array(monstersSpawned), throwRocks: Array(rocksThrown))
     }
+
     
     func nextPhase(tiles: [[Tile]]) -> BossPhaseType {
         switch bossPhaseType {
@@ -423,7 +470,7 @@ struct BossPhase: Codable, Hashable {
             }
         case .second:
             let healthLeft = pillarHealthCount(for: tiles)
-            if Double(healthLeft) <= numberOfIndividualColumns*0.40 {
+            if Double(healthLeft) <= numberOfIndividualColumns*0.33 {
                 return .third
             } else {
                 return .second

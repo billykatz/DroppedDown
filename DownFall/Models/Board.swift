@@ -331,18 +331,30 @@ class Board: Equatable {
         return Transformation(transformation: nil, inputType: input.type, endTiles: self.tiles)
     }
     
-    // Take the boss pahse change targets and throw them into a transformation!
+    // Take the boss phase change targets and throw them into a transformation!
     private func bossPhaseChange(input: Input) -> Transformation {
         guard case let InputType.bossPhaseStart(phase) = input.type else { return .zero }
         var tileTransformation: [TileTransformation] = []
-        if let bossTileAttacks = phase.phaseChangeTagets.createPillars {
-            bossTileAttacks.forEach { bossTileAttack in
+        if let spawnMonsterAttacks = phase.phaseChangeTagets.spawnMonsters {
+            spawnMonsterAttacks.forEach { bossTileAttack in
+                let coord = bossTileAttack.tileCoord
+                if let type = bossTileAttack.tileType.entityType,
+                   let newMonster = tileCreator.monsterWithType(type) {
+                    tiles[coord.row][coord.col] = newMonster
+                    tileTransformation.append(.init(coord, coord))
+                }
+            }
+        }
+        
+        if let throwRocks = phase.phaseChangeTagets.throwRocks {
+            throwRocks.forEach { bossTileAttack in
                 let coord = bossTileAttack.tileCoord
                 tiles[coord.row][coord.col] = Tile(type: bossTileAttack.tileType)
                 tileTransformation.append(.init(coord, coord))
             }
         }
         
+        // turns off flags for targeting to eat in the case that we phase change right as the boss is going to eat
         let _ = resetBossFlags(input: input)
         
         return Transformation(transformation: (tileTransformation.isEmpty ? nil : tileTransformation), inputType: input.type, endTiles: self.tiles)
@@ -1926,12 +1938,15 @@ extension Board {
             // and the pillar takes one damage
             tiles[attackerPosition.x][attackerPosition.y] = Tile(type: TileType.monster(monsterModel.didAttack()))
             pillarsThatTakeDamage.append(.init(tileType: .pillar(data), tileCoord: defenderPosition))
-            if data.health == 1 {
-                tiles[defenderPosition.x][defenderPosition.y] = Tile.empty
-            } else {
-                tiles[defenderPosition.x][defenderPosition.y] = Tile(type: .pillar(PillarData(color: data.color, health: data.health - 1)))
-                
-            }
+            
+            /// I purposefully hid some monsters in the Pillars in the boss level.  I think it better if they dont destroy the pillars they are trapped in
+            /// I have been a mistake so ill just leave this code in here
+//            if data.health == 1 {
+//                tiles[defenderPosition.x][defenderPosition.y] = Tile.empty
+//            } else {
+//                tiles[defenderPosition.x][defenderPosition.y] = Tile(type: .pillar(PillarData(color: data.color, health: data.health - 1)))
+//
+//            }
         } else if case let .monster(monsterModel) = tiles[attackerPosition].type,
                   defenderPostion == nil {
             //just note that the monster attacked

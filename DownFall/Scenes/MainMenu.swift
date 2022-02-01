@@ -10,6 +10,7 @@ import SpriteKit
 
 protocol MainMenuDelegate: AnyObject {
     func newGame(_ playerModel: EntityModel?)
+    func statsViewSelected()
     func optionsSelected()
     func continueRun()
     func menuStore()
@@ -23,7 +24,11 @@ class MainMenu: SKScene {
         static let buttonPadding = CGFloat(50.0)
         static let notificationName = "notificationRed"
         static let blankButtonName = "blankButton"
+        static let soundIconName = "soundSprite"
+        static let musicIconName = "musicSprite"
+        static let toggleIconName = "toggleSprite"
         static let feedbackFormURLString = "https://linktr.ee/shiftshaft"
+
     }
     
     private var background: SKSpriteNode!
@@ -88,7 +93,7 @@ class MainMenu: SKScene {
         
         
         let startButton = ShiftShaft_Button(size: .buttonExtralarge, delegate: self, identifier: .newGame, image: SKSpriteNode(imageNamed: Constants.blankButtonName), shape: .rectangle, addTextLabel: true)
-
+        
         
         startButton.position = CGPoint.position(startButton.frame,
                                                 inside: size.playableRect,
@@ -103,21 +108,21 @@ class MainMenu: SKScene {
         startButton.run(buttonFadeInAction)
         
         logo.position = .position(logo.frame,
-                                    inside: size.playableRect,
-                                    verticalAlign: .top,
-                                    horizontalAnchor: .center,
-                                    yOffset: 150.0)
+                                  inside: size.playableRect,
+                                  verticalAlign: .top,
+                                  horizontalAnchor: .center,
+                                  yOffset: 150.0)
         logo.zPosition = 1_000_000_000_000
         addChild(logo)
         
         let menuStoreButton = ShiftShaft_Button(size: .buttonExtralarge, delegate: self, identifier: .mainMenuStore, image: SKSpriteNode(imageNamed: Constants.blankButtonName), shape: .rectangle, addTextLabel: true)
         
         menuStoreButton.position = CGPoint.alignHorizontally(menuStoreButton.frame,
-                                                           relativeTo: startButton.frame,
-                                                           horizontalAnchor: .center,
-                                                           verticalAlign: .bottom,
-                                                           verticalPadding: Constants.buttonPadding,
-                                                           translatedToBounds: true)
+                                                             relativeTo: startButton.frame,
+                                                             horizontalAnchor: .center,
+                                                             verticalAlign: .bottom,
+                                                             verticalPadding: Constants.buttonPadding,
+                                                             translatedToBounds: true)
         menuStoreButton.zPosition = 0
         
         if displayStoreBadge {
@@ -136,36 +141,36 @@ class MainMenu: SKScene {
         menuStoreButton.run(buttonFadeInAction)
         
         
-        let optionsButton = ShiftShaft_Button(size: .buttonExtralarge, delegate: self, identifier: .mainMenuOptions, image: SKSpriteNode(imageNamed: Constants.blankButtonName), shape: .rectangle, addTextLabel: true)
+        let statsViewButton = ShiftShaft_Button(size: .buttonExtralarge, delegate: self, identifier: .mainMenuStats, image: SKSpriteNode(imageNamed: Constants.blankButtonName), shape: .rectangle, addTextLabel: true)
         
-        optionsButton.position = CGPoint.alignHorizontally(optionsButton.frame,
-                                                         relativeTo: menuStoreButton.frame,
-                                                         horizontalAnchor: .center,
-                                                         verticalAlign: .bottom,
-                                                         verticalPadding: Constants.buttonPadding,
-                                                         translatedToBounds: true)
-        optionsButton.zPosition = 0
+        statsViewButton.position = CGPoint.alignHorizontally(statsViewButton.frame,
+                                                             relativeTo: menuStoreButton.frame,
+                                                             horizontalAnchor: .center,
+                                                             verticalAlign: .bottom,
+                                                             verticalPadding: Constants.buttonPadding,
+                                                             translatedToBounds: true)
+        statsViewButton.zPosition = 0
         
-        buttonContainer.addChild(optionsButton)
-        optionsButton.alpha = 0
-        optionsButton.run(buttonFadeInAction)
+        buttonContainer.addChild(statsViewButton)
+        statsViewButton.alpha = 0
+        statsViewButton.run(buttonFadeInAction)
         
         
         /// Feedback button
         let feedbackButton = ShiftShaft_Button(size: .buttonExtralarge, delegate: self, identifier: .mainMenuFeedback, image: SKSpriteNode(imageNamed: Constants.blankButtonName), shape: .rectangle, addTextLabel: true)
         
-        feedbackButton.position = CGPoint.alignHorizontally(optionsButton.frame,
-                                                         relativeTo: optionsButton.frame,
-                                                         horizontalAnchor: .center,
-                                                         verticalAlign: .bottom,
-                                                         verticalPadding: Constants.buttonPadding,
-                                                         translatedToBounds: true)
+        feedbackButton.position = CGPoint.alignHorizontally(statsViewButton.frame,
+                                                            relativeTo: statsViewButton.frame,
+                                                            horizontalAnchor: .center,
+                                                            verticalAlign: .bottom,
+                                                            verticalPadding: Constants.buttonPadding,
+                                                            translatedToBounds: true)
         feedbackButton.zPosition = 0
         
         buttonContainer.addChild(feedbackButton)
         feedbackButton.alpha = 0
         feedbackButton.run(buttonFadeInAction)
-
+        
         
         // animate the buttons to move slightly up
         let moveUp = SKAction.move(by: CGVector(dx: 0, dy: 100), duration: 0.30)
@@ -191,6 +196,24 @@ class MainMenu: SKScene {
             }
         }
         
+        let settingsTapTarget = SKSpriteNode(texture: nil, size: Style.HUD.settingsTapTargetSize)
+        let setting = SKSpriteNode(texture: SKTexture(imageNamed: Identifiers.settings), color: .clear , size: Style.HUD.settingsSize)
+        
+        settingsTapTarget.name = Identifiers.settings
+        settingsTapTarget.position = CGPoint.position(setting.frame,
+                                                      inside: self.frame.size.playableRect,
+                                                      verticalAlign: .top,
+                                                      horizontalAnchor: .right,
+                                                      xOffset: 80.0,
+                                                      yOffset: 20.0
+                                                      
+        )
+        settingsTapTarget.zPosition = 1_000_000
+        settingsTapTarget.addChild(setting)
+        
+        self.addChild(settingsTapTarget)
+        
+        
         
         // show some FTUE if needed
         FTUEConductor().showFirstDeathDialog(playableRect: size.playableRect, in: self)
@@ -200,6 +223,21 @@ class MainMenu: SKScene {
     func removeStoreBadge() {
         self.removeChild(with: Constants.notificationName)
     }
+    
+    var soundOptions: MenuSpriteNode?
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = touches.first else { return }
+        let position = touch.location(in: self)
+        for node in self.nodes(at: position) {
+            if node.name == Identifiers.settings && soundOptions == nil {
+                let menuSpriteNode = MenuSpriteNode(.options, playableRect: self.size.playableRect, precedence: .menu, level: nil, buttonDelegate: self)
+                soundOptions = menuSpriteNode
+                self.addChild(menuSpriteNode)
+            }
+        }
+    }
+    
 }
 
 extension MainMenu: ButtonDelegate {
@@ -209,8 +247,8 @@ extension MainMenu: ButtonDelegate {
         case .newGame:
             mainMenuDelegate?.newGame(playerModel.previewAppliedEffects().healFull())
             
-        case .mainMenuOptions:
-            mainMenuDelegate?.optionsSelected()
+        case .mainMenuStats:
+            mainMenuDelegate?.statsViewSelected()
             
         case .mainMenuStore:
             mainMenuDelegate?.menuStore()
@@ -226,7 +264,7 @@ extension MainMenu: ButtonDelegate {
                 mainMenuDelegate?.continueRun()
                 detectedSavedTutorial.removeFromParent()
             }
-
+            
             
         case .mainMenuAbandonRun:
             detectedSavedGameMenu.fadeOut { [weak self, confirmAbandonRun, detectedSavedGameMenu] in
@@ -241,13 +279,13 @@ extension MainMenu: ButtonDelegate {
                 confirmAbandonTutorial.playMenuBounce()
                 detectedSavedTutorial.removeFromParent()
             }
-    
+            
         case .yesAbandonRun:
             confirmAbandonRun.fadeOut { [mainMenuDelegate, confirmAbandonRun] in
                 mainMenuDelegate?.abandonRun()
                 confirmAbandonRun.removeFromParent()
             }
-        
+            
         case .yesSkipTutorial:
             confirmAbandonTutorial.fadeOut { [confirmAbandonTutorial, mainMenuDelegate] in
                 UserDefaults.standard.setValue(true, forKey: UserDefaults.hasSkippedTutorialKey)
@@ -255,7 +293,7 @@ extension MainMenu: ButtonDelegate {
                 mainMenuDelegate?.abandonRun()
                 confirmAbandonTutorial.removeFromParent()
             }
-                
+            
             
             
             
@@ -265,7 +303,7 @@ extension MainMenu: ButtonDelegate {
                 detectedSavedGameMenu.playMenuBounce()
                 confirmAbandonRun.removeFromParent()
             }
-        
+            
         case .doNotAbandonTutorial:
             confirmAbandonTutorial.fadeOut { [weak self, confirmAbandonTutorial, detectedSavedTutorial] in
                 self?.addChild(detectedSavedTutorial)
@@ -274,15 +312,51 @@ extension MainMenu: ButtonDelegate {
             }
             
         case .mainMenuFeedback:
-            #if DEBUG
+#if DEBUG
             mainMenuDelegate?.goToTestScene()
-            #else
+#else
             let url = URL(string: Constants.feedbackFormURLString)!
             UIApplication.shared.open(url, options: [:], completionHandler: nil)
-            #endif
+#endif
+            
+            /// SOUND STUFF
+            /// Yes, some of it is copied and pasted from MenuSpriteNode
+        case .soundOptionsBack:
+            soundOptions?.removeFromParent()
+            soundOptions = nil
+            
+        case .toggleMusic:
+            let muted = UserDefaults.standard.bool(forKey: UserDefaults.muteMusicKey)
+            UserDefaults.standard.setValue(!muted, forKey: UserDefaults.muteMusicKey)
+            
+            guard let musicIcon = soundOptions?.containerView?.childNode(withName: Constants.musicIconName) as? SKSpriteNode else { return }
+            let onOff = !muted ? "off" : "on"
+            let newTexture = SKTexture(imageNamed: "sound-\(onOff)")
+            musicIcon.texture = newTexture
+            
+            
+        case .toggleSound:
+            let muted = UserDefaults.standard.bool(forKey: UserDefaults.muteSoundKey)
+            UserDefaults.standard.setValue(!muted, forKey: UserDefaults.muteSoundKey)
+            
+            guard let soundIcon = soundOptions?.containerView?.childNode(withName: Constants.soundIconName) as? SKSpriteNode else { return }
+            let onOff = !muted ? "off" : "on"
+            let newTexture = SKTexture(imageNamed: "sound-\(onOff)")
+            soundIcon.texture = newTexture
+            
+        case .toggleShowGroupNumber:
+            let show = UserDefaults.standard.bool(forKey: UserDefaults.showGroupNumberKey)
+            UserDefaults.standard.setValue(!show, forKey: UserDefaults.showGroupNumberKey)
+            
+            guard let toggleIcon = soundOptions?.containerView?.childNode(withName: Constants.toggleIconName) as? SKSpriteNode else { return }
+            let onOff = !show ? "on" : "off"
+            let newTexture = SKTexture(imageNamed: "toggle-\(onOff)")
+            toggleIcon.texture = newTexture
+
             
         default:
             ()
         }
     }
+    
 }

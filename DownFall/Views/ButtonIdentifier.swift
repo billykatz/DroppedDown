@@ -64,7 +64,7 @@ enum ButtonIdentifier: String {
     case resetData
     
     // Main Menu
-    case mainMenuOptions
+    case mainMenuStats
     case mainMenuStore
     case mainMenuFeedback
     
@@ -170,7 +170,7 @@ enum ButtonIdentifier: String {
             return "Reset Data"
         case .mainMenuStore:
             return "Store"
-        case .mainMenuOptions:
+        case .mainMenuStats:
             return "Stats"
         case .discardFoundRune:
             return "Discard Found Rune"

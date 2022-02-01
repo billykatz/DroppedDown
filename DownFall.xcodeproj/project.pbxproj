@@ -19,6 +19,8 @@
 		2811271D26855FE200F96043 /* CombineExt in Frameworks */ = {isa = PBXBuildFile; productRef = 2811271C26855FE200F96043 /* CombineExt */; };
 		2811271F26863A4500F96043 /* FileManagerClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2811271E26863A4500F96043 /* FileManagerClient.swift */; };
 		2811272126863E4A00F96043 /* PlayerClientExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2811272026863E4A00F96043 /* PlayerClientExtensions.swift */; };
+		281D43AE27A9CB5400D00376 /* menu-music.wav in Resources */ = {isa = PBXBuildFile; fileRef = 281D43AD27A9CB5400D00376 /* menu-music.wav */; };
+		281D43B027A9CB8F00D00376 /* MenuMusicManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 281D43AF27A9CB8F00D00376 /* MenuMusicManager.swift */; };
 		2831B6A6274C787B00F90626 /* GameRecapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2831B6A5274C787B00F90626 /* GameRecapView.swift */; };
 		2834737F26E94CFC0096F3DE /* StatsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2834737E26E94CFC0096F3DE /* StatsModel.swift */; };
 		283CBBD926A8A88E00B1F7C9 /* CodexItemModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 283CBBD826A8A88E00B1F7C9 /* CodexItemModalView.swift */; };
@@ -243,6 +245,8 @@
 		2811271926850E1B00F96043 /* ProfileViewModelTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModelTest.swift; sourceTree = "<group>"; };
 		2811271E26863A4500F96043 /* FileManagerClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagerClient.swift; sourceTree = "<group>"; };
 		2811272026863E4A00F96043 /* PlayerClientExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerClientExtensions.swift; sourceTree = "<group>"; };
+		281D43AD27A9CB5400D00376 /* menu-music.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "menu-music.wav"; sourceTree = "<group>"; };
+		281D43AF27A9CB8F00D00376 /* MenuMusicManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuMusicManager.swift; sourceTree = "<group>"; };
 		2831B6A5274C787B00F90626 /* GameRecapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameRecapView.swift; sourceTree = "<group>"; };
 		2834737E26E94CFC0096F3DE /* StatsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsModel.swift; sourceTree = "<group>"; };
 		283CBBD826A8A88E00B1F7C9 /* CodexItemModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexItemModalView.swift; sourceTree = "<group>"; };
@@ -856,6 +860,7 @@
 		3DF2924C20A37FEE006671AC /* DownFall */ = {
 			isa = PBXGroup;
 			children = (
+				281D43AD27A9CB5400D00376 /* menu-music.wav */,
 				288BDB2A2788FB1100B8B78C /* boss-background-music.wav */,
 				287053B7275AE8D100B84929 /* background-music.wav */,
 				28C64464274463C500098C3C /* Boss */,
@@ -1064,6 +1069,7 @@
 				284F2EC427335B9600032088 /* Music */,
 				58D56B5725AB9215002D1337 /* SoundFiles */,
 				58D56B4E25AB90DB002D1337 /* AudioManager.swift */,
+				281D43AF27A9CB8F00D00376 /* MenuMusicManager.swift */,
 			);
 			name = Sound;
 			sourceTree = "<group>";
@@ -1183,6 +1189,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5894A44E24C379C800FBF839 /* LoadingScene.sks in Resources */,
+				281D43AE27A9CB5400D00376 /* menu-music.wav in Resources */,
 				589E157E25ABBD93004A6D46 /* playerHitsEnemy.mp3 in Resources */,
 				589E15A525ABCB0F004A6D46 /* gameLose.mp3 in Resources */,
 				589E159925ABC706004A6D46 /* exitUnblocked.mp3 in Resources */,
@@ -1259,6 +1266,7 @@
 				58C9735124969CA100288133 /* ProfileManaging.swift in Sources */,
 				3DAFBD3721B8E6E7009B116A /* InputQueue.swift in Sources */,
 				28D29AD6270B82DC001AD50D /* RuneReplacementEmptyPanelView.swift in Sources */,
+				281D43B027A9CB8F00D00376 /* MenuMusicManager.swift in Sources */,
 				582CF3EC2442391900AA2A95 /* FillableBar.swift in Sources */,
 				58D56B4F25AB90DB002D1337 /* AudioManager.swift in Sources */,
 				28C806AA26F3C3D500135E29 /* StatTracker.swift in Sources */,

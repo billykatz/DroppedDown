@@ -78,6 +78,9 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
 
         view.presentScene(mainMenu, transition: transition)
         view.ignoresSiblingOrder = true
+        
+        MenuMusicManager.shared.gameIsPlaying = false
+        MenuMusicManager.shared.playBackgroundMusic()
 
     }
     
@@ -101,11 +104,13 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
         profileViewModel?.nilCurrenRun()
         playerTappedOnStore = false
         levelCoordinator.loadRun(nil, profile: profileViewModel!.profile)
+        MenuMusicManager.shared.gameIsPlaying = true
     }
     
     func continueRun() {
         playerTappedOnStore = false
         levelCoordinator.loadRun(profileViewModel!.profile.currentRun, profile: profileViewModel!.profile)
+        MenuMusicManager.shared.gameIsPlaying = true
     }
     
     func finishGame(playerData updatedPlayerData: EntityModel, currentRun: RunModel) {
@@ -119,9 +124,13 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
         menuStore()
     }
     
-    func optionsSelected() {
+    func statsViewSelected() {
         guard let profileViewModel = profileViewModel else { preconditionFailure() }
         settingsCoordinator.presentSettingsView(profileViewModel: profileViewModel)
+    }
+    
+    func optionsSelected() {
+        
     }
     
     func addRandomRune() {

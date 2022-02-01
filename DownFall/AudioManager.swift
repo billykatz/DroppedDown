@@ -111,15 +111,22 @@ class AudioManager {
                 backgroundMusicPlayer?.setVolume(0, fadeDuration: 0)
                 backgroundMusicPlayer?.play()
                 backgroundMusicPlayer?.setVolume(1, fadeDuration: 2.5)
-                backgroundMusicPlayer?.numberOfLoops = 100
+                
+                // negative value means that it will loop
+                backgroundMusicPlayer?.numberOfLoops = -1
             })
         }
     }
     
     func stopBackgroundMusic() {
         backgroundMusicThread.sync(execute: { [backgroundMusicPlayer] in
-            backgroundMusicPlayer?.setVolume(0, fadeDuration: 1.5)
+            backgroundMusicPlayer?.setVolume(0, fadeDuration: 0.5)
         })
+        
+        backgroundMusicThread.asyncAfter(deadline: .now() + 0.5, execute: { [backgroundMusicPlayer] in
+            backgroundMusicPlayer?.pause()
+        })
+
     }
     
     func loadAllSounds() {

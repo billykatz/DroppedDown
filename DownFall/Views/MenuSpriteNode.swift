@@ -352,9 +352,6 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
                 containerView?.addChild(storeButton)
             }
             
-            
-            
-            
         }
         else if menuType == .confirmation {
             let titleText = "Abandon run?"

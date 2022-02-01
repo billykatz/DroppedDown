@@ -41,6 +41,8 @@
 		2886E84526F197D00014FA5D /* PlayerStatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886E84426F197D00014FA5D /* PlayerStatView.swift */; };
 		288BDB2B2788FB1100B8B78C /* boss-background-music.wav in Resources */ = {isa = PBXBuildFile; fileRef = 288BDB2A2788FB1100B8B78C /* boss-background-music.wav */; };
 		289EF394275A95C400138F34 /* MonsterDiesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 289EF393275A95C400138F34 /* MonsterDiesModel.swift */; };
+		28A36C3627A1FCD3008252DA /* BossDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A36C3527A1FCD3008252DA /* BossDialog.swift */; };
+		28A36C3827A1FF82008252DA /* BossDialogOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A36C3727A1FF82008252DA /* BossDialogOverlay.swift */; };
 		28A836C4268FE57F00D96C48 /* JSONCoding+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A836C3268FE57F00D96C48 /* JSONCoding+Extensions.swift */; };
 		28A836C6268FE97B00D96C48 /* ProfileCodingClient+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A836C5268FE97B00D96C48 /* ProfileCodingClient+Extensions.swift */; };
 		28AE3AC126A6000600BCE56A /* CodexCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AE3AC026A6000600BCE56A /* CodexCoordinator.swift */; };
@@ -263,6 +265,8 @@
 		2886E84426F197D00014FA5D /* PlayerStatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerStatView.swift; sourceTree = "<group>"; };
 		288BDB2A2788FB1100B8B78C /* boss-background-music.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "boss-background-music.wav"; sourceTree = "<group>"; };
 		289EF393275A95C400138F34 /* MonsterDiesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonsterDiesModel.swift; sourceTree = "<group>"; };
+		28A36C3527A1FCD3008252DA /* BossDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BossDialog.swift; sourceTree = "<group>"; };
+		28A36C3727A1FF82008252DA /* BossDialogOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BossDialogOverlay.swift; sourceTree = "<group>"; };
 		28A836C3268FE57F00D96C48 /* JSONCoding+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "JSONCoding+Extensions.swift"; sourceTree = "<group>"; };
 		28A836C5268FE97B00D96C48 /* ProfileCodingClient+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileCodingClient+Extensions.swift"; sourceTree = "<group>"; };
 		28AE3AC026A6000600BCE56A /* CodexCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexCoordinator.swift; sourceTree = "<group>"; };
@@ -542,6 +546,8 @@
 			isa = PBXGroup;
 			children = (
 				28C64465274463D300098C3C /* BossController.swift */,
+				28A36C3527A1FCD3008252DA /* BossDialog.swift */,
+				28A36C3727A1FF82008252DA /* BossDialogOverlay.swift */,
 				280CD16E276A948C00052EB5 /* BossAnimator.swift */,
 				28C6446D27488DC100098C3C /* BossHelpers.swift */,
 				28C644672745B22F00098C3C /* BossDebugView.swift */,
@@ -1293,9 +1299,11 @@
 				3D58468822A6322900EDD845 /* RangeModel.swift in Sources */,
 				3D00A0F923AAC813007E2D8B /* Identifiers.swift in Sources */,
 				3DA0A37A22FFAECE0041EF34 /* UIFont+Extensions.swift in Sources */,
+				28A36C3627A1FCD3008252DA /* BossDialog.swift in Sources */,
 				28C644682745B22F00098C3C /* BossDebugView.swift in Sources */,
 				280CD173276AADEF00052EB5 /* BossTestScene.swift in Sources */,
 				28C6446A2746C84F00098C3C /* CGVector+Extensions.swift in Sources */,
+				28A36C3827A1FF82008252DA /* BossDialogOverlay.swift in Sources */,
 				3DE87C9022374C2C00D750CF /* ShiftShaft_Button.swift in Sources */,
 				3D14C82123A83D93003E211D /* LevelCoordinator.swift in Sources */,
 				283CBBDB26A8A9E100B1F7C9 /* SwiftUIView.swift in Sources */,

@@ -62,6 +62,7 @@ class AudioManager {
     
     let audioNode: SKAudioNode
     var backgroundMusicPlayer: AVAudioPlayer?
+    let musicVolume: Float = 0.75
     
     var observer: NSKeyValueObservation?
     
@@ -107,10 +108,10 @@ class AudioManager {
 
     func playBackgroundMusic() {
         if !UserDefaults.standard.bool(forKey: UserDefaults.muteMusicKey) {
-            backgroundMusicThread.sync(execute: { [backgroundMusicPlayer] in
+            backgroundMusicThread.sync(execute: { [backgroundMusicPlayer, musicVolume] in
                 backgroundMusicPlayer?.setVolume(0, fadeDuration: 0)
                 backgroundMusicPlayer?.play()
-                backgroundMusicPlayer?.setVolume(1, fadeDuration: 2.5)
+                backgroundMusicPlayer?.setVolume(musicVolume, fadeDuration: 2.5)
                 
                 // negative value means that it will loop
                 backgroundMusicPlayer?.numberOfLoops = -1

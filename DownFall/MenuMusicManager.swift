@@ -16,6 +16,7 @@ class MenuMusicManager {
     static let tag = String(describing: MenuMusicManager.shared)
     
     let menuMusicThread = DispatchQueue(label: "MenuMusicManager.menuMusicThread", qos: .userInitiated)
+    let musicVolume: Float = 0.5
     
     var menuMusicPlayer: AVAudioPlayer?
     var observer: NSKeyValueObservation?
@@ -73,9 +74,6 @@ class MenuMusicManager {
             stopBackgroundMusic()
         }
     }
-    
-
-    let musicVolume: Float = 0.5
     
     func playBackgroundMusic() {
         menuMusicThread.async { [menuMusicPlayer, shouldPlay, musicVolume] in

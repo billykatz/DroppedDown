@@ -28,7 +28,7 @@ class MainMenu: SKScene {
         static let musicIconName = "musicSprite"
         static let toggleIconName = "toggleSprite"
         static let feedbackFormURLString = "https://linktr.ee/shiftshaft"
-
+        
     }
     
     private var background: SKSpriteNode!
@@ -229,13 +229,22 @@ class MainMenu: SKScene {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
         let position = touch.location(in: self)
-        for node in self.nodes(at: position) {
+        let nodes = self.nodes(at: position)
+        for node in nodes {
             if node.name == Identifiers.settings && soundOptions == nil {
                 let menuSpriteNode = MenuSpriteNode(.options, playableRect: self.size.playableRect, precedence: .menu, level: nil, buttonDelegate: self)
                 soundOptions = menuSpriteNode
                 self.addChild(menuSpriteNode)
             }
         }
+        if let overlay = soundOptions?.childNode(withName: "overlaySpriteName"),
+           let containerView = soundOptions?.containerView,
+           nodes.contains(overlay),
+           !nodes.contains(containerView) {
+            soundOptions?.removeFromParent()
+            soundOptions = nil
+        }
+        
     }
     
 }
@@ -352,7 +361,7 @@ extension MainMenu: ButtonDelegate {
             let onOff = !show ? "on" : "off"
             let newTexture = SKTexture(imageNamed: "toggle-\(onOff)")
             toggleIcon.texture = newTexture
-
+            
             
         default:
             ()

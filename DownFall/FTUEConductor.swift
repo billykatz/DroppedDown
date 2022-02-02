@@ -122,8 +122,9 @@ class FTUEConductor {
         guard shouldShowFTUEForMiningGems  else { return nil }
             
         let sentence1 = Sentence(text: "Nice you mined a gem!\nOnly some rocks have gems inside.  Look for a sparkle to find the gem-infused rocks.", emotion: .surprised)
-        let sentence2 = Sentence(text: "The more rocks in the group the more gems you will mine!", emotion: .content)
-        let sentence3 = Sentence(text: "Less than 10 rocks earns you 1 gem per rock. \n10 or more rocks earn you 2 gems per rock.", emotion: .skeptical)
+//        let sentence2 = Sentence(text: "The larger the group of rocks, the more gems you will mine!", emotion: .content)
+        let sentence2 = Sentence(text: "Groups with less than 10 rocks earns you 1 gem per rock.", emotion: .skeptical)
+        let sentence3 = Sentence(text: "10 or more rocks earn you 2 gems per rock.", emotion: .skeptical)
         let sentence4 = Sentence(text: "Some of the best miners can collect 3 gems per rock but that is super rare.", emotion: .skeptical)
         let dialog = Dialogue(sentences: [sentence1, sentence2, sentence3, sentence4], character: .teri, delayBeforeTyping: 0.25)
         

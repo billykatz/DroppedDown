@@ -205,7 +205,7 @@ class MainMenu: SKScene {
                                                       verticalAlign: .top,
                                                       horizontalAnchor: .right,
                                                       xOffset: 80.0,
-                                                      yOffset: 20.0
+                                                      yOffset: 35.0
                                                       
         )
         settingsTapTarget.zPosition = 1_000_000

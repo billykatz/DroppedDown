@@ -27,11 +27,15 @@ class BossView: SKSpriteNode {
     // all sprites are added to this container
     private let containerView: SKSpriteNode
     
+    private let bossDialogController: BossDialogController
+    private let bossDialogContainerView: SKSpriteNode
+    
+    
     // state variables to reset the reticles when needed
     private var dynamiteTargetToAttack: [SKSpriteNode] = []
     private var poisonColumnsTargetToAttack: [SKSpriteNode] = []
     private var spawnSpiderTargetToAttack: [SKSpriteNode] = []
-    
+     
     init(playableRect: CGRect, tileSize: CGFloat, spriteProvider: @escaping () -> [[DFTileSpriteNode]]) {
         self.playableRect = playableRect
         self.spriteProvider = spriteProvider
@@ -39,6 +43,10 @@ class BossView: SKSpriteNode {
         
         self.containerView = SKSpriteNode(color: .clear, size: playableRect.size)
         containerView.zPosition = 5_000
+        
+        /// BOSS DIALOG
+        self.bossDialogContainerView = SKSpriteNode(color: .clear, size: playableRect.size)
+        self.bossDialogController = BossDialogController(foreground: bossDialogContainerView, playableRect: playableRect)
         
         self.bossSprite = BossSprite(playableRect: playableRect)
         
@@ -51,6 +59,9 @@ class BossView: SKSpriteNode {
         
         addChild(containerView)
         containerView.addChild(bossSprite)
+        
+        /// BOSS DIALOG
+        addChild(bossDialogContainerView)
         
         Dispatch.shared.register { [weak self] input in
             self?.handleInput(input)

@@ -21,7 +21,7 @@ class BossDialogueOverlay: SKSpriteNode {
     let dialogueView: DialogueView
     let bossDialoguePhase: BossDialoguePhase
     
-    init (playableRect: CGRect, foreground: SKNode, bossDialoguePhase: BossDialoguePhase, levelGoalViewOrigin: CGPoint, tileTypeToPosition: (TileType) -> CGPoint?) {
+    init (playableRect: CGRect, foreground: SKNode, bossDialoguePhase: BossDialoguePhase) {
         self.playableRect = playableRect
         self.foreground = foreground
         self.bossDialoguePhase = bossDialoguePhase

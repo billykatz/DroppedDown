@@ -21,6 +21,7 @@
 		2811272126863E4A00F96043 /* PlayerClientExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2811272026863E4A00F96043 /* PlayerClientExtensions.swift */; };
 		281D43B027A9CB8F00D00376 /* MenuMusicManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 281D43AF27A9CB8F00D00376 /* MenuMusicManager.swift */; };
 		281D43B427AA61F700D00376 /* menu-music.wav in Resources */ = {isa = PBXBuildFile; fileRef = 281D43B327AA61F700D00376 /* menu-music.wav */; };
+		281D43B627AB0B4700D00376 /* BossDialogController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 281D43B527AB0B4700D00376 /* BossDialogController.swift */; };
 		2831B6A6274C787B00F90626 /* GameRecapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2831B6A5274C787B00F90626 /* GameRecapView.swift */; };
 		2834737F26E94CFC0096F3DE /* StatsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2834737E26E94CFC0096F3DE /* StatsModel.swift */; };
 		283CBBD926A8A88E00B1F7C9 /* CodexItemModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 283CBBD826A8A88E00B1F7C9 /* CodexItemModalView.swift */; };
@@ -247,6 +248,7 @@
 		2811272026863E4A00F96043 /* PlayerClientExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerClientExtensions.swift; sourceTree = "<group>"; };
 		281D43AF27A9CB8F00D00376 /* MenuMusicManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuMusicManager.swift; sourceTree = "<group>"; };
 		281D43B327AA61F700D00376 /* menu-music.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "menu-music.wav"; sourceTree = "<group>"; };
+		281D43B527AB0B4700D00376 /* BossDialogController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BossDialogController.swift; sourceTree = "<group>"; };
 		2831B6A5274C787B00F90626 /* GameRecapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameRecapView.swift; sourceTree = "<group>"; };
 		2834737E26E94CFC0096F3DE /* StatsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsModel.swift; sourceTree = "<group>"; };
 		283CBBD826A8A88E00B1F7C9 /* CodexItemModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexItemModalView.swift; sourceTree = "<group>"; };
@@ -556,6 +558,7 @@
 				28C6446D27488DC100098C3C /* BossHelpers.swift */,
 				28C644672745B22F00098C3C /* BossDebugView.swift */,
 				28C6446B2746E27000098C3C /* BossView.swift */,
+				281D43B527AB0B4700D00376 /* BossDialogController.swift */,
 				28806D90276AB8A000C4627B /* BossSprite.swift */,
 				280CD175276AAFED00052EB5 /* BossTestView.swift */,
 			);
@@ -1338,6 +1341,7 @@
 				3D6AACE1222C997800C77B24 /* Header.swift in Sources */,
 				28DCCB802762C649004E70A8 /* AnimatorCombat.swift in Sources */,
 				2886E84326F031050014FA5D /* SettingsView.swift in Sources */,
+				281D43B627AB0B4700D00376 /* BossDialogController.swift in Sources */,
 				2886E83E26F0303B0014FA5D /* SettingsCoordinator.swift in Sources */,
 				284F2EC32731DB3C00032088 /* FTUEConductor.swift in Sources */,
 				3D06390322EEB50C00C4D5E9 /* PlayState.swift in Sources */,

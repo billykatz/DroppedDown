@@ -89,7 +89,7 @@ class LevelGoalTracker: LevelGoalTracking {
             countPillars(in: input.endTilesStruct ?? [])
             
             
-            if tutorialConductor.shouldShowLevelGoalsAtStart {
+            if tutorialConductor.shouldShowLevelGoalsAtStart && !level.isBossLevel {
                 InputQueue.append(Input(.levelGoalDetail(goalProgress)))
             }
             

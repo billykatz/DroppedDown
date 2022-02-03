@@ -359,8 +359,11 @@ struct EntityModel: Equatable, Codable {
         return self.update(pickaxe: Pickaxe(runeSlots: pickaxe?.runeSlots ?? 0, runes: newRunes))
     }
     
+    
+    static let bossMonsters: [EntityType] = [.rat, .alamo, .bat, .dragon, .sally]
+    
     static func monsterWithRandomType() -> EntityModel {
-        let randomMonsterTypes: [EntityType] = [.rat, .alamo, .bat, .dragon, .sally]
+        let randomMonsterTypes: [EntityType] = EntityModel.bossMonsters
         let randomMonster: EntityType = randomMonsterTypes.randomElement()!
         return EntityModel(originalHp: 1, hp: 1, name: randomMonster.textureString, attack: .zero, type: randomMonster, carry: .zero, animations: [], pickaxe: nil, effects: [], dodge: 0, luck: 0, killedBy: nil)
     }

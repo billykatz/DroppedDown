@@ -440,7 +440,7 @@ struct BossPhase: Codable, Hashable {
         
         var nonTargetable = nonGrowableCoords(tiles: tiles)
         var maxCount = 100
-        while (rocksThrown.count < nextPhase.rocksToSpawn) || maxCount <= 0 {
+        while (rocksThrown.count < nextPhase.rocksToSpawn) && maxCount >= 0 {
             //should be brown or green
             let rockColor = nextPhase.rockColorToSpawn ?? .brown
             let randomCoord = randomCoord(in: tiles, notIn: nonTargetable)
@@ -450,7 +450,7 @@ struct BossPhase: Codable, Hashable {
         }
         
         maxCount = 100
-        while (monstersSpawned.count < nextPhase.monstersToSpawn) || (maxCount <= 0) {
+        while (monstersSpawned.count < nextPhase.monstersToSpawn) && (maxCount >= 0) {
             let randomCoord = randomCoord(in: tiles, notIn: nonTargetable)
             let randomMonster = EntityModel.monsterWithRandomType()
             let alreadySpawnedThisTypeOfMonster = monstersSpawned.contains(where: { bossTileAttack in
@@ -461,6 +461,11 @@ struct BossPhase: Codable, Hashable {
                 }
             })
             if !alreadySpawnedThisTypeOfMonster {
+                monstersSpawned.insert(BossTileAttack(TileType.monster(randomMonster), randomCoord))
+                nonTargetable.insert(randomCoord)
+            } else if monstersSpawned.count >= EntityModel.bossMonsters.count {
+                // for the second phase change we spawn a lot of monsters
+                // so its okay if we repeat some
                 monstersSpawned.insert(BossTileAttack(TileType.monster(randomMonster), randomCoord))
                 nonTargetable.insert(randomCoord)
             }

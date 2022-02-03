@@ -52,9 +52,17 @@ func unedibleTiles(in tiles: [[Tile]]) -> Set<TileCoord> {
     for row in 0..<tiles.count {
         for col in 0..<tiles.count {
             switch tiles[row][col].type {
-            case .rock(color: _, holdsGem: false, groupCount: _):
+            case .rock(color: let color, holdsGem: false, groupCount: _):
+                
+                // dont eat brown or green rocks
+                if color == .brown || color == .green {
+                    set.insert(TileCoord(row: row, column: col))
+                }
+                
                 // target all rocks except for ones that are holding a gem
-                break
+                else {
+                    break
+                }
             default:
                 set.insert(TileCoord(row: row, column: col))
             }

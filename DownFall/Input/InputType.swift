@@ -43,7 +43,7 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
                                         .play,
                                         .pause,
                                         .animationsFinished(ref: true),
-                                        .playAgain,
+                                        .playAgain(didWin: false),
                                         .reffingFinished(newTurn: false),
                                         .collectItem(TileCoord(0,0), .zero, 0),
                                         .collectOffer(collectedCoord: .zero, collectedOffer: .zero, discardedCoord: .zero, discardedOffer: .zero),
@@ -81,7 +81,7 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
     case play
     case pause
     case animationsFinished(ref: Bool)
-    case playAgain
+    case playAgain(didWin: Bool)
     case transformation([Transformation])
     case reffingFinished(newTurn: Bool)
     case boardBuilt

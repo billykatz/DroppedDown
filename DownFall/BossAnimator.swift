@@ -423,6 +423,30 @@ extension Animator {
         return eyebrowAnimation
     }
     
+    func createPhaseChangeBandages(waitBefore: TimeInterval, phase: BossPhaseType) -> SpriteAction? {
+        guard let bossSprite = bossSprite else { return nil }
+        switch phase {
+        case .first, .dead:
+            return nil
+        case .second:
+            let waitAction = SKAction.wait(forDuration: waitBefore)
+            let action = SKAction.run { [bossSprite] in
+                bossSprite.spiderBossHurtPhase2.alpha = 1.0
+            }
+            let seq = SKAction.sequence(waitAction, action)
+            let spriteAction = SpriteAction(bossSprite.spiderHead, seq)
+            return spriteAction
+        case .third:
+            let waitAction = SKAction.wait(forDuration: waitBefore)
+            let action = SKAction.run { [bossSprite] in
+                bossSprite.spiderBossHurtPhase3.alpha = 1.0
+            }
+            let seq = SKAction.sequence(waitAction, action)
+            let spriteAction = SpriteAction(bossSprite.spiderHead, seq)
+            return spriteAction
+        }
+    }
+    
     func createAngryFace(reverse: Bool, waitBeforeDelay: TimeInterval, animationSpeed: Double? = nil
     ) -> [SpriteAction] {
         let newAnimationSpeed: Double = animationSpeed ?? timePerFrame()
@@ -1858,7 +1882,7 @@ extension Animator {
     }
     
     // After we complete this function we will call another function to finish the boss phase change animation
-    func animateBossPhaseChange(completion: @escaping () -> Void) {
+    func animateBossPhaseChange(bossIsDead: Bool, phaseType: BossPhaseType, completion: @escaping () -> Void) {
         var spriteActions: [SpriteAction] = []
         
         /// CLEAN UP BEFORE DOING ANYHTING
@@ -1917,6 +1941,14 @@ extension Animator {
             spriteActions.append(contentsOf: bossWorried)
         }
         
+        if bossIsDead {
+            resetBossThenAnimate(spriteActions, completion: completion)
+            return
+        }
+        
+        if let bandages = createPhaseChangeBandages(waitBefore: waitBefore, phase: phaseType) {
+            spriteActions.append(bandages)
+        }
         
         waitBefore += 0.5
         

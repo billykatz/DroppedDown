@@ -34,8 +34,10 @@ public extension Int {
      */
     static func random(_ n: Int, notInSet set: Set<Int>) -> Int {
         var retVal = random(n)
-        while set.contains(retVal) {
+        var maxTries = 100
+        while set.contains(retVal) && maxTries > 0 {
             retVal = random(n)
+            maxTries -= 1
         }
         return retVal
     }

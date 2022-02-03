@@ -232,6 +232,22 @@ class TileDetailView: SKSpriteNode {
         
     }
     
+    private func dynamiteDescription(tileType: TileType, nextTo: CGRect) -> ParagraphNode? {
+        guard case TileType.dynamite(let data) = tileType  else { return nil }
+        let text =
+        """
+        \u{2022} Explodes after 3 turns
+        \u{2022} Blows up orthogonal neighbors
+        \u{2022} Does 1 damage
+        """
+        let desc = ParagraphNode(text: text, paragraphWidth: detailViewTemplate.frame.width - Style.DetailView.spriteSize.width, fontSize: .fontMediumSize, fontColor: fontColor)
+        desc.position = CGPoint.alignHorizontally(desc.frame, relativeTo: nextTo, horizontalAnchor: .left, verticalAlign: .bottom, verticalPadding: Style.Padding.more, translatedToBounds: true)
+        desc.zPosition = Precedence.menu.rawValue
+        return desc
+        
+    }
+
+    
     private func gemDescription(tileType: TileType, nextTo: CGRect) -> ParagraphNode? {
         guard case TileType.item(let item) = tileType  else { return nil }
         let text =
@@ -340,6 +356,8 @@ class TileDetailView: SKSpriteNode {
             detailViewTemplate.addChild(offerDescription)
         } else if let exitDescription = exitDescription(tileType: tileType, nextTo: title.frame) {
             detailViewTemplate.addChild(exitDescription)
+        } else if let dynamiteDescription = dynamiteDescription(tileType: tileType, nextTo: title.frame) {
+            detailViewTemplate.addChild(dynamiteDescription)
         }
         
         detailViewTemplate.position = CGPoint.position(this: detailViewTemplate.frame, centeredInBottomOf: self.contentView.frame, verticalPadding: 150.0)

@@ -58,7 +58,7 @@ struct EntityModel: Equatable, Codable {
             case .rat:
                 return "Matt the Rat"
             case .dragon:
-                return "Dragon"
+                return "Draz the Dragon"
             case .alamo:
                 return "Alamo the Tree"
             case .sally:

@@ -62,7 +62,7 @@ class AudioManager {
     
     let audioNode: SKAudioNode
     var backgroundMusicPlayer: AVAudioPlayer?
-    let musicVolume: Float = 0.75
+    let musicVolume: Float = 0.5
     
     var observer: NSKeyValueObservation?
     

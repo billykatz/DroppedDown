@@ -257,8 +257,10 @@ class Renderer: SKSpriteNode {
                 animateAttack(attackInput: inputType, endTiles: trans.endTiles)
                 
             case .gameWin:
-                animate(trans.tileTransformation) { [weak self] in
-                    self?.gameWin(transformation: trans)
+                if !level.isBossLevel {
+                    animate(trans.tileTransformation) { [weak self] in
+                        self?.gameWin(transformation: trans)
+                    }
                 }
                 
             case .monsterDies:
@@ -388,6 +390,15 @@ class Renderer: SKSpriteNode {
             gameRecapView.showGameRecap(win: false, killedBy: type, with: runStatTracker.runStats)
             menuForeground.addChild(gameRecapView)
             foreground.addChildSafely(menuForeground)
+            
+        case .gameWin:
+            if level.isBossLevel {
+                animator.animateBossPhaseChange(bossIsDead: true, phaseType: .dead) { [runStatTracker, gameRecapView, menuForeground, foreground] in
+                    gameRecapView.showGameRecap(win: true, killedBy: nil, with: runStatTracker.runStats)
+                    menuForeground.addChild(gameRecapView)
+                    foreground.addChildSafely(menuForeground)
+                }
+            }
             
         case .playAgain:
             removeMenu()
@@ -1158,7 +1169,7 @@ extension Renderer {
         bossView.bossSprite.numberOfRedEyes = 0
         let positionInForeground = self.positionInForeground(at:)
         
-        animator.animateBossPhaseChange { [weak self, spriteForeground, sprites, positionInForeground] in
+        animator.animateBossPhaseChange(bossIsDead: false, phaseType: bossPhase.bossPhaseType) { [weak self, spriteForeground, sprites, positionInForeground] in
             self?.animator.animateBossPhaseChangeAnimation(spriteForground: spriteForeground, sprites: sprites, bossPhaseChangeTargets: bossPhase.phaseChangeTagets, delayBefore: 0.0, positionInForeground: positionInForeground, completion: { [weak self] in
                 self?.animationsFinished(endTiles: transformation.endTiles)
             })

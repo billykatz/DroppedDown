@@ -38,6 +38,9 @@ class BossSprite: SKSpriteNode {
         static let bossEye = "boss-spider-eyes"
         static let bossHeadCrystals = "boss-spider-head-crystals"
         
+        static let bossHurtPhase2 = "boss-hurt-phase-2-bandages"
+        static let bossHurtPhase3 = "boss-hurt-phase-3-bandages"
+        
         static let bossBodyName = "boss-body"
         
         static let dynamiteTrain = "boss-dynamite-train"
@@ -260,6 +263,23 @@ class BossSprite: SKSpriteNode {
         return sprite
     }()
     
+    lazy var spiderBossHurtPhase2: SKSpriteNode = {
+        let texture = SKTexture(imageNamed: Constants.bossHurtPhase2)
+        let size = scaleBodyPart(originalSize: texture.size(), spiderWidth: spiderWidth, spiderHeight: spiderHeight)
+        let sprite = SKSpriteNode(texture: texture, size: size)
+        sprite.zPosition = 1_150_000
+        return sprite
+    }()
+    
+    lazy var spiderBossHurtPhase3: SKSpriteNode = {
+        let texture = SKTexture(imageNamed: Constants.bossHurtPhase3)
+        let size = scaleBodyPart(originalSize: texture.size(), spiderWidth: spiderWidth, spiderHeight: spiderHeight)
+        let sprite = SKSpriteNode(texture: texture, size: size)
+        sprite.zPosition = 1_175_000
+        return sprite
+    }()
+    
+    
     lazy var originalSpiderTrainPosition: CGPoint = {
         let sprite = SKSpriteNode(texture: SKTexture(imageNamed: Constants.dynamiteTrain), size: CGSize(width: 400, height: 200))
         let initialPosition = CGPoint.alignVertically(sprite.frame, relativeTo: self.frame, horizontalAnchor: .left, verticalAlign: .bottom, verticalPadding: -25.0, horizontalPadding: 100.0, translatedToBounds: true)
@@ -462,6 +482,11 @@ class BossSprite: SKSpriteNode {
         
         spiderHead.addChild(spiderEyebrowCrystals)
         spiderHead.addChild(spiderPoisonBeam)
+        
+        spiderBossHurtPhase2.alpha = 0
+        spiderBossHurtPhase3.alpha = 0
+        spiderHead.addChild(spiderBossHurtPhase2)
+        spiderHead.addChild(spiderBossHurtPhase3)
         
         /// SPIDER BODY ATTACH
         for webAttack in spiderWebAttacks {

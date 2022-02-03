@@ -17,7 +17,7 @@ struct BossDialoguePhase {
     // currently just used to chance the win message when the player beats the boss
     var chosenDialogue: Dialogue {
         if selectRandomly > 0 {
-            guard selectRandomly >= dialogue.sentences.count else { return dialogue }
+            guard selectRandomly <= dialogue.sentences.count else { return dialogue }
             
             let randomSentences = dialogue.sentences.choose(random: selectRandomly)
             return Dialogue(sentences: randomSentences, character: dialogue.character, delayBeforeTyping: dialogue.delayBeforeTyping)
@@ -78,7 +78,6 @@ class BossDialogueOverlay: SKSpriteNode {
                 }
                 
                 self.run(SKAction.sequence([fadeOut, removeInteraction, SKAction.removeFromParent()]))
-//                InputQueue.append(Input(.tutorialPhaseEnd(tutorialPhase)))
             }
         }
     }

@@ -15,6 +15,7 @@ class GameRecapView: SKNode {
     var showBoardButton: ShiftShaft_Button?
     var showRecapButton: ShiftShaft_Button?
     var showRecapView: SKShapeNode?
+    var didWin: Bool = false
     
     init(playableRect: CGRect) {
         containerView = SKSpriteNode(color: .clear, size: playableRect.size)
@@ -30,7 +31,7 @@ class GameRecapView: SKNode {
     }
     
     func showGameRecap(win: Bool, killedBy: EntityModel.EntityType?, with statistics: [Statistics]) {
-        
+        self.didWin = win
         self.isUserInteractionEnabled = true
         self.zPosition = 900_000_000_000
         
@@ -58,7 +59,16 @@ class GameRecapView: SKNode {
         // create the you were killed by + icon
         var rectToAlignStats: CGRect = title.frame
         if let killedByTexture = killedBy?.textureString {
-            let killedBySprite = SKSpriteNode(texture: SKTexture(imageNamed: killedByTexture), size: CGSize(widthHeight: 150.0))
+            let killedBySprite: SKSpriteNode
+            //TODO: make it show you the boss that killed you
+            if killedByTexture == "lavaHorse" {
+                let scaleFactor = 1.5
+                let width = 280 * scaleFactor
+                let height = 112 * scaleFactor
+                killedBySprite = SKSpriteNode(texture: SKTexture(imageNamed: "boss-game-recap-sprite"), size: CGSize(width: width, height: height))
+            } else {
+                killedBySprite = SKSpriteNode(texture: SKTexture(imageNamed: killedByTexture), size: CGSize(widthHeight: 150.0))
+            }
             let killedByParagraph = ParagraphNode(text: "You were killed by:", fontSize: .fontLargeSize, fontColor: .white)
             
             killedByParagraph.position = CGPoint.alignHorizontally(killedByParagraph.frame, relativeTo: title.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.more*2, translatedToBounds: true)
@@ -67,6 +77,25 @@ class GameRecapView: SKNode {
             containerView.addChild(killedBySprite)
             
             rectToAlignStats = killedBySprite.frame
+        } else if win {
+            // show a defeated boss
+            let scaleFactor = 1.5
+            let width = 280 * scaleFactor
+            let height = 112 * scaleFactor
+            let bossSprite = SKSpriteNode(texture: SKTexture(imageNamed: "boss-game-recap-sprite"), size: CGSize(width: width, height: height))
+            let youDefeatedParagraph = ParagraphNode(text: "You defeated:", fontSize: .fontLargeSize, fontColor: .white)
+            
+            let spriteSheet = SpriteSheet(textureName: "boss-game-recap-sprite-sheet-12", columns: 12).animationFrames()
+            let animate = SKAction.animate(with: spriteSheet, timePerFrame: 0.07)
+            let repeatForever = SKAction.repeatForever(animate)
+            bossSprite.run(repeatForever)
+
+            youDefeatedParagraph.position = CGPoint.alignHorizontally(youDefeatedParagraph.frame, relativeTo: title.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.more*2, translatedToBounds: true)
+            bossSprite.position = CGPoint.alignHorizontally(bossSprite.frame, relativeTo: youDefeatedParagraph.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.most, translatedToBounds: true)
+            containerView.addChild(youDefeatedParagraph)
+            containerView.addChild(bossSprite)
+
+            rectToAlignStats = bossSprite.frame
         }
         
         func createStat(title: String, amount: Int) -> (ParagraphNode, ParagraphNode) {
@@ -232,7 +261,7 @@ extension GameRecapView: ButtonDelegate {
         }
         else if button.identifier == .mainMenu {
             fadeOut {
-                InputQueue.append(Input(.playAgain))
+                InputQueue.append(Input(.playAgain(didWin: self.didWin)))
             }
         }
     }

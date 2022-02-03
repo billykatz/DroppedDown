@@ -92,9 +92,9 @@ class BossDialogController {
         self.userDefaults = userDefaults
         self.numPrevBossWins = numberOfPreviousBossWins
         
-        #if DEBUG
-        userDefaults.clearBossKeys()
-        #endif
+//        #if DEBUG
+//        userDefaults.clearBossKeys()
+//        #endif
         
         Dispatch.shared.register { [weak self] input in
             if case InputType.bossTurnStart(let phase) = input.type {
@@ -136,14 +136,14 @@ class BossDialogController {
     }
     
     func handleGameWin() {
-        if !checkAndSetKey(UserDefaults.hasSeenBossDefeatedKey) {
+//        if !checkAndSetKey(UserDefaults.hasSeenBossDefeatedKey) {
             if numPrevBossWins > 3 {
                 showDialog(Dialogue.bossPlayerOnAWinStreak)
             } else {
                 showDialog(Dialogue.bossPlayerKillsBoss)
 
             }
-        }
+//        }
     }
     
     func handleBossTurnStart(_ bossPhase: BossPhase) {

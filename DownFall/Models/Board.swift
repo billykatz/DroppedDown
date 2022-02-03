@@ -146,7 +146,7 @@ class Board: Equatable {
                 InputQueue.append(Input(.tileDetail(type, attacks)))
                 return
                 
-            case .pillar, .item, .offer, .exit:
+            case .pillar, .item, .offer, .exit, .dynamite:
                 InputQueue.append(Input(.tileDetail(type, [])))
                 return
                 
@@ -419,7 +419,12 @@ class Board: Equatable {
                         hitPillarShouldStop = true
                         
                     case .player(let playerData):
-                        tiles[row][col] = Tile(type: .player(playerData.wasAttacked(for: 1, from: .north)))
+                        var newPlayer = playerData.wasAttacked(for: 1, from: .north)
+                        if playerData.isDead {
+                            newPlayer = newPlayer.update(killedBy: .lavaHorse)
+                        }
+                        
+                        tiles[row][col] = Tile(type: .player(newPlayer))
                         tileTransformations.append(TileTransformation(coord, coord))
                         
                     default:

@@ -680,9 +680,10 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             fadeOut {
                 InputQueue.append(Input(.play))
             }
+            
         case .playAgain:
             fadeOut {
-                InputQueue.append(Input(.playAgain))
+                InputQueue.append(Input(.playAgain(didWin: false)))
             }
             
         case .visitStore:
@@ -693,7 +694,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             
         case .mainMenu:
             fadeOut {
-                InputQueue.append(Input(.playAgain))
+                InputQueue.append(Input(.playAgain(didWin: false)))
             }
             
             
@@ -705,7 +706,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             
         case .yesAbandonRun, .yesSkipTutorial:
             fadeOut {
-                InputQueue.append(Input(.playAgain))
+                InputQueue.append(Input(.playAgain(didWin: false)))
             }
             
             

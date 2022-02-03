@@ -253,6 +253,16 @@ struct ResetDataView: View {
                 .background(Color(.backgroundGray))
                 .cornerRadius(5.0)
         }
+        Button(action: {
+            UserDefaults.standard.clearBossKeys()
+
+        }){
+            Text("Reset Boss FTUE flags")
+                .foregroundColor(.white)
+                .frame(width: 200, height: 75)
+                .background(Color(.backgroundGray))
+                .cornerRadius(5.0)
+        }
         
     }
 }

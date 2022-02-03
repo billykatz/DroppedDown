@@ -330,9 +330,9 @@ enum BossPhaseType: String, Codable {
     
     var rocksToEat: Int {
         switch self {
-        case .first: return 4 // return 3
-        case .second: return 5 // return 4
-        case .third: return 6
+        case .first: return 5 // return 3
+        case .second: return 6 // return 4
+        case .third: return 7
         case .dead: return 0
         }
     }
@@ -342,19 +342,29 @@ enum BossPhaseType: String, Codable {
         case .first:
             return 0
         case .second:
-            return 4
+            return 5
         case .third:
-            return 8
+            return 7
         case .dead:
             return 0
         }
     }
     
+    var rockColorToSpawn: ShiftShaft_Color? {
+        switch self {
+        case .first, .dead:
+            return nil
+        case .second: return .brown
+        case .third: return .green
+        }
+        
+    }
+    
     var monstersToSpawn: Int {
         switch self {
         case .first: return 0
-        case .second: return 2
-        case .third: return 4
+        case .second: return 3
+        case .third: return 6
         case .dead: return 0
         }
     }
@@ -431,8 +441,10 @@ struct BossPhase: Codable, Hashable {
         var nonTargetable = nonGrowableCoords(tiles: tiles)
         var maxCount = 100
         while (rocksThrown.count < nextPhase.rocksToSpawn) || maxCount <= 0 {
+            //should be brown or green
+            let rockColor = nextPhase.rockColorToSpawn ?? .brown
             let randomCoord = randomCoord(in: tiles, notIn: nonTargetable)
-            rocksThrown.insert(BossTileAttack(TileType.rock(color: .brown, holdsGem: false, groupCount: 1), randomCoord))
+            rocksThrown.insert(BossTileAttack(TileType.rock(color: rockColor, holdsGem: false, groupCount: 1), randomCoord))
             nonTargetable.insert(randomCoord)
             maxCount -= 1
         }

@@ -10,7 +10,7 @@ import Foundation
 import GameplayKit
 
 typealias Depth = Int
-let bossLevelDepthNumber = 99
+let bossLevelDepthNumber = 9
 let testLevelDepthNumber = -1
 
 struct LevelConstructor {
@@ -526,18 +526,18 @@ struct LevelConstructor {
 
     
     static func bossPillars() -> [PillarCoorindates] {
-        let newPillarColors = [ShiftShaft_Color.blue, .purple, .red]
-        let newPillarCoords: [TileCoord] = [
-            TileCoord(7, 4), TileCoord(5, 4), TileCoord(6, 3)
-        ]
-        
-        
-        
-//        let newPillarColors = [.blue, .blue, .purple, .purple, .red, .red, ShiftShaft_Color.pillarCases.randomElement()!, ShiftShaft_Color.pillarCases.randomElement()!]
+//        let newPillarColors = [ShiftShaft_Color.blue, .blue]///, .purple, .red]
 //        let newPillarCoords: [TileCoord] = [
-//            TileCoord(7, 4), TileCoord(5, 4), TileCoord(6, 3), TileCoord(6, 5),
-//            TileCoord(3, 4), TileCoord(1, 4), TileCoord(2, 3), TileCoord(2, 5),
+//            TileCoord(7, 4), TileCoord(5, 4),// TileCoord(6, 3)
 //        ]
+        
+        
+        
+        let newPillarColors = [.blue, .blue, .purple, .purple, .red, .red, ShiftShaft_Color.pillarCases.randomElement()!, ShiftShaft_Color.pillarCases.randomElement()!]
+        let newPillarCoords: [TileCoord] = [
+            TileCoord(7, 4), TileCoord(5, 4), TileCoord(6, 3), TileCoord(6, 5),
+            TileCoord(3, 4), TileCoord(1, 4), TileCoord(2, 3), TileCoord(2, 5),
+        ]
         
 //        let pillarColors: [ShiftShaft_Color] = [.blue, .blue, .blue, .purple, .purple, .purple, .red, .red, .red]
 //        let coords: [TileCoord] = [

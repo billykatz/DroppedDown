@@ -180,7 +180,7 @@ class GameScene: SKScene {
     }
     
     func handleInput(input: Input) {
-        if input.type == .playAgain {
+        if case InputType.playAgain(didWin: let didWin) = input.type {
             guard let board = self.board,
             let playerIndex = tileIndices(of: .player(.zero), in: board.tiles).first
             else { return }
@@ -192,7 +192,7 @@ class GameScene: SKScene {
             if case let TileType.player(data) = board.tiles[playerIndex].type {
                 self.removeFromParent()
                 self.swipeRecognizerView?.removeFromSuperview()
-                self.gameSceneDelegate?.navigateToMainMenu(self, playerData: data, didWin: false)
+                self.gameSceneDelegate?.navigateToMainMenu(self, playerData: data, didWin: didWin)
             }
         } else if case InputType.visitStore = input.type {
             
@@ -206,13 +206,8 @@ class GameScene: SKScene {
             self.gameSceneDelegate?.goToNextArea(updatedPlayerData: data)
         
         } else if case InputType.gameWin(_) = input.type {
-            guard let board = self.board,
-                  let playerIndex = tileIndices(of: .player(.zero), in: board.tiles).first,
-                case let TileType.player(data) = board.tiles[playerIndex].type else { return }
-
             // this is to save the state at the end of the level.
-//            self.gameSceneDelegate?.saveState(didWin: true)
-            self.gameSceneDelegate?.navigateToMainMenu(self, playerData: data, didWin: false)
+            self.gameSceneDelegate?.saveState(didWin: true)
             
             self.tutorialConductor?.setTutorialCompleted(playerDied: false)
             

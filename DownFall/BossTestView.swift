@@ -183,12 +183,7 @@ class BossTestView: ButtonDelegate {
             }
             
         case .worried:
-            animator.animateBossPhaseChange {
-                
-            }
-//            animator.animateBossWorried(delayBefore: 0.0, reversed: worriedToggle) {
-//                self.worriedToggle.toggle()
-//            }
+            animator.animateBossPhaseChange(bossIsDead: false, phaseType: .first) {}
         
         case .bossStomps:
             let rockAttacks = [BossTileAttack(.rock(color: .brown, holdsGem: false, groupCount: 1), .zero)]

@@ -189,6 +189,11 @@ class ProfileViewModel {
         // update lowest depth if needed
         newProfile = newProfile.updateStatistic(.lowestDepthReached, amount: currentRun?.depth ?? 0, overwriteIfLarger: true)
         
+        // update boss wins
+        if currentRun?.didWin ?? false {
+            newProfile = newProfile.updateBossWins()
+        }
+        
         // save profile
         saveProfile(newProfile)
     }

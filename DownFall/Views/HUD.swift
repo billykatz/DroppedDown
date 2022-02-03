@@ -212,6 +212,10 @@ class HUD: SKSpriteNode {
             showIncreaseInStat(offerType: offer, amountIncrease: 1)
         case .gems(let amount):
             showTotalGemGain(amount)
+        case .sandals, .runningShoes, .wingedBoots:
+            showIncreaseInStat(offerType: offer, amountIncrease: offer.dodgeAmount)
+        case .fourLeafClover, .horseshoe, .luckyCat:
+            showIncreaseInStat(offerType: offer, amountIncrease: offer.luckAmount)
         default:
             return
         }
@@ -242,9 +246,9 @@ class HUD: SKSpriteNode {
     
     private func labelNameForOfferType(offer: StoreOfferType) -> [String]? {
         switch offer {
-        case .dodge:
+        case .dodge, .sandals, .runningShoes, .wingedBoots:
             return [Constants.dodgeAmountLabelName]
-        case .luck:
+        case .luck, .fourLeafClover, .horseshoe, .luckyCat:
             return [Constants.luckAmountLabelName]
         case .greaterHeal:
             return [Constants.currentHealthAmountLabelName]

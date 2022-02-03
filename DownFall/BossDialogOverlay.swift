@@ -11,6 +11,20 @@ import SpriteKit
 
 struct BossDialoguePhase {
     let dialogue: Dialogue
+    let selectRandomly: Int
+    
+    // use this to choose random sentences for the dialogue
+    // currently just used to chance the win message when the player beats the boss
+    var chosenDialogue: Dialogue {
+        if selectRandomly > 0 {
+            guard selectRandomly >= dialogue.sentences.count else { return dialogue }
+            
+            let randomSentences = dialogue.sentences.choose(random: selectRandomly)
+            return Dialogue(sentences: randomSentences, character: dialogue.character, delayBeforeTyping: dialogue.delayBeforeTyping)
+        } else {
+            return dialogue
+        }
+    }
     
 }
 
@@ -26,7 +40,7 @@ class BossDialogueOverlay: SKSpriteNode {
         self.foreground = foreground
         self.bossDialoguePhase = bossDialoguePhase
         
-        let dialogueView = DialogueView(dialogue: bossDialoguePhase.dialogue)
+        let dialogueView = DialogueView(dialogue: bossDialoguePhase.chosenDialogue)
         dialogueView.zPosition = 200_000_000_000
         
         // we need these set for some UI code

@@ -53,7 +53,7 @@ class Renderer: SKSpriteNode {
     // Debug View for Boss
     private var bossDebugView: BossDebugView
     private lazy var bossView: BossView = {
-        return BossView(playableRect: playableRect, tileSize: tileSize, spriteProvider: { [weak self] in
+        return BossView(playableRect: playableRect, tileSize: tileSize, numberOfPreviousBossWins: numberOfPreviousBossWins, spriteProvider: { [weak self] in
             return self?.sprites ?? []
         })
     }()
@@ -118,6 +118,8 @@ class Renderer: SKSpriteNode {
         fatalError("init(coder:) has not been implemented")
     }
     
+    let numberOfPreviousBossWins: Int
+    
     init(playableRect: CGRect,
          foreground givenForeground: SKNode,
          boardSize theBoardSize: Int,
@@ -125,7 +127,8 @@ class Renderer: SKSpriteNode {
          level: Level,
          levelGoalTracker: LevelGoalTracker,
          tutorialConductor: TutorialConductor?,
-         runStatTracker: RunStatTracker) {
+         runStatTracker: RunStatTracker,
+         numberOfPreviousBossWins: Int) {
         
         self.precedence = precedence
         self.playableRect = playableRect
@@ -133,6 +136,7 @@ class Renderer: SKSpriteNode {
         self.level = level
         self.levelGoalTracker = levelGoalTracker
         self.tutorialConductor = tutorialConductor
+        self.numberOfPreviousBossWins = numberOfPreviousBossWins
         
         self.tileSize = GameScope.boardSizeCoefficient * (playableRect.width / boardSize)
         

@@ -7,6 +7,18 @@
 //
 
 enum StoreOfferType: Codable, Hashable, CaseIterable {
+    
+    struct Constants {
+        static let sandalsDodgeAmount = 3
+        static let runningShoesDodgeAmount = 5
+        static let wingedBootsDodgeAmount = 10
+        
+        static let fourLeafCloverLuckAmount = 3
+        static let horseshoeLuckAMount = 7
+        static let luckyCatLuckAmount = 14
+    }
+
+    
     static var allCases: [StoreOfferType] = {
         let runeCases = RuneType.allCases.map {
             return StoreOfferType.rune(Rune.rune(for: $0))
@@ -23,6 +35,7 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
             .runeUpgrade,
             .transmogrifyPotion,
             .lesserHeal,
+            .sandals
         ]
         
         values.append(contentsOf: runeCases)
@@ -49,19 +62,16 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
         case (.killMonsterPotion, killMonsterPotion): return true
         case (.transmogrifyPotion, .transmogrifyPotion): return true
             
+        case (.sandals, .sandals): return true
+        case (.runningShoes, .runningShoes): return true
+        case (.wingedBoots, .wingedBoots): return true
+        case (.fourLeafClover, .fourLeafClover): return true
+        case (.horseshoe, .horseshoe): return true
+        case (.luckyCat, .luckyCat): return true
+            
         // default cases to catch and return false for any other comparisons
-        case (.plusOneMaxHealth, _): return false
-        case (.plusTwoMaxHealth, _): return false
-        case (.runeUpgrade, _): return false
-        case (.runeSlot, _): return false
-        case (.rune(_), _): return false
-        case (.gems(_), _): return false
-        case (.dodge(_), _): return false
-        case (.luck(_), _): return false
-        case (.greaterHeal, _): return false
-        case (.lesserHeal, _): return false
-        case (.killMonsterPotion,_): return false
-        case (.transmogrifyPotion, _): return false
+        default:
+            return false
     
         }
     }
@@ -78,6 +88,12 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
     case greaterHeal
     case killMonsterPotion
     case transmogrifyPotion
+    case sandals
+    case runningShoes
+    case wingedBoots
+    case fourLeafClover
+    case horseshoe
+    case luckyCat
     
     enum CodingKeys: String, CodingKey {
         case base
@@ -100,6 +116,42 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
         case greaterHeal
         case killMonsterPotion
         case transmogrifyPotion
+        case sandals
+        case runningShoes
+        case wingedBoots
+        case fourLeafClover
+        case horseshoe
+        case luckyCat
+    }
+    
+    var luckAmount: Int {
+        switch self {
+        case .fourLeafClover:
+            return Constants.fourLeafCloverLuckAmount
+        case .horseshoe:
+            return Constants.horseshoeLuckAMount
+        case .luckyCat:
+            return Constants.luckyCatLuckAmount
+        case .luck(amount: let amt):
+            return amt
+        default:
+            return 0
+        }
+    }
+    
+    var dodgeAmount: Int {
+        switch self {
+        case .sandals:
+            return Constants.sandalsDodgeAmount
+        case .runningShoes:
+            return Constants.runningShoesDodgeAmount
+        case .wingedBoots:
+            return Constants.wingedBootsDodgeAmount
+        case .dodge(amount: let amt):
+            return amt
+        default:
+            return 0
+        }
     }
     
     init(from decoder: Decoder) throws {
@@ -135,6 +187,18 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
             self = .transmogrifyPotion
         case .killMonsterPotion:
             self = .killMonsterPotion
+        case .sandals:
+            self = .sandals
+        case .runningShoes:
+            self = .runningShoes
+        case .wingedBoots:
+            self = .wingedBoots
+        case .fourLeafClover:
+            self = .fourLeafClover
+        case .horseshoe:
+            self = .horseshoe
+        case .luckyCat:
+            self = .luckyCat
         }
     }
     
@@ -170,6 +234,19 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
             try container.encode(Base.killMonsterPotion, forKey: .base)
         case .transmogrifyPotion:
             try container.encode(Base.transmogrifyPotion, forKey: .base)
+        case .sandals:
+            try container.encode(Base.sandals, forKey: .base)
+        case .runningShoes:
+            try container.encode(Base.runningShoes, forKey: .base)
+        case .wingedBoots:
+            try container.encode(Base.wingedBoots, forKey: .base)
+        case .fourLeafClover:
+            try container.encode(Base.fourLeafClover, forKey: .base)
+        case .horseshoe:
+            try container.encode(Base.horseshoe, forKey: .base)
+        case .luckyCat:
+            try container.encode(Base.luckyCat, forKey: .base)
+
         }
     }
     

@@ -15,7 +15,7 @@ class RunModel: Codable, Equatable {
         return lhs.seed == rhs.seed
     }
     
-    static let zero = RunModel(player: .zero, seed: 0, savedTiles: nil, areas: [], goalTracking: [], stats: [], startingUnlockables: [], isTutorial: { false })
+    static let zero = RunModel(player: .zero, seed: 0, savedTiles: nil, areas: [], goalTracking: [], stats: [], startingUnlockables: [], isTutorial: { false }, didWin: false)
     
     let seed: UInt64
     var player: EntityModel
@@ -31,6 +31,8 @@ class RunModel: Codable, Equatable {
     
     var startingUnlockables: [Unlockable]
     
+    var didWin: Bool
+    
     //tutorial
     let isTutorial: Bool
     
@@ -43,7 +45,7 @@ class RunModel: Codable, Equatable {
     }
     
     
-    init(player: EntityModel, seed: UInt64, savedTiles: [[Tile]]?, areas: [Area], goalTracking: [GoalTracking], stats: [Statistics], startingUnlockables: [Unlockable], isTutorial: () -> Bool) {
+    init(player: EntityModel, seed: UInt64, savedTiles: [[Tile]]?, areas: [Area], goalTracking: [GoalTracking], stats: [Statistics], startingUnlockables: [Unlockable], isTutorial: () -> Bool, didWin: Bool) {
         self.player = player
         self.seed = seed
         self.savedTiles = savedTiles
@@ -52,6 +54,7 @@ class RunModel: Codable, Equatable {
         self.stats = stats
         self.startingUnlockables = startingUnlockables
         self.isTutorial = isTutorial()
+        self.didWin = didWin
     }
     
     func saveGoalTracking(_ goalTracking: [GoalTracking]) {

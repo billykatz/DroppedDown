@@ -12,10 +12,10 @@ import GameplayKit
 import Foundation
 
 protocol GameSceneCoordinatingDelegate: AnyObject {
-    func navigateToTheStore(_ scene: SKScene, playerData: EntityModel)
-    func navigateToMainMenu(_ scene: SKScene, playerData: EntityModel)
+    func navigateToTheStore(_ scene: SKScene, playerData: EntityModel, didWin: Bool)
+    func navigateToMainMenu(_ scene: SKScene, playerData: EntityModel, didWin: Bool)
     func goToNextArea(updatedPlayerData: EntityModel)
-    func saveState()
+    func saveState(didWin: Bool)
 }
 
 
@@ -80,6 +80,8 @@ class GameScene: SKScene {
     // profile view model
     private var profileViewModel: ProfileViewModel?
     
+    private var numberOfPreviousBossWins: Int = 0
+    
     required init?(coder aDecoder: NSCoder) { super.init(coder: aDecoder) }
     
     /// Creates an instance of board and does preparation neccessary for didMove(to:) to be called
@@ -92,7 +94,8 @@ class GameScene: SKScene {
                            stats: [Statistics],
                            loadedTiles: [[Tile]]? = [],
                            tutorialConductor: TutorialConductor,
-                           profileViewModel: ProfileViewModel?
+                           profileViewModel: ProfileViewModel?,
+                           numberOfPreviousBossWins: Int
     ) {
         
         self.profileViewModel = profileViewModel
@@ -104,6 +107,7 @@ class GameScene: SKScene {
         self.level = level
         self.levelGoalTracker = LevelGoalTracker(level: level, tutorialConductor: tutorialConductor)
         self.runStatTracker = RunStatTracker(runStats: stats)
+        self.numberOfPreviousBossWins = numberOfPreviousBossWins
         
         //create the foreground node
         foreground = SKNode()
@@ -159,7 +163,8 @@ class GameScene: SKScene {
                                  level: level!,
                                  levelGoalTracker: levelGoalTracker!,
                                  tutorialConductor: tutorialConductor,
-                                 runStatTracker: runStatTracker!)
+                                 runStatTracker: runStatTracker!,
+                                 numberOfPreviousBossWins:  numberOfPreviousBossWins)
         
         
         // Register for inputs we care about
@@ -187,7 +192,7 @@ class GameScene: SKScene {
             if case let TileType.player(data) = board.tiles[playerIndex].type {
                 self.removeFromParent()
                 self.swipeRecognizerView?.removeFromSuperview()
-                self.gameSceneDelegate?.navigateToMainMenu(self, playerData: data)
+                self.gameSceneDelegate?.navigateToMainMenu(self, playerData: data, didWin: false)
             }
         } else if case InputType.visitStore = input.type {
             
@@ -201,8 +206,13 @@ class GameScene: SKScene {
             self.gameSceneDelegate?.goToNextArea(updatedPlayerData: data)
         
         } else if case InputType.gameWin(_) = input.type {
+            guard let board = self.board,
+                  let playerIndex = tileIndices(of: .player(.zero), in: board.tiles).first,
+                case let TileType.player(data) = board.tiles[playerIndex].type else { return }
+
             // this is to save the state at the end of the level.
-            self.gameSceneDelegate?.saveState()
+//            self.gameSceneDelegate?.saveState(didWin: true)
+            self.gameSceneDelegate?.navigateToMainMenu(self, playerData: data, didWin: false)
             
             self.tutorialConductor?.setTutorialCompleted(playerDied: false)
             
@@ -221,7 +231,7 @@ class GameScene: SKScene {
             if case let TileType.player(data) = board.tiles[playerIndex].type {
                 self.removeFromParent()
                 self.swipeRecognizerView?.removeFromSuperview()
-                self.gameSceneDelegate?.navigateToTheStore(self, playerData: data)
+                self.gameSceneDelegate?.navigateToTheStore(self, playerData: data, didWin: false)
             }
         } else if case InputType.transformation(let trans) = input.type {
             if let offers = trans.first?.offers {

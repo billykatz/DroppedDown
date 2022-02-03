@@ -21,7 +21,7 @@ class BossTestView: ButtonDelegate {
         self.foreground = foreground
         self.playableRect = playableRect
         
-        bossView = BossView(playableRect: playableRect, tileSize: 100, spriteProvider: { [] })
+        bossView = BossView(playableRect: playableRect, tileSize: 100, numberOfPreviousBossWins: 0, spriteProvider: { [] })
         bossView.position = bossView.position.translateVertically(-100)
         
         testSpriteForeground = SKNode()

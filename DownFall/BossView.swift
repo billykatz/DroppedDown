@@ -36,7 +36,7 @@ class BossView: SKSpriteNode {
     private var poisonColumnsTargetToAttack: [SKSpriteNode] = []
     private var spawnSpiderTargetToAttack: [SKSpriteNode] = []
      
-    init(playableRect: CGRect, tileSize: CGFloat, spriteProvider: @escaping () -> [[DFTileSpriteNode]]) {
+    init(playableRect: CGRect, tileSize: CGFloat, numberOfPreviousBossWins: Int, spriteProvider: @escaping () -> [[DFTileSpriteNode]]) {
         self.playableRect = playableRect
         self.spriteProvider = spriteProvider
         self.tileSize = tileSize
@@ -46,7 +46,7 @@ class BossView: SKSpriteNode {
         
         /// BOSS DIALOG
         self.bossDialogContainerView = SKSpriteNode(color: .clear, size: playableRect.size)
-        self.bossDialogController = BossDialogController(foreground: bossDialogContainerView, playableRect: playableRect)
+        self.bossDialogController = BossDialogController(foreground: bossDialogContainerView, playableRect: playableRect, numberOfPreviousBossWins: numberOfPreviousBossWins)
         
         self.bossSprite = BossSprite(playableRect: playableRect)
         

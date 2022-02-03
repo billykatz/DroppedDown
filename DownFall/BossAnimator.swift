@@ -1704,7 +1704,7 @@ extension Animator {
             waitBefore += openMouth.duration
         }
         
-        resetBossThenAnimate(spriteActions, completion: completion)
+        animate(spriteActions, completion: completion)
     }
     
     

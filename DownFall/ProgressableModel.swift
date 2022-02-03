@@ -110,6 +110,10 @@ class CodexViewModel: ObservableObject {
                 if section == .playerUpgrades {
                     unlockablesInSection.append(unlockable)
                 }
+            case .luckyCat, .wingedBoots:
+                if section == .items {
+                    unlockablesInSection.append(unlockable)
+                }       
             case .rune where section == .runes:
                 unlockablesInSection.append(unlockable)
             case .killMonsterPotion, .greaterHeal, .lesserHeal, .transmogrifyPotion, .plusTwoMaxHealth:

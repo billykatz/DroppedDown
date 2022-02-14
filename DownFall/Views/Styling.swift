@@ -24,7 +24,7 @@ struct Style {
     }
     
     struct DetailView {
-        static let playerSpriteSize = CGSize(width: 160, height: 320)
+        static let playerSpriteSize = CGSize(width: 600.0, height: 600.0)
         static let spriteSize = CGSize(width: 200.0, height: 200.0)
         static let closeButtonSize = CGSize(width: 75.0, height: 75.0)
     }

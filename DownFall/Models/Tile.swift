@@ -498,7 +498,7 @@ enum TileType: Hashable, CaseIterable, Codable {
     
     
     enum TextureName: String {
-        case player = "player2"
+        case player = "player"
         case empty
         case exit
         case greenMonster

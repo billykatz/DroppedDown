@@ -535,8 +535,8 @@ class Renderer: SKSpriteNode {
             for col in 0..<Int(boardSize) {
                 x = CGFloat(col) * tileSize + bottomLeft.x
                 let isPlayer = tiles[row][col].type == TileType.player(.zero)
-                let height: CGFloat = isPlayer ? 160 : tileSize
-                let width: CGFloat = isPlayer ? 80 : tileSize
+                let height: CGFloat = isPlayer ? tileSize * 3 : tileSize
+                let width: CGFloat = isPlayer ? tileSize * 3 : tileSize
                 let sprite = DFTileSpriteNode(type: tiles[row][col].type,
                                               height: height,
                                               width: width)
@@ -1318,6 +1318,7 @@ extension Renderer {
         let positionInScene = touch.location(in: self.foreground)
         let nodes = foreground.nodes(at: positionInScene)
         
+        var touchedSprites: [(DFTileSpriteNode, TileCoord)] = []
         for node in nodes {
             if node is DFTileSpriteNode {
                 for index in 0..<sprites.reduce([],+).count {
@@ -1325,13 +1326,32 @@ extension Renderer {
                     let row = index / boardSize
                     let col = (index - row * boardSize) % boardSize
                     if sprites[row][col].contains(positionInScene) {
-                        InputQueue.append(
-                            Input(.touchBegan(TileCoord(row, col),
-                                              sprites[row][col].type))
-                        )
+                        touchedSprites.append((sprites[row][col], TileCoord(row, col)))
                     }
                 }
             }
+        }
+        touchedSprites.sort { sprite1, sprite2 in
+            if sprite1.0.isPlayerSprite {
+                return false
+            } else if sprite2.0.isPlayerSprite {
+                return true
+            }
+            else {
+                return false
+
+            }
+        }
+        
+        for spriteCoord in touchedSprites {
+            let sprite = spriteCoord.0
+            let newTileCoord = spriteCoord.1
+                
+            InputQueue.append(
+              Input(.touchBegan(newTileCoord,
+                                sprite.type))
+            )
+            return
         }
     }
     
@@ -1353,29 +1373,47 @@ extension Renderer {
             levelGoalView.touchesEnded(touches, with: event)
         }
         
+        var touchedSprites: [(DFTileSpriteNode, TileCoord)] = []
         for node in nodes {
             if node is DFTileSpriteNode {
                 for index in 0..<sprites.reduce([],+).count {
                     let boardSize = Int(self.boardSize)
                     let row = index / boardSize
                     let col = (index - row * boardSize) % boardSize
-                    if sprites[row][col].contains(positionInScene) {
-                        // create the new til coord
-                        let newTileCoord = TileCoord(row, col)
-                        
-                        // Check to see if where out touch ends is where it began
-                        guard let lastTouchInput = InputQueue.lastTouchInput(),
-                              case let InputType.touchBegan(lastTileCoord, _) = lastTouchInput.type,
-                              newTileCoord == lastTileCoord else { return }
-                        
-                        InputQueue.append(
-                            Input(.touch(TileCoord(row, col),
-                                         sprites[row][col].type))
-                        )
-                        
+                    if sprites[row][col] == node {
+                        touchedSprites.append((sprites[row][col], TileCoord(row, col)))
                     }
                 }
             }
+        }
+        
+        touchedSprites.sort { sprite1, sprite2 in
+            if sprite1.0.isPlayerSprite {
+                return false
+            } else if sprite2.0.isPlayerSprite {
+                return true
+            }
+            else {
+                return false
+
+            }
+        }
+        
+        for spriteCoord in touchedSprites {
+            let sprite = spriteCoord.0
+            let newTileCoord = spriteCoord.1
+            
+            // Check to see if where our touch ends is where it began
+            guard let lastTouchInput = InputQueue.lastTouchInput(),
+                  case let InputType.touchBegan(lastTileCoord, _) = lastTouchInput.type,
+                  newTileCoord == lastTileCoord else { return }
+            
+            InputQueue.append(
+                Input(.touch(newTileCoord,
+                             sprite.type))
+            )
+            return
+            
         }
     }
 }

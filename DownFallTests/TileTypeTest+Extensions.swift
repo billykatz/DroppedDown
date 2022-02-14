@@ -102,7 +102,7 @@ extension TileType {
     
     static func createPlayer(originalHp: Int = 1,
                              hp: Int = 1,
-                             name: String = "player2",
+                             name: String = "player",
                              attack: AttackModel = AttackModel.pickaxe,
                              type: EntityModel.EntityType = .player,
                              carry: CarryModel = .zero,

@@ -73,12 +73,7 @@ struct EntityModel: Equatable, Codable {
         }
         
         var textureString: String {
-            switch self {
-            case.player:
-                return "player3"
-            default:
-                return self.rawValue
-            }
+            return self.rawValue
         }
     }
     

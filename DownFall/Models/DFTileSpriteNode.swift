@@ -69,6 +69,10 @@ class DFTileSpriteNode: SKSpriteNode {
     
     required init?(coder aDecoder: NSCoder) { fatalError("DFTileSpriteNode init?(coder:) is not implemented") }
     
+    var isPlayerSprite: Bool {
+        return type == .player(.zero)
+    }
+    
     func removeMinecart() {
         guard case TileType.exit = self.type else { return }
         for child in children {

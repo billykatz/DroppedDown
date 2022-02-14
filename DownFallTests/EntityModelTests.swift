@@ -14,7 +14,7 @@ extension EntityModel {
     
     static func createPlayer(originalHp: Int = 3,
                              hp: Int = 3,
-                             name: String = "player2",
+                             name: String = "player",
                              attack: AttackModel = AttackModel.pickaxe,
                              type: EntityModel.EntityType = .player,
                              carry: CarryModel = .zero,

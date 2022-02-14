@@ -183,13 +183,16 @@ class TileDetailView: SKSpriteNode {
     }
     
     private func spriteNode(tileType: TileType) -> SKSpriteNode {
-        let spriteSize: CGSize
+        let spriteSize: CGSize = Style.DetailView.spriteSize
+        let spriteName: String
         if case TileType.player = tileType {
-            spriteSize = Style.DetailView.playerSpriteSize
+            spriteName = "player-tile-detail"
         } else {
-            spriteSize = Style.DetailView.spriteSize
+            spriteName = tileType.textureString()
         }
-        let sprite = SKSpriteNode(texture: SKTexture(imageNamed: tileType.textureString()), size: spriteSize)
+
+        
+        let sprite = SKSpriteNode(texture: SKTexture(imageNamed: spriteName), size: spriteSize)
         sprite.position = CGPoint.position(sprite.frame, inside: detailViewTemplate.frame, verticalAlign: .top, horizontalAnchor: .left, xOffset: Style.Padding.normal, yOffset: Style.Padding.normal)
         sprite.zPosition = Precedence.menu.rawValue
         return sprite

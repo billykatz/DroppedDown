@@ -6,7 +6,7 @@
     "startingUnlockables": [],
     "stats": [],
     "player" :
-        { "name": "player3",
+        { "name": "player",
             "type": "player",
             "originalHp": 2,
             "hp": 2,

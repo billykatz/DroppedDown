@@ -1,6 +1,6 @@
 {
     "entities": [
-        { "name": "player3",
+        { "name": "player",
             "type": "player",
             "originalHp": 3,
             "hp": 3,

@@ -45,25 +45,38 @@ extension TileType {
 }
 
 enum RuneType: String, Codable, Hashable, CaseIterable, Identifiable {
+    
+    /// red runes
     case rainEmbers
-    case getSwifty
-    case transformRock
+    case phoenix
     case flameWall
-    case bubbleUp
-    case vortex
-    case undo
     case flameColumn
     case fireball
     case drillDown
+    // case fireLine
+    // TODO: consolidate flame wall and flame column
+    
+    /// blue runes
+    case getSwifty
+    case bubbleUp
+    case teleportation
+    // case chachaSlide
+    // case freeze
+    
+    /// purple runes
+    case vortex
     case flipFlop
     case gemification
     case moveEarth
-    case phoenix
+    case transformRock
+    // case gemification
+    
+    /// blood runes
     case fieryRage
-    case teleportation
     case monsterBrawl
     case monsterCrush
     case monsterDrain
+    // case liquifyMonsters
     
     
     var id: String {
@@ -72,38 +85,39 @@ enum RuneType: String, Codable, Hashable, CaseIterable, Identifiable {
     
     var humanReadable: String {
         switch self {
-        case.getSwifty:
-            return "Get Swifty"
-        case .rainEmbers:
-            return "Rain Embers"
-        case .transformRock:
-            return "Transform Rock"
+        case .phoenix:
+            return "Phoenix"
         case .flameWall:
             return "Flame Wall"
-        case .bubbleUp:
-            return "Bubble Up"
-        case .vortex:
-            return "Vortex"
-        case .undo:
-            return "Undo"
         case .flameColumn:
             return "Flame Column"
         case .fireball:
             return "Fireball"
         case .drillDown:
             return "Drill Down"
+        case .rainEmbers:
+            return "Rain Embers"
+            
+        case .getSwifty:
+            return "Get Swifty"
+        case .bubbleUp:
+            return "Bubble Up"
+        case .teleportation:
+            return "Teleport"
+            
+        case .transformRock:
+            return "Transform Rock"
+        case .vortex:
+            return "Vortex"
         case .flipFlop:
             return "Flip Flop"
         case .gemification:
             return "Gemify"
         case .moveEarth:
             return "Move Earth"
-        case .phoenix:
-            return "Phoenix"
+            
         case .fieryRage:
             return "Fiery Rage"
-        case .teleportation:
-            return "Teleport"
         case .monsterBrawl:
             return "Brawl"
         case .monsterCrush:
@@ -427,35 +441,6 @@ struct Rune: Hashable, Codable {
                 animationColumns: 5
             )
             
-        case .undo:
-            return Rune(
-                type: .undo,
-                textureName: "rune-reversereverse-on",
-                cost: 0,
-                currency: .gem,
-                description: "Undo your most recent move",
-                flavorText:
-                    """
-                "Oopsies! Let's see if this works in real life" - Cal the Mathematician
-                """
-                ,
-                targets: 0,
-                targetTypes: [],
-                constrainedTargets: nil,
-                targetsGroupOfMonsters: false,
-                affectSlopes: [],
-                affectRange: 1,
-                stopsEffectTypes: nil,
-                heal: 0,
-                cooldown: 5,
-                rechargeType: [.monster(.zero)],
-                rechargeMinimum: 1,
-                rechargeCurrent: 0,
-                progressColor: .blood,
-                maxDistanceBetweenTargets: CGFloat.greatestFiniteMagnitude,
-                animationTextureName: "",
-                animationColumns: 0
-            )
         case .flameColumn:
             return Rune(
                 type: .flameColumn,

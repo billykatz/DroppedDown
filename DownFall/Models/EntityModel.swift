@@ -180,9 +180,28 @@ struct EntityModel: Equatable, Codable {
         return attack.attacksPerTurn - attack.attacksThisTurn > 0
     }
     
+    //TODO: Fix hack that hard codes player animations because the player entity modal is not updated with new animations
     func animation(of animationType: AnimationType) -> [SKTexture]? {
-        guard let animations = animations.first(where: { $0.animationType == animationType })?.animationTextures else { return nil }
-        return animations
+        switch self.type {
+        case .player:
+            switch animationType {
+            case .attack:
+                return SpriteSheet(textureName: "player-attack-11", columns: 11).animationFrames()
+            case .hurt:
+                return SpriteSheet(textureName: "player-hurt-7", columns: 7).animationFrames()
+            case .dying:
+                return SpriteSheet(textureName: "player-dying-11", columns: 11).animationFrames()
+            case .dodge:
+                return SpriteSheet(textureName: "player-dodge-11", columns: 11).animationFrames()
+            case .fall, .idle, .projectileStart, .projectileMid, .projectileEnd:
+                return nil
+            }
+        default:
+            guard let animations = animations.first(where: { $0.animationType == animationType })?.animationTextures else { return nil }
+            return animations
+        }
+        
+        
     }
     
     func keyframe(of animationType: AnimationType) -> Int? {

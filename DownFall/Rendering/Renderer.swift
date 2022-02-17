@@ -387,9 +387,20 @@ class Renderer: SKSpriteNode {
             }
             
         case .gameLose(let type):
-            gameRecapView.showGameRecap(win: false, killedBy: type, with: runStatTracker.runStats)
-            menuForeground.addChild(gameRecapView)
-            foreground.addChildSafely(menuForeground)
+            if let playerCoord = getTilePosition(.player(.zero), sprites: self.sprites),
+                    case TileType.player(let data) = sprites[playerCoord].type {
+                
+                animator.animateGameLost(playerData: data, playerSprite: sprites[playerCoord], delayBefore: 0.5) { [gameRecapView, menuForeground, foreground, runStatTracker] in
+                    gameRecapView.showGameRecap(win: false, killedBy: type, with: runStatTracker.runStats)
+                    menuForeground.addChild(gameRecapView)
+                    foreground.addChildSafely(menuForeground)
+                }
+            } else {
+                gameRecapView.showGameRecap(win: false, killedBy: type, with: runStatTracker.runStats)
+                menuForeground.addChild(gameRecapView)
+                foreground.addChildSafely(menuForeground)
+            }
+            
             
         case .gameWin:
             if level.isBossLevel {

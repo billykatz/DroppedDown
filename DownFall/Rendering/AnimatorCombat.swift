@@ -67,29 +67,9 @@ extension Animator {
         if !defenderDodged,
            let defend = animation(for: .hurt, fromPosition: defenderPosition, toPosition: nil, in: tiles, sprites: sprites, dispatchGroup: dispatchGroup) {
             groupedActions.append(defend)
-        } else if defenderDodged {
-            let dodgedText = ParagraphNode(text: "Dodged!", paragraphWidth: 800.0, fontSize: .fontGiantSize, fontColor: .yellow)
-            dodgedText.zPosition = Precedence.flying.rawValue
-            let scaleAction = SKAction.run {
-                let action = SKAction.scale(by: 1.75, duration: 0.75)
-                let rotateAction = SKAction.rotate(byAngle: .pi/16, duration: 0.30)
-                let antiRotateAction = SKAction.rotate(byAngle: -.pi/8, duration: 0.45)
-                
-                dodgedText.run(SKAction.group([action, SKAction.sequence([rotateAction, antiRotateAction])]))
-            }
-            
-            let addToSceneAction = SKAction.run {
-                foreground.addChild(dodgedText)
-            }
-            let removeAction = SKAction.run {
-                dodgedText.removeFromParent()
-            }
-            let addMoveUpAndScaleAction = SKAction.group([addToSceneAction, SKAction.wait(forDuration: 0.75),  scaleAction])
-            let sequence = SKAction.sequence([addMoveUpAndScaleAction, removeAction])
-            
-            
-            
-            groupedActions.append(sequence)
+        } else if defenderDodged,
+            let dodgeAnimation = animation(for: .dodge, fromPosition: defenderPosition, toPosition: attackerPosition, in: tiles, sprites: sprites, dispatchGroup: dispatchGroup) {
+            groupedActions.append(dodgeAnimation)
         }
         
         
@@ -333,7 +313,14 @@ extension Animator {
         }
         
         var flipHorizontally = false
-        if let defendPos = defenderPosition, position?.direction(relative: defendPos) == .east {
+        if  animationType != .dodge, let defendPos = defenderPosition, position?.direction(relative: defendPos) == .east {
+            flipHorizontally = true
+        }
+        // TODO: this requires an entire refactor.  But yes.  WE swap the defender and attack position.  IM not sure why and I dont have time to figure out.
+        else if animationType == .dodge,
+                let attackPosition = defenderPosition,
+                    let defenderPosition = position,
+                  attackPosition.direction(relative: defenderPosition) == .east {
             flipHorizontally = true
         }
         

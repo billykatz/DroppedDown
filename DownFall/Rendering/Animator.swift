@@ -1824,4 +1824,19 @@ struct Animator {
         
     }
     
+    func animateGameLost(playerData: EntityModel, playerSprite: DFTileSpriteNode, delayBefore: TimeInterval, completion: @escaping () -> Void) {
+        guard let dyingAnimation = playerData.animation(of: .dying) else {
+            completion()
+            return
+        }
+        
+        let animation = SKAction.animate(with: dyingAnimation, timePerFrame: timePerFrame())
+        let waitBefore = SKAction.wait(forDuration: delayBefore)
+        let seq = SKAction.sequence([waitBefore, animation])
+        let spriteAction = SpriteAction(playerSprite, seq)
+        
+        
+        animate([spriteAction], completion: completion)
+    }
+    
 }

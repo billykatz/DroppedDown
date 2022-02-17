@@ -23,8 +23,8 @@
             "animations":
                 [
                     {
-                        "animationFilename": "playerAttack",
-                        "numberOfFrames": 10,
+                        "animationFilename": "player-attack-11",
+                        "numberOfFrames": 11,
                         "animationType": "attack"
                     },
                     {

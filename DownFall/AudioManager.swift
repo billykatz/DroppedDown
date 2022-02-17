@@ -99,7 +99,7 @@ class AudioManager {
         
         sceneNode.addChild(self.audioNode)
             
-        loadAllSounds()
+//        loadAllSounds()
     }
     
     deinit {
@@ -137,28 +137,28 @@ class AudioManager {
     }
     
     func playSound(_ sound: Sound, waitForCompletion: Bool = false, silent: Bool = false) {
-        audioThread.async { [weak self] in
-            let rockSound = SKAction.playSoundFileNamed(sound.filename, waitForCompletion: waitForCompletion)
-            
-            if !silent && !UserDefaults.standard.bool(forKey: UserDefaults.muteSoundKey) {
-                self?.audioNode.run(rockSound)
-            }
-
-        }
+//        audioThread.async { [weak self] in
+//            let rockSound = SKAction.playSoundFileNamed(sound.filename, waitForCompletion: waitForCompletion)
+//
+//            if !silent && !UserDefaults.standard.bool(forKey: UserDefaults.muteSoundKey) {
+//                self?.audioNode.run(rockSound)
+//            }
+//
+//        }
     }
     
     func sequenceSounds(_ sounds: [Sound]) {
-        var soundActions = [SKAction]()
-        for sound in sounds {
-            soundActions.append(SKAction.playSoundFileNamed(sound.filename, waitForCompletion: true))
-        }
-        
-        audioThread.async { [weak self] in
-            if !UserDefaults.standard.bool(forKey: UserDefaults.muteSoundKey) {
-                self?.audioNode.run(SKAction.sequence(soundActions))
-            }
-
-        }
+//        var soundActions = [SKAction]()
+//        for sound in sounds {
+//            soundActions.append(SKAction.playSoundFileNamed(sound.filename, waitForCompletion: true))
+//        }
+//        
+//        audioThread.async { [weak self] in
+//            if !UserDefaults.standard.bool(forKey: UserDefaults.muteSoundKey) {
+//                self?.audioNode.run(SKAction.sequence(soundActions))
+//            }
+//
+//        }
     }
 
 }

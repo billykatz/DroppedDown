@@ -47,6 +47,8 @@ enum ProfileError: Error {
     case failedToSaveLocalProfile(Error?)
     case failureToSaveRemoteProfile(Error)
     case failedToLoadRemoteProfile(Error?)
+    
+    case gameCenterTurnedOff
 }
 /// This class is soley responsible for saving and loading game files from the local disk and iCloud
 class ProfileLoadingManager: ProfileManaging {
@@ -75,7 +77,7 @@ class ProfileLoadingManager: ProfileManaging {
     
     private var disposables = Set<AnyCancellable>()
     
-    init(localPlayer: PlayerClient = .live,
+    init(localPlayer: PlayerClient = .gameCenterTurnedOff,
          userDefaultClient: UserDefaultClient = .live,
          fileManagerClient: FileManagerClient = .live,
          profileCodingClient: ProfileCodingClient = .live,
@@ -120,7 +122,7 @@ class ProfileLoadingManager: ProfileManaging {
         
         /// Zip the files together. No matter what we expect each inner pipeline to spit out at least one value
         let loadedProfilesZip = Publishers.CombineLatest(
-            loadRemoteData
+            Just(Profile.zero)
                 .eraseToAnyPublisher()
                 .replaceError(with: nil),
             loadLocalProfilePublisher
@@ -192,9 +194,11 @@ class ProfileLoadingManager: ProfileManaging {
                 if let vc = viewController, showGCSignIn {
                     GameLogger.shared.log(prefix: Constants.tag, message: "Showing GameCenter Log in view controller.")
                     presenter.present(vc, animated: true)
+                    
                 } else if let error = error {
                     GameLogger.shared.log(prefix: Constants.tag, message:"\(error.localizedDescription)")
                     authenicatedSubject.send(localPlayer.isAuthenticated())
+                    
                 } else {
                     GameLogger.shared.log(prefix: Constants.tag, message: "Player is authenticated with GameCenter \(localPlayer.isAuthenticated())")
                     authenicatedSubject.send(localPlayer.isAuthenticated())
@@ -319,23 +323,24 @@ func saveProfileLocallyAndRemotely(_ profile: Profile, localPlayer: PlayerClient
 func saveProfileRemotely(_ profile: Profile, localPlayer: PlayerClient, profileCodingClient: ProfileCodingClient) -> Future<Profile, Error> {
     return Future { promise in
         GameLogger.shared.log(prefix: ProfileLoadingManager.Constants.tag, message: "Saving profile to GameCenter")
+        promise(.failure(ProfileError.gameCenterTurnedOff))
         
-        let name = profile.name
-        do {
-            let data = try profileCodingClient.encoder.encode(profile)
-            localPlayer.saveGameData(data, name) { (savedGame, error) in
-                if let error = error {
-                    GameLogger.shared.log(prefix: ProfileLoadingManager.Constants.tag, message: "Error saving game file in Game Center with name \(name) due to error \(error)")
-                    promise(.failure(ProfileError.failureToSaveRemoteProfile(error)))
-                } else {
-                    GameLogger.shared.log(prefix: ProfileLoadingManager.Constants.tag, message: "Successfully save game file with name \(name)")
-                    promise(.success(profile))
-                }
-            }
-        } catch {
-            GameLogger.shared.log(prefix: ProfileLoadingManager.Constants.tag, message: "Failed to encode profile with error: \(error)")
-            promise(.failure(ProfileError.failureToSaveRemoteProfile(error)))
-        }
+//        let name = profile.name
+//        do {
+//            let data = try profileCodingClient.encoder.encode(profile)
+//            localPlayer.saveGameData(data, name) { (savedGame, error) in
+//                if let error = error {
+//                    GameLogger.shared.log(prefix: ProfileLoadingManager.Constants.tag, message: "Error saving game file in Game Center with name \(name) due to error \(error)")
+//                    promise(.failure(ProfileError.failureToSaveRemoteProfile(error)))
+//                } else {
+//                    GameLogger.shared.log(prefix: ProfileLoadingManager.Constants.tag, message: "Successfully save game file with name \(name)")
+//                    promise(.success(profile))
+//                }
+//            }
+//        } catch {
+//            GameLogger.shared.log(prefix: ProfileLoadingManager.Constants.tag, message: "Failed to encode profile with error: \(error)")
+//            promise(.failure(ProfileError.failureToSaveRemoteProfile(error)))
+//        }
     }
 }
 

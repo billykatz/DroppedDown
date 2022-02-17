@@ -135,6 +135,7 @@ class LevelCoordinator: LevelCoordinating {
         let remove = SKAction.removeFromParent()
         scene.run(SKAction.group([fadeOut, remove])) { [weak self] in
             guard let self = self else { return }
+            /// first save all the state
             self.runModel = self.saveAllState(didWin: didWin)
             self.delegate?.finishGame(playerData: playerData, currentRun: self.runModel)
         }

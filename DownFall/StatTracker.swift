@@ -85,6 +85,7 @@ class RunStatTracker {
             if removedCount > runStats.first(where: { $0.statType == .largestRockGroupDestroyed })?.amount ?? 0 {
                 self.addStat(Statistics(amount: removedCount, statType: .largestRockGroupDestroyed), amount: removedCount)
             }
+            
         default:
             break
             

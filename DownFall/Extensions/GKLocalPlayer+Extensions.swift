@@ -17,6 +17,10 @@ struct PlayerClient {
     var isAuthenticated: () -> Bool
 }
 
+enum PlayerClientError: Error {
+    case gameCenterTurnedOff
+}
+
 extension PlayerClient {
     static let live = Self(
         fetchGCSavedGames: { GKLocalPlayer.local.fetchGCSavedGames() },
@@ -29,6 +33,27 @@ extension PlayerClient {
         },
         isAuthenticated: { GKLocalPlayer.local.isAuthenticated }
     )
+    
+    static let gameCenterTurnedOff = Self(
+        fetchGCSavedGames: {
+            return Future { promise in
+                promise(.failure(PlayerClientError.gameCenterTurnedOff))
+            }
+        },
+        saveGameData: { data, name, completion in
+            return completion(nil, PlayerClientError.gameCenterTurnedOff)
+        },
+        deleteGame: { gameName in
+            return Future { promise in
+                promise(.failure(PlayerClientError.gameCenterTurnedOff))
+            }
+        },
+        authenticationHandler: { authHandler in
+            return authHandler?(nil, PlayerClientError.gameCenterTurnedOff) ?? {}()
+        },
+        isAuthenticated: { return false }
+    )
+
 }
 
 extension GKLocalPlayer {

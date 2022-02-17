@@ -1172,17 +1172,6 @@ struct Animator {
         }
     }
     
-    // Recursively animates the sprite actions array from the start of the array at index 0/
-    // Returns when there are no more sprites to animate.
-    func animateSequentially(_ spriteActions: [SpriteAction], completion: @escaping () -> Void) {
-        if spriteActions.count == 0 { completion() }
-        // tell each child to run it's action
-        guard let firstAction = spriteActions.first else { completion(); return }
-        firstAction.sprite.run(firstAction.action) {
-            animateSequentially(Array(spriteActions.dropFirst()), completion: completion)
-        }
-    }
-    
     func animate(_ transformation: [TileTransformation]?,
                  boardSize: CGFloat,
                  bottomLeft: CGPoint,

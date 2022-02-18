@@ -37,6 +37,7 @@
 		284F2EC32731DB3C00032088 /* FTUEConductor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 284F2EC22731DB3C00032088 /* FTUEConductor.swift */; };
 		287053B8275AE8D100B84929 /* background-music.wav in Resources */ = {isa = PBXBuildFile; fileRef = 287053B7275AE8D100B84929 /* background-music.wav */; };
 		28806D91276AB8A000C4627B /* BossSprite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28806D90276AB8A000C4627B /* BossSprite.swift */; };
+		2881F28F27C02FFD00DC83DA /* CodexWalletView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2881F28E27C02FFD00DC83DA /* CodexWalletView.swift */; };
 		288330F7274FDB400070A1E8 /* ConfirmShuffleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 288330F6274FDB400070A1E8 /* ConfirmShuffleView.swift */; };
 		2886E83E26F0303B0014FA5D /* SettingsCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886E83D26F0303B0014FA5D /* SettingsCoordinator.swift */; };
 		2886E84026F030750014FA5D /* UIViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886E83F26F030750014FA5D /* UIViewController+Extensions.swift */; };
@@ -264,6 +265,7 @@
 		284F2EC22731DB3C00032088 /* FTUEConductor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FTUEConductor.swift; sourceTree = "<group>"; };
 		287053B7275AE8D100B84929 /* background-music.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "background-music.wav"; sourceTree = "<group>"; };
 		28806D90276AB8A000C4627B /* BossSprite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BossSprite.swift; sourceTree = "<group>"; };
+		2881F28E27C02FFD00DC83DA /* CodexWalletView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexWalletView.swift; sourceTree = "<group>"; };
 		288330F6274FDB400070A1E8 /* ConfirmShuffleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmShuffleView.swift; sourceTree = "<group>"; };
 		2886E83D26F0303B0014FA5D /* SettingsCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsCoordinator.swift; sourceTree = "<group>"; };
 		2886E83F26F030750014FA5D /* UIViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extensions.swift"; sourceTree = "<group>"; };
@@ -537,6 +539,7 @@
 			isa = PBXGroup;
 			children = (
 				28B7274326A0E90D00F349ED /* CodexView.swift */,
+				2881F28E27C02FFD00DC83DA /* CodexWalletView.swift */,
 				28C64460273B4CFC00098C3C /* CodexUnlockAtView.swift */,
 				283CBBD826A8A88E00B1F7C9 /* CodexItemModalView.swift */,
 				28C64462273B540C00098C3C /* CodexBuyButton.swift */,
@@ -1396,6 +1399,7 @@
 				58A4B91D2472E5620011624A /* ChanceModel.swift in Sources */,
 				2842BABF26A0EC740021CD0B /* CodexItemView.swift in Sources */,
 				28DF00882772B5140071E384 /* Animator+Extensions.swift in Sources */,
+				2881F28F27C02FFD00DC83DA /* CodexWalletView.swift in Sources */,
 				283DC778271892BC002A499A /* TutorialConductor.swift in Sources */,
 				5881DBF4244FEE440053A690 /* RuneSlotView.swift in Sources */,
 				58383643242D7A6E004CA026 /* Array+Extensions.swift in Sources */,

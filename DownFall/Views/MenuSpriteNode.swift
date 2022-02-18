@@ -12,7 +12,7 @@ fileprivate func menuHeight(type: MenuType) -> CGFloat {
     switch type {
     case .pause, .tutorialPause:
         return 750
-    case .gameLose, .tutorialWin:
+    case .tutorialWin:
         return 700
     case .gameWin:
         return 550
@@ -302,57 +302,6 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             
         }
         
-        else if menuType == .gameLose {
-            let titleText = "You made it to depth level \(level?.humanReadableDepth ?? "0")."
-            let titleNode = ParagraphNode.labelNode(text: titleText, paragraphWidth: menuSizeWidth * 0.95,
-                                                    fontSize: .fontExtraLargeSize, textAlignment: .center)
-            
-            titleNode.position = CGPoint.position(titleNode.frame, inside: containerFrame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most * 2)
-            
-            
-            let body1Text = "Spend gems at the store."
-            let body1Node = ParagraphNode.labelNode(text: body1Text, paragraphWidth: menuSizeWidth * 0.90,
-                                                    fontSize: .fontMediumSize, textAlignment: .center)
-            
-            body1Node.position = CGPoint.alignHorizontally(body1Node.frame, relativeTo: titleNode.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.most, translatedToBounds: true)
-            
-            
-            //            let body2Text = "You made it to depth level \(level?.humanReadableDepth ?? "0")."
-            //            let body2Node = ParagraphNode.labelNode(text: body2Text, paragraphWidth: menuSizeWidth * 0.90,
-            //                                                    fontSize: .fontMediumSize, textAlignment: .center)
-            //
-            //            body2Node.position = CGPoint.alignHorizontally(body2Node.frame, relativeTo: body1Node.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.normal, translatedToBounds: true)
-            
-            containerView?.addChild(titleNode)
-            containerView?.addChild(body1Node)
-            //            containerView?.addChild(body2Node)
-            
-            
-            let mainMenuButton = ShiftShaft_Button(size: buttonSize,
-                                                   delegate: buttonDelegate ?? self,
-                                                   identifier: .mainMenu,
-                                                   precedence: precedence,
-                                                   fontSize: .fontLargeSize,
-                                                   fontColor: .black,
-                                                   backgroundColor: .buttonGray)
-            mainMenuButton.position = CGPoint.position(mainMenuButton.frame, inside: containerFrame, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: Style.Padding.most * 2)
-            
-            containerView?.addChild(mainMenuButton)
-            
-            if (!FTUEConductor().doNotShowGoDirectlyToStoreButton) {
-                let storeButton = ShiftShaft_Button(size: buttonSize,
-                                                    delegate: buttonDelegate ?? self,
-                                                    identifier: .loseAndGoToStore,
-                                                    precedence: precedence,
-                                                    fontSize: .fontLargeSize,
-                                                    fontColor: .black,
-                                                    backgroundColor: .buttonGray)
-                storeButton.position = CGPoint.alignHorizontally(storeButton.frame, relativeTo: mainMenuButton.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: Style.Padding.more*2, translatedToBounds: true)
-                
-                containerView?.addChild(storeButton)
-            }
-            
-        }
         else if menuType == .confirmation {
             let titleText = "Abandon run?"
             let titleNode = ParagraphNode.labelNode(text: titleText, paragraphWidth: menuSizeWidth * 0.95,
@@ -773,19 +722,11 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             setup(.pause, playableRect: self.playableRect, precedence: self.precedence, level: self.level, buttonDelegate: self.buttonDelegate)
         case .debugWin:
             setup(.gameWin, playableRect: self.playableRect, precedence: self.precedence, level: self.level, buttonDelegate: self.buttonDelegate)
-        case .debugLose:
-            setup(.gameLose, playableRect: self.playableRect, precedence: self.precedence, level: self.level,  buttonDelegate: self.buttonDelegate)
             
         case .backpackCancel:
             fadeOut {
                 InputQueue.append(Input(.play))
             }
-            
-        case .loseAndGoToStore:
-            fadeOut {
-                InputQueue.append(Input(.loseAndGoToStore))
-            }
-            
             
         default:
             fatalError("These buttons dont appear in game")
@@ -806,7 +747,7 @@ extension MenuSpriteNode {
                     InputQueue.append(.init(.play))
                 }
 
-        case .gameLose, .gameWin:
+        case .gameWin:
             break
         
         default:

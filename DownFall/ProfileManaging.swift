@@ -89,7 +89,7 @@ class ProfileLoadingManager: ProfileManaging {
         self.profileCodingClient = profileCodingClient
         self.scheduler = scheduler
         self.mainQueue = mainQueue
-        self.authenicated = authenicatedSubject.eraseToAnyPublisher()
+        self.authenicated = authenicatedSubject.prepend(false).eraseToAnyPublisher()//.prepend(false).eraseToAnyPublisher()
     }
     
     /// Defines all business logic and kickoffs the pipeline by attempting to authenicate with GameCenter
@@ -173,6 +173,7 @@ class ProfileLoadingManager: ProfileManaging {
         )
             .subscribe(on: scheduler)
             .receive(on: mainQueue)
+            .print("\(Constants.tag): Resolve profile conflict + authenticate", to: GameLogger.shared)
             .sink(receiveCompletion: { _ in },
                   receiveValue:
                     {  [loadedProfileSubject] value  in

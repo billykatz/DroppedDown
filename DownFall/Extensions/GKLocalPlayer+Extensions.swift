@@ -51,7 +51,9 @@ extension PlayerClient {
         authenticationHandler: { authHandler in
             return authHandler?(nil, PlayerClientError.gameCenterTurnedOff) ?? {}()
         },
-        isAuthenticated: { return false }
+        isAuthenticated: {
+            return false
+        }
     )
 
 }

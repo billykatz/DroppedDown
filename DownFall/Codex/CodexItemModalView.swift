@@ -169,6 +169,6 @@ struct CodexItemModalView_Previews: PreviewProvider {
     static var previews: some View {
         let vm = ProfileViewModel(profile: .debugProfile)
         
-        CodexItemModalView(viewModel: CodexViewModel(profileViewModel: vm, codexCoordinator: CodexCoordinator(viewController: UINavigationController())), index: 0)
+        CodexItemModalView(viewModel: CodexViewModel(profileViewModel: vm, codexCoordinator: CodexCoordinator(viewController: UINavigationController(), delegate: nil)), index: 0)
     }
 }

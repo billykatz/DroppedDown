@@ -13,7 +13,6 @@ protocol MainMenuDelegate: AnyObject {
     func statsViewSelected()
     func optionsSelected()
     func continueRun()
-    func menuStore()
     func abandonRun()
     func goToTestScene()
 }
@@ -113,26 +112,12 @@ class MainMenu: SKScene {
                                   yOffset: 150.0)
         logo.zPosition = 1_000_000_000_000
         addChild(logo)
-        
-        let menuStoreButton = ShiftShaft_Button(size: .buttonExtralarge, delegate: self, identifier: .mainMenuStore, image: SKSpriteNode(imageNamed: Constants.blankButtonName), shape: .rectangle, addTextLabel: true)
-        
-        menuStoreButton.position = CGPoint.alignHorizontally(menuStoreButton.frame,
-                                                             relativeTo: startButton.frame,
-                                                             horizontalAnchor: .center,
-                                                             verticalAlign: .bottom,
-                                                             verticalPadding: Constants.buttonPadding,
-                                                             translatedToBounds: true)
-        menuStoreButton.zPosition = 0
-        
-        buttonContainer.addChild(menuStoreButton)
-        menuStoreButton.alpha = 0
-        menuStoreButton.run(buttonFadeInAction)
-        
+
         
         let statsViewButton = ShiftShaft_Button(size: .buttonExtralarge, delegate: self, identifier: .mainMenuStats, image: SKSpriteNode(imageNamed: Constants.blankButtonName), shape: .rectangle, addTextLabel: true)
         
         statsViewButton.position = CGPoint.alignHorizontally(statsViewButton.frame,
-                                                             relativeTo: menuStoreButton.frame,
+                                                             relativeTo: startButton.frame,
                                                              horizontalAnchor: .center,
                                                              verticalAlign: .bottom,
                                                              verticalPadding: Constants.buttonPadding,
@@ -247,9 +232,6 @@ extension MainMenu: ButtonDelegate {
         case .mainMenuStats:
             mainMenuDelegate?.statsViewSelected()
             
-        case .mainMenuStore:
-            mainMenuDelegate?.menuStore()
-            
         case .mainMenuContinueRun:
             detectedSavedGameMenu.fadeOut { [mainMenuDelegate, detectedSavedGameMenu] in
                 mainMenuDelegate?.continueRun()
@@ -290,8 +272,6 @@ extension MainMenu: ButtonDelegate {
                 mainMenuDelegate?.abandonRun()
                 confirmAbandonTutorial.removeFromParent()
             }
-            
-            
             
             
         case .doNotAbandonRun:

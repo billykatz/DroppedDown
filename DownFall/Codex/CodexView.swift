@@ -8,19 +8,18 @@
 
 import SwiftUI
 
-struct CodexWalletView: View {
-    let gemAmount: Int
-    
-    var body: some View {
-        HStack {
-            HStack {
-                Image("crystals").alignmentGuide(VerticalAlignment.center, computeValue: { dimension in
-                    dimension[VerticalAlignment.center] - 3
-                })
-                Text(verbatim: "\(gemAmount)").font(.titleCodexFont).foregroundColor(.white)
-            }.padding(.trailing, 10)
-        }
+extension Shape {
+    public func fill<Shape: ShapeStyle>(
+        _ fillContent: Shape,
+        strokeColor  : Color,
+        lineWidth    : CGFloat
 
+    ) -> some View {
+        ZStack {
+            self.fill(fillContent)
+            self.stroke(strokeColor, lineWidth: lineWidth)
+
+        }
     }
 }
 
@@ -52,7 +51,6 @@ struct CodexView: View {
             }
             CodexItemModalView(viewModel: viewModel, index: selectedIndex)
             .opacity(modalOpacity)
-                
         }
         .onAppear {
             // needs to be a withAnimation block or else it animates our sprite sheet
@@ -69,18 +67,78 @@ struct CodexView: View {
     }
     
     func sectionView(section: CodexSections) -> some View {
-            ForEach(viewModel.unlockables(in: section)) {
-                unlockable in
-                let index = viewModel.unlockables.firstIndex(of: unlockable)!
-                CodexItemView(viewModel: viewModel, index: index)
-                    .onTapGesture {
-                        selectedIndex = index
-                        showModal.toggle()
-                    }
-                    .contentShape(Rectangle())
-
-            }
+        ForEach(viewModel.unlockables(in: section)) {
+            unlockable in
+            let index = viewModel.unlockables.firstIndex(of: unlockable)!
+            CodexItemView(viewModel: viewModel, index: index)
+                .onTapGesture {
+                    selectedIndex = index
+                    showModal.toggle()
+                }
+                .contentShape(Rectangle())
+        }
     }
+    
+    var startRunButton: some View {
+        return Button(action: {
+            viewModel.startRunPressed()
+        }, label: {
+            RoundedRectangle(cornerRadius: 50.0)
+                .fill(Color(UIColor.foregroundBlue), strokeColor: Color(UIColor.codexButtonLightGray), lineWidth: 3)
+                .frame(width: 250, height: 75)
+                .overlay(
+                    HStack(alignment: .center, spacing: 0) {
+                        Text("Start Run")
+                            .font(.bigSubTitleCodexFont)
+                            .foregroundColor(Color(UIColor.codexButtonLightGray))
+                            .padding()
+                            .minimumScaleFactor(0.1)
+                            .lineLimit(1)
+                            .foregroundColor(.black)
+                            .alignmentGuide(VerticalAlignment.center, computeValue: { dimension in
+                                dimension[VerticalAlignment.center] + 4
+                            })
+                    }
+
+                
+                )
+        })
+    }
+    
+    var permanentUpgradesSection: some View {
+        return VStack {
+        
+            Text("Permanent Upgrades ").font(.bigSubTitleCodexFont).foregroundColor(.white).multilineTextAlignment(.center)
+            Text("Upgrades applied immediately to your base character ").font(.codexFont).foregroundColor(.white).multilineTextAlignment(.center)
+            Spacer().frame(height: 25.0)
+            LazyVGrid(columns: columns,
+                      spacing: 20) {
+                ForEach(viewModel.permanentUpgrades) { section in
+                    sectionView(section: section)
+                }
+
+            }.frame(alignment: .top)
+        }
+
+    }
+    
+    var itemPoolSection: some View {
+        return VStack {
+            Text("Item Pool ").font(.bigSubTitleCodexFont).foregroundColor(.white).multilineTextAlignment(.center)
+            Text("These items have a chance to show up in runs. ").font(.codexFont).foregroundColor(.white).multilineTextAlignment(.center)
+            
+            Spacer().frame(height: 25.0)
+            
+            LazyVGrid(columns: columns,
+                      spacing: 20) {
+                ForEach(viewModel.availableInRun) { section in
+                    sectionView(section: section)
+                }
+            }.frame(alignment: .top)
+        }
+
+    }
+
     
     var body: some View {
         VStack(spacing: 4.0) {
@@ -88,31 +146,23 @@ struct CodexView: View {
             ZStack {
                 ScrollView {
                     Spacer().frame(height: 10.0)
-                    Text("Permanent Upgrades ").font(.bigSubTitleCodexFont).foregroundColor(.white).multilineTextAlignment(.center)
-                    Text("When purchased, these upgrades will be applied immediately to your character ").font(.codexFont).foregroundColor(.white).multilineTextAlignment(.center)
-                    Spacer().frame(height: 20.0)
-                    LazyVGrid(columns: columns,
-                              spacing: 20) {
-                        ForEach(viewModel.permanentUpgrades) { section in
-                            sectionView(section: section)
-                        }
-
-                    }.frame(alignment: .top)
+                    permanentUpgradesSection
                     Spacer().frame(height: 85.0)
-                    Text("Level Goal Rewards ").font(.bigSubTitleCodexFont).foregroundColor(.white).multilineTextAlignment(.center)
-                    Text("When purchased, these items have a chance to show up in future runs. ").font(.codexFont).foregroundColor(.white).multilineTextAlignment(.center)
-                    Spacer().frame(height: 20.0)
-                    LazyVGrid(columns: columns,
-                              spacing: 20) {
-                        ForEach(viewModel.availableInRun) { section in
-                            sectionView(section: section)
-                        }
-                    }.frame(alignment: .top)
-                    
+                    itemPoolSection
+                    Spacer().frame(height: 120)
+                                        
                 }
                 .padding(.horizontal)
                 
                 if (showModal) { modalView }
+                
+                if (modalOpacity == 0.0) {
+                    VStack {
+                        Spacer()
+                        startRunButton
+                        Spacer().frame(height: 20.0)
+                    }
+                }
             }
         }.background(Color(UIColor.backgroundGray))
     }
@@ -121,9 +171,7 @@ struct CodexView: View {
 struct CodexView_Previews: PreviewProvider {
     static var previews: some View {
         let profileVM = ProfileViewModel(profile: .debugProfile)
-//        let rootVC = UIViewController()
-//        rootVC.title = "Store"
-        let codexCoord = CodexCoordinator(viewController: UINavigationController())
+        let codexCoord = CodexCoordinator(viewController: UINavigationController(), delegate: nil)
         
         let data = CodexViewModel(profileViewModel: profileVM, codexCoordinator: codexCoord)
         

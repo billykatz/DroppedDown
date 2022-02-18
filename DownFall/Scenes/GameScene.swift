@@ -12,7 +12,6 @@ import GameplayKit
 import Foundation
 
 protocol GameSceneCoordinatingDelegate: AnyObject {
-    func navigateToTheStore(_ scene: SKScene, playerData: EntityModel)
     func navigateToMainMenu(_ scene: SKScene, playerData: EntityModel)
     func goToNextArea(updatedPlayerData: EntityModel)
     func saveState()
@@ -217,17 +216,6 @@ class GameScene: SKScene {
             
             // set this so the player sees the FTUE for dying
             UserDefaults.standard.setValue(true, forKey: UserDefaults.shouldSeeDiedForTheFirstTimeKey)
-        } else if case InputType.loseAndGoToStore = input.type {
-            guard let board = self.board,
-            let playerIndex = tileIndices(of: .player(.zero), in: board.tiles).first
-            else { return }
-            
-            self.foreground.removeAllChildren()
-            if case let TileType.player(data) = board.tiles[playerIndex].type {
-                self.removeFromParent()
-                self.swipeRecognizerView?.removeFromSuperview()
-                self.gameSceneDelegate?.navigateToTheStore(self, playerData: data)
-            }
         } else if case InputType.transformation(let trans) = input.type {
             if let offers = trans.first?.offers {
                 profileViewModel?.updateUnlockablesHaveSpawned(offers: offers)

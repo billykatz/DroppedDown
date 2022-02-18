@@ -52,6 +52,7 @@ class GameViewController: UIViewController {
         self.navigationController?.setNavigationBarHidden(true, animated: false)
     }
     
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         GameLogger.shared.log(prefix: Constants.tag, message: "View did load start")
@@ -94,7 +95,7 @@ class GameViewController: UIViewController {
         
         /// setup the coordinators
         let levelCoordinator = LevelCoordinator(gameSceneNode: gameScene, entities: entities, tutorialConductor: tutorialConductor, view: view)
-        let codexCoordinator = CodexCoordinator(viewController: self.navigationController!)
+        let codexCoordinator = CodexCoordinator(viewController: self.navigationController!, delegate: levelCoordinator)
         let settingsCoordinator = SettingsCoordinator(viewController: self.navigationController!)
         
         self.menuCoordinator = MenuCoordinator(levelCoordinator: levelCoordinator, codexCoordinator: codexCoordinator, settingsCoordinator: settingsCoordinator, tutorialConductor: tutorialConductor, view: view)

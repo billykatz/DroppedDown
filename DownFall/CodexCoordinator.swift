@@ -11,17 +11,23 @@ import UIKit
 import SwiftUI
 
 
+protocol CodexCoordinatorDelegate: AnyObject {
+    func startRunPressed()
+}
+
 class CodexCoordinator {
     
-    private let viewController: UINavigationController
+    private let navigationController: UINavigationController
     var profileViewModel: ProfileViewModel?
+    private weak var delegate: CodexCoordinatorDelegate?
     
-    init(viewController: UINavigationController) {
-        self.viewController = viewController
+    init(viewController: UINavigationController, delegate: CodexCoordinatorDelegate?) {
+        self.navigationController = viewController
+        self.delegate = delegate
         
-        self.viewController.navigationBar.barTintColor = .backgroundGray
-        self.viewController.navigationBar.tintColor = .white
-        self.viewController.navigationBar.isTranslucent = false
+        self.navigationController.navigationBar.barTintColor = .backgroundGray
+        self.navigationController.navigationBar.tintColor = .white
+        self.navigationController.navigationBar.isTranslucent = false
         
     }
     
@@ -38,14 +44,19 @@ class CodexCoordinator {
         titleLabel.text = "Basecamp"
         titleLabel.textAlignment = .center
         titleLabel.font = .bigSubtitleCodexFont
-
+        
         
         hostingViewController.navigationItem.titleView = titleLabel
-        
-        viewController.pushViewController(hostingViewController, animated: true)
+        navigationController.pushViewController(hostingViewController, animated: true)
     }
     
     func updateUnlockable(_ unlockable: Unlockable) {
         profileViewModel?.updateUnlockables(unlockable)
+    }
+    
+    func startRunPressed() {
+        //        hostingViewController.dismiss(animated: true)
+        navigationController.popViewController(animated: true)
+        delegate?.startRunPressed()
     }
 }

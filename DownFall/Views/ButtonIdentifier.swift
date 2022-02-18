@@ -24,7 +24,6 @@ enum ButtonIdentifier: String {
     case playAgain
     case selectLevel
     case leaveStore
-    case loseAndGoToStore
     case storeItem
     case rotate
     case wallet
@@ -65,7 +64,6 @@ enum ButtonIdentifier: String {
     
     // Main Menu
     case mainMenuStats
-    case mainMenuStore
     case mainMenuFeedback
     
     case continueRun
@@ -80,7 +78,6 @@ enum ButtonIdentifier: String {
     case givePlayerRune
     case debugPause
     case debugWin
-    case debugLose
     
     case gameMenuOptions
     case soundOptionsBack
@@ -131,7 +128,7 @@ enum ButtonIdentifier: String {
         case .visitStore:
             return "Continue"
         case .newGame:
-            return "New Game"
+            return "New Run"
         case .back:
             return "Back"
         case .startTutorial:
@@ -168,8 +165,6 @@ enum ButtonIdentifier: String {
             return "Delete Remote profile"
         case .resetData:
             return "Reset Data"
-        case .mainMenuStore:
-            return "Store"
         case .mainMenuStats:
             return "Stats"
         case .discardFoundRune:
@@ -184,14 +179,12 @@ enum ButtonIdentifier: String {
             return "Rock Group Total"
         case .givePlayerRune:
             return "Give Player Random Rune"
+            
+            
         case .debugPause:
             return "Debug Pause"
         case .debugWin:
             return "Debug Win"
-        case .debugLose:
-            return "Debug Lose"
-        case .loseAndGoToStore:
-            return "Go to Store"
             
         case .yesAbandonRun, .mainMenuAbandonRun:
             return "Abandon run"

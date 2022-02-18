@@ -101,7 +101,12 @@ class CodexViewModel: ObservableObject {
     }
     
     
-    //API
+    /// API
+    
+    func startRunPressed() {
+        codexCoordinator?.startRunPressed()
+    }
+    
     func unlockables(in section: CodexSections) -> [Unlockable] {
         var unlockablesInSection: [Unlockable] = []
         for unlockable in unlockables {

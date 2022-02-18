@@ -23,8 +23,7 @@ protocol LevelCoordinating: AnyObject {
     var runModel: RunModel { get }
 }
 
-class LevelCoordinator: LevelCoordinating, GameSceneCoordinatingDelegate {
-    
+class LevelCoordinator: LevelCoordinating, GameSceneCoordinatingDelegate, CodexCoordinatorDelegate {
     
     struct Constants {
         static let tag = String(describing: LevelCoordinator.self)
@@ -68,7 +67,7 @@ class LevelCoordinator: LevelCoordinating, GameSceneCoordinatingDelegate {
                                       profileViewModel: profileViewModel,
                                       numberOfPreviousBossWins: runModel.numberOfBossWins())
             
-            view.presentScene(gameSceneNode)
+            view.presentScene(gameSceneNode, transition: .moveIn(with: .left, duration: 0.65))
             view.ignoresSiblingOrder = true
             
             //Debug settings
@@ -138,23 +137,10 @@ class LevelCoordinator: LevelCoordinating, GameSceneCoordinatingDelegate {
             guard let self = self else { return }
             /// first save all the state
             self.runModel = self.saveAllState()
-            self.delegate?.finishGame(playerData: playerData, currentRun: self.runModel, andGoToStore: false)
+            self.delegate?.finishGame(playerData: playerData, currentRun: self.runModel)
         }
         
     }
-    
-    func navigateToTheStore(_ scene: SKScene, playerData: EntityModel) {
-        
-        let fadeOut = SKAction.fadeOut(withDuration: 0.75)
-        let remove = SKAction.removeFromParent()
-        scene.run(SKAction.group([fadeOut, remove])) { [weak self] in
-            guard let self = self else { return }
-            self.runModel = self.saveAllState()
-            self.delegate?.finishGame(playerData: playerData, currentRun: self.runModel, andGoToStore: true)
-        }
-
-    }
-    
     
     
     // removes the current game scene and then triggers presentation of the next area
@@ -194,6 +180,14 @@ class LevelCoordinator: LevelCoordinating, GameSceneCoordinatingDelegate {
     fileprivate func saveTiles(_ savedTiles: [[Tile]]) -> RunModel {
         return RunModel(player: runModel.player, seed: runModel.seed, savedTiles: savedTiles, areas: runModel.areas, goalTracking: runModel.goalTracking, stats: runModel.stats, startingUnlockables: runModel.startingUnlockables, isTutorial: { runModel.isTutorial })
     }
+    
+    
+    
+    // MARK: CodexCoordinatorDelegate methods
+    func startRunPressed() {
+        loadRun(nil, profile: profileViewModel!.profile)
+    }
+    
     
 }
 

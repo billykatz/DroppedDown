@@ -57,10 +57,6 @@ class FTUEConductor {
         
     }
     
-    var doNotShowGoDirectlyToStoreButton: Bool {
-        return !UserDefaults.standard.bool(forKey: UserDefaults.hasSkippedTutorialKey) && !UserDefaults.standard.bool(forKey: UserDefaults.hasSeenDiedForTheFirstTimeKey)
-    }
-    
     public func showFirstDeathDialog(playableRect: CGRect, in view: SKNode) {
         if UserDefaults.standard.bool(forKey: UserDefaults.shouldSeeDiedForTheFirstTimeKey) && !UserDefaults.standard.bool(forKey: UserDefaults.hasSeenDiedForTheFirstTimeKey) {
             UserDefaults.standard.setValue(true, forKey: UserDefaults.hasSeenDiedForTheFirstTimeKey)

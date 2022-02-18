@@ -99,7 +99,7 @@ struct CodexItemView_Previews: PreviewProvider {
     static var previews: some View {
 
         
-        let data = CodexViewModel(profileViewModel: ProfileViewModel(profile: .debugProfile), codexCoordinator: CodexCoordinator(viewController: UINavigationController()))
+        let data = CodexViewModel(profileViewModel: ProfileViewModel(profile: .debugProfile), codexCoordinator: CodexCoordinator(viewController: UINavigationController(), delegate: nil))
         
         VStack {
             CodexItemView(viewModel: data, index: 4)

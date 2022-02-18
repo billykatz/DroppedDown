@@ -12,7 +12,6 @@ enum MenuType {
     case pause
     case gameWin
     case rotate
-    case gameLose
     case confirmation
     case tutorialConfirmation
     case debug
@@ -44,9 +43,6 @@ enum MenuType {
             
         case .rotate:
             return .rotate
-            
-        case .gameLose:
-            return .playAgain
             
         case .confirmation, .tutorialConfirmation, .confirmAbandonTutorial:
             return .backpackConfirm

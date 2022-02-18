@@ -35,7 +35,7 @@ class CodexCoordinator {
         
         let titleLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 100, height: 30))
         titleLabel.textColor = UIColor.white
-        titleLabel.text = "Store"
+        titleLabel.text = "Basecamp"
         titleLabel.textAlignment = .center
         titleLabel.font = .bigSubtitleCodexFont
 

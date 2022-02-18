@@ -56,7 +56,6 @@ class MainMenu: SKScene {
     var playerModel: EntityModel?
     var hasRunToContinue: Bool?
     var runToContinue: RunModel?
-    var displayStoreBadge: Bool = false
     
     lazy var detectedSavedGameMenu: MenuSpriteNode = {
         let detectedSavedGame = MenuSpriteNode(.detectedSavedGame, playableRect: size.playableRect, precedence: .menu, level: nil, buttonDelegate: self)
@@ -125,17 +124,6 @@ class MainMenu: SKScene {
                                                              translatedToBounds: true)
         menuStoreButton.zPosition = 0
         
-        if displayStoreBadge {
-            let notificationBadge = SKSpriteNode(imageNamed: Constants.notificationName)
-            notificationBadge.size = CGSize.fifty
-            
-            notificationBadge.position = CGPoint.position(notificationBadge.frame, inside: menuStoreButton.frame, verticalAlign: .top, horizontalAnchor: .right, xOffset: 0.0, yOffset: 5.0)
-            
-            notificationBadge.name = Constants.notificationName
-            notificationBadge.zPosition = Precedence.flying.rawValue
-            
-            menuStoreButton.addChild(notificationBadge)
-        }
         buttonContainer.addChild(menuStoreButton)
         menuStoreButton.alpha = 0
         menuStoreButton.run(buttonFadeInAction)

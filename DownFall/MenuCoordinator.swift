@@ -23,7 +23,7 @@ extension SKView {
 protocol MenuCoordinating: AnyObject {
     var levelCoordinator: LevelCoordinating { get }
     
-    func finishGame(playerData updatedPlayerData: EntityModel, currentRun: RunModel, andGoToStore: Bool)
+    func finishGame(playerData updatedPlayerData: EntityModel, currentRun: RunModel)
     func loadedProfile(_ profile: Profile, hasLaunchedBefore: Bool)
     
     /// exposed so that we can save the profile
@@ -40,9 +40,6 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
     var profileViewModel: ProfileViewModel?
     var tutorialConductor: TutorialConductor?
     
-    // hack for now, remove later
-    var playerTappedOnStore: Bool = false
-    
     private lazy var mainMenuScene: MainMenu? = {
         guard let scene = GKScene(fileNamed: Identifiers.mainMenuScene)?.rootNode as? MainMenu else { return nil }
         scene.mainMenuDelegate = self
@@ -58,16 +55,9 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
         self.view = view
     }
     
-    func viewWillAppear() {
-        if playerTappedOnStore {
-            mainMenuScene?.removeStoreBadge()
-        }
-    }
-    
     private func presentMainMenu(transition: SKTransition? = nil, allowContinueRun: Bool = true) {
         guard let mainMenu = mainMenuScene else { fatalError("Unable to unwrap the main menu scene")}
         mainMenu.playerModel = profileViewModel?.profile.player
-        mainMenu.displayStoreBadge = profileViewModel?.playerHasPurchasableUnlockables() ?? false
         
         if allowContinueRun && (profileViewModel?.profile.currentRun != nil && profileViewModel?.profile.currentRun != .zero) {
             mainMenu.runToContinue = profileViewModel?.profile.currentRun
@@ -100,25 +90,21 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
     
     func newGame(_ playerModel: EntityModel?) {
         profileViewModel?.nilCurrenRun()
-        playerTappedOnStore = false
-        levelCoordinator.loadRun(nil, profile: profileViewModel!.profile)
+        codexCoordinator.presentCodexView(profileViewModel: profileViewModel!)
+//        levelCoordinator.loadRun(nil, profile: profileViewModel!.profile)
         MenuMusicManager.shared.gameIsPlaying = true
     }
     
     func continueRun() {
-        playerTappedOnStore = false
         levelCoordinator.loadRun(profileViewModel!.profile.currentRun, profile: profileViewModel!.profile)
         MenuMusicManager.shared.gameIsPlaying = true
     }
     
     /// Updates and saves the player data based on the current run
     /// Optionally directly navigates to the store (soon will be removed)
-    func finishGame(playerData updatedPlayerData: EntityModel, currentRun: RunModel, andGoToStore goToStore: Bool) {
+    func finishGame(playerData updatedPlayerData: EntityModel, currentRun: RunModel) {
         profileViewModel?.finishRun(playerData: updatedPlayerData, currentRun: currentRun)
         presentMainMenu(transition: SKTransition.fade(withDuration: 0.2), allowContinueRun: false)
-        if goToStore {
-            menuStore()
-        }
     }
     
     func statsViewSelected() {
@@ -136,7 +122,6 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
     
     func menuStore() {
         guard let profileViewModel = profileViewModel else { preconditionFailure() }
-        playerTappedOnStore = true
         codexCoordinator.presentCodexView(profileViewModel: profileViewModel)
     }
     

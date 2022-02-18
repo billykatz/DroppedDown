@@ -152,7 +152,7 @@ class ProfileLoadingManager: ProfileManaging {
                     return progressedFuther(lhs: remote, rhs: local)
                 } else {
                     /// this is likely a new player and needs to save a new profile
-                    GameLogger.shared.log(prefix: Constants.tag, message: "Neither local or remote file found.")
+                        GameLogger.shared.log(prefix: Constants.tag, message: "Neither local or remote file found.")
                     throw ProfileError.failedToResolveProfiles
                 }
             })

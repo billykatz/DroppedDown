@@ -11,9 +11,11 @@ import Foundation
 class RunStatTracker {
     
     public var runStats: [Statistics]
+    private let level: Level
     
-    init(runStats: [Statistics]) {
+    init(runStats: [Statistics], level: Level) {
         self.runStats = runStats
+        self.level = level
         
         initializeStats()
         
@@ -34,30 +36,41 @@ class RunStatTracker {
     
 //    Statistics.distanceFallen,
 //    Statistics.monstersKilledInARow,
-//    Statistics.totalWins,
     
     private func handleInput(input: Input) {
         switch input.type {
         case .rotateCounterClockwise(preview: false):
             self.addStat(Statistics(amount: 1, statType: .counterClockwiseRotations), amount: 1)
+            
         case .rotateClockwise(preview: false):
             self.addStat(Statistics(amount: 1, statType: .clockwiseRotations), amount: 1)
+            
         case .transformation(let trans):
             self.handleTransformation(trans)
+            
         case .gameLose:
             self.addStat(Statistics(amount: 1, statType: .totalLoses), amount: 1)
+            
         case .itemUsed(let rune, _):
             self.addStat(Statistics(amount: 1, statType: .totalRuneUses), amount: 1)
             self.addStat(Statistics(runeType: rune.type, amount: 1, statType: .runeUses), amount: 1)
+            
         case .collectItem(_, let item, _):
             self.addStat(Statistics(amount: item.amount, statType: .totalGemsCollected), amount: item.amount)
             self.addStat(Statistics(gemColor: item.color, amount: item.amount, statType: .gemsCollected), amount: item.amount)
+            
         case .collectOffer(_, let offer, _, _):
             if offer.type == .lesserHeal {
                 self.addStat(Statistics(amount: 1, statType: .healthHealed), amount: 1)
             } else if offer.type == .greaterHeal {
                 self.addStat(Statistics(amount: 2, statType: .healthHealed), amount: 2)
             }
+            
+        case .gameWin:
+            if level.isBossLevel {
+                self.addStat(Statistics(amount: 1, statType: .totalWins), amount: 1)
+            }
+            
         default:
             break
         }

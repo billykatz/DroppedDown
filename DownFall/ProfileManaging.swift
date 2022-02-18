@@ -122,7 +122,7 @@ class ProfileLoadingManager: ProfileManaging {
         
         /// Zip the files together. No matter what we expect each inner pipeline to spit out at least one value
         let loadedProfilesZip = Publishers.CombineLatest(
-            Just(Profile.zero)
+            loadRemoteData
                 .eraseToAnyPublisher()
                 .replaceError(with: nil),
             loadLocalProfilePublisher
@@ -412,7 +412,7 @@ func createLocalProfile(playerUUIDKey: String, userDefaultClient: UserDefaultCli
             /// save the profile with the uuid as the name
             /// copy all other defaults
             // @TODO: Create a progressable model from a JSON file
-            let newProfile = Profile(name: uuid, player: profile.player, currentRun: nil, stats: Statistics.startingStats, unlockables: Unlockable.unlockables, startingUnlockbles: Unlockable.startingUnlockedUnlockables, bossWins: 0)
+            let newProfile = Profile(name: uuid, player: profile.player, currentRun: nil, stats: Statistics.startingStats, unlockables: Unlockable.unlockables, startingUnlockbles: Unlockable.startingUnlockedUnlockables)
             
             /// encode the new profile into data
             let jsonData = try profileCodingClient.encoder.encode(newProfile)

@@ -10,20 +10,21 @@ import UIKit
 import SpriteKit
 import GameplayKit
 
-protocol LevelCoordinating: GameSceneCoordinatingDelegate {
+protocol LevelCoordinating: AnyObject {
     var profileViewModel: ProfileViewModel? { get set }
     var gameSceneNode: GameScene? { get set }
     var entities: EntitiesModel? { get set }
     var delegate: MenuCoordinating? { get set }
     func presentNextLevel(_ level: Level, playerData: EntityModel?, savedTiles: [[Tile]]?)
     func loadRun(_ runModel: RunModel?, profile: Profile)
-    func saveAllState(didWin: Bool) -> RunModel
+    func saveAllState() -> RunModel
     
     // Exposed so that we can save the current run
     var runModel: RunModel { get }
 }
 
-class LevelCoordinator: LevelCoordinating {
+class LevelCoordinator: LevelCoordinating, GameSceneCoordinatingDelegate {
+    
     
     struct Constants {
         static let tag = String(describing: LevelCoordinator.self)
@@ -65,7 +66,7 @@ class LevelCoordinator: LevelCoordinating {
                                       loadedTiles: savedTiles,
                                       tutorialConductor: tutorialConductor,
                                       profileViewModel: profileViewModel,
-                                      numberOfPreviousBossWins: profileViewModel?.profile.bossWins ?? 0)
+                                      numberOfPreviousBossWins: runModel.numberOfBossWins())
             
             view.presentScene(gameSceneNode)
             view.ignoresSiblingOrder = true
@@ -88,7 +89,7 @@ class LevelCoordinator: LevelCoordinating {
         #if DEBUG
         playerData = ProfileViewModel.runPlayer(playerData: playerData)
         #endif
-        let freshRunModel = RunModel(player: playerData, seed: seed, savedTiles: nil, areas: [], goalTracking: [], stats: [], startingUnlockables: profile.startingUnlockbles, isTutorial: { return tutorialConductor.isTutorial }, didWin: false)
+        let freshRunModel = RunModel(player: playerData, seed: seed, savedTiles: nil, areas: [], goalTracking: [], stats: [], startingUnlockables: profile.startingUnlockbles, isTutorial: { return tutorialConductor.isTutorial })
         
         self.runModel = runModel ?? freshRunModel
         RunScope.deepestDepth = profile.stats.filter( { $0.statType == .lowestDepthReached }).map { $0.amount }.first ?? 0
@@ -130,26 +131,26 @@ class LevelCoordinator: LevelCoordinating {
     
     
     // MARK: - GameSceneCoordinatingDelegate
-    func navigateToMainMenu(_ scene: SKScene, playerData: EntityModel, didWin: Bool) {
+    func navigateToMainMenu(_ scene: SKScene, playerData: EntityModel) {
         let fadeOut = SKAction.fadeOut(withDuration: 0.75)
         let remove = SKAction.removeFromParent()
         scene.run(SKAction.group([fadeOut, remove])) { [weak self] in
             guard let self = self else { return }
             /// first save all the state
-            self.runModel = self.saveAllState(didWin: didWin)
-            self.delegate?.finishGame(playerData: playerData, currentRun: self.runModel)
+            self.runModel = self.saveAllState()
+            self.delegate?.finishGame(playerData: playerData, currentRun: self.runModel, andGoToStore: false)
         }
         
     }
     
-    func navigateToTheStore(_ scene: SKScene, playerData: EntityModel, didWin: Bool) {
+    func navigateToTheStore(_ scene: SKScene, playerData: EntityModel) {
         
         let fadeOut = SKAction.fadeOut(withDuration: 0.75)
         let remove = SKAction.removeFromParent()
         scene.run(SKAction.group([fadeOut, remove])) { [weak self] in
             guard let self = self else { return }
-            self.runModel = self.saveAllState(didWin: didWin)
-            self.delegate?.finishGameAndGoToStore(playerData: playerData, currentRun: self.runModel)
+            self.runModel = self.saveAllState()
+            self.delegate?.finishGame(playerData: playerData, currentRun: self.runModel, andGoToStore: true)
         }
 
     }
@@ -165,20 +166,19 @@ class LevelCoordinator: LevelCoordinating {
         presentNextArea(updatedPlayerData: updatedPlayerData, isTutorial: false)
     }
     
-    func saveState(didWin: Bool) {
-        _ = self.saveAllState(didWin: didWin)
+    func saveState() {
+        _ = self.saveAllState()
     }
     
     // MARK: Saving game state
     
-    func saveAllState(didWin: Bool) -> RunModel {
+    func saveAllState() -> RunModel {
         guard let (data, goalTracking, tiles, updatedStats, bossPhase) = self.gameSceneNode?.saveAllState() else {
             GameLogger.shared.log(prefix: Constants.tag, message: "Unable to save all state")
             return self.runModel
         }
         
         
-        runModel.didWin = didWin
         runModel.stats = updatedStats
         runModel.saveGoalTracking(goalTracking)
         runModel.saveBossPhase(bossPhase)
@@ -192,7 +192,7 @@ class LevelCoordinator: LevelCoordinating {
     
     // MARK: Utility functions
     fileprivate func saveTiles(_ savedTiles: [[Tile]]) -> RunModel {
-        return RunModel(player: runModel.player, seed: runModel.seed, savedTiles: savedTiles, areas: runModel.areas, goalTracking: runModel.goalTracking, stats: runModel.stats, startingUnlockables: runModel.startingUnlockables, isTutorial: { runModel.isTutorial }, didWin: runModel.didWin)
+        return RunModel(player: runModel.player, seed: runModel.seed, savedTiles: savedTiles, areas: runModel.areas, goalTracking: runModel.goalTracking, stats: runModel.stats, startingUnlockables: runModel.startingUnlockables, isTutorial: { runModel.isTutorial })
     }
     
 }

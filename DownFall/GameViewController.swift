@@ -107,7 +107,11 @@ class GameViewController: UIViewController {
     }
     
     override var shouldAutorotate: Bool {
-        return false
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            return false
+        } else {
+            return true
+        }
     }
 
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
@@ -136,7 +140,7 @@ class GameViewController: UIViewController {
 
         
         /// If we are able to update the run model, then update our profile
-        if let runModel = levelCoordinator?.saveAllState(didWin: false) {
+        if let runModel = levelCoordinator?.saveAllState() {
             GameLogger.shared.log(prefix: Constants.tag, message: "Run model updated")
             profile = profile.updateRunModel(runModel)
         }

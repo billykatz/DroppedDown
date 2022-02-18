@@ -222,6 +222,7 @@ extension Statistics {
                 Statistics.damageTaken,
                 Statistics.healthHealed,
                 Statistics.totalLoses,
+                Statistics.totalWins,
                 Statistics.totalRuneUsesamount
             ]
         

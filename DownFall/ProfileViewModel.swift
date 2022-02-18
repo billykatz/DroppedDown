@@ -169,8 +169,8 @@ class ProfileViewModel {
         /// update player gem carry
         newPlayerData = newPlayerData.updateCarry(carry: updatedPlayerData.carry)
 
-        // reset to base stat of 3 hp
-        newPlayerData = newPlayerData.update(originalHp: 3, dodge: 0, luck: 0)
+        // reset to base stat of 2 hp
+        newPlayerData = newPlayerData.update(originalHp: 2, dodge: 0, luck: 0)
         
         // revive
         newPlayerData = newPlayerData.revive()
@@ -193,17 +193,13 @@ class ProfileViewModel {
         // update lowest depth if needed
         newProfile = newProfile.updateStatistic(.lowestDepthReached, amount: currentRun?.depth ?? 0, overwriteIfLarger: true)
         
-        // update boss wins
-        if currentRun?.didWin ?? false {
-            newProfile = newProfile.updateBossWins()
-        }
-        
         // save profile
         saveProfile(newProfile)
     }
     
     /// When we abandon the run, the player data on the provile view model is stale
     /// So we need to take the player in the current run and update the relevant fields like the current run's carry model
+    /// THIS IS SLIGHTLY DIFFERENT THAN JUST CALLING `finishRun` so yes, some duplicate code for a different use case
     func abandonRun(playerData stalePlayerData: EntityModel, currentRun: RunModel) {
         /// update the player
         var newPlayerData = stalePlayerData.update(pickaxe: Pickaxe(runeSlots: 1, runes: []))
@@ -211,8 +207,8 @@ class ProfileViewModel {
         /// update player gem carry
         newPlayerData = newPlayerData.updateCarry(carry: currentRun.player.carry)
 
-        // reset to base stat of 3 hp
-        newPlayerData = newPlayerData.update(originalHp: 3, dodge: 0, luck: 0)
+        // reset to base stat of 2 hp
+        newPlayerData = newPlayerData.update(originalHp: 2, dodge: 0, luck: 0)
         
         // revive
         newPlayerData = newPlayerData.revive()

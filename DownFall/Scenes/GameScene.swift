@@ -12,10 +12,10 @@ import GameplayKit
 import Foundation
 
 protocol GameSceneCoordinatingDelegate: AnyObject {
-    func navigateToTheStore(_ scene: SKScene, playerData: EntityModel, didWin: Bool)
-    func navigateToMainMenu(_ scene: SKScene, playerData: EntityModel, didWin: Bool)
+    func navigateToTheStore(_ scene: SKScene, playerData: EntityModel)
+    func navigateToMainMenu(_ scene: SKScene, playerData: EntityModel)
     func goToNextArea(updatedPlayerData: EntityModel)
-    func saveState(didWin: Bool)
+    func saveState()
 }
 
 
@@ -106,7 +106,7 @@ class GameScene: SKScene {
         // init our level
         self.level = level
         self.levelGoalTracker = LevelGoalTracker(level: level, tutorialConductor: tutorialConductor)
-        self.runStatTracker = RunStatTracker(runStats: stats)
+        self.runStatTracker = RunStatTracker(runStats: stats, level: level)
         self.numberOfPreviousBossWins = numberOfPreviousBossWins
         
         //create the foreground node
@@ -192,7 +192,7 @@ class GameScene: SKScene {
             if case let TileType.player(data) = board.tiles[playerIndex].type {
                 self.removeFromParent()
                 self.swipeRecognizerView?.removeFromSuperview()
-                self.gameSceneDelegate?.navigateToMainMenu(self, playerData: data, didWin: didWin)
+                self.gameSceneDelegate?.navigateToMainMenu(self, playerData: data)
             }
         } else if case InputType.visitStore = input.type {
             
@@ -207,7 +207,7 @@ class GameScene: SKScene {
         
         } else if case InputType.gameWin(_) = input.type {
             // this is to save the state at the end of the level.
-            self.gameSceneDelegate?.saveState(didWin: true)
+            self.gameSceneDelegate?.saveState()
             
             self.tutorialConductor?.setTutorialCompleted(playerDied: false)
             
@@ -226,7 +226,7 @@ class GameScene: SKScene {
             if case let TileType.player(data) = board.tiles[playerIndex].type {
                 self.removeFromParent()
                 self.swipeRecognizerView?.removeFromSuperview()
-                self.gameSceneDelegate?.navigateToTheStore(self, playerData: data, didWin: false)
+                self.gameSceneDelegate?.navigateToTheStore(self, playerData: data)
             }
         } else if case InputType.transformation(let trans) = input.type {
             if let offers = trans.first?.offers {

@@ -563,26 +563,6 @@ class Board: Equatable {
         return nil
     }
     
-    private func useOneTimeUseEffect(_ effect: EffectModel, at offerCoord: TileCoord, input: Input, previousTransformation: Transformation) -> [Transformation] {
-        
-        var trans: Transformation?
-        
-        switch effect.kind {
-        case .killMonster:
-            if let randomMonsterCoord = randomTilecoord(ofType: .monster(.zero)) {
-                trans = removeAndReplace(from: tiles, tileCoord: randomMonsterCoord, singleTile: true, input: input)
-            }
-        case .transmogrify:
-            if let randomMonsterCoord = randomTilecoord(ofType: .monster(.zero)) {
-                trans = transmogrify(randomMonsterCoord, input: input)
-            }
-        default:
-            preconditionFailure("Currently only killMonster and transmogrify are set up for this code path")
-        }
-        
-        return (trans != nil) ? [previousTransformation, trans!] : [previousTransformation]
-    }
-    
     private func reservedCoords() -> Set<TileCoord> {
         var tileCoords: [TileCoord] = []
         for (i, _) in tiles.enumerated() {
@@ -843,6 +823,70 @@ class Board: Equatable {
         }
         return nil
     }
+}
+
+//MARK: - Items
+extension Board {
+
+    private func useOneTimeUseEffect(_ effect: EffectModel, at offerCoord: TileCoord, input: Input, previousTransformation: Transformation) -> [Transformation] {
+        
+        var trans: Transformation?
+        
+        switch effect.kind {
+        case .killMonster:
+            if let randomMonsterCoord = randomTilecoord(ofType: .monster(.zero)) {
+                trans = removeAndReplace(from: tiles, tileCoord: randomMonsterCoord, singleTile: true, input: input)
+            }
+            
+        case .transmogrify:
+            if let randomMonsterCoord = randomTilecoord(ofType: .monster(.zero)) {
+                trans = transmogrify(randomMonsterCoord, input: input)
+            }
+        
+        case .gemMagnet:
+            trans = useGemMagnet(input: input)
+            
+        default:
+            preconditionFailure("Currently only killMonster and transmogrify are set up for this code path")
+        }
+        
+        return (trans != nil) ? [previousTransformation, trans!] : [previousTransformation]
+    }
+
+
+    func useGemMagnet(input: Input) -> Transformation {
+        var newTiles = tiles
+        var tileTransformation: [TileTransformation] = []
+        var collectGemCount: Int = 0
+        
+        
+        /// move all gems to the player
+        for coord in tileCoords(for: tiles, of: [.gem]) {
+            if case TileType.item(let item) = tiles[coord].type {
+                let startCoord = coord
+                let endCoord = playerCoord
+                
+                tileTransformation.append(TileTransformation(startCoord, endCoord))
+                
+                newTiles[startCoord.row][startCoord.col] = .empty
+                
+                collectGemCount += item.amount
+            }
+        }
+        
+        // update the player carry to reflec thte new gems
+        if case TileType.player(let playerData) = newTiles[playerCoord].type {
+            newTiles[playerCoord.row][playerCoord.col] = Tile(type: .player(playerData.earn(amount: collectGemCount)))
+        }
+        
+        
+        // update our tile storage
+        self.tiles = newTiles
+        
+        return Transformation(transformation: tileTransformation, inputType: input.type, endTiles: newTiles)
+        
+    }
+
 }
 
 //MARK: - Use Rune

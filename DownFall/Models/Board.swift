@@ -21,16 +21,16 @@ class Board: Equatable {
                 if case TileType.rock(let color, let hasGem, _) = newTiles[row][col].type {
                     let groupCount = neighbors[row][col]
                     newTiles[row][col] =
-                        Tile(
-                            type: TileType.rock(color: color, holdsGem: hasGem, groupCount: groupCount),
-                            bossTargetedToEat: newTiles[row][col].bossTargetedToEat
-                        )
+                    Tile(
+                        type: TileType.rock(color: color, holdsGem: hasGem, groupCount: groupCount),
+                        bossTargetedToEat: newTiles[row][col].bossTargetedToEat
+                    )
                 }
             }
         }
         
         return newTiles
-
+        
     }
     
     private var _tiles : [[Tile]]
@@ -38,22 +38,22 @@ class Board: Equatable {
         get {
             return _tiles
         } set {
-//            let neighnors = findNeighborsForBoard(in: newValue)
+            //            let neighnors = findNeighborsForBoard(in: newValue)
             _tiles = calculateNeighbors(for: newValue)
-//            for row in 0..<newTiles.count {
-//                for col in 0..<newTiles.count {
-//                    if case TileType.rock(let color, let hasGem, _) = newTiles[row][col].type {
-//                        let groupCount = neighnors[row][col]
-//                        newTiles[row][col] =
-//                            Tile(
-//                                type: TileType.rock(color: color, holdsGem: hasGem, groupCount: groupCount),
-//                                bossTargetedToEat: newTiles[row][col].bossTargetedToEat
-//                            )
-//                    }
-//                }
-//            }
-//
-//            _tiles = newTiles
+            //            for row in 0..<newTiles.count {
+            //                for col in 0..<newTiles.count {
+            //                    if case TileType.rock(let color, let hasGem, _) = newTiles[row][col].type {
+            //                        let groupCount = neighnors[row][col]
+            //                        newTiles[row][col] =
+            //                            Tile(
+            //                                type: TileType.rock(color: color, holdsGem: hasGem, groupCount: groupCount),
+            //                                bossTargetedToEat: newTiles[row][col].bossTargetedToEat
+            //                            )
+            //                    }
+            //                }
+            //            }
+            //
+            //            _tiles = newTiles
         }
     }
     private(set) var level: Level
@@ -117,9 +117,9 @@ class Board: Equatable {
     private func isWithinBounds(_ tileCoord: TileCoord) -> Bool {
         let (tileRow, tileCol) = tileCoord.tuple
         return tileRow >= 0 && //lower bound
-            tileCol >= 0 && // lower bound
-            tileRow < boardSize && // upper bound
-            tileCol < boardSize
+        tileCol >= 0 && // lower bound
+        tileRow < boardSize && // upper bound
+        tileCol < boardSize
     }
     
     
@@ -157,9 +157,9 @@ class Board: Equatable {
                 guard let playerData = playerEntityData,
                       let pp = playerPosition,
                       let count =  transformation?.removed?.count else {
-                    /// no update for the player is needed
-                    break
-                }
+                          /// no update for the player is needed
+                          break
+                      }
                 
                 /// by doing this we have recorded the progress of the runes.
                 let updatedPlayer = playerData.progressRunes(tileType: type, count: count)
@@ -173,10 +173,10 @@ class Board: Equatable {
         case .monsterDies(let tileCoord, _, let deathBy):
             guard var playerData = playerEntityData,
                   let pp = playerPosition else {
-                /// no update for the player is needed
-                break
-            }
-
+                      /// no update for the player is needed
+                      break
+                  }
+            
             // only remove a single tile when a monster dies
             if deathBy == .player {
                 playerData = playerData.progressRunes(tileType: TileType.monster(.zero), count: 1)
@@ -278,7 +278,7 @@ class Board: Equatable {
         case .foundRuneDiscarded(let rune):
             transformation = self.foundRuneDiscarded(rune, input: input)
             
-        // handling boss input
+            // handling boss input
         case .bossTurnStart(let phase):
             switch phase.bossState.stateType {
             case .targetEat:
@@ -301,19 +301,19 @@ class Board: Equatable {
             
         case .bossPhaseStart:
             transformation = bossPhaseChange(input: input)
-        
+            
         case .gameLose,
-             .play,
-             .pause,
-             .animationsFinished,
-             .playAgain,
-             .boardBuilt,
-             .boardLoaded,
-             .selectLevel,
-             .newTurn,
-             .visitStore, .loseAndGoToStore,
-             .itemUseCanceled, .itemCanBeUsed, .rotatePreview, .tileDetail, .levelGoalDetail, .runeReplacement,
-             .tutorialPhaseStart, .tutorialPhaseEnd:
+                .play,
+                .pause,
+                .animationsFinished,
+                .playAgain,
+                .boardBuilt,
+                .boardLoaded,
+                .selectLevel,
+                .newTurn,
+                .visitStore, .loseAndGoToStore,
+                .itemUseCanceled, .itemCanBeUsed, .rotatePreview, .tileDetail, .levelGoalDetail, .runeReplacement,
+                .tutorialPhaseStart, .tutorialPhaseEnd:
             transformation = nil
         }
         
@@ -322,7 +322,7 @@ class Board: Equatable {
     }
     
     private func resetBossFlags(input: Input) -> Transformation {
-//        guard case let InputType.bossTurnStart(phase) = input.type else { return .zero }
+        //        guard case let InputType.bossTurnStart(phase) = input.type else { return .zero }
         for row in 0..<tiles.count {
             for column in 0..<tiles[row].count {
                 tiles[row][column].bossTargetedToEat = false
@@ -364,7 +364,7 @@ class Board: Equatable {
         guard case let InputType.bossTurnStart(phase) = input.type else { return .zero }
         if let coords = phase.bossState.targets.whatToEat {
             coords.forEach { coord in
-                 tiles[coord.row][coord.column].bossTargetedToEat = true
+                tiles[coord.row][coord.column].bossTargetedToEat = true
             }
         }
         return Transformation(transformation: nil, inputType: .bossTurnStart(phase), endTiles: self.tiles)
@@ -396,7 +396,7 @@ class Board: Equatable {
         
     }
     
-    // Only excutes attacks for the single AttackType that is past in. 
+    // Only excutes attacks for the single AttackType that is past in.
     private func bossExecutesAttacks(input: Input, attackType executeAttackType: BossAttackType) -> Transformation {
         guard case let InputType.bossTurnStart(phase) = input.type else { return .zero }
         var tileTransformations: [TileTransformation] = []
@@ -433,7 +433,7 @@ class Board: Equatable {
                     }
                 }
             }
-
+            
         }
         
         // dynamite and spawning stuff
@@ -444,7 +444,7 @@ class Board: Equatable {
                         tiles[coord.row][coord.column] = Tile(type: .dynamite(.init(count: 3, hasBeenDecremented: false)))
                         
                     } else if case BossAttackType.spawnMonster = executeAttackType,
-                        case BossAttackType.spawnMonster(withType: let monsterType) = attackType,
+                              case BossAttackType.spawnMonster(withType: let monsterType) = attackType,
                               let tile = tileCreator.monsterWithType(monsterType) {
                         tiles[coord.row][coord.column] = tile
                     }
@@ -455,7 +455,7 @@ class Board: Equatable {
         return Transformation(transformation: tileTransformations.isEmpty ? nil : tileTransformations, inputType: .bossTurnStart(phase), endTiles: self.tiles)
         
     }
-
+    
     
     private func foundRuneDiscarded(_ rune: Rune, input: Input) -> Transformation {
         guard let specificCoord = tiles(of: TileType.offer(StoreOffer(type: .rune(rune), tier: 1, textureName: "", title: "", body: "", startingPrice: 0))).first else { return .zero }
@@ -487,67 +487,74 @@ class Board: Equatable {
     
     /// This is for collecting runes or other things like max health
     private func collect(offer: StoreOffer, at offerCoord: TileCoord, input: Input) -> [Transformation] {
-        let selectedTile = tiles[offerCoord]
         
-        // find the other offer if it exist
+        // get the collected item's tile
+        let collectedItemTile = tiles[offerCoord]
+        
+        // find the other offer of the same tier if it exist
+        // it is possible for the other item not to exist in the case where a player discards a found rune when there pickaxe handle is full.  IN that case, the other offer from that tier is not discarded.
         var otherOfferTile: TileCoord?
         var otherOffer: StoreOffer?
         for (i, _) in tiles.enumerated() {
             for (j, _) in tiles[i].enumerated() {
-                if case TileType.offer(let tileOffer) = tiles[i][j].type, tileOffer != offer, tileOffer.tier == offer.tier {
+                if case TileType.offer(let tileOffer) = tiles[i][j].type,
+                   tileOffer != offer,
+                   tileOffer.tier == offer.tier {
                     otherOfferTile = TileCoord(i, j)
                     otherOffer = tileOffer
                 }
             }
         }
         
+        // create a transformation to return later
+        var transformation: Transformation
+        
         // if it does exists then remove both the collected offer and the other offer from the board
-        let transformation: Transformation
         if let otherOfferTile = otherOfferTile,
            let otherOffer = otherOffer,
            case InputType.collectOffer(let collectedCoord, let collectedStoreOffer, _, _) = input.type {
             transformation = removeAndReplaces(from: tiles, specificCoord: [offerCoord, otherOfferTile], input: Input(.collectOffer(collectedCoord: collectedCoord, collectedOffer: collectedStoreOffer, discardedCoord: otherOfferTile, discardedOffer: otherOffer)), forceSpawnMonsters: shouldSpawnMonsterDuringTutorial)
+            
             hasAlreadySpawnedMonsterForTutorial = true
-        } else {
-            //remove and replace the single item tile
+        }
+        // otherwise just remove and replace the single item tile
+        else {
             transformation = removeAndReplace(from: tiles, tileCoord: offerCoord, singleTile: true, input: input, forceMonsterSpawn: shouldSpawnMonsterDuringTutorial)
+            
             hasAlreadySpawnedMonsterForTutorial = true
         }
         
-        // save the item
-        guard case let TileType.offer(storeOffer) = selectedTile.type,
+        // Get the item and the new end tiles from the remove and replace transformation
+        guard case let TileType.offer(storeOffer) = collectedItemTile.type,
               var updatedTiles = transformation.endTiles,
               let pp = playerPosition,
               case let .player(data) = updatedTiles[pp].type
-        else { return [Transformation.zero] }
+        else { return [transformation] }
         
-        
+        // grab the effect from the store offer for convenience
         let effect = storeOffer.effect
         
         // we have to reset attack here because the player has moved but the turn may not be over
         // Eg: it is possible that there could be monster, item, monster in a row below the player and the player should be able to kill the second monster after collecting the offer/effect
         let playerData = data.update(attack: data.attack.resetAttack()).applyEffect(effect)
         
-        
+        /// store the update player data in the new updated tiles
         updatedTiles[pp.x][pp.y] = Tile(type: .player(playerData))
         
+        /// update our tile stores
         tiles = updatedTiles
         
-        let trans = Transformation(transformation: transformation.tileTransformation,
-                                   inputType: transformation.inputType,
-                                   endTiles: self.tiles,
-                                   removed: transformation.removed,
-                                   newTiles: transformation.newTiles,
-                                   shiftDown: transformation.shiftDown)
+        /// update the previos transformation with our new tiles (basically just with the applied effect and reset attacks on the player)
+        transformation.endTiles = self.tiles
         
         
         /// If this is a one time use potion then we will tack on that trackformation after the remove and replace
         if effect.stat == .oneTimeUse {
-            return useOneTimeUseEffect(effect, at: offerCoord, input: input, previousTransformation: trans)
+            return useOneTimeUseEffect(effect, at: offerCoord, input: input, previousTransformation: transformation)
         }
         /// otherwise just return the tranformation for remove and replace with the updated player
         else {
-            return [trans]
+            return [transformation]
         }
     }
     
@@ -713,9 +720,9 @@ class Board: Equatable {
         // if we do not have a trans, then we are not rotating, creating an empty Transformation
         guard case InputType.rotatePreviewFinish(let spriteAction, let trans) = input.type,
               let tiles = trans?.endTiles else {
-            let transformation = Transformation(transformation: nil, inputType: input.type, endTiles: self.tiles)
-            return [transformation]
-        }
+                  let transformation = Transformation(transformation: nil, inputType: input.type, endTiles: self.tiles)
+                  return [transformation]
+              }
         /// if we have a trans, that is because we are actually rotating
         self.tiles = tiles
         return [Transformation(transformation: nil, inputType: .rotatePreviewFinish(spriteAction, trans), endTiles: tiles)]
@@ -827,7 +834,7 @@ class Board: Equatable {
 
 //MARK: - Items
 extension Board {
-
+    
     private func useOneTimeUseEffect(_ effect: EffectModel, at offerCoord: TileCoord, input: Input, previousTransformation: Transformation) -> [Transformation] {
         
         var trans: Transformation?
@@ -842,7 +849,7 @@ extension Board {
             if let randomMonsterCoord = randomTilecoord(ofType: .monster(.zero)) {
                 trans = transmogrify(randomMonsterCoord, input: input)
             }
-        
+            
         case .gemMagnet:
             trans = useGemMagnet(input: input)
             
@@ -852,8 +859,8 @@ extension Board {
         
         return (trans != nil) ? [previousTransformation, trans!] : [previousTransformation]
     }
-
-
+    
+    
     func useGemMagnet(input: Input) -> Transformation {
         var newTiles = tiles
         var tileTransformation: [TileTransformation] = []
@@ -886,7 +893,7 @@ extension Board {
         return Transformation(transformation: tileTransformation, inputType: input.type, endTiles: newTiles)
         
     }
-
+    
 }
 
 //MARK: - Use Rune
@@ -896,9 +903,9 @@ extension Board {
     private func useRune(_ rune: Rune, on allTargets: AllTarget, input: Input) -> [Transformation] {
         guard let playerData = playerEntityData,
               let pp = playerPosition else {
-            /// no update for the player is needed
-            preconditionFailure("Failed")
-        }
+                  /// no update for the player is needed
+                  preconditionFailure("Failed")
+              }
         
         /// by doing this we have recorded the progress of the runes.
         let updatedPlayer = playerData.useRune(rune)
@@ -1098,8 +1105,8 @@ extension Board {
         
         guard !tilesToBeDestroyed.isEmpty,
               let minCoord = tilesToBeDestroyed.min(by: { $0.row < $1.row }) else {
-            return [Transformation(transformation: nil, inputType: input.type, endTiles: tiles)]
-        }
+                  return [Transformation(transformation: nil, inputType: input.type, endTiles: tiles)]
+              }
         
         
         // the player will fall from their original coord to the lowest coord of the tiles that were destroyed
@@ -1360,7 +1367,7 @@ extension Board {
                 intermediateTiles[coord.x][coord.y] = Tile(type: .emptyGem(color, amount: numberOfGemsForGroup(size: selectedTiles.count)))
                 removedTilesContainGem = holdsGem
             } else if case TileType.monster = tiles[coord].type,
-                let deathType = monsterDeathType {
+                      let deathType = monsterDeathType {
                 // remove the tile
                 intermediateTiles[coord.x][coord.y] = .empty
                 // keep track of monsters killed
@@ -1577,7 +1584,7 @@ extension Board {
         
         guard let pp = playerPosition,
               case let .player(data) = tiles[pp].type,
-                case let InputType.monsterDies(_, _, deathType: deathType) = input.type
+              case let InputType.monsterDies(_, _, deathType: deathType) = input.type
         else { return Transformation.zero }
         
         var newTiles = tiles
@@ -1881,8 +1888,8 @@ extension Board {
     func gameWin() -> Transformation {
         guard let playerPosition = getTileStructPosition(TileType.player(.zero)),
               isWithinBounds(playerPosition.rowBelow), case TileType.player(let data) = tiles[playerPosition].type else {
-            return Transformation(transformation: [], inputType: .gameWin(0))
-        }
+                  return Transformation(transformation: [], inputType: .gameWin(0))
+              }
         
         var newTiles = tiles
         newTiles[playerPosition.row][playerPosition.column] = Tile(type: .player(data))
@@ -1990,12 +1997,12 @@ extension Board {
             
             /// I purposefully hid some monsters in the Pillars in the boss level.  I think it better if they dont destroy the pillars they are trapped in
             /// I have been a mistake so ill just leave this code in here
-//            if data.health == 1 {
-//                tiles[defenderPosition.x][defenderPosition.y] = Tile.empty
-//            } else {
-//                tiles[defenderPosition.x][defenderPosition.y] = Tile(type: .pillar(PillarData(color: data.color, health: data.health - 1)))
-//
-//            }
+            //            if data.health == 1 {
+            //                tiles[defenderPosition.x][defenderPosition.y] = Tile.empty
+            //            } else {
+            //                tiles[defenderPosition.x][defenderPosition.y] = Tile(type: .pillar(PillarData(color: data.color, health: data.health - 1)))
+            //
+            //            }
         } else if case let .monster(monsterModel) = tiles[attackerPosition].type,
                   defenderPostion == nil {
             //just note that the monster attacked
@@ -2008,8 +2015,8 @@ extension Board {
                                                           affectedTiles: affectedTiles,
                                                           dodged: dodged,
                                                           attackerIsPlayer: attackerIsPlayer
-        ),
-        endTiles: self.tiles,
+                                                         ),
+                              endTiles: self.tiles,
                               pillarsTakeDamage: pillarsThatTakeDamage.isEmpty ? nil : pillarsThatTakeDamage )
     }
 }

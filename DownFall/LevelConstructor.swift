@@ -69,7 +69,7 @@ struct LevelConstructor {
         } else if depth == testLevelDepthNumber {
             return [
                 StoreOffer.offer(type: .rune(.rune(for: .moveEarth)), tier: 1),
-                StoreOffer.offer(type: .plusOneMaxHealth, tier: 1),
+                StoreOffer.offer(type: .gemMagnet, tier: 1),
                 StoreOffer.offer(type: .rune(.rune(for: .teleportation)), tier: 2),
                 StoreOffer.offer(type: .plusOneMaxHealth, tier: 2)
                 

@@ -723,6 +723,7 @@ extension Renderer {
         let first = trans.first!
         let second = trans.last!
         
+        // TODO: Allow this rendering transformation to handle items without animating textures
         let potionAnimationFrames = SpriteSheet(texture: SKTexture(imageNamed: offer.textureName),
                                                 rows: 1,
                                                 columns: offer.spriteSheetColumns!)

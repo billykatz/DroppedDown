@@ -8,28 +8,19 @@
 
 import SpriteKit
 
-
 typealias StoreOfferTier = Int
 
 struct StoreOffer: Codable, Hashable, Identifiable {
     
-    var id: String {
-        return self.textureName
-    }
-    
-    static func ==(_ lhsOffer: StoreOffer, _ rhsOffer: StoreOffer) -> Bool {
-        return lhsOffer.type == rhsOffer.type
-    }
-    
-    static let zero = StoreOffer(type: .greaterHeal, tier: 0, textureName: "zero", currency: .gem, title: "zero", body: "zero", startingPrice: 0)
-    
-    
     let type: StoreOfferType
     let tier: StoreOfferTier
     let textureName: String
-    let currency: Currency
     let title: String
     let body: String
+    
+    var id: String {
+        return self.textureName
+    }
     
     var sprite: SKSpriteNode {
         if hasSpriteSheet {
@@ -48,7 +39,7 @@ struct StoreOffer: Codable, Hashable, Identifiable {
         case .rune(let rune):
             return rune.fullDescription
         case .gems(amount: let amount):
-            return "Immediately gain \(amount) gem\(amount > 1 ? "s" : "")."
+            return "Gain \(amount) gem\(amount > 1 ? "s" : "")."
         default:
             return self.body
         }
@@ -57,6 +48,97 @@ struct StoreOffer: Codable, Hashable, Identifiable {
     var tierIndex: Int {
         return tier - 1
     }
+    
+    var hasSpriteSheet: Bool {
+        switch self.type {
+        case .killMonsterPotion, .transmogrifyPotion, .lesserHeal, .greaterHeal:
+            return true
+        default:
+            return false
+        }
+    }
+    
+    var spriteSheetColumns: Int? {
+        switch self.type {
+        case .killMonsterPotion:
+            return 7
+        case .transmogrifyPotion:
+            return 6
+        case .lesserHeal, .greaterHeal:
+            return 5
+        default:
+            return nil
+        }
+    }
+    
+    var effect: EffectModel {
+        let effect: EffectModel
+        switch self.type {
+        case .lesserHeal:
+            effect = EffectModel(kind: .buff, stat: .health, amount: 1, duration: Int.max)
+            
+        case .greaterHeal:
+            effect = EffectModel(kind: .buff, stat: .health, amount: 2, duration: Int.max)
+            
+        case .plusOneMaxHealth:
+            effect = EffectModel(kind: .buff, stat: .maxHealth, amount: 1, duration: Int.max)
+            
+        case .plusTwoMaxHealth:
+            effect = EffectModel(kind: .buff, stat: .maxHealth, amount: 2, duration: Int.max)
+            
+        case .rune(let rune):
+            effect = EffectModel(kind: .rune, stat: .pickaxe, amount: 0, duration: 0, rune: rune)
+            
+        case .gems(let amount):
+            effect = EffectModel(kind: .buff, stat: .gems, amount: amount, duration: 0)
+            
+        case .runeUpgrade:
+            effect = EffectModel(kind: .buff, stat: .pickaxe, amount: 10, duration: 0)
+            
+        case .runeSlot:
+            effect = EffectModel(kind: .buff, stat: .runeSlot, amount: 1, duration: 0)
+            
+        case .dodge(let amount):
+            effect = EffectModel(kind: .buff, stat: .dodge, amount: amount, duration: 0)
+            
+        case .luck(let amount):
+            effect = EffectModel(kind: .buff, stat: .luck, amount: amount, duration: 0)
+            
+        case .killMonsterPotion:
+            effect = EffectModel(kind: .killMonster, stat: .oneTimeUse, amount: Int.max, duration: 0)
+            
+        case .transmogrifyPotion:
+            effect = EffectModel(kind: .transmogrify, stat: .oneTimeUse, amount: Int.max, duration: 0)
+            
+        case .sandals, .runningShoes, .wingedBoots:
+            effect = EffectModel(kind: .buff, stat: .dodge, amount: type.dodgeAmount, duration: 0)
+            
+        case .fourLeafClover, .horseshoe, .luckyCat:
+            effect = EffectModel(kind: .buff, stat: .luck, amount: type.luckAmount, duration: 0)
+            
+        case .gemMagnet:
+            effect = EffectModel(kind: .gemMagnet, stat: .oneTimeUse, amount: 1, duration: 0)
+            
+        }
+        return effect
+    }
+    
+    var rune: Rune? {
+        if case StoreOfferType.rune(let rune) = self.type {
+            return rune
+        }
+        return nil
+    }
+}
+
+extension StoreOffer {
+    
+    static func ==(_ lhsOffer: StoreOffer, _ rhsOffer: StoreOffer) -> Bool {
+        return lhsOffer.type == rhsOffer.type
+    }
+    
+    static let zero = StoreOffer(type: .greaterHeal, tier: 0, textureName: "zero", title: "zero", body: "zero", startingPrice: 0)
+    
     
     static func offer(type: StoreOfferType, tier: StoreOfferTier) -> StoreOffer {
         let title: String
@@ -135,88 +217,15 @@ struct StoreOffer: Codable, Hashable, Identifiable {
             title = "Lucky Cat"
             body = "Teri might not appreciate you carrying this ceramic cat.\n+\(type.luckAmount) luck"
             textureName = "luckyCat"
+        case .gemMagnet:
+            title = "Gem Magnet"
+            body = "Collect all gems on the board"
+            textureName = "gemMagnet"
             
         }
         
-        return StoreOffer(type: type, tier: tier, textureName: textureName, currency: .gem, title: title, body: body, startingPrice: 0)
+        return StoreOffer(type: type, tier: tier, textureName: textureName, title: title, body: body, startingPrice: 0)
     }
-    
-    var hasSpriteSheet: Bool {
-        switch self.type {
-        case .killMonsterPotion, .transmogrifyPotion, .lesserHeal, .greaterHeal:
-            return true
-        default:
-            return false
-        }
-    }
-    
-    var spriteSheetColumns: Int? {
-        switch self.type {
-        case .killMonsterPotion:
-            return 7
-        case .transmogrifyPotion:
-            return 6
-        case .lesserHeal, .greaterHeal:
-            return 5
-        default:
-            return nil
-        }
-    }
-    
-    var effect: EffectModel {
-        let effect: EffectModel
-        switch self.type {
-        case .lesserHeal:
-            effect = EffectModel(kind: .buff, stat: .health, amount: 1, duration: Int.max, offerTier: tier)
-            
-        case .greaterHeal:
-            effect = EffectModel(kind: .buff, stat: .health, amount: 2, duration: Int.max, offerTier: tier)
-            
-        case .plusOneMaxHealth:
-            effect = EffectModel(kind: .buff, stat: .maxHealth, amount: 1, duration: Int.max, offerTier: tier)
-            
-        case .plusTwoMaxHealth:
-            effect = EffectModel(kind: .buff, stat: .maxHealth, amount: 2, duration: Int.max, offerTier: tier)
-            
-        case .rune(let rune):
-            effect = EffectModel(kind: .rune, stat: .pickaxe, amount: 0, duration: 0, rune: rune, offerTier: tier)
-            
-        case .gems(let amount):
-            effect = EffectModel(kind: .buff, stat: .gems, amount: amount, duration: 0, offerTier: tier)
-            
-        case .runeUpgrade:
-            effect = EffectModel(kind: .buff, stat: .pickaxe, amount: 10, duration: 0, offerTier: tier)
-            
-        case .runeSlot:
-            effect = EffectModel(kind: .buff, stat: .runeSlot, amount: 1, duration: 0, offerTier: tier)
-            
-        case .dodge(let amount):
-            effect = EffectModel(kind: .buff, stat: .dodge, amount: amount, duration: 0, offerTier: tier)
-            
-        case .luck(let amount):
-            effect = EffectModel(kind: .buff, stat: .luck, amount: amount, duration: 0, offerTier: tier)
-            
-        case .killMonsterPotion:
-            effect = EffectModel(kind: .killMonster, stat: .oneTimeUse, amount: Int.max, duration: 0, offerTier: tier)
-            
-        case .transmogrifyPotion:
-            effect = EffectModel(kind: .transmogrify, stat: .oneTimeUse, amount: Int.max, duration: 0, offerTier: tier)
-            
-        case .sandals, .runningShoes, .wingedBoots:
-            effect = EffectModel(kind: .buff, stat: .dodge, amount: type.dodgeAmount, duration: 0, offerTier: tier)
-            
-        case .fourLeafClover, .horseshoe, .luckyCat:
-            effect = EffectModel(kind: .buff, stat: .luck, amount: type.luckAmount, duration: 0, offerTier: tier)
-            
-        }
-        return effect
-    }
-    
-    var rune: Rune? {
-        if case StoreOfferType.rune(let rune) = self.type {
-            return rune
-        }
-        return nil
-    }
-}
 
+    
+}

@@ -458,7 +458,7 @@ class Board: Equatable {
 
     
     private func foundRuneDiscarded(_ rune: Rune, input: Input) -> Transformation {
-        guard let specificCoord = tiles(of: TileType.offer(StoreOffer(type: .rune(rune), tier: 1, textureName: "", currency: .gem, title: "", body: "", startingPrice: 0))).first else { return .zero }
+        guard let specificCoord = tiles(of: TileType.offer(StoreOffer(type: .rune(rune), tier: 1, textureName: "", title: "", body: "", startingPrice: 0))).first else { return .zero }
         
         let removeAndReplace = removeAndReplaces(from: tiles, specificCoord: [specificCoord], input: input)
         

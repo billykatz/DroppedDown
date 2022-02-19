@@ -13,6 +13,7 @@ import AVFoundation
 class Renderer: SKSpriteNode {
     
     struct Constants {
+        static let tag = String(describing: Renderer.self)
         static let rotateVisualCueSize: CGSize = .init(width: 850, height: 170)
     }
     
@@ -680,10 +681,11 @@ extension Renderer {
     
     /// Renders and delegates animation of collecting store offers
     private func collectOffer(_ trans: [Transformation], offer: StoreOffer, atTilecoord: TileCoord, discardOffer: StoreOffer, discardedOfferTileCoord: TileCoord) {
-        guard trans.count > 1 else {
+        
+        // This code path covers colelcting Runes and health, dodge and luck upgrades
+        if trans.count == 1 {
             
-            // in this case we have collected a upgrade for the run
-            
+            // in this case we have collected a Rune
             if case StoreOfferType.rune = offer.type {
                 // get the target area to move the rune.
                 let runeSlotView = backpackView.runeInventoryContainer?.firstEmptyRuneSlotNode()
@@ -691,74 +693,62 @@ extension Renderer {
                 let sprite = sprites[atTilecoord.x][atTilecoord.y]
                 
                 animator.animateCollectRune(runeSprite: sprite, targetPosition: targetPoint) { [weak self] in
-                    self?.computeNewBoard(for: trans.first) { [weak self] in self?.animationsFinished(endTiles: trans.first?.endTiles) }
+                    self?.computeNewBoard(for: trans.first) { [weak self] in
+                        self?.animationsFinished(endTiles: trans.first?.endTiles)
+                    }
                 }
                 
                 return
             }
             
             else if let endTiles = trans.first?.endTiles,
-//                    let playerCoord = getTilePosition(.player(.zero), tiles: endTiles),
                     let oldPlayerCoord = getTilePosition(.player(.zero), sprites: self.sprites),
                     case TileType.player(let data) = sprites[oldPlayerCoord].type {
+                
                 // animate received the health, dodge or luck and then compute the new board
                 let targetSprite = hud.targetSprite(for: offer.type)
                 let targetPoint = hud.convert(targetSprite?.frame.center ?? .zero, to: foreground)// ?? .zero
                 let sprite = sprites[atTilecoord.x][atTilecoord.y]
                 animator.animateCollectOffer(offerType: offer.type, offerSprite: sprite, targetPosition: targetPoint, to: hud, updatedPlayerData: data) { [weak self] in
-                    self?.computeNewBoard(for: trans.first) { [weak self] in self?.animationsFinished(endTiles: endTiles) }
+                    self?.computeNewBoard(for: trans.first) { [weak self] in
+                        self?.animationsFinished(endTiles: endTiles)
+                    }
                 }
                 
                 return
             }
-            
-            self.computeNewBoard(for: trans.first) { [weak self] in self?.animationsFinished(endTiles: trans.first?.endTiles) }
-            return
-        }
-        
-        
-        guard trans.count < 3 else {
-            preconditionFailure("This method is not set up to handle more than 2 transformations")
-        }
-        let first = trans.first!
-        let second = trans.last!
-        
-        // TODO: Allow this rendering transformation to handle items without animating textures
-        let potionAnimationFrames = SpriteSheet(texture: SKTexture(imageNamed: offer.textureName),
-                                                rows: 1,
-                                                columns: offer.spriteSheetColumns!)
-        
-        let placeholderSprite = SKSpriteNode(color: .clear, size: CGSize(width: tileSize, height: tileSize))
-        placeholderSprite.run(SKAction.repeatForever(SKAction.animate(with: potionAnimationFrames.animationFrames(), timePerFrame: 0.2)))
-        
-        computeNewBoard(for: first) { [weak self] in
-            guard let self = self else {
-                preconditionFailure("this is bad")
+            else {
+                GameLogger.shared.log(prefix: Constants.tag, message: "Rendering collecting offer trans but it is not a rune or a hp/dodge/lucl upgrade")
+                self.computeNewBoard(for: trans.first) { [weak self] in self?.animationsFinished(endTiles: trans.first?.endTiles) }
+                return
             }
-            /// add sprites from first one
-            let sprites = self.createSprites(from: first.endTiles)
-            self.add(sprites: sprites, tiles: first.endTiles!)
             
+        }
+        /// This is the case for other collected items that have more than 1 assocaited transformation. like the gem magnet
+        else if trans.count == 2 {
+            // this is the remove and replace transformation that removes the offer (and the other offer) and replaces the empty spaces in the board
+            let first = trans.first!
             
-            /// add potion sprite to board
-            let position = self.positionInForeground(at: atTilecoord)
-            placeholderSprite.size = CGSize(width: self.tileSize/2, height: self.tileSize/2)
-            placeholderSprite.position = position
-            placeholderSprite.zPosition = Precedence.floating.rawValue
-            self.spriteForeground.addChild(placeholderSprite)
+            // this is the second trans that is different for each item. for gem magnet is moves all the gems to the player and makes the player gain gems.
+            let second = trans.last!
             
-            /// animate it moving to the affected tile
-            if let affectedTile = second.tileTransformation?.first {
+            // Pass in a custom completion block to computeNewBoard so that we can animate the items effect
+            computeNewBoard(for: first) { [weak self, animator] in
+                guard let self = self,
+                        let targetTiles = second.tileTransformation?.compactMap( { $0.initial })
+                else { preconditionFailure("this is bad") }
                 
-                /// determine target position
-                let position = self.positionInForeground(at: affectedTile.initial)
+                /// add sprites from first one
+                let sprites = self.createSprites(from: first.endTiles)
+                self.add(sprites: sprites, tiles: first.endTiles!)
                 
-                self.animator.animateMoveGrowShrinkExplode(sprite: placeholderSprite, to: position, tileSize: self.tileSize) {
-                    [weak self] in
+                
+                let playerPosition = getTilePosition(.player(.zero), sprites: self.sprites) ?? .zero
+                animator.animateCollectingOffer(offer, playerPosition: playerPosition, targetPositions: targetTiles, positionInForeground: self.positionInForeground(at:)) { [weak self] in
                     self?.animationsFinished(endTiles: second.endTiles)
                 }
+                
             }
-            
         }
     }
     

@@ -38,6 +38,7 @@
 		287053B8275AE8D100B84929 /* background-music.wav in Resources */ = {isa = PBXBuildFile; fileRef = 287053B7275AE8D100B84929 /* background-music.wav */; };
 		28806D91276AB8A000C4627B /* BossSprite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28806D90276AB8A000C4627B /* BossSprite.swift */; };
 		2881F28F27C02FFD00DC83DA /* CodexWalletView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2881F28E27C02FFD00DC83DA /* CodexWalletView.swift */; };
+		2881F29127C1972200DC83DA /* OfferAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2881F29027C1972200DC83DA /* OfferAnimator.swift */; };
 		288330F7274FDB400070A1E8 /* ConfirmShuffleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 288330F6274FDB400070A1E8 /* ConfirmShuffleView.swift */; };
 		2886E83E26F0303B0014FA5D /* SettingsCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886E83D26F0303B0014FA5D /* SettingsCoordinator.swift */; };
 		2886E84026F030750014FA5D /* UIViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886E83F26F030750014FA5D /* UIViewController+Extensions.swift */; };
@@ -266,6 +267,7 @@
 		287053B7275AE8D100B84929 /* background-music.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "background-music.wav"; sourceTree = "<group>"; };
 		28806D90276AB8A000C4627B /* BossSprite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BossSprite.swift; sourceTree = "<group>"; };
 		2881F28E27C02FFD00DC83DA /* CodexWalletView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexWalletView.swift; sourceTree = "<group>"; };
+		2881F29027C1972200DC83DA /* OfferAnimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfferAnimator.swift; sourceTree = "<group>"; };
 		288330F6274FDB400070A1E8 /* ConfirmShuffleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmShuffleView.swift; sourceTree = "<group>"; };
 		2886E83D26F0303B0014FA5D /* SettingsCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsCoordinator.swift; sourceTree = "<group>"; };
 		2886E83F26F030750014FA5D /* UIViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extensions.swift"; sourceTree = "<group>"; };
@@ -607,6 +609,7 @@
 				3D9C505F21FE206000A2210D /* Renderer.swift */,
 				283DC7792718A831002A499A /* DialogueOverlay.swift */,
 				3D106097232E9A0200ECE7E6 /* Animator.swift */,
+				2881F29027C1972200DC83DA /* OfferAnimator.swift */,
 				28DF00872772B5140071E384 /* Animator+Extensions.swift */,
 				28DCCB7F2762C649004E70A8 /* AnimatorCombat.swift */,
 			);
@@ -1251,6 +1254,7 @@
 				3D5FB09420AE768700ACD716 /* AnimationSettings.swift in Sources */,
 				58AD9282243C283300B5B1EC /* LevelGoalView.swift in Sources */,
 				5845A2C92560BA78002DBD07 /* RuneReplacementView.swift in Sources */,
+				2881F29127C1972200DC83DA /* OfferAnimator.swift in Sources */,
 				3DF2925620A37FEE006671AC /* GameViewController.swift in Sources */,
 				2886E84526F197D00014FA5D /* PlayerStatView.swift in Sources */,
 				3D7EF45C21D18D9000A2D9E8 /* Transformation.swift in Sources */,

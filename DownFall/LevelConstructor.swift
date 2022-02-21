@@ -71,7 +71,7 @@ struct LevelConstructor {
                 StoreOffer.offer(type: .transmogrifyPotion, tier: 1),
                 StoreOffer.offer(type: .infusion, tier: 1),
                 StoreOffer.offer(type: .rune(.rune(for: .teleportation)), tier: 2),
-                StoreOffer.offer(type: .plusOneMaxHealth, tier: 2)
+                StoreOffer.offer(type: .infusion, tier: 2)
                 
             ]
             
@@ -306,7 +306,7 @@ struct LevelConstructor {
         case 5...Int.max:
             return 9
         case testLevelDepthNumber:
-            return 8
+            return 7
         default:
             fatalError()
         }

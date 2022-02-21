@@ -744,7 +744,7 @@ extension Renderer {
                 
                 
                 let playerPosition = getTilePosition(.player(.zero), tiles: second.endTiles ?? []) ?? .zero
-                let targetTileTypes = targetTiles.map { TargetTileTypes(target: $0, type: sprites[$0].type) }
+                let targetTileTypes = targetTiles.map { TargetTileType(target: $0, type: sprites[$0].type) }
                 
                 animator.animateCollectingOffer(offer, playerPosition: playerPosition, targetTileTypes: targetTileTypes, delayBefore: 0.0, hud: hud, sprites: sprites, positionInForeground: self.positionInForeground(at:)) { [weak self] in
                     self?.animationsFinished(endTiles: second.endTiles)

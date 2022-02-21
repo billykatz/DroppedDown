@@ -48,7 +48,7 @@ class ProfileViewModel {
             debugRunesToAddToPlayer = Array(debugRunesToAddToPlayer[0..<endIndex])
         }
         #if DEBUG
-        return playerData.update(pickaxe: Pickaxe(runeSlots: debugNumberRuneSlots, runes: debugRunesToAddToPlayer)).update(luck:100)
+        return playerData.update(pickaxe: Pickaxe(runeSlots: debugNumberRuneSlots, runes: debugRunesToAddToPlayer))//.update(luck:100)
         #endif
         
         return playerData.update(pickaxe: Pickaxe(runeSlots: debugNumberRuneSlots, runes: debugRunesToAddToPlayer))

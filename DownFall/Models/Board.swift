@@ -853,11 +853,48 @@ extension Board {
         case .gemMagnet:
             trans = useGemMagnet(input: input)
             
+        case .infusion:
+            trans = useInfusion(input: input)
+            
         default:
             preconditionFailure("Currently only killMonster and transmogrify are set up for this code path")
         }
         
         return (trans != nil) ? [previousTransformation, trans!] : [previousTransformation]
+    }
+    
+    func useInfusion(input: Input) -> Transformation {
+        guard let pp = playerPosition else {
+            fatalError()
+        }
+        var newTiles = tiles
+        var tileTransformation: [TileTransformation] = []
+        
+        
+        
+        // TODO: model this somewhere
+        let infusionRange: ClosedRange<CGFloat> = 0...2
+        
+        let reservedCoords = reservedCoords()
+        
+        // grab a random rock nearby
+        let nearbyTargetCoord = randomCoord(in: tiles, notIn: reservedCoords, nearby: pp, in: infusionRange, specificTypeChecker: { $0.isARock })
+        
+        let oldTile = tiles[nearbyTargetCoord]
+        // safely ignore holdsGem because reserved coords doesnt allow us to target a rock with a gem in it
+        if case TileType.rock(color: let color, holdsGem: _, groupCount: let groupCount) = oldTile.type {
+            newTiles[nearbyTargetCoord.row][nearbyTargetCoord.col] = Tile(type: .rock(color: color, holdsGem: true, groupCount: groupCount))
+            
+            tileTransformation.append(.init(nearbyTargetCoord, nearbyTargetCoord))
+        } else {
+            preconditionFailure("The chosen coord must be a rock!")
+        }
+        
+        
+        self.tiles = newTiles
+        
+        return Transformation(transformation: tileTransformation, inputType: input.type, endTiles: self.tiles)
+        
     }
     
     

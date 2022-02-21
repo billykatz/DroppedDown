@@ -119,6 +119,9 @@ struct StoreOffer: Codable, Hashable, Identifiable {
         case .gemMagnet:
             effect = EffectModel(kind: .gemMagnet, stat: .oneTimeUse, amount: 1, duration: 0)
             
+        case .infusion:
+            effect = EffectModel(kind: .infusion, stat: .oneTimeUse, amount: 1, duration: 0)
+            
         }
         return effect
     }
@@ -221,6 +224,10 @@ extension StoreOffer {
             title = "Gem Magnet"
             body = "Collect all gems on the board"
             textureName = "gemMagnet"
+        case .infusion:
+            title = "Infusion"
+            body = "Infuse a random nearby rock with a gem."
+            textureName = "infusion"
             
         }
         

@@ -82,8 +82,11 @@ func randomCoord(in tiles: [[Tile]]?, notIn set: Set<TileCoord>) -> TileCoord {
     return tileCoord
 }
 
-func randomCoord(in tiles: [[Tile]]?, notIn set: Set<TileCoord>, nearby target: TileCoord, in range: ClosedRange<CGFloat>) -> TileCoord {
-    guard let boardSize = tiles?.count else { preconditionFailure("We need a board size to continue") }
+// attamptes to find a random coord with the closed range of the target.
+// if it fails after 30 attempts it increase the range and tries again.
+func randomCoord(in tiles: [[Tile]]?, notIn set: Set<TileCoord>, nearby target: TileCoord, in range: ClosedRange<CGFloat>, specificTypeChecker: ((TileType) -> Bool)? = nil ) -> TileCoord {
+    guard let tiles = tiles  else { preconditionFailure("We need tiles to continue") }
+    let boardSize = tiles.count
     let upperbound = boardSize
     
     var newRange = range
@@ -92,10 +95,22 @@ func randomCoord(in tiles: [[Tile]]?, notIn set: Set<TileCoord>, nearby target: 
     var tileCoord = TileCoord(row: Int.random(upperbound), column: Int.random(upperbound))
     var maxTries = 30
     
-    // when we choose a tileCoord that is in the reserved set or is too far from the target then
-    while set.contains(tileCoord) || !newRange.contains(tileCoord.distance(to: target))  {
+    // defaults to true
+    // if the types dont match, then we should continue choosing new tileCoords/
+    // when they DO match, then we can stop
+    var specificTypeCheck = specificTypeChecker?(tiles[tileCoord].type) ?? true
+
+    
+    // when the chosen coord is NOT in the reserved set
+    // and
+    // when the range DOES contain the distance from coord to target coord
+    // and
+    // when the specific type check evaluates to true (or defaults to true)
+    // ----
+    // THEN STOP THE LOOP. We are done and have a tile coord
+    while !(!set.contains(tileCoord) && newRange.contains(tileCoord.distance(to: target)) && specificTypeCheck)  {
         tileCoord = TileCoord(row: Int.random(upperbound), column: Int.random(upperbound))
-        
+        specificTypeCheck = specificTypeChecker?(tiles[tileCoord].type) ?? true
         maxTries -= 1
         
         // we might need to try a slight wider range after trying for "too long"

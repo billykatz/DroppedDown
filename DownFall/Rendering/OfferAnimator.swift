@@ -29,7 +29,10 @@ extension Animator {
                 spriteActions.append(contentsOf: gemAction)
             }
                 
-                
+              
+        case .infusion:
+            ()
+            
         default:
             break
             

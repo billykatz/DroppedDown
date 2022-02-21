@@ -37,6 +37,7 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
     case horseshoe
     case luckyCat
     case gemMagnet
+    case infusion
     
     enum CodingKeys: String, CodingKey {
         case base
@@ -66,6 +67,7 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
         case horseshoe
         case luckyCat
         case gemMagnet
+        case infusion
     }
     
     var luckAmount: Int {
@@ -145,6 +147,8 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
             self = .luckyCat
         case .gemMagnet:
             self = .gemMagnet
+        case .infusion:
+            self = .infusion
         }
     }
     
@@ -194,7 +198,8 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
             try container.encode(Base.luckyCat, forKey: .base)
         case .gemMagnet:
             try container.encode(Base.gemMagnet, forKey: .base)
-
+        case .infusion:
+            try container.encode(Base.infusion, forKey: .base)
         }
     }
     
@@ -218,7 +223,15 @@ extension StoreOfferType {
             .runeUpgrade,
             .transmogrifyPotion,
             .lesserHeal,
-            .sandals
+            .sandals,
+            .runningShoes,
+            .wingedBoots,
+            .fourLeafClover,
+            .horseshoe,
+            .luckyCat,
+            .gemMagnet,
+            .infusion,
+            
         ]
         
         values.append(contentsOf: runeCases)
@@ -251,7 +264,9 @@ extension StoreOfferType {
         case (.fourLeafClover, .fourLeafClover): return true
         case (.horseshoe, .horseshoe): return true
         case (.luckyCat, .luckyCat): return true
+            
         case (.gemMagnet, .gemMagnet): return true
+        case (.infusion, .infusion): return true
             
         // default cases to catch and return false for any other comparisons
         default:

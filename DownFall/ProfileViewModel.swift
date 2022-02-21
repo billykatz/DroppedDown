@@ -47,9 +47,9 @@ class ProfileViewModel {
             let endIndex = debugRunesToAddToPlayer.startIndex.advanced(by: debugNumberRuneSlots)
             debugRunesToAddToPlayer = Array(debugRunesToAddToPlayer[0..<endIndex])
         }
-//        #if DEBUG
-//        return playerData.update(pickaxe: Pickaxe(runeSlots: debugNumberRuneSlots, runes: debugRunesToAddToPlayer)).update(dodge:100)
-//        #endif
+        #if DEBUG
+        return playerData.update(pickaxe: Pickaxe(runeSlots: debugNumberRuneSlots, runes: debugRunesToAddToPlayer)).update(luck:100)
+        #endif
         
         return playerData.update(pickaxe: Pickaxe(runeSlots: debugNumberRuneSlots, runes: debugRunesToAddToPlayer))
     }

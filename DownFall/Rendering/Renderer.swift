@@ -733,7 +733,7 @@ extension Renderer {
             let second = trans.last!
             
             // Pass in a custom completion block to computeNewBoard so that we can animate the items effect
-            computeNewBoard(for: first) { [weak self, animator] in
+            computeNewBoard(for: first) { [weak self, animator, hud] in
                 guard let self = self,
                         let targetTiles = second.tileTransformation?.compactMap( { $0.initial })
                 else { preconditionFailure("this is bad") }
@@ -743,8 +743,10 @@ extension Renderer {
                 self.add(sprites: sprites, tiles: first.endTiles!)
                 
                 
-                let playerPosition = getTilePosition(.player(.zero), sprites: self.sprites) ?? .zero
-                animator.animateCollectingOffer(offer, playerPosition: playerPosition, targetPositions: targetTiles, positionInForeground: self.positionInForeground(at:)) { [weak self] in
+                let playerPosition = getTilePosition(.player(.zero), tiles: second.endTiles ?? []) ?? .zero
+                let targetTileTypes = targetTiles.map { TargetTileTypes(target: $0, type: sprites[$0].type) }
+                
+                animator.animateCollectingOffer(offer, playerPosition: playerPosition, targetTileTypes: targetTileTypes, delayBefore: 0.0, hud: hud, sprites: sprites, positionInForeground: self.positionInForeground(at:)) { [weak self] in
                     self?.animationsFinished(endTiles: second.endTiles)
                 }
                 

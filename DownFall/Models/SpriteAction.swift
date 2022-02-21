@@ -11,6 +11,7 @@ import SpriteKit
 struct SpriteAction: Hashable {
     let sprite: SKNode
     let action: SKAction
+    var removeFromParentWhenComplete: Bool = false
     private var _duration: Double?
     var duration: Double {
         get {
@@ -30,10 +31,12 @@ struct SpriteAction: Hashable {
         self.action = action
     }
     
-    init(_ node: SKNode, _ action: SKAction) {
+    init(_ node: SKNode, _ action: SKAction, removeFromParentWhenComplete: Bool = false) {
         self.sprite = node
         self.action = action
+        self.removeFromParentWhenComplete = removeFromParentWhenComplete
     }
+    
     
     init(sprite: SKSpriteNode, action: SKAction) {
         self.sprite = sprite

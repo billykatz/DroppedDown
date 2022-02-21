@@ -8,6 +8,13 @@
 
 import SpriteKit
 
+enum HUDElement: String {
+    case health
+    case gems
+    case dodge
+    case luck
+}
+
 class HUD: SKSpriteNode {
     
     struct Constants {
@@ -194,16 +201,22 @@ class HUD: SKSpriteNode {
 
     }
     
-    func incrementStat(offer: StoreOfferType, updatedPlayerData: EntityModel) {
+    func incrementStat(offer: StoreOfferType, updatedPlayerData: EntityModel?, totalToIncrement: Int) {
         switch offer {
         case .dodge(amount: let amount):
             showIncreaseInStat(offerType: offer, amountIncrease: amount)
         case .luck(amount: let amount):
             showIncreaseInStat(offerType: offer, amountIncrease: amount)
         case .greaterHeal:
+            guard let updatedPlayerData = updatedPlayerData else {
+                return
+            }
             let maxHealthGain = min(2, updatedPlayerData.originalHp - updatedPlayerData.hp)
             showIncreaseInStat(offerType: offer, amountIncrease: maxHealthGain)
         case .lesserHeal:
+            guard let updatedPlayerData = updatedPlayerData else {
+                return
+            }
             let maxHealthGain = min(1, updatedPlayerData.originalHp - updatedPlayerData.hp)
             showIncreaseInStat(offerType: offer, amountIncrease: maxHealthGain)
         case .plusTwoMaxHealth:
@@ -216,6 +229,8 @@ class HUD: SKSpriteNode {
             showIncreaseInStat(offerType: offer, amountIncrease: offer.dodgeAmount)
         case .fourLeafClover, .horseshoe, .luckyCat:
             showIncreaseInStat(offerType: offer, amountIncrease: offer.luckAmount)
+        case .gemMagnet:
+            showIncreaseInStat(offerType: offer, amountIncrease: totalToIncrement)
         default:
             return
         }
@@ -244,6 +259,35 @@ class HUD: SKSpriteNode {
         }
     }
     
+//    public func positionOfHUDElement(_ hudELement: HUDElement) -> CGPoint {
+//        let position: CGPoint?
+//        switch hudELement {
+//        case .health:
+//            position = self.childNode(withName: Constants.currentHealthAmountLabelName)?.position
+//        case .gems:
+//            position = self.childNode(withName: Constants.gemAmountLabelName)?.position
+//        case .dodge:
+//            position = self.childNode(withName: Constants.dodgeAmountLabelName)?.position
+//        case .luck:
+//            position = self.childNode(withName: Constants.luckAmountLabelName)?.position
+//        }
+//
+//        return position ?? .zero
+//    }
+//
+//    private func labelNameForHUDElement(_ hudElement: HUDElement) -> [String]? {
+//        switch hudElement {
+//        case .health:
+//            return [Constants.currentHealthAmountLabelName]
+//        case .gems:
+//            return [Constants.gemAmountLabelName]
+//        case .dodge:
+//            return [Constants.dodgeAmountLabelName]
+//        case .luck:
+//            return [Constants.luckAmountLabelName]
+//        }
+//    }
+    
     private func labelNameForOfferType(offer: StoreOfferType) -> [String]? {
         switch offer {
         case .dodge, .sandals, .runningShoes, .wingedBoots:
@@ -258,6 +302,8 @@ class HUD: SKSpriteNode {
             return [Constants.currentHealthAmountLabelName, Constants.totalHealthAmountLabelName]
         case .plusOneMaxHealth:
             return [Constants.currentHealthAmountLabelName, Constants.totalHealthAmountLabelName]
+        case .gemMagnet:
+            return [Constants.gemAmountLabelName]
         default:
             return nil
         }

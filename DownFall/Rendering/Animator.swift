@@ -865,7 +865,8 @@ struct Animator {
         moveAwayMoveToScale.timingMode = .easeOut
         
         let hudAction = SKAction.run {
-            hud.incrementStat(offer: offerType, updatedPlayerData: updatedPlayerData)
+            // total to increment parameter is ignored for now
+            hud.incrementStat(offer: offerType, updatedPlayerData: updatedPlayerData, totalToIncrement: 0)
         }
         
         let hudActionRemoveFromparent = SKAction.group([hudAction, .removeFromParent()])
@@ -1162,9 +1163,13 @@ struct Animator {
         var numActions = spriteActions.count
         // tell each child to run it's action
         for spriteAction in spriteActions {
-            spriteAction.sprite.run(spriteAction.action) {
+            let sprite = spriteAction.sprite
+            sprite.run(spriteAction.action) { [spriteAction, sprite] in
                 numActions -= 1
                 print(numActions)
+                if spriteAction.removeFromParentWhenComplete {
+                    sprite.removeFromParent()
+                }
                 if numActions == 0 {
                     completion()
                 }

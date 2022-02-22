@@ -553,7 +553,7 @@ class Board: Equatable {
         
         /// If this is a one time use potion then we will tack on that trackformation after the remove and replace
         if effect.stat == .oneTimeUse {
-            return useOneTimeUseEffect(effect, at: offerCoord, input: input, previousTransformation: transformation)
+            return useOneTimeUseEffect(effect, offer: storeOffer, at: offerCoord, input: input, previousTransformation: transformation)
         }
         /// otherwise just return the tranformation for remove and replace with the updated player
         else {
@@ -838,7 +838,7 @@ class Board: Equatable {
 //MARK: - Items
 extension Board {
     
-    private func useOneTimeUseEffect(_ effect: EffectModel, at offerCoord: TileCoord, input: Input, previousTransformation: Transformation) -> [Transformation] {
+    private func useOneTimeUseEffect(_ effect: EffectModel, offer: StoreOffer, at offerCoord: TileCoord, input: Input, previousTransformation: Transformation) -> [Transformation] {
         
         var trans: Transformation?
         
@@ -862,12 +862,45 @@ extension Board {
         case .snakeEyes:
             trans = useSnakeEyes(input: input)
             
+        case .liquifyMonsters:
+            trans = useLiquifyMonsters(input: input, offer: offer)
+            
             
         default:
             preconditionFailure("Currently only killMonster and transmogrify are set up for this code path")
         }
         
         return (trans != nil) ? [previousTransformation, trans!] : [previousTransformation]
+    }
+    
+    func useLiquifyMonsters(input: Input, offer: StoreOffer) -> Transformation {
+        var newTiles = tiles
+        var tileTransformation: [TileTransformation] = []
+        
+        /// find all monsters
+        let monsterTilecoords = tiles(where: { tileType in
+            if case TileType.monster = tileType {
+                return true
+            }
+            return false
+        })
+        
+        // choose x randomly
+        let chosenCoords = monsterTilecoords.choose(random: offer.type.numberOfTargets)
+        
+        for coord in chosenCoords {
+            var randomColor = ShiftShaft_Color.randomColor
+            let newItem = Item(type: .gem, amount: offer.type.effectAmount, color: randomColor)
+            let newTile = Tile(type: .item(newItem))
+            
+            newTiles[coord.row][coord.col] = newTile
+            tileTransformation.append(.init(coord, coord))
+        }
+        
+        
+        self.tiles = newTiles
+        
+        return Transformation(transformation: tileTransformation, inputType: input.type, endTiles: self.tiles)
     }
     
     func useSnakeEyes(input: Input) -> Transformation {
@@ -879,14 +912,12 @@ extension Board {
         var tileTransformations: [TileTransformation] = []
         
         // get the other coords
-        let otherOfferTiles: [(Tile, TileCoord)] = tiles(of: .offer(.zero), comparator: { lhsTileType, rhsTileType in
-            if case TileType.offer = lhsTileType,
-               case TileType.offer = rhsTileType {
+        let otherOfferTiles: [(Tile, TileCoord)] = tiles(where: { tileType in
+            if case TileType.offer = tileType {
                 return true
             }
             return false
-        })
-            .map { [tiles] in
+        }).map { [tiles] in
             (tiles[$0.row][$0.col], $0)
         }
         
@@ -2013,11 +2044,11 @@ extension Board {
         return tileCoords
     }
     
-    func tiles(of type: TileType, comparator: (TileType, TileType) -> Bool) -> [TileCoord] {
+    func tiles(where comparator: (TileType) -> Bool) -> [TileCoord] {
         var tileCoords: [TileCoord] = []
         for (i, _) in tiles.enumerated() {
             for (j, _) in tiles[i].enumerated() {
-                comparator(tiles[i][j].type, type) ? tileCoords.append(TileCoord(i, j)) : ()
+                comparator(tiles[i][j].type) ? tileCoords.append(TileCoord(i, j)) : ()
             }
         }
         return tileCoords

@@ -42,6 +42,11 @@ extension Animator {
             if let snakeEyesAnimation = createSnakeEyesOfferAnimation(delayBefore: delayBefore, offer: offer, startTileCoord: playerPosition, targetTileTyes: targetTileTypes, sprites: sprites) {
                 spriteActions.append(contentsOf: snakeEyesAnimation)
             }
+            
+        case .liquifyMonsters:
+            if let animation = createLiquifyMonstersOfferAnimation(delayBefore: delayBefore, offer: offer, startTileCoord: playerPosition, targetTileTypes: targetTileTypes, sprites: sprites, positionGiver: positionInForeground) {
+                spriteActions.append(contentsOf: animation)
+            }
         
         default:
             break
@@ -50,6 +55,76 @@ extension Animator {
         
         animate(spriteActions, completion: completion)
         
+    }
+    
+    func createLiquifyMonstersOfferAnimation(delayBefore: TimeInterval, offer: StoreOffer, startTileCoord: TileCoord, targetTileTypes: [TargetTileType], sprites: [[DFTileSpriteNode]], positionGiver: PositionGiver) -> [SpriteAction]? {
+        guard let tileSize = tileSize, let foreground = foreground else { return nil }
+        let cgTileSize = CGSize(widthHeight: tileSize)
+        var spriteActions: [SpriteAction] = []
+        let moveDuration = 0.25
+        var waitBefore: TimeInterval = delayBefore
+        
+        // make the liquify monsters sprite fly from the player to the targeted monsters
+        for targetTileType in targetTileTypes {
+            let liquifyMonsterSprite = SKSpriteNode(texture: SKTexture(imageNamed: "liquifyMonsters"), size: cgTileSize)
+            liquifyMonsterSprite.position = positionGiver(startTileCoord)
+            liquifyMonsterSprite.zPosition = 1_000_000
+            liquifyMonsterSprite.alpha = 1.0
+            
+            foreground.addChild(liquifyMonsterSprite)
+            
+            let targetPosition = positionGiver(targetTileType.target)
+            
+            let moveAction = SKAction.move(to: targetPosition, duration: moveDuration)
+            
+            
+            // make it glow and blink
+            let lowerFade: CGFloat = 0.0
+            let waitForABlink = SKAction.wait(forDuration: 0.05)
+            let fadeToNone0 = SKAction.fadeAlpha(to: lowerFade, duration: 0.2)
+            let fadeToFull1 = SKAction.fadeAlpha(to: 1.0, duration: 0.2)
+            let fadeToHalf1 = SKAction.fadeAlpha(to: lowerFade, duration: 0.2)
+            let fadeToFull2 = SKAction.fadeAlpha(to: 1.0, duration: 0.1)
+            let fadeToHalf2 = SKAction.fadeAlpha(to: lowerFade, duration: 0.1)
+            let fadeToFull3 = SKAction.fadeAlpha(to: 1.0, duration: 0.05)
+            let fadeToHalf3 = SKAction.fadeAlpha(to: lowerFade, duration: 0.05)
+            let fadeToFull4 = SKAction.fadeAlpha(to: 1.0, duration: 0.025)
+            let fadeToHalf4 = SKAction.fadeAlpha(to: lowerFade, duration: 0.025)
+            let fadeToFull5 = SKAction.fadeAlpha(to: 1.0, duration: 0.0125)
+            let fadeToHalf5 = SKAction.fadeAlpha(to: lowerFade, duration: 0.0125)
+            
+            let seq = SKAction.sequence(moveAction, fadeToNone0, waitForABlink, fadeToFull1, fadeToHalf1, waitForABlink, fadeToFull2, fadeToHalf2, waitForABlink, fadeToFull3, fadeToHalf3, waitForABlink, fadeToFull4, fadeToHalf4, waitForABlink, fadeToFull5, fadeToHalf5, .removeFromParent(), curve: .easeInEaseOut)
+            
+            spriteActions.append(.init(liquifyMonsterSprite, seq))
+            
+        }
+        // calculated by hand
+        let flashDuration: TimeInterval = 1.225
+        waitBefore += flashDuration + moveDuration
+        
+
+        // make the monster poof
+        for targetTileType in targetTileTypes {
+            let sprite = sprites[targetTileType.target]
+            
+            let removeSpriteAttackIndicator: SKAction = .run {
+                sprite.removeAttackIndicator()
+            }
+            
+            // poof the offers away in a bit of smoke
+            let poofAction = smokeAnimation
+            let scaleAction = SKAction.scale(by: 3.0, duration: 0.1)
+            
+            
+            let group = SKAction.group(removeSpriteAttackIndicator, poofAction, scaleAction).waitBefore(delay: waitBefore)
+            
+            spriteActions.append(.init(sprite, group))
+        }
+        
+        // leave behind 10x gem stack (handled by just called animations finished in the Renderer 
+        
+        
+        return spriteActions
     }
     
     func createSnakeEyesOfferAnimation(delayBefore: TimeInterval, offer: StoreOffer, startTileCoord: TileCoord, targetTileTyes: [TargetTileType], sprites: [[DFTileSpriteNode]]) -> [SpriteAction]? {

@@ -147,8 +147,13 @@ class DFTileSpriteNode: SKSpriteNode {
         previousCircle?.strokeColor = color
         previousCircle?.position = CGPoint.position(previousCircle?.frame, inside: frame, verticalAlign: .bottom, horizontalAnchor: .right)
         previousCircle?.zPosition = Precedence.foreground.rawValue
+        previousCircle?.name = "attackIndicator"
         addOptionalChild(previousCircle)
         
+    }
+    
+    func removeAttackIndicator() {
+        removeChild(with: "attackIndicator")
     }
     
     func showAmount() {

@@ -39,6 +39,7 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
     case gemMagnet
     case infusion
     case snakeEyes
+    case liquifyMonsters
     
     enum CodingKeys: String, CodingKey {
         case base
@@ -70,6 +71,7 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
         case gemMagnet
         case infusion
         case snakeEyes
+        case liquifyMonsters
     }
     
     var luckAmount: Int {
@@ -97,6 +99,24 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
             return Constants.wingedBootsDodgeAmount
         case .dodge(amount: let amt):
             return amt
+        default:
+            return 0
+        }
+    }
+    
+    var numberOfTargets: Int {
+        switch self {
+        case .liquifyMonsters:
+            return 5
+        default:
+            return 0
+        }
+    }
+    
+    var effectAmount: Int {
+        switch self {
+        case .liquifyMonsters:
+            return 10
         default:
             return 0
         }
@@ -153,6 +173,8 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
             self = .infusion
         case .snakeEyes:
             self = .snakeEyes
+        case .liquifyMonsters:
+            self = .liquifyMonsters
         }
     }
     
@@ -206,6 +228,8 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
             try container.encode(Base.infusion, forKey: .base)
         case .snakeEyes:
             try container.encode(Base.snakeEyes, forKey: .base)
+        case .liquifyMonsters:
+            try container.encode(Base.liquifyMonsters, forKey: .base)
         }
     }
     
@@ -237,7 +261,8 @@ extension StoreOfferType {
             .luckyCat,
             .gemMagnet,
             .infusion,
-            .snakeEyes
+            .snakeEyes,
+            .liquifyMonsters
             
         ]
         
@@ -275,6 +300,7 @@ extension StoreOfferType {
         case (.gemMagnet, .gemMagnet): return true
         case (.infusion, .infusion): return true
         case (.snakeEyes, .snakeEyes): return true
+        case (.liquifyMonsters, .liquifyMonsters): return true
             
         // default cases to catch and return false for any other comparisons
         default:

@@ -72,9 +72,9 @@ struct LevelConstructor {
         } else if depth == testLevelDepthNumber {
             return [
                 StoreOffer.offer(type: .transmogrifyPotion, tier: 1),
-                StoreOffer.offer(type: .snakeEyes, tier: 1),
+                StoreOffer.offer(type: .liquifyMonsters, tier: 1),
                 StoreOffer.offer(type: .rune(.rune(for: .teleportation)), tier: 2),
-                StoreOffer.offer(type: .infusion, tier: 2)
+                StoreOffer.offer(type: .liquifyMonsters, tier: 2)
                 
             ]
             
@@ -630,7 +630,7 @@ struct LevelConstructor {
     
     
     static func monsterCountStart(depth: Depth) -> Int {
-        if depth == testLevelDepthNumber { return 2 }
+        if depth == testLevelDepthNumber { return 4 }
         if depth == bossLevelDepthNumber { return 0 }
         return min(boardSize(depth: depth), depth + 2)
     }

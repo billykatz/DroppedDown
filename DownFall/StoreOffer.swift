@@ -125,6 +125,9 @@ struct StoreOffer: Codable, Hashable, Identifiable {
         case .snakeEyes:
             effect = EffectModel(kind: .snakeEyes, stat: .oneTimeUse, amount: 1, duration: 0)
             
+        case .liquifyMonsters:
+            effect = EffectModel(kind: .liquifyMonsters, stat: .oneTimeUse, amount: 1, duration: 0)
+            
         }
         return effect
     }
@@ -236,6 +239,11 @@ extension StoreOffer {
             title = "Snake Eyeys"
             body = "Reroll all the other offers on board. (The Mineral Spirits will not take the other offer from this tier)"
             textureName = "snakeEyes-orange"
+            
+        case .liquifyMonsters:
+            title = "Liquify"
+            body = "Transform \(type.numberOfTargets) random monsters into stacks of \(type.effectAmount)x gems."
+            textureName = "liquifyMonsters"
             
         }
         

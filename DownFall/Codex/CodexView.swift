@@ -86,11 +86,12 @@ struct CodexView: View {
             RoundedRectangle(cornerRadius: 50.0)
                 .fill(Color(UIColor.foregroundBlue), strokeColor: Color(UIColor.codexButtonLightGray), lineWidth: 3)
                 .frame(width: 250, height: 75)
+                .shadow(color: .black, radius: 15, x: 0, y: 0)
                 .overlay(
                     HStack(alignment: .center, spacing: 0) {
                         Text("Start Run")
                             .font(.bigSubTitleCodexFont)
-                            .foregroundColor(Color(UIColor.codexButtonLightGray))
+                            .foregroundColor(Color(UIColor.white))
                             .padding()
                             .minimumScaleFactor(0.1)
                             .lineLimit(1)
@@ -152,6 +153,16 @@ struct CodexView: View {
                     Spacer().frame(height: 120)
                                         
                 }
+                .overlay(
+                    VStack {
+                        Spacer()
+                        Text("")
+                            .frame(width: 500, height: 200, alignment: .bottom)
+                            .background(
+                                LinearGradient(gradient: Gradient(colors: [.clear, .black]), startPoint: .top, endPoint: .bottom)
+                                )
+                    }
+                )
                 .padding(.horizontal)
                 
                 if (showModal) { modalView }

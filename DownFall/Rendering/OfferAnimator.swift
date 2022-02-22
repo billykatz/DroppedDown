@@ -19,11 +19,11 @@ struct TargetTileType {
 
 extension Animator {
     
-    func animateCollectingOffer(_ offer: StoreOffer, playerPosition: TileCoord, targetTileTypes: [TargetTileType], delayBefore: TimeInterval, hud: HUD, sprites: [[DFTileSpriteNode]], positionInForeground: PositionGiver, completion: @escaping () -> Void) {
+    func animateCollectingOffer(_ offer: StoreOffer, playerPosition: TileCoord, targetTileTypes: [TargetTileType], delayBefore: TimeInterval, hud: HUD, sprites: [[DFTileSpriteNode]], endTiles: [[Tile]], positionInForeground: PositionGiver, completion: @escaping () -> Void) {
         var spriteActions: [SpriteAction] = []
         switch offer.type {
         case .transmogrifyPotion, .killMonsterPotion:
-            if let spriteAction = createSingleTargetOfferAnimation(delayBefore: delayBefore, offer: offer, startTileCoord: playerPosition, targetTileCoord: targetTileTypes.first!.target, positionInForeground: positionInForeground) {
+            if let firsTarget = targetTileTypes.first?.target, let spriteAction = createSingleTargetOfferAnimation(delayBefore: delayBefore, offer: offer, startTileCoord: playerPosition, targetTileCoord: firsTarget, positionInForeground: positionInForeground) {
                 spriteActions.append(contentsOf: spriteAction)
             }
             
@@ -34,10 +34,15 @@ extension Animator {
                 
               
         case .infusion:
-            if let infusion = createInfusionOfferAnimation(delayBefore: delayBefore, offer: offer, startTileCoord: playerPosition, targetTileType: targetTileTypes.first!, sprites: sprites, positionInForeground: positionInForeground) {
+            if let firstTarget = targetTileTypes.first, let infusion = createInfusionOfferAnimation(delayBefore: delayBefore, offer: offer, startTileCoord: playerPosition, targetTileType: firstTarget, sprites: sprites, positionInForeground: positionInForeground) {
                 spriteActions.append(contentsOf: infusion)
             }
             
+        case .snakeEyes:
+            if let snakeEyesAnimation = createSnakeEyesOfferAnimation(delayBefore: delayBefore, offer: offer, startTileCoord: playerPosition, targetTileTyes: targetTileTypes, sprites: sprites) {
+                spriteActions.append(contentsOf: snakeEyesAnimation)
+            }
+        
         default:
             break
             
@@ -45,6 +50,45 @@ extension Animator {
         
         animate(spriteActions, completion: completion)
         
+    }
+    
+    func createSnakeEyesOfferAnimation(delayBefore: TimeInterval, offer: StoreOffer, startTileCoord: TileCoord, targetTileTyes: [TargetTileType], sprites: [[DFTileSpriteNode]]) -> [SpriteAction]? {
+
+        
+        var spriteActions: [SpriteAction] = []
+        
+        
+        // spin the current offers (located in sprites)
+        for targetTileType in targetTileTyes {
+            let currentOfferSprite = sprites[targetTileType.target]
+            
+            currentOfferSprite.zPosition = 1_000_000
+            
+            let spinSpeed: CGFloat = 20
+            let spinDuration: CGFloat = 1.0
+            let spinAngle: CGFloat = -spinSpeed * spinDuration
+            
+            // spit it
+            let spinAction = SKAction.rotate(byAngle: spinAngle, duration: spinDuration)
+            spinAction.timingMode = .easeIn
+            
+            let removeOfferTierBorder = SKAction.run {
+                currentOfferSprite.hideOfferTier()
+            }
+            
+            // poof the offers away in a bit of smoke
+            let poofAction = smokeAnimation
+            let scaleAction = SKAction.scale(by: 3.0, duration: 0.1)
+            let poofScale = SKAction.group(poofAction, scaleAction)
+            
+            
+            let seq = SKAction.sequence(spinAction, removeOfferTierBorder, poofScale).waitBefore(delay: delayBefore)
+            
+            spriteActions.append(.init(currentOfferSprite, seq))
+        }
+        
+        
+        return spriteActions
     }
     
     func createInfusionOfferAnimation(delayBefore: TimeInterval, offer: StoreOffer, startTileCoord: TileCoord, targetTileType: TargetTileType, sprites: [[DFTileSpriteNode]], positionInForeground: PositionGiver) -> [SpriteAction]? {
@@ -171,22 +215,6 @@ extension Animator {
             glowAlpha -= 0.05
             glowEffectZPosition -= 1_000
         }
-//        
-        // put the rock with sprkales in the glow
-//        var newRockSprite: DFTileSpriteNode = .init(type: .empty, height: tileSize, width: tileSize)
-        let createSparklyRock = SKAction.run {
-            if case TileType.rock(color: let color, holdsGem: _, groupCount: let groupCount) = targetTileType.type {
-                
-                // creat the new one
-                rockSprite = DFTileSpriteNode(type: .rock(color: color, holdsGem: true, groupCount: groupCount), height: tileSize, width: tileSize)
-                rockSprite.position = .zero
-                rockSprite.zPosition = glowEffectZPosition*2
-                
-//                foreground.addChild(rockSprite)
-            }
-        }.waitBefore(delay: waitBefore)
-        
-        spriteActions.append(.init(foreground, createSparklyRock))
         
         /// UNSQUASH ROCK
         let finalRockUnSquash = SKAction.scaleX(by: 4, y: 1.0, duration: 0.0)

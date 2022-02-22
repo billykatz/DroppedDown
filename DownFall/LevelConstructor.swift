@@ -19,6 +19,7 @@ struct LevelConstructor {
         let pillars = pillars(depth: depth, randomSource: randomSource)
         let gemsAtDepth = maxSpawnGems(depth: depth)
         
+        
         return Level(
             depth: depth,
             monsterTypeRatio: monsterTypes(depth: depth),
@@ -34,7 +35,9 @@ struct LevelConstructor {
             potentialItems: potentialItems(depth: depth, unlockables: unlockables, startingUnlockables: startingUnlockables, playerData: playerData, randomSource: randomSource, isTutorial: isTutorial),
             gemsSpawned: 0,
             monsterSpawnTurnTimer: 0,
-            levelStartTiles: createLevelStartTiles(depth: depth)
+            levelStartTiles: createLevelStartTiles(depth: depth),
+            startingUnlockables: startingUnlockables,
+            otherUnlockables: unlockables
         )
     }
     
@@ -69,7 +72,7 @@ struct LevelConstructor {
         } else if depth == testLevelDepthNumber {
             return [
                 StoreOffer.offer(type: .transmogrifyPotion, tier: 1),
-                StoreOffer.offer(type: .infusion, tier: 1),
+                StoreOffer.offer(type: .snakeEyes, tier: 1),
                 StoreOffer.offer(type: .rune(.rune(for: .teleportation)), tier: 2),
                 StoreOffer.offer(type: .infusion, tier: 2)
                 

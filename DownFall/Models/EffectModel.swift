@@ -18,6 +18,7 @@ enum EffectType: String, Hashable, Codable {
     case transmogrify
     case gemMagnet
     case infusion
+    case snakeEyes
 }
 
 enum StatType: String, Hashable, Codable {

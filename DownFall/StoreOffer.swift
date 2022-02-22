@@ -122,6 +122,9 @@ struct StoreOffer: Codable, Hashable, Identifiable {
         case .infusion:
             effect = EffectModel(kind: .infusion, stat: .oneTimeUse, amount: 1, duration: 0)
             
+        case .snakeEyes:
+            effect = EffectModel(kind: .snakeEyes, stat: .oneTimeUse, amount: 1, duration: 0)
+            
         }
         return effect
     }
@@ -228,6 +231,11 @@ extension StoreOffer {
             title = "Infusion"
             body = "Infuse a random nearby rock with a gem."
             textureName = "infusion"
+            
+        case .snakeEyes:
+            title = "Snake Eyeys"
+            body = "Reroll all the other offers on board. (The Mineral Spirits will not take the other offer from this tier)"
+            textureName = "snakeEyes-orange"
             
         }
         

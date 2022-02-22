@@ -512,7 +512,10 @@ class Board: Equatable {
         // if it does exists then remove both the collected offer and the other offer from the board
         if let otherOfferTile = otherOfferTile,
            let otherOffer = otherOffer,
-           case InputType.collectOffer(let collectedCoord, let collectedStoreOffer, _, _) = input.type {
+           case InputType.collectOffer(let collectedCoord, let collectedStoreOffer, _, _) = input.type,
+           // snake eye is a special case whre we dont want to remove the other offer from the same tier
+           collectedStoreOffer.type != .snakeEyes
+        {
             transformation = removeAndReplaces(from: tiles, specificCoord: [offerCoord, otherOfferTile], input: Input(.collectOffer(collectedCoord: collectedCoord, collectedOffer: collectedStoreOffer, discardedCoord: otherOfferTile, discardedOffer: otherOffer)), forceSpawnMonsters: shouldSpawnMonsterDuringTutorial)
             
             hasAlreadySpawnedMonsterForTutorial = true
@@ -856,11 +859,68 @@ extension Board {
         case .infusion:
             trans = useInfusion(input: input)
             
+        case .snakeEyes:
+            trans = useSnakeEyes(input: input)
+            
+            
         default:
             preconditionFailure("Currently only killMonster and transmogrify are set up for this code path")
         }
         
         return (trans != nil) ? [previousTransformation, trans!] : [previousTransformation]
+    }
+    
+    func useSnakeEyes(input: Input) -> Transformation {
+        guard let pp = playerPosition, case TileType.player(let playerData) = tiles[pp].type else {
+            return Transformation(transformation: [], inputType: input.type, endTiles: self.tiles)
+        }
+        
+        var newTiles = tiles
+        var tileTransformations: [TileTransformation] = []
+        
+        // get the other coords
+        let otherOfferTiles: [(Tile, TileCoord)] = tiles(of: .offer(.zero), comparator: { lhsTileType, rhsTileType in
+            if case TileType.offer = lhsTileType,
+               case TileType.offer = rhsTileType {
+                return true
+            }
+            return false
+        })
+            .map { [tiles] in
+            (tiles[$0.row][$0.col], $0)
+        }
+        
+        // if there are other offer tiles (I cant think of asituation where there wouldnt be)
+        // then replace them
+        if !otherOfferTiles.isEmpty {
+            let newOffers = level.rerollOffersForLevel(level, playerData: playerData)
+            
+            for tierIndex in 1...2 {
+                let tierOffers = newOffers.filter({ $0.tier == tierIndex })
+                let currentTierOfferings = otherOfferTiles.filter({ offerTile in
+                    if case TileType.offer(let offer) = offerTile.0.type {
+                        return offer.tier == tierIndex
+                    }
+                    return false
+                    
+                })
+                
+                // replace first tier offers
+                if tierOffers.count == currentTierOfferings.count {
+                    for idx in 0..<tierOffers.count {
+                        let currentOfferingCoord = currentTierOfferings[idx].1
+                        newTiles[currentOfferingCoord.row][currentOfferingCoord.col] = Tile(type: .offer(tierOffers[idx]))
+                        tileTransformations.append(.init(currentOfferingCoord, currentOfferingCoord))
+                    }
+                }
+            }
+        }
+        
+        
+        self.tiles = newTiles
+        
+        return Transformation(transformation: tileTransformations, inputType: input.type, endTiles: self.tiles)
+        
     }
     
     func useInfusion(input: Input) -> Transformation {
@@ -1952,6 +2012,17 @@ extension Board {
         }
         return tileCoords
     }
+    
+    func tiles(of type: TileType, comparator: (TileType, TileType) -> Bool) -> [TileCoord] {
+        var tileCoords: [TileCoord] = []
+        for (i, _) in tiles.enumerated() {
+            for (j, _) in tiles[i].enumerated() {
+                comparator(tiles[i][j].type, type) ? tileCoords.append(TileCoord(i, j)) : ()
+            }
+        }
+        return tileCoords
+    }
+
 }
 
 

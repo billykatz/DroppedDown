@@ -186,7 +186,7 @@ struct EntityModel: Equatable, Codable {
         case .player:
             switch animationType {
             case .attack:
-                return SpriteSheet(textureName: "player-attack-11", columns: 11).animationFrames()
+                return SpriteSheet(textureName: "player-attack-12", columns: 12).animationFrames()
             case .hurt:
                 return SpriteSheet(textureName: "player-hurt-7", columns: 7).animationFrames()
             case .dying:
@@ -337,7 +337,7 @@ struct EntityModel: Equatable, Codable {
             return update(luck: luck + effect.amount)
         case (.buff, .dodge):
             return update(dodge: dodge + effect.amount)
-        case (.killMonster, _), (.transmogrify, _), (.gemMagnet, _), (.infusion, _), (.item, _):
+        case (.killMonster, _), (.transmogrify, _), (.gemMagnet, _), (.infusion, _), (.item, _), (.snakeEyes, _):
             return self
         default:
             preconditionFailure("Youll want to implement future cases here")

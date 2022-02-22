@@ -189,9 +189,14 @@ class DFTileSpriteNode: SKSpriteNode {
         sprite.position = .zero
         sprite.size = self.size.scale(by: 1.33)
 //        sprite.alpha = 0.5
+        sprite.name = "offerTierBorder"
         sprite.zPosition = -10
         
         addChild(sprite)
+    }
+    
+    func hideOfferTier() {
+        self.removeChild(with: "offerTierBorder")
     }
     
     func showFinger() {

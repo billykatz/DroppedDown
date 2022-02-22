@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "player-attack-11 1.png",
+      "filename" : "player-attack-12 1.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "player-attack-11 1@2x.png",
+      "filename" : "player-attack-12 1@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "player-attack-11 1@3x.png",
+      "filename" : "player-attack-12 1@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

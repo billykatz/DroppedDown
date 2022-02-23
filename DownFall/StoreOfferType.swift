@@ -21,7 +21,6 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
     case plusTwoMaxHealth
     case plusOneMaxHealth
     case rune(Rune)
-    case runeUpgrade
     case runeSlot
     case gems(amount: Int)
     case dodge(amount: Int)
@@ -41,6 +40,7 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
     case snakeEyes
     case liquifyMonsters
     case chest
+    case escape
     
     enum CodingKeys: String, CodingKey {
         case base
@@ -53,7 +53,6 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
     private enum Base: String, Codable {
         case plusTwoMaxHealth
         case rune
-        case runeUpgrade
         case runeSlot
         case gems
         case dodge
@@ -74,6 +73,7 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
         case snakeEyes
         case liquifyMonsters
         case chest
+        case escape
     }
     
     var luckAmount: Int {
@@ -134,8 +134,6 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
         case .rune:
             let data = try container.decode(Rune.self, forKey: .runeModel)
             self = .rune(data)
-        case .runeUpgrade:
-            self = .runeUpgrade
         case .runeSlot:
             self = .runeSlot
         case .gems:
@@ -179,6 +177,9 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
             self = .liquifyMonsters
         case .chest:
             self = .chest
+        case .escape:
+            self = .escape
+
         }
     }
     
@@ -191,8 +192,6 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
         case .rune(let runeModel):
             try container.encode(Base.rune, forKey: .base)
             try container.encode(runeModel, forKey: .runeModel)
-        case .runeUpgrade:
-            try container.encode(Base.runeUpgrade, forKey: .base)
         case .runeSlot:
             try container.encode(Base.runeSlot, forKey: .base)
         case .gems(let amount):
@@ -236,6 +235,8 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
             try container.encode(Base.liquifyMonsters, forKey: .base)
         case .chest:
             try container.encode(Base.chest, forKey: .base)
+        case .escape:
+            try container.encode(Base.escape, forKey: .base)
         }
     }
     
@@ -256,7 +257,6 @@ extension StoreOfferType {
             .luck(amount: 5),
             .dodge(amount: 5),
             .gems(amount: 5),
-            .runeUpgrade,
             .transmogrifyPotion,
             .lesserHeal,
             .sandals,
@@ -269,7 +269,8 @@ extension StoreOfferType {
             .infusion,
             .snakeEyes,
             .liquifyMonsters,
-            chest
+            .chest,
+            .escape,
             
         ]
         
@@ -283,7 +284,6 @@ extension StoreOfferType {
         case (.plusOneMaxHealth, .plusOneMaxHealth): return true
         case (.plusTwoMaxHealth, .plusTwoMaxHealth): return true
             
-        case (.runeUpgrade, .runeUpgrade): return true
         case (.runeSlot, .runeSlot): return true
         case (.rune(let lhsRune), .rune(let rhsRune)): return lhsRune == rhsRune
             
@@ -309,6 +309,7 @@ extension StoreOfferType {
         case (.snakeEyes, .snakeEyes): return true
         case (.liquifyMonsters, .liquifyMonsters): return true
         case (.chest, .chest): return true
+        case (.escape, .escape): return true
             
         // default cases to catch and return false for any other comparisons
         default:

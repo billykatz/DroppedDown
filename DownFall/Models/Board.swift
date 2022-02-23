@@ -475,20 +475,24 @@ class Board: Equatable {
     }
     
     private func runeReplaced(_ replacedRune: Rune, withNewRune newRune: Rune, promptedByChest: Bool, inputType: InputType) -> Transformation {
-        guard
-            let pp = playerPosition,
+        guard let pp = playerPosition,
             case let .player(data) = tiles[pp].type
         else {
-            return Transformation.zero
-            
+            return Transformation(transformation: [], inputType: inputType, endTiles: self.tiles)
         }
         
         var newTiles = tiles
         
         let pickaxe: Pickaxe?
+        
+        // rune replacement can be prompted by the chest item or by a player collecting an offer
+        // when prompted by the chest, the newRune is not "on the board", so we need to replace the rune in this transformation
         if promptedByChest {
             pickaxe = data.pickaxe?.replaceRune(replacedRune, withNewRune: newRune)
-        } else {
+        }
+        // if the rune new rune is being collected by the player, then we first make room in the pickaxe by removing the rune.
+        // then the referee will allow us to collect the rune as normal
+        else {
             pickaxe = data.pickaxe?.removeRune(replacedRune)
         }
         
@@ -920,12 +924,40 @@ extension Board {
         case .chest:
             trans = useChest(input: input)
             
+        case .escape:
+            trans = useEscape(input: input)
+            
             
         default:
             preconditionFailure("Currently only killMonster and transmogrify are set up for this code path")
         }
         
         return (trans != nil) ? [previousTransformation, trans!] : [previousTransformation]
+    }
+    
+    func useEscape(input: Input) -> Transformation {
+        let exitPosition = tiles { tileType in
+            if case TileType.exit = tileType {
+                return true
+            } else {
+                return false
+            }
+        }
+        
+        
+        guard let exitPosition = exitPosition.first else {
+            return Transformation(transformation: [], inputType: input.type, endTiles: self.tiles)
+        }
+        
+        var newTiles = self.tiles
+        
+        newTiles[exitPosition.row][exitPosition.col] = Tile(type: .exit(blocked: false))
+        let tileTransformation: [TileTransformation] = [.init(exitPosition, exitPosition)]
+        
+        
+        self.tiles = newTiles
+        return Transformation(transformation: tileTransformation, inputType: input.type, endTiles: self.tiles)
+        
     }
     
     func useChest(input: Input) -> Transformation? {

@@ -94,9 +94,6 @@ struct StoreOffer: Codable, Hashable, Identifiable {
         case .gems(let amount):
             effect = EffectModel(kind: .buff, stat: .gems, amount: amount, duration: 0)
             
-        case .runeUpgrade:
-            effect = EffectModel(kind: .buff, stat: .pickaxe, amount: 10, duration: 0)
-            
         case .runeSlot:
             effect = EffectModel(kind: .buff, stat: .runeSlot, amount: 1, duration: 0)
             
@@ -132,6 +129,9 @@ struct StoreOffer: Codable, Hashable, Identifiable {
             
         case .chest:
             effect = EffectModel(kind: .chest, stat: .oneTimeUse, amount: 1, duration: 0)
+            
+        case .escape:
+            effect = EffectModel(kind: .escape, stat: .oneTimeUse, amount: 1, duration: 0)
             
         }
         return effect
@@ -188,11 +188,6 @@ extension StoreOffer {
             title = "+1 Rune Slot"
             body = "Add a rune slot to your pickaxe handle"
             textureName = "pickaxe-upgrade"
-            
-        case .runeUpgrade:
-            title = "Rune Upgrade"
-            body = "Your runes will be better"
-            textureName = "blankRune"
             
         case .plusOneMaxHealth:
             title = "Increase Max Health"
@@ -277,6 +272,11 @@ extension StoreOffer {
             title = "Chest"
             body = "Get a random Rune or Item."
             textureName = "chest"
+            
+        case .escape:
+            title = "Escape"
+            body = "Opens up the exit"
+            textureName = "escape"
             
         }
         

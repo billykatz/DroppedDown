@@ -83,6 +83,12 @@ extension Animator {
                 let animation = createChestOfferAnimation(delayBefore: delayBefore, offer: offer, finalOffer: finalOffer, startTileCoord: playerPosition, targetTileTypes: targetTileTypes, sprites: sprites, positionGiver: positionInForeground) {
                 spriteActions.append(contentsOf: animation)
             }
+            
+        case .escape:
+            if let animation =  createEscapeOfferAnimation(delayBefore: delayBefore, offer: offer, startTileCoord: playerPosition, targetTileTypes: targetTileTypes, sprites: sprites, positionGiver: positionInForeground) {
+                spriteActions.append(contentsOf: animation)
+            }
+
         
         default:
             break
@@ -91,6 +97,77 @@ extension Animator {
         
         animate(spriteActions, completion: completion)
         
+    }
+    
+    func createEscapeOfferAnimation(delayBefore: TimeInterval, offer: StoreOffer, startTileCoord: TileCoord, targetTileTypes: [TargetTileType], sprites: [[DFTileSpriteNode]], positionGiver: PositionGiver) -> [SpriteAction]? {
+        guard let tileSize = tileSize,
+                let foreground = foreground,
+              let exitCoord = targetTileTypes.first?.target,
+              case let TileType.exit(blocked: exitIsBlocked)? = targetTileTypes.first?.type
+        else { return nil }
+        let cgTileSize = CGSize(widthHeight: tileSize)
+        var spriteActions: [SpriteAction] = []
+        var waitBefore = delayBefore
+        // create the bubble
+        
+        let emptyBubbleSprite = SKSpriteNode(texture: SKTexture(imageNamed: "escape-bubble"), size: cgTileSize)
+        emptyBubbleSprite.position = positionGiver(startTileCoord)
+        emptyBubbleSprite.zPosition = 1_000_000
+        foreground.addChild(emptyBubbleSprite)
+        
+        // move the bubble from the player location to the exit
+        let exitTilePosition = positionGiver(exitCoord)
+        let moveSpeed: CGFloat = 600
+        let moveDistance = (emptyBubbleSprite.position - exitTilePosition).length
+        let moveDuration = moveDistance / moveSpeed
+        let moveAction = SKAction.move(to: exitTilePosition, duration: moveDuration).waitBefore(delay: waitBefore)
+        moveAction.timingMode = .easeInEaseOut
+        let emptyBubbleSeq = SKAction.sequence(moveAction, .removeFromParent())
+        
+        spriteActions.append(.init(emptyBubbleSprite, emptyBubbleSeq))
+        
+        // keep track of timing
+        waitBefore += moveDuration
+        
+        guard exitIsBlocked else {
+            return spriteActions
+        }
+        
+        // create the exit sprite to be "open" and palce it on top of the actual sprite.
+        let openedExitSprite = DFTileSpriteNode(type: .exit(blocked: false), height: tileSize, width: tileSize)
+        openedExitSprite.position = exitTilePosition
+        openedExitSprite.zPosition = 700_000
+        
+        let foregroundAddOpenedExit = SKAction.run {
+            foreground.addChild(openedExitSprite)
+            sprites[exitCoord.row][exitCoord.col].alpha = 0.0
+        }.waitBefore(delay: waitBefore)
+        spriteActions.append(.init(foreground, foregroundAddOpenedExit))
+        
+        
+        // replace the bubble with the bubble with rocks
+        let bubbleWithRocks = SKSpriteNode(texture: SKTexture(imageNamed: "escape-bubble-with-rocks"), size: cgTileSize)
+        bubbleWithRocks.position = exitTilePosition
+        bubbleWithRocks.zPosition = 1_000_000
+        
+        let foregroundAddBubbleWithRocks = SKAction.run {
+            foreground.addChild(bubbleWithRocks)
+        }.waitBefore(delay: waitBefore)
+        spriteActions.append(.init(foreground, foregroundAddBubbleWithRocks))
+        
+        // move the bubble off the top of the screen
+        // this action doesnt have to delay more because sprites only start their waiting timer once they are on the screen
+        let bubbleRocksMoveUpAction = SKAction.moveBy(x: 0.0, y: 1500, duration: 0.75).waitBefore(delay: 0.1)
+        bubbleRocksMoveUpAction.timingMode = .easeIn
+        
+        spriteActions.append(.init(bubbleWithRocks, bubbleRocksMoveUpAction))
+        
+        
+        let removeOpenedExit: SKAction = .removeFromParent().waitBefore(delay: 0.85)
+        spriteActions.append(.init(openedExitSprite, removeOpenedExit))
+        
+        
+        return spriteActions
     }
     
     func createChestOfferAnimation(delayBefore: TimeInterval, offer: StoreOffer, finalOffer: StoreOffer, startTileCoord: TileCoord, targetTileTypes: [TargetTileType], sprites: [[DFTileSpriteNode]], positionGiver: PositionGiver) -> [SpriteAction]? {

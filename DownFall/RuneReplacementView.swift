@@ -13,6 +13,7 @@ import SpriteKit
 struct RuneReplacementViewModel {
     let foundRune: Rune
     let pickaxe: Pickaxe
+    let promptedByChest: Bool
     var runeToSwap: Rune?
 }
 
@@ -136,7 +137,7 @@ class RuneReplacementView: SKSpriteNode, ButtonDelegate {
     
     func buttonTapped(_ button: ShiftShaft_Button) {
         if button.identifier == .swapRunes {
-            InputQueue.append(Input(.runeReplaced(viewModel.pickaxe, viewModel.runeToSwap!)))
+            InputQueue.append(Input(.runeReplaced(viewModel.pickaxe, replacedRune: viewModel.runeToSwap!, newRune: viewModel.foundRune, promptedByChest: viewModel.promptedByChest)))
             self.removeFromParent()
         }
     }

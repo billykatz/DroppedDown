@@ -79,13 +79,13 @@ class RuneSlotView: SKSpriteNode {
         return progress
     }
     
-    private var runeSprite: SKSpriteNode? {
+    public lazy var runeSprite: SKSpriteNode? = {
         guard let textureName = viewModel.textureName else { return nil }
         let sprite = SKSpriteNode(texture: SKTexture(imageNamed: textureName), size: outline.frame.size.scale(by: Constants.runeScale))
         sprite.zPosition = Precedence.menu.rawValue
         
         return sprite
-    }
+    }()
     
     func setupView(justDisplayRune: Bool) {
 

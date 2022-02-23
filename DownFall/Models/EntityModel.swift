@@ -25,6 +25,16 @@ struct Pickaxe: Equatable, Codable, Hashable {
         })
     }
     
+    func replaceRune(_ runeToReplace: Rune, withNewRune newRune: Rune) -> Pickaxe {
+        return Pickaxe(runeSlots: self.runeSlots, runes: self.runes.map {
+            if $0 == runeToReplace {
+                return newRune
+            } else {
+                return $0
+            }
+        })
+    }
+    
     func isAtMaxCapacity() -> Bool {
         return runeSlots != Pickaxe.maxRuneSlots && runes.count == runeSlots
     }

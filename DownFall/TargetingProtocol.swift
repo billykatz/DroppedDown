@@ -14,7 +14,7 @@ protocol TargetingOutputs {
     var currentTargets: AllTarget { get }
     var legallyTargeted: Bool { get }
     var inventory: [Rune] { get }
-    var runeReplacementPublisher: AnyPublisher<(Pickaxe, Rune), Never> { get }
+    var runeReplacementPublisher: AnyPublisher<(Pickaxe, Rune, Bool), Never> { get }
 }
 
 protocol TargetingInputs {

@@ -74,6 +74,13 @@ class RuneContainerView: SKSpriteNode {
         return runeSlotView
     }
     
+    public func runeSlotViewForRune(_ rune: Rune) -> RuneSlotView? {
+        runeSlotViews.first { runeSlotView in
+            return runeSlotView.viewModel.rune == rune
+        }
+
+    }
+    
     
     public func enableButton(_ enabled: Bool, targets: AllTarget) {
         runeDetailView?.enableButton(enabled, targets: targets)

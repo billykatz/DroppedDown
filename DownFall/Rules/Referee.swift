@@ -340,7 +340,7 @@ class Referee {
             if case let StoreOfferType.rune(rune) = storeOffer.type,
                let pickaxe = data.pickaxe,
                pickaxe.runeSlots < pickaxe.runes.count + 1 {
-                return Input(.runeReplacement(pickaxe, rune))
+                return Input(.runeReplacement(pickaxe, rune, promptedByChest: false))
             } else {
                 return Input(.collectOffer(collectedCoord: playerPosition.rowBelow, collectedOffer: storeOffer, discardedCoord: .zero, discardedOffer: .zero))
             }

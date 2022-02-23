@@ -301,8 +301,22 @@ class Renderer: SKSpriteNode {
             case .refillEmpty:
                 refillEmptyTiles(with: trans)
                 
-            case .runeReplaced:
-                animationsFinished(endTiles: trans.endTiles)
+            case .runeReplaced(let pickaxe, let replacedRune, let newRune, let promptedByChest):
+                guard let playerPosition = getTilePosition(.player(.zero), tiles: transformations.first?.endTiles ?? []) else {
+                    animationsFinished(endTiles: trans.endTiles)
+                    return
+                }
+                let newRuneCoord = tileCoords(for: sprites, of: TileType.offer(.offer(type: .rune(newRune), tier: 2)))
+                
+                if !promptedByChest {
+                    animationsFinished(endTiles: trans.endTiles)
+                } else {
+                    animator.animateReplacingRuneOfferedFromChest(delayBefore: 0.0, replacedRune: replacedRune, newRune: newRune, playerPosition: playerPosition, pickaxeHandleView: backpackView, sprites: sprites, positionGiver: positionInForeground(at:)) { [weak self] in
+                        
+                        self?.animationsFinished(endTiles: trans.endTiles)
+                    }
+                }
+                
             case .foundRuneDiscarded:
                 computeNewBoard(for: trans)
             case .goalCompleted(let goals, allGoalsCompleted: let allGoalsCompleted):
@@ -781,7 +795,16 @@ extension Renderer {
                         self.sprites = self.createSprites(from: endTiles)
                         self.add(sprites: sprites, tiles: endTiles)
                         print("Special case where after rendering we go to computing for the chest item")
-                        InputQueue.append(Input(.collectChestOffer(offer: chestOffer)))
+                        /// The player can only collect a rune offer if they have an empty slot.
+                        /// If they dont have an empty slot then we enter the rune replacement flow
+                        if case let StoreOfferType.rune(rune) = chestOffer.type,
+                           case let TileType.player(data) = sprites[playerPosition].type,
+                           let pickaxe = data.pickaxe,
+                           pickaxe.runeSlots < pickaxe.runes.count + 1 {
+                            InputQueue.append(Input(.runeReplacement(pickaxe, rune, promptedByChest: true)))
+                        }  else {
+                            InputQueue.append(Input(.collectChestOffer(offer: chestOffer)))
+                        }
                     } else {
                         self.animationsFinished(endTiles: second.endTiles)
                     }

@@ -26,8 +26,8 @@ class TargetingViewModel: Targeting {
         return foundRuneDiscardedSubject.eraseToAnyPublisher()
     }
     
-    var runeReplacementSubject = PassthroughSubject<(Pickaxe, Rune), Never>()
-    var runeReplacementPublisher: AnyPublisher<(Pickaxe, Rune), Never> {
+    var runeReplacementSubject = PassthroughSubject<(Pickaxe, Rune, Bool), Never>()
+    var runeReplacementPublisher: AnyPublisher<(Pickaxe, Rune, Bool), Never> {
         return runeReplacementSubject.eraseToAnyPublisher()
     }
     
@@ -123,13 +123,16 @@ class TargetingViewModel: Targeting {
     
     func handle(_ input: Input) {
         switch input.type {
-        case .runeReplaced(let pickaxe, let rune):
-            let runes = pickaxe.runes.filter { $0.type != rune.type }
+        case .runeReplaced(let pickaxe, let replacedRune, _, let promptedByChest):
+            let runes = pickaxe.runes.filter { $0.type != replacedRune.type }
             runeSlotsUpdated?(pickaxe.runeSlots, runes)
+            
         case .foundRuneDiscarded:
             foundRuneDiscardedSubject.send(())
-        case .runeReplacement(let pickaxe, let rune):
-            runeReplacementSubject.send((pickaxe, rune))
+            
+        case .runeReplacement(let pickaxe, let rune, let promptedByChest):
+            runeReplacementSubject.send((pickaxe, rune, promptedByChest))
+            
         case .transformation(let trans):
             if let inputType = trans.first?.inputType,
                 case InputType.itemUsed = inputType,

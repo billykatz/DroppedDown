@@ -24,6 +24,8 @@ struct AnimatingState: GameState {
             return AnyGameState(ComputingState())
         case .collectChestOffer:
             return AnyGameState(ComputingState())
+        case .runeReplacement:
+            return AnyGameState(PauseState())
         default:
             return nil
         }

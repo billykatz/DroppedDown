@@ -12,12 +12,43 @@ import CoreMedia
 
 typealias PositionGiver = (TileCoord) -> CGPoint
 
+
 struct TargetTileType {
     let target: TileCoord
     let type: TileType
 }
 
 extension Animator {
+    
+    func animateReplacingRuneOfferedFromChest(delayBefore: TimeInterval, replacedRune: Rune, newRune: Rune, playerPosition: TileCoord, pickaxeHandleView: BackpackView, sprites: [[DFTileSpriteNode]], positionGiver: PositionGiver, completion: @escaping () -> Void) {
+        guard let foreground = foreground, let tileSize = tileSize else {
+            completion()
+            return
+        }
+        var spriteActions: [SpriteAction] = []
+        var replacedRunePosition: CGPoint = pickaxeHandleView.runeInventoryContainer?.position ?? .zero
+        
+    
+        let newRuneSprite = DFTileSpriteNode(type: TileType.offer(.offer(type: .rune(newRune), tier: 2)), height: tileSize, width: tileSize)
+//        if newRuneExistingSprite == nil {
+        newRuneSprite.position = positionGiver(playerPosition)
+        newRuneSprite.zPosition = 5_000_000
+        foreground.addChild(newRuneSprite)
+//        }
+        
+        // move the new rune to the old rune's position
+        let moveSpeed: CGFloat = 1000
+        let moveDistane = (newRuneSprite.position - replacedRunePosition).length
+        let moveDuration = moveDistane / moveSpeed
+        let moveAction = SKAction.move(to: replacedRunePosition, duration: moveDuration)
+        moveAction.timingMode = .easeInEaseOut
+        let seq = SKAction.sequence(moveAction, .removeFromParent())
+        
+        spriteActions.append(.init(newRuneSprite, seq))
+        
+        
+        animate(spriteActions, completion: completion)
+    }
     
     func animateCollectingOffer(_ offer: StoreOffer, playerPosition: TileCoord, targetTileTypes: [TargetTileType], delayBefore: TimeInterval, hud: HUD, sprites: [[DFTileSpriteNode]], endTiles: [[Tile]], transformationOffers: [StoreOffer]?, positionInForeground: PositionGiver, completion: @escaping () -> Void) {
         var spriteActions: [SpriteAction] = []
@@ -122,8 +153,10 @@ extension Animator {
                 waitBefore += startingShowTime
             }
             
-            
-            if floatIndex > floatTotalItems / 6 * 5 {
+            if floatIndex > floatTotalItems / 8 * 7 {
+                startingShowTime = 0.3
+            }
+            else if floatIndex > floatTotalItems / 6 * 5 {
                 startingShowTime = 0.2
             } else if floatIndex > floatTotalItems / 4 * 3 {
                 startingShowTime = 0.13

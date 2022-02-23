@@ -46,6 +46,9 @@ extension TileType {
 
 enum RuneType: String, Codable, Hashable, CaseIterable, Identifiable {
     
+    /// debug runes
+    case debugTeleport
+    
     /// red runes
     case rainEmbers
     case phoenix
@@ -104,6 +107,9 @@ enum RuneType: String, Codable, Hashable, CaseIterable, Identifiable {
             return "Bubble Up"
         case .teleportation:
             return "Teleport"
+            
+        case .debugTeleport:
+            return "Debug Teleport"
             
         case .transformRock:
             return "Transform Rock"
@@ -646,6 +652,42 @@ struct Rune: Hashable, Codable {
                 maxDistanceBetweenTargets: CGFloat.greatestFiniteMagnitude,
                 animationTextureName: "rainEmbersSpriteSheet",
                 animationColumns: 5
+            )
+            
+        case .debugTeleport:
+            var constrainedTypes = TileType.rockCases
+            constrainedTypes.append(.monster(.zero))
+            constrainedTypes.append(.dynamite(.standardFuse))
+            constrainedTypes.append(.offer(.zero))
+            constrainedTypes.append(.item(.gem))
+//            let constrained = ConstrainedTargets.init(constraintedTypes: constrainedTypes, nearByType: [.exit(blocked: false), .exit(blocked: true)], maxDistance: 1)
+            
+            var targets = constrainedTypes
+            targets.append(TileType.player(.playerZero))
+            
+            return Rune(
+                type: .debugTeleport,
+                textureName: "rune-teleport-enabled",
+                cost: 0,
+                currency: .gem,
+                description: "Swap places with a tile adjacent to the exit",
+                flavorText: "[Olivia the Cunning]",
+                targets: 2,
+                targetTypes: targets,
+                constrainedTargets: nil,
+                targetsGroupOfMonsters: false,
+                affectSlopes: [],
+                affectRange: Int.max,
+                stopsEffectTypes: nil,
+                heal: 0,
+                cooldown: 25,
+                rechargeType: [.rock(color: .blue, holdsGem: false, groupCount: 0)],
+                rechargeMinimum: 1,
+                rechargeCurrent: 0,
+                progressColor: .blue,
+                maxDistanceBetweenTargets: CGFloat.greatestFiniteMagnitude,
+                animationTextureName: "getSwiftySpriteSheet",
+                animationColumns: 6
             )
             
         case .teleportation:

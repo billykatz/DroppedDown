@@ -278,8 +278,9 @@ class Board: Equatable {
             InputQueue.append(Input(.transformation(trans)))
             return
             
-        case .runeReplaced(_, let rune):
-            transformation = self.runeReplaced(rune, inputType: input.type)
+        case .runeReplaced(_, let replacedRune, let newRune, let promptedByChest):
+            transformation = self.runeReplaced(replacedRune, withNewRune: newRune, promptedByChest: promptedByChest, inputType: input.type)
+            
         case .foundRuneDiscarded(let rune):
             transformation = self.foundRuneDiscarded(rune, input: input)
             
@@ -463,22 +464,33 @@ class Board: Equatable {
     
     
     private func foundRuneDiscarded(_ rune: Rune, input: Input) -> Transformation {
-        guard let specificCoord = tiles(of: TileType.offer(StoreOffer(type: .rune(rune), tier: 1, textureName: "", title: "", body: "", startingPrice: 0))).first else { return .zero }
+        guard let specificCoord = tiles(of: TileType.offer(StoreOffer(type: .rune(rune), tier: 1, textureName: "", title: "", body: "", startingPrice: 0))).first else {
+            return Transformation(transformation: [], inputType: input.type, endTiles: self.tiles)
+            
+        }
         
         let removeAndReplace = removeAndReplaces(from: tiles, specificCoord: [specificCoord], input: input)
         
         return removeAndReplace
     }
     
-    private func runeReplaced(_ rune: Rune, inputType: InputType) -> Transformation {
+    private func runeReplaced(_ replacedRune: Rune, withNewRune newRune: Rune, promptedByChest: Bool, inputType: InputType) -> Transformation {
         guard
             let pp = playerPosition,
             case let .player(data) = tiles[pp].type
-        else { return Transformation.zero }
+        else {
+            return Transformation.zero
+            
+        }
         
         var newTiles = tiles
         
-        let pickaxe = data.pickaxe?.removeRune(rune)
+        let pickaxe: Pickaxe?
+        if promptedByChest {
+            pickaxe = data.pickaxe?.replaceRune(replacedRune, withNewRune: newRune)
+        } else {
+            pickaxe = data.pickaxe?.removeRune(replacedRune)
+        }
         
         let newPlayer = data.update(pickaxe: pickaxe)
         
@@ -1128,7 +1140,7 @@ extension Board {
         case .fieryRage:
             return fieryRage(allTarget: allTargets, input: input)
             
-        case .teleportation:
+        case .teleportation, .debugTeleport:
             return [teleportation(tiles: tiles, allTargets: allTargets, input: input)]
             
         case .moveEarth:

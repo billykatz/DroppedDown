@@ -60,8 +60,8 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
                                         .unlockExit,
                                         .levelGoalDetail([]),
                                         .goalCompleted([], allGoalsCompleted: false),
-                                        .runeReplacement(Pickaxe(runeSlots: 0, runes: []), .zero),
-                                        .runeReplaced(Pickaxe(runeSlots: 0, runes: []), .zero),
+                                        .runeReplacement(Pickaxe(runeSlots: 0, runes: []), .zero, promptedByChest: false),
+                                        .runeReplaced(Pickaxe(runeSlots: 0, runes: []), replacedRune: .zero,  newRune: .zero, promptedByChest: false),
                                         .bossTurnStart(BossPhase()),
                                         .bossPhaseStart(BossPhase()),
                                         .noMoreMoves,
@@ -107,8 +107,8 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
     case unlockExit
     case levelGoalDetail([GoalTracking])
     case goalCompleted([GoalTracking], allGoalsCompleted: Bool)
-    case runeReplacement(Pickaxe, Rune)
-    case runeReplaced(Pickaxe, Rune)
+    case runeReplacement(Pickaxe, Rune, promptedByChest: Bool)
+    case runeReplaced(Pickaxe, replacedRune: Rune, newRune: Rune, promptedByChest: Bool)
     case foundRuneDiscarded(Rune)
     case loseAndGoToStore
     
@@ -196,8 +196,8 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
             return "Goal was completed"
         case .collectOffer(_, let offer, _, _):
             return "Player collects \(offer.textureName)"
-        case .runeReplacement(_, _):
-            return "Rune Replacement flow"
+        case .runeReplacement(_, _, let promptedByChest):
+            return "Rune Replacement flow. Prompted by chest \(promptedByChest)"
         case .runeReplaced:
             return "Rune replaced"
         case .foundRuneDiscarded:

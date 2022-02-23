@@ -123,7 +123,7 @@ class TargetingViewModel: Targeting {
     
     func handle(_ input: Input) {
         switch input.type {
-        case .runeReplaced(let pickaxe, let replacedRune, _, let promptedByChest):
+        case .runeReplaced(let pickaxe, let replacedRune, _, _):
             let runes = pickaxe.runes.filter { $0.type != replacedRune.type }
             runeSlotsUpdated?(pickaxe.runeSlots, runes)
             

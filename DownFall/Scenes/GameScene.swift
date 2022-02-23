@@ -179,7 +179,7 @@ class GameScene: SKScene {
     }
     
     func handleInput(input: Input) {
-        if case InputType.playAgain(didWin: let didWin) = input.type {
+        if case InputType.playAgain = input.type {
             guard let board = self.board,
             let playerIndex = tileIndices(of: .player(.zero), in: board.tiles).first
             else { return }

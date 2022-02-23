@@ -276,7 +276,6 @@ class Level: Codable, Hashable {
             maxTries -= 1
         }
         
-        return StoreOffer.offer(type: .rune(.rune(for: .drillDown)), tier: 1)
         return newOffer!
     }
 

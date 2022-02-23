@@ -20,21 +20,20 @@ struct TargetTileType {
 
 extension Animator {
     
+    /// This is only used for rune replacmenet prompted by the chest
     func animateReplacingRuneOfferedFromChest(delayBefore: TimeInterval, replacedRune: Rune, newRune: Rune, playerPosition: TileCoord, pickaxeHandleView: BackpackView, sprites: [[DFTileSpriteNode]], positionGiver: PositionGiver, completion: @escaping () -> Void) {
         guard let foreground = foreground, let tileSize = tileSize else {
             completion()
             return
         }
         var spriteActions: [SpriteAction] = []
-        var replacedRunePosition: CGPoint = pickaxeHandleView.runeInventoryContainer?.position ?? .zero
+        let replacedRunePosition: CGPoint = pickaxeHandleView.runeInventoryContainer?.position ?? .zero
         
     
         let newRuneSprite = DFTileSpriteNode(type: TileType.offer(.offer(type: .rune(newRune), tier: 2)), height: tileSize, width: tileSize)
-//        if newRuneExistingSprite == nil {
         newRuneSprite.position = positionGiver(playerPosition)
         newRuneSprite.zPosition = 5_000_000
         foreground.addChild(newRuneSprite)
-//        }
         
         // move the new rune to the old rune's position
         let moveSpeed: CGFloat = 1000
@@ -346,7 +345,7 @@ extension Animator {
         
         /// INITIAL ROCK MOVEMENT
         // expand the rock and move it to the right half of the center third
-        var rockSprite = sprites[targetTileType.target]
+        let rockSprite = sprites[targetTileType.target]
         rockSprite.zPosition = 30_000_000
         let newRockSpritePosition = CGPoint.position(CGRect(origin: .zero, size: cgTileSize), inside: playableRect, verticalAnchor: .center, horizontalAnchor: .center, yOffset: 0.0, xOffset: playableRect.width/3, translatedToBounds: true)
         

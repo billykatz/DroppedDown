@@ -888,7 +888,7 @@ extension Animator {
         }
         
         let addCopiesAction = SKAction.run { [bossSpriteCopies, bossSprite] in
-            for (idx, sprite) in bossSpriteCopies.enumerated() {
+            for (_, sprite) in bossSpriteCopies.enumerated() {
                 bossSprite.addChild(sprite)
             }
         }
@@ -1384,7 +1384,7 @@ extension Animator {
     
     // After we animate the boss eating rocks we want to show the animations of the boss getting ready to attack
     func animateBossGettingReadyToAttack(delayBefore: TimeInterval, completion: @escaping () -> Void) {
-        var spriteActions: [SpriteAction] = []
+        let spriteActions: [SpriteAction] = []
         
         resetBossThenAnimate(spriteActions, completion: completion)
     }
@@ -1808,7 +1808,7 @@ extension Animator {
         for eyeIndex in 1..<9 {
             // reversed = false makes it red
             // reversed = true makes it yellow
-            var reversed = ((8-numberOfRedEyes+1)..<9).contains(eyeIndex) ? false : true
+            let reversed = ((8-numberOfRedEyes+1)..<9).contains(eyeIndex) ? false : true
             let turnEyeColor = createSingleEyeRed(delayBefore: delayBefore, reversed: reversed, animationSpeed: 0.0, eyeIndex: eyeIndex)
             spriteActions.append(contentsOf: turnEyeColor)
         }

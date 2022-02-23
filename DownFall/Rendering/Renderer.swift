@@ -301,12 +301,11 @@ class Renderer: SKSpriteNode {
             case .refillEmpty:
                 refillEmptyTiles(with: trans)
                 
-            case .runeReplaced(let pickaxe, let replacedRune, let newRune, let promptedByChest):
+            case .runeReplaced(_, let replacedRune, let newRune, let promptedByChest):
                 guard let playerPosition = getTilePosition(.player(.zero), tiles: transformations.first?.endTiles ?? []) else {
                     animationsFinished(endTiles: trans.endTiles)
                     return
                 }
-                let newRuneCoord = tileCoords(for: sprites, of: TileType.offer(.offer(type: .rune(newRune), tier: 2)))
                 
                 if !promptedByChest {
                     animationsFinished(endTiles: trans.endTiles)
@@ -1184,12 +1183,7 @@ extension Renderer {
         
         animator.animateBossEatingRocks(sprites: sprites, foreground: spriteForeground, transformation: rockEatTrans) { [weak self] in
             self?.computeNewBoard(for: removeAndReplace)
-//            self?.animator.animateBossGettingReadyToAttack(delayBefore: 0.0, completion: { [weak self] in
-//            })
         }
-        // purpposefully called immediately so the boss getting ready to attack animation can be interupted
-        
-        
     }
     
     private func showBossTargetsWhatToAttack(in transformation: [Transformation], bossPhase: BossPhase, attackType: BossAttackType) {

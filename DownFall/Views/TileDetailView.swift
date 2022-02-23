@@ -237,7 +237,7 @@ class TileDetailView: SKSpriteNode {
     }
     
     private func dynamiteDescription(tileType: TileType, nextTo: CGRect) -> ParagraphNode? {
-        guard case TileType.dynamite(let data) = tileType  else { return nil }
+        guard case TileType.dynamite = tileType  else { return nil }
         let text =
         """
         \u{2022} Explodes after 3 turns

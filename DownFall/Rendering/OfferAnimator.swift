@@ -52,7 +52,12 @@ extension Animator {
     func animateCollectingOffer(_ offer: StoreOffer, playerPosition: TileCoord, targetTileTypes: [TargetTileType], delayBefore: TimeInterval, hud: HUD, sprites: [[DFTileSpriteNode]], endTiles: [[Tile]], transformationOffers: [StoreOffer]?, positionInForeground: PositionGiver, completion: @escaping () -> Void) {
         var spriteActions: [SpriteAction] = []
         switch offer.type {
-        case .transmogrifyPotion, .killMonsterPotion:
+        case .transmogrifyPotion:
+            if let first = targetTileTypes.first,
+                let animation = createTransmogrifyOfferAnimation(delayBefore: delayBefore, offer: offer, startTileCoord: playerPosition, targetTileType: first, sprites: sprites, endTiles: endTiles, positionInForeground: positionInForeground) {
+                spriteActions.append(contentsOf: animation)
+            }
+        case .killMonsterPotion:
             if let firsTarget = targetTileTypes.first?.target, let spriteAction = createSingleTargetOfferAnimation(delayBefore: delayBefore, offer: offer, startTileCoord: playerPosition, targetTileCoord: firsTarget, positionInForeground: positionInForeground) {
                 spriteActions.append(contentsOf: spriteAction)
             }
@@ -97,6 +102,159 @@ extension Animator {
         
         animate(spriteActions, completion: completion)
         
+    }
+    
+    func createTransmogrifyOfferAnimation(delayBefore: TimeInterval, offer: StoreOffer, startTileCoord: TileCoord, targetTileType: TargetTileType, sprites: [[DFTileSpriteNode]], endTiles: [[Tile]], positionInForeground: PositionGiver) -> [SpriteAction]? {
+        guard let foreground = foreground, let tileSize = tileSize, let playableRect = playableRect else { return nil }
+        var spriteActions: [SpriteAction] = []
+        let cgTileSize = CGSize(widthHeight: tileSize)
+        var waitBefore = delayBefore
+        
+        /// save this for later
+        let originalRockPosition = sprites[targetTileType.target].position
+        
+        /// INITIAL ROCK MOVEMENT
+        // expand the rock and move it to the right half of the center third
+        let rockSprite = sprites[targetTileType.target]
+        rockSprite.zPosition = 30_000_000
+        let newRockSpritePosition = CGPoint.position(CGRect(origin: .zero, size: cgTileSize), inside: playableRect, verticalAnchor: .center, horizontalAnchor: .center, yOffset: 0.0, xOffset: playableRect.width/3, translatedToBounds: true)
+        
+        let initialRockScale = cgTileSize.scale(by: 4)
+        let initialRockSpeed: CGFloat = 1000
+        let initialRockDistance = (newRockSpritePosition - rockSprite.position).length
+        let initialRockDuration = initialRockDistance / initialRockSpeed
+        let initialMoveRockSpriteAction = SKAction.move(to: newRockSpritePosition, duration: initialRockDuration)
+        let initialRockScaleAction = SKAction.scale(to: initialRockScale, duration: initialRockDuration)
+        
+        let initialRockSeq = SKAction.group(initialRockScaleAction, initialMoveRockSpriteAction, curve: .easeInEaseOut).waitBefore(delay: waitBefore)
+        spriteActions.append(.init(rockSprite, initialRockSeq))
+        
+        /// INITIAL GEM CREATION AND MOVEMENT
+        // create and expand the gem and move it to the left half of the center third
+        let gemSprite = SKSpriteNode(texture: SKTexture(imageNamed: offer.textureName), size: cgTileSize)
+        let initalGemPosition = positionInForeground(startTileCoord)
+        gemSprite.zPosition = 1_000_000
+        gemSprite.position = initalGemPosition
+        foreground.addChild(gemSprite)
+        
+        let newGemSpritePosition = CGPoint.position(CGRect(origin: .zero, size: cgTileSize), inside: playableRect, verticalAnchor: .center, horizontalAnchor: .center, yOffset: 0.0, xOffset: -playableRect.width/3, translatedToBounds: true)
+        let initialMoveGemAction = SKAction.move(to: newGemSpritePosition, duration: initialRockDuration)
+        let initialGemScaleAction = SKAction.scale(to: initialRockScale, duration: initialRockDuration)
+        let initialGemSeq = SKAction.group(initialGemScaleAction, initialMoveGemAction, curve: .easeInEaseOut).waitBefore(delay: waitBefore)
+        spriteActions.append(.init(gemSprite, initialGemSeq))
+        
+        // keep track of wait before for sequencing purposes
+        waitBefore += initialRockDuration
+        
+        /// SECONDARY MOVEMENT PRIOR TO INFUSION
+        // move them away from one another slowly
+        let rockMoveVector = CGVector(dx: 100, dy: 0.0)
+        let gemMoveVector = CGVector(dx: -100, dy: 0.0)
+        let secondaryMoveDuration = 0.3
+        
+        let secondaryRockMoveAway = SKAction.move(by: rockMoveVector, duration: secondaryMoveDuration).waitBefore(delay: waitBefore)
+        secondaryRockMoveAway.timingMode = .easeIn
+        let secondaryGemMoveAway = SKAction.move(by: gemMoveVector, duration: secondaryMoveDuration).waitBefore(delay: waitBefore)
+        secondaryGemMoveAway.timingMode = .easeIn
+        spriteActions.append(.init(rockSprite, secondaryRockMoveAway))
+        spriteActions.append(.init(gemSprite, secondaryGemMoveAway))
+        
+        // keep track of wait before for sequencing purposes
+        waitBefore += secondaryMoveDuration
+        
+        /// TERTIARY MOVEMENT - BIG BANG
+        // crash them into one another
+        let finalMeetingPoint = CGPoint.position(CGRect(origin: .zero, size: cgTileSize), inside: playableRect, verticalAnchor: .center, horizontalAnchor: .center)
+        
+        let finalMoveDuration: TimeInterval = 0.1
+        let moveTowardsMeetingPoint = SKAction.move(to: finalMeetingPoint, duration: 0.1).waitBefore(delay: waitBefore)
+        let squash = SKAction.scaleX(by: 0.25, y: 1.0, duration: 0.05).waitBefore(delay: finalMoveDuration/4*3)
+        let moveThenSquash = SKAction.sequence(moveTowardsMeetingPoint, squash, .removeFromParent(), curve: .easeIn)
+        let gemMoveThenSquash = SKAction.sequence(moveTowardsMeetingPoint, squash, .removeFromParent(), curve: .easeIn)
+
+        
+        spriteActions.append(.init(rockSprite, moveThenSquash))
+        spriteActions.append(.init(gemSprite, gemMoveThenSquash))
+        
+        // keep track of wait before for sequencing purposes
+        waitBefore += finalMoveDuration
+        
+        // flash the screen white
+        let whiteSprite = SKSpriteNode(texture: SKTexture(imageNamed: "white-sprite"), size: cgTileSize)
+        whiteSprite.zPosition = 300_000_000
+        whiteSprite.position = .zero
+        
+        let whiteSpriteDuration: TimeInterval = 0.2
+        let waitToAddWhiteSprite = SKAction.run { [foreground] in
+            foreground.addChild(whiteSprite)
+        }.waitBefore(delay: waitBefore)
+        let whiteSpriteScale = SKAction.scale(to: cgTileSize.scale(by: 100), duration: whiteSpriteDuration)
+        let whiteSpriteSeq = SKAction.sequence(whiteSpriteScale, .removeFromParent())
+        spriteActions.append(.init(foreground, waitToAddWhiteSprite))
+        spriteActions.append(.init(whiteSprite, whiteSpriteSeq))
+        
+        waitBefore += whiteSpriteDuration
+        
+        // show a the new rock with 10 alternating/spinning glow sprites behind it of different sizes and alphas (smaller and closer are brighter)
+        var glowEffectZPosition: CGFloat = 1_000_000
+        var glowAlpha = 1.0
+        for idx in 1..<11 {
+            let glow = SKSpriteNode(texture: SKTexture(imageNamed: "crystalGlow"), size: tileCGSize.scale(by: CGFloat(idx)))
+            glow.alpha = glowAlpha
+            glow.zPosition = glowEffectZPosition
+            
+            let waitToAddGlowSprite = SKAction.run { [foreground] in
+                foreground.addChild(glow)
+            }.waitBefore(delay: waitBefore)
+            spriteActions.append(.init(foreground, waitToAddGlowSprite))
+            
+            // spin at a random speed, and spin a lot
+            let spinSpeed: CGFloat = CGFloat((idx % 4) + 1) * CGFloat(5.0) / .pi
+            let spinDuation = 1.0
+            let spinAngle: CGFloat = CGFloat(idx.isEven ? -1 : 1) * spinSpeed * spinDuation
+            
+            // no wait before because it will wait to be added to the screen
+            let spinAction = SKAction.rotate(byAngle: spinAngle, duration: spinDuation)
+            let seq = SKAction.sequence(spinAction, .removeFromParent())
+            spriteActions.append(.init(glow, seq))
+            
+            glowAlpha -= 0.05
+            glowEffectZPosition -= 1_000
+        }
+        
+        /// SHOW THE FINAL thing
+        var finalCreationSprite: SKSpriteNode = SKSpriteNode()
+        if case TileType.item(let item) = endTiles[targetTileType.target].type {
+            finalCreationSprite = SKSpriteNode(texture: SKTexture(imageNamed: item.textureName), size: cgTileSize.scale(by: 4))
+        } else if case TileType.monster(let monsterData) = endTiles[targetTileType.target].type {
+            finalCreationSprite = SKSpriteNode(texture: SKTexture(imageNamed: monsterData.type.textureString), size: cgTileSize.scale(by: 4))
+        }
+        finalCreationSprite.zPosition = 10_000_000
+        finalCreationSprite.position = .zero
+        
+        let waitBeforeAddingFinalCreationSprite: SKAction = SKAction.run {
+            foreground.addChild(finalCreationSprite)
+        }.waitBefore(delay: waitBefore)
+        
+        spriteActions.append(.init(foreground, waitBeforeAddingFinalCreationSprite))
+        
+        // add the spin duration
+        waitBefore += 1.0
+        
+        /// FINALLY MOVE IT BACK TO it's palce
+        // then put the rock back into place
+        let finalRockDistance = (CGPoint.zero - originalRockPosition).length
+        let finalRockDuration = finalRockDistance / initialRockSpeed
+        let finalRockScaleNormal = SKAction.scale(to: cgTileSize, duration: finalRockDuration)
+
+        let moveBackToOriginalPosition = SKAction.move(to: originalRockPosition, duration: finalRockDuration)
+        
+        let finalRockSeq = SKAction.sequence(moveBackToOriginalPosition, finalRockScaleNormal, .removeFromParent()).waitBefore(delay: 1.0)
+        
+        spriteActions.append(.init(finalCreationSprite, finalRockSeq))
+        
+        
+        return spriteActions
     }
     
     func createEscapeOfferAnimation(delayBefore: TimeInterval, offer: StoreOffer, startTileCoord: TileCoord, targetTileTypes: [TargetTileType], sprites: [[DFTileSpriteNode]], positionGiver: PositionGiver) -> [SpriteAction]? {

@@ -905,10 +905,8 @@ extension Board {
             }
             
         case .transmogrify:
-            if let randomMonsterCoord = randomTilecoord(ofType: .monster(.zero)) {
-                trans = transmogrify(randomMonsterCoord, input: input)
-            }
-            
+            trans = useTransmogrify(offer: offer, input: input)
+
         case .gemMagnet:
             trans = useGemMagnet(input: input)
             
@@ -1129,6 +1127,45 @@ extension Board {
         
     }
     
+    private func useTransmogrify(offer: StoreOffer, input: Input) -> Transformation {
+        guard let pp = playerPosition else {
+            return Transformation(transformation: [], inputType: input.type, endTiles: self.tiles)
+        }
+        var newTiles = tiles
+        var tileTransformation: [TileTransformation] = []
+        
+        // TODO: model this somewhere
+        let transmogrifyRange: ClosedRange<CGFloat> = 0...2
+        
+        let reservedCoords = reservedCoords()
+        
+        // grab a random rock nearby
+        let nearbyTargetCoord = randomCoord(in: tiles, notIn: reservedCoords, nearby: pp, in: transmogrifyRange, specificTypeChecker: { $0.isARock })
+        
+        /// they got lucky - get gems
+        if (Bool.random()) {
+            let randomColor = ShiftShaft_Color.randomColor
+            let item = Item(type: .gem, amount: offer.type.effectAmount, color: randomColor)
+            
+            // update the tile storage
+            newTiles[nearbyTargetCoord.row][nearbyTargetCoord.col] = Tile(type: .item(item))
+            tileTransformation.append(.init(nearbyTargetCoord, nearbyTargetCoord))
+        }
+        /// the got unlucky, random monster
+        else {
+            let newMonster = tileCreator.randomMonster()
+            
+            // update the tile storage
+            newTiles[nearbyTargetCoord.row][nearbyTargetCoord.column] = Tile(type: newMonster)
+            tileTransformation.append(.init(nearbyTargetCoord, nearbyTargetCoord))
+        }
+        
+        self.tiles = newTiles
+        
+        return Transformation(transformation: tileTransformation, inputType: input.type, endTiles: self.tiles)
+    }
+
+    
 }
 
 //MARK: - Use Rune
@@ -1245,16 +1282,7 @@ extension Board {
         return Transformation(transformation: transformation, inputType: input.type, endTiles: newTiles)
     }
     
-    private func transmogrify(_ target: TileCoord, input: Input) -> Transformation {
-        if case let TileType.monster(data) = tiles[target].type {
-            let newMonster = tileCreator.randomMonster(not: data.type)
-            tiles[target.row][target.column] = newMonster
-            return Transformation(transformation: [TileTransformation(TileCoord(target.row, target.column), TileCoord(target.row, target.column))], inputType: input.type, endTiles: tiles)
-        } else {
-            preconditionFailure("We should never hit this code path")
-        }
-    }
-    
+        
     private func fieryRage(allTarget: AllTarget, input: Input) -> [Transformation] {
         // destroy any monsters that are within the the effected tile coords
         

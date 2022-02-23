@@ -214,7 +214,7 @@ extension StoreOffer {
             
         case .transmogrifyPotion:
             title = "Trans-Mogrify Potion"
-            body = "Instantly transform a random monster into another random monster"
+            body = "Transform a random nearby rock into a stack of \(type.effectAmount) gems OR a random monster"
             textureName = "item-transmogrification-potion"
             spriteSheetName = "transmogrificationPotionSpriteSheet"
             

@@ -119,6 +119,8 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
         switch self {
         case .liquifyMonsters:
             return 10
+        case .transmogrifyPotion:
+            return 50
         default:
             return 0
         }

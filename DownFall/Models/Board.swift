@@ -273,6 +273,11 @@ class Board: Equatable {
             InputQueue.append(Input(.transformation(trans)))
             return
             
+        case let .collectChestOffer(offer: offer):
+            let trans = self.collectChestOffer(offer, input: input)
+            InputQueue.append(Input(.transformation(trans)))
+            return
+            
         case .runeReplaced(_, let rune):
             transformation = self.runeReplaced(rune, inputType: input.type)
         case .foundRuneDiscarded(let rune):
@@ -485,6 +490,41 @@ class Board: Equatable {
         
     }
     
+    /// Only to be used for collecting the chest offer
+    private func collectChestOffer(_ offer: StoreOffer, input: Input) -> [Transformation] {
+        
+        // Get the item and the new end tiles from the remove and replace transformation
+        guard let pp = playerPosition,
+              case let .player(data) = tiles[pp].type
+        else { return [Transformation(transformation: [], inputType: input.type, endTiles: self.tiles)] }
+        
+        var newTiles = tiles
+        
+        // grab the effect from the store offer for convenience
+        let effect = offer.effect
+        
+        // we have to reset attack here because the player has moved but the turn may not be over
+        // Eg: it is possible that there could be monster, item, monster in a row below the player and the player should be able to kill the second monster after collecting the offer/effect
+        let playerData = data.update(attack: data.attack.resetAttack()).applyEffect(effect)
+        
+        /// store the update player data in the new updated tiles
+        newTiles[pp.x][pp.y] = Tile(type: .player(playerData))
+        
+        /// update our tile stores
+        tiles = newTiles
+        
+        let transformation = Transformation(transformation: [.init(pp, pp)], inputType: input.type, endTiles: self.tiles)
+        
+        /// If this is a one time use potion then we will tack on that trackformation after the remove and replace
+        if effect.stat == .oneTimeUse {
+            return useOneTimeUseEffect(offer: offer, input: input, previousTransformation: transformation)
+        }
+        /// otherwise just return the tranformation for remove and replace with the updated player
+        else {
+            return [transformation]
+        }
+    }
+    
     /// This is for collecting runes or other things like max health
     private func collect(offer: StoreOffer, at offerCoord: TileCoord, input: Input) -> [Transformation] {
         
@@ -553,7 +593,7 @@ class Board: Equatable {
         
         /// If this is a one time use potion then we will tack on that trackformation after the remove and replace
         if effect.stat == .oneTimeUse {
-            return useOneTimeUseEffect(effect, offer: storeOffer, at: offerCoord, input: input, previousTransformation: transformation)
+            return useOneTimeUseEffect(offer: storeOffer, input: input, previousTransformation: transformation)
         }
         /// otherwise just return the tranformation for remove and replace with the updated player
         else {
@@ -838,11 +878,11 @@ class Board: Equatable {
 //MARK: - Items
 extension Board {
     
-    private func useOneTimeUseEffect(_ effect: EffectModel, offer: StoreOffer, at offerCoord: TileCoord, input: Input, previousTransformation: Transformation) -> [Transformation] {
+    private func useOneTimeUseEffect(offer: StoreOffer, input: Input, previousTransformation: Transformation) -> [Transformation] {
         
         var trans: Transformation?
         
-        switch effect.kind {
+        switch offer.effect.kind {
         case .killMonster:
             if let randomMonsterCoord = randomTilecoord(ofType: .monster(.zero)) {
                 trans = removeAndReplace(from: tiles, tileCoord: randomMonsterCoord, singleTile: true, input: input)
@@ -865,12 +905,35 @@ extension Board {
         case .liquifyMonsters:
             trans = useLiquifyMonsters(input: input, offer: offer)
             
+        case .chest:
+            trans = useChest(input: input)
+            
             
         default:
             preconditionFailure("Currently only killMonster and transmogrify are set up for this code path")
         }
         
         return (trans != nil) ? [previousTransformation, trans!] : [previousTransformation]
+    }
+    
+    func useChest(input: Input) -> Transformation? {
+        guard let pp = playerPosition else { return nil }
+        var tileTransformation: [TileTransformation] = []
+        
+        let otherOffers: [StoreOffer] = tiles(where: { tileType in
+            if case TileType.offer = tileType {
+                return true
+            }
+            return false
+        }).compactMap {
+            tiles[$0].type.offer
+        }
+        
+        // get the random item or rune
+        let randomItemOrRune = level.randomItemOrRune(offersOnBoard: otherOffers)
+        tileTransformation.append(.init(pp, pp))
+        
+        return Transformation(transformation: tileTransformation, inputType: input.type, endTiles: self.tiles, offers: [randomItemOrRune])
     }
     
     func useLiquifyMonsters(input: Input, offer: StoreOffer) -> Transformation {
@@ -889,7 +952,7 @@ extension Board {
         let chosenCoords = monsterTilecoords.choose(random: offer.type.numberOfTargets)
         
         for coord in chosenCoords {
-            var randomColor = ShiftShaft_Color.randomColor
+            let randomColor = ShiftShaft_Color.randomColor
             let newItem = Item(type: .gem, amount: offer.type.effectAmount, color: randomColor)
             let newTile = Tile(type: .item(newItem))
             

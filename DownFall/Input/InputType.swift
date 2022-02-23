@@ -65,6 +65,7 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
                                         .bossTurnStart(BossPhase()),
                                         .bossPhaseStart(BossPhase()),
                                         .noMoreMoves,
+                                        .collectChestOffer(offer: .zero)
                                                                  
     ]
     
@@ -86,8 +87,11 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
     case reffingFinished(newTurn: Bool)
     case boardBuilt
     case boardLoaded
+    
     case collectItem(TileCoord, Item, Int)
     case collectOffer(collectedCoord: TileCoord, collectedOffer: StoreOffer, discardedCoord: TileCoord, discardedOffer: StoreOffer)
+    case collectChestOffer(offer: StoreOffer)
+    
     case selectLevel
     case newTurn
     case visitStore
@@ -152,8 +156,12 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
             return "Board has been built"
         case .boardLoaded:
             return "Board has been loaded"
+        
         case .collectItem:
             return "Player collects an item"
+        case .collectChestOffer:
+            return "Player collects offer from chest"
+            
         case .selectLevel:
             return "Select Level"
         case .newTurn:

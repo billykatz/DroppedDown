@@ -17,16 +17,18 @@ struct StoreOffer: Codable, Hashable, Identifiable {
     let textureName: String
     let title: String
     let body: String
+    var spriteSheetName: String?
+    
     
     var id: String {
         return self.textureName
     }
     
     var sprite: SKSpriteNode {
-        if hasSpriteSheet {
-            let fallbackSprite = SKSpriteNode(texture: SKTexture(imageNamed: self.textureName))
+        if let spriteSheetName = spriteSheetName {
+            let fallbackSprite = SKSpriteNode(texture: SKTexture(imageNamed: textureName))
             guard let columns = spriteSheetColumns else { return fallbackSprite }
-            return SpriteSheet(texture: SKTexture(imageNamed: textureName), rows: 1, columns: columns).firstFrame() ?? fallbackSprite
+            return SpriteSheet(texture: SKTexture(imageNamed: spriteSheetName), rows: 1, columns: columns).firstFrame() ?? fallbackSprite
         } else {
             return SKSpriteNode(texture: SKTexture(imageNamed: self.textureName))
         }
@@ -128,6 +130,9 @@ struct StoreOffer: Codable, Hashable, Identifiable {
         case .liquifyMonsters:
             effect = EffectModel(kind: .liquifyMonsters, stat: .oneTimeUse, amount: 1, duration: 0)
             
+        case .chest:
+            effect = EffectModel(kind: .chest, stat: .oneTimeUse, amount: 1, duration: 0)
+            
         }
         return effect
     }
@@ -153,6 +158,7 @@ extension StoreOffer {
         let title: String
         let body: String
         let textureName: String
+        var spriteSheetName: String? = nil
         switch type {
         case .dodge(let amount):
             title = "Dodge Up"
@@ -162,74 +168,96 @@ extension StoreOffer {
             title = "Gems"
             body = "Gain \(amount) gems."
             textureName = "crystals"
+            
         case .luck(let amount):
             title = "Luck Up"
             body = "Increase the frequency and overall number of gems you find by \(amount)%."
             textureName = "luck"
+            
         case .plusTwoMaxHealth:
             title = "Increase Max Health"
             body = "Add 2 max health."
             textureName = "twoMaxHealth"
+            
         case .rune(let rune):
             title = rune.type.humanReadable
             body = rune.fullDescription
             textureName = rune.textureName
+            
         case .runeSlot:
             title = "+1 Rune Slot"
             body = "Add a rune slot to your pickaxe handle"
             textureName = "pickaxe-upgrade"
+            
         case .runeUpgrade:
             title = "Rune Upgrade"
             body = "Your runes will be better"
             textureName = "blankRune"
+            
         case .plusOneMaxHealth:
             title = "Increase Max Health"
             body = "Add 1 max health."
             textureName = "plusOneHeart"
+            
         case .lesserHeal:
             title = "Lesser Healing Potion"
             body = "Heals 1 HP."
-            textureName = "lesserHealingPotionSpriteSheet"
+            textureName = "lesserHealingPotion"
+            spriteSheetName = "lesserHealingPotionSpriteSheet"
+            
         case .greaterHeal:
             title = "Greater Healing Potion"
             body = "Heals 2 HP."
-            textureName = "greaterHealingPotionSpriteSheet"
+            textureName = "greaterHealingPotion"
+            spriteSheetName = "greaterHealingPotionSpriteSheet"
+            
         case .killMonsterPotion:
             title = "Death Potion"
             body = "Instantly kills a random monster"
-            textureName = "killMonsterPotionSpriteSheet"
+            textureName = "item-kill-potion"
+            spriteSheetName = "killMonsterPotionSpriteSheet"
+            
         case .transmogrifyPotion:
             title = "Trans-Mogrify Potion"
             body = "Instantly transform a random monster into another random monster"
-            textureName = "transmogrificationPotionSpriteSheet"
+            textureName = "item-transmogrification-potion"
+            spriteSheetName = "transmogrificationPotionSpriteSheet"
+            
         case .sandals:
             title = "Sandals"
             body = "Slightly better than just socks\n+\(type.dodgeAmount) dodge"
             textureName = "sandals"
+            
         case .runningShoes:
             title = "Running Shoes"
             body = "Sleek running shoes\n+\(type.dodgeAmount) dodge"
             textureName = "runningShoes"
+            
         case .wingedBoots:
             title = "Winged Boots"
             body = "You may be able to keep up with Teri sporting a pair of these.\n+\(type.dodgeAmount) dodge"
             textureName = "wingedBoots"
+            
         case .fourLeafClover:
             title = "4 Leaf Clover"
             body = "Miners carry around clovers to increase their chance of striking it rich.\n+\(type.luckAmount) luck"
             textureName = "clover"
+            
         case .horseshoe:
             title = "Horseshoe"
             body = "Miners hang these on their mantles to keep evil spirits at bay.\n+\(type.luckAmount) luck"
             textureName = "horseshoe"
+            
         case .luckyCat:
             title = "Lucky Cat"
             body = "Teri might not appreciate you carrying this ceramic cat.\n+\(type.luckAmount) luck"
             textureName = "luckyCat"
+            
         case .gemMagnet:
             title = "Gem Magnet"
             body = "Collect all gems on the board"
             textureName = "gemMagnet"
+            
         case .infusion:
             title = "Infusion"
             body = "Infuse a random nearby rock with a gem."
@@ -245,9 +273,14 @@ extension StoreOffer {
             body = "Transform \(type.numberOfTargets) random monsters into stacks of \(type.effectAmount)x gems."
             textureName = "liquifyMonsters"
             
+        case .chest:
+            title = "Chest"
+            body = "Get a random Rune or Item."
+            textureName = "chest"
+            
         }
         
-        return StoreOffer(type: type, tier: tier, textureName: textureName, title: title, body: body, startingPrice: 0)
+        return StoreOffer(type: type, tier: tier, textureName: textureName, title: title, body: body, spriteSheetName: spriteSheetName, startingPrice: 0)
     }
 
     

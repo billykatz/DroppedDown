@@ -283,6 +283,15 @@ class Renderer: SKSpriteNode {
                     collectOffer(transformations, offer: offer, atTilecoord: tileCoord, discardOffer: discardedOffer, discardedOfferTileCoord: discardedCoord)
                 }
                 
+            case .collectChestOffer(offer: let offer):
+                guard let playerCoord = transformations.first?.tileTransformation?.first?.initial else { return }
+                if case let StoreOfferType.gems(amount) = offer.type {
+                    collectItem(for: trans, amount: amount, atCoord: playerCoord, textureName: offer.textureName, inputType: inputType, randomColor: true)
+                } else {
+                    collectOffer(transformations, offer: offer, atTilecoord: playerCoord, discardOffer: .zero, discardedOfferTileCoord: .zero)
+                }
+
+                
             case let .collectItem(coord, item, _):
                 collectItem(for: trans, amount: item.amount, atCoord: coord, textureName: item.textureName, inputType: inputType)
                 
@@ -690,7 +699,17 @@ extension Renderer {
                 // get the target area to move the rune.
                 let runeSlotView = backpackView.runeInventoryContainer?.firstEmptyRuneSlotNode()
                 let targetPoint = runeSlotView?.convert(backpackView.frame.center, to: foreground) ?? .zero
-                let sprite = sprites[atTilecoord.x][atTilecoord.y]
+                
+                let sprite: DFTileSpriteNode //= sprites[atTilecoord.x][atTilecoord.y]
+                if case TileType.offer = sprites[atTilecoord.x][atTilecoord.y].type {
+                    sprite = sprites[atTilecoord.x][atTilecoord.y]
+                } else {
+                    sprite = DFTileSpriteNode(type: .offer(offer), height: tileSize, width: tileSize)
+                    sprite.position = sprites[atTilecoord.x][atTilecoord.y].position
+                    sprite.zPosition = 100_000
+                    spriteForeground.addChild(sprite)
+                }
+
                 
                 animator.animateCollectRune(runeSprite: sprite, targetPosition: targetPoint) { [weak self] in
                     self?.computeNewBoard(for: trans.first) { [weak self] in
@@ -708,7 +727,16 @@ extension Renderer {
                 // animate received the health, dodge or luck and then compute the new board
                 let targetSprite = hud.targetSprite(for: offer.type)
                 let targetPoint = hud.convert(targetSprite?.frame.center ?? .zero, to: foreground)// ?? .zero
-                let sprite = sprites[atTilecoord.x][atTilecoord.y]
+                let sprite: DFTileSpriteNode
+                if case TileType.offer = sprites[atTilecoord.x][atTilecoord.y].type {
+                    sprite = sprites[atTilecoord.x][atTilecoord.y]
+                } else {
+                    sprite = DFTileSpriteNode(type: .offer(offer), height: tileSize, width: tileSize)
+                    sprite.position = sprites[atTilecoord.x][atTilecoord.y].position
+                    sprite.zPosition = 100_000
+                    spriteForeground.addChild(sprite)
+                }
+                
                 animator.animateCollectOffer(offerType: offer.type, offerSprite: sprite, targetPosition: targetPoint, to: hud, updatedPlayerData: data) { [weak self] in
                     self?.computeNewBoard(for: trans.first) { [weak self] in
                         self?.animationsFinished(endTiles: endTiles)
@@ -718,7 +746,7 @@ extension Renderer {
                 return
             }
             else {
-                GameLogger.shared.log(prefix: Constants.tag, message: "Rendering collecting offer trans but it is not a rune or a hp/dodge/lucl upgrade")
+                GameLogger.shared.log(prefix: Constants.tag, message: "Rendering collecting offer trans but it is not a rune or a hp/dodge/luck upgrade")
                 self.computeNewBoard(for: trans.first) { [weak self] in self?.animationsFinished(endTiles: trans.first?.endTiles) }
                 return
             }
@@ -727,28 +755,36 @@ extension Renderer {
         /// This is the case for other collected items that have more than 1 assocaited transformation. like the gem magnet
         else if trans.count == 2 {
             // this is the remove and replace transformation that removes the offer (and the other offer) and replaces the empty spaces in the board
-            let first = trans.first!
+            let removeAndReplaceTrans = trans.first!
             
             // this is the second trans that is different for each item. for gem magnet is moves all the gems to the player and makes the player gain gems.
             let second = trans.last!
             
             // Pass in a custom completion block to computeNewBoard so that we can animate the items effect
-            computeNewBoard(for: first) { [weak self, animator, hud] in
+            computeNewBoard(for: removeAndReplaceTrans) { [weak self, animator, hud] in
                 guard let self = self,
                         let targetTiles = second.tileTransformation?.compactMap( { $0.initial }),
                       let endTiles = second.endTiles
                 else { preconditionFailure("this is bad") }
                 
                 /// add sprites from first one
-                let sprites = self.createSprites(from: first.endTiles)
-                self.add(sprites: sprites, tiles: first.endTiles!)
+                let sprites = self.createSprites(from: removeAndReplaceTrans.endTiles)
+                self.add(sprites: sprites, tiles: removeAndReplaceTrans.endTiles!)
                 
                 
                 let playerPosition = getTilePosition(.player(.zero), tiles: second.endTiles ?? []) ?? .zero
                 let targetTileTypes = targetTiles.map { TargetTileType(target: $0, type: sprites[$0].type) }
                 
-                animator.animateCollectingOffer(offer, playerPosition: playerPosition, targetTileTypes: targetTileTypes, delayBefore: 0.0, hud: hud, sprites: sprites, endTiles: endTiles, positionInForeground: self.positionInForeground(at:)) { [weak self] in
-                    self?.animationsFinished(endTiles: second.endTiles)
+                animator.animateCollectingOffer(offer, playerPosition: playerPosition, targetTileTypes: targetTileTypes, delayBefore: 0.0, hud: hud, sprites: sprites, endTiles: endTiles, transformationOffers: second.offers, positionInForeground: self.positionInForeground(at:)) { [weak self] in
+                    guard let self = self else { return }
+                    if offer.type == .chest, let chestOffer = second.offers?.first {
+                        self.sprites = self.createSprites(from: endTiles)
+                        self.add(sprites: sprites, tiles: endTiles)
+                        print("Special case where after rendering we go to computing for the chest item")
+                        InputQueue.append(Input(.collectChestOffer(offer: chestOffer)))
+                    } else {
+                        self.animationsFinished(endTiles: second.endTiles)
+                    }
                 }
                 
             }
@@ -829,7 +865,7 @@ extension Renderer {
               let shiftDown = transformation.shiftDown
         else {
             #warning("I removed the precondition failure here because I wanted to use this function to end all rune use animations.  I would check here for any strange bugs around animating.")
-            animationsFinished(endTiles: endTiles)
+            completion?() ?? animationsFinished(endTiles: endTiles)
             return
         }
         

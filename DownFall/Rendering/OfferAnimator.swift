@@ -19,7 +19,7 @@ struct TargetTileType {
 
 extension Animator {
     
-    func animateCollectingOffer(_ offer: StoreOffer, playerPosition: TileCoord, targetTileTypes: [TargetTileType], delayBefore: TimeInterval, hud: HUD, sprites: [[DFTileSpriteNode]], endTiles: [[Tile]], positionInForeground: PositionGiver, completion: @escaping () -> Void) {
+    func animateCollectingOffer(_ offer: StoreOffer, playerPosition: TileCoord, targetTileTypes: [TargetTileType], delayBefore: TimeInterval, hud: HUD, sprites: [[DFTileSpriteNode]], endTiles: [[Tile]], transformationOffers: [StoreOffer]?, positionInForeground: PositionGiver, completion: @escaping () -> Void) {
         var spriteActions: [SpriteAction] = []
         switch offer.type {
         case .transmogrifyPotion, .killMonsterPotion:
@@ -47,6 +47,12 @@ extension Animator {
             if let animation = createLiquifyMonstersOfferAnimation(delayBefore: delayBefore, offer: offer, startTileCoord: playerPosition, targetTileTypes: targetTileTypes, sprites: sprites, positionGiver: positionInForeground) {
                 spriteActions.append(contentsOf: animation)
             }
+            
+        case .chest:
+            if let finalOffer = transformationOffers?.first,
+                let animation = createChestOfferAnimation(delayBefore: delayBefore, offer: offer, finalOffer: finalOffer, startTileCoord: playerPosition, targetTileTypes: targetTileTypes, sprites: sprites, positionGiver: positionInForeground) {
+                spriteActions.append(contentsOf: animation)
+            }
         
         default:
             break
@@ -55,6 +61,136 @@ extension Animator {
         
         animate(spriteActions, completion: completion)
         
+    }
+    
+    func createChestOfferAnimation(delayBefore: TimeInterval, offer: StoreOffer, finalOffer: StoreOffer, startTileCoord: TileCoord, targetTileTypes: [TargetTileType], sprites: [[DFTileSpriteNode]], positionGiver: PositionGiver) -> [SpriteAction]? {
+        guard let tileSize = tileSize, let foreground = foreground else { return nil }
+        let cgTileSize = CGSize(widthHeight: tileSize)
+        var spriteActions: [SpriteAction] = []
+        
+        var waitBefore: TimeInterval = delayBefore
+        
+        // open up the chest
+        let openChestSprite = SKSpriteNode(texture: SKTexture(imageNamed: "open-chest"), size: cgTileSize)
+        openChestSprite.zPosition = 1_000_000
+        openChestSprite.position = positionGiver(startTileCoord).translateVertically(-20)
+        
+        foreground.addChild(openChestSprite)
+        
+        let moveDuration = 0.2
+        let moveUpChestSlowly = SKAction.moveBy(x: 0, y: 40, duration: moveDuration)
+        
+        spriteActions.append(.init(openChestSprite, moveUpChestSlowly))
+        
+        waitBefore += moveDuration
+        
+        // create all the items possible
+        var itemsToShow: [StoreOffer] = StoreOfferType.allCases.filter { $0 != finalOffer.type }.map { StoreOffer.offer(type: $0, tier: 1) }.shuffled()
+        itemsToShow.append(finalOffer)
+        
+        // show each one for a moment and then show the next one
+        // slowly increase the amount of time that we show an item
+        // finally show the final item
+        var startingShowTime: TimeInterval = 0.05
+        var itemToShowPosition = openChestSprite.position
+        itemToShowPosition = itemToShowPosition.translateVertically(200)
+        
+        var finalItemSprite: SKSpriteNode = finalOffer.sprite
+        let floatTotalItems = CGFloat(itemsToShow.count)
+        for (idx, itemToShow) in itemsToShow.enumerated() {
+            let floatIndex = CGFloat(idx)
+            let itemSprite = SKSpriteNode(texture: SKTexture(imageNamed: itemToShow.textureName), size: cgTileSize.scale(by: 1.5))
+            itemSprite.position = itemToShowPosition
+            itemSprite.zPosition = 1_750_000
+            let appearAction = SKAction.run {
+                foreground.addChild(itemSprite)
+            }
+            
+            let initialWaitAction = SKAction.wait(forDuration: waitBefore)
+            let foregroundSeq = SKAction.sequence(initialWaitAction, appearAction)
+            spriteActions.append(.init(foreground, foregroundSeq))
+            
+            waitBefore += startingShowTime
+            
+            finalItemSprite = itemSprite
+            
+            if (itemToShow != itemsToShow.last) {
+                let waitBeforeRemove = SKAction.wait(forDuration: startingShowTime)
+                let itemAction = SKAction.sequence(waitBeforeRemove, .removeFromParent())
+                spriteActions.append(.init(itemSprite, itemAction))
+                
+                waitBefore += startingShowTime
+            }
+            
+            
+            if floatIndex > floatTotalItems / 6 * 5 {
+                startingShowTime = 0.2
+            } else if floatIndex > floatTotalItems / 4 * 3 {
+                startingShowTime = 0.13
+            } else if floatIndex > floatTotalItems / 2  {
+                startingShowTime = 0.08
+            } else {
+                startingShowTime = 0.04
+            }
+
+
+        }
+        
+        // show glow fun stuff
+        let durationBeforeGlow = TimeInterval(0.2)
+        var glowEffectZPosition: CGFloat = 500_000
+        var glowAlpha = 1.0
+        for idx in 1..<11 {
+            let glow = SKSpriteNode(texture: SKTexture(imageNamed: "crystalGlow"), size: tileCGSize.scale(by: 3 + CGFloat(idx)/10))
+            var glowPosition = positionGiver(startTileCoord)
+            glowPosition = glowPosition.translateVertically(150)
+            glow.position = glowPosition
+            glow.zPosition = glowEffectZPosition
+            glow.alpha = glowAlpha
+            
+            let waitToAddGlowSprite = SKAction.run { [foreground] in
+                foreground.addChild(glow)
+            }.waitBefore(delay: durationBeforeGlow)
+            spriteActions.append(.init(foreground, waitToAddGlowSprite))
+            
+            // spin at a random speed, and spin a lot
+            let spinSpeed: CGFloat = CGFloat((idx % 4) + 1) * CGFloat(5.0) / .pi
+            // spin the entire time we are showing the options
+            let spinDuation = (waitBefore + 0.2)
+            let spinAngle: CGFloat = CGFloat(idx.isEven ? -1 : 1) * spinSpeed * spinDuation
+            
+            // no wait before because it will wait to be added to the screen
+            let spinAction = SKAction.rotate(byAngle: spinAngle, duration: spinDuation)
+            let seq = SKAction.sequence(spinAction, .removeFromParent())
+            spriteActions.append(.init(glow, seq))
+            
+            glowAlpha -= 0.05
+            glowEffectZPosition -= 1_000
+        }
+        
+        // remove the chest
+        let removeOpenChestSprite = SKAction.scale(to: .zero, duration: 0.2)
+        let openChestFinalSeq = SKAction.sequence(removeOpenChestSprite, .removeFromParent()).waitBefore(delay: waitBefore)
+        spriteActions.append(.init(openChestSprite, openChestFinalSeq))
+
+        
+        // grow the final offer sprite
+        // raise it up slowly
+        // and then scale way small as the player collects it
+        let scaleFinalOffer = SKAction.scale(by: 2.0, duration: 0.2)
+        let raiseUpSlowly = SKAction.moveBy(x: 0.0, y: 30, duration: 0.2)
+        let scaleAndRaise = SKAction.group(scaleFinalOffer, raiseUpSlowly, curve: .easeInEaseOut)
+        
+        let scaleDown = SKAction.scale(to: cgTileSize.scale(by: 0.25), duration: 0.2)
+        let moveToPlayerPosition = SKAction.move(to: positionGiver(startTileCoord), duration: 0.2)
+        let scaleDownAndMove = SKAction.group(scaleDown, moveToPlayerPosition, curve: .easeIn).waitBefore(delay: 1.0)
+        
+        let finalItemSeq = SKAction.sequence(scaleAndRaise, scaleDownAndMove, .removeFromParent()).waitBefore(delay: 0.2)
+        
+        spriteActions.append(.init(finalItemSprite, finalItemSeq))
+        
+        
+        return spriteActions
     }
     
     func createLiquifyMonstersOfferAnimation(delayBefore: TimeInterval, offer: StoreOffer, startTileCoord: TileCoord, targetTileTypes: [TargetTileType], sprites: [[DFTileSpriteNode]], positionGiver: PositionGiver) -> [SpriteAction]? {
@@ -121,7 +257,7 @@ extension Animator {
             spriteActions.append(.init(sprite, group))
         }
         
-        // leave behind 10x gem stack (handled by just called animations finished in the Renderer 
+        // leave behind 10x gem stack (handled by just called animations finished in the Renderer
         
         
         return spriteActions
@@ -414,9 +550,17 @@ extension Animator {
         let startPosition = positionInForeground(startTileCoord)
         
         // TODO: Allow this rendering transformation to handle items without animating textures
-        let potionAnimationFrames = SpriteSheet(texture: SKTexture(imageNamed: offer.textureName),
+        let potionAnimationFrames: SpriteSheet
+        if let spriteSheet = offer.spriteSheetName {
+            potionAnimationFrames = SpriteSheet(texture: SKTexture(imageNamed: spriteSheet),
                                                 rows: 1,
                                                 columns: offer.spriteSheetColumns!)
+        } else {
+            potionAnimationFrames = SpriteSheet(texture: SKTexture(imageNamed: offer.textureName),
+                                                rows: 1,
+                                                columns: 1)
+
+        }
         
         let placeholderSprite = SKSpriteNode(color: .clear, size: CGSize(width: tileSize, height: tileSize))
         placeholderSprite.run(SKAction.repeatForever(SKAction.animate(with: potionAnimationFrames.animationFrames(), timePerFrame: 0.2)))

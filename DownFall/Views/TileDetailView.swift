@@ -199,7 +199,8 @@ class TileDetailView: SKSpriteNode {
     }
     
     private func animatedSprite(offer: StoreOffer) -> SKSpriteNode {
-        let potionAnimationFrames = SpriteSheet(texture: SKTexture(imageNamed: offer.textureName),
+        guard let spriteSheetName = offer.spriteSheetName else { return SKSpriteNode() }
+        let potionAnimationFrames = SpriteSheet(texture: SKTexture(imageNamed: spriteSheetName),
                                                 rows: 1,
                                                 columns: offer.spriteSheetColumns!)
         

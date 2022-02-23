@@ -338,7 +338,7 @@ struct EntityModel: Equatable, Codable {
         case (.buff, .dodge):
             return update(dodge: dodge + effect.amount)
         case (.killMonster, _), (.transmogrify, _), (.gemMagnet, _), (.infusion, _), (.item, _), (.snakeEyes, _),
-            (.liquifyMonsters, _):
+            (.liquifyMonsters, _), (.chest, _):
             return self
         default:
             preconditionFailure("Youll want to implement future cases here")

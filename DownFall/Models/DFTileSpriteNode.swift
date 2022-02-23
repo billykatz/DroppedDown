@@ -42,8 +42,8 @@ class DFTileSpriteNode: SKSpriteNode {
                 addChild(trackSprite)
             }
         case .offer(let offer):
-            if offer.hasSpriteSheet, let columns = offer.spriteSheetColumns {
-                let spriteSheet = SpriteSheet(texture: SKTexture(imageNamed: offer.textureName), rows: 1, columns: columns)
+            if offer.hasSpriteSheet, let columns = offer.spriteSheetColumns, let spriteSheetName = offer.spriteSheetName {
+                let spriteSheet = SpriteSheet(texture: SKTexture(imageNamed: spriteSheetName), rows: 1, columns: columns)
                 
                 let firstTexture = spriteSheet.firstTexture()
                 

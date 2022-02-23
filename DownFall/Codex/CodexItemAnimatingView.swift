@@ -35,7 +35,9 @@ struct CodexItemAnimatingView: View {
     }
     
     var clippedSpriteSheet: some View {
-        spriteSheet
+        Image(storeOffer.spriteSheetName ?? "")
+            .saturation(unlockable.isPurchased ? 1.0 : 0.0)
+            .contrast(unlockable.isUnlocked ? 1.0: 0.0)
             .offset(x: initialOffset - offset, y: 0)
             .clipShape(
                 Square().path(in: CGRect(x: initialOffset, y: 0, width: dimension, height: dimension))

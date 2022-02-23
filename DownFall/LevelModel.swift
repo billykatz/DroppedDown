@@ -259,5 +259,24 @@ class Level: Codable, Hashable {
         
         return storeOffers
     }
+    
+    func randomItemOrRune(offersOnBoard: [StoreOffer]) -> StoreOffer {
+        // pool of items
+        var allUnlockables = Set<Unlockable>(self.startingUnlockables)
+        allUnlockables.formUnion(self.otherUnlockables)
+        
+        // reserve items
+        var reservedOffers = Set<StoreOffer>(self.potentialItems)
+        reservedOffers.formUnion(offersOnBoard)
+        
+        var newOffer: StoreOffer? = allUnlockables.randomElement()?.item
+        var maxTries: Int = 30
+        while reservedOffers.contains(newOffer ?? .zero) && maxTries > 0 {
+            newOffer = allUnlockables.randomElement()?.item
+            maxTries -= 1
+        }
+        
+        return newOffer!
+    }
 
 }

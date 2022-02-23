@@ -20,6 +20,7 @@ enum EffectType: String, Hashable, Codable {
     case infusion
     case snakeEyes
     case liquifyMonsters
+    case chest
 }
 
 enum StatType: String, Hashable, Codable {

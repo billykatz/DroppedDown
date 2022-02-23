@@ -22,6 +22,8 @@ struct AnimatingState: GameState {
             return AnyGameState(AnimatingState())
         case .rotatePreviewFinish:
             return AnyGameState(ComputingState())
+        case .collectChestOffer:
+            return AnyGameState(ComputingState())
         default:
             return nil
         }

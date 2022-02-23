@@ -8,10 +8,14 @@
 
 import Foundation
 
-struct Unlockable: Codable, Identifiable, Equatable {
+struct Unlockable: Codable, Identifiable, Equatable, Hashable {
     
     static func == (lhs: Unlockable, rhs: Unlockable) -> Bool {
         return lhs.id == rhs.id
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
     
     let stat: Statistics

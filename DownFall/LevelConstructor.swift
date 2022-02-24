@@ -72,9 +72,9 @@ struct LevelConstructor {
         } else if depth == testLevelDepthNumber {
             return [
                 StoreOffer.offer(type: .rune(.rune(for: .drillDown)), tier: 1),
-                StoreOffer.offer(type: .killMonsterPotion, tier: 1),
+                StoreOffer.offer(type: .runeSlot, tier: 1),
                 StoreOffer.offer(type: .wingedBoots, tier: 2),
-                StoreOffer.offer(type: .killMonsterPotion, tier: 2)
+                StoreOffer.offer(type: .runeSlot, tier: 2)
                 
             ]
             

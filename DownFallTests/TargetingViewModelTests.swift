@@ -49,7 +49,7 @@ class TargetingViewModelTests: XCTestCase {
         vm.didTarget(TileCoord(1, 1))
         
         // verify
-        XCTAssertEqual(vm.currentTargets.allTargetCoords.count, 9)
+        XCTAssertEqual(vm.currentTargets.allTargetAssociatedCoords.count, 9)
         
         
     }

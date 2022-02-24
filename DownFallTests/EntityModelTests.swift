@@ -125,7 +125,7 @@ class EntityModelTests: XCTestCase {
         let player = EntityModel.createPlayer()
         XCTAssertTrue(assertBasePlayerStats(player), "A base player has not yet attacked. A base player can attack at most once a turn.  A base player does not have any abilities")
         
-        let buffHealth = EffectModel(kind: .buff, stat: .maxHealth, amount: 2, duration: 1, offerTier: 1)
+        let buffHealth = EffectModel(kind: .buff, stat: .maxHealth, amount: 2, duration: 1)
         let playerGetsAbility = player.addEffect(buffHealth)
         
         XCTAssertTrue(playerGetsAbility.effects.contains(where: { $0 == buffHealth }), "After gaining an ability, it exists within the player's abilities array")
@@ -148,7 +148,7 @@ class EntityModelTests: XCTestCase {
     }
     
     func testEntityRemovesAbility() {
-         let buffHealth = EffectModel(kind: .buff, stat: .maxHealth, amount: 2, duration: 1, offerTier: 1)
+         let buffHealth = EffectModel(kind: .buff, stat: .maxHealth, amount: 2, duration: 1)
               
         let player = EntityModel.createPlayer(effects:[buffHealth])
         

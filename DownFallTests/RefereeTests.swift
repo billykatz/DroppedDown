@@ -206,7 +206,7 @@ class RefereeTests: XCTestCase {
                      [.blueRock, Tile(type: .deadRat), .exit, .greenRock],
                      [.greenRock, Tile(type: .normalPlayer), .blueRock, .purpleRock],
                      [.blueRock, .purpleRock, .greenRock, .greenRock]]
-        var expected = Input(.monsterDies(TileCoord(1, 1), EntityModel.EntityType.rat, deathType: MonsterDeathType.mineralSpirits))
+        var expected = Input(.monsterDies(TileCoord(1, 1), EntityModel.EntityType.rat, deathType: MonsterDeathType.rune))
         var actual = Referee().enforceRules(tiles)
         
         XCTAssertEqual(expected, actual, "Monster dies when hp reaches 0")
@@ -215,7 +215,7 @@ class RefereeTests: XCTestCase {
                  [.blueRock, Tile(type: .deadRat), .exit, .greenRock],
                  [.greenRock, Tile(type: .normalPlayer), .blueRock, .purpleRock],
                  [.blueRock, .purpleRock, Tile(type: .deadRat), .greenRock]]
-        expected = Input(.monsterDies(TileCoord(1, 1), EntityModel.EntityType.rat, deathType: MonsterDeathType.mineralSpirits))
+        expected = Input(.monsterDies(TileCoord(1, 1), EntityModel.EntityType.rat, deathType: MonsterDeathType.rune))
         actual = Referee().enforceRules(tiles)
         
         XCTAssertEqual(expected, actual, "Only one monster can die at a time")
@@ -327,8 +327,9 @@ class RefereeTests: XCTestCase {
     
     // So this only happens when there is a internal "pocket" of empty spaces created by unmovable tiles like pillars surrounding an empty tile
     // The logic to actual figure out if there is a "pocket" is complicated and I likely wont get to it
-    // 
-    func testRefereeShouldBeGameOverBecauseThereAreNoActualMoves() {
+    // TODO: This is purposefully left in because currently we do not support this which limits level design. We should try to implement an algorithm that checks if the empty tiles can draw a line from themeselves to the edge of the board without touching a pillar.  If a empty tile can do that in any direction, then it's possible there are moves left.  If all empty tiles cannot do that, then there are truly no more moves.
+    //
+    func testRefereeShouldRecognizeNoMoreMoves() {
         
         let tiles = [[.noGroupRock, .purplePillar, .purplePillar, .noGroupRock],
                      [.purplePillar, .empty,  .purplePillar, .noGroupRock],

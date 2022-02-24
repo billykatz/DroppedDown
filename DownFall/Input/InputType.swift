@@ -149,8 +149,8 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
             return "Animations Finished"
         case .playAgain:
             return "Play Again"
-        case .reffingFinished:
-            return "Reffing Finished"
+        case .reffingFinished(let newTurn):
+            return "Reffing Finished. New Turn? \(newTurn)"
         case .attack(_, let attacker, let defender, _, _, _):
             return "Attacked from \(attacker) to \(String(describing: defender))"
         case .boardBuilt:

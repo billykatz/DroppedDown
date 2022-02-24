@@ -22,6 +22,7 @@ class BackpackView: SKSpriteNode {
     private struct Constants {
         static let tag = String(describing: BackpackView.self)
         static let runeUseMaskSpriteName = "rune-use-mask"
+        static let runeReplacementName = "runeReplacement"
     }
     
     // view model
@@ -116,15 +117,15 @@ class BackpackView: SKSpriteNode {
                                            playableRect: playableRect,
                                            viewModel: viewModel)
             view.zPosition = 40_000_000
-            view.position = .zero // centered 
-            view.name = "runeReplacement"
-            self?.removeChild(with: "runeReplacement")
+            view.position = .zero
+            view.name = Constants.runeReplacementName
+            self?.removeChild(with: Constants.runeReplacementName)
             self?.addChild(view)
             
         }.store(in: &disposables)
         
         viewModel.foundRuneDiscardedPublisher.sink { [weak self] in
-            self?.removeChild(with: "runeReplacement")
+            self?.removeChild(with: Constants.runeReplacementName)
         }.store(in: &disposables)
         
     }

@@ -13,14 +13,11 @@ import CoreGraphics
 
 class TargetingViewModel: Targeting {
     
+    // MARK: - Outputs that the Backpack hooks up to
     public var updateCallback: (() -> Void)?
     public var runeSlotsUpdated: ((Int, [Rune]) -> Void)?
     
-    private var runeSlots: Int = 0
-    var inventory: [Rune] = []
-    var boardSize: Int = 0
-    
-    /// publishers
+    /// publishers that the Backpack hooks up to
     private var foundRuneDiscardedSubject = PassthroughSubject<(), Never>()
     var foundRuneDiscardedPublisher: AnyPublisher<(), Never> {
         return foundRuneDiscardedSubject.eraseToAnyPublisher()
@@ -31,6 +28,14 @@ class TargetingViewModel: Targeting {
         return runeReplacementSubject.eraseToAnyPublisher()
     }
     
+    // MARK: - Normal variables
+    
+    private var runeSlots: Int = 0
+    var inventory: [Rune] = []
+    var boardSize: Int = 0
+    
+    
+    // MARK: - Computer variables
     var rune: Rune? {
         didSet {
             currentTargets = AllTarget(targets: [], areLegal: false)
@@ -42,6 +47,14 @@ class TargetingViewModel: Targeting {
                 InputQueue.append(Input(InputType.runeUseCanceled))
             }
         }
+    }
+    
+    var needsToTargetPlayer: Bool {
+        rune?.targetTypes?.contains(.player(.playerZero)) ?? false
+    }
+    
+    var playerCoord: TileCoord? {
+        return tileCoords(for: tiles ?? [], of: .player(.playerZero)).first
     }
     
     var numberOfTargets: Int {
@@ -115,13 +128,43 @@ class TargetingViewModel: Targeting {
         }
     }
     
+    // MARK: - Init and public methods
     init() {
         Dispatch.shared.register { [weak self] (input) in
             self?.handle(input)
         }
     }
     
-    func handle(_ input: Input) {
+    public func didUse(_ rune: Rune?) {
+        guard let rune = rune, legallyTargeted else {
+            self.rune = nil
+            return
+        }
+        
+        InputQueue.append(
+            Input(.runeUsed(rune, currentTargets))
+        )
+        
+        self.rune = nil
+        currentTargets = AllTarget(targets: [], areLegal: false)
+        
+    }
+    
+    public func didDeselect() {
+        self.rune = nil
+        currentTargets = AllTarget(targets: [], areLegal: false)
+    }
+    
+    public func didSelect(_ rune: Rune?) {
+        self.rune = rune
+        if rune == nil {
+            currentTargets = AllTarget(targets: [], areLegal: false)
+        }
+    }
+    
+    
+    // MARK: - Private methods, mostly targeting logic
+    private func handle(_ input: Input) {
         switch input.type {
         case .runeReplaced(let pickaxe, let replacedRune, _, _):
             let runes = pickaxe.runes.filter { $0.type != replacedRune.type }
@@ -163,8 +206,12 @@ class TargetingViewModel: Targeting {
                     self.runeSlots = runeSlots
                     inventory = playerData.runes ?? []
                     runeSlotsUpdated?(runeSlots, runes)
+                    
                 }
             }
+            // this makes sure that the view looks right if the player taps on a rune during an animation
+            self.didDeselect()
+            
         case .newTurn:
             guard let tiles = input.endTilesStruct else { return }
             self.tiles = tiles
@@ -189,20 +236,11 @@ class TargetingViewModel: Targeting {
                 inventory = playerData.runes ?? []
                 runeSlotsUpdated?(runeSlots, runes)
             }
-        case .runeUseCanceled:
-            ()
+            
         default:
-            ()
+            break
         }
         
-    }
-
-    var needsToTargetPlayer: Bool {
-        rune?.targetTypes?.contains(.player(.playerZero)) ?? false
-    }
-    
-    var playerCoord: TileCoord? {
-        return tileCoords(for: tiles ?? [], of: .player(.playerZero)).first
     }
     
     private func areAllTargetsLegal(in allTarget: AllTarget) -> Bool {
@@ -278,7 +316,7 @@ class TargetingViewModel: Targeting {
         return false
     }
     
-    public func affectedTiles(affectSlope: [AttackSlope], range: RangeModel, from position: TileCoord, tiles: [[Tile]]?, stopsTileTypes: EndEffectTile?) -> [TileCoord] {
+    private func affectedTiles(affectSlope: [AttackSlope], range: RangeModel, from position: TileCoord, tiles: [[Tile]]?, stopsTileTypes: EndEffectTile?) -> [TileCoord] {
         func calculateTargetSlope(in slopedDirection: AttackSlope, distance i: Int, from position: TileCoord) -> TileCoord {
             let (initialRow, initialCol) = position.tuple
             
@@ -330,7 +368,7 @@ class TargetingViewModel: Targeting {
         return effectedTileCoords
     }
     
-    func targets(given coord: TileCoord, withRune rune: Rune) -> AllTarget {
+    private func targets(given coord: TileCoord, withRune rune: Rune) -> AllTarget {
         var allTarget: AllTarget = .init(targets: [], areLegal: false)
         if currentTargets.allTargetAssociatedCoords.contains(coord) {
             if needsToTargetPlayer{
@@ -429,7 +467,7 @@ class TargetingViewModel: Targeting {
      - Parameters coord: The coord that is being targetted
      - Returns: Nothing
      */
-    func didTarget(_ coord: TileCoord) {
+    public func didTarget(_ coord: TileCoord) {
         guard let rune = rune else { preconditionFailure("We cant target if we dont have an ability set") }
         
         /// This type of rune affects multiple targets at once
@@ -489,33 +527,6 @@ class TargetingViewModel: Targeting {
         }
     }
     
-    func didUse(_ rune: Rune?) {
-        guard let rune = rune, legallyTargeted else {
-            self.rune = nil
-            return
-        }
-        
-        InputQueue.append(
-            Input(.runeUsed(rune, currentTargets))
-        )
-        
-        self.rune = nil
-        currentTargets = AllTarget(targets: [], areLegal: false)
-        
-    }
-    
-    func didDeselect() {
-        self.rune = nil
-        currentTargets = AllTarget(targets: [], areLegal: false)
-    }
-    
-    func didSelect(_ rune: Rune?) {
-        self.rune = rune
-        if rune == nil {
-            currentTargets = AllTarget(targets: [], areLegal: false)
-        }
-    }
-    
     private func autoTarget() {
         guard let tiles = tiles else { return }
         var targetCoords: [TileCoord] = []
@@ -542,5 +553,6 @@ class TargetingViewModel: Targeting {
         }
     }
     
+   
     
 }

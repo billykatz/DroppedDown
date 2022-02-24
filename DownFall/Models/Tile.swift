@@ -348,6 +348,11 @@ enum TileType: Hashable, CaseIterable, Codable {
         return false
     }
     
+    public var isPlayer: Bool {
+        if case TileType.player = self { return true }
+        return false
+    }
+    
     public var sparkleSheetName: SpriteSheet? {
         precondition(self.isRock, "Only call this for rocks")
         

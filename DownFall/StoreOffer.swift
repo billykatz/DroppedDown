@@ -208,7 +208,7 @@ extension StoreOffer {
             
         case .killMonsterPotion:
             title = "Death Potion"
-            body = "Instantly kills a random monster"
+            body = "Kill all monsters on the board"
             textureName = "item-kill-potion"
             spriteSheetName = "killMonsterPotionSpriteSheet"
             

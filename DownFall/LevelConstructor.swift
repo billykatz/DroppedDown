@@ -72,9 +72,9 @@ struct LevelConstructor {
         } else if depth == testLevelDepthNumber {
             return [
                 StoreOffer.offer(type: .rune(.rune(for: .drillDown)), tier: 1),
-                StoreOffer.offer(type: .transmogrifyPotion, tier: 1),
+                StoreOffer.offer(type: .killMonsterPotion, tier: 1),
                 StoreOffer.offer(type: .wingedBoots, tier: 2),
-                StoreOffer.offer(type: .transmogrifyPotion, tier: 2)
+                StoreOffer.offer(type: .killMonsterPotion, tier: 2)
                 
             ]
             
@@ -289,8 +289,9 @@ struct LevelConstructor {
             goals = [rockGoal, monsterGoal]
             
         case testLevelDepthNumber:
-            let rockGoal = LevelGoal(type: .unlockExit, tileType: .rock(color: .blue, holdsGem: false, groupCount: 0), targetAmount: 5, minimumGroupSize: 1, grouped: false)
-            let rockGoal2 = LevelGoal(type: .unlockExit, tileType: .rock(color: .purple, holdsGem: false, groupCount: 0), targetAmount: 5, minimumGroupSize: 1, grouped: false)
+            let rockGoal = LevelGoal(type: .unlockExit, tileType: .rock(color: .blue, holdsGem: false, groupCount: 0), targetAmount: 3, minimumGroupSize: 1, grouped: false)
+            let rockGoal2 = LevelGoal(type: .unlockExit, tileType: .rock(color: .purple, holdsGem: false, groupCount: 0), targetAmount: 4, minimumGroupSize: 1, grouped: false)
+//            let monsterGoal = LevelGoal.killMonsterGoal(amount: 4)
             goals = [rockGoal, rockGoal2]
             
         default:
@@ -630,7 +631,7 @@ struct LevelConstructor {
     
     
     static func monsterCountStart(depth: Depth) -> Int {
-        if depth == testLevelDepthNumber { return 2 }
+        if depth == testLevelDepthNumber { return 5 }
         if depth == bossLevelDepthNumber { return 0 }
         return min(boardSize(depth: depth), depth + 2)
     }

@@ -18,7 +18,7 @@ class ProfileViewModel {
     private var cancellables = Set<AnyCancellable>()
     
     private static var debugNumberRuneSlots: Int = 1
-    private static var debugRunesToAddToPlayer: [Rune] = []
+    private static var debugRunesToAddToPlayer: [Rune] = [.rune(for: .debugTeleport, isCharged: true)]
     
     static func addRuneToPlayer(runeType: RuneType, charged: Bool, cooldown: Int) {
         var rune = Rune.rune(for: runeType)

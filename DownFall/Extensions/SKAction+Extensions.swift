@@ -23,6 +23,11 @@ extension SKAction {
         return action
     }
 
+    func setTimingMode(_ timingMode: SKActionTimingMode) -> SKAction {
+        var newAction = self
+        newAction.timingMode = timingMode
+        return newAction
+    }
 }
 
 extension SKAction {

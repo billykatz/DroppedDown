@@ -58,8 +58,8 @@ extension Animator {
                 spriteActions.append(contentsOf: animation)
             }
         case .killMonsterPotion:
-            if let firsTarget = targetTileTypes.first?.target, let spriteAction = createSingleTargetOfferAnimation(delayBefore: delayBefore, offer: offer, startTileCoord: playerPosition, targetTileCoord: firsTarget, positionInForeground: positionInForeground) {
-                spriteActions.append(contentsOf: spriteAction)
+            if let animation = createDeathPotionOfferAnimation(delayBefore: delayBefore, offer: offer, startTileCoord: playerPosition, targetTileTypes: targetTileTypes, sprites: sprites, positionInForeground: positionInForeground) {
+                spriteActions.append(contentsOf: animation)
             }
             
         case .gemMagnet:
@@ -102,6 +102,44 @@ extension Animator {
         
         animate(spriteActions, completion: completion)
         
+    }
+    
+    func createDeathPotionOfferAnimation(delayBefore: TimeInterval, offer: StoreOffer, startTileCoord: TileCoord, targetTileTypes: [TargetTileType], sprites: [[DFTileSpriteNode]], positionInForeground: PositionGiver) -> [SpriteAction]? {
+        guard let tileSize = tileSize else { return nil }
+        var spriteActions: [SpriteAction] = []
+        
+        // dark smoke animation constants
+        let darkSmokeAnimationFrames = SpriteSheet(textureName: "dark-smoke-animation-6", columns: 6).animationFrames()
+        let slowAnimationSpeed = timePerFrame() * 2.5
+        let darkSmokeAnimation = SKAction.animate(with: darkSmokeAnimationFrames, timePerFrame: slowAnimationSpeed)
+        
+        // show the dark smoke animation starting in the bottom row
+        var waitBefore = delayBefore
+        let timeBetweeenRowAnimations = 0.3
+        let smokeMoveUpDuration: TimeInterval = 0.8
+        for row in 0..<sprites.count {
+            for column in 0..<sprites.count {
+                let startDown = SKAction.moveBy(x: 0.0, y: -tileSize/2, duration: 0)
+                let animatingSprite = sprites[row][column].animatingLayer
+                let slowlyMoveUp = SKAction.moveBy(x: 0.0, y: tileSize/2, duration: 0.5).setTimingMode(.easeIn)
+                
+                let moveAndAnimate = SKAction.group(darkSmokeAnimation, slowlyMoveUp)
+                let smokeAnimationSeq = SKAction.sequence(startDown, moveAndAnimate, .removeFromParent()).waitBefore(delay: waitBefore)
+                
+                spriteActions.append(.init(animatingSprite, smokeAnimationSeq))
+                
+                if  case TileType.monster = sprites[row][column].type
+                {
+                    let dyingAnimation = createMonsterDyingAnimation(sprite: sprites[row][column], durationWaitBefore: waitBefore + smokeMoveUpDuration)
+                    spriteActions.append(dyingAnimation)
+                }
+            }
+            
+            waitBefore += timeBetweeenRowAnimations
+        }
+        
+        
+        return spriteActions
     }
     
     func createTransmogrifyOfferAnimation(delayBefore: TimeInterval, offer: StoreOffer, startTileCoord: TileCoord, targetTileType: TargetTileType, sprites: [[DFTileSpriteNode]], endTiles: [[Tile]], positionInForeground: PositionGiver) -> [SpriteAction]? {

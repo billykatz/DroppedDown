@@ -65,6 +65,31 @@ class DFTileSpriteNode: SKSpriteNode {
                        color: .clear,
                        size: CGSize(width: width, height: height))
         }
+        
+        addAnimatingLayer()
+    }
+    
+    let animatingLayerName = "animatingLayer"
+    
+    @discardableResult
+    func addAnimatingLayer() -> SKSpriteNode {
+        var tileSize = self.size
+        if self.type.isPlayer {
+            tileSize = tileSize.scale(by: 1/3)
+        }
+        let animatingLayer = SKSpriteNode(color: .clear, size: tileSize)
+        animatingLayer.name = animatingLayerName
+        animatingLayer.zPosition = 1_000
+        self.addChild(animatingLayer)
+        return animatingLayer
+    }
+    
+    var animatingLayer: SKSpriteNode {
+        if let child = self.childNode(withName: animatingLayerName) as? SKSpriteNode {
+            return child
+        } else {
+            return addAnimatingLayer()
+        }
     }
     
     required init?(coder aDecoder: NSCoder) { fatalError("DFTileSpriteNode init?(coder:) is not implemented") }

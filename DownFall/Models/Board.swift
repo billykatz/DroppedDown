@@ -900,9 +900,7 @@ extension Board {
         
         switch offer.effect.kind {
         case .killMonster:
-            if let randomMonsterCoord = randomTilecoord(ofType: .monster(.zero)) {
-                trans = removeAndReplace(from: tiles, tileCoord: randomMonsterCoord, singleTile: true, input: input)
-            }
+            trans = useDeathPotion(input: input)
             
         case .transmogrify:
             trans = useTransmogrify(offer: offer, input: input)
@@ -1126,6 +1124,31 @@ extension Board {
         return Transformation(transformation: tileTransformation, inputType: input.type, endTiles: newTiles)
         
     }
+    
+    private func useDeathPotion(input: Input) -> Transformation {
+        var newTiles = tiles
+        var tileTransformation: [TileTransformation] = []
+        var monstersKilled: [MonsterDies] = []
+        
+        let monsterCoords = tiles { tileType in
+            if case TileType.monster = tileType {
+                return true
+            } else {
+                return false
+            }
+        }
+        
+        for coord in monsterCoords {
+            newTiles[coord.row][coord.col] = .empty
+            tileTransformation.append(.init(coord, coord))
+            monstersKilled.append(.init(tileType: tiles[coord].type, tileCoord: coord, deathType: .player))
+        }
+        
+        
+        self.tiles = newTiles
+        return Transformation(transformation: tileTransformation, inputType: input.type, endTiles: self.tiles, monstersDies: monstersKilled)
+    }
+
     
     private func useTransmogrify(offer: StoreOffer, input: Input) -> Transformation {
         guard let pp = playerPosition else {

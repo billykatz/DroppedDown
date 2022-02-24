@@ -14,15 +14,15 @@ struct TargetingState: GameState {
 
     func transitionState(given input: Input) -> AnyGameState? {
         switch input.type {
-        case .itemUseCanceled:
+        case .runeUseCanceled:
             return AnyGameState(PlayState())
-        case .itemCanBeUsed, .itemUseSelected:
+        case .runeUseSelected:
             return AnyGameState(TargetingState())
-        case .itemUsed:
+        case .runeUsed:
             return AnyGameState(ComputingState())
         case .transformation(let trans):
             guard let inputType = trans.first?.inputType else { fatalError() }
-            if case InputType.itemUseSelected(_) = inputType {
+            if case InputType.runeUseSelected(_) = inputType {
                 return AnyGameState(TargetingState())
             }
             return nil

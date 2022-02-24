@@ -47,10 +47,9 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
                                         .reffingFinished(newTurn: false),
                                         .collectItem(TileCoord(0,0), .zero, 0),
                                         .collectOffer(collectedCoord: .zero, collectedOffer: .zero, discardedCoord: .zero, discardedOffer: .zero),
-                                        .itemUseCanceled,
-                                        .itemUseSelected(.zero),
-                                        .itemCanBeUsed(false),
-                                        .itemUsed(.zero, .init(targets: [], areLegal: false)),
+                                        .runeUseCanceled,
+                                        .runeUseSelected(.zero),
+                                        .runeUsed(.zero, .init(targets: [], areLegal: false)),
                                         .decrementDynamites(Set<TileCoord>()),
                                         .rotatePreview([], .zero),
                                         .rotatePreviewFinish([], nil),
@@ -95,10 +94,12 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
     case selectLevel
     case newTurn
     case visitStore
-    case itemUseSelected(Rune)
-    case itemUseCanceled
-    case itemCanBeUsed(Bool)
-    case itemUsed(Rune, AllTarget)
+    
+    /// Rune Use and Targeting inputs
+    case runeUseSelected(Rune)
+    case runeUseCanceled
+    case runeUsed(Rune, AllTarget)
+    
     case decrementDynamites(Set<TileCoord>)
     case rotatePreview([[DFTileSpriteNode]], Transformation)
     case rotatePreviewFinish([SpriteAction], Transformation?)
@@ -170,13 +171,11 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
             return "Touch began"
         case .visitStore:
             return "Visiting store between levels"
-        case .itemUseCanceled:
+        case .runeUseCanceled:
             return "Item use canceled"
-        case .itemUseSelected:
+        case .runeUseSelected:
             return "Item use selected"
-        case .itemCanBeUsed(let used):
-            return "item can be used: \(used)"
-        case .itemUsed(let ability, let targets):
+        case .runeUsed(let ability, let targets):
             return "\(ability.textureName) used on targets \(targets.allTargetCoords)"
         case .decrementDynamites:
             return "Decrement the dynamite fuses"

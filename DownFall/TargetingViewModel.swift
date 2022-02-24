@@ -35,11 +35,11 @@ class TargetingViewModel: Targeting {
         didSet {
             currentTargets = AllTarget(targets: [], areLegal: false)
             if let rune = rune {
-                InputQueue.append(Input(InputType.itemUseSelected(rune)))
+                InputQueue.append(Input(InputType.runeUseSelected(rune)))
                 autoTarget()
             }
             else {
-                InputQueue.append(Input(InputType.itemUseCanceled))
+                InputQueue.append(Input(InputType.runeUseCanceled))
             }
         }
     }
@@ -135,7 +135,7 @@ class TargetingViewModel: Targeting {
             
         case .transformation(let trans):
             if let inputType = trans.first?.inputType,
-                case InputType.itemUsed = inputType,
+                case InputType.runeUsed = inputType,
                 let endTiles = trans.first?.endTiles {
                 if let playerData = playerData(in: endTiles),
                    let runes = playerData.runes,
@@ -148,7 +148,7 @@ class TargetingViewModel: Targeting {
                 }
 
             } else if let inputType = trans.first?.inputType,
-                 case InputType.itemUseSelected = inputType {
+                 case InputType.runeUseSelected = inputType {
                 // skip these as well
             }
             else {
@@ -189,7 +189,7 @@ class TargetingViewModel: Targeting {
                 inventory = playerData.runes ?? []
                 runeSlotsUpdated?(runeSlots, runes)
             }
-        case .itemUseCanceled:
+        case .runeUseCanceled:
             ()
         default:
             ()
@@ -496,7 +496,7 @@ class TargetingViewModel: Targeting {
         }
         
         InputQueue.append(
-            Input(.itemUsed(rune, currentTargets))
+            Input(.runeUsed(rune, currentTargets))
         )
         
         self.rune = nil

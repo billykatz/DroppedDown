@@ -38,6 +38,16 @@ struct Pickaxe: Equatable, Codable, Hashable {
     func isAtMaxCapacity() -> Bool {
         return runeSlots != Pickaxe.maxRuneSlots && runes.count == runeSlots
     }
+    
+    func chargeAllRunes() -> Pickaxe {
+        var newRunes: [Rune] = []
+        for rune in runes {
+            let chargedRune = rune.fullyCharge()
+            newRunes.append(chargedRune)
+        }
+        let newPickaxe = Pickaxe(runeSlots: self.runeSlots, runes: newRunes)
+        return newPickaxe
+    }
 }
 
 struct EntityModel: Equatable, Codable {
@@ -349,7 +359,10 @@ struct EntityModel: Equatable, Codable {
             return update(dodge: dodge + effect.amount)
         case (.killMonster, _), (.transmogrify, _), (.gemMagnet, _),
             (.infusion, _), (.item, _), (.snakeEyes, _),
-            (.liquifyMonsters, _), (.chest, _), (.escape, _):
+            (.liquifyMonsters, _), (.chest, _), (.escape, _),
+            (.greaterRuneSpiritPotion, _)
+            :
+            
             return self
         default:
             preconditionFailure("Youll want to implement future cases here")

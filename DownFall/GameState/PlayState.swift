@@ -29,9 +29,9 @@ struct PlayState: GameState {
             return AnyGameState(PlayState())
         case .boardLoaded:
             return AnyGameState(ReffingState())
-        case .itemUseSelected:
+        case .runeUseSelected:
             return AnyGameState(TargetingState())
-        case .animationsFinished, .play, .transformation, .reffingFinished, .playAgain,. selectLevel, .newTurn, .visitStore, .itemUseCanceled, .itemCanBeUsed, .itemUsed, .decrementDynamites, .rotatePreview, .rotatePreviewFinish, .refillEmpty, .tileDetail, .runeReplacement,
+        case .animationsFinished, .play, .transformation, .reffingFinished, .playAgain,. selectLevel, .newTurn, .visitStore, .runeUseCanceled, .runeUsed, .decrementDynamites, .rotatePreview, .rotatePreviewFinish, .refillEmpty, .tileDetail, .runeReplacement,
              .collectOffer, .runeReplaced, .foundRuneDiscarded, .loseAndGoToStore, .tutorialPhaseEnd,
              .noMoreMoves, .noMoreMovesConfirm, .collectChestOffer
             :

@@ -273,7 +273,7 @@ class Renderer: SKSpriteNode {
             case .unlockExit:
                 animationsFinished(endTiles: trans.endTiles)
                 
-            case .itemUsed(let ability, let allTarget):
+            case .runeUsed(let ability, let allTarget):
                 animateRuneUsed(input: inputType, transformations: transformations, rune: ability, targets: allTarget.allTargetAssociatedCoords)
                 
             case .collectOffer(let tileCoord, let offer, let discardedCoord, let discardedOffer):
@@ -378,7 +378,7 @@ class Renderer: SKSpriteNode {
             case .noMoreMovesConfirm:
                 shuffleBoard(transformations: transformations)
                 
-            case .reffingFinished, .touchBegan, .itemUseSelected:
+            case .reffingFinished, .touchBegan, .runeUseSelected:
                 () // Purposely left blank.
                 
             default:
@@ -774,7 +774,7 @@ extension Renderer {
             let second = trans.last!
             
             // Pass in a custom completion block to computeNewBoard so that we can animate the items effect
-            computeNewBoard(for: removeAndReplaceTrans) { [weak self, animator, hud] in
+            computeNewBoard(for: removeAndReplaceTrans) { [weak self, animator, hud, backpackView] in
                 guard let self = self,
                         let targetTiles = second.tileTransformation?.compactMap( { $0.initial }),
                       let endTiles = second.endTiles
@@ -788,7 +788,7 @@ extension Renderer {
                 let playerPosition = getTilePosition(.player(.zero), tiles: second.endTiles ?? []) ?? .zero
                 let targetTileTypes = targetTiles.map { TargetTileType(target: $0, type: sprites[$0].type) }
                 
-                animator.animateCollectingOffer(offer, playerPosition: playerPosition, targetTileTypes: targetTileTypes, delayBefore: 0.0, hud: hud, sprites: sprites, endTiles: endTiles, transformationOffers: second.offers, positionInForeground: self.positionInForeground(at:)) { [weak self] in
+                animator.animateCollectingOffer(offer, playerPosition: playerPosition, targetTileTypes: targetTileTypes, delayBefore: 0.0, hud: hud, sprites: sprites, endTiles: endTiles, transformationOffers: second.offers, pickaxeHandleView: backpackView, positionInForeground: self.positionInForeground(at:)) { [weak self] in
                     guard let self = self else { return }
                     if offer.type == .chest, let chestOffer = second.offers?.first {
                         self.sprites = self.createSprites(from: endTiles)
@@ -955,7 +955,7 @@ extension Renderer {
                 sprites[tileTrans.end.x][tileTrans.end.y].zPosition = 100_000
                 
                 var shouldSkipDyingAnimation = false
-                if case InputType.itemUsed(let rune, _)? = transformation.inputType {
+                if case InputType.runeUsed(let rune, _)? = transformation.inputType {
                     switch rune.type {
                         // these aniamtions take care of the death animation themselves
                     case .fireball, .rainEmbers, .fieryRage, .drillDown, .monsterCrush:

@@ -113,7 +113,7 @@ class TargetingViewModelTests: XCTestCase {
         let tiles = sendTiles()
         
         let trans = Transformation(transformation: nil,
-                                   inputType: .itemUseSelected(Rune.rune(for: .bubbleUp)),
+                                   inputType: .runeUseSelected(Rune.rune(for: .bubbleUp)),
                                    endTiles: tiles)
         
         Dispatch.shared.send(Input(InputType.newTurn, tiles))
@@ -139,7 +139,7 @@ class TargetingViewModelTests: XCTestCase {
         let tiles = sendTiles(2)
         
         let trans = Transformation(transformation: nil,
-                                   inputType: .itemUseSelected(Rune.rune(for: .bubbleUp)),
+                                   inputType: .runeUseSelected(Rune.rune(for: .bubbleUp)),
                                    endTiles: tiles)
         
         Dispatch.shared.send(Input(InputType.newTurn, tiles))
@@ -162,7 +162,7 @@ class TargetingViewModelTests: XCTestCase {
         XCTAssertEqual(vm.currentTargets.allTargetCoords.count, 0)
         
         //when
-        Dispatch.shared.send(Input(InputType.itemUseSelected(Rune.rune(for: .rainEmbers))))
+        Dispatch.shared.send(Input(InputType.runeUseSelected(Rune.rune(for: .rainEmbers))))
         
         // with 1 monster
         sendTiles(3)
@@ -179,7 +179,7 @@ class TargetingViewModelTests: XCTestCase {
         XCTAssertEqual(vm.currentTargets.allTargetCoords.count, 0)
         
         //when
-        Dispatch.shared.send(Input(InputType.itemUseSelected(Rune.rune(for: .getSwifty))))
+        Dispatch.shared.send(Input(InputType.runeUseSelected(Rune.rune(for: .getSwifty))))
         sendTiles()
         
         // verify

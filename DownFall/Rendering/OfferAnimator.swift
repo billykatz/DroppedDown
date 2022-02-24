@@ -49,7 +49,7 @@ extension Animator {
         animate(spriteActions, completion: completion)
     }
     
-    func animateCollectingOffer(_ offer: StoreOffer, playerPosition: TileCoord, targetTileTypes: [TargetTileType], delayBefore: TimeInterval, hud: HUD, sprites: [[DFTileSpriteNode]], endTiles: [[Tile]], transformationOffers: [StoreOffer]?, positionInForeground: PositionGiver, completion: @escaping () -> Void) {
+    func animateCollectingOffer(_ offer: StoreOffer, playerPosition: TileCoord, targetTileTypes: [TargetTileType], delayBefore: TimeInterval, hud: HUD, sprites: [[DFTileSpriteNode]], endTiles: [[Tile]], transformationOffers: [StoreOffer]?, pickaxeHandleView: BackpackView, positionInForeground: PositionGiver, completion: @escaping () -> Void) {
         var spriteActions: [SpriteAction] = []
         switch offer.type {
         case .transmogrifyPotion:
@@ -93,6 +93,11 @@ extension Animator {
             if let animation =  createEscapeOfferAnimation(delayBefore: delayBefore, offer: offer, startTileCoord: playerPosition, targetTileTypes: targetTileTypes, sprites: sprites, positionGiver: positionInForeground) {
                 spriteActions.append(contentsOf: animation)
             }
+            
+        case .greaterRuneSpiritPotion:
+            if let animation = createGreaterRuneSpiritPotionOfferAnimation(delayBefore: delayBefore, offer: offer, startTileCoord: playerPosition, targetTileTypes: targetTileTypes, sprites: sprites, pixkaxeHandleView: pickaxeHandleView, positionInForeground: positionInForeground) {
+                spriteActions.append(contentsOf: animation)
+            }
 
         
         default:
@@ -103,6 +108,19 @@ extension Animator {
         animate(spriteActions, completion: completion)
         
     }
+    
+    func createGreaterRuneSpiritPotionOfferAnimation(delayBefore: TimeInterval, offer: StoreOffer, startTileCoord: TileCoord, targetTileTypes: [TargetTileType], sprites: [[DFTileSpriteNode]], pixkaxeHandleView: BackpackView, positionInForeground: PositionGiver) -> [SpriteAction]? {
+        guard let foreground = foreground else { return nil }
+        var spriteActions: [SpriteAction]?
+        
+        // aniamte each rune slot filling up
+        // runes should start using their "fully charged" sprite
+        // runes should grow a little and shake?
+        
+        
+        return spriteActions
+    }
+    
     
     func createDeathPotionOfferAnimation(delayBefore: TimeInterval, offer: StoreOffer, startTileCoord: TileCoord, targetTileTypes: [TargetTileType], sprites: [[DFTileSpriteNode]], positionInForeground: PositionGiver) -> [SpriteAction]? {
         guard let tileSize = tileSize else { return nil }

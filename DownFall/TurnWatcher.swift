@@ -24,7 +24,7 @@ class TurnWatcher {
                     ()
                 case .touchBegan:
                     ()
-                case .itemUsed, .unlockExit:
+                case .runeUsed, .unlockExit:
                     self?.newTurn = false
                 case .touch(_, let type):
                     if case TileType.monster = type {

@@ -93,7 +93,7 @@ class LevelGoalTracker: LevelGoalTracking {
                 InputQueue.append(Input(.levelGoalDetail(goalProgress)))
             }
             
-        case .itemUsed:
+        case .runeUsed:
             advanceRuneUseGoal()
             
         case .goalCompleted(let completedGoals, _):

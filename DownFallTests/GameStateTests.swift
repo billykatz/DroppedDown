@@ -185,9 +185,6 @@
 //    func testTargetingStateTransition(_ gameState: AnyGameState) {
 //        for input in InputType.allCases {
 //            switch input {
-//            case .itemCanBeUsed:
-//                XCTAssertEqual(AnyGameState(TargetingState()),
-//                gameState.transitionState(given: Input(input)))
 //            case .itemUseCanceled:
 //                XCTAssertEqual(AnyGameState(PlayState()),
 //                               gameState.transitionState(given: Input(input)))

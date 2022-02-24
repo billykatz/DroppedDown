@@ -51,7 +51,7 @@ class RunStatTracker {
         case .gameLose:
             self.addStat(Statistics(amount: 1, statType: .totalLoses), amount: 1)
             
-        case .itemUsed(let rune, _):
+        case .runeUsed(let rune, _):
             self.addStat(Statistics(amount: 1, statType: .totalRuneUses), amount: 1)
             self.addStat(Statistics(runeType: rune.type, amount: 1, statType: .runeUses), amount: 1)
             

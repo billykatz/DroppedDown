@@ -202,16 +202,16 @@ class Board: Equatable {
                 transformation = nil
             }
             
-        case .itemUseSelected(let ability):
+        case .runeUseSelected(let ability):
             InputQueue.append(
                 Input(
                     InputType.transformation(
-                        [Transformation(transformation: nil, inputType: .itemUseSelected(ability), endTiles: self.tiles)]
+                        [Transformation(transformation: nil, inputType: .runeUseSelected(ability), endTiles: self.tiles)]
                     )
                 )
             )
             
-        case .itemUsed(let rune, let allTarget):
+        case .runeUsed(let rune, let allTarget):
             let trans = useRune(rune, on: allTarget, input: input)
             
             InputQueue.append(
@@ -318,7 +318,7 @@ class Board: Equatable {
                 .selectLevel,
                 .newTurn,
                 .visitStore, .loseAndGoToStore,
-                .itemUseCanceled, .itemCanBeUsed, .rotatePreview, .tileDetail, .levelGoalDetail, .runeReplacement,
+                .runeUseCanceled, .rotatePreview, .tileDetail, .levelGoalDetail, .runeReplacement,
                 .tutorialPhaseStart, .tutorialPhaseEnd:
             transformation = nil
         }
@@ -930,6 +930,26 @@ extension Board {
         
         return (trans != nil) ? [previousTransformation, trans!] : [previousTransformation]
     }
+    
+    func useGreaterRuneSpiritPotion(input: Input) -> Transformation {
+        guard let pp = playerPosition,
+            case TileType.player(let data) = tiles[pp].type,
+              let pickaxe = data.pickaxe
+        else {
+            return Transformation(transformation: [], inputType: input.type, endTiles: self.tiles)
+        }
+        var newTiles = tiles
+        var tileTransformation: [TileTransformation] = []
+        
+        let newPickaxe = pickaxe.chargeAllRunes()
+        let newPlayerData = data.update(pickaxe: newPickaxe)
+        newTiles[pp.row][pp.column] = Tile(type: .player(newPlayerData))
+        tileTransformation.append(.init(pp, pp))
+        
+        self.tiles = newTiles
+        return Transformation(transformation: tileTransformation, inputType: input.type, endTiles: self.tiles)
+        
+     }
     
     func useEscape(input: Input) -> Transformation {
         let exitPosition = tiles { tileType in

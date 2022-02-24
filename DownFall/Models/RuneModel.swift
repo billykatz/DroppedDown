@@ -285,6 +285,10 @@ struct Rune: Hashable, Codable {
         return  textureName + "-enabled"
     }
     
+    func fullyCharge() -> Rune {
+        return update(rechargeCurrent: cooldown)
+    }
+    
     static let zero = Rune(type: .getSwifty, textureName: "", cost: 0, currency: .gem, description: "", flavorText: "", targets: 0, targetTypes: [], targetsGroupOfMonsters: false, affectSlopes: [], affectRange: 0, heal: 0, cooldown: 0, rechargeType: [], rechargeMinimum: 0, rechargeCurrent: 0, progressColor: .red, maxDistanceBetweenTargets: 0, animationTextureName: "", animationColumns: 0)
     
     static func rune(for type: RuneType, isCharged: Bool = false) -> Rune {

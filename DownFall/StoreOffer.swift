@@ -133,6 +133,9 @@ struct StoreOffer: Codable, Hashable, Identifiable {
         case .escape:
             effect = EffectModel(kind: .escape, stat: .oneTimeUse, amount: 1, duration: 0)
             
+        case .greaterRuneSpiritPotion:
+            effect = EffectModel(kind: .greaterRuneSpiritPotion, stat: .oneTimeUse, amount: 1, duration: 0)
+            
         }
         return effect
     }
@@ -277,6 +280,11 @@ extension StoreOffer {
             title = "Escape"
             body = "Opens up the exit"
             textureName = "escape"
+            
+        case .greaterRuneSpiritPotion:
+            title = "Greater Rune Spirit Potion"
+            body = "Fully charge all runes in your pickaxe"
+            textureName = "greaterSpiritPotion"
             
         }
         

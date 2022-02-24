@@ -41,6 +41,7 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
     case liquifyMonsters
     case chest
     case escape
+    case greaterRuneSpiritPotion
     
     enum CodingKeys: String, CodingKey {
         case base
@@ -74,6 +75,7 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
         case liquifyMonsters
         case chest
         case escape
+        case greaterRuneSpiritPotion
     }
     
     var luckAmount: Int {
@@ -181,6 +183,8 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
             self = .chest
         case .escape:
             self = .escape
+        case .greaterRuneSpiritPotion:
+            self = .greaterRuneSpiritPotion
 
         }
     }
@@ -239,6 +243,8 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
             try container.encode(Base.chest, forKey: .base)
         case .escape:
             try container.encode(Base.escape, forKey: .base)
+        case .greaterRuneSpiritPotion:
+            try container.encode(Base.greaterRuneSpiritPotion, forKey: .base)
         }
     }
     
@@ -273,6 +279,7 @@ extension StoreOfferType {
             .liquifyMonsters,
             .chest,
             .escape,
+            .greaterRuneSpiritPotion
             
         ]
         
@@ -312,6 +319,7 @@ extension StoreOfferType {
         case (.liquifyMonsters, .liquifyMonsters): return true
         case (.chest, .chest): return true
         case (.escape, .escape): return true
+        case (.greaterRuneSpiritPotion, .greaterRuneSpiritPotion): return true
             
         // default cases to catch and return false for any other comparisons
         default:

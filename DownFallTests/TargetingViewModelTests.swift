@@ -31,7 +31,7 @@ class TargetingViewModelTests: XCTestCase {
         
         self.playerCoord = tileCoords(for: tiles, of: .player(.zero)).first
         
-        Dispatch.shared.send(Input(.boardBuilt, board.tiles))
+        Dispatch.shared.send(Input(.boardBuilt, tiles))
         
         return tiles
 
@@ -63,10 +63,13 @@ class TargetingViewModelTests: XCTestCase {
         let _ = sendTiles()
         vm.didSelect(Rune.rune(for: .getSwifty))
         
+        // verify auto target works
+        XCTAssertEqual(vm.currentTargets.allTargetCoords.count, 1)
+        
         vm.didTarget(.zero)
         
-        // verify
-        XCTAssertEqual(vm.currentTargets.allTargetCoords.count, 1)
+        // verify that target was added
+        XCTAssertEqual(vm.currentTargets.allTargetCoords.count, 2)
         
         //when
         vm.didTarget(TileCoord(0,3))
@@ -80,28 +83,14 @@ class TargetingViewModelTests: XCTestCase {
         //verify
         XCTAssertEqual(vm.currentTargets.allTargetCoords.count, 2)
         
-        // when we try to target a 3rd, it removes an old target to add the new one
-        vm.didTarget(TileCoord(0,5))
         
-        //verify
-        XCTAssertEqual(vm.currentTargets.allTargetCoords.count, 2)
-        
-        
-        // when you target one that has already been chosen
-        // it removes it
-        
-        vm.didTarget(TileCoord(0,5))
-        
-        //verify
-        XCTAssertEqual(vm.currentTargets.allTargetCoords.count, 1)
-        
-        // when you target one that has already been chosen
-        // it removes it
+        // when you target one that has already been chosen it removes it
         
         vm.didTarget(TileCoord(0,4))
         
         //verify
-        XCTAssertEqual(vm.currentTargets.allTargetCoords.count, 0)
+        XCTAssertEqual(vm.currentTargets.allTargetCoords.count, 1)
+        
     }
     
     func testAutoTargetPlayer() {
@@ -124,9 +113,6 @@ class TargetingViewModelTests: XCTestCase {
         
         // verify
         XCTAssertEqual(vm.currentTargets.allTargetCoords.count, 1)
-        
-        
-        
     }
     
     
@@ -166,6 +152,9 @@ class TargetingViewModelTests: XCTestCase {
         
         // with 1 monster
         sendTiles(3)
+        
+        // choose to use fireball rune which targets 1 monster
+        vm.didSelect(Rune.rune(for: .fireball))
         
         // verify
         XCTAssertEqual(vm.currentTargets.allTargetCoords.count, 0)

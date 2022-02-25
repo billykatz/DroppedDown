@@ -92,7 +92,10 @@ class ShiftShaft_Button: SKShapeNode {
          aspectFillToSize: Bool = true,
          showSelection: Bool = true,
          disable: Bool = false,
-         addTextLabel: Bool = false) {
+         addTextLabel: Bool = false,
+         fontType: UIFontType = .legacy,
+         fontSize: CGFloat = .fontLargeSize
+    ) {
         self.buttonType = .image
         self.delegate = delegate
         self.identifier = identifier
@@ -132,8 +135,9 @@ class ShiftShaft_Button: SKShapeNode {
                               delegate: self,
                               precedence: precedence,
                               identifier: identifier,
-                              fontSize: .fontLargeSize,
-                              fontColor: .brown)
+                              fontSize: fontSize,
+                              fontColor: .brown,
+                              fontType: fontType)
             label.position = self.frame.center
             label.zPosition = Precedence.button.rawValue
             

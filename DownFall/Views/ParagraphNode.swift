@@ -51,12 +51,12 @@ class ParagraphNode: SKSpriteNode {
     
     init(text: String,
          paragraphWidth: CGFloat = 2000,
-         fontName: String = ParagraphNode.defaultFontName,
          fontSize: CGFloat = ParagraphNode.defaultFontSize,
          fontColor: UIColor = ParagraphNode.defaultFontColor,
+         fontType: UIFontType = UIFontType.legacy,
          textAlignment: NSTextAlignment = NSTextAlignment.left
          ) {
-        self.fontName = fontName
+        self.fontName = fontType.rawValue
         self.text = text
         self.fontSize = fontSize
         self.fontColor = fontColor
@@ -76,14 +76,15 @@ class ParagraphNode: SKSpriteNode {
                           fontName: String = ParagraphNode.defaultFontName,
                           fontSize: CGFloat = ParagraphNode.defaultFontSize,
                           fontColor: UIColor = ParagraphNode.defaultFontColor,
+                          fontType: UIFontType = UIFontType.legacy,
                           textAlignment: NSTextAlignment = .left
                           ) -> ParagraphNode {
         return ParagraphNode(
             text: text,
             paragraphWidth: paragraphWidth,
-            fontName: fontName,
             fontSize: fontSize,
             fontColor: fontColor,
+            fontType: fontType,
             textAlignment: textAlignment
         )
     }
@@ -96,14 +97,26 @@ class ParagraphNode: SKSpriteNode {
     }
     
     lazy var customFont: UIFont = {
-        guard let customFont = UIFont(name: "Alterebro-Pixel-Font", size: fontSize) else {
+        guard let customFont = UIFont(name: fontName, size: fontSize) else {
             fatalError("""
-                Failed to load the "pixel-font" font.
+                Failed to load the font with name \(fontName).
                 Make sure the font file is included in the project and the font name is spelled correctly.
                 """
             )
         }
         return customFont
+        
+        /*
+         Stumped?  Look for the name of the font you are trying to load
+         for family in UIFont.familyNames
+         {
+            print("\(family)")
+            for names in UIFont.fontNames(forFamilyName: family)
+            {
+                print("== \(names)")
+            }
+         }
+         */
 
     }()
     

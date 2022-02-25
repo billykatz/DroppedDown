@@ -186,6 +186,7 @@ class LevelCoordinator: LevelCoordinating, GameSceneCoordinatingDelegate, CodexC
     // MARK: CodexCoordinatorDelegate methods
     func startRunPressed() {
         loadRun(nil, profile: profileViewModel!.profile)
+        MenuMusicManager.shared.gameIsPlaying = true
     }
     
     

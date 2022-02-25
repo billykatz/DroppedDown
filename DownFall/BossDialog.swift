@@ -45,7 +45,7 @@ extension Dialogue {
     
     static let bossTargetsToAttackPoison: Dialogue = .init(sentences:
                                                 [
-                                                    Sentence(text: "You might not want to stand under the acid-looking green stuff. I'm pretty sure \(bossNickName) are blue roks just now.", emotion: .skeptical),
+                                                    Sentence(text: "You might not want to stand under the acid-looking green stuff. I'm pretty sure \(bossNickName) ate blue rocks just now.", emotion: .skeptical),
                                                 ],
                                               character: .teri,
                                               delayBeforeTyping: 0.25)

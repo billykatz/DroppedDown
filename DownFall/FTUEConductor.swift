@@ -62,8 +62,8 @@ class FTUEConductor {
             UserDefaults.standard.setValue(true, forKey: UserDefaults.hasSeenDiedForTheFirstTimeKey)
         
             let sentence1 = Sentence(text: "Wow, good thing the Mineral Sprites are so nice. They will bring you back here everytime you die.", emotion: .skeptical)
-            let sentence2 = Sentence(text: "AND you'll have a chance to spend your gems at the local store!", emotion: .content)
-            let sentence3 = Sentence(text: "Tap on the store button and see what's available.", emotion: .content)
+            let sentence2 = Sentence(text: "AND you'll have a chance to spend your gems at basecamp!", emotion: .content)
+            let sentence3 = Sentence(text: "Tap on the `New Run` button and see what's available.", emotion: .content)
             let dialog = Dialogue(sentences: [sentence1, sentence2, sentence3], character: .teri, delayBeforeTyping: 0.25)
             
             let dialogView = FTUEDialogueOverlay(playableRect: playableRect, dialog: dialog)

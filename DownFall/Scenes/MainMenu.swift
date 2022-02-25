@@ -20,7 +20,7 @@ protocol MainMenuDelegate: AnyObject {
 class MainMenu: SKScene {
     
     struct Constants {
-        static let buttonPadding = CGFloat(50.0)
+        static let buttonPadding = CGFloat(75.0)
         static let notificationName = "notificationRed"
         static let blankButtonName = "blankButton"
         static let soundIconName = "soundSprite"
@@ -88,9 +88,9 @@ class MainMenu: SKScene {
         buttonContainer = SKNode()
         buttonContainer.position = .zero.translateVertically(-100)
         self.addChild(buttonContainer)
+
         
-        
-        let startButton = ShiftShaft_Button(size: .buttonExtralarge, delegate: self, identifier: .newGame, image: SKSpriteNode(imageNamed: Constants.blankButtonName), shape: .rectangle, addTextLabel: true)
+        let startButton = ShiftShaft_Button(size: .buttonMainMenu, delegate: self, identifier: .newGame, image: SKSpriteNode(imageNamed: Constants.blankButtonName), shape: .rectangle, addTextLabel: true, fontType: .small, fontSize: 120.0)
         
         
         startButton.position = CGPoint.position(startButton.frame,
@@ -114,7 +114,7 @@ class MainMenu: SKScene {
         addChild(logo)
 
         
-        let statsViewButton = ShiftShaft_Button(size: .buttonExtralarge, delegate: self, identifier: .mainMenuStats, image: SKSpriteNode(imageNamed: Constants.blankButtonName), shape: .rectangle, addTextLabel: true)
+        let statsViewButton = ShiftShaft_Button(size: .buttonMainMenu, delegate: self, identifier: .mainMenuStats, image: SKSpriteNode(imageNamed: Constants.blankButtonName), shape: .rectangle, addTextLabel: true, fontType: .small, fontSize: 120.0)
         
         statsViewButton.position = CGPoint.alignHorizontally(statsViewButton.frame,
                                                              relativeTo: startButton.frame,
@@ -130,7 +130,7 @@ class MainMenu: SKScene {
         
         
         /// Feedback button
-        let feedbackButton = ShiftShaft_Button(size: .buttonExtralarge, delegate: self, identifier: .mainMenuFeedback, image: SKSpriteNode(imageNamed: Constants.blankButtonName), shape: .rectangle, addTextLabel: true)
+        let feedbackButton = ShiftShaft_Button(size: .buttonMainMenu, delegate: self, identifier: .mainMenuFeedback, image: SKSpriteNode(imageNamed: Constants.blankButtonName), shape: .rectangle, addTextLabel: true, fontType: .small, fontSize: 120.0)
         
         feedbackButton.position = CGPoint.alignHorizontally(statsViewButton.frame,
                                                             relativeTo: statsViewButton.frame,

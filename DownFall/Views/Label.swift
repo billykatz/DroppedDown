@@ -25,9 +25,10 @@ class Label: ParagraphNode {
          identifier: ButtonIdentifier,
          fontSize: CGFloat = .fontLargeSize,
          fontColor: UIColor = .black,
+         fontType: UIFontType = .legacy,
          textAlignment: NSTextAlignment = .left) {
         
-        super.init(text: text, paragraphWidth: width, fontSize: fontSize, fontColor: fontColor, textAlignment: textAlignment)
+        super.init(text: text, paragraphWidth: width, fontSize: fontSize, fontColor: fontColor, fontType: fontType, textAlignment: textAlignment)
         self.delegate = delegate
         fontName = ParagraphNode.defaultFontName
         name = identifier.rawValue

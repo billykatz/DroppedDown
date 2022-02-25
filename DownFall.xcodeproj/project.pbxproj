@@ -72,6 +72,9 @@
 		28DCCB7E27616809004E70A8 /* RuneDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28DCCB7D27616809004E70A8 /* RuneDetailViewModel.swift */; };
 		28DCCB802762C649004E70A8 /* AnimatorCombat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28DCCB7F2762C649004E70A8 /* AnimatorCombat.swift */; };
 		28DF00882772B5140071E384 /* Animator+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28DF00872772B5140071E384 /* Animator+Extensions.swift */; };
+		28EBD55827C9593B004C46B6 /* PixelMiddle.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 28EBD55427C9593B004C46B6 /* PixelMiddle.ttf */; };
+		28EBD55927C9593B004C46B6 /* PixelHigh.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 28EBD55527C9593B004C46B6 /* PixelHigh.ttf */; };
+		28EBD55A27C9593B004C46B6 /* PixelSmall_v2.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 28EBD55627C9593B004C46B6 /* PixelSmall_v2.ttf */; };
 		28FA8974275809A700E6D57F /* TargetModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FA8973275809A700E6D57F /* TargetModel.swift */; };
 		28FA8976275809CB00E6D57F /* TargetingProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FA8975275809CB00E6D57F /* TargetingProtocol.swift */; };
 		3D00A0F923AAC813007E2D8B /* Identifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D00A0F823AAC813007E2D8B /* Identifiers.swift */; };
@@ -195,7 +198,6 @@
 		5881DBF4244FEE440053A690 /* RuneSlotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5881DBF3244FEE440053A690 /* RuneSlotView.swift */; };
 		5881DBF6244FEE630053A690 /* RuneSlotViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5881DBF5244FEE630053A690 /* RuneSlotViewModel.swift */; };
 		5893899F245E7D0E00350A2E /* StoreOffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5893899E245E7D0E00350A2E /* StoreOffer.swift */; };
-		589389A5245F52BB00350A2E /* ParagraphNode+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589389A4245F52BB00350A2E /* ParagraphNode+Extensions.swift */; };
 		5894A44A24C36AFA00FBF839 /* GKLocalPlayer+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5894A44924C36AFA00FBF839 /* GKLocalPlayer+Extensions.swift */; };
 		5894A44C24C36B4600FBF839 /* Publishers+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5894A44B24C36B4600FBF839 /* Publishers+Extensions.swift */; };
 		5894A44E24C379C800FBF839 /* LoadingScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 5894A44D24C379C800FBF839 /* LoadingScene.sks */; };
@@ -302,6 +304,9 @@
 		28DCCB7D27616809004E70A8 /* RuneDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneDetailViewModel.swift; sourceTree = "<group>"; };
 		28DCCB7F2762C649004E70A8 /* AnimatorCombat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatorCombat.swift; sourceTree = "<group>"; };
 		28DF00872772B5140071E384 /* Animator+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Animator+Extensions.swift"; sourceTree = "<group>"; };
+		28EBD55427C9593B004C46B6 /* PixelMiddle.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = PixelMiddle.ttf; sourceTree = "<group>"; };
+		28EBD55527C9593B004C46B6 /* PixelHigh.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = PixelHigh.ttf; sourceTree = "<group>"; };
+		28EBD55627C9593B004C46B6 /* PixelSmall_v2.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = PixelSmall_v2.ttf; sourceTree = "<group>"; };
 		28FA8973275809A700E6D57F /* TargetModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetModel.swift; sourceTree = "<group>"; };
 		28FA8975275809CB00E6D57F /* TargetingProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetingProtocol.swift; sourceTree = "<group>"; };
 		3D00A0F823AAC813007E2D8B /* Identifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identifiers.swift; sourceTree = "<group>"; };
@@ -430,7 +435,6 @@
 		5881DBF3244FEE440053A690 /* RuneSlotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneSlotView.swift; sourceTree = "<group>"; };
 		5881DBF5244FEE630053A690 /* RuneSlotViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneSlotViewModel.swift; sourceTree = "<group>"; };
 		5893899E245E7D0E00350A2E /* StoreOffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreOffer.swift; sourceTree = "<group>"; };
-		589389A4245F52BB00350A2E /* ParagraphNode+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ParagraphNode+Extensions.swift"; sourceTree = "<group>"; };
 		5894A44924C36AFA00FBF839 /* GKLocalPlayer+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GKLocalPlayer+Extensions.swift"; sourceTree = "<group>"; };
 		5894A44B24C36B4600FBF839 /* Publishers+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Publishers+Extensions.swift"; sourceTree = "<group>"; };
 		5894A44D24C379C800FBF839 /* LoadingScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = LoadingScene.sks; sourceTree = "<group>"; };
@@ -776,7 +780,6 @@
 				3DD72590239DC37B005933B2 /* SKView+Extensions.swift */,
 				3DD72592239DC47F005933B2 /* IndexPath+Extensions.swift */,
 				3DC072BC23747F6B0046F224 /* CGSize+Extension.swift */,
-				589389A4245F52BB00350A2E /* ParagraphNode+Extensions.swift */,
 				582CF3F124425CC000AA2A95 /* CGFloat+Extensions.swift */,
 				3DA0A385230457580041EF34 /* SKLabelNode+Extension.swift */,
 			);
@@ -845,6 +848,9 @@
 		3DF0A6B12379CC0500941305 /* Fonts */ = {
 			isa = PBXGroup;
 			children = (
+				28EBD55527C9593B004C46B6 /* PixelHigh.ttf */,
+				28EBD55427C9593B004C46B6 /* PixelMiddle.ttf */,
+				28EBD55627C9593B004C46B6 /* PixelSmall_v2.ttf */,
 				3DF0A6B22379CC4600941305 /* pixel-font.ttf */,
 			);
 			path = Fonts;
@@ -1209,12 +1215,14 @@
 				288BDB2B2788FB1100B8B78C /* boss-background-music.wav in Resources */,
 				3D528FD62154A50300EF65CA /* GameScene.sks in Resources */,
 				589E156825ABA1AC004A6D46 /* gemAppears.mp3 in Resources */,
+				28EBD55A27C9593B004C46B6 /* PixelSmall_v2.ttf in Resources */,
 				3DF2925E20A37FF0006671AC /* LaunchScreen.storyboard in Resources */,
 				3DA4E89D2290B156006E90D1 /* EntityTest.json in Resources */,
 				3D674C9322C9D54C0003AEB4 /* MainMenu.sks in Resources */,
 				3DA4E8912290A722006E90D1 /* entities.json in Resources */,
 				589E157425ABA8CE004A6D46 /* TBD.mp3 in Resources */,
 				280CD177276AB20D00052EB5 /* BossTestScene.sks in Resources */,
+				28EBD55927C9593B004C46B6 /* PixelHigh.ttf in Resources */,
 				287053B8275AE8D100B84929 /* background-music.wav in Resources */,
 				58C37F2425AB94ED00F6D164 /* pickaxe.mp3 in Resources */,
 				3D528FDF2155BD7300EF65CA /* Assets.xcassets in Resources */,
@@ -1222,6 +1230,7 @@
 				589E156E25ABA324004A6D46 /* collectGem.mp3 in Resources */,
 				589E159F25ABC909004A6D46 /* levelComplete.mp3 in Resources */,
 				589E159325ABC3D1004A6D46 /* enemyHitsPlayer.mp3 in Resources */,
+				28EBD55827C9593B004C46B6 /* PixelMiddle.ttf in Resources */,
 				589E156225AB9BE7004A6D46 /* mineRocks.wav in Resources */,
 				3DF0A6B32379CC4600941305 /* pixel-font.ttf in Resources */,
 				589E157825ABA9D7004A6D46 /* goalCompleted.mp3 in Resources */,
@@ -1345,7 +1354,6 @@
 				3DF2928320A66BEB006671AC /* Tile.swift in Sources */,
 				3DA4E88B228FC156006E90D1 /* Util.swift in Sources */,
 				3DC072C6237545400046F224 /* Rule.swift in Sources */,
-				589389A5245F52BB00350A2E /* ParagraphNode+Extensions.swift in Sources */,
 				283F21F926E30D5200108D4D /* ProgressableModel.swift in Sources */,
 				3DE87C8E2235D05300D750CF /* MenuSpriteNode.swift in Sources */,
 				28CAFA7B26A0F2F000151CA8 /* CodexItemAnimatingView.swift in Sources */,
@@ -1587,7 +1595,7 @@
 				CODE_SIGN_ENTITLEMENTS = "DownFall/Shift Shaft.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 38;
+				CURRENT_PROJECT_VERSION = 40;
 				DEVELOPMENT_TEAM = G6N5X5RF9Q;
 				INFOPLIST_FILE = DownFall/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
@@ -1611,7 +1619,7 @@
 				CODE_SIGN_ENTITLEMENTS = "DownFall/Shift Shaft.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 38;
+				CURRENT_PROJECT_VERSION = 40;
 				DEVELOPMENT_TEAM = G6N5X5RF9Q;
 				INFOPLIST_FILE = DownFall/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;

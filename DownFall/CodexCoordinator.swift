@@ -43,7 +43,7 @@ class CodexCoordinator {
         titleLabel.textColor = UIColor.white
         titleLabel.text = "Basecamp"
         titleLabel.textAlignment = .center
-        titleLabel.font = .bigSubtitleCodexFont
+        titleLabel.font = .bigTitleCodexFont
         
         
         hostingViewController.navigationItem.titleView = titleLabel

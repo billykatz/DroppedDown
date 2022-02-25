@@ -84,15 +84,15 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
             presentMainMenu()
         } else {
             // This springs us into the tutorial
-            newGame(profileViewModel?.profile.player)
+            profileViewModel?.nilCurrenRun()
+            levelCoordinator.loadRun(nil, profile: profileViewModel!.profile)
+            MenuMusicManager.shared.gameIsPlaying = true
         }
     }
     
     func newGame(_ playerModel: EntityModel?) {
         profileViewModel?.nilCurrenRun()
         codexCoordinator.presentCodexView(profileViewModel: profileViewModel!)
-//        levelCoordinator.loadRun(nil, profile: profileViewModel!.profile)
-        MenuMusicManager.shared.gameIsPlaying = true
     }
     
     func continueRun() {

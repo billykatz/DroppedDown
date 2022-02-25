@@ -122,7 +122,7 @@ class TargetingViewModelTests: XCTestCase {
         XCTAssertEqual(vm.currentTargets.allTargetCoords.count, 0)
         
         // with 1 monster
-        let tiles = sendTiles(2)
+        let tiles = sendTiles(1)
         
         let trans = Transformation(transformation: nil,
                                    inputType: .runeUseSelected(Rune.rune(for: .bubbleUp)),
@@ -134,15 +134,15 @@ class TargetingViewModelTests: XCTestCase {
         
         
         //when
-        vm.didSelect(Rune.rune(for: .rainEmbers))
+        vm.didSelect(Rune.rune(for: .fireball))
 
         
         // verify
-        XCTAssertEqual(vm.currentTargets.allTargetCoords.count, 2)
+        XCTAssertEqual(vm.currentTargets.allTargetCoords.count, 1)
         
     }
     
-    func testAutoTargetMonsterFail() {
+    func testAutoTargetMonsterFailBecauseTooManyTargets() {
         // given
         let vm = TargetingViewModel()
         XCTAssertEqual(vm.currentTargets.allTargetCoords.count, 0)
@@ -150,7 +150,7 @@ class TargetingViewModelTests: XCTestCase {
         //when
         Dispatch.shared.send(Input(InputType.runeUseSelected(Rune.rune(for: .rainEmbers))))
         
-        // with 1 monster
+        // with 3 monster
         sendTiles(3)
         
         // choose to use fireball rune which targets 1 monster
@@ -162,21 +162,7 @@ class TargetingViewModelTests: XCTestCase {
     }
     
     
-    func testAutoTargetFail() {
-        // given
-        let vm = TargetingViewModel()
-        XCTAssertEqual(vm.currentTargets.allTargetCoords.count, 0)
-        
-        //when
-        Dispatch.shared.send(Input(InputType.runeUseSelected(Rune.rune(for: .getSwifty))))
-        sendTiles()
-        
-        // verify
-        XCTAssertEqual(vm.currentTargets.allTargetCoords.count, 0)
-        
-    }
-    
-    func testDidUseAbility() {
+    func testDidUseAbilityNilsOutCurrentRune() {
         // given
         let vm = TargetingViewModel()
         

@@ -923,6 +923,9 @@ extension Board {
         case .escape:
             trans = useEscape(input: input)
             
+        case .greaterRuneSpiritPotion:
+            trans = useGreaterRuneSpiritPotion(input: input)
+            
             
         default:
             preconditionFailure("Currently only killMonster and transmogrify are set up for this code path")

@@ -9,6 +9,7 @@
 import Foundation
 import SpriteKit
 import CoreMedia
+import CoreGraphics
 
 typealias PositionGiver = (TileCoord) -> CGPoint
 
@@ -95,7 +96,7 @@ extension Animator {
             }
             
         case .greaterRuneSpiritPotion:
-            if let animation = createGreaterRuneSpiritPotionOfferAnimation(delayBefore: delayBefore, offer: offer, startTileCoord: playerPosition, targetTileTypes: targetTileTypes, sprites: sprites, pixkaxeHandleView: pickaxeHandleView, positionInForeground: positionInForeground) {
+            if let animation = createGreaterRuneSpiritPotionOfferAnimation(delayBefore: delayBefore, offer: offer, startTileCoord: playerPosition, targetTileTypes: targetTileTypes, sprites: sprites, pickaxeHandleView: pickaxeHandleView, positionInForeground: positionInForeground) {
                 spriteActions.append(contentsOf: animation)
             }
 
@@ -109,14 +110,49 @@ extension Animator {
         
     }
     
-    func createGreaterRuneSpiritPotionOfferAnimation(delayBefore: TimeInterval, offer: StoreOffer, startTileCoord: TileCoord, targetTileTypes: [TargetTileType], sprites: [[DFTileSpriteNode]], pixkaxeHandleView: BackpackView, positionInForeground: PositionGiver) -> [SpriteAction]? {
-        guard let foreground = foreground else { return nil }
-        var spriteActions: [SpriteAction]?
+    func createGreaterRuneSpiritPotionOfferAnimation(delayBefore: TimeInterval, offer: StoreOffer, startTileCoord: TileCoord, targetTileTypes: [TargetTileType], sprites: [[DFTileSpriteNode]], pickaxeHandleView: BackpackView, positionInForeground: PositionGiver) -> [SpriteAction]? {
+        guard let foreground = foreground, let tileSize = tileSize else { return nil }
+        let cgTileSize = CGSize(widthHeight: tileSize)
+        var spriteActions: [SpriteAction] = []
         
-        // aniamte each rune slot filling up
-        // runes should start using their "fully charged" sprite
-        // runes should grow a little and shake?
+        var waitBefore = delayBefore
+        let timeBetween: TimeInterval = 0.2
         
+        let playerPosition = positionInForeground(startTileCoord)
+        // create a copy of the potion for each rune and send it down to them
+        if let runeSlotViews = pickaxeHandleView.runeInventoryContainer?.runeSlotViews {
+            
+            func waitToExplode(idx: Int) -> TimeInterval {
+                return (Double(runeSlotViews.count) - Double(idx)) * timeBetween
+            }
+            
+            for (idx, runeSlotView) in runeSlotViews.enumerated() {
+                let potionSprite = SKSpriteNode(texture: SKTexture(imageNamed: offer.textureName), size: cgTileSize)
+                potionSprite.position = playerPosition
+                potionSprite.zPosition = 100_000_000
+                foreground.addChild(potionSprite)
+                
+                
+                // now create an arc from the player to the thing
+                let targetPoint = runeSlotView.convert(pickaxeHandleView.frame.center, to: foreground)
+                let moveSpeed: CGFloat = 800
+                let moveDistance = (targetPoint - playerPosition).length
+                let moveDuration = moveDistance / moveSpeed
+                let moveAction = SKAction.move(to: targetPoint, duration: moveDuration).setTimingMode(.easeIn)
+                let scaleAction = SKAction.scale(by: 1.5, duration: moveDuration)
+                let scaleAndMoveGroup = SKAction.group(scaleAction, moveAction)
+                let smokeAnimation = smokeAnimation
+                let scaleWhileSmoke = SKAction.scale(by: 2, duration: smokeAnimation.duration)
+                let scaleAndSmoke = SKAction.group(scaleWhileSmoke, smokeAnimation).waitBefore(delay: waitToExplode(idx: idx))
+                let potionSeq = SKAction.sequence(scaleAndMoveGroup, scaleAndSmoke, .removeFromParent()).waitBefore(delay: waitBefore)
+                
+                spriteActions.append(.init(potionSprite, potionSeq))
+                
+                
+                
+                waitBefore += timeBetween
+            }
+        }
         
         return spriteActions
     }

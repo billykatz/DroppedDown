@@ -46,7 +46,7 @@ class RuneContainerViewModel: RuneContainerViewModelable {
 class RuneContainerView: SKSpriteNode {
     let viewModel: RuneContainerViewModelable
     var runeSlotViewModels: [RuneSlotViewModel] = []
-    private var runeSlotViews:  [RuneSlotView] = []
+    public var runeSlotViews:  [RuneSlotView] = []
     var disposables = Set<AnyCancellable>()
     
     struct Constants {

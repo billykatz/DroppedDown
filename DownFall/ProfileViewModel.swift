@@ -18,7 +18,7 @@ class ProfileViewModel {
     private var cancellables = Set<AnyCancellable>()
     
     private static var debugNumberRuneSlots: Int = 1
-    private static var debugRunesToAddToPlayer: [Rune] = [.rune(for: .debugTeleport, isCharged: true)]
+    private static var debugRunesToAddToPlayer: [Rune] = [] //[.rune(for: .debugTeleport, isCharged: true)]
     
     static func addRuneToPlayer(runeType: RuneType, charged: Bool, cooldown: Int) {
         var rune = Rune.rune(for: runeType)
@@ -47,9 +47,9 @@ class ProfileViewModel {
             let endIndex = debugRunesToAddToPlayer.startIndex.advanced(by: debugNumberRuneSlots)
             debugRunesToAddToPlayer = Array(debugRunesToAddToPlayer[0..<endIndex])
         }
-        #if DEBUG
-        return playerData.update(pickaxe: Pickaxe(runeSlots: debugNumberRuneSlots, runes: debugRunesToAddToPlayer))//.update(luck:100)
-        #endif
+//        #if DEBUG
+//        return playerData.update(pickaxe: Pickaxe(runeSlots: debugNumberRuneSlots, runes: debugRunesToAddToPlayer))//.update(luck:100)
+//        #endif
         
         return playerData.update(pickaxe: Pickaxe(runeSlots: debugNumberRuneSlots, runes: debugRunesToAddToPlayer))
     }

@@ -71,4 +71,6 @@ extension UserDefaults {
     // MARK: DEBUG flags
     static let startingDepthLevelKey = "startingDepthLevelKey"
     
+    static let musicFadeInDurationKey = "musicFadeInDurationKey"
+    
 }

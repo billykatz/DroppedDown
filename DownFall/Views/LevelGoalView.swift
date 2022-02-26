@@ -50,6 +50,7 @@ class LevelGoalView: SKSpriteNode {
         addChild(contentView)
         addBorder()
         
+        
         isUserInteractionEnabled = true
         
         bindToViewModel()

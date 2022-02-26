@@ -35,7 +35,7 @@ class LevelGoalTracker: LevelGoalTracking {
     
     public var goalProgress: [GoalTracking] = []
     
-    private let level: Level
+    public let level: Level
     private let tutorialConductor: TutorialConductor
     private var pillarColor =  Set<ShiftShaft_Color>(ShiftShaft_Color.pillarCases)
     private var numberOfIndividualPillars: Int = 0

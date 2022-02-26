@@ -55,7 +55,7 @@ enum Sound: CaseIterable {
 }
 
 
-class AudioManager {
+class AudioManager: NSObject, AVAudioPlayerDelegate {
     
     let audioThread = DispatchQueue(label: "audioThread", qos: .userInitiated)
     let backgroundMusicThread = DispatchQueue(label: "musicThread", qos: .userInitiated)
@@ -63,11 +63,17 @@ class AudioManager {
     let audioNode: SKAudioNode
     var backgroundMusicPlayer: AVAudioPlayer?
     let musicVolume: Float = 0.5
+    var fadeInDuration: Float = 2.5
     
     var observer: NSKeyValueObservation?
     
+    var isBossLevel: Bool
+    
     init(sceneNode: SKNode, isBossLevel: Bool) {
         self.audioNode = SKAudioNode()
+        self.isBossLevel = isBossLevel
+        
+        super.init()
         
         backgroundMusicThread.sync { [weak self] in
             do {
@@ -106,12 +112,17 @@ class AudioManager {
         observer?.invalidate()
     }
 
+    
     func playBackgroundMusic() {
+        #if DEBUG
+        fadeInDuration = UserDefaults.standard.float(forKey: UserDefaults.musicFadeInDurationKey)
+        #endif
+
         if !UserDefaults.standard.bool(forKey: UserDefaults.muteMusicKey) {
-            backgroundMusicThread.sync(execute: { [backgroundMusicPlayer, musicVolume] in
+            backgroundMusicThread.sync(execute: { [backgroundMusicPlayer, musicVolume, fadeInDuration] in
                 backgroundMusicPlayer?.setVolume(0, fadeDuration: 0)
                 backgroundMusicPlayer?.play()
-                backgroundMusicPlayer?.setVolume(musicVolume, fadeDuration: 2.5)
+                backgroundMusicPlayer?.setVolume(musicVolume, fadeDuration: TimeInterval(fadeInDuration))
                 
                 // negative value means that it will loop
                 backgroundMusicPlayer?.numberOfLoops = -1

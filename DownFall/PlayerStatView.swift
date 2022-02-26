@@ -44,6 +44,38 @@ struct DebugButtonLabel: View {
     }
 }
 
+struct MusicIntroFadeInDurationView:  View {
+    @State var fadeInDuration: Float = UserDefaults.standard.float(forKey: UserDefaults.musicFadeInDurationKey) {
+        didSet {
+            UserDefaults.standard.set(fadeInDuration, forKey: UserDefaults.musicFadeInDurationKey)
+        }
+    }
+    var title: String {
+        "Fade in duration: \(fadeInDuration)"
+    
+    }
+    let statButtonSize = CGSize(widthHeight: 50)
+    
+    var body: some View {
+        VStack {
+            HStack {
+                StatButton(add: false, frame: statButtonSize).onTapGesture(perform: {
+                    fadeInDuration -= 0.125
+                    fadeInDuration = max(0, fadeInDuration)
+                })
+                Text(title)
+                StatButton(add: true, frame: statButtonSize).onTapGesture(perform: {
+                    fadeInDuration += 0.125
+                })
+            }
+        }
+
+    }
+    
+    
+}
+
+
 struct StartingLevelView:  View {
     @State var startingLevel: Int = UserDefaults.standard.integer(forKey: UserDefaults.startingDepthLevelKey) {
         didSet {
@@ -279,6 +311,9 @@ struct PlayerStatsView: View {
     
     var body: some View {
         ScrollView{
+#if DEBUG
+            MusicIntroFadeInDurationView()
+#endif
             #if DEBUG
             StartingLevelView()
             #endif

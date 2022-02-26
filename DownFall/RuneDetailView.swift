@@ -92,7 +92,12 @@ class RuneDetailView: SKSpriteNode, ButtonDelegate {
     
     private func shouldEnableConfirmButton(allTargets: AllTarget) -> Bool {
         guard let rune = viewModel.rune else { return false }
-        return allTargets.areLegal && rune.targets == allTargets.targets.count
+        return allTargets.areLegal
+//        && (
+//            rune.targets == allTargets.targets.count
+//            ||
+//            (rune.targetAmountType == .upToAmount && !allTargets.allTargetAssociatedCoords.isEmpty)
+//        )
     }
     
     public func enableButton(_ enable: Bool, targets: AllTarget) {
@@ -198,8 +203,7 @@ class RuneDetailView: SKSpriteNode, ButtonDelegate {
             shouldEnableConfirmButton(allTargets: allTargets)
         {
             targetsStrokeColor = .runeChargedYellow
-        } else { //if let allTargets = allTargets?.allTargetCoords,
-                 // allTargets.count < (rune.targets? ?? 0) {
+        } else {
             targetsStrokeColor = .runeIllegalTargetsRed
         }
         
@@ -213,7 +217,8 @@ class RuneDetailView: SKSpriteNode, ButtonDelegate {
         shapeNode.strokeColor = targetsStrokeColor
         shapeNode.lineWidth = 2.0
         
-        let progressDescription = ParagraphNode(text: "\(allTargets?.targets.count ?? 0)/\(rune.targets ?? 0)", paragraphWidth: 200.0, fontSize: 60.0)
+        let maxTargets = min(rune.targets ?? 0, allTargets?.targets.count ?? 0)
+        let progressDescription = ParagraphNode(text: "\(maxTargets)/\(rune.targets ?? 0)", paragraphWidth: 200.0, fontSize: 60.0)
         progressDescription.position = CGPoint.position(progressDescription.frame, inside: shapeNode.frame, verticalAlign: .center, horizontalAnchor: .right, xOffset: Style.Padding.more, yOffset: 2.0, translatedToBounds: true)
         
         targetIcon.position = CGPoint.position(targetIcon.frame, inside: shapeNode.frame, verticalAlign: .center, horizontalAnchor: .left, xOffset: Style.Padding.most)

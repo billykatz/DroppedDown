@@ -1264,8 +1264,30 @@ extension Board {
         case .monsterCrush:
             return [monsterCrush(tiles: tiles, allTarget: allTargets, input: input)]
             
+        case .liquifyMonsters:
+            return [useLiquifyMonsterRune(rune: rune, tiles: tiles, allTarget: allTargets, input: input)]
+            
         default: fatalError()
         }
+        
+    }
+    
+    private func useLiquifyMonsterRune(rune: Rune, tiles: [[Tile]], allTarget: AllTarget, input: Input) -> Transformation {
+        var newTiles = tiles
+        var tileTransformation : [TileTransformation] = []
+        
+        // this rune uses up to 5 targets so either we max it out based on the rune or we only use some of the targets
+        let targets = min(rune.targets ?? 0, allTarget.allTargetAssociatedCoords.count)
+        let randomlyChosenMonsters = allTarget.allTargetAssociatedCoords.choose(random: targets)
+        
+        for coord in randomlyChosenMonsters {
+            // TODO: the amount given by the Rune should be modeled somewhere else
+            newTiles[coord.row][coord.col] = Tile(type: .item(Item(type: .gem, amount: 10)))
+            tileTransformation.append(.init(coord, coord))
+        }
+        
+        self.tiles = newTiles
+        return Transformation(transformation: tileTransformation, inputType: input.type, endTiles: self.tiles)
         
     }
     

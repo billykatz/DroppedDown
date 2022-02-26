@@ -30,6 +30,7 @@ struct Identifiers {
     struct Sprite {
         static let redReticle = "redReticle"
         static let greenReticle = "greenReticle"
+        static let potentialTargetReticle = "potentialTargetReticle"
         
         struct Sheet {
             static let brownRockCrumble = "brownRockCrumble"

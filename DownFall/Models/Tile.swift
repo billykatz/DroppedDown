@@ -65,6 +65,10 @@ enum ShiftShaft_Color: String, Codable, CaseIterable, Hashable {
     static var randomColor: ShiftShaft_Color {
         return [ShiftShaft_Color.red, .purple, .blue].randomElement()!
     }
+    
+    static var randomCrystalColor: ShiftShaft_Color {
+        return [ShiftShaft_Color.red, .purple, .blue, .green, .brown].randomElement()!
+    }
 }
 
 struct Tile: Hashable, Codable {

@@ -40,6 +40,9 @@
 		2881F28F27C02FFD00DC83DA /* CodexWalletView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2881F28E27C02FFD00DC83DA /* CodexWalletView.swift */; };
 		2881F29127C1972200DC83DA /* OfferAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2881F29027C1972200DC83DA /* OfferAnimator.swift */; };
 		2881F29327C33D6C00DC83DA /* Bool+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2881F29227C33D6C00DC83DA /* Bool+Extensions.swift */; };
+		2882DF1027C99C2F00149899 /* RuneAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2882DF0F27C99C2F00149899 /* RuneAnimator.swift */; };
+		2882DF1327C9B8AA00149899 /* shift-shaft-boss-intro.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2882DF1127C9B8A900149899 /* shift-shaft-boss-intro.wav */; };
+		2882DF1427C9B8AA00149899 /* shift-shaft-boss-loop.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2882DF1227C9B8AA00149899 /* shift-shaft-boss-loop.wav */; };
 		288330F7274FDB400070A1E8 /* ConfirmShuffleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 288330F6274FDB400070A1E8 /* ConfirmShuffleView.swift */; };
 		2886E83E26F0303B0014FA5D /* SettingsCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886E83D26F0303B0014FA5D /* SettingsCoordinator.swift */; };
 		2886E84026F030750014FA5D /* UIViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886E83F26F030750014FA5D /* UIViewController+Extensions.swift */; };
@@ -272,6 +275,9 @@
 		2881F28E27C02FFD00DC83DA /* CodexWalletView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexWalletView.swift; sourceTree = "<group>"; };
 		2881F29027C1972200DC83DA /* OfferAnimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfferAnimator.swift; sourceTree = "<group>"; };
 		2881F29227C33D6C00DC83DA /* Bool+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bool+Extensions.swift"; sourceTree = "<group>"; };
+		2882DF0F27C99C2F00149899 /* RuneAnimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneAnimator.swift; sourceTree = "<group>"; };
+		2882DF1127C9B8A900149899 /* shift-shaft-boss-intro.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "shift-shaft-boss-intro.wav"; sourceTree = "<group>"; };
+		2882DF1227C9B8AA00149899 /* shift-shaft-boss-loop.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "shift-shaft-boss-loop.wav"; sourceTree = "<group>"; };
 		288330F6274FDB400070A1E8 /* ConfirmShuffleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmShuffleView.swift; sourceTree = "<group>"; };
 		2886E83D26F0303B0014FA5D /* SettingsCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsCoordinator.swift; sourceTree = "<group>"; };
 		2886E83F26F030750014FA5D /* UIViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extensions.swift"; sourceTree = "<group>"; };
@@ -615,6 +621,7 @@
 				3D9C505F21FE206000A2210D /* Renderer.swift */,
 				283DC7792718A831002A499A /* DialogueOverlay.swift */,
 				3D106097232E9A0200ECE7E6 /* Animator.swift */,
+				2882DF0F27C99C2F00149899 /* RuneAnimator.swift */,
 				2881F29027C1972200DC83DA /* OfferAnimator.swift */,
 				28DF00872772B5140071E384 /* Animator+Extensions.swift */,
 				28DCCB7F2762C649004E70A8 /* AnimatorCombat.swift */,
@@ -881,6 +888,8 @@
 				281D43B327AA61F700D00376 /* menu-music.wav */,
 				288BDB2A2788FB1100B8B78C /* boss-background-music.wav */,
 				287053B7275AE8D100B84929 /* background-music.wav */,
+				2882DF1127C9B8A900149899 /* shift-shaft-boss-intro.wav */,
+				2882DF1227C9B8AA00149899 /* shift-shaft-boss-loop.wav */,
 				28C64464274463C500098C3C /* Boss */,
 				284F2EC12731DB2400032088 /* FTUE */,
 				283DC776271892A2002A499A /* Tutorial */,
@@ -1222,6 +1231,7 @@
 				3DA4E8912290A722006E90D1 /* entities.json in Resources */,
 				589E157425ABA8CE004A6D46 /* TBD.mp3 in Resources */,
 				280CD177276AB20D00052EB5 /* BossTestScene.sks in Resources */,
+				2882DF1427C9B8AA00149899 /* shift-shaft-boss-loop.wav in Resources */,
 				28EBD55927C9593B004C46B6 /* PixelHigh.ttf in Resources */,
 				287053B8275AE8D100B84929 /* background-music.wav in Resources */,
 				58C37F2425AB94ED00F6D164 /* pickaxe.mp3 in Resources */,
@@ -1234,6 +1244,7 @@
 				589E156225AB9BE7004A6D46 /* mineRocks.wav in Resources */,
 				3DF0A6B32379CC4600941305 /* pixel-font.ttf in Resources */,
 				589E157825ABA9D7004A6D46 /* goalCompleted.mp3 in Resources */,
+				2882DF1327C9B8AA00149899 /* shift-shaft-boss-intro.wav in Resources */,
 				281D43B427AA61F700D00376 /* menu-music.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1415,6 +1426,7 @@
 				58A4B91D2472E5620011624A /* ChanceModel.swift in Sources */,
 				2842BABF26A0EC740021CD0B /* CodexItemView.swift in Sources */,
 				28DF00882772B5140071E384 /* Animator+Extensions.swift in Sources */,
+				2882DF1027C99C2F00149899 /* RuneAnimator.swift in Sources */,
 				2881F28F27C02FFD00DC83DA /* CodexWalletView.swift in Sources */,
 				283DC778271892BC002A499A /* TutorialConductor.swift in Sources */,
 				5881DBF4244FEE440053A690 /* RuneSlotView.swift in Sources */,
@@ -1595,7 +1607,7 @@
 				CODE_SIGN_ENTITLEMENTS = "DownFall/Shift Shaft.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 41;
+				CURRENT_PROJECT_VERSION = 42;
 				DEVELOPMENT_TEAM = G6N5X5RF9Q;
 				INFOPLIST_FILE = DownFall/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
@@ -1619,7 +1631,7 @@
 				CODE_SIGN_ENTITLEMENTS = "DownFall/Shift Shaft.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 41;
+				CURRENT_PROJECT_VERSION = 42;
 				DEVELOPMENT_TEAM = G6N5X5RF9Q;
 				INFOPLIST_FILE = DownFall/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;

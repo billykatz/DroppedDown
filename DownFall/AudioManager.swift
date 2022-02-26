@@ -71,7 +71,7 @@ class AudioManager {
         
         backgroundMusicThread.sync { [weak self] in
             do {
-                let resourceName = isBossLevel ? "boss-background-music" : "background-music"
+                let resourceName = isBossLevel ? "shift-shaft-boss-loop" : "background-music"
                 if let backgroundMusicPath = Bundle.main.path(forResource: resourceName, ofType: "wav") {
                     let url = URL(fileURLWithPath: backgroundMusicPath)
                     self?.backgroundMusicPlayer = try AVAudioPlayer(contentsOf: url)

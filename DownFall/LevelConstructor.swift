@@ -631,7 +631,7 @@ struct LevelConstructor {
     
     
     static func monsterCountStart(depth: Depth) -> Int {
-        if depth == testLevelDepthNumber { return 5 }
+        if depth == testLevelDepthNumber { return 6 }
         if depth == bossLevelDepthNumber { return 0 }
         return min(boardSize(depth: depth), depth + 2)
     }

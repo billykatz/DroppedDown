@@ -72,14 +72,14 @@ class DFTileSpriteNode: SKSpriteNode {
     let animatingLayerName = "animatingLayer"
     
     @discardableResult
-    func addAnimatingLayer() -> SKSpriteNode {
+    private func addAnimatingLayer() -> SKSpriteNode {
         var tileSize = self.size
         if self.type.isPlayer {
             tileSize = tileSize.scale(by: 1/3)
         }
         let animatingLayer = SKSpriteNode(color: .clear, size: tileSize)
         animatingLayer.name = animatingLayerName
-        animatingLayer.zPosition = 1_000
+        animatingLayer.zPosition = 100_000_000
         self.addChild(animatingLayer)
         return animatingLayer
     }

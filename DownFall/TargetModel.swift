@@ -10,6 +10,7 @@ struct Target: Codable, Hashable {
     let coord: TileCoord
     let associatedCoord: [TileCoord]
     let isLegal: Bool
+    let isPotentialTarget: Bool
     
     var all: [TileCoord] {
         return  [coord] + associatedCoord

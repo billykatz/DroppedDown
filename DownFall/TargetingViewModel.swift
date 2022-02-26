@@ -114,9 +114,11 @@ class TargetingViewModel: Targeting {
     
     
     var legallyTargeted: Bool {
+        guard let rune = rune else { return false }
         return self.currentTargets.targets.allSatisfy({
             return $0.isLegal
-        }) && self.currentTargets.targets.count == self.numberOfTargets
+        })
+        && (self.currentTargets.targets.count == self.numberOfTargets || rune.targetAmountType == .upToAmount)
         && self.currentTargets.areLegal
     }
     
@@ -178,8 +180,8 @@ class TargetingViewModel: Targeting {
             
         case .transformation(let trans):
             if let inputType = trans.first?.inputType,
-                case InputType.runeUsed = inputType,
-                let endTiles = trans.first?.endTiles {
+               case InputType.runeUsed = inputType,
+               let endTiles = trans.first?.endTiles {
                 if let playerData = playerData(in: endTiles),
                    let runes = playerData.runes,
                    let endTiles = input.endTilesStruct {
@@ -189,9 +191,9 @@ class TargetingViewModel: Targeting {
                     inventory = playerData.runes ?? []
                     runeSlotsUpdated?(runeSlots, runes)
                 }
-
+                
             } else if let inputType = trans.first?.inputType,
-                 case InputType.runeUseSelected = inputType {
+                      case InputType.runeUseSelected = inputType {
                 // skip these as well
             }
             else {
@@ -201,7 +203,7 @@ class TargetingViewModel: Targeting {
         case .animationsFinished:
             if let endTiles = input.endTilesStruct {
                 if let playerData = playerData(in: endTiles),
-                    let runes = playerData.runes {
+                   let runes = playerData.runes {
                     let runeSlots = playerData.runeSlots ?? 0
                     self.runeSlots = runeSlots
                     inventory = playerData.runes ?? []
@@ -362,7 +364,7 @@ class TargetingViewModel: Targeting {
                         effectCancelled = true
                     }
                 }
-
+                
             }
         }
         return effectedTileCoords
@@ -400,7 +402,7 @@ class TargetingViewModel: Targeting {
             
             /// remove the illegally placed target if need
             if currentTargets.targets.count >= self.numberOfTargets {
-                    
+                
                 // first try to move a target that doesnt not contain the player
                 if needsToTargetPlayer {
                     
@@ -450,7 +452,8 @@ class TargetingViewModel: Targeting {
             /// add the new target
             targets.append(Target(coord: coord,
                                   associatedCoord: associatedCoords,
-                                  isLegal: isTargetLegal(coord)))
+                                  isLegal: isTargetLegal(coord),
+                                  isPotentialTarget: false))
             var areLegal: Bool = areTargetsLegal(inTargets: targets)
             if rune.targetsGroupOfMonsters {
                 areLegal = areLegal && associatedCoords.count >= 3
@@ -492,7 +495,9 @@ class TargetingViewModel: Targeting {
             // the number of targets is less than the max number of targets. So just add it to list of tile coords
             else if currentTargets.targets.count < self.numberOfTargets {
                 //add the new target
-                currentTargets.targets.append(Target(coord: coord, associatedCoord: [], isLegal: isTargetLegal(coord)))
+                currentTargets.targets.append(
+                    Target(coord: coord, associatedCoord: [], isLegal: isTargetLegal(coord), isPotentialTarget: false)
+                )
                 let areLegal = areAllTargetsLegal(in: currentTargets)
                 currentTargets = AllTarget(targets: currentTargets.targets, areLegal: areLegal)
                 
@@ -520,7 +525,7 @@ class TargetingViewModel: Targeting {
                     }
                 }
                 //add the new target
-                currentTargets.targets.append(Target(coord: coord, associatedCoord: [], isLegal: isTargetLegal(coord)))
+                currentTargets.targets.append(Target(coord: coord, associatedCoord: [], isLegal: isTargetLegal(coord), isPotentialTarget: false))
                 let areLegal = areAllTargetsLegal(in: currentTargets)
                 currentTargets = AllTarget(targets: currentTargets.targets, areLegal: areLegal)
             }
@@ -528,31 +533,37 @@ class TargetingViewModel: Targeting {
     }
     
     private func autoTarget() {
-        guard let tiles = tiles else { return }
+        guard let tiles = tiles, let rune = rune else { return }
         var targetCoords: [TileCoord] = []
         
         for type in typesOfTargets {
             targetCoords.append(contentsOf: tileCoords(for: tiles, of: type))
         }
         
-        if needsToTargetPlayer,
-                  let playerCoord = playerCoord,
-                  let rune = rune {
+        // auto target the player
+        if needsToTargetPlayer, let playerCoord = playerCoord {
             currentTargets = targets(given: playerCoord, withRune: rune)
         }
-        
-        // if the number of legal targets it less than or equal to the number of total possible targets for this rune then auto target them.
-        else if targetCoords.count <= numberOfTargets {
-            let targets = targetCoords.map { Target(coord: $0, associatedCoord: [], isLegal: true) }
-            var areLegal = areTargetsLegal(inTargets: targets)
-            if rune?.targetsGroupOfMonsters ?? false {
-                areLegal = false
+        // else try to auto target targets the player might want
+        else if rune.targetInput == .playerInput {
+            
+            // if the number of legal targets it less than or equal to the number of total possible targets for this rune then auto target them.
+            if targetCoords.count <= numberOfTargets {
+                let targets = targetCoords.map { Target(coord: $0, associatedCoord: [], isLegal: true, isPotentialTarget: false) }
+                var areLegal = areTargetsLegal(inTargets: targets)
+                if rune.targetsGroupOfMonsters {
+                    areLegal = false
+                }
+                
+                currentTargets = AllTarget(targets: targets, areLegal: areLegal)
             }
-
-            currentTargets = AllTarget(targets: targets, areLegal: areLegal)
         }
+        // else show all the possible targets with the question mark reticle
+        else if rune.targetInput == .random {
+            let targets = targetCoords.map { Target(coord: $0, associatedCoord: [], isLegal: true, isPotentialTarget: true) }
+            currentTargets = AllTarget(targets: targets, areLegal: true)
+        }
+        
+        
     }
-    
-   
-    
 }

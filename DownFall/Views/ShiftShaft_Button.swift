@@ -9,6 +9,47 @@
 import Foundation
 import SpriteKit
 
+extension SKNode: UIAccessibilityIdentification {
+    public var accessibilityIdentifier: String? {
+        get {
+            super.accessibilityLabel
+        }
+        set(accessibilityIdentifier) {
+            super.accessibilityLabel = accessibilityIdentifier
+        }
+    }
+
+    func makeUITestAccessible(label: String, traits: UIAccessibilityTraits) {
+
+        accessibilityLabel = label
+        isAccessibilityElement = true
+        accessibilityTraits = traits
+
+        if let scene = scene {
+            if scene.accessibilityElements == nil {
+                scene.accessibilityElements = [self]
+            } else {
+                scene.accessibilityElements?.append(self)
+            }
+        }
+    }
+    
+    func makeUITestAccessible(label: String, traits: UIAccessibilityTraits, scene: SKScene) {
+
+        accessibilityLabel = label
+        isAccessibilityElement = true
+        accessibilityTraits = traits
+
+        if scene.accessibilityElements == nil {
+            scene.accessibilityElements = [self]
+        } else {
+            scene.accessibilityElements?.append(self)
+        }
+    }
+
+}
+
+
 extension SKSpriteNode {
 
     func aspectFillToSize(fillSize: CGSize) {
@@ -266,6 +307,9 @@ class ShiftShaft_Button: SKShapeNode {
         
         /// set the color to clear
         self.color = .clear
+        
+        
+//        self.makeUITestAccessible(label: identifier.rawValue, traits: .button)
         
     }
     

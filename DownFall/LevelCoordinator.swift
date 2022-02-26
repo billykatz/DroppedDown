@@ -72,8 +72,10 @@ class LevelCoordinator: LevelCoordinating, GameSceneCoordinatingDelegate, CodexC
             
             //Debug settings
             #if DEBUG
-            view.showsFPS = true
-            view.showsNodeCount = true
+            if !UITestRunningChecker.shared.testsAreRunning {
+                view.showsFPS = true
+                view.showsNodeCount = true
+            }
             #endif
             
         }

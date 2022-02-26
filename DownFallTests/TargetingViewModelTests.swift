@@ -170,7 +170,7 @@ class TargetingViewModelTests: XCTestCase {
         vm.didSelect(Rune.rune(for: .transformRock))
         sendTiles()
         XCTAssertNotNil(vm.rune)
-        vm.currentTargets = AllTarget(targets: [Target(coord: .zero, associatedCoord: [], isLegal: true), Target(coord: TileCoord(1, 2), associatedCoord: [], isLegal: true)], areLegal: true)
+        vm.currentTargets = AllTarget(targets: [Target(coord: .zero, associatedCoord: [], isLegal: true, isPotentialTarget: false), Target(coord: TileCoord(1, 2), associatedCoord: [], isLegal: true, isPotentialTarget: false)], areLegal: true)
         vm.didUse(Rune.rune(for: .transformRock))
         
         // verify

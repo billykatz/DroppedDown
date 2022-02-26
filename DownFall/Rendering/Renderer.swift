@@ -129,7 +129,8 @@ class Renderer: SKSpriteNode {
          levelGoalTracker: LevelGoalTracker,
          tutorialConductor: TutorialConductor?,
          runStatTracker: RunStatTracker,
-         numberOfPreviousBossWins: Int) {
+         numberOfPreviousBossWins: Int,
+         scene: SKScene) {
         
         self.precedence = precedence
         self.playableRect = playableRect
@@ -195,6 +196,7 @@ class Renderer: SKSpriteNode {
         } else {
             [spriteForeground, safeArea, hud, levelGoalView, backpackView, rotateVisualCue].forEach { foreground.addChild($0) }
         }
+        levelGoalView.makeUITestAccessible(label: "levelGoalView", traits: .none, scene: scene)
         
         #if DEBUG
 //        foreground.addChild(bossDebugView)

@@ -51,7 +51,11 @@ class TutorialConductor {
     
     
     var isTutorial: Bool {
-        return !UserDefaults.standard.bool(forKey: UserDefaults.hasCompletedTutorialKey) && !UserDefaults.standard.bool(forKey: UserDefaults.hasSkippedTutorialKey)
+        let uiTestAreRunning = UITestRunningChecker.shared.testsAreRunning
+        
+        return !UserDefaults.standard.bool(forKey: UserDefaults.hasCompletedTutorialKey)
+        && !UserDefaults.standard.bool(forKey: UserDefaults.hasSkippedTutorialKey)
+        && !uiTestAreRunning
     }
     
     var shouldShowLevelGoalsAtStart: Bool {

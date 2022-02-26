@@ -80,8 +80,8 @@ class MainMenu: SKScene {
         return confirmAbandonRun
     }()
     
-    
     override func didMove(to view: SKView) {
+        isAccessibilityElement = false
         background = self.childNode(withName: "background") as? SKSpriteNode
         background.color = UIColor.backgroundGray
         self.removeAllChildren(exclude: ["background"])
@@ -99,6 +99,7 @@ class MainMenu: SKScene {
                                                 horizontalAnchor: .center,
                                                 yOffset: 200.0
         )
+        startButton.makeUITestAccessible(label: "newGame", traits: .button, scene: self)
         startButton.zPosition = 0
         buttonContainer.addChild(startButton)
         

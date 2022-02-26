@@ -45,6 +45,16 @@
                ReferencedContainer = "container:DownFall.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "28AFDFFB27CAC1D700B72B14"
+               BuildableName = "Shift-ShaftUITests.xctest"
+               BlueprintName = "Shift-ShaftUITests"
+               ReferencedContainer = "container:DownFall.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

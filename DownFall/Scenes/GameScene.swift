@@ -151,6 +151,8 @@ class GameScene: SKScene {
     
     override func didMove(to view: SKView) {
         
+        isAccessibilityElement = false
+        
         // preview view
         self.rotatePreview = RotatePreviewView()
     
@@ -163,7 +165,8 @@ class GameScene: SKScene {
                                  levelGoalTracker: levelGoalTracker!,
                                  tutorialConductor: tutorialConductor,
                                  runStatTracker: runStatTracker!,
-                                 numberOfPreviousBossWins:  numberOfPreviousBossWins)
+                                 numberOfPreviousBossWins:  numberOfPreviousBossWins,
+                                 scene: self)
         
         
         // Register for inputs we care about

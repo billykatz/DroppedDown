@@ -55,6 +55,9 @@
 		28A836C6268FE97B00D96C48 /* ProfileCodingClient+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A836C5268FE97B00D96C48 /* ProfileCodingClient+Extensions.swift */; };
 		28AE3AC126A6000600BCE56A /* CodexCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AE3AC026A6000600BCE56A /* CodexCoordinator.swift */; };
 		28AE3AC526A6113900BCE56A /* CodexBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AE3AC426A6113900BCE56A /* CodexBackgroundView.swift */; };
+		28AFDFFF27CAC1D700B72B14 /* Shift_ShaftUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AFDFFE27CAC1D700B72B14 /* Shift_ShaftUITests.swift */; };
+		28AFE00127CAC1D700B72B14 /* Shift_ShaftUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AFE00027CAC1D700B72B14 /* Shift_ShaftUITestsLaunchTests.swift */; };
+		28AFE00727CAC22500B72B14 /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2882DF2827CAB67400149899 /* SnapshotHelper.swift */; };
 		28B7274426A0E90D00F349ED /* CodexView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28B7274326A0E90D00F349ED /* CodexView.swift */; };
 		28C64461273B4CFC00098C3C /* CodexUnlockAtView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28C64460273B4CFC00098C3C /* CodexUnlockAtView.swift */; };
 		28C64463273B540C00098C3C /* CodexBuyButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28C64462273B540C00098C3C /* CodexBuyButton.swift */; };
@@ -233,6 +236,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		28AFE00227CAC1D700B72B14 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DF2924220A37FEE006671AC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3DF2924920A37FEE006671AC;
+			remoteInfo = DownFall;
+		};
 		3DF2926520A37FF0006671AC /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3DF2924220A37FEE006671AC /* Project object */;
@@ -243,6 +253,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2805EAD027CAC01B0043F006 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		280831FB2683A3F600EFAEC3 /* ProfileModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileModel.swift; sourceTree = "<group>"; };
 		280831FD2683A7B000EFAEC3 /* UserDefaults+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Extensions.swift"; sourceTree = "<group>"; };
 		280C354326F50E9400BBE8F7 /* AreaModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AreaModel.swift; sourceTree = "<group>"; };
@@ -276,6 +287,7 @@
 		2881F29227C33D6C00DC83DA /* Bool+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bool+Extensions.swift"; sourceTree = "<group>"; };
 		2882DF0F27C99C2F00149899 /* RuneAnimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneAnimator.swift; sourceTree = "<group>"; };
 		2882DF1527CA963500149899 /* shift-shaft-boss-loop.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "shift-shaft-boss-loop.wav"; sourceTree = "<group>"; };
+		2882DF2827CAB67400149899 /* SnapshotHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SnapshotHelper.swift; path = fastlane/SnapshotHelper.swift; sourceTree = SOURCE_ROOT; };
 		288330F6274FDB400070A1E8 /* ConfirmShuffleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmShuffleView.swift; sourceTree = "<group>"; };
 		2886E83D26F0303B0014FA5D /* SettingsCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsCoordinator.swift; sourceTree = "<group>"; };
 		2886E83F26F030750014FA5D /* UIViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extensions.swift"; sourceTree = "<group>"; };
@@ -289,6 +301,9 @@
 		28A836C5268FE97B00D96C48 /* ProfileCodingClient+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileCodingClient+Extensions.swift"; sourceTree = "<group>"; };
 		28AE3AC026A6000600BCE56A /* CodexCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexCoordinator.swift; sourceTree = "<group>"; };
 		28AE3AC426A6113900BCE56A /* CodexBackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexBackgroundView.swift; sourceTree = "<group>"; };
+		28AFDFFC27CAC1D700B72B14 /* Shift-ShaftUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Shift-ShaftUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		28AFDFFE27CAC1D700B72B14 /* Shift_ShaftUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shift_ShaftUITests.swift; sourceTree = "<group>"; };
+		28AFE00027CAC1D700B72B14 /* Shift_ShaftUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shift_ShaftUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		28B7274326A0E90D00F349ED /* CodexView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexView.swift; sourceTree = "<group>"; };
 		28C64460273B4CFC00098C3C /* CodexUnlockAtView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexUnlockAtView.swift; sourceTree = "<group>"; };
 		28C64462273B540C00098C3C /* CodexBuyButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexBuyButton.swift; sourceTree = "<group>"; };
@@ -471,6 +486,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		28AFDFF927CAC1D700B72B14 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3DF2924720A37FEE006671AC /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -545,6 +567,15 @@
 				2886E84426F197D00014FA5D /* PlayerStatView.swift */,
 			);
 			name = OptionsSwiftUI;
+			sourceTree = "<group>";
+		};
+		28AFDFFD27CAC1D700B72B14 /* Shift-ShaftUITests */ = {
+			isa = PBXGroup;
+			children = (
+				28AFDFFE27CAC1D700B72B14 /* Shift_ShaftUITests.swift */,
+				28AFE00027CAC1D700B72B14 /* Shift_ShaftUITestsLaunchTests.swift */,
+			);
+			path = "Shift-ShaftUITests";
 			sourceTree = "<group>";
 		};
 		28B7274226A0E8FA00F349ED /* Codex */ = {
@@ -751,6 +782,7 @@
 		3D7D8B38225436B60016FE4C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2805EAD027CAC01B0043F006 /* XCTest.framework */,
 				5802613124AFC23300D7CF20 /* CloudKit.framework */,
 				5802612E24AFB78B00D7CF20 /* GameKit.framework */,
 			);
@@ -866,6 +898,7 @@
 			children = (
 				3DF2924C20A37FEE006671AC /* DownFall */,
 				3DF2926720A37FF0006671AC /* DownFallTests */,
+				28AFDFFD27CAC1D700B72B14 /* Shift-ShaftUITests */,
 				3DF2924B20A37FEE006671AC /* Products */,
 				3D7D8B38225436B60016FE4C /* Frameworks */,
 			);
@@ -876,6 +909,7 @@
 			children = (
 				3DF2924A20A37FEE006671AC /* Shift Shaft.app */,
 				3DF2926420A37FF0006671AC /* DownFallTests.xctest */,
+				28AFDFFC27CAC1D700B72B14 /* Shift-ShaftUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -883,6 +917,7 @@
 		3DF2924C20A37FEE006671AC /* DownFall */ = {
 			isa = PBXGroup;
 			children = (
+				2882DF2827CAB67400149899 /* SnapshotHelper.swift */,
 				2882DF1527CA963500149899 /* shift-shaft-boss-loop.wav */,
 				281D43B327AA61F700D00376 /* menu-music.wav */,
 				288BDB2A2788FB1100B8B78C /* boss-background-music.wav */,
@@ -1119,6 +1154,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		28AFDFFB27CAC1D700B72B14 /* Shift-ShaftUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 28AFE00427CAC1D700B72B14 /* Build configuration list for PBXNativeTarget "Shift-ShaftUITests" */;
+			buildPhases = (
+				28AFDFF827CAC1D700B72B14 /* Sources */,
+				28AFDFF927CAC1D700B72B14 /* Frameworks */,
+				28AFDFFA27CAC1D700B72B14 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				28AFE00327CAC1D700B72B14 /* PBXTargetDependency */,
+			);
+			name = "Shift-ShaftUITests";
+			productName = "Shift-ShaftUITests";
+			productReference = 28AFDFFC27CAC1D700B72B14 /* Shift-ShaftUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		3DF2924920A37FEE006671AC /* DownFall */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3DF2927820A37FF0006671AC /* Build configuration list for PBXNativeTarget "DownFall" */;
@@ -1164,10 +1217,14 @@
 		3DF2924220A37FEE006671AC /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 0930;
+				LastSwiftUpdateCheck = 1310;
 				LastUpgradeCheck = 1200;
 				ORGANIZATIONNAME = "William Katz LLC";
 				TargetAttributes = {
+					28AFDFFB27CAC1D700B72B14 = {
+						CreatedOnToolsVersion = 13.1;
+						TestTargetID = 3DF2924920A37FEE006671AC;
+					};
 					3DF2924920A37FEE006671AC = {
 						CreatedOnToolsVersion = 9.3;
 						LastSwiftMigration = 1030;
@@ -1203,11 +1260,19 @@
 			targets = (
 				3DF2924920A37FEE006671AC /* DownFall */,
 				3DF2926320A37FF0006671AC /* DownFallTests */,
+				28AFDFFB27CAC1D700B72B14 /* Shift-ShaftUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		28AFDFFA27CAC1D700B72B14 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3DF2924820A37FEE006671AC /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1256,6 +1321,16 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		28AFDFF827CAC1D700B72B14 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				28AFE00127CAC1D700B72B14 /* Shift_ShaftUITestsLaunchTests.swift in Sources */,
+				28AFDFFF27CAC1D700B72B14 /* Shift_ShaftUITests.swift in Sources */,
+				28AFE00727CAC22500B72B14 /* SnapshotHelper.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3DF2924620A37FEE006671AC /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1461,6 +1536,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		28AFE00327CAC1D700B72B14 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3DF2924920A37FEE006671AC /* DownFall */;
+			targetProxy = 28AFE00227CAC1D700B72B14 /* PBXContainerItemProxy */;
+		};
 		3DF2926620A37FF0006671AC /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 3DF2924920A37FEE006671AC /* DownFall */;
@@ -1480,6 +1560,57 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		28AFE00527CAC1D700B72B14 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = G6N5X5RF9Q;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.babygoatgames.Shift-ShaftUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = DownFall;
+			};
+			name = Debug;
+		};
+		28AFE00627CAC1D700B72B14 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = G6N5X5RF9Q;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.babygoatgames.Shift-ShaftUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = DownFall;
+			};
+			name = Release;
+		};
 		3DF2927620A37FF0006671AC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1692,6 +1823,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		28AFE00427CAC1D700B72B14 /* Build configuration list for PBXNativeTarget "Shift-ShaftUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				28AFE00527CAC1D700B72B14 /* Debug */,
+				28AFE00627CAC1D700B72B14 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		3DF2924520A37FEE006671AC /* Build configuration list for PBXProject "DownFall" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

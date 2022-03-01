@@ -239,7 +239,7 @@ class Level: Codable, Hashable {
             let encasement = potentialEncasementPillarCoords(randomSource: randomSource, encasementChanceModel: chanceModel, numberOfEncasements: 1)
             
             // procs and adds a encasement.  also adds 2 extra pillar
-            if randomSource.procsGivenChance(50) {
+            if randomSource.procsGivenChance(100) {
                 var tiles: [LevelStartTiles] = []
                 tiles.append(contentsOf: encasement)
                 
@@ -248,7 +248,7 @@ class Level: Codable, Hashable {
                 tiles.append(contentsOf: randomSource.chooseElements(choose: 2, fromArray: highLevelPillars))
                 levelStartTiles = tiles
             } else {
-                levelStartTiles = highLevelPillars(randomSource: randomSource, avoid: encasement)
+                levelStartTiles = highLevelPillars(randomSource: randomSource)
             }
             
             
@@ -783,7 +783,7 @@ class Level: Codable, Hashable {
         // filter out any set of coords that contains someone from avoid
         let possibleCoords = allCoords.filter { coords in
             return coords.allSatisfy { coord in
-                avoid
+                !avoid
                     .map { $0.tileCoord }
                     .contains(coord)
             }

@@ -17,6 +17,11 @@ struct PauseState: GameState {
             return AnyGameState(PlayState())
         case .runeReplaced, .foundRuneDiscarded, .noMoreMovesConfirm:
             return AnyGameState(ComputingState())
+        case .gameWin:
+            #if DEBUG
+            return AnyGameState(WinState())
+            #endif
+            return nil
         default:
             return nil
         }

@@ -51,7 +51,11 @@ class CodexCoordinator {
     }
     
     func updateUnlockable(_ unlockable: Unlockable) {
-        profileViewModel?.updateUnlockables(unlockable)
+        profileViewModel?.purchaseUnlockables(unlockable)
+    }
+    
+    func didTapOn(_ unlockable: Unlockable) {
+        profileViewModel?.didTapOnUnlockable(unlockable)
     }
     
     func startRunPressed() {

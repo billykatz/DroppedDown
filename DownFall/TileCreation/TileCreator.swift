@@ -368,35 +368,32 @@ class TileCreator: TileStrategy {
         }
         
         // place the pillars
-        var pillarCoordinates: Set<TileCoord> = Set(level.pillarCoordinates.map { $0.coord })
-        for (pillar) in level.pillarCoordinates {
-            tiles[pillar.coord.row][pillar.coord.column] = Tile(type: pillar.pillar)
-        }
+        var reservedCoordinates: Set<TileCoord> = Set()
         
         // reserve special level start tile coords
-        for levelStartTile in level.levelStartTiles {
+        let levelStartTiles = level.createLevelStartTiles(playerData: playerData)
+        for levelStartTile in levelStartTiles {
             if case TileType.monster(let monster) = levelStartTile.tileType,
                 let entity = entities.entity(with: monster.type) {
                 tiles[levelStartTile.tileCoord.row][levelStartTile.tileCoord.col] = Tile(type: TileType.monster(entity))
             } else {
                 tiles[levelStartTile.tileCoord.row][levelStartTile.tileCoord.col] = Tile(type: levelStartTile.tileType)
             }
-            pillarCoordinates.insert(levelStartTile.tileCoord)
+            reservedCoordinates.insert(levelStartTile.tileCoord)
         }
         
         // place the player in a quadrant
         let playerQuadrant = Quadrant.allCases[Int.random(Quadrant.allCases.count)]
-        let playerPosition = playerQuadrant.randomCoord(for: boardSize, notIn: pillarCoordinates)
+        let playerPosition = playerQuadrant.randomCoord(for: boardSize, notIn: reservedCoordinates)
         
         
-        //
+        // place the player in the board
         tiles[playerPosition.x][playerPosition.y] = Tile(type: .player(playerData))
-        //        tiles[3][7] = Tile(type: .player(playerData))
         
         
         // reserve all positions so we don't overwrite any one position multiple times
         var reservedSet = Set<TileCoord>([playerPosition, playerPosition.colLeft, playerPosition.colRight, playerPosition.rowAbove, playerPosition.rowBelow])
-        reservedSet.formUnion(pillarCoordinates)
+        reservedSet.formUnion(reservedCoordinates)
         // add monsters
         for _ in 0..<level.monsterCountStart {
             let randomTileCoord = randomCoord(notIn: reservedSet)
@@ -417,18 +414,6 @@ class TileCreator: TileStrategy {
             
             tiles[exitPosition.x][exitPosition.y] = Tile(type: .exit(blocked: true))
         }
-        
-        // Quick testing for game recap screen
-        //        let data = entities.entity(with: .alamo)!
-        //        tiles[playerPosition.row+1][playerPosition.column] = Tile(type: .monster(data))
-        
-        // quick testing gem collectin
-        //        tiles[3][6] = Tile(type: .item(Item.init(type: .gem, amount: 10, color: .blue)))
-        //        tiles[3][5] = Tile(type: .item(Item.init(type: .gem, amount: 50, color: .red)))
-        //        tiles[3][4] = Tile(type: .item(Item.init(type: .gem, amount: 100, color: .purple)))
-        //        tiles[3][3] = Tile(type: .item(Item.init(type: .gem, amount: 250, color: .blue)))
-        //        tiles[3][2] = Tile(type: .item(Item.init(type: .gem, amount: 5, color: .red)))
-        //        tiles[3][1] = Tile(type: .item(Item.init(type: .gem, amount: 25, color: .purple)))
         
         return (tiles, true)
     }

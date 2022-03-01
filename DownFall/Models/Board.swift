@@ -644,51 +644,10 @@ class Board: Equatable {
         return Set<TileCoord>(tileCoords)
     }
     
-    //    private func randomItem(in tier: Int, excludeRunesInPickaxe pickaxe: Pickaxe) -> StoreOffer {
-    //        let offersInTier = self.level.potentialItems.filter { $0.tierIndex == tier }
-    //        let randomNumber = Int.random(abs(tileCreator.randomSource.nextInt())) % offersInTier.count
-    //        let randomItem = offersInTier[randomNumber]
-    //
-    //        if let rune = randomItem.rune, pickaxe.runes.contains(rune) {
-    //            // repeat until we get one that the current pickaxe doesnt contain.
-    //            return self.randomItem(in: tier, excludeRunesInPickaxe: pickaxe)
-    //        } else {
-    //            return randomItem
-    //        }
-    //    }
-    
     private func randomTwoItem(in tier: Int, excludeRunesInPickaxe pickaxe: Pickaxe) -> [StoreOffer] {
-        let offersInTier = self.level.potentialItems.filter { $0.tierIndex == tier }
-        
-        // store two unique random items
-        var randomNumbersSet = Set<Int>()
-        
-        // grab two unique random numbers
-        while randomNumbersSet.count < 2 {
-            let randomNumber = Int.random(abs(tileCreator.randomSource.nextInt())) % offersInTier.count
-            randomNumbersSet.insert(randomNumber)
-        }
-        
-        let randomNumbers = Array(randomNumbersSet)
-        
-        // store two random items
-        var randomItems : [StoreOffer] = []
-        
-        // get two random items
-        var count = 0
-        while randomItems.count < 2 {
-            let index = randomNumbers[count]
-            let randomItem = offersInTier[index]
-            if let rune = randomItem.rune, pickaxe.runes.contains(rune) {
-                // dont choose an item the player already has
-                continue
-            }
-            count += 1
-            randomItems.append(randomItem)
-        }
-        
-        // finally return the random items.
-        return randomItems
+        guard let pp = playerPosition, case let TileType.player(playerData) = tiles[pp].type else { return [] }
+        let offersInTier = self.level.itemsInTier(tier+1, playerData: playerData)
+        return offersInTier
     }
     
     

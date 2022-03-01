@@ -201,5 +201,8 @@ class CodexViewModel: ObservableObject {
         return value
     }
     
+    func didTapOnCodexItem(at index: Int) {
+        codexCoordinator?.didTapOn(unlockables[index])
+    }
     
 }

@@ -58,6 +58,7 @@
 		28AFDFFF27CAC1D700B72B14 /* Shift_ShaftUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AFDFFE27CAC1D700B72B14 /* Shift_ShaftUITests.swift */; };
 		28AFE00127CAC1D700B72B14 /* Shift_ShaftUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AFE00027CAC1D700B72B14 /* Shift_ShaftUITestsLaunchTests.swift */; };
 		28AFE00727CAC22500B72B14 /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2882DF2827CAB67400149899 /* SnapshotHelper.swift */; };
+		28AFE00927CD60A400B72B14 /* Unlockables+Debug.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AFE00827CD60A400B72B14 /* Unlockables+Debug.swift */; };
 		28B7274426A0E90D00F349ED /* CodexView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28B7274326A0E90D00F349ED /* CodexView.swift */; };
 		28C64461273B4CFC00098C3C /* CodexUnlockAtView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28C64460273B4CFC00098C3C /* CodexUnlockAtView.swift */; };
 		28C64463273B540C00098C3C /* CodexBuyButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28C64462273B540C00098C3C /* CodexBuyButton.swift */; };
@@ -304,6 +305,7 @@
 		28AFDFFC27CAC1D700B72B14 /* Shift-ShaftUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Shift-ShaftUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		28AFDFFE27CAC1D700B72B14 /* Shift_ShaftUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shift_ShaftUITests.swift; sourceTree = "<group>"; };
 		28AFE00027CAC1D700B72B14 /* Shift_ShaftUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shift_ShaftUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		28AFE00827CD60A400B72B14 /* Unlockables+Debug.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Unlockables+Debug.swift"; sourceTree = "<group>"; };
 		28B7274326A0E90D00F349ED /* CodexView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexView.swift; sourceTree = "<group>"; };
 		28C64460273B4CFC00098C3C /* CodexUnlockAtView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexUnlockAtView.swift; sourceTree = "<group>"; };
 		28C64462273B540C00098C3C /* CodexBuyButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexBuyButton.swift; sourceTree = "<group>"; };
@@ -1112,6 +1114,7 @@
 				2842BAC026A0EEC10021CD0B /* StoreOfferType.swift */,
 				283F21F826E30D5200108D4D /* ProgressableModel.swift */,
 				2842570526EF2ACB00C96CCC /* Unlockables.swift */,
+				28AFE00827CD60A400B72B14 /* Unlockables+Debug.swift */,
 				2834737E26E94CFC0096F3DE /* StatsModel.swift */,
 				5893899E245E7D0E00350A2E /* StoreOffer.swift */,
 				3D2C757422C854F8009ABD36 /* ItemModel.swift */,
@@ -1447,6 +1450,7 @@
 				284F2EC32731DB3C00032088 /* FTUEConductor.swift in Sources */,
 				3D06390322EEB50C00C4D5E9 /* PlayState.swift in Sources */,
 				3DD36ECB21E5B86100AC4873 /* TileStrategy.swift in Sources */,
+				28AFE00927CD60A400B72B14 /* Unlockables+Debug.swift in Sources */,
 				3DB0CEE9239DB072002A8FF3 /* GameScope.swift in Sources */,
 				3D90AAD321D8869200C7428A /* Referee.swift in Sources */,
 				5894A45424C5FFCD00FBF839 /* AbilityModel.swift in Sources */,
@@ -1734,7 +1738,7 @@
 				CODE_SIGN_ENTITLEMENTS = "DownFall/Shift Shaft.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 43;
+				CURRENT_PROJECT_VERSION = 44;
 				DEVELOPMENT_TEAM = G6N5X5RF9Q;
 				INFOPLIST_FILE = DownFall/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
@@ -1758,7 +1762,7 @@
 				CODE_SIGN_ENTITLEMENTS = "DownFall/Shift Shaft.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 43;
+				CURRENT_PROJECT_VERSION = 44;
 				DEVELOPMENT_TEAM = G6N5X5RF9Q;
 				INFOPLIST_FILE = DownFall/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;

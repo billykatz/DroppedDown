@@ -211,13 +211,13 @@ class HUD: SKSpriteNode {
             guard let updatedPlayerData = updatedPlayerData else {
                 return
             }
-            let maxHealthGain = min(2, updatedPlayerData.originalHp - updatedPlayerData.hp)
+            let maxHealthGain = min(offer.healAmount, updatedPlayerData.originalHp - updatedPlayerData.hp)
             showIncreaseInStat(offerType: offer, amountIncrease: maxHealthGain)
         case .lesserHeal:
             guard let updatedPlayerData = updatedPlayerData else {
                 return
             }
-            let maxHealthGain = min(1, updatedPlayerData.originalHp - updatedPlayerData.hp)
+            let maxHealthGain = min(offer.healAmount, updatedPlayerData.originalHp - updatedPlayerData.hp)
             showIncreaseInStat(offerType: offer, amountIncrease: maxHealthGain)
         case .plusTwoMaxHealth:
             showIncreaseInStat(offerType: offer, amountIncrease: 2)

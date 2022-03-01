@@ -108,6 +108,26 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
         }
     }
     
+    var healAmount: Int{
+        switch self {
+        case .greaterHeal:
+            return 3
+        case .lesserHeal:
+            return 2
+        default:
+            return 0
+        }
+    }
+    
+    var isAHealingOption: Bool {
+        switch self {
+        case .greaterHeal, .lesserHeal, .plusOneMaxHealth, .plusTwoMaxHealth:
+            return true
+        default:
+            return false
+        }
+    }
+    
     var numberOfTargets: Int {
         switch self {
         case .liquifyMonsters:

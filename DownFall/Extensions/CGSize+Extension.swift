@@ -23,6 +23,13 @@ extension CGSize {
     
     static let buttonMainMenu = CGSize(width: 410, height: 202.5)
     
+    var fullScreenSize: CGSize {
+        let maxAspectRatio : CGFloat = 19.5/9.0
+        let fullWidth = height * maxAspectRatio
+        return CGSize(width: fullWidth, height: height)
+
+    }
+    
     var playableRect: CGRect {
         /// This is a special ratio based on the iPhoneX ratio.  However we also account for the safe areas so we dont show anything too close to the top or bottom of the screen.  The side safe areas are ignored because we dont put anything useful in those areas to begin with
         let maxAspectRatio : CGFloat = 19.5/9.0

@@ -117,7 +117,7 @@ class RunModel: Codable, Equatable {
             #endif
             nextDepth = nextDepthNumber
         }
-        let nextLevel = LevelConstructor.buildLevel(depth: nextDepth, randomSource: randomSource, playerData: player, unlockables: unlockables, startingUnlockables: startingUnlockables, isTutorial: isTutorial)
+        let nextLevel = LevelConstructor.buildLevel(depth: nextDepth, randomSource: randomSource, playerData: player, unlockables: unlockables, startingUnlockables: startingUnlockables, isTutorial: isTutorial, randomSeed: randomSource.seed)
         let nextArea = Area(depth: nextDepth, type: .level(nextLevel))
         areas.append(nextArea)
         return nextArea

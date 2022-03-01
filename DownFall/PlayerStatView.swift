@@ -246,17 +246,17 @@ struct ResetDataView: View {
             Text("Delete All Data")
         }
         Button(action: {
-            UserDefaults.standard.setValue(false, forKey: UserDefaults.hasStartedTutorialKey)
-            UserDefaults.standard.setValue(false, forKey: UserDefaults.hasCompletedTutorialKey)
-            UserDefaults.standard.setValue(false, forKey: UserDefaults.hasDiedDuringTutorialKey)
-            UserDefaults.standard.setValue(false, forKey: UserDefaults.hasLaunchedBeforeKey)
-            UserDefaults.standard.setValue(false, forKey: UserDefaults.hasSkippedTutorialKey)
+            UserDefaults.standard.removeObject(forKey: UserDefaults.hasStartedTutorialKey)
+            UserDefaults.standard.removeObject(forKey: UserDefaults.hasCompletedTutorialKey)
+            UserDefaults.standard.removeObject(forKey: UserDefaults.hasDiedDuringTutorialKey)
+            UserDefaults.standard.removeObject(forKey: UserDefaults.hasLaunchedBeforeKey)
+            UserDefaults.standard.removeObject(forKey: UserDefaults.hasSkippedTutorialKey)
             
             
             
-            UserDefaults.standard.setValue(false, forKey: UserDefaults.shouldShowCompletedTutorialKey)
+            UserDefaults.standard.removeObject(forKey: UserDefaults.shouldShowCompletedTutorialKey)
             
-            UserDefaults.standard.setValue(false, forKey: UserDefaults.hasSeenCompletedTutorialKey)
+            UserDefaults.standard.removeObject(forKey: UserDefaults.hasSeenCompletedTutorialKey)
 
 
             
@@ -312,6 +312,9 @@ struct PlayerStatsView: View {
     var body: some View {
         ScrollView{
 #if DEBUG
+ResetDataView(action: viewModel.deletePlayerData)
+#endif
+#if DEBUG
             MusicIntroFadeInDurationView()
 #endif
             #if DEBUG
@@ -349,9 +352,6 @@ struct PlayerStatsView: View {
                 playerStatistics = profile.stats
                 gemAmount = viewModel.gemAmount
             })
-            #if DEBUG
-            ResetDataView(action: viewModel.deletePlayerData)
-            #endif
         }
     }
 }

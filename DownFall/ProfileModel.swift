@@ -14,7 +14,7 @@ class Profile: Codable, Equatable {
         return lhs.name == rhs.name
     }
 
-    static var debugProfile = Profile(name: "debug", player: .lotsOfCash, currentRun: nil, stats: Statistics.startingStats, unlockables: Unlockable.unlockables, startingUnlockbles: [])
+    static var debugProfile = Profile(name: "debug", player: .lotsOfCash, currentRun: nil, stats: Statistics.startingStats, unlockables: Unlockable.debugUnlockables, startingUnlockbles: [])
     
     static var zero = Profile(name: "zero", player: .zero, currentRun: nil, stats: [], unlockables: [], startingUnlockbles: [])
     
@@ -172,6 +172,16 @@ class Profile: Codable, Equatable {
         return Profile(name: name, player: player, currentRun: currentRun, stats: stats, unlockables: newUnlockables, startingUnlockbles: newStartingUnlockables)
         
     }
+    
+    func didTapOnUnlockable(_ unlockable: Unlockable) -> Profile {
+        guard let index = unlockables.firstIndex(of: unlockable) else { preconditionFailure("Unlockable must be in the array") }
+        var newUnlockables = unlockables
+        newUnlockables[index] = unlockable.didTapOn()
+        
+        return Profile(name: name, player: player, currentRun: currentRun, stats: stats, unlockables: newUnlockables, startingUnlockbles: startingUnlockbles)
+        
+    }
+
     
     func updateUnlockables(_ newUnlockable: Unlockable) -> Profile {
         guard let index = unlockables.firstIndex(of: newUnlockable) else { preconditionFailure("Unlockable must be in the array") }

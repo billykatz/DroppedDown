@@ -229,7 +229,7 @@ class DialogueOverlay: SKSpriteNode {
         }
         self.dialogueView = dialogueView
         
-        super.init(texture: nil, color: .clear, size: playableRect.size)
+        super.init(texture: nil, color: .clear, size: playableRect.size.fullScreenSize)
         
         self.isUserInteractionEnabled = true
         self.zPosition = 100_000_000_000

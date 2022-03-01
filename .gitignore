@@ -32,6 +32,7 @@
 * Files I would Like to ignore
 Sprites/
 Builds/
+fastlane/*
 
 
 #####

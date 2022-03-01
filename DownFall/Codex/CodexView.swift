@@ -72,6 +72,7 @@ struct CodexView: View {
             let index = viewModel.unlockables.firstIndex(of: unlockable)!
             CodexItemView(viewModel: viewModel, index: index)
                 .onTapGesture {
+                    viewModel.didTapOnCodexItem(at: index)
                     selectedIndex = index
                     showModal.toggle()
                 }
@@ -155,12 +156,14 @@ struct CodexView: View {
                 }
                 .overlay(
                     VStack {
-                        Spacer()
-                        Text("")
-                            .frame(width: 500, height: 200, alignment: .bottom)
-                            .background(
-                                LinearGradient(gradient: Gradient(colors: [.clear, .black]), startPoint: .top, endPoint: .bottom)
-                                )
+//                        GeometryReader { reader in
+                            Spacer()
+                            Text("")
+                            .frame(width: UIScreen.main.bounds.size.width, height: 200, alignment: .bottom)
+                                .background(
+                                    LinearGradient(gradient: Gradient(colors: [.clear, .black]), startPoint: .top, endPoint: .bottom)
+                                    )
+//
                     }
                 )
                 .padding(.horizontal)

@@ -77,10 +77,10 @@ struct StoreOffer: Codable, Hashable, Identifiable {
         let effect: EffectModel
         switch self.type {
         case .lesserHeal:
-            effect = EffectModel(kind: .buff, stat: .health, amount: 1, duration: Int.max)
+            effect = EffectModel(kind: .buff, stat: .health, amount: 2, duration: Int.max)
             
         case .greaterHeal:
-            effect = EffectModel(kind: .buff, stat: .health, amount: 2, duration: Int.max)
+            effect = EffectModel(kind: .buff, stat: .health, amount: 3, duration: Int.max)
             
         case .plusOneMaxHealth:
             effect = EffectModel(kind: .buff, stat: .maxHealth, amount: 1, duration: Int.max)
@@ -199,13 +199,13 @@ extension StoreOffer {
             
         case .lesserHeal:
             title = "Lesser Healing Potion"
-            body = "Heals 1 HP."
+            body = "Heals \(type.healAmount) HP."
             textureName = "lesserHealingPotion"
             spriteSheetName = "lesserHealingPotionSpriteSheet"
             
         case .greaterHeal:
             title = "Greater Healing Potion"
-            body = "Heals 2 HP."
+            body = "Heals \(type.healAmount) HP."
             textureName = "greaterHealingPotion"
             spriteSheetName = "greaterHealingPotionSpriteSheet"
             

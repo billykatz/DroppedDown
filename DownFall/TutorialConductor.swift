@@ -331,6 +331,8 @@ class TutorialConductor {
             // send it to the queue
             InputQueue.append(.init(.tutorialPhaseStart(phase)))
         } else if oldPhase == .thisIsTheExit {
+            
+            // This input is not sent to the InputQueue because the LevelGoalTracker is listening for this phase to display the level goal detail view
             self.phase = .theseAreLevelGoals
         } else if oldPhase == .theseAreLevelGoals {
             self.phase = .theseAreLevelGoalsInTheHud

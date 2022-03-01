@@ -117,7 +117,7 @@ class RunModel: Codable, Equatable {
             #endif
             nextDepth = nextDepthNumber
         }
-        let nextLevel = LevelConstructor.buildLevel(depth: nextDepth, randomSource: randomSource, playerData: player, unlockables: unlockables, startingUnlockables: startingUnlockables, isTutorial: isTutorial, randomSeed: randomSource.seed)
+        let nextLevel = LevelConstructor.buildLevel(depth: nextDepth, randomSource: randomSource, playerData: player, unlockables: unlockables, startingUnlockables: startingUnlockables, isTutorial: isTutorial, randomSeed: randomSource.seed, runModel: self)
         let nextArea = Area(depth: nextDepth, type: .level(nextLevel))
         areas.append(nextArea)
         return nextArea
@@ -130,5 +130,27 @@ class RunModel: Codable, Equatable {
             }
         }
         return 0
+    }
+    
+    func pastLevelStartTiles(currentDepth: Int) -> [LevelStartTiles] {
+        var levelStartTiles: [LevelStartTiles] = []
+        for area in areas {
+            if case AreaType.level(let level) = area.type,
+               level.depth != currentDepth {
+                levelStartTiles.append(contentsOf: level.levelStartTiles)
+            }
+        }
+        return levelStartTiles
+    }
+    
+    func lastLevelStartTiles(currentDepth: Int) -> [LevelStartTiles] {
+        var levelStartTiles: [LevelStartTiles] = []
+        for area in areas {
+            if case AreaType.level(let level) = area.type,
+               level.depth == currentDepth - 1 {
+                levelStartTiles.append(contentsOf: level.levelStartTiles)
+            }
+        }
+        return levelStartTiles
     }
 }

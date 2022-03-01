@@ -14,3 +14,61 @@ extension GKLinearCongruentialRandomSource {
     }
 }
 
+extension GKLinearCongruentialRandomSource {
+    func procsGivenChance(_ chance: Float) -> Bool {
+        let nextFloat = nextUniform()
+        if chance >= nextFloat * 100 {
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    func chooseElement<Element>(_ array: [Element]) -> Element? {
+        guard !array.isEmpty else { return nil }
+        let nextFloat = nextUniform()
+        let totalChances = Float(array.count) * nextFloat
+        let chosenIndex =  Int(totalChances.rounded(.towardZero))
+        return array[chosenIndex]
+    }
+    
+    func chooseElements<Element>(choose: Int, fromArray array: [Element]) -> [Element] where Element: Equatable {
+        guard !array.isEmpty else { return [] }
+        var chosenElements: [Element] = []
+        var chooseFromArray = array
+        var maxTries = 30
+        while !chooseFromArray.isEmpty && maxTries > 0 && chosenElements.count < choose {
+            if let nextElement = chooseElement(chooseFromArray) {
+                chosenElements.append(nextElement)
+                if let idx = chosenElements.firstIndex(where: { element in
+                    return element == nextElement
+                }) {
+                    chooseFromArray.remove(at: idx)
+                }
+            } else {
+                maxTries -= 1
+            }
+        }
+        return chosenElements
+    }
+    
+    func chooseElementWithChance<Element>(_ array: [Element]) -> Element? where Element: ChanceModel {
+        guard !array.isEmpty else { return nil }
+        let nextFloat = nextUniform()
+        
+        let totalChances = array.reduce(0, { prev, current in return prev + current.chance }) * nextFloat
+        var chosenNumber = totalChances.rounded(.towardZero)
+        
+        // we want teh current chance number to encompassment the valid remainging
+        for chanceModel in array {
+            if chanceModel.chance >= chosenNumber {
+                return chanceModel
+            } else {
+                chosenNumber -= chanceModel.chance
+            }
+        }
+        
+        return array.last!
+    }
+}
+

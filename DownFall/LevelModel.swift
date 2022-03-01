@@ -8,110 +8,15 @@
 
 import SpriteKit
 import GameplayKit
-import AVFoundation
-
-class ChanceModel {
-    let tileType: TileType
-    let chance: Float
-    
-    init(tileType: TileType, chance: Float) {
-        self.tileType = tileType
-        self.chance = chance
-    }
-}
-
-struct EncasementCoords {
-    let middleTile: TileCoord
-    let outerTiles: [TileCoord]
-}
-
-extension GKLinearCongruentialRandomSource {
-    func procsGivenChance(_ chance: Float) -> Bool {
-        let nextFloat = nextUniform()
-        if chance >= nextFloat * 100 {
-            return true
-        } else {
-            return false
-        }
-    }
-    
-    func chooseElement<Element>(_ array: [Element]) -> Element {
-        let nextFloat = nextUniform()
-        let totalChances = Float(array.count) * nextFloat
-        let chosenIndex =  Int(totalChances.rounded(.towardZero))
-        return array[chosenIndex]
-    }
-    
-    func chooseElementWithChance<Element>(_ array: [Element]) -> Element? where Element: ChanceModel {
-        guard !array.isEmpty else { return nil }
-        let nextFloat = nextUniform()
-        
-        let totalChances = array.reduce(0, { prev, current in return prev + current.chance }) * nextFloat
-        var chosenNumber = totalChances.rounded(.towardZero)
-        
-        // we want teh current chance number to encompassment the valid remainging
-        for chanceModel in array {
-            if chanceModel.chance >= chosenNumber {
-                return chanceModel
-            } else {
-                chosenNumber -= chanceModel.chance
-            }
-        }
-        
-        return array.last!
-    }
-}
-
-enum LevelGoalType: String, Codable, Hashable {
-    case unlockExit
-    case useRune
-    case destroyBoss
-}
-
-struct LevelGoal: Codable, Hashable {
-    let type: LevelGoalType
-    let tileType: TileType
-    let targetAmount: Int
-    let minimumGroupSize: Int
-    let grouped: Bool
-    
-    static func bossGoal() -> LevelGoal {
-        return LevelGoal(type: .destroyBoss, tileType: .empty, targetAmount: 1, minimumGroupSize: 1, grouped: false)
-    }
-    
-    static func gemGoal(amount: Int) -> LevelGoal {
-        return LevelGoal(type: .unlockExit, tileType: .gem, targetAmount: amount, minimumGroupSize: 1, grouped: false)
-    }
-    
-    static func killMonsterGoal(amount: Int) -> LevelGoal {
-        return LevelGoal(type: .unlockExit, tileType: .monster(.zeroedEntity(type: .rat)), targetAmount: amount, minimumGroupSize: 1, grouped: false)
-    }
-    
-    static func pillarGoal(amount: Int) -> LevelGoal {
-        return LevelGoal(type: .unlockExit, tileType: .pillar(PillarData(color: .blue, health: 1)), targetAmount: amount, minimumGroupSize: 1, grouped: false)
-    }
-    
-    static func useRuneGoal(amount: Int) -> LevelGoal {
-        return LevelGoal(type: .useRune, tileType: .empty, targetAmount: amount, minimumGroupSize: 1, grouped: false)
-    }
-}
-
-struct LevelStartTiles: Codable, Hashable {
-    let tileType: TileType
-    let tileCoord: TileCoord
-    
-    init(tileType: TileType, tileCoord: TileCoord) {
-        self.tileType = tileType
-        self.tileCoord = tileCoord
-    }
-    
-    init(_ tuple: (TileType, TileCoord)) {
-        self.tileType = tuple.0
-        self.tileCoord = tuple.1
-    }
-}
 
 class Level: Codable, Hashable {
+    
+    static func ==(_ lhs: Level, _ rhs: Level) -> Bool {
+        return lhs.depth == rhs.depth && lhs.randomSeed == rhs.randomSeed
+    }
+    
+    static let zero = Level(depth: 0, monsterTypeRatio: [:], monsterCountStart: 0, maxMonsterOnBoardRatio: 0.0, boardSize: 0, tileTypeChances: TileTypeChanceModel(chances: [.empty: 1]), goals: [LevelGoal(type: .unlockExit, tileType: .empty, targetAmount: 0, minimumGroupSize: 0, grouped: false)], maxSpawnGems: 0, goalProgress: [], savedBossPhase: nil, gemsSpawned: 0, monsterSpawnTurnTimer: 0, startingUnlockables: [], otherUnlockables: [], randomSeed: 12345, isTutorial: false, runModel: nil)
+    
     let depth: Depth
     let monsterTypeRatio: [EntityModel.EntityType: RangeModel]
     let monsterCountStart: Int
@@ -128,6 +33,46 @@ class Level: Codable, Hashable {
     let otherUnlockables: [Unlockable]
     let randomSeed: UInt64
     let isTutorial: Bool
+    weak var runModel: RunModel?
+    
+    var levelStartTiles: [LevelStartTiles] = []
+    
+    public var bossLevelStartTiles: [LevelStartTiles] {
+        let toughMonster: EntityModel.EntityType = Bool.random() ? .bat : .sally
+        let goodReward = TileType.item(Item(type: .gem, amount: 100, color: .blue))
+        
+        let coord1 = TileCoord(6, 4)
+        let coord2 = TileCoord(2, 4)
+        let coords = [coord1, coord2]
+        
+        let monsterEntity = EntityModel(originalHp: 1, hp: 1, name: toughMonster.textureString, attack: .zero, type: toughMonster, carry: .zero, animations: [], pickaxe: nil, effects: [], dodge: 0, luck: 0, killedBy: nil)
+        
+        let (newCoords, element) = coords.dropRandom()
+        let monsterStartTile = LevelStartTiles(tileType: TileType.monster(monsterEntity), tileCoord: element!)
+        
+        let rewardStartTile = LevelStartTiles(tileType: goodReward, tileCoord: newCoords.first!)
+        
+        let newPillarCoords: [TileCoord] = [
+            TileCoord(7, 4), TileCoord(5, 4), TileCoord(6, 3), TileCoord(6, 5),
+            TileCoord(3, 4), TileCoord(1, 4), TileCoord(2, 3), TileCoord(2, 5),
+        ]
+        
+        var pillarCoords = matchupPillarsRandomly(coordinatess: newPillarCoords)
+        
+        pillarCoords.append(monsterStartTile)
+        pillarCoords.append(rewardStartTile)
+        
+        return pillarCoords
+        
+    }
+
+    public var isBossLevel: Bool {
+        return bossLevelDepthNumber == depth
+    }
+    
+    public var humanReadableDepth: String {
+        return "\(depth + 1)"
+    }
     
     init(
         depth: Depth,
@@ -145,7 +90,8 @@ class Level: Codable, Hashable {
         startingUnlockables: [Unlockable],
         otherUnlockables: [Unlockable],
         randomSeed: UInt64,
-        isTutorial: Bool
+        isTutorial: Bool,
+        runModel: RunModel?
         
     ) {
         self.depth = depth
@@ -164,37 +110,17 @@ class Level: Codable, Hashable {
         self.otherUnlockables = otherUnlockables
         self.randomSeed = randomSeed
         self.isTutorial = isTutorial
-    }
-    
-    static func ==(_ lhs: Level, _ rhs: Level) -> Bool {
-        return lhs.depth == rhs.depth
+        self.runModel = runModel
     }
     
     func hash(into hasher: inout Hasher) {
         hasher.combine(depth)
     }
     
-    var hasExit: Bool {
-        return true
-    }
+    // MARK: - Public Methods
     
-    var spawnsMonsters: Bool {
-        return true
-    }
     
-    var isBossLevel: Bool {
-        return bossLevelDepthNumber == depth
-    }
-    
-    var humanReadableDepth: String {
-        return "\(depth + 1)"
-    }
-    
-    private var numberOfIndividualColumns: Int {
-        return 0
-    }
-    
-    func monsterChanceOfShowingUp(tilesSinceMonsterKilled: Int) -> Int {
+    public func monsterChanceOfShowingUp(tilesSinceMonsterKilled: Int) -> Int {
         switch depth {
         case 0,1:
             if tilesSinceMonsterKilled < 20 {
@@ -241,13 +167,145 @@ class Level: Codable, Hashable {
         }
     }
     
-    static let zero = Level(depth: 0, monsterTypeRatio: [:], monsterCountStart: 0, maxMonsterOnBoardRatio: 0.0, boardSize: 0, tileTypeChances: TileTypeChanceModel(chances: [.empty: 1]), goals: [LevelGoal(type: .unlockExit, tileType: .empty, targetAmount: 0, minimumGroupSize: 0, grouped: false)], maxSpawnGems: 0, goalProgress: [], savedBossPhase: nil, gemsSpawned: 0, monsterSpawnTurnTimer: 0, startingUnlockables: [], otherUnlockables: [], randomSeed: 12345, isTutorial: false)
+    /// func to create different configurations of level start tiles
+    public func createLevelStartTiles(playerData: EntityModel) -> [LevelStartTiles] {
+        let randomSource = GKLinearCongruentialRandomSource(seed: randomSeed)
+        let lastLevelStartTiles = runModel?.lastLevelStartTiles(currentDepth: depth)
+        var levelStartTiles: [LevelStartTiles] = []
+        
+        switch depth {
+        case 0,1,2:
+            levelStartTiles = []
+            
+        case 3:
+            // 2 pillars
+            levelStartTiles = lowLevelPillars(randomSource: randomSource)
+            
+        case 4:
+            // 50% chance to have just a pair of columns
+            if randomSource.procsGivenChance(50) {
+                // then create 4 pillars with something inside
+                let chanceModel: [ChanceModel] = [.init(tileType: .offer(.offer(type: .lesserHeal, tier: 3)), chance: 50), .init(tileType: .item(.init(type: .gem, amount: 25)), chance: 50)]
+                let encasement = potentialEncasementPillarCoords(randomSource: randomSource, encasementChanceModel: chanceModel, numberOfEncasements: 1)
+                levelStartTiles = encasement
+            } else {
+                levelStartTiles = lowLevelPillars(randomSource: randomSource)
+            }
+            
+        case 5:
+            // spawn encasement
+            if randomSource.procsGivenChance(66) {
+                // then create 4 pillars with something inside
+                let toughMonster: EntityModel.EntityType = .bat
+                let monsterEntity = EntityModel(originalHp: 1, hp: 1, name: toughMonster.textureString, attack: .zero, type: toughMonster, carry: .zero, animations: [], pickaxe: nil, effects: [], dodge: 0, luck: 0, killedBy: nil)
+                let randomRune = randomRune(playerData: playerData)
+                let chanceModel: [ChanceModel] = [
+                    .init(tileType: .offer(.offer(type: .rune(randomRune.rune ?? .zero), tier: 3)), chance: 30),
+                    .init(tileType: .item(.init(type: .gem, amount: 50)), chance: 30),
+                    .init(tileType: .monster(monsterEntity), chance: 15),
+                    .init(tileType: .empty, chance: 25),
+                ]
+                let encasement = potentialEncasementPillarCoords(randomSource: randomSource, encasementChanceModel: chanceModel, numberOfEncasements: 1)
+                levelStartTiles = encasement
+            } else {
+                levelStartTiles = midLevelPillars(randomSource: randomSource)
+            }
+            
+        case 6:
+            // spawn encasement
+            if randomSource.procsGivenChance(66) {
+                // then create 4 pillars with something inside
+                let toughMonster: EntityModel.EntityType = .bat
+                let monsterEntity = EntityModel(originalHp: 1, hp: 1, name: toughMonster.textureString, attack: .zero, type: toughMonster, carry: .zero, animations: [], pickaxe: nil, effects: [], dodge: 0, luck: 0, killedBy: nil)
+                let chanceModel: [ChanceModel] = [
+                    .init(tileType: .exit(blocked: true), chance: 50),
+                    .init(tileType: .monster(monsterEntity), chance: 50),
+                ]
+                let encasement = potentialEncasementPillarCoords(randomSource: randomSource, encasementChanceModel: chanceModel, numberOfEncasements: 1)
+                levelStartTiles = encasement
+            } else {
+                levelStartTiles = midLevelPillars(randomSource: randomSource)
+            }
+            
+        case 7:
+            // spawn encasement
+            let toughMonster: EntityModel.EntityType = .bat
+            let monsterEntity = EntityModel(originalHp: 1, hp: 1, name: toughMonster.textureString, attack: .zero, type: toughMonster, carry: .zero, animations: [], pickaxe: nil, effects: [], dodge: 0, luck: 0, killedBy: nil)
+            let chanceModel: [ChanceModel] = [
+                .init(tileType: .exit(blocked: true), chance: 50),
+                .init(tileType: .monster(monsterEntity), chance: 50),
+            ]
+            
+            let encasement = potentialEncasementPillarCoords(randomSource: randomSource, encasementChanceModel: chanceModel, numberOfEncasements: 1)
+            
+            // procs and adds a encasement.  also adds 2 extra pillar
+            if randomSource.procsGivenChance(50) {
+                var tiles: [LevelStartTiles] = []
+                tiles.append(contentsOf: encasement)
+                
+                let highLevelPillars = highLevelPillars(randomSource: randomSource, avoid: encasement)
+                
+                tiles.append(contentsOf: randomSource.chooseElements(choose: 2, fromArray: highLevelPillars))
+                levelStartTiles = tiles
+            } else {
+                levelStartTiles = highLevelPillars(randomSource: randomSource, avoid: encasement)
+            }
+            
+            
+        case 8:
+            
+            let toughMonster: EntityModel.EntityType = randomSource.nextBool() ? .sally : .bat
+            let toughMonster2: EntityModel.EntityType = randomSource.nextBool() ? .dragon : .sally
+            let monsterEntity = EntityModel(originalHp: 1, hp: 1, name: toughMonster.textureString, attack: .zero, type: toughMonster, carry: .zero, animations: [], pickaxe: nil, effects: [], dodge: 0, luck: 0, killedBy: nil)
+            let monsterEntity2 = EntityModel(originalHp: 1, hp: 1, name: toughMonster2.textureString, attack: .zero, type: toughMonster2, carry: .zero, animations: [], pickaxe: nil, effects: [], dodge: 0, luck: 0, killedBy: nil)
+            let randomItem = randomItem(playerData: playerData, tier: 2)
+            let chanceModel: [ChanceModel] = [
+                .init(tileType: .exit(blocked: true), chance: 20),
+                .init(tileType: .monster(monsterEntity), chance: 20),
+                .init(tileType: .monster(monsterEntity2), chance: 8),
+                .init(tileType: .offer(.offer(type: .greaterHeal, tier: 3)), chance: 20),
+                .init(tileType: .offer(.offer(type: randomItem.type, tier: 3)), chance: 20),
+                .init(tileType: .item(.init(type: .gem, amount: 100)), chance: 2),
+                .init(tileType: .empty, chance: 10),
+            ]
+            
+            
+            if randomSource.procsGivenChance(10) {
+                // spawn encasement
+                
+                let encasement = potentialEncasementPillarCoords(randomSource: randomSource, encasementChanceModel: chanceModel, numberOfEncasements: 2)
+                
+                levelStartTiles = encasement
+            } else if randomSource.procsGivenChance(55) {
+                let encasement = potentialEncasementPillarCoords(randomSource: randomSource, encasementChanceModel: chanceModel, numberOfEncasements: 1)
+                
+                levelStartTiles = encasement
+
+            } else {
+                levelStartTiles = highLevelPillars(randomSource: randomSource)
+            }
+            
+            
+            
+        case bossLevelDepthNumber:
+            levelStartTiles = bossLevelStartTiles
+            
+        case bossLevelDepthNumber...Int.max:
+            levelStartTiles = []
+            
+        default:
+            levelStartTiles = []
+            
+        }
+        self.levelStartTiles = levelStartTiles
+        return levelStartTiles
+    }
     
-    func itemsInTier(_ tier: StoreOfferTier, playerData: EntityModel) -> [StoreOffer] {
+    public func itemsInTier(_ tier: StoreOfferTier, playerData: EntityModel) -> [StoreOffer] {
         return potentialItems(tier: tier, playerData: playerData)
     }
     
-    func rerollOffersForLevel(_ level: Level, playerData: EntityModel) -> [StoreOffer] {
+    public func rerollOffersForLevel(_ level: Level, playerData: EntityModel) -> [StoreOffer] {
         var newOffers: [StoreOffer] = []
         var reservedOffers = Set<StoreOffer>()
         
@@ -275,7 +333,7 @@ class Level: Codable, Hashable {
         return newOffers
     }
     
-    func rerollPotentialItems(depth: Depth, unlockables: [Unlockable], startingUnlockables: [Unlockable], playerData: EntityModel, randomSource: GKLinearCongruentialRandomSource, reservedOffers: Set<StoreOffer>, offerTier: StoreOfferTier, numberOfItems: Int) -> [StoreOffer] {
+    private func rerollPotentialItems(depth: Depth, unlockables: [Unlockable], startingUnlockables: [Unlockable], playerData: EntityModel, randomSource: GKLinearCongruentialRandomSource, reservedOffers: Set<StoreOffer>, offerTier: StoreOfferTier, numberOfItems: Int) -> [StoreOffer] {
         
         var offers = [StoreOffer]()
         var allUnlockables = unlockables
@@ -286,7 +344,7 @@ class Level: Codable, Hashable {
     }
     
     
-    func rerollTierItems(numberOfItems: Int, tier: StoreOfferTier, depth: Depth, unlockables: [Unlockable], playerData: EntityModel, reservedOffers: Set<StoreOffer>, randomSource: GKLinearCongruentialRandomSource) -> [StoreOffer] {
+    private func rerollTierItems(numberOfItems: Int, tier: StoreOfferTier, depth: Depth, unlockables: [Unlockable], playerData: EntityModel, reservedOffers: Set<StoreOffer>, randomSource: GKLinearCongruentialRandomSource) -> [StoreOffer] {
         var storeOffers: [StoreOffer] = []
         
         var allOptions =
@@ -313,7 +371,7 @@ class Level: Codable, Hashable {
         return storeOffers
     }
     
-    func randomItemOrRune(offersOnBoard: [StoreOffer]) -> StoreOffer {
+    public func randomItemOrRune(offersOnBoard: [StoreOffer]) -> StoreOffer {
         // pool of items
         var allUnlockables = Set<Unlockable>(self.startingUnlockables)
         allUnlockables.formUnion(self.otherUnlockables)
@@ -332,7 +390,9 @@ class Level: Codable, Hashable {
         return newOffer!
     }
     
-    func potentialItems(tier: Int, playerData: EntityModel) -> [StoreOffer] {
+    // MARK: - Private methods
+    
+    private func potentialItems(tier: Int, playerData: EntityModel) -> [StoreOffer] {
         
         let randomSource = GKLinearCongruentialRandomSource(seed: randomSeed)
         
@@ -342,7 +402,7 @@ class Level: Codable, Hashable {
                 StoreOffer.offer(type: .plusOneMaxHealth, tier: 1)
             ]
         }
-#if DEBUG
+        #if DEBUG
         if depth == testLevelDepthNumber {
             if tier == 1 {
                 return [
@@ -358,7 +418,7 @@ class Level: Codable, Hashable {
             }
             
         }
-#endif
+        #endif
         
         var offers = [StoreOffer]()
         var allUnlockables = otherUnlockables
@@ -378,7 +438,7 @@ class Level: Codable, Hashable {
     /// [✅] - if a player just bought an item then increase the chance of it showing up
     ///
     
-    func tierItems(tier: StoreOfferTier, depth: Depth, unlockables: [Unlockable], playerData: EntityModel, randomSource: GKLinearCongruentialRandomSource) -> [StoreOffer] {
+    private func tierItems(tier: StoreOfferTier, depth: Depth, unlockables: [Unlockable], playerData: EntityModel, randomSource: GKLinearCongruentialRandomSource) -> [StoreOffer] {
         
         if tier == 1 {
             // always offer at least 1 heal
@@ -477,71 +537,17 @@ class Level: Codable, Hashable {
         
     }
     
-    /// func to create different configurations of level start tiles
-    func createLevelStartTiles(playerData: EntityModel) -> [LevelStartTiles] {
-        let depth = depth
-        let randomSource = GKLinearCongruentialRandomSource(seed: randomSeed)
-        
-        switch depth {
-        case 0,1,2:
-            return []
-            
-        case 3:
-            // 2 pillars
-            return LevelConstructor.lowLevelPillars()
-            
-        case 4:
-            // 50% chance to have just a pair of columns
-            if randomSource.procsGivenChance(50) {
-                // then create 4 pillars with something inside
-                let chanceModel: [ChanceModel] = [.init(tileType: .offer(.offer(type: .lesserHeal, tier: 1)), chance: 50), .init(tileType: .item(.init(type: .gem, amount: 25)), chance: 50)]
-                let encasement = potentialEncasementPillarCoords(randomSource: randomSource, encasementChanceModel: chanceModel)
-                return encasement
-            } else {
-                return LevelConstructor.lowLevelPillars()
-            }
-            
-        case 5:
-            // spawn encasement
-            if randomSource.procsGivenChance(100) {
-                // then create 4 pillars with something inside
-                let toughMonster: EntityModel.EntityType = .bat
-                let monsterEntity = EntityModel(originalHp: 1, hp: 1, name: toughMonster.textureString, attack: .zero, type: toughMonster, carry: .zero, animations: [], pickaxe: nil, effects: [], dodge: 0, luck: 0, killedBy: nil)
-                let randomRune = randomRune(playerData: playerData)
-                let chanceModel: [ChanceModel] = [
-                    .init(tileType: .offer(.offer(type: .rune(randomRune.rune ?? .zero), tier: 3)), chance: 30),
-                    .init(tileType: .item(.init(type: .gem, amount: 50)), chance: 30),
-                    .init(tileType: .monster(monsterEntity), chance: 15),
-                    .init(tileType: .empty, chance: 25),
-                ]
-                let encasement = potentialEncasementPillarCoords(randomSource: randomSource, encasementChanceModel: chanceModel)
-                return encasement
-            } else {
-                return LevelConstructor.midLevelPillars()
-            }
-            
-        case 6, 7, 8:
-            return []
-            
-        case bossLevelDepthNumber:
-            return bossLevelStartTiles
-            
-        case bossLevelDepthNumber...Int.max:
-            return []
-            
-        default:
-            fatalError()
-            
-        }
-        return []
-    }
     
-    func randomRune(playerData: EntityModel) -> StoreOffer {
+    private func randomRune(playerData: EntityModel) -> StoreOffer {
         // pool of items
         var allUnlockables = Set<Unlockable>(self.startingUnlockables)
         allUnlockables.formUnion(self.otherUnlockables)
         
-        var newOffer: StoreOffer? = allUnlockables.filter({ $0.isUnlocked }).filter({ $0.item.rune != nil }).randomElement()?.item
+        var newOffer: StoreOffer? = allUnlockables
+            .filter({ $0.canAppearInRun })
+            .filter({ $0.item.rune != nil })
+            .randomElement()?.item
+        
         var maxTries: Int = 30
         
         while maxTries > 0 {
@@ -559,8 +565,23 @@ class Level: Codable, Hashable {
         return newOffer!
     }
     
+    private func randomItem(playerData: EntityModel, tier: StoreOfferTier) -> StoreOffer {
+        // pool of items
+        var allUnlockables = Set<Unlockable>(self.startingUnlockables)
+        allUnlockables.formUnion(self.otherUnlockables)
+        
+        let newOffer: StoreOffer? = allUnlockables
+            .filter({ $0.canAppearInRun })
+            .filter({ $0.item.rune == nil })
+            .filter({ $0.item.tier == tier })
+            .randomElement()?.item
+        
+        return newOffer ?? .zero
+    }
     
-    private func potentialEncasementPillarCoords(randomSource: GKLinearCongruentialRandomSource, encasementChanceModel: [ChanceModel]) -> [LevelStartTiles] {
+
+    
+    private func potentialEncasementPillarCoords(randomSource: GKLinearCongruentialRandomSource, encasementChanceModel: [ChanceModel], numberOfEncasements: Int) -> [LevelStartTiles] {
         
         if boardSize == 8 {
             let encasementOption1: EncasementCoords = .init(middleTile: TileCoord(2, 2), outerTiles: [TileCoord(2, 1), TileCoord(1, 2), TileCoord(2, 3), TileCoord(3, 2)])
@@ -569,14 +590,16 @@ class Level: Codable, Hashable {
             let encasementOption4: EncasementCoords = .init(middleTile: TileCoord(2, 5), outerTiles: [TileCoord(2, 4), TileCoord(1, 5), TileCoord(3, 5), TileCoord(2, 6)])
             
             
-            let chosenEncasement = randomSource.chooseElement([encasementOption1, encasementOption2, encasementOption3, encasementOption4])
-            var pillarCoords = matchupPillarsRandomly(colors: ShiftShaft_Color.pillarCases, coordinatess: chosenEncasement.outerTiles)
+            var pillarCoords: [LevelStartTiles] = []
+            if let chosenEncasement = randomSource.chooseElement([encasementOption1, encasementOption2, encasementOption3, encasementOption4]) {
             
-            if let randomTile = randomSource.chooseElementWithChance(encasementChanceModel)?.tileType {
-                let encasedLevelStartTile = LevelStartTiles(tileType: randomTile, tileCoord: chosenEncasement.middleTile)
-                pillarCoords.append(encasedLevelStartTile)
+                pillarCoords.append(contentsOf: matchupPillarsRandomly(colors: ShiftShaft_Color.pillarCases, coordinatess: chosenEncasement.outerTiles))
+            
+                if let randomTile = randomSource.chooseElementWithChance(encasementChanceModel)?.tileType {
+                    let encasedLevelStartTile = LevelStartTiles(tileType: randomTile, tileCoord: chosenEncasement.middleTile)
+                    pillarCoords.append(encasedLevelStartTile)
+                }
             }
-            
             return pillarCoords
             
             
@@ -593,15 +616,27 @@ class Level: Codable, Hashable {
             
             
             
-            let chosenEncasement = randomSource.chooseElement([encasementOption1, encasementOption2, encasementOption3, encasementOption4, encasementOption5, encasementOption6, encasementOption7, encasementOption8, encasementOption9])
-            var pillarCoords = matchupPillarsRandomly(colors: ShiftShaft_Color.pillarCases, coordinatess: chosenEncasement.outerTiles)
+            /// choose the outer encasements
+            let allEncasements = [encasementOption1, encasementOption2, encasementOption3, encasementOption4, encasementOption5, encasementOption6, encasementOption7, encasementOption8, encasementOption9]
+            let chosenEncasements = randomSource.chooseElements(choose: numberOfEncasements, fromArray: allEncasements)
             
-            if let randomTile = randomSource.chooseElementWithChance(encasementChanceModel)?.tileType {
-                let encasedLevelStartTile = LevelStartTiles(tileType: randomTile, tileCoord: chosenEncasement.middleTile)
-                pillarCoords.append(encasedLevelStartTile)
+            /// choose the two chance models
+            var mutableChangeModels = encasementChanceModel
+            
+            var allCoords: [LevelStartTiles] = []
+            for chosenEncasement in chosenEncasements {
+                allCoords.append(contentsOf: matchupPillarsRandomly(colors: ShiftShaft_Color.pillarCases, coordinatess: chosenEncasement.outerTiles))
+                
+                if let randomTile = randomSource.chooseElementWithChance(mutableChangeModels)?.tileType {
+                    mutableChangeModels.removeFirst { chanceModel in
+                        return chanceModel.tileType == randomTile
+                    }
+                    let encasedLevelStartTile = LevelStartTiles(tileType: randomTile, tileCoord: chosenEncasement.middleTile)
+                    allCoords.append(encasedLevelStartTile)
+                }
             }
             
-            return pillarCoords
+            return allCoords
             
         } else {
             // shouldnt be calling this
@@ -609,7 +644,7 @@ class Level: Codable, Hashable {
         }
     }
     
-    func matchupPillarsRandomly(colors: [ShiftShaft_Color], coordinatess: [TileCoord]) -> [LevelStartTiles] {
+    private func matchupPillarsRandomly(colors: [ShiftShaft_Color] = ShiftShaft_Color.pillarCases, coordinatess: [TileCoord]) -> [LevelStartTiles] {
         var pillarColors = colors
         var coords = coordinatess
         var pillarCoordinates: [LevelStartTiles] = []
@@ -628,7 +663,7 @@ class Level: Codable, Hashable {
             
             if let color = randomColor, let coord = randomCoord {
                 let pillarTile = TileType.pillar(PillarData(color: color, health: 3))
-                let pillarCoord = LevelStartTiles((pillarTile, coord))
+                let pillarCoord = LevelStartTiles(tileType: pillarTile, tileCoord: coord)
                 pillarCoordinates.append(pillarCoord)
             }
             
@@ -638,34 +673,127 @@ class Level: Codable, Hashable {
     }
     
     
-    var bossLevelStartTiles: [LevelStartTiles] {
-        let toughMonster: EntityModel.EntityType = Bool.random() ? .bat : .sally
-        let goodReward = TileType.item(Item(type: .gem, amount: 100, color: .blue))
         
-        let coord1 = TileCoord(6, 4)
-        let coord2 = TileCoord(2, 4)
-        let coords = [coord1, coord2]
-        
-        let monsterEntity = EntityModel(originalHp: 1, hp: 1, name: toughMonster.textureString, attack: .zero, type: toughMonster, carry: .zero, animations: [], pickaxe: nil, effects: [], dodge: 0, luck: 0, killedBy: nil)
-        
-        let (newCoords, element) = coords.dropRandom()
-        let monsterStartTile = LevelStartTiles(tileType: TileType.monster(monsterEntity), tileCoord: element!)
-        
-        let rewardStartTile = LevelStartTiles(tileType: goodReward, tileCoord: newCoords.first!)
-        
-        let newPillarColors = [.blue, .blue, .purple, .purple, .red, .red, ShiftShaft_Color.pillarCases.randomElement()!, ShiftShaft_Color.pillarCases.randomElement()!]
-        let newPillarCoords: [TileCoord] = [
-            TileCoord(7, 4), TileCoord(5, 4), TileCoord(6, 3), TileCoord(6, 5),
-            TileCoord(3, 4), TileCoord(1, 4), TileCoord(2, 3), TileCoord(2, 5),
+    private func lowLevelPillars(randomSource: GKLinearCongruentialRandomSource) -> [LevelStartTiles] {
+        let coords: [TileCoord] = [
+            TileCoord(5, 4), TileCoord(3, 4),
         ]
         
-        var pillarCoords = LevelConstructor.matchupPillarsRandomly(colors: newPillarColors, coordinatess: newPillarCoords)
+        let coords2: [TileCoord] = [
+            TileCoord(1, 1), TileCoord(6, 6)
+        ]
         
-        pillarCoords.append(monsterStartTile)
-        pillarCoords.append(rewardStartTile)
+        let coords3: [TileCoord] = [
+            TileCoord(4, 1), TileCoord(3, 6)
+        ]
         
-        return pillarCoords
+        let coords4: [TileCoord] = [
+            TileCoord(3, 4), TileCoord(4, 3),
+        ]
         
+        let coords5: [TileCoord] = [
+            TileCoord(4, 0), TileCoord(3, 7),
+        ]
+        
+        
+        if let chosenCoords = randomSource.chooseElement([coords, coords2, coords3, coords4, coords5]) {
+            return matchupPillarsRandomly(coordinatess: chosenCoords)
+        } else {
+            return []
+        }
     }
     
+    
+    private func midLevelPillars(randomSource: GKLinearCongruentialRandomSource) -> [LevelStartTiles] {
+        let coords: [TileCoord] = [
+            TileCoord(3, 3), TileCoord(5, 3),
+            TileCoord(3, 5), TileCoord(5, 5)
+        ]
+        
+        let coords2: [TileCoord] = [
+            TileCoord(1, 4), TileCoord(3, 4), TileCoord(5, 4), TileCoord(7, 4)
+        ]
+        
+        let coords3: [TileCoord] = [
+            TileCoord(6, 2), TileCoord(2, 2),
+            TileCoord(2, 6), TileCoord(6, 6)
+        ]
+        
+        let coords4: [TileCoord] = [
+            TileCoord(8, 3), TileCoord(8, 5),
+            TileCoord(0, 3), TileCoord(0, 5)
+        ]
+        
+        let coords5: [TileCoord] = [
+            TileCoord(7, 1), TileCoord(1, 1),
+            TileCoord(4, 4),
+            TileCoord(7, 7), TileCoord(1, 7)
+        ]
+        
+        let coords6: [TileCoord] = [
+            TileCoord(8, 4), TileCoord(4, 8),
+            TileCoord(4, 4),
+            TileCoord(0, 4), TileCoord(4, 0)
+        ]
+        
+        if let chosenCoords = randomSource.chooseElement([coords, coords2, coords3, coords4, coords5, coords6]) {
+            return matchupPillarsRandomly(coordinatess: chosenCoords)
+        } else {
+             return []
+        }
+    }
+    
+    private func highLevelPillars(randomSource: GKLinearCongruentialRandomSource, avoid: [LevelStartTiles] = []) -> [LevelStartTiles] {
+        let coords: [TileCoord] = [
+            TileCoord(1, 8), TileCoord(0, 7), TileCoord(0, 8),
+            TileCoord(8, 0), TileCoord(7, 0), TileCoord(8, 1)
+        ]
+        
+        let coords2: [TileCoord] = [
+            TileCoord(3, 0), TileCoord(4, 0), TileCoord(5, 0),
+            TileCoord(3, 8), TileCoord(4, 8), TileCoord(5, 8)
+        ]
+        
+        let coords3: [TileCoord] = [
+            TileCoord(7, 3), TileCoord(6, 4), TileCoord(7, 5),
+            TileCoord(1, 3), TileCoord(2, 4), TileCoord(1, 5),
+        ]
+        
+        let coords4: [TileCoord] = [
+            TileCoord(5, 3), TileCoord(5, 4),TileCoord(5, 5),
+            TileCoord(4, 4),
+            TileCoord(3, 3), TileCoord(3, 4),TileCoord(3, 5),
+        ]
+        
+        let coords5: [TileCoord] = [
+            TileCoord(4, 3), TileCoord(4, 4), TileCoord(4, 5),
+            TileCoord(8, 4), TileCoord(7, 4),
+            TileCoord(0, 4), TileCoord(1, 4),
+        ]
+        
+        let coords6: [TileCoord] = [
+            TileCoord(8, 0), TileCoord(7, 1),
+            TileCoord(0, 0), TileCoord(1, 1),
+            TileCoord(1, 7), TileCoord(0, 8),
+            TileCoord(7, 7), TileCoord(8, 8),
+        ]
+        
+        let allCoords = [coords, coords2, coords3, coords4, coords5, coords6]
+        
+        // filter out any set of coords that contains someone from avoid
+        let possibleCoords = allCoords.filter { coords in
+            return coords.allSatisfy { coord in
+                avoid
+                    .map { $0.tileCoord }
+                    .contains(coord)
+            }
+        }
+        if let chosenCoords = randomSource.chooseElement(possibleCoords) {
+            return matchupPillarsRandomly(coordinatess: chosenCoords)
+        } else {
+            return []
+        }
+        
+    }
 }
+

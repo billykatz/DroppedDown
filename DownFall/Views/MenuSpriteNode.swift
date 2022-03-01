@@ -699,13 +699,16 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             
             
         case .toggleSound:
-            let muted = UserDefaults.standard.bool(forKey: UserDefaults.muteSoundKey)
-            UserDefaults.standard.setValue(!muted, forKey: UserDefaults.muteSoundKey)
-            
-            guard let soundIcon = containerView?.childNode(withName: Constants.soundIconName) as? SKSpriteNode else { return }
-            let onOff = !muted ? "off" : "on"
-            let newTexture = SKTexture(imageNamed: "sound-\(onOff)")
-            soundIcon.texture = newTexture
+            #if DEBUG
+            InputQueue.append(.init(.gameWin(2)))
+            #endif
+//            let muted = UserDefaults.standard.bool(forKey: UserDefaults.muteSoundKey)
+//            UserDefaults.standard.setValue(!muted, forKey: UserDefaults.muteSoundKey)
+//
+//            guard let soundIcon = containerView?.childNode(withName: Constants.soundIconName) as? SKSpriteNode else { return }
+//            let onOff = !muted ? "off" : "on"
+//            let newTexture = SKTexture(imageNamed: "sound-\(onOff)")
+//            soundIcon.texture = newTexture
             
         case .toggleShowGroupNumber:
             let show = UserDefaults.standard.bool(forKey: UserDefaults.showGroupNumberKey)

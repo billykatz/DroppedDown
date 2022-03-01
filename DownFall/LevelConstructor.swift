@@ -15,8 +15,7 @@ let testLevelDepthNumber = -1
 
 struct LevelConstructor {
     
-    static func buildLevel(depth: Int, randomSource: GKLinearCongruentialRandomSource, playerData: EntityModel, unlockables: [Unlockable], startingUnlockables: [Unlockable], isTutorial: Bool, randomSeed: UInt64) -> Level {
-        let pillars = pillars(depth: depth, randomSource: randomSource)
+    static func buildLevel(depth: Int, randomSource: GKLinearCongruentialRandomSource, playerData: EntityModel, unlockables: [Unlockable], startingUnlockables: [Unlockable], isTutorial: Bool, randomSeed: UInt64, runModel: RunModel?) -> Level {
         let gemsAtDepth = maxSpawnGems(depth: depth)
         
         
@@ -36,7 +35,8 @@ struct LevelConstructor {
             startingUnlockables: startingUnlockables,
             otherUnlockables: unlockables,
             randomSeed: randomSeed,
-            isTutorial: isTutorial
+            isTutorial: isTutorial,
+            runModel: runModel
         )
     }
     
@@ -215,180 +215,8 @@ struct LevelConstructor {
             fatalError("Level must be positive")
         }
     }
-    
-    /// Randomly creates 0 up to a max of boardsize/8 pillar coordinates
-    static func pillars(depth: Depth, randomSource: GKLinearCongruentialRandomSource) -> [LevelStartTiles] {
-        switch depth {
-        case 0, 1, 2:
-            return []
-        case 3, 4:
-            return lowLevelPillars()
-        case 5, 6:
-            return midLevelPillars()
-        case 7, 8...Int.max:
-            return highLevelPillars()
-        case bossLevelDepthNumber:
-            return [] // bossPillars()
-        default:
-            return []
-        }
-    }
-    
-    static func lowLevelPillars() -> [LevelStartTiles] {
-        let pillarColors: [ShiftShaft_Color] = [.blue, .red]
-        let coords: [TileCoord] = [
-            TileCoord(5, 4), TileCoord(3, 4),
-        ]
-        
-        let pillarColors2: [ShiftShaft_Color] = [.red, .purple]
-        let coords2: [TileCoord] = [
-            TileCoord(1, 1), TileCoord(6, 6)
-        ]
-        
-        let pillarColors3: [ShiftShaft_Color] = [.blue, .purple]
-        let coords3: [TileCoord] = [
-            TileCoord(4, 1), TileCoord(3, 6)
-        ]
-        
-        let pillarColors4: [ShiftShaft_Color] = [.red, .purple]
-        let coords4: [TileCoord] = [
-            TileCoord(3, 4), TileCoord(4, 3),
-        ]
-        
-        let pillarColors5: [ShiftShaft_Color] = [.blue, .red]
-        let coords5: [TileCoord] = [
-            TileCoord(4, 0), TileCoord(3, 7),
-        ]
-        
-        
-        let chosenColors = [pillarColors, pillarColors2, pillarColors3, pillarColors4, pillarColors5]
-        let chosenCoords = [coords, coords2, coords3, coords4, coords5]
-        let randomIdx = Int.random(chosenColors.count)
-        return matchupPillarsRandomly(colors: chosenColors[randomIdx], coordinatess: chosenCoords[randomIdx])
-    }
-    
-    static func midLevelPillars() -> [LevelStartTiles] {
-        let pillarColors: [ShiftShaft_Color] = [.blue, .red, .purple, .randomColor]
-        let coords: [TileCoord] = [
-            TileCoord(3, 3), TileCoord(5, 3),
-            TileCoord(3, 5), TileCoord(5, 5)
-        ]
-        
-        let pillarColors2: [ShiftShaft_Color] = [.blue, .red, .purple, .randomColor]
-        let coords2: [TileCoord] = [
-            TileCoord(1, 4), TileCoord(3, 4), TileCoord(5, 4), TileCoord(7, 4)
-        ]
-        
-        let pillarColors3: [ShiftShaft_Color] = [.blue, .red, .purple, .randomColor, .randomColor]
-        let coords3: [TileCoord] = [
-            TileCoord(7, 1), TileCoord(1, 1),
-            TileCoord(4, 4),
-            TileCoord(7, 7), TileCoord(1, 7)
-        ]
-        
-        let pillarColors4: [ShiftShaft_Color] = [.blue, .red, .purple, .randomColor, .randomColor]
-        let coords4: [TileCoord] = [
-            TileCoord(8, 4), TileCoord(4, 8),
-            TileCoord(4, 4),
-            TileCoord(0, 4), TileCoord(4, 0)
-        ]
-        
-        let pillarColors5: [ShiftShaft_Color] = [.blue, .red, .purple, .randomColor]
-        let coords5: [TileCoord] = [
-            TileCoord(6, 2), TileCoord(2, 2),
-            TileCoord(2, 6), TileCoord(6, 6)
-        ]
-        
-        let pillarColors6: [ShiftShaft_Color] = [.blue, .red, .purple, .randomColor]
-        let coords6: [TileCoord] = [
-            TileCoord(8, 3), TileCoord(8, 5),
-            TileCoord(0, 3), TileCoord(0, 5)
-        ]
-        
-        
-        let chosenColors = [pillarColors, pillarColors2, pillarColors3, pillarColors4, pillarColors5, pillarColors6]
-        let chosenCoords = [coords, coords2, coords3, coords4, coords5, coords6]
-        let randomIdx = Int.random(chosenColors.count)
-        return matchupPillarsRandomly(colors: chosenColors[randomIdx], coordinatess: chosenCoords[randomIdx])
-    }
-    
-    static func highLevelPillars() -> [LevelStartTiles] {
-        let pillarColors: [ShiftShaft_Color] = [.blue, .red, .purple, .randomColor, .randomColor, .randomColor]
-        let coords: [TileCoord] = [
-            TileCoord(1, 8), TileCoord(0, 7), TileCoord(0, 8),
-            TileCoord(8, 0), TileCoord(7, 0), TileCoord(8, 1)
-        ]
-        
-        let pillarColors2: [ShiftShaft_Color] = [.blue, .red, .purple, .randomColor, .randomColor, .randomColor]
-        let coords2: [TileCoord] = [
-            TileCoord(3, 0), TileCoord(4, 0), TileCoord(5, 0),
-            TileCoord(3, 8), TileCoord(4, 8), TileCoord(5, 8)
-        ]
-        
-        let pillarColors3: [ShiftShaft_Color] = [.blue, .red, .purple, .randomColor, .randomColor, .randomColor]
-        let coords3: [TileCoord] = [
-            TileCoord(7, 3), TileCoord(6, 4), TileCoord(7, 5),
-            TileCoord(1, 3), TileCoord(2, 4), TileCoord(1, 5),
-        ]
-        
-        let pillarColors4: [ShiftShaft_Color] = [.blue, .red, .purple, .randomColor, .randomColor, .randomColor, .randomColor]
-        let coords4: [TileCoord] = [
-            TileCoord(5, 3), TileCoord(5, 4),TileCoord(5, 5),
-            TileCoord(4, 4),
-            TileCoord(3, 3), TileCoord(3, 4),TileCoord(3, 5),
-        ]
-        
-        let pillarColors5: [ShiftShaft_Color] = [.blue, .red, .purple, .randomColor, .randomColor, .randomColor, .randomColor]
-        let coords5: [TileCoord] = [
-            TileCoord(4, 3), TileCoord(4, 4), TileCoord(4, 5),
-            TileCoord(8, 4), TileCoord(7, 4),
-            TileCoord(0, 4), TileCoord(1, 4),
-        ]
-        
-        let pillarColors6: [ShiftShaft_Color] = [.blue, .red, .purple, .randomColor, .randomColor, .randomColor, .randomColor, .randomColor]
-        let coords6: [TileCoord] = [
-            TileCoord(8, 0), TileCoord(7, 1),
-            TileCoord(0, 0), TileCoord(1, 1),
-            TileCoord(1, 7), TileCoord(0, 8),
-            TileCoord(7, 7), TileCoord(8, 8),
-        ]
-        
-        let chosenColors = [pillarColors, pillarColors2, pillarColors3, pillarColors4, pillarColors5, pillarColors6]
-        let chosenCoords = [coords, coords2, coords3, coords4, coords5, coords6]
-        let randomIdx = Int.random(chosenColors.count)
-        return matchupPillarsRandomly(colors: chosenColors[randomIdx], coordinatess: chosenCoords[randomIdx])
-        
-    }
-
         
        
-    
-    static func matchupPillarsRandomly(colors:[ShiftShaft_Color], coordinatess: [TileCoord]) -> [LevelStartTiles] {
-        var pillarColors = colors
-        var coords = coordinatess
-        precondition(pillarColors.count == coords.count, "Pillar colors and coord must be equal")
-        let originalColorCount = pillarColors.count
-        var pillarCoordinates: [LevelStartTiles] = []
-        
-        // create PillarCoordinates randoming selecting elements from pillarColors and coords
-        while pillarCoordinates.count < originalColorCount {
-            let (remainingColors, randomColor) = pillarColors.dropRandom()
-            let (remainingCoords, randomCoord) = coords.dropRandom()
-            
-            pillarColors = remainingColors
-            coords = remainingCoords
-            
-            if let color = randomColor, let coord = randomCoord {
-                let pillarTile = TileType.pillar(PillarData(color: color, health: 3))
-                let pillarCoord = LevelStartTiles((pillarTile, coord))
-                pillarCoordinates.append(pillarCoord)
-            }
-            
-        }
-        
-        return pillarCoordinates
-    }
-    
     
     static func monsterCountStart(depth: Depth) -> Int {
         if depth == testLevelDepthNumber { return 3 }

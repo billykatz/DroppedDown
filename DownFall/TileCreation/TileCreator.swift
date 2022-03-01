@@ -54,7 +54,11 @@ class TileCreator: TileStrategy {
     let boardSize: Int
     var level: Level
     var loadedTiles: [[Tile]]?
-    var specialRocks = 0
+    var numberOfTilesSinceLastGemDropped = 0
+    
+    // get at least one gem per board
+    var spawnAtleastOneGem = true;
+    
     var specialGems: Int {
         get {
             level.gemsSpawned
@@ -63,15 +67,6 @@ class TileCreator: TileStrategy {
             level.gemsSpawned = newValue
         }
     }
-    var goldVariance = 2
-    let maxMonsterRatio: Double = 0.15
-    var numberOfTilesSinceLastGemDropped = 0
-    
-    
-    // debug help to get at least one gem per board
-    var spawnAtleastOneGem = true;
-    
-    var hasAlreadySpawnedMonsterForTutorial = false
     
     required init(_ entities: EntitiesModel,
                   difficulty: Difficulty,
@@ -94,7 +89,6 @@ class TileCreator: TileStrategy {
     
     private func randomTile(given: Int, neighbors: [Tile], playerData: EntityModel, forceMonsters: Bool) -> TileType {
         guard !forceMonsters else { return randomMonster() }
-        guard level.spawnsMonsters else { return randomRock([], playerData: playerData) }
         guard !level.isBossLevel else { return randomRock([], playerData: playerData) }
         let weight = 98
         let index = abs(given) % (TileType.randomCases.count + weight)
@@ -394,6 +388,7 @@ class TileCreator: TileStrategy {
         // reserve all positions so we don't overwrite any one position multiple times
         var reservedSet = Set<TileCoord>([playerPosition, playerPosition.colLeft, playerPosition.colRight, playerPosition.rowAbove, playerPosition.rowBelow])
         reservedSet.formUnion(reservedCoordinates)
+        
         // add monsters
         for _ in 0..<level.monsterCountStart {
             let randomTileCoord = randomCoord(notIn: reservedSet)
@@ -402,17 +397,19 @@ class TileCreator: TileStrategy {
             tiles[randomRow][randomCol] = Tile(type: randomMonster())
         }
         
-        guard level.hasExit else { return (tiles, false) }
-        //place the exit on the opposite side of the grid
-        #warning ("make sure this is set properly for release")
         // no exit on the boss level
         if (!level.isBossLevel) {
-            let exitQuadrant = playerQuadrant.opposite
-            //        let exitQuadrant = playerQuadrant
-            let exitPosition = exitQuadrant.randomCoord(for: boardSize, notIn: reservedSet)
-            reservedSet.insert(exitPosition)
-            
-            tiles[exitPosition.x][exitPosition.y] = Tile(type: .exit(blocked: true))
+            /// some level start tiles place exits inside encasements. So only add an exit if we need too.
+            if getTilePosition(.exit(blocked: true), tiles: tiles) == nil {
+                //place the exit on the opposite side of the grid
+                #warning ("make sure this is set properly for release")
+                let exitQuadrant = playerQuadrant.opposite
+                //        let exitQuadrant = playerQuadrant
+                let exitPosition = exitQuadrant.randomCoord(for: boardSize, notIn: reservedSet)
+                reservedSet.insert(exitPosition)
+                
+                tiles[exitPosition.x][exitPosition.y] = Tile(type: .exit(blocked: true))
+            }
         }
         
         return (tiles, true)

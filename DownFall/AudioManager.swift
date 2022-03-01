@@ -77,7 +77,7 @@ class AudioManager: NSObject, AVAudioPlayerDelegate {
         
         backgroundMusicThread.sync { [weak self] in
             do {
-                let resourceName = isBossLevel ? "shift-shaft-boss-loop" : "background-music"
+                let resourceName = isBossLevel ? "shift-shaft-boss-loop" : "shift-shaft-nonBoss-level-music-gold"
                 if let backgroundMusicPath = Bundle.main.path(forResource: resourceName, ofType: "wav") {
                     let url = URL(fileURLWithPath: backgroundMusicPath)
                     self?.backgroundMusicPlayer = try AVAudioPlayer(contentsOf: url)

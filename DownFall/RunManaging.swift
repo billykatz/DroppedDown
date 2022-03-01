@@ -153,4 +153,16 @@ class RunModel: Codable, Equatable {
         }
         return levelStartTiles
     }
+
+    func lastLevelOffers(currentDepth: Int) -> [StoreOffer] {
+        var offers: [StoreOffer] = []
+        for area in areas {
+            if case AreaType.level(let level) = area.type,
+               level.depth == currentDepth - 1 {
+                offers.append(contentsOf: level.offers)
+            }
+        }
+        return offers
+    }
+
 }

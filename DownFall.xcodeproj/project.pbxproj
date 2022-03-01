@@ -20,12 +20,13 @@
 		2811271F26863A4500F96043 /* FileManagerClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2811271E26863A4500F96043 /* FileManagerClient.swift */; };
 		2811272126863E4A00F96043 /* PlayerClientExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2811272026863E4A00F96043 /* PlayerClientExtensions.swift */; };
 		281D43B027A9CB8F00D00376 /* MenuMusicManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 281D43AF27A9CB8F00D00376 /* MenuMusicManager.swift */; };
-		281D43B427AA61F700D00376 /* menu-music.wav in Resources */ = {isa = PBXBuildFile; fileRef = 281D43B327AA61F700D00376 /* menu-music.wav */; };
 		281D43B627AB0B4700D00376 /* BossDialogController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 281D43B527AB0B4700D00376 /* BossDialogController.swift */; };
 		2831B6A6274C787B00F90626 /* GameRecapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2831B6A5274C787B00F90626 /* GameRecapView.swift */; };
 		2834737F26E94CFC0096F3DE /* StatsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2834737E26E94CFC0096F3DE /* StatsModel.swift */; };
 		283CBBD926A8A88E00B1F7C9 /* CodexItemModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 283CBBD826A8A88E00B1F7C9 /* CodexItemModalView.swift */; };
 		283CBBDB26A8A9E100B1F7C9 /* SwiftUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 283CBBDA26A8A9E100B1F7C9 /* SwiftUIView.swift */; };
+		283DA67F27CEA892009C5224 /* shift-shaft-menu-music-gold.wav in Resources */ = {isa = PBXBuildFile; fileRef = 283DA67D27CEA890009C5224 /* shift-shaft-menu-music-gold.wav */; };
+		283DA68027CEA892009C5224 /* shift-shaft-nonBoss-level-music-gold.wav in Resources */ = {isa = PBXBuildFile; fileRef = 283DA67E27CEA892009C5224 /* shift-shaft-nonBoss-level-music-gold.wav */; };
 		283DC778271892BC002A499A /* TutorialConductor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 283DC777271892BC002A499A /* TutorialConductor.swift */; };
 		283DC77A2718A831002A499A /* DialogueOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 283DC7792718A831002A499A /* DialogueOverlay.swift */; };
 		283F21F926E30D5200108D4D /* ProgressableModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 283F21F826E30D5200108D4D /* ProgressableModel.swift */; };
@@ -47,7 +48,6 @@
 		2886E84026F030750014FA5D /* UIViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886E83F26F030750014FA5D /* UIViewController+Extensions.swift */; };
 		2886E84326F031050014FA5D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886E84226F031050014FA5D /* SettingsView.swift */; };
 		2886E84526F197D00014FA5D /* PlayerStatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886E84426F197D00014FA5D /* PlayerStatView.swift */; };
-		288BDB2B2788FB1100B8B78C /* boss-background-music.wav in Resources */ = {isa = PBXBuildFile; fileRef = 288BDB2A2788FB1100B8B78C /* boss-background-music.wav */; };
 		289EF394275A95C400138F34 /* MonsterDiesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 289EF393275A95C400138F34 /* MonsterDiesModel.swift */; };
 		28A36C3627A1FCD3008252DA /* BossDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A36C3527A1FCD3008252DA /* BossDialog.swift */; };
 		28A36C3827A1FF82008252DA /* BossDialogOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A36C3727A1FF82008252DA /* BossDialogOverlay.swift */; };
@@ -269,12 +269,13 @@
 		2811271E26863A4500F96043 /* FileManagerClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagerClient.swift; sourceTree = "<group>"; };
 		2811272026863E4A00F96043 /* PlayerClientExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerClientExtensions.swift; sourceTree = "<group>"; };
 		281D43AF27A9CB8F00D00376 /* MenuMusicManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuMusicManager.swift; sourceTree = "<group>"; };
-		281D43B327AA61F700D00376 /* menu-music.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "menu-music.wav"; sourceTree = "<group>"; };
 		281D43B527AB0B4700D00376 /* BossDialogController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BossDialogController.swift; sourceTree = "<group>"; };
 		2831B6A5274C787B00F90626 /* GameRecapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameRecapView.swift; sourceTree = "<group>"; };
 		2834737E26E94CFC0096F3DE /* StatsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsModel.swift; sourceTree = "<group>"; };
 		283CBBD826A8A88E00B1F7C9 /* CodexItemModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexItemModalView.swift; sourceTree = "<group>"; };
 		283CBBDA26A8A9E100B1F7C9 /* SwiftUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIView.swift; sourceTree = "<group>"; };
+		283DA67D27CEA890009C5224 /* shift-shaft-menu-music-gold.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "shift-shaft-menu-music-gold.wav"; sourceTree = "<group>"; };
+		283DA67E27CEA892009C5224 /* shift-shaft-nonBoss-level-music-gold.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "shift-shaft-nonBoss-level-music-gold.wav"; sourceTree = "<group>"; };
 		283DC777271892BC002A499A /* TutorialConductor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialConductor.swift; sourceTree = "<group>"; };
 		283DC7792718A831002A499A /* DialogueOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogueOverlay.swift; sourceTree = "<group>"; };
 		283F21F826E30D5200108D4D /* ProgressableModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressableModel.swift; sourceTree = "<group>"; };
@@ -297,7 +298,6 @@
 		2886E83F26F030750014FA5D /* UIViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extensions.swift"; sourceTree = "<group>"; };
 		2886E84226F031050014FA5D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		2886E84426F197D00014FA5D /* PlayerStatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerStatView.swift; sourceTree = "<group>"; };
-		288BDB2A2788FB1100B8B78C /* boss-background-music.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "boss-background-music.wav"; sourceTree = "<group>"; };
 		289EF393275A95C400138F34 /* MonsterDiesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonsterDiesModel.swift; sourceTree = "<group>"; };
 		28A36C3527A1FCD3008252DA /* BossDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BossDialog.swift; sourceTree = "<group>"; };
 		28A36C3727A1FF82008252DA /* BossDialogOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BossDialogOverlay.swift; sourceTree = "<group>"; };
@@ -930,8 +930,8 @@
 			children = (
 				2882DF2827CAB67400149899 /* SnapshotHelper.swift */,
 				2882DF1527CA963500149899 /* shift-shaft-boss-loop.wav */,
-				281D43B327AA61F700D00376 /* menu-music.wav */,
-				288BDB2A2788FB1100B8B78C /* boss-background-music.wav */,
+				283DA67D27CEA890009C5224 /* shift-shaft-menu-music-gold.wav */,
+				283DA67E27CEA892009C5224 /* shift-shaft-nonBoss-level-music-gold.wav */,
 				287053B7275AE8D100B84929 /* background-music.wav */,
 				28C64464274463C500098C3C /* Boss */,
 				284F2EC12731DB2400032088 /* FTUE */,
@@ -1296,7 +1296,6 @@
 				3DA4E8952290A7B4006E90D1 /* gloop.png in Resources */,
 				2882DF1727CA963500149899 /* shift-shaft-boss-loop.wav in Resources */,
 				586319C224C1FF890090CD6D /* newProfile.json in Resources */,
-				288BDB2B2788FB1100B8B78C /* boss-background-music.wav in Resources */,
 				3D528FD62154A50300EF65CA /* GameScene.sks in Resources */,
 				589E156825ABA1AC004A6D46 /* gemAppears.mp3 in Resources */,
 				28EBD55A27C9593B004C46B6 /* PixelSmall_v2.ttf in Resources */,
@@ -1308,6 +1307,7 @@
 				280CD177276AB20D00052EB5 /* BossTestScene.sks in Resources */,
 				28EBD55927C9593B004C46B6 /* PixelHigh.ttf in Resources */,
 				287053B8275AE8D100B84929 /* background-music.wav in Resources */,
+				283DA68027CEA892009C5224 /* shift-shaft-nonBoss-level-music-gold.wav in Resources */,
 				58C37F2425AB94ED00F6D164 /* pickaxe.mp3 in Resources */,
 				3D528FDF2155BD7300EF65CA /* Assets.xcassets in Resources */,
 				3DB270A522ADBD0100D9BF8B /* player.png in Resources */,
@@ -1318,7 +1318,7 @@
 				589E156225AB9BE7004A6D46 /* mineRocks.wav in Resources */,
 				3DF0A6B32379CC4600941305 /* pixel-font.ttf in Resources */,
 				589E157825ABA9D7004A6D46 /* goalCompleted.mp3 in Resources */,
-				281D43B427AA61F700D00376 /* menu-music.wav in Resources */,
+				283DA67F27CEA892009C5224 /* shift-shaft-menu-music-gold.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

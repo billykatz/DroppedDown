@@ -36,6 +36,7 @@ class Level: Codable, Hashable {
     weak var runModel: RunModel?
     
     var levelStartTiles: [LevelStartTiles] = []
+    var offers: [StoreOffer] = []
     
     public var bossLevelStartTiles: [LevelStartTiles] {
         let toughMonster: EntityModel.EntityType = Bool.random() ? .bat : .sally
@@ -302,7 +303,10 @@ class Level: Codable, Hashable {
     }
     
     public func itemsInTier(_ tier: StoreOfferTier, playerData: EntityModel) -> [StoreOffer] {
-        return potentialItems(tier: tier, playerData: playerData)
+        let items = potentialItems(tier: tier, playerData: playerData)
+        let lastLevelOffers = runModel?.lastLevelOffers(currentDepth: depth)
+        self.offers.append(contentsOf: items)
+        return items
     }
     
     public func rerollOffersForLevel(_ level: Level, playerData: EntityModel) -> [StoreOffer] {

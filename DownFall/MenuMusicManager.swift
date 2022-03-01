@@ -35,7 +35,7 @@ class MenuMusicManager {
     init() {
         menuMusicThread.sync { [weak self] in
             do {
-                let resourceName = "menu-music"
+                let resourceName = "shift-shaft-menu-music-gold"
                 if let backgroundMusicPath = Bundle.main.path(forResource: resourceName, ofType: "wav") {
                     let url = URL(fileURLWithPath: backgroundMusicPath)
                     self?.menuMusicPlayer = try AVAudioPlayer(contentsOf: url)

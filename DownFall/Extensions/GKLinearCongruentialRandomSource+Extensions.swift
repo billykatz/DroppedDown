@@ -32,6 +32,22 @@ extension GKLinearCongruentialRandomSource {
         return array[chosenIndex]
     }
     
+    func chooseElement<Element>(_ array: [Element], avoidBlock: (Element) -> Bool) -> Element? {
+        guard !array.isEmpty else { return nil }
+        let nextFloat = nextUniform()
+        let totalChances = Float(array.count) * nextFloat
+        let chosenIndex =  Int(totalChances.rounded(.towardZero))
+        var chosen = array[chosenIndex]
+        while avoidBlock(chosen) {
+            let nextFloat = nextUniform()
+            let totalChances = Float(array.count) * nextFloat
+            let chosenIndex =  Int(totalChances.rounded(.towardZero))
+            chosen = array[chosenIndex]
+        }
+        return array[chosenIndex]
+    }
+
+    
     func chooseElements<Element>(choose: Int, fromArray array: [Element]) -> [Element] where Element: Equatable {
         guard !array.isEmpty else { return [] }
         var chosenElements: [Element] = []
@@ -70,5 +86,43 @@ extension GKLinearCongruentialRandomSource {
         
         return array.last!
     }
+    
+    func chooseElementWithChance<Element, T>(_ array: [Element]) -> Element? where Element: AnyChanceModel<T> {
+        guard !array.isEmpty else { return nil }
+        let nextFloat = nextUniform()
+        
+        let totalChances = array.reduce(0, { prev, current in return prev + current.chance }) * nextFloat
+        var chosenNumber = totalChances.rounded(.towardZero)
+        
+        // we want the current chance number to encompass the valid remaining
+        for chanceModel in array {
+            if chanceModel.chance >= chosenNumber {
+                return chanceModel
+            } else {
+                chosenNumber -= chanceModel.chance
+            }
+        }
+        
+        return array.last!
+    }
+
+    
+    func chooseElementsWithChance<Element, T>(_ array: [Element], choices: Int) -> [Element] where Element: AnyChanceModel<T> {
+        guard !array.isEmpty else { return [] }
+        var chosenElements: [Element] = []
+        
+        var maxTries = 30
+        while chosenElements.count < choices && maxTries > 0 {
+            if let chosen = chooseElementWithChance(array) {
+                if !chosenElements.contains(chosen) {
+                    chosenElements.append(chosen)
+                }
+            }
+            maxTries -= 1
+        }
+        
+        return chosenElements
+    }
+
 }
 

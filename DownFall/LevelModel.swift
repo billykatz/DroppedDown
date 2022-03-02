@@ -13,18 +13,38 @@ struct LevelVariableModifier {
     
     func chanceDeltaOfferHealth(playerData: EntityModel) -> Float {
         if Double(playerData.hp) <= Double(playerData.originalHp / 4)  {
-            return 30
+            return 25
         }
         else if Double(playerData.hp) <= Double(playerData.originalHp / 3) {
-            return 20
+            return 15
         } else if Double(playerData.hp) <= Double(playerData.originalHp / 2)  {
             return 10
+        } else if Double(playerData.hp) <= Double(playerData.originalHp / 3 * 4)  {
+            return 5
         } else if playerData.hp == playerData.originalHp {
             return -20
         } else {
             return 0
         }
     }
+    
+//    func chanceDeltaOfferNonRuneRelated(playerData: EntityModel, lastLevelOfferings: [StoreOffer]?) -> Float {
+//        if Double(playerData.hp) <= Double(playerData.originalHp / 4)  {
+//            return 30
+//        }
+//        else if Double(playerData.hp) <= Double(playerData.originalHp / 3) {
+//            return 20
+//        } else if Double(playerData.hp) <= Double(playerData.originalHp / 2)  {
+//            return 10
+//        } else if Double(playerData.hp) <= Double(playerData.originalHp / 3 * 4)  {
+//            return 5
+//        } else if playerData.hp == playerData.originalHp {
+//            return -20
+//        } else {
+//            return 0
+//        }
+//    }
+//
     
     func chanceDeltaOfferRune(playerData: EntityModel, currentChance: Float, lastLevelOfferings: [StoreOffer]?) -> Float {
         guard let pickaxe = playerData.pickaxe else { return 0 }
@@ -36,11 +56,11 @@ struct LevelVariableModifier {
         case (true, true):
             delta += -10
         case (true, false):
-            delta += 20
+            delta += 10
         case (false, true):
             delta += 0
         case (false, false):
-            delta += 40
+            delta += 15
         case (true, .none):
             delta += -20
         case (false, .none):
@@ -55,23 +75,23 @@ struct LevelVariableModifier {
     
     func chanceDeltaOfferRuneSlot(playerData: EntityModel, currentChance: Float, lastLevelOfferings: [StoreOffer]?) -> Float {
         guard let pickaxe = playerData.pickaxe else { return 0 }
-            
+        
         var delta: Float = 0
         let offeredARuneSlotLastLevel = lastLevelOfferings?.contains(where: { $0.type == .runeSlot })
-    
+        
         switch (pickaxe.isAtMaxCapacity(), offeredARuneSlotLastLevel) {
         case (true, true):
-            delta += 20
+            delta += 15
         case (true, false):
-            delta += 30
+            delta += 20
         case (false, true):
-            delta += -40
+            delta += -30
         case (false, false):
             delta += 0
         case (true, .none):
-            delta += 30
+            delta += 25
         case (false, .none):
-            delta += -25
+            delta += -15
         default:
             delta += 0
         }
@@ -92,10 +112,10 @@ struct LevelVariableModifier {
         } else {
             delta = 0
         }
-
+        
         return max(1, currentChance + delta)
     }
-
+    
     
     func chanceDeltaOfferRuneInEncasement(playerData: EntityModel, currentChance: Float) -> Float {
         guard let pickaxe = playerData.pickaxe else { return 0 }
@@ -111,7 +131,7 @@ struct LevelVariableModifier {
         return max(1, currentChance+delta)
         
     }
-
+    
     func chanceDeltaOfferRuneSlotInEncasement(playerData: EntityModel, currentChance: Float) -> Float {
         guard let pickaxe = playerData.pickaxe else { return 0 }
         
@@ -127,9 +147,9 @@ struct LevelVariableModifier {
         
     }
     
-
-
-
+    
+    
+    
     func chanceDeltaEncasement(numberOfEncasements: Int, depth: Depth, lastLevelFeatures: LevelFeatures?) -> Float {
         guard let lastLevelFeatures = lastLevelFeatures else {
             return 0
@@ -162,7 +182,7 @@ struct LevelVariableModifier {
         }
         
         return 0
-
+        
     }
     
     func chanceDeltaEncasementOffer(encasedOfferChanceModel: ChanceModel, playerData: EntityModel, lastLevelFeatures: LevelFeatures?) -> ChanceModel {
@@ -175,7 +195,7 @@ struct LevelVariableModifier {
             let newOffer = encasedOfferChanceModel.tileType
             switch (oldOffer, newOffer) {
                 
-            // monster was the old offer
+                // monster was the old offer
             case (.monster, .monster):
                 totalDelta -= 25
             case (.monster, .exit):
@@ -183,7 +203,7 @@ struct LevelVariableModifier {
             case (.monster, .item), (.monster, .offer):
                 totalDelta += 25
                 
-            // exit was the old offer
+                // exit was the old offer
             case (.exit, .monster):
                 totalDelta -= 20
             case (.exit, .exit):
@@ -191,7 +211,7 @@ struct LevelVariableModifier {
             case (.exit, .item), (.exit, .offer):
                 totalDelta += 25
                 
-            // offered an rune or item last level?
+                // offered an rune or item last level?
             case (.offer, .exit):
                 totalDelta += 15
             case (.offer, .monster):
@@ -201,7 +221,7 @@ struct LevelVariableModifier {
             case (.offer, .item):
                 totalDelta -= 12.5
                 
-            // got offered gems last level?
+                // got offered gems last level?
             case (.item, .exit):
                 totalDelta += 10
             case (.item, .monster):
@@ -221,7 +241,7 @@ struct LevelVariableModifier {
         
         return ChanceModel(tileType: encasedOfferChanceModel.tileType, chance: max(1, encasedOfferChanceModel.chance + totalDelta))
     }
-
+    
     
 }
 
@@ -251,7 +271,7 @@ class Level: Codable, Hashable {
     let randomSeed: UInt64
     let isTutorial: Bool
     weak var runModel: RunModel?
-
+    
     private var levelChanceModifier: LevelVariableModifier {
         return LevelVariableModifier()
     }
@@ -267,7 +287,7 @@ class Level: Codable, Hashable {
     public var offers: [StoreOffer] = []
     
     public var bossLevelStartTiles: [LevelStartTiles] {
-        let toughMonster: EntityModel.EntityType = Bool.random() ? .bat : .sally
+        let toughMonster: EntityModel.EntityType = .bat
         let goodReward = TileType.item(Item(type: .gem, amount: 100, color: .blue))
         
         let coord1 = TileCoord(6, 4)
@@ -294,7 +314,7 @@ class Level: Codable, Hashable {
         return pillarCoords
         
     }
-
+    
     public var isBossLevel: Bool {
         return bossLevelDepthNumber == depth
     }
@@ -401,7 +421,7 @@ class Level: Codable, Hashable {
     public func createLevelStartTiles(playerData: EntityModel) -> [LevelStartTiles] {
         let randomSource = GKLinearCongruentialRandomSource(seed: randomSeed)
         let lastLevelFeatures = runModel?.lastLevelFeatures(currentDepth: depth)
-//        let lastLevelOffersings = runModel?.lastLevelOffers(currentDepth: depth)
+        //        let lastLevelOffersings = runModel?.lastLevelOffers(currentDepth: depth)
         var encasementTiles: [LevelStartTiles] = []
         var pillarTiles: [LevelStartTiles] = []
         
@@ -448,7 +468,7 @@ class Level: Codable, Hashable {
             if randomSource.procsGivenChance(newChanceProcEncasement) {
                 // then create 4 pillars with something inside
                 // create monster to encase
-                let toughMonster: EntityModel.EntityType = randomSource.nextBool() ? .bat : .dragon
+                let toughMonster: EntityModel.EntityType = .bat
                 let monsterEntity = EntityModel(originalHp: 1, hp: 1, name: toughMonster.textureString, attack: .zero, type: toughMonster, carry: .zero, animations: [], pickaxe: nil, effects: [], dodge: 0, luck: 0, killedBy: nil)
                 
                 // create rune encasement chances
@@ -487,7 +507,7 @@ class Level: Codable, Hashable {
             
             if randomSource.procsGivenChance(newChanceProcEncasement) {
                 // then create 4 pillars with something inside
-                let toughMonster: EntityModel.EntityType = randomSource.nextBool() ? .bat : .sally
+                let toughMonster: EntityModel.EntityType = .bat
                 let monsterEntity = EntityModel(originalHp: 1, hp: 1, name: toughMonster.textureString, attack: .zero, type: toughMonster, carry: .zero, animations: [], pickaxe: nil, effects: [], dodge: 0, luck: 0, killedBy: nil)
                 let highTierItem = randomItem(playerData: playerData, tier: 2, optionalCheck: nil)
                 
@@ -513,7 +533,7 @@ class Level: Codable, Hashable {
             
             if randomSource.procsGivenChance(newChanceProcEncasement) {
                 // then create 4 pillars with something inside
-                let toughMonster: EntityModel.EntityType = randomSource.nextBool() ? .bat : .sally
+                let toughMonster: EntityModel.EntityType = .bat
                 let monsterEntity = EntityModel(originalHp: 1, hp: 1, name: toughMonster.textureString, attack: .zero, type: toughMonster, carry: .zero, animations: [], pickaxe: nil, effects: [], dodge: 0, luck: 0, killedBy: nil)
                 let highTierHealthItem = randomItem(playerData: playerData, tier: 2, optionalCheck: { $0.type.isAHealingOption })
                 let lowTierHealthItem = randomItem(playerData: playerData, tier: 1, optionalCheck: { $0.type.isAHealingOption })
@@ -552,8 +572,8 @@ class Level: Codable, Hashable {
         case 8:
             
             // create monster for encasements
-            let toughMonster: EntityModel.EntityType = randomSource.nextBool() ? .sally : .bat
-            let toughMonster2: EntityModel.EntityType = randomSource.nextBool() ? .dragon : .sally
+            let toughMonster: EntityModel.EntityType = .bat
+            let toughMonster2: EntityModel.EntityType = .bat
             let monsterEntity = EntityModel(originalHp: 1, hp: 1, name: toughMonster.textureString, attack: .zero, type: toughMonster, carry: .zero, animations: [], pickaxe: nil, effects: [], dodge: 0, luck: 0, killedBy: nil)
             let monsterEntity2 = EntityModel(originalHp: 1, hp: 1, name: toughMonster2.textureString, attack: .zero, type: toughMonster2, carry: .zero, animations: [], pickaxe: nil, effects: [], dodge: 0, luck: 0, killedBy: nil)
             let monster1ChanceModel: ChanceModel = .init(tileType: .monster(monsterEntity), chance: 25)
@@ -604,7 +624,7 @@ class Level: Codable, Hashable {
                 encasementTiles = potentialEncasementPillarCoords(randomSource: randomSource, encasementChanceModel: chanceModel, numberOfEncasements: 2)
             } else if randomSource.procsGivenChance(newChanceSingleEncasement) {
                 encasementTiles = potentialEncasementPillarCoords(randomSource: randomSource, encasementChanceModel: chanceModel, numberOfEncasements: 1)
-
+                
             } else {
                 pillarTiles = highLevelPillars(randomSource: randomSource)
             }
@@ -629,8 +649,8 @@ class Level: Codable, Hashable {
     }
     
     public func itemsInTier(_ tier: StoreOfferTier, playerData: EntityModel) -> [StoreOffer] {
-        let items = potentialItems(tier: tier, playerData: playerData)
         let lastLevelOffers = runModel?.lastLevelOffers(currentDepth: depth)
+        let items = potentialItems(tier: tier, playerData: playerData, lastLevelOffers: lastLevelOffers)
         self.offers.append(contentsOf: items)
         return items
     }
@@ -722,7 +742,7 @@ class Level: Codable, Hashable {
     
     // MARK: - Private methods
     
-    private func potentialItems(tier: Int, playerData: EntityModel) -> [StoreOffer] {
+    private func potentialItems(tier: Int, playerData: EntityModel, lastLevelOffers: [StoreOffer]?) -> [StoreOffer] {
         
         let randomSource = GKLinearCongruentialRandomSource(seed: randomSeed)
         
@@ -732,7 +752,7 @@ class Level: Codable, Hashable {
                 StoreOffer.offer(type: .plusOneMaxHealth, tier: 1)
             ]
         }
-        #if DEBUG
+#if DEBUG
         if depth == testLevelDepthNumber {
             if tier == 1 {
                 return [
@@ -748,12 +768,12 @@ class Level: Codable, Hashable {
             }
             
         }
-        #endif
+#endif
         
         var offers = [StoreOffer]()
         var allUnlockables = otherUnlockables
         allUnlockables.append(contentsOf: startingUnlockables)
-        offers.append(contentsOf: tierItems(tier: tier, depth: depth, unlockables: allUnlockables, playerData: playerData, randomSource: randomSource))
+        offers.append(contentsOf: tierItems(tier: tier, depth: depth, unlockables: allUnlockables, playerData: playerData, randomSource: randomSource, lastLevelOffers: lastLevelOffers))
         
         return offers
         
@@ -768,10 +788,11 @@ class Level: Codable, Hashable {
     /// [✅] - if a player just bought an item then increase the chance of it showing up
     ///
     
-    private func tierItems(tier: StoreOfferTier, depth: Depth, unlockables: [Unlockable], playerData: EntityModel, randomSource: GKLinearCongruentialRandomSource) -> [StoreOffer] {
+    private func tierItems(tier: StoreOfferTier, depth: Depth, unlockables: [Unlockable], playerData: EntityModel, randomSource: GKLinearCongruentialRandomSource, lastLevelOffers: [StoreOffer]?) -> [StoreOffer] {
         
         if tier == 1 {
             // always offer at least 1 heal
+            
             let healingOptions =
             unlockables
                 .filter { unlockable in
@@ -786,85 +807,99 @@ class Level: Codable, Hashable {
                     return !healingOptions.contains(unlockable) && unlockable.canAppearInRun && unlockable.item.tier == tier
                 }
             
-            guard let otherOption = otherOptions.randomElement(favorWhere: { $0.recentlyPurchasedAndHasntSpawnedYet }) else {  preconditionFailure("There must always be at least 1 other unlockable at tier 1 that isn't healing")}
+            guard let otherOptionOne = otherOptions.randomElement(favorWhere: { $0.recentlyPurchasedAndHasntSpawnedYet }) else {  preconditionFailure("There must always be at least 1 other unlockable at tier 1 that isn't healing")}
             
-            return [healingOption.item, otherOption.item]
+            guard let otherOptionTwo = otherOptions.randomElement(favorWhere: { $0.recentlyPurchasedAndHasntSpawnedYet }) else {  preconditionFailure("There must always be at least 1 other unlockable at tier 1 that isn't healing")}
+            
+            
+            var healthChance:Float = 33
+            let deltaHealthChance = levelChanceModifier.chanceDeltaOfferHealth(playerData: playerData)
+            healthChance += deltaHealthChance
+            let healthChanceModel = AnyChanceModel<StoreOffer>(thing: healingOption.item, chance: healthChance)
+            let otherOptionOneChanceModel = AnyChanceModel<StoreOffer>(thing: otherOptionOne.item, chance: 33)
+            let otherOptionTwoChanceModel = AnyChanceModel<StoreOffer>(thing: otherOptionTwo.item, chance: 33)
+            
+            let potentialItems: [AnyChanceModel<StoreOffer>] = [healthChanceModel, otherOptionOneChanceModel, otherOptionTwoChanceModel]
+            let choices: [AnyChanceModel<StoreOffer>] = randomSource.chooseElementsWithChance(potentialItems, choices: 2)
+            
+            return choices.map { $0.thing }
             
             // For testing purposes
             //            return [healingOption.item, StoreOffer.offer(type: .rune(.rune(for: .bubbleUp)), tier: 1)]
         }
         else if tier == 2 {
-            let playerHasFullPickaxe = playerData.pickaxe?.isAtMaxCapacity() ?? false
+            // create var to holf potential offerings
+            var potentialItems: [AnyChanceModel<StoreOffer>] = []
             
-            let chanceRune: Int
-            let chanceRuneSlot: Int
-            if playerHasFullPickaxe {
-                chanceRune = 20
-                chanceRuneSlot = 50
-            } else {
-                chanceRune = 75
-                chanceRuneSlot = 0
+            // create just random item chance
+            let nonRuneRelatedOptionChance: Float = 25
+//            let deltaNonRuneRelatedOptionChance = levelChanceModifier.chanceDeltaOfferHealth(playerData: <#T##EntityModel#>)
+            let notRuneRelatedOptions = unlockables.filter { unlockable in
+                // remove rune slots, just offer other types of rewards
+                return unlockable.canAppearInRun
+                && unlockable.item.tier == tier
+                && unlockable.item.type != .runeSlot
+                && unlockable.item.rune == nil
             }
             
-            var randomNumber = randomSource.nextInt(upperBound: 100)
-            var offeredRuneAlready = false
-            var offeredRuneSlotAlready = false
-            var options: [Unlockable] = []
-            while (options.count < 2) {
+            if let favoredChoice = notRuneRelatedOptions.randomElement(favorWhere: { $0.recentlyPurchasedAndHasntSpawnedYet } ) {
+                let favoredChoiceChanceModel = AnyChanceModel(thing: favoredChoice.item, chance: nonRuneRelatedOptionChance)
+                potentialItems.append(favoredChoiceChanceModel)
                 
-                if (randomNumber < chanceRune && !offeredRuneAlready) {
-                    offeredRuneAlready = true
-                    let runeOptions = unlockables.filter { unlockable in
-                        if case let StoreOfferType.rune(rune) = unlockable.item.type {
-                            return unlockable.canAppearInRun && unlockable.item.tier == tier && !(playerData.pickaxe?.runes.contains(rune) ?? false)
-                        } else {
-                            return false
-                        }
-                    }
-                    
-                    guard let option = runeOptions.randomElement(favorWhere: { $0.recentlyPurchasedAndHasntSpawnedYet }) else { continue }
-                    
-                    options.append(option)
-                    
-                } else if (randomNumber >= chanceRune && randomNumber < chanceRune + chanceRuneSlot && !offeredRuneSlotAlready) {
-                    offeredRuneSlotAlready = true
-                    
-                    let runeSlotOptions = unlockables.filter { unlockable in
-                        return unlockable.canAppearInRun && unlockable.item.tier == tier && unlockable.item.type == .runeSlot
-                    }
-                    
-                    guard let option = runeSlotOptions.randomElement(favorWhere: { $0.recentlyPurchasedAndHasntSpawnedYet }) else { continue }
-                    
-                    options.append(option)
-                    
-                } else {
-                    let otherOptions = unlockables.filter { unlockable in
-                        
-                        // remove runes
-                        if case StoreOfferType.rune = unlockable.item.type {
-                            return false
-                        }
-                        
-                        // remove rune slots, just offer other types of rewards
-                        return !options.contains(unlockable) && unlockable.canAppearInRun && unlockable.item.tier == tier && unlockable.item.type != .runeSlot
-                    }
-                    
-                    guard let option = otherOptions.randomElement(favorWhere: { $0.recentlyPurchasedAndHasntSpawnedYet }) else { continue }
-                    
-                    options.append(option)
+                if let nextChoice = randomSource.chooseElement(notRuneRelatedOptions, avoidBlock: { $0 == favoredChoice }) {
+                    let nextChoiceChanceModel = AnyChanceModel(thing: nextChoice.item, chance: 15)
+                    potentialItems.append(nextChoiceChanceModel)
                 }
-                
-                randomNumber = randomSource.nextInt(upperBound: 100)
-                
             }
             
-            return options.map { $0.item }
             
+            
+            // create a rune slot offer based on the palyer's pickaxe and last level's offering
+            let offerRuneSlotChance = levelChanceModifier.chanceDeltaOfferRuneSlot(playerData: playerData, currentChance: 25, lastLevelOfferings: lastLevelOffers)
+            let runeSlotOffer = StoreOffer.offer(type: .runeSlot, tier: 2)
+            let offerRuneSlotChanceModel: AnyChanceModel = .init(thing: runeSlotOffer, chance: offerRuneSlotChance)
+            
+            potentialItems.append(offerRuneSlotChanceModel)
+            
+            // create a rune offer 1
+            let offerRuneChance = levelChanceModifier.chanceDeltaOfferRune(playerData: playerData, currentChance: 25, lastLevelOfferings: lastLevelOffers)
+            let runeOneOptions = unlockables.filter { unlockable in
+                if case let StoreOfferType.rune(rune) = unlockable.item.type {
+                    return unlockable.canAppearInRun && unlockable.item.tier == tier && !(playerData.pickaxe?.runes.contains(rune) ?? false)
+                } else {
+                    return false
+                }
+            }
+            
+            guard let runeOptionOne = runeOneOptions.randomElement(favorWhere: { $0.recentlyPurchasedAndHasntSpawnedYet }) else {
+                return potentialItems.map { $0.thing }
+            }
+            let runeOptionOneChanceModel = AnyChanceModel(thing: runeOptionOne.item, chance: offerRuneChance)
+            potentialItems.append(runeOptionOneChanceModel)
+            
+            let runeOptionsTwo = unlockables.filter { unlockable in
+                if case let StoreOfferType.rune(rune) = unlockable.item.type {
+                    return unlockable.canAppearInRun
+                    && unlockable.item.tier == tier
+                    && unlockable != runeOptionOne
+                    && !(playerData.pickaxe?.runes.contains(rune) ?? false)
+                } else {
+                    return false
+                }
+            }
+            
+            if let runeOptionTwo = randomSource.chooseElement(runeOptionsTwo) {
+                let offerRuneTwoChance = levelChanceModifier.chanceDeltaOfferRune(playerData: playerData, currentChance: 5, lastLevelOfferings: lastLevelOffers)
+                let runeOptionTwoChanceModel = AnyChanceModel(thing: runeOptionTwo.item, chance: offerRuneTwoChance)
+                potentialItems.append(runeOptionTwoChanceModel)
+            }
+            
+            let choices = randomSource.chooseElementsWithChance(potentialItems, choices: 2)
+            return choices.map { $0.thing }
             
         } else {
-            preconditionFailure("For this release we are only allowing two goals")
+            preconditionFailure("Only call this for tiers 1 and 2")
         }
-        
     }
     
     
@@ -873,10 +908,12 @@ class Level: Codable, Hashable {
         var allUnlockables = Set<Unlockable>(self.startingUnlockables)
         allUnlockables.formUnion(self.otherUnlockables)
         
-        var newOffer: StoreOffer? = allUnlockables
+        let potentialOffers = allUnlockables
             .filter({ $0.canAppearInRun })
             .filter({ $0.item.rune != nil })
-            .randomElement()?.item
+
+        
+        var newOffer: StoreOffer? = potentialOffers.randomElement()?.item
         
         var maxTries: Int = 30
         
@@ -885,7 +922,7 @@ class Level: Codable, Hashable {
                pickace.runes.contains(where: { playerRune in
                    return playerRune == (newOffer?.rune ?? .zero)
                }) {
-                newOffer = allUnlockables.randomElement()?.item
+                newOffer = potentialOffers.randomElement()?.item
             } else {
                 return newOffer!
             }
@@ -910,7 +947,7 @@ class Level: Codable, Hashable {
         return newOffer ?? .zero
     }
     
-
+    
     
     private func potentialEncasementPillarCoords(randomSource: GKLinearCongruentialRandomSource, encasementChanceModel: [ChanceModel], numberOfEncasements: Int) -> [LevelStartTiles] {
         
@@ -923,9 +960,9 @@ class Level: Codable, Hashable {
             
             var pillarCoords: [LevelStartTiles] = []
             if let chosenEncasement = randomSource.chooseElement([encasementOption1, encasementOption2, encasementOption3, encasementOption4]) {
-            
+                
                 pillarCoords.append(contentsOf: matchupPillarsRandomly(colors: ShiftShaft_Color.pillarCases, coordinatess: chosenEncasement.outerTiles))
-            
+                
                 if let randomTile = randomSource.chooseElementWithChance(encasementChanceModel)?.tileType {
                     let encasedLevelStartTile = LevelStartTiles(tileType: randomTile, tileCoord: chosenEncasement.middleTile)
                     pillarCoords.append(encasedLevelStartTile)
@@ -1004,7 +1041,7 @@ class Level: Codable, Hashable {
     }
     
     
-        
+    
     private func lowLevelPillars(randomSource: GKLinearCongruentialRandomSource) -> [LevelStartTiles] {
         let coords: [TileCoord] = [
             TileCoord(5, 4), TileCoord(3, 4),
@@ -1070,7 +1107,7 @@ class Level: Codable, Hashable {
         if let chosenCoords = randomSource.chooseElement([coords, coords2, coords3, coords4, coords5, coords6]) {
             return matchupPillarsRandomly(coordinatess: chosenCoords)
         } else {
-             return []
+            return []
         }
     }
     

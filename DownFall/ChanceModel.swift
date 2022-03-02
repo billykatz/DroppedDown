@@ -19,6 +19,22 @@ class BlockChangeModel {
   
 }
 
+class AnyChanceModel<T: Equatable>: Equatable {
+    static func == (lhs: AnyChanceModel, rhs: AnyChanceModel) -> Bool {
+        return  (lhs.thing == rhs.thing) && (lhs.chance == rhs.chance)
+    }
+    
+    
+    let thing: T
+    let chance: Float
+    
+    init(thing: T, chance: Float) {
+        self.thing = thing
+        self.chance = chance
+    }
+}
+
+
 class ChanceModel: Equatable {
     static func == (lhs: ChanceModel, rhs: ChanceModel) -> Bool {
         return  (lhs.tileType == rhs.tileType) && (lhs.chance == rhs.chance)

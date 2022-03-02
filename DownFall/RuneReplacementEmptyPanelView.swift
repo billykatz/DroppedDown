@@ -39,7 +39,7 @@ class RuneReplacementEmptyPanelView: SKSpriteNode, ButtonDelegate {
     func addDiscardButton() {
         let button = ShiftShaft_Button(size: CGSize(width: 380, height: 80), delegate: self, identifier: .discardFoundRune, precedence: Precedence.floating, fontSize: 60, fontColor: .black, backgroundColor: .buttonGray)
         button.position = CGPoint.position(button.frame, inside: containerView.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: 45)
-        
+        button.zPosition = 100_000_000
         containerView.addChild(button)
         
     }

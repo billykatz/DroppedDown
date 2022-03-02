@@ -32,14 +32,17 @@ extension GKLinearCongruentialRandomSource {
         return array[chosenIndex]
     }
     
-    func chooseElement<Element>(_ array: [Element], avoidBlock: (Element) -> Bool) -> Element? {
+    func chooseElement<Element>(_ array: [Element], avoidBlock shouldAvoid: (Element) -> Bool) -> Element? {
         guard !array.isEmpty else { return nil }
         let nextFloat = nextUniform()
         let totalChances = Float(array.count) * nextFloat
         let chosenIndex =  Int(totalChances.rounded(.towardZero))
         var chosen = array[chosenIndex]
-        while avoidBlock(chosen) {
-            let nextFloat = nextUniform()
+        while shouldAvoid(chosen) {
+            var nextFloat = nextUniform()
+            if nextFloat == 1 {
+                nextFloat = 0.99
+            }
             let totalChances = Float(array.count) * nextFloat
             let chosenIndex =  Int(totalChances.rounded(.towardZero))
             chosen = array[chosenIndex]

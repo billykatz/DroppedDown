@@ -407,6 +407,10 @@ struct EntityModel: Equatable, Codable {
         return EntityModel(originalHp: 1, hp: 1, name: randomMonster.textureString, attack: .zero, type: randomMonster, carry: .zero, animations: [], pickaxe: nil, effects: [], dodge: 0, luck: 0, killedBy: nil)
     }
     
+    static func monsterWithType(_ type: EntityType) -> EntityModel {
+        return EntityModel(originalHp: 1, hp: 1, name: type.textureString, attack: .zero, type: type, carry: .zero, animations: [], pickaxe: nil, effects: [], dodge: 0, luck: 0, killedBy: nil)
+    }
+    
 }
 
 extension EntityModel: ResetsAttacks {

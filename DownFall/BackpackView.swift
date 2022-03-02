@@ -251,6 +251,8 @@ extension BackpackView {
             if node.name == targetingAreaName && viewModel.rune != nil && !background.contains(position) {
                 let tileCoord = translatePoint(position)
                 viewModel.didTarget(tileCoord)
+            } else if node.name == Constants.runeReplacementName  {
+                self.childNode(withName: Constants.runeReplacementName)?.touchesEnded(touches, with: event)
             }
         }
     }

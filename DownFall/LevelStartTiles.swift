@@ -33,5 +33,11 @@ struct LevelStartTiles: Codable, Hashable {
 struct EncasementCoords: Equatable, Hashable {
     let middleTile: TileCoord
     let outerTiles: [TileCoord]
+    
+    var allCoords: [TileCoord] {
+        var allTiles = outerTiles
+        allTiles.append(middleTile)
+        return allTiles
+    }
 }
 

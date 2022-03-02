@@ -519,7 +519,7 @@ class BossController {
     
     init(level: Level) {
         
-        let numIndividualPillars = level.bossLevelStartTiles.reduce(0, { prev, current in
+        let numIndividualPillars = level.levelStartTiles.reduce(0, { prev, current in
             if case let TileType.pillar(pillarData) = current.tileType {
                 return prev + pillarData.health
             } else {

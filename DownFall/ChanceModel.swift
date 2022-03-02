@@ -8,7 +8,23 @@
 
 import Foundation
 
-class BlockChangeModel {
+class IdentifiableBlock: Equatable {
+    static func ==(lhs: IdentifiableBlock, rhs: IdentifiableBlock) -> Bool {
+        return lhs.id == rhs.id
+    }
+    
+    
+    let block: () -> ()
+    let id = UUID()
+    
+    init(block: @escaping () -> ()) {
+        self.block = block
+    }
+
+}
+
+class BlockChanceModel {
+    
     let block: () -> ()
     let chance: Float
     

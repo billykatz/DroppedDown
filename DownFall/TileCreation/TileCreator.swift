@@ -363,10 +363,9 @@ class TileCreator: TileStrategy {
         
         // place the pillars
         var reservedCoordinates: Set<TileCoord> = Set()
+
         
-        // reserve special level start tile coords
-        let levelStartTiles = level.createLevelStartTiles(playerData: playerData)
-        for levelStartTile in levelStartTiles {
+        for levelStartTile in level.levelStartTiles {
             if case TileType.monster(let monster) = levelStartTile.tileType,
                 let entity = entities.entity(with: monster.type) {
                 tiles[levelStartTile.tileCoord.row][levelStartTile.tileCoord.col] = Tile(type: TileType.monster(entity))

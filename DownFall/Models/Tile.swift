@@ -347,6 +347,22 @@ enum TileType: Hashable, CaseIterable, Codable {
         return TileType.item(.gem)
     }
     
+    var gemAmount: Int? {
+        if case TileType.item(let item) = self {
+            return item.amount
+        } else {
+            return nil
+        }
+    }
+    
+    var pillarHealth: Int? {
+        if case TileType.pillar(let data) = self {
+            return data.health
+        } else {
+            return nil
+        }
+    }
+    
     private var isRock: Bool {
         if case TileType.rock = self { return true }
         return false

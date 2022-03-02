@@ -56,8 +56,8 @@ extension UIColor {
     static let lightBarGem = UIColor(rgb: 0x9edfc6)
     static let lightBarRune = UIColor(rgb: 0xafafaf)
     static let darkBarRune = UIColor(rgb: 0x817e7e)
-    static let lightBarPillar = UIColor(rgb: 0xe2eb3d)
-    static let darkBarPillar = UIColor(rgb: 0xd0d936)
+    static let lightBarPillar = UIColor(rgb: 0xA0D398)
+    static let darkBarPillar = UIColor(rgb: 0x4C7D44)
     static let lightBarBlood = UIColor(rgb: 0xD22E35)
     static let darkBarBlood = UIColor(rgb: 0x9A1F2F)
 

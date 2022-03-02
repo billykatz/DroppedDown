@@ -26,7 +26,6 @@ struct LevelConstructor {
             maxMonsterOnBoardRatio: maxMonsterOnBoardRatio(depth: depth),
             boardSize: boardSize(depth: depth),
             tileTypeChances: availableRocksPerLevel(depth: depth),
-            goals: levelGoal(depth: depth, gemAtDepth: gemsAtDepth, randomSource: randomSource, isTutorial: isTutorial),
             maxSpawnGems: gemsAtDepth,
             goalProgress: [],
             savedBossPhase: nil,
@@ -49,96 +48,6 @@ struct LevelConstructor {
         return max(1, depthDivided(depth))
     }
     
-    static func levelGoal(depth: Depth, gemAtDepth: Int, randomSource: GKLinearCongruentialRandomSource, isTutorial: Bool) -> [LevelGoal] {
-        func randomRockGoal(_ colors: [ShiftShaft_Color], amount: Int, minimumGroupSize: Int = 1) -> LevelGoal? {
-            guard let randomColor = colors.randomElement() else { return nil }
-            return LevelGoal(type: .unlockExit, tileType: .rock(color: randomColor, holdsGem: false, groupCount: 0), targetAmount: amount, minimumGroupSize: minimumGroupSize, grouped: minimumGroupSize > 1)
-        }
-        
-        
-        var goals: [LevelGoal?]
-        switch depth {
-        case 0:
-            if isTutorial {
-                let rockGoal = randomRockGoal([.purple], amount: 15)!
-                
-                return [rockGoal]
-            }
-            let monsterGoal = LevelGoal.killMonsterGoal(amount: 1)
-            let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 20)
-            
-            goals = [monsterGoal, rockGoal]
-        case 1:
-            let monsterGoal = LevelGoal.killMonsterGoal(amount: 2)
-            let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 25)
-            goals = [rockGoal, monsterGoal]
-            
-        case 2,3:
-            let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 30)
-            let monsterGoal = LevelGoal.killMonsterGoal(amount: 3)
-            
-            goals = [rockGoal, monsterGoal]
-            
-        case 4:
-            let monsterAmount = 4
-            let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 35)
-            let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
-            
-            goals = [rockGoal, monsterGoal]
-            
-        case 5:
-            let monsterAmount = 5
-            let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 40)
-            let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
-            
-            goals = [rockGoal, monsterGoal]
-            
-        case 6:
-            let monsterAmount = 6
-            let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 45)
-            let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
-            
-            goals = [rockGoal, monsterGoal]
-            
-        case 7:
-            let monsterAmount = 7
-            let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 50)
-            let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
-            
-            goals = [rockGoal, monsterGoal]
-            
-        case bossLevelDepthNumber:
-            
-            goals = [LevelGoal.bossGoal()]
-            
-        case 8, 9:
-            let monsterAmount = 8
-            let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 55)
-            let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
-            
-            goals = [rockGoal, monsterGoal]
-            
-            
-        case 10...Int.max:
-            let monsterAmount = Int.random(in: 10...15)
-            let rockGoal = randomRockGoal([.red, .purple, .blue], amount: Int.random(lower: 60, upper: 75, interval: 5))
-            let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
-            
-            goals = [rockGoal, monsterGoal]
-            
-        case testLevelDepthNumber:
-            let rockGoal = LevelGoal(type: .unlockExit, tileType: .rock(color: .blue, holdsGem: false, groupCount: 0), targetAmount: 3, minimumGroupSize: 1, grouped: false)
-            let rockGoal2 = LevelGoal(type: .unlockExit, tileType: .rock(color: .purple, holdsGem: false, groupCount: 0), targetAmount: 4, minimumGroupSize: 1, grouped: false)
-            //            let monsterGoal = LevelGoal.killMonsterGoal(amount: 4)
-            goals = [rockGoal, rockGoal2]
-            
-        default:
-            goals = []
-        }
-        
-        return goals.compactMap { $0 }.choose(random: 2)
-    }
-    
     static func boardSize(depth: Depth) -> Int {
         switch depth {
         case 0, 1:
@@ -148,7 +57,7 @@ struct LevelConstructor {
         case 5...Int.max:
             return 9
         case testLevelDepthNumber:
-            return 7
+            return 8
         default:
             fatalError()
         }

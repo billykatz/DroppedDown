@@ -87,7 +87,7 @@ class GameScene: SKScene {
     public func commonInit(boardSize: Int,
                            entities: EntitiesModel,
                            difficulty: Difficulty = .normal,
-                           updatedEntity: EntityModel? = nil,
+                           updatedEntity: EntityModel,
                            level: Level,
                            randomSource: GKLinearCongruentialRandomSource?,
                            stats: [Statistics],
@@ -96,7 +96,6 @@ class GameScene: SKScene {
                            profileViewModel: ProfileViewModel?,
                            numberOfPreviousBossWins: Int
     ) {
-        
         self.profileViewModel = profileViewModel
         
         // create the tutorial conductor
@@ -104,14 +103,18 @@ class GameScene: SKScene {
         
         // init our level
         self.level = level
-        self.levelGoalTracker = LevelGoalTracker(level: level, tutorialConductor: tutorialConductor)
-        self.runStatTracker = RunStatTracker(runStats: stats, level: level)
-        self.numberOfPreviousBossWins = numberOfPreviousBossWins
+        level.startLevel(playerData: updatedEntity, isTutorial: tutorialConductor.isTutorial)
+        
         
         //create the foreground node
         foreground = SKNode()
         foreground.position = .zero
         addChild(foreground)
+        
+        
+        self.levelGoalTracker = LevelGoalTracker(level: level, tutorialConductor: tutorialConductor)
+        self.runStatTracker = RunStatTracker(runStats: stats, level: level)
+        self.numberOfPreviousBossWins = numberOfPreviousBossWins
         
         
         //init our tile creator

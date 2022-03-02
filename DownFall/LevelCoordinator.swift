@@ -15,7 +15,7 @@ protocol LevelCoordinating: AnyObject {
     var gameSceneNode: GameScene? { get set }
     var entities: EntitiesModel? { get set }
     var delegate: MenuCoordinating? { get set }
-    func presentNextLevel(_ level: Level, playerData: EntityModel?, savedTiles: [[Tile]]?)
+    func presentNextLevel(_ level: Level, playerData: EntityModel, savedTiles: [[Tile]]?)
     func loadRun(_ runModel: RunModel?, profile: Profile)
     func saveAllState() -> RunModel
     
@@ -48,7 +48,7 @@ class LevelCoordinator: LevelCoordinating, GameSceneCoordinatingDelegate, CodexC
         
     }
     
-    func presentNextLevel(_ level: Level, playerData: EntityModel?, savedTiles: [[Tile]]? = []) {
+    func presentNextLevel(_ level: Level, playerData: EntityModel, savedTiles: [[Tile]]? = []) {
         gameSceneNode?.prepareForReuse()
         if let scene = GKScene(fileNamed: "GameScene")?.rootNode as? GameScene,
            let entities = entities {

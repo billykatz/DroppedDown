@@ -153,5 +153,16 @@ class RunModel: Codable, Equatable {
         }
         return offers
     }
+    
+    func lastLevelGoals(currentDepth: Int) -> [LevelGoal] {
+        var goals: [LevelGoal] = []
+        for area in areas {
+            if case AreaType.level(let level) = area.type,
+               level.depth == currentDepth - 1 {
+                goals.append(contentsOf: level.goals)
+            }
+        }
+        return goals
+    }
 
 }

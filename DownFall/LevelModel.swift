@@ -252,7 +252,7 @@ class Level: Codable, Hashable {
         return lhs.depth == rhs.depth && lhs.randomSeed == rhs.randomSeed
     }
     
-    static let zero = Level(depth: 0, monsterTypeRatio: [:], monsterCountStart: 0, maxMonsterOnBoardRatio: 0.0, boardSize: 0, tileTypeChances: TileTypeChanceModel(chances: [.empty: 1]), goals: [LevelGoal(type: .unlockExit, tileType: .empty, targetAmount: 0, minimumGroupSize: 0, grouped: false)], maxSpawnGems: 0, goalProgress: [], savedBossPhase: nil, gemsSpawned: 0, monsterSpawnTurnTimer: 0, startingUnlockables: [], otherUnlockables: [], randomSeed: 12345, isTutorial: false, runModel: nil)
+    static let zero = Level(depth: 0, monsterTypeRatio: [:], monsterCountStart: 0, maxMonsterOnBoardRatio: 0.0, boardSize: 0, tileTypeChances: TileTypeChanceModel(chances: [.empty: 1]), maxSpawnGems: 0, goalProgress: [], savedBossPhase: nil, gemsSpawned: 0, monsterSpawnTurnTimer: 0, startingUnlockables: [], otherUnlockables: [], randomSeed: 12345, isTutorial: false, runModel: nil)
     
     let depth: Depth
     let monsterTypeRatio: [EntityModel.EntityType: RangeModel]
@@ -260,7 +260,6 @@ class Level: Codable, Hashable {
     let maxMonsterOnBoardRatio: Double
     let boardSize: Int
     let tileTypeChances: TileTypeChanceModel
-    let goals: [LevelGoal]
     let maxSpawnGems: Int
     var goalProgress: [GoalTracking]
     var savedBossPhase: BossPhase?
@@ -284,7 +283,10 @@ class Level: Codable, Hashable {
             return  []
         }
     }
+    
     public var offers: [StoreOffer] = []
+    
+    public var goals: [LevelGoal] = []
     
     public var bossLevelStartTiles: [LevelStartTiles] {
         let toughMonster: EntityModel.EntityType = .bat
@@ -330,7 +332,6 @@ class Level: Codable, Hashable {
         maxMonsterOnBoardRatio: Double,
         boardSize: Int,
         tileTypeChances: TileTypeChanceModel,
-        goals: [LevelGoal],
         maxSpawnGems: Int,
         goalProgress: [GoalTracking],
         savedBossPhase: BossPhase?,
@@ -349,7 +350,6 @@ class Level: Codable, Hashable {
         self.maxMonsterOnBoardRatio = maxMonsterOnBoardRatio
         self.boardSize = boardSize
         self.tileTypeChances = tileTypeChances
-        self.goals = goals
         self.maxSpawnGems = maxSpawnGems
         self.goalProgress = goalProgress
         self.savedBossPhase = savedBossPhase
@@ -367,6 +367,14 @@ class Level: Codable, Hashable {
     }
     
     // MARK: - Public Methods
+    
+    public func startLevel(playerData: EntityModel, isTutorial: Bool) {
+        // sets level features
+        let levelStartTiles = createLevelStartTiles(playerData: playerData)
+        // sets our self.goals
+        let previousLevelGoals = runModel?.lastLevelGoals(currentDepth: depth)
+        self.goals = createLevelGoals(playerData: playerData, levelStartTiles: levelStartTiles, isTutorial: isTutorial, previousLevelGoals: previousLevelGoals)
+    }
     
     
     public func monsterChanceOfShowingUp(tilesSinceMonsterKilled: Int) -> Int {
@@ -416,9 +424,266 @@ class Level: Codable, Hashable {
         }
     }
     
+    public func itemsInTier(_ tier: StoreOfferTier, playerData: EntityModel) -> [StoreOffer] {
+        let lastLevelOffers = runModel?.lastLevelOffers(currentDepth: depth)
+        let items = potentialItems(tier: tier, playerData: playerData, lastLevelOffers: lastLevelOffers)
+        self.offers.append(contentsOf: items)
+        return items
+    }
+    
+    public func rerollOffersForLevel(_ level: Level, playerData: EntityModel) -> [StoreOffer] {
+        var newOffers: [StoreOffer] = []
+        var reservedOffers = Set<StoreOffer>()
+        
+        let randomSource = GKLinearCongruentialRandomSource(seed: randomSeed)
+        let firstTierOffers = level.itemsInTier(1, playerData: playerData).filter( { $0.type != .snakeEyes } )
+        
+        if !firstTierOffers.isEmpty {
+            reservedOffers = reservedOffers.union(firstTierOffers)
+            let newOffer = level.rerollPotentialItems(depth: level.depth, unlockables: level.otherUnlockables, startingUnlockables: level.startingUnlockables, playerData: playerData, randomSource: randomSource, reservedOffers: reservedOffers, offerTier: 1, numberOfItems: firstTierOffers.count)
+            
+            newOffers.append(contentsOf: newOffer)
+        }
+        
+        reservedOffers.removeAll()
+        
+        let secondTierOffers = level.itemsInTier(2, playerData: playerData).filter( { $0.type != .snakeEyes } )
+        
+        if !secondTierOffers.isEmpty {
+            reservedOffers = reservedOffers.union(secondTierOffers)
+            let newOffer = level.rerollPotentialItems(depth: level.depth, unlockables: level.otherUnlockables, startingUnlockables: level.startingUnlockables, playerData: playerData, randomSource: randomSource, reservedOffers: reservedOffers, offerTier: 2, numberOfItems: secondTierOffers.count)
+            
+            newOffers.append(contentsOf: newOffer)
+        }
+        
+        return newOffers
+    }
+    
+    public func randomItemOrRune(offersOnBoard: [StoreOffer]) -> StoreOffer {
+        // pool of items
+        var allUnlockables = Set<Unlockable>(self.startingUnlockables)
+        allUnlockables.formUnion(self.otherUnlockables)
+        
+        // reserve items
+        var reservedOffers = Set<StoreOffer>()
+        reservedOffers.formUnion(offersOnBoard)
+        
+        var newOffer: StoreOffer? = allUnlockables.randomElement()?.item
+        var maxTries: Int = 30
+        while reservedOffers.contains(newOffer ?? .zero) && maxTries > 0 {
+            newOffer = allUnlockables.randomElement()?.item
+            maxTries -= 1
+        }
+        
+        return newOffer!
+    }
+    
+    
+    // MARK: - Private methods
+    
+    private func rerollPotentialItems(depth: Depth, unlockables: [Unlockable], startingUnlockables: [Unlockable], playerData: EntityModel, randomSource: GKLinearCongruentialRandomSource, reservedOffers: Set<StoreOffer>, offerTier: StoreOfferTier, numberOfItems: Int) -> [StoreOffer] {
+        
+        var offers = [StoreOffer]()
+        var allUnlockables = unlockables
+        allUnlockables.append(contentsOf: startingUnlockables)
+        offers.append(contentsOf: rerollTierItems(numberOfItems: numberOfItems, tier: offerTier, depth: depth, unlockables: allUnlockables, playerData: playerData, reservedOffers: reservedOffers, randomSource: randomSource))
+        
+        return offers
+    }
+    
+    private func rerollTierItems(numberOfItems: Int, tier: StoreOfferTier, depth: Depth, unlockables: [Unlockable], playerData: EntityModel, reservedOffers: Set<StoreOffer>, randomSource: GKLinearCongruentialRandomSource) -> [StoreOffer] {
+        var storeOffers: [StoreOffer] = []
+        
+        var allOptions =
+        unlockables
+            .filter { unlockable in
+                return unlockable.canAppearInRun && unlockable.item.tier == tier && (!reservedOffers.contains(unlockable.item) && unlockable.item.type != .snakeEyes)
+            }
+        
+        // grab as many as we need
+        var maxCount = 30
+        while storeOffers.count < numberOfItems {
+            let potentialOption = allOptions.randomElement(favorWhere: { $0.recentlyPurchasedAndHasntSpawnedYet })
+            if let potentialOffer = potentialOption?.item, !storeOffers.contains(potentialOffer) {
+                storeOffers.append(potentialOffer)
+                allOptions.removeFirst(where: { $0 == potentialOption })
+            }
+            
+            maxCount -= 1
+            if maxCount < 0 {
+                break
+            }
+        }
+        
+        return storeOffers
+    }
+    
     /// func to create different configurations of level start tiles
     /// Sets the LevelFeatures var that backs level start tiles
-    public func createLevelStartTiles(playerData: EntityModel) -> [LevelStartTiles] {
+    private func createLevelGoals(playerData: EntityModel, levelStartTiles: [LevelStartTiles], isTutorial: Bool, previousLevelGoals: [LevelGoal]?) -> [LevelGoal] {
+        let randomSource = GKLinearCongruentialRandomSource(seed: randomSeed)
+        func randomRockGoal(_ colors: [ShiftShaft_Color], amount: Int, minimumGroupSize: Int = 1) -> LevelGoal? {
+            guard let randomColor = colors.randomElement() else { return nil }
+            return LevelGoal(type: .unlockExit, tileType: .rock(color: randomColor, holdsGem: false, groupCount: 0),
+                             targetAmount: amount, minimumGroupSize: minimumGroupSize, grouped: minimumGroupSize > 1)
+        }
+        
+        let totalPillarAmount = levelStartTiles
+            .filter { levelStartTile in
+                if case TileType.pillar = levelStartTile.tileType {
+                    return true
+                } else {
+                    return false
+                }
+            }
+            .compactMap { $0.tileType.pillarHealth }
+            .reduce(0, +)
+        
+        let offeredGemAmount = levelStartTiles
+            .filter({ levelStartTile in
+                if case TileType.item = levelStartTile.tileType {
+                    return true
+                } else {
+                    return false
+                }
+            })
+            .compactMap { $0.tileType.gemAmount }
+            .reduce(0, +)
+                
+        
+        var goals: [LevelGoal?] = []
+        switch depth {
+        case 0:
+            if isTutorial {
+                let rockGoal = randomRockGoal([.purple], amount: 15)!
+                
+                return [rockGoal]
+            }
+            
+            let monsterGoal = LevelGoal.killMonsterGoal(amount: 1)
+            let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 20)
+            
+            goals = [monsterGoal, rockGoal]
+            
+        case 1:
+            let monsterGoal = LevelGoal.killMonsterGoal(amount: 2)
+            let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 25)
+            
+            goals = [rockGoal, monsterGoal]
+            
+        case 2:
+            let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 30)
+            let monsterGoal = LevelGoal.killMonsterGoal(amount: 3)
+            
+            goals = [rockGoal, monsterGoal]
+            
+        case 3:
+            let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 30)
+            let monsterGoal = LevelGoal.killMonsterGoal(amount: 4)
+            let pillarGoal = LevelGoal.pillarGoal(amount: totalPillarAmount)
+            
+            goals = [rockGoal, monsterGoal, pillarGoal]
+            
+        case 4:
+            let monsterAmount = 5
+            let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 35)
+            let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
+            let pillarGoal = LevelGoal.pillarGoal(amount: totalPillarAmount)
+            
+            goals = [rockGoal, monsterGoal, pillarGoal]
+            
+        case 5:
+            let monsterAmount = 7
+            let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 40)
+            let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
+            let pillarGoal = LevelGoal.pillarGoal(amount: totalPillarAmount)
+            if offeredGemAmount > 0 {
+                goals.append(LevelGoal.gemGoal(amount: offeredGemAmount))
+            }
+            
+            goals.append(contentsOf: [rockGoal, monsterGoal, pillarGoal])
+            
+        case 6:
+            let monsterAmount = 9
+            let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 45)
+            let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
+            let pillarGoal = LevelGoal.pillarGoal(amount: totalPillarAmount)
+            
+            goals = [rockGoal, monsterGoal, pillarGoal]
+            
+        case 7:
+            let monsterAmount = 12
+            let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 50)
+            let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
+            let pillarGoal = LevelGoal.pillarGoal(amount: totalPillarAmount)
+            if offeredGemAmount > 0 {
+                goals.append(LevelGoal.gemGoal(amount: offeredGemAmount))
+            }
+
+            
+            goals.append(contentsOf: [rockGoal, monsterGoal, pillarGoal])
+            
+        case 8:
+            let monsterAmount = 15
+            let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 55)
+            let brownRockGoal = randomRockGoal([.brown], amount: 6)
+            let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
+            let pillarGoal = LevelGoal.pillarGoal(amount: totalPillarAmount)
+            if offeredGemAmount > 0 {
+                goals.append(LevelGoal.gemGoal(amount: offeredGemAmount))
+            }
+
+            
+            goals.append(contentsOf: [rockGoal, monsterGoal, brownRockGoal, pillarGoal])
+            
+        case 9:
+            let monsterAmount = 20
+            let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 60)
+            let brownRockGoal = randomRockGoal([.brown], amount: 12)
+            let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
+            let pillarGoal = LevelGoal.pillarGoal(amount: totalPillarAmount)
+            if offeredGemAmount > 0 {
+                goals.append(LevelGoal.gemGoal(amount: offeredGemAmount))
+            }
+
+            
+            goals.append(contentsOf: [rockGoal, monsterGoal, brownRockGoal, pillarGoal])
+
+        case bossLevelDepthNumber:
+            
+            goals = [LevelGoal.bossGoal()]
+            
+            
+            
+        case 10...Int.max:
+            let monsterAmount = Int.random(in: 10...15)
+            let rockGoal = randomRockGoal([.red, .purple, .blue], amount: Int.random(lower: 60, upper: 75, interval: 5))
+            let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
+            
+            goals = [rockGoal, monsterGoal]
+            
+        case testLevelDepthNumber:
+            let rockGoal = LevelGoal(type: .unlockExit, tileType: .rock(color: .blue, holdsGem: false, groupCount: 0), targetAmount: 3, minimumGroupSize: 1, grouped: false)
+            let pillarGoal = LevelGoal.pillarGoal(amount: totalPillarAmount)
+            if offeredGemAmount > 0 {
+                goals.append(LevelGoal.gemGoal(amount: offeredGemAmount))
+            }
+
+            
+            goals.append(contentsOf: [rockGoal, pillarGoal])
+
+            
+        default:
+            goals = []
+        }
+        
+        return randomSource.chooseElements(choose: 2, fromArray: goals.compactMap { $0 })
+    }
+
+    
+    /// func to create different configurations of level start tiles
+    /// Sets the LevelFeatures var that backs level start tiles
+    private func createLevelStartTiles(playerData: EntityModel) -> [LevelStartTiles] {
         let randomSource = GKLinearCongruentialRandomSource(seed: randomSeed)
         let lastLevelFeatures = runModel?.lastLevelFeatures(currentDepth: depth)
         //        let lastLevelOffersings = runModel?.lastLevelOffers(currentDepth: depth)
@@ -637,6 +902,38 @@ class Level: Codable, Hashable {
         case bossLevelDepthNumber...Int.max:
             pillarTiles = []
             
+        case testLevelDepthNumber:
+            pillarTiles = []//lowLevelPillars(randomSource: randomSource)
+            // then create 4 pillars with something inside
+            // create monster to encase
+            let toughMonster: EntityModel.EntityType = .bat
+            let monsterEntity = EntityModel(originalHp: 1, hp: 1, name: toughMonster.textureString, attack: .zero, type: toughMonster, carry: .zero, animations: [], pickaxe: nil, effects: [], dodge: 0, luck: 0, killedBy: nil)
+            
+            // create rune encasement chances
+            let randomRune = randomRune(playerData: playerData)
+            let runeChance = levelChanceModifier.chanceDeltaOfferRuneInEncasement(playerData: playerData, currentChance: 15)
+            
+            // create rune slot encasement chances
+            let runeSlotChance = levelChanceModifier.chanceDeltaOfferRuneSlotInEncasement(playerData: playerData, currentChance: 15)
+            
+            // create other items to encase
+            let randomHealthItem = randomItem(playerData: playerData, tier: 1, optionalCheck: { $0.type.isAHealingOption })
+            let gems: Item = .init(type: .gem, amount: 50)
+            
+            let chanceModel: [ChanceModel] = [
+//                .init(tileType: .offer(.offer(type: .rune(randomRune.rune ?? .zero), tier: 3)), chance: runeChance),
+//                .init(tileType: .offer(.offer(type: .runeSlot, tier: 3)), chance: runeSlotChance),
+//                .init(tileType: .offer(.offer(type: randomHealthItem.type, tier: 3)), chance: 30),
+                .init(tileType: .item(gems), chance: 20),
+//                .init(tileType: .monster(monsterEntity), chance: 15),
+//                .init(tileType: .exit(blocked: true), chance: 5),
+            ].map { [levelChanceModifier] chanceModel in levelChanceModifier.chanceDeltaEncasementOffer(encasedOfferChanceModel: chanceModel, playerData: playerData, lastLevelFeatures: lastLevelFeatures)
+            }
+            
+            
+            let encasement = potentialEncasementPillarCoords(randomSource: randomSource, encasementChanceModel: chanceModel, numberOfEncasements: 1)
+            encasementTiles = encasement
+            
         default:
             pillarTiles = []
             
@@ -647,100 +944,6 @@ class Level: Codable, Hashable {
         pillarTiles.append(contentsOf: encasementTiles)
         return pillarTiles
     }
-    
-    public func itemsInTier(_ tier: StoreOfferTier, playerData: EntityModel) -> [StoreOffer] {
-        let lastLevelOffers = runModel?.lastLevelOffers(currentDepth: depth)
-        let items = potentialItems(tier: tier, playerData: playerData, lastLevelOffers: lastLevelOffers)
-        self.offers.append(contentsOf: items)
-        return items
-    }
-    
-    public func rerollOffersForLevel(_ level: Level, playerData: EntityModel) -> [StoreOffer] {
-        var newOffers: [StoreOffer] = []
-        var reservedOffers = Set<StoreOffer>()
-        
-        let randomSource = GKLinearCongruentialRandomSource(seed: randomSeed)
-        let firstTierOffers = level.itemsInTier(1, playerData: playerData).filter( { $0.type != .snakeEyes } )
-        
-        if !firstTierOffers.isEmpty {
-            reservedOffers = reservedOffers.union(firstTierOffers)
-            let newOffer = level.rerollPotentialItems(depth: level.depth, unlockables: level.otherUnlockables, startingUnlockables: level.startingUnlockables, playerData: playerData, randomSource: randomSource, reservedOffers: reservedOffers, offerTier: 1, numberOfItems: firstTierOffers.count)
-            
-            newOffers.append(contentsOf: newOffer)
-        }
-        
-        reservedOffers.removeAll()
-        
-        let secondTierOffers = level.itemsInTier(2, playerData: playerData).filter( { $0.type != .snakeEyes } )
-        
-        if !secondTierOffers.isEmpty {
-            reservedOffers = reservedOffers.union(secondTierOffers)
-            let newOffer = level.rerollPotentialItems(depth: level.depth, unlockables: level.otherUnlockables, startingUnlockables: level.startingUnlockables, playerData: playerData, randomSource: randomSource, reservedOffers: reservedOffers, offerTier: 2, numberOfItems: secondTierOffers.count)
-            
-            newOffers.append(contentsOf: newOffer)
-        }
-        
-        return newOffers
-    }
-    
-    private func rerollPotentialItems(depth: Depth, unlockables: [Unlockable], startingUnlockables: [Unlockable], playerData: EntityModel, randomSource: GKLinearCongruentialRandomSource, reservedOffers: Set<StoreOffer>, offerTier: StoreOfferTier, numberOfItems: Int) -> [StoreOffer] {
-        
-        var offers = [StoreOffer]()
-        var allUnlockables = unlockables
-        allUnlockables.append(contentsOf: startingUnlockables)
-        offers.append(contentsOf: rerollTierItems(numberOfItems: numberOfItems, tier: offerTier, depth: depth, unlockables: allUnlockables, playerData: playerData, reservedOffers: reservedOffers, randomSource: randomSource))
-        
-        return offers
-    }
-    
-    
-    private func rerollTierItems(numberOfItems: Int, tier: StoreOfferTier, depth: Depth, unlockables: [Unlockable], playerData: EntityModel, reservedOffers: Set<StoreOffer>, randomSource: GKLinearCongruentialRandomSource) -> [StoreOffer] {
-        var storeOffers: [StoreOffer] = []
-        
-        var allOptions =
-        unlockables
-            .filter { unlockable in
-                return unlockable.canAppearInRun && unlockable.item.tier == tier && (!reservedOffers.contains(unlockable.item) && unlockable.item.type != .snakeEyes)
-            }
-        
-        // grab as many as we need
-        var maxCount = 30
-        while storeOffers.count < numberOfItems {
-            let potentialOption = allOptions.randomElement(favorWhere: { $0.recentlyPurchasedAndHasntSpawnedYet })
-            if let potentialOffer = potentialOption?.item, !storeOffers.contains(potentialOffer) {
-                storeOffers.append(potentialOffer)
-                allOptions.removeFirst(where: { $0 == potentialOption })
-            }
-            
-            maxCount -= 1
-            if maxCount < 0 {
-                break
-            }
-        }
-        
-        return storeOffers
-    }
-    
-    public func randomItemOrRune(offersOnBoard: [StoreOffer]) -> StoreOffer {
-        // pool of items
-        var allUnlockables = Set<Unlockable>(self.startingUnlockables)
-        allUnlockables.formUnion(self.otherUnlockables)
-        
-        // reserve items
-        var reservedOffers = Set<StoreOffer>()
-        reservedOffers.formUnion(offersOnBoard)
-        
-        var newOffer: StoreOffer? = allUnlockables.randomElement()?.item
-        var maxTries: Int = 30
-        while reservedOffers.contains(newOffer ?? .zero) && maxTries > 0 {
-            newOffer = allUnlockables.randomElement()?.item
-            maxTries -= 1
-        }
-        
-        return newOffer!
-    }
-    
-    // MARK: - Private methods
     
     private func potentialItems(tier: Int, playerData: EntityModel, lastLevelOffers: [StoreOffer]?) -> [StoreOffer] {
         

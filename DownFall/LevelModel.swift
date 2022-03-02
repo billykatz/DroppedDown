@@ -185,6 +185,42 @@ struct LevelVariableModifier {
         
     }
     
+    func chanceDeltaLevelGoal(propsedGoalChanceModel: AnyChanceModel<LevelGoal>, lastLevelGoals: [LevelGoal]) -> AnyChanceModel<LevelGoal> {
+        guard !lastLevelGoals.isEmpty else { return propsedGoalChanceModel }
+        
+        
+        let delta = lastLevelGoals.reduce(Float(0), { prevDeltaTotal, lastLevelGoal in
+            var totalDelta: Float = 0
+            switch (lastLevelGoal.tileType, propsedGoalChanceModel.thing.tileType) {
+            case (.pillar, .pillar):
+                totalDelta -= propsedGoalChanceModel.chance / 2
+                
+            case let (.rock(lhsColor, _, _), .rock(rhsColor, _,  _)):
+                switch (lhsColor, rhsColor) {
+                case (.brown, .brown), (.red, .red), (.blue, .blue), (.purple, .purple):
+                    totalDelta -= propsedGoalChanceModel.chance / 2
+                case (_, .brown):
+                    totalDelta += propsedGoalChanceModel.chance * 1.5
+                default:
+                    break
+                }
+                
+            case (.monster, .monster):
+                totalDelta -= propsedGoalChanceModel.chance / 2
+                
+            default:
+                break
+                         
+            }
+            
+            return prevDeltaTotal + totalDelta
+            
+        })
+        
+        return AnyChanceModel(thing: propsedGoalChanceModel.thing, chance: propsedGoalChanceModel.chance + delta)
+        
+    }
+    
     func chanceDeltaEncasementOffer(encasedOfferChanceModel: ChanceModel, playerData: EntityModel, lastLevelFeatures: LevelFeatures?) -> ChanceModel {
         guard let features = lastLevelFeatures, !features.encasements.isEmpty else { return encasedOfferChanceModel }
         var totalDelta: Float = 0
@@ -522,8 +558,8 @@ class Level: Codable, Hashable {
     /// Sets the LevelFeatures var that backs level start tiles
     private func createLevelGoals(playerData: EntityModel, levelStartTiles: [LevelStartTiles], isTutorial: Bool, previousLevelGoals: [LevelGoal]?) -> [LevelGoal] {
         let randomSource = GKLinearCongruentialRandomSource(seed: randomSeed)
-        func randomRockGoal(_ colors: [ShiftShaft_Color], amount: Int, minimumGroupSize: Int = 1) -> LevelGoal? {
-            guard let randomColor = colors.randomElement() else { return nil }
+        func randomRockGoal(_ colors: [ShiftShaft_Color], amount: Int, minimumGroupSize: Int = 1) -> LevelGoal {
+            let randomColor = colors.randomElement()!
             return LevelGoal(type: .unlockExit, tileType: .rock(color: randomColor, holdsGem: false, groupCount: 0),
                              targetAmount: amount, minimumGroupSize: minimumGroupSize, grouped: minimumGroupSize > 1)
         }
@@ -540,22 +576,15 @@ class Level: Codable, Hashable {
             .reduce(0, +)
         
         let offeredGemAmount = levelStartTiles
-            .filter({ levelStartTile in
-                if case TileType.item = levelStartTile.tileType {
-                    return true
-                } else {
-                    return false
-                }
-            })
             .compactMap { $0.tileType.gemAmount }
             .reduce(0, +)
                 
         
-        var goals: [LevelGoal?] = []
+        var goalChances: [AnyChanceModel<LevelGoal>] = []
         switch depth {
         case 0:
             if isTutorial {
-                let rockGoal = randomRockGoal([.purple], amount: 15)!
+                let rockGoal = randomRockGoal([.purple], amount: 15)
                 
                 return [rockGoal]
             }
@@ -563,26 +592,42 @@ class Level: Codable, Hashable {
             let monsterGoal = LevelGoal.killMonsterGoal(amount: 1)
             let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 20)
             
-            goals = [monsterGoal, rockGoal]
+            let rockGoalChance = AnyChanceModel(thing: rockGoal, chance: 50)
+            let monsterGoalChance = AnyChanceModel(thing: monsterGoal, chance: 50)
+            
+            goalChances.append(contentsOf: [rockGoalChance, monsterGoalChance])
             
         case 1:
             let monsterGoal = LevelGoal.killMonsterGoal(amount: 2)
             let rockGoal = randomRockGoal([.blue, .purple, .red], amount: 25)
             
-            goals = [rockGoal, monsterGoal]
+            let rockGoalChance = AnyChanceModel(thing: rockGoal, chance: 50)
+            let monsterGoalChance = AnyChanceModel(thing: monsterGoal, chance: 50)
+            
+            goalChances.append(contentsOf: [rockGoalChance, monsterGoalChance])
             
         case 2:
             let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 30)
             let monsterGoal = LevelGoal.killMonsterGoal(amount: 3)
             
-            goals = [rockGoal, monsterGoal]
+            let rockGoalChance = AnyChanceModel(thing: rockGoal, chance: 50)
+            let monsterGoalChance = AnyChanceModel(thing: monsterGoal, chance: 50)
+            
+            goalChances.append(contentsOf: [rockGoalChance, monsterGoalChance])
+
             
         case 3:
+            
             let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 30)
             let monsterGoal = LevelGoal.killMonsterGoal(amount: 4)
             let pillarGoal = LevelGoal.pillarGoal(amount: totalPillarAmount)
             
-            goals = [rockGoal, monsterGoal, pillarGoal]
+            
+            let rockGoalChance = AnyChanceModel(thing: rockGoal, chance: 33)
+            let monsterGoalChance = AnyChanceModel(thing: monsterGoal, chance: 33)
+            let pillarGoalChance = AnyChanceModel(thing: pillarGoal, chance: 33)
+            
+            goalChances.append(contentsOf: [rockGoalChance, monsterGoalChance, pillarGoalChance])
             
         case 4:
             let monsterAmount = 5
@@ -590,7 +635,11 @@ class Level: Codable, Hashable {
             let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
             let pillarGoal = LevelGoal.pillarGoal(amount: totalPillarAmount)
             
-            goals = [rockGoal, monsterGoal, pillarGoal]
+            let rockGoalChance = AnyChanceModel(thing: rockGoal, chance: 33)
+            let monsterGoalChance = AnyChanceModel(thing: monsterGoal, chance: 33)
+            let pillarGoalChance = AnyChanceModel(thing: pillarGoal, chance: 33)
+            
+            goalChances.append(contentsOf: [rockGoalChance, monsterGoalChance, pillarGoalChance])
             
         case 5:
             let monsterAmount = 7
@@ -598,10 +647,16 @@ class Level: Codable, Hashable {
             let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
             let pillarGoal = LevelGoal.pillarGoal(amount: totalPillarAmount)
             if offeredGemAmount > 0 {
-                goals.append(LevelGoal.gemGoal(amount: offeredGemAmount))
+                let gemGoal = LevelGoal.gemGoal(amount: offeredGemAmount)
+                let gemGoalChance = AnyChanceModel(thing: gemGoal, chance: 100)
+                goalChances.append(gemGoalChance)
             }
             
-            goals.append(contentsOf: [rockGoal, monsterGoal, pillarGoal])
+            let rockGoalChance = AnyChanceModel(thing: rockGoal, chance: 20)
+            let monsterGoalChance = AnyChanceModel(thing: monsterGoal, chance: 20)
+            let pillarGoalChance = AnyChanceModel(thing: pillarGoal, chance: 20)
+            
+            goalChances.append(contentsOf: [rockGoalChance, monsterGoalChance, pillarGoalChance])
             
         case 6:
             let monsterAmount = 9
@@ -609,7 +664,12 @@ class Level: Codable, Hashable {
             let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
             let pillarGoal = LevelGoal.pillarGoal(amount: totalPillarAmount)
             
-            goals = [rockGoal, monsterGoal, pillarGoal]
+            let rockGoalChance = AnyChanceModel(thing: rockGoal, chance: 33)
+            let monsterGoalChance = AnyChanceModel(thing: monsterGoal, chance: 33)
+            let pillarGoalChance = AnyChanceModel(thing: pillarGoal, chance: 33)
+            
+            goalChances.append(contentsOf: [rockGoalChance, monsterGoalChance, pillarGoalChance])
+
             
         case 7:
             let monsterAmount = 12
@@ -617,12 +677,17 @@ class Level: Codable, Hashable {
             let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
             let pillarGoal = LevelGoal.pillarGoal(amount: totalPillarAmount)
             if offeredGemAmount > 0 {
-                goals.append(LevelGoal.gemGoal(amount: offeredGemAmount))
+                let gemGoal = LevelGoal.gemGoal(amount: offeredGemAmount)
+                let gemGoalChance = AnyChanceModel(thing: gemGoal, chance: 100)
+                goalChances.append(gemGoalChance)
             }
+            
+            let rockGoalChance = AnyChanceModel(thing: rockGoal, chance: 20)
+            let monsterGoalChance = AnyChanceModel(thing: monsterGoal, chance: 20)
+            let pillarGoalChance = AnyChanceModel(thing: pillarGoal, chance: 20)
+            
+            goalChances.append(contentsOf: [rockGoalChance, monsterGoalChance, pillarGoalChance])
 
-            
-            goals.append(contentsOf: [rockGoal, monsterGoal, pillarGoal])
-            
         case 8:
             let monsterAmount = 15
             let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 55)
@@ -630,54 +695,68 @@ class Level: Codable, Hashable {
             let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
             let pillarGoal = LevelGoal.pillarGoal(amount: totalPillarAmount)
             if offeredGemAmount > 0 {
-                goals.append(LevelGoal.gemGoal(amount: offeredGemAmount))
+                let gemGoal = LevelGoal.gemGoal(amount: offeredGemAmount)
+                let gemGoalChance = AnyChanceModel(thing: gemGoal, chance: 100)
+                goalChances.append(gemGoalChance)
             }
+            
+            let rockGoalChance = AnyChanceModel(thing: rockGoal, chance: 20)
+            let monsterGoalChance = AnyChanceModel(thing: monsterGoal, chance: 20)
+            let pillarGoalChance = AnyChanceModel(thing: pillarGoal, chance: 20)
+            let brownGoalChance = AnyChanceModel(thing: brownRockGoal, chance: 15)
+            
+            goalChances.append(contentsOf: [rockGoalChance, monsterGoalChance, pillarGoalChance, brownGoalChance])
 
-            
-            goals.append(contentsOf: [rockGoal, monsterGoal, brownRockGoal, pillarGoal])
-            
         case 9:
             let monsterAmount = 20
             let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 60)
             let brownRockGoal = randomRockGoal([.brown], amount: 12)
             let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
-            let pillarGoal = LevelGoal.pillarGoal(amount: totalPillarAmount)
+            let pillarGoal = LevelGoal.pillarGoal(amount: (totalPillarAmount))
             if offeredGemAmount > 0 {
-                goals.append(LevelGoal.gemGoal(amount: offeredGemAmount))
+                let gemGoal = LevelGoal.gemGoal(amount: offeredGemAmount)
+                let gemGoalChance = AnyChanceModel(thing: gemGoal, chance: 100)
+                goalChances.append(gemGoalChance)
             }
-
             
-            goals.append(contentsOf: [rockGoal, monsterGoal, brownRockGoal, pillarGoal])
-
+            let rockGoalChance = AnyChanceModel(thing: rockGoal, chance: 20)
+            let monsterGoalChance = AnyChanceModel(thing: monsterGoal, chance: 20)
+            let pillarGoalChance = AnyChanceModel(thing: pillarGoal, chance: 20)
+            let brownGoalChance = AnyChanceModel(thing: brownRockGoal, chance: 20)
+            
+            goalChances.append(contentsOf: [rockGoalChance, monsterGoalChance, pillarGoalChance, brownGoalChance])
         case bossLevelDepthNumber:
-            
-            goals = [LevelGoal.bossGoal()]
-            
-            
+            return [LevelGoal.bossGoal()]
             
         case 10...Int.max:
             let monsterAmount = Int.random(in: 10...15)
             let rockGoal = randomRockGoal([.red, .purple, .blue], amount: Int.random(lower: 60, upper: 75, interval: 5))
             let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
             
-            goals = [rockGoal, monsterGoal]
+            return [rockGoal, monsterGoal]
             
         case testLevelDepthNumber:
             let rockGoal = LevelGoal(type: .unlockExit, tileType: .rock(color: .blue, holdsGem: false, groupCount: 0), targetAmount: 3, minimumGroupSize: 1, grouped: false)
             let pillarGoal = LevelGoal.pillarGoal(amount: totalPillarAmount)
             if offeredGemAmount > 0 {
-                goals.append(LevelGoal.gemGoal(amount: offeredGemAmount))
+                let gemGoal = LevelGoal.gemGoal(amount: offeredGemAmount)
+                let gemGoalChance = AnyChanceModel(thing: gemGoal, chance: 200)
+                goalChances.append(gemGoalChance)
             }
-
             
-            goals.append(contentsOf: [rockGoal, pillarGoal])
+            let rockGoalChance = AnyChanceModel(thing: rockGoal, chance: 20)
+            let pillarGoalChance = AnyChanceModel(thing: pillarGoal, chance: 20)
+            
+            goalChances.append(contentsOf: [rockGoalChance, pillarGoalChance])
 
             
         default:
-            goals = []
+            goalChances = []
         }
         
-        return randomSource.chooseElements(choose: 2, fromArray: goals.compactMap { $0 })
+        goalChances = goalChances.map { levelChanceModifier.chanceDeltaLevelGoal(propsedGoalChanceModel: $0, lastLevelGoals: previousLevelGoals ?? []) }
+        
+        return randomSource.chooseElementsWithChance(goalChances, choices: 2).map { $0.thing }
     }
 
     

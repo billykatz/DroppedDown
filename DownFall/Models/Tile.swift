@@ -350,6 +350,13 @@ enum TileType: Hashable, CaseIterable, Codable {
     var gemAmount: Int? {
         if case TileType.item(let item) = self {
             return item.amount
+        } else if case TileType.offer(let offer) = self {
+            switch offer.type {
+            case .gems(amount: let amount):
+                return amount
+            default:
+                return nil
+            }
         } else {
             return nil
         }

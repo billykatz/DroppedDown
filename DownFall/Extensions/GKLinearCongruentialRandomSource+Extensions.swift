@@ -110,6 +110,7 @@ extension GKLinearCongruentialRandomSource {
     
     func chooseElementsWithChance<Element, T>(_ array: [Element], choices: Int) -> [Element] where Element: AnyChanceModel<T> {
         guard !array.isEmpty else { return [] }
+        guard choices < array.count else { return array }
         var chosenElements: [Element] = []
         
         var maxTries = 30

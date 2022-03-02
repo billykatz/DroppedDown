@@ -8,10 +8,22 @@
 
 import Foundation
 
+class BlockChangeModel {
+    let block: () -> ()
+    let chance: Float
+    
+    init(block: @escaping () -> (), chance: Float) {
+        self.block = block
+        self.chance = chance
+    }
+  
+}
+
 class ChanceModel: Equatable {
     static func == (lhs: ChanceModel, rhs: ChanceModel) -> Bool {
         return  (lhs.tileType == rhs.tileType) && (lhs.chance == rhs.chance)
     }
+    
     
     let tileType: TileType
     let chance: Float

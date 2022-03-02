@@ -132,26 +132,15 @@ class RunModel: Codable, Equatable {
         return 0
     }
     
-    func pastLevelStartTiles(currentDepth: Int) -> [LevelStartTiles] {
-        var levelStartTiles: [LevelStartTiles] = []
+    func lastLevelFeatures(currentDepth: Int) -> LevelFeatures? {
         for area in areas {
             if case AreaType.level(let level) = area.type,
-               level.depth != currentDepth {
-                levelStartTiles.append(contentsOf: level.levelStartTiles)
+               level.depth == currentDepth - 1,
+               let features = level.levelFeatures {
+                return features
             }
         }
-        return levelStartTiles
-    }
-    
-    func lastLevelStartTiles(currentDepth: Int) -> [LevelStartTiles] {
-        var levelStartTiles: [LevelStartTiles] = []
-        for area in areas {
-            if case AreaType.level(let level) = area.type,
-               level.depth == currentDepth - 1 {
-                levelStartTiles.append(contentsOf: level.levelStartTiles)
-            }
-        }
-        return levelStartTiles
+        return nil
     }
 
     func lastLevelOffers(currentDepth: Int) -> [StoreOffer] {

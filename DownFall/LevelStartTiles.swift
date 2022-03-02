@@ -8,6 +8,18 @@
 
 import Foundation
 
+struct LevelFeatures: Codable, Hashable {
+    let encasements: [LevelStartTiles]
+    let pillars: [LevelStartTiles]
+    
+    var levelStartTiles: [LevelStartTiles] {
+        var all = encasements
+        all.append(contentsOf: pillars)
+        return all
+    }
+    
+}
+
 struct LevelStartTiles: Codable, Hashable {
     let tileType: TileType
     let tileCoord: TileCoord
@@ -18,7 +30,7 @@ struct LevelStartTiles: Codable, Hashable {
     }
 }
 
-struct EncasementCoords: Equatable {
+struct EncasementCoords: Equatable, Hashable {
     let middleTile: TileCoord
     let outerTiles: [TileCoord]
 }

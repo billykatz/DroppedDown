@@ -9,6 +9,223 @@
 import SpriteKit
 import GameplayKit
 
+struct LevelVariableModifier {
+    
+    func chanceDeltaOfferHealth(playerData: EntityModel) -> Float {
+        if Double(playerData.hp) <= Double(playerData.originalHp / 4)  {
+            return 30
+        }
+        else if Double(playerData.hp) <= Double(playerData.originalHp / 3) {
+            return 20
+        } else if Double(playerData.hp) <= Double(playerData.originalHp / 2)  {
+            return 10
+        } else if playerData.hp == playerData.originalHp {
+            return -20
+        } else {
+            return 0
+        }
+    }
+    
+    func chanceDeltaOfferRune(playerData: EntityModel, currentChance: Float, lastLevelOfferings: [StoreOffer]?) -> Float {
+        guard let pickaxe = playerData.pickaxe else { return 0 }
+        
+        var delta: Float = 0
+        let offeredARuneLastLevel = lastLevelOfferings?.contains(where: { $0.rune != nil })
+        
+        switch (pickaxe.isAtMaxCapacity(), offeredARuneLastLevel) {
+        case (true, true):
+            delta += -10
+        case (true, false):
+            delta += 20
+        case (false, true):
+            delta += 0
+        case (false, false):
+            delta += 40
+        case (true, .none):
+            delta += -20
+        case (false, .none):
+            delta += 0
+        default:
+            delta += 0
+        }
+        
+        return max(1, currentChance+delta)
+        
+    }
+    
+    func chanceDeltaOfferRuneSlot(playerData: EntityModel, currentChance: Float, lastLevelOfferings: [StoreOffer]?) -> Float {
+        guard let pickaxe = playerData.pickaxe else { return 0 }
+            
+        var delta: Float = 0
+        let offeredARuneSlotLastLevel = lastLevelOfferings?.contains(where: { $0.type == .runeSlot })
+    
+        switch (pickaxe.isAtMaxCapacity(), offeredARuneSlotLastLevel) {
+        case (true, true):
+            delta += 20
+        case (true, false):
+            delta += 30
+        case (false, true):
+            delta += -40
+        case (false, false):
+            delta += 0
+        case (true, .none):
+            delta += 30
+        case (false, .none):
+            delta += -25
+        default:
+            delta += 0
+        }
+        return max(1, currentChance + delta)
+    }
+    
+    func chanceDeltaOfferHealthInEncasement(playerData: EntityModel, currentChance: Float) -> Float {
+        var delta: Float = 0
+        if Double(playerData.hp) <= Double(playerData.originalHp / 4)  {
+            delta = 15
+        }
+        else if Double(playerData.hp) <= Double(playerData.originalHp / 3) {
+            delta = 10
+        } else if Double(playerData.hp) <= Double(playerData.originalHp / 2)  {
+            delta = 5
+        } else if playerData.hp == playerData.originalHp {
+            delta = -20
+        } else {
+            delta = 0
+        }
+
+        return max(1, currentChance + delta)
+    }
+
+    
+    func chanceDeltaOfferRuneInEncasement(playerData: EntityModel, currentChance: Float) -> Float {
+        guard let pickaxe = playerData.pickaxe else { return 0 }
+        
+        var delta: Float = 0
+        
+        if pickaxe.isAtMaxCapacity() {
+            delta += -10
+        } else {
+            delta += 10
+        }
+        
+        return max(1, currentChance+delta)
+        
+    }
+
+    func chanceDeltaOfferRuneSlotInEncasement(playerData: EntityModel, currentChance: Float) -> Float {
+        guard let pickaxe = playerData.pickaxe else { return 0 }
+        
+        var delta: Float = 0
+        
+        if pickaxe.isAtMaxCapacity() {
+            delta += 10
+        } else {
+            delta += -10
+        }
+        
+        return max(1, currentChance+delta)
+        
+    }
+    
+
+
+
+    func chanceDeltaEncasement(numberOfEncasements: Int, depth: Depth, lastLevelFeatures: LevelFeatures?) -> Float {
+        guard let lastLevelFeatures = lastLevelFeatures else {
+            return 0
+        }
+        
+        if lastLevelFeatures.encasements.isEmpty {
+            if depth < 6 {
+                return 20
+            } else if depth < 8 {
+                return 25
+            } else if depth <= bossLevelDepthNumber {
+                if numberOfEncasements < 2 {
+                    return 15
+                } else {
+                    return 5
+                }
+            }
+        } else {
+            if depth < 6 {
+                return -15
+            } else if depth < 8 {
+                return -20
+            } else if depth <= bossLevelDepthNumber {
+                if numberOfEncasements < 2 {
+                    return -10
+                } else {
+                    return -3
+                }
+            }
+        }
+        
+        return 0
+
+    }
+    
+    func chanceDeltaEncasementOffer(encasedOfferChanceModel: ChanceModel, playerData: EntityModel, lastLevelFeatures: LevelFeatures?) -> ChanceModel {
+        guard let features = lastLevelFeatures, !features.encasements.isEmpty else { return encasedOfferChanceModel }
+        var totalDelta: Float = 0
+        let delta = features.encasements.reduce(Float(0), { prev, tile in
+            var totalDelta: Float = 0
+            // touch luck
+            let oldOffer = tile.tileType
+            let newOffer = encasedOfferChanceModel.tileType
+            switch (oldOffer, newOffer) {
+                
+            // monster was the old offer
+            case (.monster, .monster):
+                totalDelta -= 25
+            case (.monster, .exit):
+                totalDelta -= 15
+            case (.monster, .item), (.monster, .offer):
+                totalDelta += 25
+                
+            // exit was the old offer
+            case (.exit, .monster):
+                totalDelta -= 20
+            case (.exit, .exit):
+                totalDelta -= 25
+            case (.exit, .item), (.exit, .offer):
+                totalDelta += 25
+                
+            // offered an rune or item last level?
+            case (.offer, .exit):
+                totalDelta += 15
+            case (.offer, .monster):
+                totalDelta += 10
+            case (.offer, .offer):
+                totalDelta -= 12.5
+            case (.offer, .item):
+                totalDelta -= 12.5
+                
+            // got offered gems last level?
+            case (.item, .exit):
+                totalDelta += 10
+            case (.item, .monster):
+                totalDelta += 5
+            case (.item, .item):
+                totalDelta -= 20
+            case (.item, .offer):
+                totalDelta -= 5
+                
+            case (_, _):
+                totalDelta += 0
+            }
+            
+            return prev + totalDelta
+        })
+        totalDelta += delta
+        
+        return ChanceModel(tileType: encasedOfferChanceModel.tileType, chance: max(1, encasedOfferChanceModel.chance + totalDelta))
+    }
+
+    
+}
+
+
 class Level: Codable, Hashable {
     
     static func ==(_ lhs: Level, _ rhs: Level) -> Bool {
@@ -34,9 +251,20 @@ class Level: Codable, Hashable {
     let randomSeed: UInt64
     let isTutorial: Bool
     weak var runModel: RunModel?
+
+    private var levelChanceModifier: LevelVariableModifier {
+        return LevelVariableModifier()
+    }
     
-    var levelStartTiles: [LevelStartTiles] = []
-    var offers: [StoreOffer] = []
+    public var levelFeatures: LevelFeatures?
+    public var levelStartTiles: [LevelStartTiles] {
+        if let all = levelFeatures?.levelStartTiles {
+            return all
+        } else {
+            return  []
+        }
+    }
+    public var offers: [StoreOffer] = []
     
     public var bossLevelStartTiles: [LevelStartTiles] {
         let toughMonster: EntityModel.EntityType = Bool.random() ? .bat : .sally
@@ -169,137 +397,235 @@ class Level: Codable, Hashable {
     }
     
     /// func to create different configurations of level start tiles
+    /// Sets the LevelFeatures var that backs level start tiles
     public func createLevelStartTiles(playerData: EntityModel) -> [LevelStartTiles] {
         let randomSource = GKLinearCongruentialRandomSource(seed: randomSeed)
-        let lastLevelStartTiles = runModel?.lastLevelStartTiles(currentDepth: depth)
-        var levelStartTiles: [LevelStartTiles] = []
+        let lastLevelFeatures = runModel?.lastLevelFeatures(currentDepth: depth)
+//        let lastLevelOffersings = runModel?.lastLevelOffers(currentDepth: depth)
+        var encasementTiles: [LevelStartTiles] = []
+        var pillarTiles: [LevelStartTiles] = []
         
         switch depth {
         case 0,1,2:
-            levelStartTiles = []
+            pillarTiles = []
+            encasementTiles = []
             
         case 3:
             // 2 pillars
-            levelStartTiles = lowLevelPillars(randomSource: randomSource)
+            pillarTiles = lowLevelPillars(randomSource: randomSource)
+            encasementTiles = []
             
         case 4:
             // 50% chance to have just a pair of columns
             if randomSource.procsGivenChance(50) {
                 // then create 4 pillars with something inside
-                let chanceModel: [ChanceModel] = [.init(tileType: .offer(.offer(type: .lesserHeal, tier: 3)), chance: 50), .init(tileType: .item(.init(type: .gem, amount: 25)), chance: 50)]
+                let randomHealthItem = randomItem(playerData: playerData, tier: 1) { offer in
+                    return offer.type.isAHealingOption
+                }
+                let nonHealthItem = randomItem(playerData: playerData, tier: 1) { offer in
+                    return !offer.type.isAHealingOption
+                }
+                
+                let chanceDeltaHealthOffer = levelChanceModifier.chanceDeltaOfferHealth(playerData: playerData)
+                let randomHealthChance = 50 + chanceDeltaHealthOffer
+                let randomNonHealthChance = 50 - chanceDeltaHealthOffer
+                
+                let chanceModel: [ChanceModel] = [
+                    .init(tileType: .offer(.offer(type: randomHealthItem.type, tier: 3)), chance: randomHealthChance),
+                    .init(tileType: .offer(.offer(type: nonHealthItem.type, tier: 3)), chance: randomNonHealthChance)]
                 let encasement = potentialEncasementPillarCoords(randomSource: randomSource, encasementChanceModel: chanceModel, numberOfEncasements: 1)
-                levelStartTiles = encasement
+                encasementTiles = encasement
             } else {
-                levelStartTiles = lowLevelPillars(randomSource: randomSource)
+                pillarTiles = lowLevelPillars(randomSource: randomSource)
             }
             
         case 5:
             // spawn encasement
-            if randomSource.procsGivenChance(66) {
+            let deltaSpawnEncasement = levelChanceModifier.chanceDeltaEncasement(numberOfEncasements: 1, depth: depth, lastLevelFeatures: lastLevelFeatures)
+            let baseChanceProcEncasement: Float = 66
+            let newChanceProcEncasement = baseChanceProcEncasement + deltaSpawnEncasement
+            
+            if randomSource.procsGivenChance(newChanceProcEncasement) {
                 // then create 4 pillars with something inside
-                let toughMonster: EntityModel.EntityType = .bat
+                // create monster to encase
+                let toughMonster: EntityModel.EntityType = randomSource.nextBool() ? .bat : .dragon
                 let monsterEntity = EntityModel(originalHp: 1, hp: 1, name: toughMonster.textureString, attack: .zero, type: toughMonster, carry: .zero, animations: [], pickaxe: nil, effects: [], dodge: 0, luck: 0, killedBy: nil)
+                
+                // create rune encasement chances
                 let randomRune = randomRune(playerData: playerData)
+                let runeChance = levelChanceModifier.chanceDeltaOfferRuneInEncasement(playerData: playerData, currentChance: 15)
+                
+                // create rune slot encasement chances
+                let runeSlotChance = levelChanceModifier.chanceDeltaOfferRuneSlotInEncasement(playerData: playerData, currentChance: 15)
+                
+                // create other items to encase
+                let randomHealthItem = randomItem(playerData: playerData, tier: 1, optionalCheck: { $0.type.isAHealingOption })
+                let gems: Item = .init(type: .gem, amount: 50)
+                
                 let chanceModel: [ChanceModel] = [
-                    .init(tileType: .offer(.offer(type: .rune(randomRune.rune ?? .zero), tier: 3)), chance: 30),
-                    .init(tileType: .item(.init(type: .gem, amount: 50)), chance: 30),
+                    .init(tileType: .offer(.offer(type: .rune(randomRune.rune ?? .zero), tier: 3)), chance: runeChance),
+                    .init(tileType: .offer(.offer(type: .runeSlot, tier: 3)), chance: runeSlotChance),
+                    .init(tileType: .offer(.offer(type: randomHealthItem.type, tier: 3)), chance: 30),
+                    .init(tileType: .item(gems), chance: 20),
                     .init(tileType: .monster(monsterEntity), chance: 15),
-                    .init(tileType: .empty, chance: 25),
-                ]
+                    .init(tileType: .exit(blocked: true), chance: 5),
+                ].map { [levelChanceModifier] chanceModel in levelChanceModifier.chanceDeltaEncasementOffer(encasedOfferChanceModel: chanceModel, playerData: playerData, lastLevelFeatures: lastLevelFeatures)
+                }
+                
+                
                 let encasement = potentialEncasementPillarCoords(randomSource: randomSource, encasementChanceModel: chanceModel, numberOfEncasements: 1)
-                levelStartTiles = encasement
+                encasementTiles = encasement
             } else {
-                levelStartTiles = midLevelPillars(randomSource: randomSource)
+                pillarTiles = midLevelPillars(randomSource: randomSource)
             }
             
         case 6:
             // spawn encasement
-            if randomSource.procsGivenChance(66) {
+            let deltaSpawnEncasement = levelChanceModifier.chanceDeltaEncasement(numberOfEncasements: 1, depth: depth, lastLevelFeatures: lastLevelFeatures)
+            let baseChanceProcEncasement: Float = 66
+            let newChanceProcEncasement = baseChanceProcEncasement + deltaSpawnEncasement
+            
+            if randomSource.procsGivenChance(newChanceProcEncasement) {
                 // then create 4 pillars with something inside
-                let toughMonster: EntityModel.EntityType = .bat
+                let toughMonster: EntityModel.EntityType = randomSource.nextBool() ? .bat : .sally
                 let monsterEntity = EntityModel(originalHp: 1, hp: 1, name: toughMonster.textureString, attack: .zero, type: toughMonster, carry: .zero, animations: [], pickaxe: nil, effects: [], dodge: 0, luck: 0, killedBy: nil)
+                let highTierItem = randomItem(playerData: playerData, tier: 2, optionalCheck: nil)
+                
                 let chanceModel: [ChanceModel] = [
-                    .init(tileType: .exit(blocked: true), chance: 50),
-                    .init(tileType: .monster(monsterEntity), chance: 50),
-                ]
+                    .init(tileType: .exit(blocked: true), chance: 40),
+                    .init(tileType: .monster(monsterEntity), chance: 40),
+                    .init(tileType: .offer(.offer(type: highTierItem.type, tier: 3)), chance: 20),
+                ].map {
+                    levelChanceModifier.chanceDeltaEncasementOffer(encasedOfferChanceModel: $0, playerData: playerData, lastLevelFeatures: lastLevelFeatures)
+                }
+                
                 let encasement = potentialEncasementPillarCoords(randomSource: randomSource, encasementChanceModel: chanceModel, numberOfEncasements: 1)
-                levelStartTiles = encasement
+                encasementTiles = encasement
             } else {
-                levelStartTiles = midLevelPillars(randomSource: randomSource)
+                pillarTiles = midLevelPillars(randomSource: randomSource)
             }
             
         case 7:
             // spawn encasement
-            let toughMonster: EntityModel.EntityType = .bat
-            let monsterEntity = EntityModel(originalHp: 1, hp: 1, name: toughMonster.textureString, attack: .zero, type: toughMonster, carry: .zero, animations: [], pickaxe: nil, effects: [], dodge: 0, luck: 0, killedBy: nil)
-            let chanceModel: [ChanceModel] = [
-                .init(tileType: .exit(blocked: true), chance: 50),
-                .init(tileType: .monster(monsterEntity), chance: 50),
-            ]
+            let deltaSpawnEncasement = levelChanceModifier.chanceDeltaEncasement(numberOfEncasements: 1, depth: depth, lastLevelFeatures: lastLevelFeatures)
+            let baseChanceProcEncasement: Float = 66
+            let newChanceProcEncasement = baseChanceProcEncasement + deltaSpawnEncasement
             
-            let encasement = potentialEncasementPillarCoords(randomSource: randomSource, encasementChanceModel: chanceModel, numberOfEncasements: 1)
-            
-            // procs and adds a encasement.  also adds 2 extra pillar
-            if randomSource.procsGivenChance(100) {
-                var tiles: [LevelStartTiles] = []
-                tiles.append(contentsOf: encasement)
+            if randomSource.procsGivenChance(newChanceProcEncasement) {
+                // then create 4 pillars with something inside
+                let toughMonster: EntityModel.EntityType = randomSource.nextBool() ? .bat : .sally
+                let monsterEntity = EntityModel(originalHp: 1, hp: 1, name: toughMonster.textureString, attack: .zero, type: toughMonster, carry: .zero, animations: [], pickaxe: nil, effects: [], dodge: 0, luck: 0, killedBy: nil)
+                let highTierHealthItem = randomItem(playerData: playerData, tier: 2, optionalCheck: { $0.type.isAHealingOption })
+                let lowTierHealthItem = randomItem(playerData: playerData, tier: 1, optionalCheck: { $0.type.isAHealingOption })
                 
-                let highLevelPillars = highLevelPillars(randomSource: randomSource, avoid: encasement)
+                let exitChanceModel: ChanceModel = .init(tileType: .exit(blocked: true), chance: 35)
+                let monsterChanceModel: ChanceModel = .init(tileType: .monster(monsterEntity), chance: 35)
+                let lowGemChanceModel: ChanceModel = .init(tileType: .item(.init(type: .gem, amount: 50)), chance: 15)
+                let highGemChanceModel: ChanceModel = .init(tileType: .item(.init(type: .gem, amount: 100)), chance: 1)
                 
-                tiles.append(contentsOf: randomSource.chooseElements(choose: 2, fromArray: highLevelPillars))
-                levelStartTiles = tiles
+                // create and modify health items
+                let highHealthChance = levelChanceModifier.chanceDeltaOfferHealthInEncasement(playerData: playerData, currentChance: 10)
+                let lowHealthChance = levelChanceModifier.chanceDeltaOfferHealthInEncasement(playerData: playerData, currentChance: 5)
+                let highHealthChanceModel: ChanceModel = .init(tileType: .offer(.offer(type: highTierHealthItem.type, tier: 3)), chance: highHealthChance)
+                let lowHealthChanceModel: ChanceModel = .init(tileType: .offer(.offer(type: lowTierHealthItem.type, tier: 3)), chance: lowHealthChance)
+                
+                let chanceModel: [ChanceModel] = [
+                    // gems
+                    highGemChanceModel,
+                    lowGemChanceModel,
+                    //health
+                    highHealthChanceModel,
+                    lowHealthChanceModel,
+                    // tough
+                    monsterChanceModel,
+                    exitChanceModel
+                ].map {
+                    levelChanceModifier.chanceDeltaEncasementOffer(encasedOfferChanceModel: $0, playerData: playerData, lastLevelFeatures: lastLevelFeatures)
+                }
+                
+                let encasement = potentialEncasementPillarCoords(randomSource: randomSource, encasementChanceModel: chanceModel, numberOfEncasements: 1)
+                encasementTiles = encasement
             } else {
-                levelStartTiles = highLevelPillars(randomSource: randomSource)
+                pillarTiles = midLevelPillars(randomSource: randomSource)
             }
-            
             
         case 8:
             
+            // create monster for encasements
             let toughMonster: EntityModel.EntityType = randomSource.nextBool() ? .sally : .bat
             let toughMonster2: EntityModel.EntityType = randomSource.nextBool() ? .dragon : .sally
             let monsterEntity = EntityModel(originalHp: 1, hp: 1, name: toughMonster.textureString, attack: .zero, type: toughMonster, carry: .zero, animations: [], pickaxe: nil, effects: [], dodge: 0, luck: 0, killedBy: nil)
             let monsterEntity2 = EntityModel(originalHp: 1, hp: 1, name: toughMonster2.textureString, attack: .zero, type: toughMonster2, carry: .zero, animations: [], pickaxe: nil, effects: [], dodge: 0, luck: 0, killedBy: nil)
-            let randomItem = randomItem(playerData: playerData, tier: 2)
+            let monster1ChanceModel: ChanceModel = .init(tileType: .monster(monsterEntity), chance: 25)
+            let monster2ChanceModel: ChanceModel = .init(tileType: .monster(monsterEntity2), chance: 10)
+            
+            //exit
+            let exitChanceModel: ChanceModel = .init(tileType: .exit(blocked: true), chance: 20)
+            
+            // gem chances
+            let highGemChanceModel: ChanceModel = .init(tileType: .item(.init(type: .gem, amount: 100)), chance: 2)
+            
+            // create and modify health items
+            let highTierHealthItem = randomItem(playerData: playerData, tier: 2, optionalCheck: { $0.type.isAHealingOption })
+            let lowTierHealthItem = randomItem(playerData: playerData, tier: 1, optionalCheck: { $0.type.isAHealingOption })
+            let highHealthChance = levelChanceModifier.chanceDeltaOfferHealthInEncasement(playerData: playerData, currentChance: 10)
+            let lowHealthChance = levelChanceModifier.chanceDeltaOfferHealthInEncasement(playerData: playerData, currentChance: 10)
+            let highHealthChanceModel: ChanceModel = .init(tileType: .offer(.offer(type: highTierHealthItem.type, tier: 3)), chance: highHealthChance)
+            let lowHealthChanceModel: ChanceModel = .init(tileType: .offer(.offer(type: lowTierHealthItem.type, tier: 3)), chance: lowHealthChance)
+            
+            let highTierItem = randomItem(playerData: playerData, tier: 2, optionalCheck: nil)
+            let hieghTierItemChanceModel: ChanceModel = ChanceModel(tileType: .offer(.offer(type: highTierItem.type, tier: 3)), chance: 20)
+            
             let chanceModel: [ChanceModel] = [
-                .init(tileType: .exit(blocked: true), chance: 20),
-                .init(tileType: .monster(monsterEntity), chance: 20),
-                .init(tileType: .monster(monsterEntity2), chance: 8),
-                .init(tileType: .offer(.offer(type: .greaterHeal, tier: 3)), chance: 20),
-                .init(tileType: .offer(.offer(type: randomItem.type, tier: 3)), chance: 20),
-                .init(tileType: .item(.init(type: .gem, amount: 100)), chance: 2),
-                .init(tileType: .empty, chance: 10),
+                // tough onces
+                exitChanceModel,
+                monster1ChanceModel,
+                monster2ChanceModel,
+                //health
+                highHealthChanceModel,
+                lowHealthChanceModel,
+                // gems
+                highGemChanceModel,
+                // item
+                hieghTierItemChanceModel
             ]
             
+            let baseChanceDoubleEncasements: Float = 50
+            let deltaDouble = levelChanceModifier.chanceDeltaEncasement(numberOfEncasements: 2, depth: depth, lastLevelFeatures: lastLevelFeatures)
+            let newChanceDoubleEncasements = baseChanceDoubleEncasements + deltaDouble
             
-            if randomSource.procsGivenChance(10) {
+            let baseChanceSingleEncasement: Float = 40
+            let deltaSingle = levelChanceModifier.chanceDeltaEncasement(numberOfEncasements: 1, depth: depth, lastLevelFeatures: lastLevelFeatures)
+            let newChanceSingleEncasement = baseChanceSingleEncasement + deltaSingle
+            
+            if randomSource.procsGivenChance(newChanceDoubleEncasements) {
                 // spawn encasement
                 
-                let encasement = potentialEncasementPillarCoords(randomSource: randomSource, encasementChanceModel: chanceModel, numberOfEncasements: 2)
-                
-                levelStartTiles = encasement
-            } else if randomSource.procsGivenChance(55) {
-                let encasement = potentialEncasementPillarCoords(randomSource: randomSource, encasementChanceModel: chanceModel, numberOfEncasements: 1)
-                
-                levelStartTiles = encasement
+                encasementTiles = potentialEncasementPillarCoords(randomSource: randomSource, encasementChanceModel: chanceModel, numberOfEncasements: 2)
+            } else if randomSource.procsGivenChance(newChanceSingleEncasement) {
+                encasementTiles = potentialEncasementPillarCoords(randomSource: randomSource, encasementChanceModel: chanceModel, numberOfEncasements: 1)
 
             } else {
-                levelStartTiles = highLevelPillars(randomSource: randomSource)
+                pillarTiles = highLevelPillars(randomSource: randomSource)
             }
             
             
             
         case bossLevelDepthNumber:
-            levelStartTiles = bossLevelStartTiles
+            pillarTiles = bossLevelStartTiles
             
         case bossLevelDepthNumber...Int.max:
-            levelStartTiles = []
+            pillarTiles = []
             
         default:
-            levelStartTiles = []
+            pillarTiles = []
             
         }
-        self.levelStartTiles = levelStartTiles
-        return levelStartTiles
+        
+        self.levelFeatures = LevelFeatures(encasements: encasementTiles, pillars: pillarTiles)
+        
+        pillarTiles.append(contentsOf: encasementTiles)
+        return pillarTiles
     }
     
     public func itemsInTier(_ tier: StoreOfferTier, playerData: EntityModel) -> [StoreOffer] {
@@ -569,7 +895,7 @@ class Level: Codable, Hashable {
         return newOffer!
     }
     
-    private func randomItem(playerData: EntityModel, tier: StoreOfferTier) -> StoreOffer {
+    private func randomItem(playerData: EntityModel, tier: StoreOfferTier, optionalCheck: ((StoreOffer) -> Bool)? ) -> StoreOffer {
         // pool of items
         var allUnlockables = Set<Unlockable>(self.startingUnlockables)
         allUnlockables.formUnion(self.otherUnlockables)
@@ -578,6 +904,7 @@ class Level: Codable, Hashable {
             .filter({ $0.canAppearInRun })
             .filter({ $0.item.rune == nil })
             .filter({ $0.item.tier == tier })
+            .filter({ optionalCheck?($0.item) ?? true })
             .randomElement()?.item
         
         return newOffer ?? .zero

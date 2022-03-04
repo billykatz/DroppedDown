@@ -72,7 +72,9 @@ struct CodexView: View {
             let index = viewModel.unlockables.firstIndex(of: unlockable)!
             CodexItemView(viewModel: viewModel, index: index)
                 .onTapGesture {
-                    viewModel.didTapOnCodexItem(at: index)
+                    if unlockable.isUnlocked {
+                        viewModel.didTapOnCodexItem(at: index)
+                    }
                     selectedIndex = index
                     showModal.toggle()
                 }

@@ -29,7 +29,7 @@ struct CodexItemTitleView: View {
 
 extension Unlockable {
     var backgroundColor: UIColor {
-        if isPurchased && isUnlocked {
+        if isPurchased {
             return .codexItemBackgroundBlue
         } else if isUnlocked && !isPurchased {
             return .codexItemBackgroundLightGray
@@ -120,7 +120,7 @@ struct CodexItemView: View {
                             ).padding(20.0), alignment: .top)
                     if (!unlockable.isPurchased && unlockable.isUnlocked) {
                         PriceView(price: unlockable.purchaseAmount, textColor: self.priceTextColor, scale: 0.5, font: Font.codexFont)
-                    } else if !unlockable.isUnlocked {
+                    } else if !unlockable.isPurchased && !unlockable.isUnlocked {
                         Spacer().frame(height: 4)
                         Image("codex-lock").resizable().frame(width: 25, height: 25)
                     }

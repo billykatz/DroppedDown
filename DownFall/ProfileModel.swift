@@ -73,7 +73,14 @@ class Profile: Codable, Equatable {
         randomRune = try? container.decode(Rune.self, forKey: .randomRune)
         
         if let stats = try? container.decode([Statistics].self, forKey: .stats) {
-            self.stats = stats
+            var updatedStates = Statistics.startingStats
+            for stat in stats {
+                if let index = updatedStates.firstIndex(of: stat) {
+                    updatedStates[index] = stat
+                }
+            }
+            self.stats = updatedStates
+            
         } else {
             stats = Statistics.startingStats
         }
@@ -81,7 +88,7 @@ class Profile: Codable, Equatable {
         if let unlockables = try? container.decode([Unlockable].self, forKey: .unlockables) {
             self.unlockables = unlockables
         } else {
-            self.unlockables = Unlockable.unlockables
+            self.unlockables = Unlockable.unlockables()
         }
         
         if let startingUnlockbles = try? container.decode([Unlockable].self, forKey: .startingUnlockables) {
@@ -201,13 +208,37 @@ class Profile: Codable, Equatable {
     
     
     public func updateUnlockables() -> Profile {
-        var newUnlockables = Unlockable.unlockables
-        for unlockable in unlockables {
-            if let index = newUnlockables.firstIndex(of: unlockable) {
-                newUnlockables[index] = unlockable
+        var newUnlockables = Unlockable.unlockables()
+        for oldUnlockable in unlockables {
+            if let index = newUnlockables.firstIndex(of: oldUnlockable) {
+                print(newUnlockables[index].id)
+                let newUnlockable = newUnlockables[index]
+                let updatedUnlockable = oldUnlockable.update(stat: newUnlockable.stat,
+                                                             item: newUnlockable.item,
+                                                             purchaseAmount: newUnlockable.purchaseAmount,
+                                                             isPurchased: oldUnlockable.isPurchased,
+                                                             isUnlocked: oldUnlockable.isUnlocked,
+                                                             applysToBasePlayer: newUnlockable.applysToBasePlayer,
+                                                             recentlyPurchasedAndHasntSpawnedYet: oldUnlockable.recentlyPurchasedAndHasntSpawnedYet,
+                                                             hasBeenTappedOnByPlayer: oldUnlockable.hasBeenTappedOnByPlayer)
+                newUnlockables[index] = updatedUnlockable
+                
             }
         }
         
+#if DEBUG
+        /// print this shit so we can debug
+        print("---------UNLOCKABLES--------")
+        print("---------START--------")
+        print(newUnlockables.count)
+        var count = 1
+        newUnlockables.forEach { updatedUnlockable in
+            print(count)
+            count += 1
+            updatedUnlockable.debugDescription()
+        }
+        print("---------END--------")
+#endif
         let newStartingUnlockable = Unlockable.startingUnlockedUnlockables
         
         return self.updateAllUnlockables(newUnlockables, startingUnlockables: newStartingUnlockable)

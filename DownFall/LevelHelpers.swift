@@ -336,24 +336,24 @@ func baseChanceEncasementSize(depth: Depth) -> [AnyChanceModel<[EncasementSize]>
 }
 
 
-func chanceDeltaOfferHealth(playerData: EntityModel, modifer: Float = 1.0) -> Float {
-    var total: Float = 0
-    if Double(playerData.hp) <= Double(playerData.originalHp)/4  {
-        total = 25
+func chanceDeltaOfferHealth(playerData: EntityModel, currentChance: Float, modifier: Float) -> Float {
+    var delta: Float = 1
+    let currHealth = Float(playerData.hp)
+    let maxHealth = Float(playerData.originalHp)
+    if currHealth <= maxHealth / 4  {
+        delta = 3
     }
-    else if Double(playerData.hp) <= Double(playerData.originalHp) / 3 {
-        total = 15
-    } else if Double(playerData.hp) <= Double(playerData.originalHp) / 2  {
-        total = 10
-    } else if Double(playerData.hp) <= Double(playerData.originalHp) / 3 * 4  {
-        total = 5
-    } else if playerData.hp == playerData.originalHp {
-        total = -20
+    else if currHealth <= maxHealth / 3 {
+        delta = 2
+    } else if currHealth <= maxHealth / 2  {
+        delta = 1.5
+    } else if currHealth == maxHealth {
+        delta = 0.75
     } else {
-        total = 0
+        delta = 1
     }
     
-    return total * modifer
+    return delta * currentChance * modifier
 }
 
 func chanceDeltaOfferRune(playerData: EntityModel, currentChance: Float, lastLevelOfferings: [StoreOffer]?) -> Float {
@@ -409,13 +409,13 @@ func chanceDeltaOfferRuneSlot(playerData: EntityModel, currentChance: Float, las
 }
 
 func chanceDeltaOfferHealthInEncasement(playerData: EntityModel, currentChance: Float) -> Float {
-    var delta: Float = 0
-    if Double(playerData.hp) <= Double(playerData.originalHp / 4)  {
+    var delta: Float = 1
+    if Double(playerData.hp) <= Double(playerData.originalHp) / 4  {
         delta = 15
     }
-    else if Double(playerData.hp) <= Double(playerData.originalHp / 3) {
+    else if Double(playerData.hp) <= Double(playerData.originalHp) / 3 {
         delta = 10
-    } else if Double(playerData.hp) <= Double(playerData.originalHp / 2)  {
+    } else if Double(playerData.hp) <= Double(playerData.originalHp) / 2  {
         delta = 5
     } else if playerData.hp == playerData.originalHp {
         delta = -20

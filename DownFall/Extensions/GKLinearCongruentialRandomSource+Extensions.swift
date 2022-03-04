@@ -38,6 +38,7 @@ extension GKLinearCongruentialRandomSource {
         let totalChances = Float(array.count) * nextFloat
         let chosenIndex =  Int(totalChances.rounded(.towardZero))
         var chosen = array[chosenIndex]
+        
         while shouldAvoid(chosen) {
             var nextFloat = nextUniform()
             if nextFloat == 1 {
@@ -47,7 +48,8 @@ extension GKLinearCongruentialRandomSource {
             let chosenIndex =  Int(totalChances.rounded(.towardZero))
             chosen = array[chosenIndex]
         }
-        return array[chosenIndex]
+        
+        return chosen
     }
 
     
@@ -99,6 +101,7 @@ extension GKLinearCongruentialRandomSource {
         var chosenNumber = totalChances.rounded(.towardZero)
         
         // we want the current chance number to encompass the valid remaining
+//        var runningTotal
         for chanceModel in array {
             if chanceModel.chance >= chosenNumber {
                 return chanceModel

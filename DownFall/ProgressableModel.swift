@@ -121,7 +121,7 @@ class CodexViewModel: ObservableObject {
                 }       
             case .rune where section == .runes:
                 unlockablesInSection.append(unlockable)
-            case .killMonsterPotion, .greaterHeal, .lesserHeal, .transmogrifyPotion, .plusTwoMaxHealth:
+            case .killMonsterPotion, .greaterHeal, .lesserHeal, .transmogrifyPotion, .plusTwoMaxHealth, .escape, .gemMagnet, .greaterRuneSpiritPotion, .infusion, .liquifyMonsters:
                 if section == .items {
                     unlockablesInSection.append(unlockable)
                 }
@@ -195,6 +195,15 @@ class CodexViewModel: ObservableObject {
             return "Mine a group of \(target) rocks to unlock this."
         } else if relevantPlayerStat.statType == .lowestDepthReached {
             return "Reach depth \(target) to unlock this."
+        } else if relevantPlayerStat.statType == .totalWins {
+            if target == 1 {
+                return "Defeat the boss to unlock this"
+            } else {
+                return "Defeat the boss \(target) times to unlock this"
+            }
+        } else if relevantPlayerStat.statType == .attacksDodged {
+            value += "Dodge"
+            subject = "attacks"
         }
         
         value += " \(target - current) more \(subject) to unlock this."

@@ -82,11 +82,12 @@ class RunStatTracker {
         case let .attack(_, _, _, _, dodged: dodged, attackerIsPlayer: attackerIsPlayer):
             if attackerIsPlayer {
                 self.addStat(Statistics(amount: 1, statType: .damageDealt), amount: 1)
+            } else {
                 if dodged {
                     self.addStat(Statistics(amount: 1, statType: .attacksDodged), amount: 1)
+                } else {
+                    self.addStat(Statistics(amount: 1, statType: .damageTaken), amount: 1)
                 }
-            } else {
-                self.addStat(Statistics(amount: 1, statType: .damageTaken), amount: 1)
             }
         case .touch(_, let type):
             guard case let TileType.rock(color: color, _, _) = type,

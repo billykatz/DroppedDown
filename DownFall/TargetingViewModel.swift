@@ -473,6 +473,10 @@ class TargetingViewModel: Targeting {
     public func didTarget(_ coord: TileCoord) {
         guard let rune = rune else { preconditionFailure("We cant target if we dont have an ability set") }
         
+        if rune.targetInput == .random {
+            return
+        }
+        
         /// This type of rune affects multiple targets at once
         if !rune.affectSlopes.isEmpty {
             currentTargets = targets(given: coord, withRune: rune)

@@ -514,143 +514,7 @@ class Level: Codable, Hashable {
         
         let offers = tierOptions(tier: tier, depth: depth, startingUnlockabls: startingUnlockables, otherUnlockabls: otherUnlockables, lastLevelsOffering: lastLevelOffers, allPastLevelOffers: allPastLevelOffers, playerData: playerData, randomSource: randomSource)
         return offers
-        
-//        var offers = [StoreOffer]()
-//        var allUnlockables = otherUnlockables
-//        allUnlockables.append(contentsOf: startingUnlockables)
-//        offers.append(contentsOf: tierItems(tier: tier, depth: depth, unlockables: allUnlockables, playerData: playerData, randomSource: randomSource, lastLevelOffers: lastLevelOffers))
-//
-//        return offers
-        
     }
-    
-    /// Item pool rewards
-    /// [✅] - At least 1 offer must be a way to heal
-    /// [✅] - If the player has an empty rune slot then increase the chance of offering a rune
-    /// [✅] - first goal: offer health and something else
-    /// [✅] - second goal: offer non-health and non-health
-    /// [✅] - if the player has a full pickaxe then increase chance of offering a rune slot
-    /// [✅] - if a player just bought an item then increase the chance of it showing up
-    ///
-    
-    private func tierItems(tier: StoreOfferTier, depth: Depth, unlockables: [Unlockable], playerData: EntityModel, randomSource: GKLinearCongruentialRandomSource, lastLevelOffers: [StoreOffer]?) -> [StoreOffer] {
-        
-//        return tierItems(from: <#T##[StoreOfferBucket]#>, tier: <#T##StoreOfferTier#>, depth: <#T##Depth#>, unlockables: <#T##[Unlockable]#>, playerData: <#T##EntityModel#>, randomSource: <#T##GKLinearCongruentialRandomSource#>, lastLevelOffers: <#T##[StoreOffer]?#>, allPastLevelOFfers: <#T##[StoreOffer]?#>)
-        
-        if tier == 1 {
-            let healingOptions =
-            unlockables
-                .filter { unlockable in
-                    return unlockable.canAppearInRun && unlockable.item.tier == tier && unlockable.item.type.isAHealingOption
-                }
-            
-            guard let healingOption = healingOptions.randomElement(favorWhere: { $0.recentlyPurchasedAndHasntSpawnedYet }) else { preconditionFailure("There must always be at least 1 unlockable at tier 1 for healing")}
-            
-            let otherOptions =
-            unlockables
-                .filter { unlockable in
-                    return !healingOptions.contains(unlockable) && unlockable.canAppearInRun && unlockable.item.tier == tier
-                }
-            
-            let chosenOtherOptions = randomSource.chooseElements(choose: 2, fromArray: otherOptions)
-            
-            guard let otherOptionOne = otherOptions.randomElement(favorWhere: { $0.recentlyPurchasedAndHasntSpawnedYet }) else {  preconditionFailure("There must always be at least 1 other unlockable at tier 1 that isn't healing")
-            }
-            
-            guard let otherOptionTwo = otherOptions.randomElement(favorWhere: { $0.recentlyPurchasedAndHasntSpawnedYet }) else {  preconditionFailure("There must always be at least 1 other unlockable at tier 1 that isn't healing")
-            }
-            
-            
-            var healthChance:Float = 33
-            let deltaHealthChance =  chanceDeltaOfferHealth(playerData: playerData)
-            healthChance += deltaHealthChance
-            let healthChanceModel = AnyChanceModel<StoreOffer>(thing: healingOption.item, chance: healthChance)
-            let otherOptionOneChanceModel = AnyChanceModel<StoreOffer>(thing: otherOptionOne.item, chance: 33)
-            let otherOptionTwoChanceModel = AnyChanceModel<StoreOffer>(thing: otherOptionTwo.item, chance: 33)
-            
-            let potentialItems: [AnyChanceModel<StoreOffer>] = [healthChanceModel, otherOptionOneChanceModel, otherOptionTwoChanceModel]
-            let choices: [AnyChanceModel<StoreOffer>] = randomSource.chooseElementsWithChance(potentialItems, choices: 2)
-            
-            return choices.map { $0.thing }
-            
-            // For testing purposes
-            //            return [healingOption.item, StoreOffer.offer(type: .rune(.rune(for: .bubbleUp)), tier: 1)]
-        }
-        else if tier == 2 {
-            // create var to holf potential offerings
-            var potentialItems: [AnyChanceModel<StoreOffer>] = []
-            
-            // create just random item chance
-            let nonRuneRelatedOptionChance: Float = 25
-            //            let deltaNonRuneRelatedOptionChance =  chanceDeltaOfferHealth(playerData: <#T##EntityModel#>)
-            let notRuneRelatedOptions = unlockables.filter { unlockable in
-                // remove rune slots, just offer other types of rewards
-                return unlockable.canAppearInRun
-                && unlockable.item.tier == tier
-                && unlockable.item.type != .runeSlot
-                && unlockable.item.rune == nil
-            }
-            
-            if let favoredChoice = notRuneRelatedOptions.randomElement(favorWhere: { $0.recentlyPurchasedAndHasntSpawnedYet } ) {
-                let favoredChoiceChanceModel = AnyChanceModel(thing: favoredChoice.item, chance: nonRuneRelatedOptionChance)
-                potentialItems.append(favoredChoiceChanceModel)
-                
-                if let nextChoice = randomSource.chooseElement(notRuneRelatedOptions, avoidBlock: { $0 == favoredChoice }) {
-                    let nextChoiceChanceModel = AnyChanceModel(thing: nextChoice.item, chance: 15)
-                    potentialItems.append(nextChoiceChanceModel)
-                }
-            }
-            
-            
-            
-            // create a rune slot offer based on the palyer's pickaxe and last level's offering
-            let offerRuneSlotChance =  chanceDeltaOfferRuneSlot(playerData: playerData, currentChance: 25, lastLevelOfferings: lastLevelOffers)
-            let runeSlotOffer = StoreOffer.offer(type: .runeSlot, tier: 2)
-            let offerRuneSlotChanceModel: AnyChanceModel = .init(thing: runeSlotOffer, chance: offerRuneSlotChance)
-            
-            potentialItems.append(offerRuneSlotChanceModel)
-            
-            // create a rune offer 1
-            let offerRuneChance =  chanceDeltaOfferRune(playerData: playerData, currentChance: 25, lastLevelOfferings: lastLevelOffers)
-            let runeOneOptions = unlockables.filter { unlockable in
-                if case let StoreOfferType.rune(rune) = unlockable.item.type {
-                    return unlockable.canAppearInRun && unlockable.item.tier == tier && !(playerData.pickaxe?.runes.contains(rune) ?? false)
-                } else {
-                    return false
-                }
-            }
-            
-            guard let runeOptionOne = runeOneOptions.randomElement(favorWhere: { $0.recentlyPurchasedAndHasntSpawnedYet }) else {
-                return potentialItems.map { $0.thing }
-            }
-            let runeOptionOneChanceModel = AnyChanceModel(thing: runeOptionOne.item, chance: offerRuneChance)
-            potentialItems.append(runeOptionOneChanceModel)
-            
-            let runeOptionsTwo = unlockables.filter { unlockable in
-                if case let StoreOfferType.rune(rune) = unlockable.item.type {
-                    return unlockable.canAppearInRun
-                    && unlockable.item.tier == tier
-                    && unlockable != runeOptionOne
-                    && !(playerData.pickaxe?.runes.contains(rune) ?? false)
-                } else {
-                    return false
-                }
-            }
-            
-            if let runeOptionTwo = randomSource.chooseElement(runeOptionsTwo) {
-                let offerRuneTwoChance =  chanceDeltaOfferRune(playerData: playerData, currentChance: 5, lastLevelOfferings: lastLevelOffers)
-                let runeOptionTwoChanceModel = AnyChanceModel(thing: runeOptionTwo.item, chance: offerRuneTwoChance)
-                potentialItems.append(runeOptionTwoChanceModel)
-            }
-            
-            let choices = randomSource.chooseElementsWithChance(potentialItems, choices: 2)
-            return choices.map { $0.thing }
-            
-        } else {
-            preconditionFailure("Only call this for tiers 1 and 2")
-        }
-    }
-    
     
     private func randomRune(playerData: EntityModel) -> StoreOffer {
         // pool of items
@@ -699,80 +563,79 @@ class Level: Codable, Hashable {
     
 }
 
-func chanceDeltaOfferDodge(playerData player: EntityModel, modifier: Float) -> Float {
-    var delta = Float(0)
+func chanceDeltaOfferDodge(playerData player: EntityModel, modifier: Float, currentChance: Float) -> Float {
+    var delta = Float(1)
     if player.dodge > 40 {
-        delta = -100
+        delta = 0.1
     } else if player.dodge > 35 {
-        delta = -25
+        delta = 0.2
     } else if player.dodge > 30 {
-        delta = -21
+        delta = 0.3
     } else if player.dodge > 25 {
-        delta = -18
+        delta = 0.4
     } else if player.dodge > 20 {
-        delta = -10
+        delta = 0.5
     } else if player.dodge > 15 {
-        delta = -8
+        delta = 0.75
     } else if player.dodge > 10 {
-        delta = -7
+        delta = 0.9
     } else if player.dodge > 5 {
-        delta = 5
+        delta = 1.2
     } else if player.dodge > 0 {
-        delta = 8
+        delta = 1.5
     }
     
-    return delta * modifier
+    return currentChance * delta * modifier
 }
 
-func chanceDeltaOfferLuck(playerData player: EntityModel, modifier: Float) -> Float {
-    var delta = Float(0)
+func chanceDeltaOfferLuck(playerData player: EntityModel, modifier: Float, currentChance: Float) -> Float {
+    var delta = Float(1)
     if player.luck > 70 {
-        delta = -100
+        delta = 0.1
     } else if player.luck > 60 {
-        delta = -25
+        delta = 0.2
     } else if player.luck > 50 {
-        delta = -21
+        delta = 0.3
     } else if player.luck > 40 {
-        delta = -18
+        delta = 0.5
     } else if player.luck > 30 {
-        delta = -10
+        delta = 0.6
     } else if player.luck > 25 {
-        delta = -8
+        delta = 0.8
     } else if player.luck > 10 {
-        delta = -7
+        delta = 0.9
     } else if player.luck > 5 {
-        delta = 5
+        delta = 1
     } else if player.luck > 0 {
-        delta = 8
+        delta = 1.25
     }
     
-    return delta * modifier
+    return currentChance * delta * modifier
 }
 
-func chanceOfferUtilBucket(pastLevelOffers: [StoreOfferBucket]?, modifier: Float) -> Float {
+func chanceOfferUtilBucket(pastLevelOffers: [StoreOfferBucket]?, modifier: Float, currentChance: Float) -> Float {
     let numberPastLevels = pastLevelOffers?.filter( { $0.type == .util }).count ?? 0
-    var delta = Float(0)
+    var delta = Float(1)
     if numberPastLevels > 2 {
-        delta = -10
+        delta = 0.25
     } else if numberPastLevels > 1 {
-        delta = -5
+        delta = 0.5
     } else {
-        delta = 10
+        delta = 1.5
     }
     
-    return delta * modifier
+    return delta * modifier * currentChance
 }
 
-// TODO: think this through
 func chanceDeltaOfferWealthBucket(playerData: EntityModel, unlockables: [Unlockable], currentChance: Float) -> Float {
     var deltaChance = Float(1)
     let totalUnlockables = Float(unlockables.count)
     let totalOwnedUnlockables = Float(unlockables.filter { $0.canAppearInRun }.count)
     
     if totalOwnedUnlockables < totalUnlockables / 5 {
-        deltaChance = 4
+        deltaChance = 2
     } else if totalOwnedUnlockables < totalUnlockables / 3 {
-        deltaChance = 3
+        deltaChance = 1.75
     } else if totalOwnedUnlockables < totalUnlockables / 2 {
         deltaChance = 1.5
     } else if totalOwnedUnlockables < totalUnlockables / 3 * 4 {
@@ -781,102 +644,112 @@ func chanceDeltaOfferWealthBucket(playerData: EntityModel, unlockables: [Unlocka
         deltaChance = 0.75
     }
     
-    return max(1, currentChance * deltaChance)
+    return max(0.01, currentChance * deltaChance)
     
 }
 
-func chanceDeltaOfferRuneBucket(playerData: EntityModel, allPastLevelOffers: [StoreOfferBucket]?, modifier: Float, depth: Depth) -> Float
+func chanceDeltaOfferRuneBucket(playerData: EntityModel, allPastLevelOffers: [StoreOfferBucket]?, modifier: Float, depth: Depth, currentChance: Float) -> Float
 {
     guard let pickaxe = playerData.pickaxe else { return  0 }
-    var totalDelta = Float(0)
+    var totalDelta = Float(1)
     let runeSlots = pickaxe.runeSlots
     let runes = pickaxe.runes.count
-    
-    if runeSlots - runes >= 4 {
-        totalDelta += 10
-    } else if runeSlots - runes >= 3 {
-        totalDelta += 7
-    } else if runeSlots - runes >= 2 {
-        totalDelta += 5
-    } else if runeSlots - runes >= 1 {
-        totalDelta += 3
-    } else {
-        totalDelta -= 5
-    }
     
     let numberOfRuneOffered = allPastLevelOffers?.filter( { $0.type == .rune }).count ?? 0
     
     switch depth {
-    case 0, 1, 2:
+    case 0, 1:
         if numberOfRuneOffered >= 2 {
-            totalDelta -= 30
+            totalDelta = 0.25
         } else if numberOfRuneOffered >= 1 {
-            totalDelta -= 20
+            totalDelta = 0.5
         } else {
-            totalDelta += 0
+            totalDelta = 1.5
+        }
+    case 2:
+        if numberOfRuneOffered >= 2 {
+            totalDelta = 0.25
+        } else if numberOfRuneOffered >= 1 {
+            totalDelta = 0.5
+        } else {
+            totalDelta = 5
         }
     case 3:
         if numberOfRuneOffered >= 3 {
-            totalDelta -= 40
+            totalDelta = 0.05
         } else if numberOfRuneOffered >= 2 {
-            totalDelta -= 30
+            totalDelta = 0.25
         } else if numberOfRuneOffered >= 1 {
-            totalDelta += 0
+            totalDelta = 0.75
         } else {
             // you deserve a ruin
-            totalDelta += 20
+            totalDelta = 10
         }
         
     case 4:
         if numberOfRuneOffered >= 3 {
-            totalDelta -= 40
+            totalDelta = 0.05
         } else if numberOfRuneOffered >= 2 {
-            totalDelta -= 30
+            totalDelta = 0.25
         } else if numberOfRuneOffered >= 1 {
-            totalDelta -= 20
+            totalDelta = 0.75
         } else {
             // you deserve a ruin
-            totalDelta += 500
+            totalDelta = 250
         }
         
     case 5, 6:
         if numberOfRuneOffered >= 5 {
-            totalDelta -= 50
+            totalDelta = 0.05
         } else if numberOfRuneOffered >= 4 {
-            totalDelta -= 40
+            totalDelta = 0.25
         } else if numberOfRuneOffered >= 3 {
-            totalDelta -= 30
+            totalDelta = 0.5
         } else if numberOfRuneOffered >= 2 {
-            totalDelta -= 20
+            totalDelta = 0.75
         } else if numberOfRuneOffered >= 1 {
-            totalDelta += 10
+            totalDelta = 1
         } else {
             // you deserve a ruin
-            totalDelta += 1000
+            totalDelta = 1000
         }
         
     case 7, 8:
         if numberOfRuneOffered >= 5 {
-            totalDelta -= 50
+            totalDelta = 0.05
         } else if numberOfRuneOffered >= 4 {
-            totalDelta -= 40
+            totalDelta = 0.2
         } else if numberOfRuneOffered >= 3 {
-            totalDelta -= 30
+            totalDelta = 0.4
         } else if numberOfRuneOffered >= 2 {
-            totalDelta += 10
+            totalDelta = 0.8
         } else if numberOfRuneOffered >= 1 {
-            totalDelta += 20
+            totalDelta = 1.2
         } else {
             // you deserve a ruin
-            totalDelta += 5000
+            totalDelta = 5000
         }
         
     default:
-        totalDelta += 5000
+        totalDelta = 5000
     }
     
+    if runeSlots - runes >= 4 {
+        totalDelta += 0.5
+    } else if runeSlots - runes >= 3 {
+        totalDelta += 0.33
+    } else if runeSlots - runes >= 2 {
+        totalDelta += 0.25
+    } else if runeSlots - runes >= 1 {
+        totalDelta += 0.1
+    } else if runeSlots - runes >= 0 {
+        totalDelta += 0.1
+    }
     
-    return totalDelta * modifier
+    totalDelta = max(0.1, totalDelta)
+    
+    
+    return totalDelta * currentChance * modifier
 }
 
 
@@ -894,38 +767,38 @@ func chanceDeltaStoreOfferBuckets(_ buckets: [AnyChanceModel<StoreOfferBucket>],
     for bucket in buckets {
         switch (depth, bucket.thing.type) {
         case (0, .health), (1, .health), (2, .health):
-            healthBucketChance += chanceDeltaOfferHealth(playerData: playerData, modifer: 0.25)
+            healthBucketChance = chanceDeltaOfferHealth(playerData: playerData, currentChance: healthBucketChance, modifier: 1.0)
         case (3, .health), (4, .health), (5, .health):
-            healthBucketChance += chanceDeltaOfferHealth(playerData: playerData, modifer: 0.50)
+            healthBucketChance = chanceDeltaOfferHealth(playerData: playerData, currentChance: healthBucketChance, modifier: 0.9)
         case (6, .health), (7, .health), (8, .health):
-            healthBucketChance += chanceDeltaOfferHealth(playerData: playerData)
+            healthBucketChance = chanceDeltaOfferHealth(playerData: playerData, currentChance: healthBucketChance, modifier: 0.8)
             
         case (_, .dodge):
-            dodgeBucketChance += chanceDeltaOfferDodge(playerData: playerData, modifier: 1)
+            dodgeBucketChance = chanceDeltaOfferDodge(playerData: playerData, modifier: 1, currentChance: dodgeBucketChance)
             
         case (_, .luck):
-            luckBucketChance += chanceDeltaOfferLuck(playerData: playerData, modifier: 1)
+            luckBucketChance = chanceDeltaOfferLuck(playerData: playerData, modifier: 1, currentChance: luckBucketChance)
             
         case (_, .util):
-            utilBucketChance += chanceOfferUtilBucket(pastLevelOffers: lastLevelOfferings, modifier: 1)
+            utilBucketChance = chanceOfferUtilBucket(pastLevelOffers: lastLevelOfferings, modifier: 1, currentChance: utilBucketChance)
             
         case (_, .wealth):
             wealthBucketChance = chanceDeltaOfferWealthBucket(playerData: playerData, unlockables: unlockables, currentChance: wealthBucketChance)
             
         case (_, .rune):
-            runeBucketChance += chanceDeltaOfferRuneBucket(playerData: playerData, allPastLevelOffers: allPastLevelOffers, modifier: 1.0, depth: depth)
+            runeBucketChance = chanceDeltaOfferRuneBucket(playerData: playerData, allPastLevelOffers: allPastLevelOffers, modifier: 1.0, depth: depth, currentChance: runeBucketChance)
             
         default:
             break
         }
         
     }
-    healthBucketChance = max(1, healthBucketChance)
-    luckBucketChance = max(1, luckBucketChance)
-    dodgeBucketChance = max(1, dodgeBucketChance)
-    wealthBucketChance = max(1, wealthBucketChance)
-    utilBucketChance = max(1, utilBucketChance)
-    runeBucketChance = max(1, runeBucketChance)
+    healthBucketChance = max(0.01, healthBucketChance)
+    luckBucketChance = max(0.01, luckBucketChance)
+    dodgeBucketChance = max(0.01, dodgeBucketChance)
+    wealthBucketChance = max(0.01, wealthBucketChance)
+    utilBucketChance = max(0.01, utilBucketChance)
+    runeBucketChance = max(0.01, runeBucketChance)
     
     return buckets.map { bucket in
         switch bucket.thing.type {
@@ -957,32 +830,40 @@ func tierOptions(tier: StoreOfferTier, depth: Depth, startingUnlockabls: [Unlock
     
     switch tier {
     case 1:
-        let healthBucketChanceModel = AnyChanceModel(thing: StoreOfferBucket(type: .health), chance: 1/5)
-        let luckBucketChanceModel = AnyChanceModel(thing: StoreOfferBucket(type: .luck), chance: 1/5)
-        let dodgeBucketChanceModel = AnyChanceModel(thing: StoreOfferBucket(type: .dodge), chance: 1/5)
-        let utilBucketChanceModel = AnyChanceModel(thing: StoreOfferBucket(type: .util), chance: 1/5)
-        let wealthBucketChanceModel = AnyChanceModel(thing: StoreOfferBucket(type: .wealth), chance: 1/5)
+        let baseChance: Float = Float(1)/Float(5) * 100
+        let healthBucketChanceModel = AnyChanceModel(thing: StoreOfferBucket(type: .health), chance: baseChance)
+        let luckBucketChanceModel = AnyChanceModel(thing: StoreOfferBucket(type: .luck), chance: baseChance)
+        let dodgeBucketChanceModel = AnyChanceModel(thing: StoreOfferBucket(type: .dodge), chance: baseChance)
+        let utilBucketChanceModel = AnyChanceModel(thing: StoreOfferBucket(type: .util), chance: baseChance)
+        let wealthBucketChanceModel = AnyChanceModel(thing: StoreOfferBucket(type: .wealth), chance: baseChance)
         
         let nonweightBuckets = [healthBucketChanceModel, luckBucketChanceModel, dodgeBucketChanceModel, utilBucketChanceModel, wealthBucketChanceModel]
         let weightedBuckets = chanceDeltaStoreOfferBuckets(nonweightBuckets, lastLevelOfferings: pastLevelOfferBuckets, allPastLevelOffers: allPastLevelOfferBuckets, playerData: playerData, depth: depth, unlockables: otherUnlockabls)
         
-        chosenBucketOne = randomSource.chooseElementWithChance(weightedBuckets)
-        chosenBucketTwo = randomSource.chooseElementWithChance(weightedBuckets)
+//        chosenBucketOne = randomSource.chooseElementWithChance(weightedBuckets)
+//        chosenBucketTwo = randomSource.chooseElementWithChance(weightedBuckets)
+        let buckets = randomSource.chooseElementsWithChance(weightedBuckets, choices: 2)
+        chosenBucketOne = buckets.first
+        chosenBucketTwo = buckets.last
 
 
     case 2:
-        let healthBucketChanceModel = AnyChanceModel(thing: StoreOfferBucket(type: .health), chance: 1/6)
-        let luckBucketChanceModel = AnyChanceModel(thing: StoreOfferBucket(type: .luck), chance: 1/6)
-        let dodgeBucketChanceModel = AnyChanceModel(thing: StoreOfferBucket(type: .dodge), chance: 1/6)
-        let utilBucketChanceModel = AnyChanceModel(thing: StoreOfferBucket(type: .util), chance: 1/6)
-        let wealthBucketChanceModel = AnyChanceModel(thing: StoreOfferBucket(type: .wealth), chance: 1/6)
-        let runeBucketChanceModel = AnyChanceModel(thing: StoreOfferBucket(type: .wealth), chance: 1/6)
+        let baseChance: Float = Float(1)/Float(6) * 100
+        let healthBucketChanceModel = AnyChanceModel(thing: StoreOfferBucket(type: .health), chance: baseChance)
+        let luckBucketChanceModel = AnyChanceModel(thing: StoreOfferBucket(type: .luck), chance: baseChance)
+        let dodgeBucketChanceModel = AnyChanceModel(thing: StoreOfferBucket(type: .dodge), chance: baseChance)
+        let utilBucketChanceModel = AnyChanceModel(thing: StoreOfferBucket(type: .util), chance: baseChance)
+        let wealthBucketChanceModel = AnyChanceModel(thing: StoreOfferBucket(type: .wealth), chance: baseChance)
+        let runeBucketChanceModel = AnyChanceModel(thing: StoreOfferBucket(type: .rune), chance: baseChance)
         
         let nonweightBuckets = [healthBucketChanceModel, luckBucketChanceModel, dodgeBucketChanceModel, utilBucketChanceModel, wealthBucketChanceModel, runeBucketChanceModel]
         let weightedBuckets = chanceDeltaStoreOfferBuckets(nonweightBuckets, lastLevelOfferings: pastLevelOfferBuckets, allPastLevelOffers: allPastLevelOfferBuckets, playerData: playerData, depth: depth, unlockables: otherUnlockabls)
         
-        chosenBucketOne = randomSource.chooseElementWithChance(weightedBuckets)
-        chosenBucketTwo = randomSource.chooseElementWithChance(weightedBuckets)
+        let buckets = randomSource.chooseElementsWithChance(weightedBuckets, choices: 2)
+        chosenBucketOne = buckets.first
+        chosenBucketTwo = buckets.last
+//        chosenBucketOne = randomSource.chooseElementWithChance(weightedBuckets)
+//        chosenBucketTwo = randomSource.chooseElementWithChance(weightedBuckets)
         
     default:
         chosenBucketOne = nil
@@ -994,7 +875,9 @@ func tierOptions(tier: StoreOfferTier, depth: Depth, startingUnlockabls: [Unlock
         return []
     }
     
-    let items = tierItems(from: [chosenBucketOne.thing, chosenBucketTwo.thing], tier: tier, depth: depth, unlockables: otherUnlockabls, playerData: playerData, randomSource: randomSource, lastLevelOffers: lastLevelsOffering, allPastLevelOFfers: allPastLevelOffers)
+    var allUnlockables = startingUnlockabls
+    allUnlockables.append(contentsOf: otherUnlockabls)
+    let items = tierItems(from: [chosenBucketOne.thing, chosenBucketTwo.thing], tier: tier, depth: depth, allUnlockables: allUnlockables, playerData: playerData, randomSource: randomSource, lastLevelOffers: lastLevelsOffering, allPastLevelOFfers: allPastLevelOffers)
     
     
     return items
@@ -1099,11 +982,11 @@ func deltaChanceOfferHealth(playerData: EntityModel, depth: Depth, storeOffer: S
     }
     
     if offerType == .lesserHeal || offerType == .greaterHeal {
-        currentChance *= healingPotionMultipler
+        currentChance = healingPotionMultipler
     }
     
         
-    return max(1, currentChance)
+    return max(0.1, currentChance)
 }
 
 func deltaChanceOfferUtilWealth(storeOfferChance: AnyChanceModel<StoreOffer>, allPastLevelOffers: [StoreOffer]?) -> Float {
@@ -1117,11 +1000,15 @@ func deltaChanceOfferUtilWealth(storeOfferChance: AnyChanceModel<StoreOffer>, al
     if noneWereThisOffer {
         let sameTierOfferCount = Float(sameTierOffersInPast?.count ?? 0)
         delta += (sameTierOfferCount * 0.1)
-    } else {
+    } else if storeOfferChance.thing.type == .runeSlot {
+        // make these pretty rare to force the player to interact with the store
+        delta = 0.25
+    }
+    else {
         delta -= 0.25
     }
     
-    return max(1, delta * storeOfferChance.chance)
+    return max(0.01, delta * storeOfferChance.chance)
 }
 
 func deltaChanceOfferDodgeLuck(offerChance: AnyChanceModel<StoreOffer>, depth: Depth) -> Float {
@@ -1189,6 +1076,11 @@ func deltaChanceOfferRune(offerChance: AnyChanceModel<StoreOffer>, playerData: E
         deltaChance += 0.25
     }
     
+    // remove it form the options with a negative chance
+    if runes.contains(offerChance.thing.rune ?? .zero) {
+        deltaChance = -1
+    }
+    
     return offerChance.chance * deltaChance
 }
 
@@ -1216,19 +1108,21 @@ func deltaChanceForOffer(offerChances: [AnyChanceModel<StoreOffer>], recentlyPur
             newChance *= 1000
         }
         
-        newOfferChances.append(.init(thing: offerChance.thing, chance: newChance))
+        if newChance > 0 {
+            newOfferChances.append(.init(thing: offerChance.thing, chance: newChance))
+        }
         
     }
     
     return newOfferChances
 }
 
-func tierItems(from buckets: [StoreOfferBucket], tier: StoreOfferTier, depth: Depth, unlockables: [Unlockable], playerData: EntityModel, randomSource: GKLinearCongruentialRandomSource, lastLevelOffers: [StoreOffer]?, allPastLevelOFfers: [StoreOffer]?) -> [StoreOffer] {
+func tierItems(from buckets: [StoreOfferBucket], tier: StoreOfferTier, depth: Depth, allUnlockables: [Unlockable], playerData: EntityModel, randomSource: GKLinearCongruentialRandomSource, lastLevelOffers: [StoreOffer]?, allPastLevelOFfers: [StoreOffer]?) -> [StoreOffer] {
     
     var chosenOffers: [StoreOffer] = []
     
     for bucket in buckets {
-        let availableBucketItems = unlockables
+        let availableBucketItems = allUnlockables
             .filter { unlockable in
                 return unlockable.canAppearInRun
                 && unlockable.item.tier == tier
@@ -1237,7 +1131,7 @@ func tierItems(from buckets: [StoreOfferBucket], tier: StoreOfferTier, depth: De
                 $0.item
             }
         
-        let recentlyPurchasedSpawnedItems = unlockables
+        let recentlyPurchasedSpawnedItems = allUnlockables
             .filter { unlockable in
                 return unlockable.canAppearInRun
                 && unlockable.item.tier == tier
@@ -1252,7 +1146,9 @@ func tierItems(from buckets: [StoreOfferBucket], tier: StoreOfferTier, depth: De
         let availbleOffersWithWeightChance = deltaChanceForOffer(offerChances: availableOffersWithChance, recentlyPurchasedAndShouldSpawn: recentlyPurchasedSpawnedItems, playerData: playerData, depth: depth, tier: tier, lastLevelOffers: lastLevelOffers, allPastLevelOffers: allPastLevelOFfers)
         
         
-        chosenOffers = randomSource.chooseElementsWithChance(availbleOffersWithWeightChance, choices: 2).map { $0.thing }
+        if let random = randomSource.chooseElementWithChance(availbleOffersWithWeightChance).map( { $0.thing }) {
+            chosenOffers.append(random)
+        }
         
         
     }

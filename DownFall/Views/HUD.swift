@@ -42,7 +42,7 @@ class HUD: SKSpriteNode {
                                             yOffset: -40.0
                                             
         )
-        settingsTapTarget.zPosition = 1_000_000
+        settingsTapTarget.zPosition = 100_000_000_000
         settingsTapTarget.addChild(setting)
         
         header.addChild(settingsTapTarget)

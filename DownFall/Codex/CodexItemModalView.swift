@@ -36,7 +36,7 @@ struct CodexItemModalDescriptionView: View {
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding()
-        } else {
+        } else if !unlockable.isPurchased {
             CodexUnlockAtView(unlockable: unlockable,
                               progress: relevantProgress,
                               progressString: relevantPlayerStat)

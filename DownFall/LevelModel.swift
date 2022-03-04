@@ -10,580 +10,6 @@ import SpriteKit
 import GameplayKit
 
 
-enum EncasementSize {
-    case small
-    case medium
-    case large
-}
-
-func randomRune(playerData: EntityModel, startingUnlockables: [Unlockable], otherUnlockables: [Unlockable], avoid: (Rune) -> Bool = { _ in false }) -> Rune? {
-    // pool of items
-    var allUnlockables = Set<Unlockable>(startingUnlockables)
-    allUnlockables.formUnion(otherUnlockables)
-    
-    let potentialOffers = allUnlockables
-        .filter({ $0.canAppearInRun })
-        .filter({ $0.item.rune != nil })
-    
-    
-    var newOffer: StoreOffer? = potentialOffers.randomElement()?.item
-    
-    var maxTries: Int = 30
-    
-    while maxTries > 0 {
-        if let pickace = playerData.pickaxe,
-           // player already has
-           // or we want to avoid the new rune executing this branch chooses a new offer
-           pickace.runes.contains(where: { playerRune in
-               if let newRune = newOffer?.rune {
-                   if avoid(newRune) {
-                       return true
-                   } else {
-                       return playerRune == newRune
-                   }
-               } else {
-                   return true
-               }
-           }) {
-            newOffer = potentialOffers.randomElement()?.item
-        } else if let rune = newOffer?.rune {
-            return rune
-        }
-        maxTries -= 1
-    }
-    
-    return newOffer?.rune
-}
-
-
-fileprivate func baseChanceEncasementOffers(depth: Depth, playerData: EntityModel, startingUnlockables: [Unlockable], otherUnlockables: [Unlockable], randomSource: GKLinearCongruentialRandomSource, lastLevelFeatures: LevelFeatures?) -> [ChanceModel] {
-    /// Create random offers
-    // tier 1 health
-    let randomTier1HealthOption = randomItem(playerData: playerData, tier: 1, startingUnlockables: startingUnlockables, otherUnlockables: otherUnlockables) { offer in
-        return offer.type.isAHealingOption
-    }
-    // tier 1 health
-    let randomTier1NonHealthOption = randomItem(playerData: playerData, tier: 1, startingUnlockables: startingUnlockables, otherUnlockables: otherUnlockables) { offer in
-        return !offer.type.isAHealingOption
-    }
-    
-    // tier 2 health
-    let randomTier2HealthOption = randomItem(playerData: playerData, tier: 1, startingUnlockables: startingUnlockables, otherUnlockables: otherUnlockables) { offer in
-        return offer.type.isAHealingOption
-    }
-    // tier 2 non-health
-    let randomTier2NonHealthOption = randomItem(playerData: playerData, tier: 1, startingUnlockables: startingUnlockables, otherUnlockables: otherUnlockables) { offer in
-        return !offer.type.isAHealingOption
-    }
-    
-    // rune
-    var randomRune1: Rune = .rune(for: .getSwifty)
-    if let rune = randomRune(playerData: playerData, startingUnlockables: startingUnlockables, otherUnlockables: otherUnlockables) {
-        randomRune1 = rune
-    }
-    
-    var randomRune2: Rune = .rune(for: .fireball)
-    if let rune = randomRune(playerData: playerData, startingUnlockables: startingUnlockables, otherUnlockables: otherUnlockables) {
-        randomRune2 = rune
-    }
-    
-    // health and items
-    let tier1HealthOption: TileType = .offer(.offer(type: randomTier1HealthOption.type, tier: 3))
-    let tier1NonHealthOption: TileType = .offer(.offer(type: randomTier1NonHealthOption.type, tier: 3))
-    let tier2HealthOption: TileType = .offer(.offer(type: randomTier2HealthOption.type, tier: 3))
-    let tier2NonHealthOption: TileType = .offer(.offer(type: randomTier2NonHealthOption.type, tier: 3))
-    
-    // just runes and slots
-    let rune1Type: TileType = .offer(.offer(type: .rune(.rune(for: randomRune1.type)), tier: 3))
-    let rune2Type: TileType = .offer(.offer(type: .rune(.rune(for: randomRune2.type)), tier: 3))
-    let runeSlot: TileType = .offer(.offer(type: .runeSlot, tier: 3))
-    
-    // monster types
-    let batMonsterType: TileType = .monster(EntityModel.monsterWithType(.bat))
-    let hardMonsterType: TileType = .monster(EntityModel.monsterWithType(randomSource.nextBool() ? .bat : .sally))
-    let mediumMonsterType: TileType = .monster(EntityModel.monsterWithType(randomSource.nextBool() ? .dragon : .alamo))
-    let easyMonsterType: TileType = .monster(EntityModel.monsterWithType(randomSource.nextBool() ? .rat : .alamo))
-    
-    // exits
-    let blockExit = TileType.exit(blocked: true)
-    
-
-    switch depth {
-    case 0, 1, 2:
-        return []
-    case 3:
-        let baseChance: Float = 25
-        let randomHealthChance: ChanceModel = .init(tileType: tier1HealthOption, chance: baseChance)
-        let randomNonHealthChance: ChanceModel = .init(tileType: tier1NonHealthOption, chance: baseChance)
-        let mediumMonsterChance: ChanceModel = .init(tileType: mediumMonsterType, chance: baseChance)
-        let easyMonsterChance: ChanceModel = .init(tileType: easyMonsterType, chance: 20)
-        let exitBlockedChance: ChanceModel = .init(tileType: blockExit, chance: 5)
-        
-        let chanceModel: [ChanceModel] = [
-            randomHealthChance, randomNonHealthChance, mediumMonsterChance, easyMonsterChance, exitBlockedChance
-        ].map {
-            chanceDeltaEncasementOffer(encasedOfferChanceModel: $0, playerData: playerData, lastLevelFeatures: lastLevelFeatures)
-        }
-        
-        return chanceModel
-        
-    case 4:
-        
-        let tier1Health: ChanceModel = .init(tileType: tier1HealthOption, chance: 20)
-        let tier1NonHealth: ChanceModel = .init(tileType: tier1NonHealthOption, chance: 20)
-        let easyMonsterChance: ChanceModel = .init(tileType: easyMonsterType, chance: 15)
-        let mediumMonsterChance: ChanceModel = .init(tileType: mediumMonsterType, chance: 25)
-        let hardMonsterChance: ChanceModel = .init(tileType: hardMonsterType, chance: 10)
-        let exitBlockedChance: ChanceModel = .init(tileType: blockExit, chance: 10)
-        
-        let chanceModel: [ChanceModel] = [
-            tier1Health, tier1NonHealth, hardMonsterChance, mediumMonsterChance, easyMonsterChance, exitBlockedChance
-        ].map {
-            chanceDeltaEncasementOffer(encasedOfferChanceModel: $0, playerData: playerData, lastLevelFeatures: lastLevelFeatures)
-        }
-        
-        return chanceModel
-
-    case 5:
-        let tier1Health: ChanceModel = .init(tileType: tier1HealthOption, chance: 15)
-        let tier1NonHealth: ChanceModel = .init(tileType: tier1NonHealthOption, chance: 15)
-        let tier2Health: ChanceModel = .init(tileType: tier2HealthOption, chance: 5)
-        let easyMonsterChance: ChanceModel = .init(tileType: easyMonsterType, chance: 10)
-        let mediumMonsterChance: ChanceModel = .init(tileType: mediumMonsterType, chance: 15)
-        let hardMonsterChance: ChanceModel = .init(tileType: hardMonsterType, chance: 25)
-        let exitBlockedChance: ChanceModel = .init(tileType: blockExit, chance: 10)
-        let runeChance: ChanceModel = .init(tileType: rune1Type, chance: 5)
-        
-        let chanceModel: [ChanceModel] = [
-            tier1Health, tier1NonHealth,
-            tier2Health,
-            easyMonsterChance, mediumMonsterChance, hardMonsterChance,
-            exitBlockedChance,
-            runeChance
-        ].map {
-            chanceDeltaEncasementOffer(encasedOfferChanceModel: $0, playerData: playerData, lastLevelFeatures: lastLevelFeatures)
-        }
-        
-        return chanceModel
-
-        
-    case 6:
-        let tier1Health: ChanceModel = .init(tileType: tier1HealthOption, chance: 5)
-        let tier1NonHealth: ChanceModel = .init(tileType: tier1NonHealthOption, chance: 5)
-        let tier2Health: ChanceModel = .init(tileType: tier2HealthOption, chance: 10)
-        let tier2NonHealth: ChanceModel = .init(tileType: tier2NonHealthOption, chance: 10)
-        let mediumMonsterChance: ChanceModel = .init(tileType: mediumMonsterType, chance: 5)
-        let hardMonsterChance: ChanceModel = .init(tileType: hardMonsterType, chance: 15)
-        let batMonsterChance: ChanceModel = .init(tileType: hardMonsterType, chance: 25)
-        let exitBlockedChance: ChanceModel = .init(tileType: blockExit, chance: 25)
-        let runeChance: ChanceModel = .init(tileType: rune1Type, chance: 10)
-        
-        let chanceModel: [ChanceModel] = [
-            tier1Health, tier1NonHealth,
-            tier2Health, tier2NonHealth,
-            mediumMonsterChance, hardMonsterChance, batMonsterChance,
-            exitBlockedChance,
-            runeChance
-        ].map {
-            chanceDeltaEncasementOffer(encasedOfferChanceModel: $0, playerData: playerData, lastLevelFeatures: lastLevelFeatures)
-        }
-        
-        return chanceModel
-        
-    case 7:
-        let tier2Health: ChanceModel = .init(tileType: tier2HealthOption, chance: 10)
-        let tier2NonHealth: ChanceModel = .init(tileType: tier2NonHealthOption, chance: 5)
-        let hardMonsterChance: ChanceModel = .init(tileType: hardMonsterType, chance: 10)
-        let batMonsterChance: ChanceModel = .init(tileType: batMonsterType, chance: 30)
-        let exitBlockedChance: ChanceModel = .init(tileType: blockExit, chance: 40)
-        let runeChance: ChanceModel = .init(tileType: rune1Type, chance: 5)
-        
-        let chanceModel: [ChanceModel] = [
-            tier2Health, tier2NonHealth,
-            hardMonsterChance, batMonsterChance,
-            exitBlockedChance,
-            runeChance
-        ].map {
-            chanceDeltaEncasementOffer(encasedOfferChanceModel: $0, playerData: playerData, lastLevelFeatures: lastLevelFeatures)
-        }
-        
-        return chanceModel
-        
-    case 8:
-        let tier2Health: ChanceModel = .init(tileType: tier2HealthOption, chance: 15)
-        let tier2NonHealth: ChanceModel = .init(tileType: tier2NonHealthOption, chance: 10)
-        let hardMonsterChance: ChanceModel = .init(tileType: hardMonsterType, chance: 10)
-        let batMonsterChance: ChanceModel = .init(tileType: batMonsterType, chance: 25)
-        let exitBlockedChance: ChanceModel = .init(tileType: blockExit, chance: 30)
-        let runeChance: ChanceModel = .init(tileType: rune1Type, chance: 5)
-        let runeSlotChance: ChanceModel = .init(tileType: runeSlot, chance: 5)
-        
-        let chanceModel: [ChanceModel] = [
-            tier2Health, tier2NonHealth,
-            hardMonsterChance, batMonsterChance,
-            exitBlockedChance,
-            runeChance, runeSlotChance
-        ].map {
-            chanceDeltaEncasementOffer(encasedOfferChanceModel: $0, playerData: playerData, lastLevelFeatures: lastLevelFeatures)
-        }
-        
-        return chanceModel
-        
-    case bossLevelDepthNumber:
-        let tier1Health: ChanceModel = .init(tileType: tier1HealthOption, chance: 16)
-        let tier2Health: ChanceModel = .init(tileType: tier2HealthOption, chance: 16)
-        let batMonsterChance1: ChanceModel = .init(tileType: batMonsterType, chance: 33)
-        let batMonsterChance2: ChanceModel = .init(tileType: batMonsterType, chance: 33)
-        
-        let chanceModel: [ChanceModel] = [
-            tier1Health, tier2Health,
-            batMonsterChance1, batMonsterChance2
-        ].map {
-            chanceDeltaEncasementOffer(encasedOfferChanceModel: $0, playerData: playerData, lastLevelFeatures: lastLevelFeatures)
-        }
-        
-        return chanceModel
-
-        
-    default:
-        return[]
-    }
-}
-
-
-
-private func randomItem(playerData: EntityModel, tier: StoreOfferTier, startingUnlockables: [Unlockable], otherUnlockables: [Unlockable], optionalCheck: ((StoreOffer) -> Bool)?) -> StoreOffer {
-    // pool of items
-    var allUnlockables = Set<Unlockable>(startingUnlockables)
-    allUnlockables.formUnion(otherUnlockables)
-    
-    let newOffer: StoreOffer? = allUnlockables
-        .filter({ $0.canAppearInRun })
-        .filter({ $0.item.rune == nil })
-        .filter({ $0.item.tier == tier })
-        .filter({ optionalCheck?($0.item) ?? true })
-        .randomElement()?.item
-    
-    return newOffer ?? .zero
-}
-
-
-fileprivate func baseChanceEncasementSize(depth: Depth) -> [AnyChanceModel<[EncasementSize]>] {
-    switch depth {
-    case 0, 1, 2:
-        return []
-    case 3:
-        let justPillarsChance = AnyChanceModel<[EncasementSize]>.init(thing: [], chance: 65)
-        let smallSizeChance = AnyChanceModel<[EncasementSize]>.init(thing: [.small], chance: 30)
-        let mediumSizeChance = AnyChanceModel<[EncasementSize]>.init(thing: [.medium], chance: 5)
-        
-        return [smallSizeChance, mediumSizeChance, justPillarsChance]
-    case 4:
-        let justPillarsChance = AnyChanceModel<[EncasementSize]>.init(thing: [], chance: 30)
-        let smallSizeChance = AnyChanceModel<[EncasementSize]>.init(thing: [.small], chance: 35)
-        let mediumSizeChance = AnyChanceModel<[EncasementSize]>.init(thing: [.medium], chance: 25)
-        let largeSizeChance = AnyChanceModel<[EncasementSize]>.init(thing: [.large], chance: 5)
-        let smallSmallSizeChance = AnyChanceModel<[EncasementSize]>.init(thing: [.small, .small], chance: 5)
-        
-        return [smallSizeChance, mediumSizeChance, justPillarsChance, largeSizeChance, smallSmallSizeChance]
-        
-    case 5:
-        let justPillarsChance = AnyChanceModel<[EncasementSize]>.init(thing: [], chance: 20)
-        let smallSizeChance = AnyChanceModel<[EncasementSize]>.init(thing: [.small], chance: 15)
-        let mediumSizeChance = AnyChanceModel<[EncasementSize]>.init(thing: [.medium], chance: 35)
-        let largeSizeChance = AnyChanceModel<[EncasementSize]>.init(thing: [.large], chance: 15)
-        let smallSmallSizeChance = AnyChanceModel<[EncasementSize]>.init(thing: [.small, .small], chance: 5)
-        let smallMediumSizeChance = AnyChanceModel<[EncasementSize]>.init(thing: [.small, .medium], chance: 10)
-        
-        return [smallSizeChance, mediumSizeChance, justPillarsChance, largeSizeChance, smallMediumSizeChance, smallSmallSizeChance]
-        
-    case 6:
-        let justPillarsChance = AnyChanceModel<[EncasementSize]>.init(thing: [], chance: 15)
-        let mediumSizeChance = AnyChanceModel<[EncasementSize]>.init(thing: [.medium], chance: 25)
-        let largeSizeChance = AnyChanceModel<[EncasementSize]>.init(thing: [.large], chance: 30)
-        let mediumMediumSizeChance = AnyChanceModel<[EncasementSize]>.init(thing: [.medium, .medium], chance: 15)
-        let smallLargeSizeChance = AnyChanceModel<[EncasementSize]>.init(thing: [.small, .large], chance: 5)
-        let largeMediumSizeChance = AnyChanceModel<[EncasementSize]>.init(thing: [.large, .medium], chance: 5)
-        
-        return [justPillarsChance, mediumSizeChance, largeSizeChance, mediumMediumSizeChance, smallLargeSizeChance, largeMediumSizeChance]
-
-    case 7:
-        let justPillarsChance = AnyChanceModel<[EncasementSize]>.init(thing: [], chance: 10)
-        let mediumSizeChance = AnyChanceModel<[EncasementSize]>.init(thing: [.medium], chance: 5)
-        let largeSizeChance = AnyChanceModel<[EncasementSize]>.init(thing: [.large], chance: 30)
-        let mediumMediumSizeChance = AnyChanceModel<[EncasementSize]>.init(thing: [.medium, .medium], chance: 25)
-        let smallLargeSizeChance = AnyChanceModel<[EncasementSize]>.init(thing: [.small, .large], chance: 20)
-        let largeMediumSizeChance = AnyChanceModel<[EncasementSize]>.init(thing: [.large, .medium], chance: 15)
-        
-        return [justPillarsChance, mediumSizeChance, largeSizeChance, mediumMediumSizeChance, smallLargeSizeChance, largeMediumSizeChance]
-        
-    case 8:
-        let justPillarsChance = AnyChanceModel<[EncasementSize]>.init(thing: [], chance: 10)
-        let largeSizeChance = AnyChanceModel<[EncasementSize]>.init(thing: [.large], chance: 20)
-        let mediumMediumSizeChance = AnyChanceModel<[EncasementSize]>.init(thing: [.medium, .medium], chance: 20)
-        let mediumLargeSizeChance = AnyChanceModel<[EncasementSize]>.init(thing: [.medium, .large], chance: 25)
-        let largeLargeSizeChance = AnyChanceModel<[EncasementSize]>.init(thing: [.large, .large], chance: 25)
-        
-        return [justPillarsChance, largeSizeChance, mediumMediumSizeChance, mediumLargeSizeChance, largeLargeSizeChance]
-
-    case bossLevelDepthNumber:
-        return [AnyChanceModel<[EncasementSize]>.init(thing: [.large, .large], chance: 100)]
-        
-    default:
-        return[]
-    }
-}
-
-
-func chanceDeltaOfferHealth(playerData: EntityModel) -> Float {
-    if Double(playerData.hp) <= Double(playerData.originalHp / 4)  {
-        return 25
-    }
-    else if Double(playerData.hp) <= Double(playerData.originalHp / 3) {
-        return 15
-    } else if Double(playerData.hp) <= Double(playerData.originalHp / 2)  {
-        return 10
-    } else if Double(playerData.hp) <= Double(playerData.originalHp / 3 * 4)  {
-        return 5
-    } else if playerData.hp == playerData.originalHp {
-        return -20
-    } else {
-        return 0
-    }
-}
-
-func chanceDeltaOfferRune(playerData: EntityModel, currentChance: Float, lastLevelOfferings: [StoreOffer]?) -> Float {
-    guard let pickaxe = playerData.pickaxe else { return 0 }
-    
-    var delta: Float = 0
-    let offeredARuneLastLevel = lastLevelOfferings?.contains(where: { $0.rune != nil })
-    
-    switch (pickaxe.isAtMaxCapacity(), offeredARuneLastLevel) {
-    case (true, true):
-        delta += -10
-    case (true, false):
-        delta += 10
-    case (false, true):
-        delta += 0
-    case (false, false):
-        delta += 15
-    case (true, .none):
-        delta += -20
-    case (false, .none):
-        delta += 0
-    default:
-        delta += 0
-    }
-    
-    return max(1, currentChance+delta)
-    
-}
-
-func chanceDeltaOfferRuneSlot(playerData: EntityModel, currentChance: Float, lastLevelOfferings: [StoreOffer]?) -> Float {
-    guard let pickaxe = playerData.pickaxe else { return 0 }
-    
-    var delta: Float = 0
-    let offeredARuneSlotLastLevel = lastLevelOfferings?.contains(where: { $0.type == .runeSlot })
-    
-    switch (pickaxe.isAtMaxCapacity(), offeredARuneSlotLastLevel) {
-    case (true, true):
-        delta += 15
-    case (true, false):
-        delta += 20
-    case (false, true):
-        delta += -30
-    case (false, false):
-        delta += 0
-    case (true, .none):
-        delta += 25
-    case (false, .none):
-        delta += -15
-    default:
-        delta += 0
-    }
-    return max(1, currentChance + delta)
-}
-
-func chanceDeltaOfferHealthInEncasement(playerData: EntityModel, currentChance: Float) -> Float {
-    var delta: Float = 0
-    if Double(playerData.hp) <= Double(playerData.originalHp / 4)  {
-        delta = 15
-    }
-    else if Double(playerData.hp) <= Double(playerData.originalHp / 3) {
-        delta = 10
-    } else if Double(playerData.hp) <= Double(playerData.originalHp / 2)  {
-        delta = 5
-    } else if playerData.hp == playerData.originalHp {
-        delta = -20
-    } else {
-        delta = 0
-    }
-    
-    return max(1, currentChance + delta)
-}
-
-
-func chanceDeltaOfferRuneInEncasement(playerData: EntityModel, currentChance: Float) -> Float {
-    guard let pickaxe = playerData.pickaxe else { return 0 }
-    
-    var delta: Float = 0
-    
-    if pickaxe.isAtMaxCapacity() {
-        delta += -10
-    } else {
-        delta += 10
-    }
-    
-    return max(1, currentChance+delta)
-    
-}
-
-func chanceDeltaOfferRuneSlotInEncasement(playerData: EntityModel, currentChance: Float) -> Float {
-    guard let pickaxe = playerData.pickaxe else { return 0 }
-    
-    var delta: Float = 0
-    
-    if pickaxe.isAtMaxCapacity() {
-        delta += 10
-    } else {
-        delta += -10
-    }
-    
-    return max(1, currentChance+delta)
-    
-}
-
-
-
-
-func chanceDeltaEncasement(numberOfEncasements: Int, depth: Depth, lastLevelFeatures: LevelFeatures?) -> Float {
-    guard let lastLevelFeatures = lastLevelFeatures else {
-        return 0
-    }
-    
-    if lastLevelFeatures.encasements.isEmpty {
-        if depth < 6 {
-            return 20
-        } else if depth < 8 {
-            return 25
-        } else if depth <= bossLevelDepthNumber {
-            if numberOfEncasements < 2 {
-                return 15
-            } else {
-                return 5
-            }
-        }
-    } else {
-        if depth < 6 {
-            return -15
-        } else if depth < 8 {
-            return -5
-        } else if depth <= bossLevelDepthNumber {
-            if numberOfEncasements < 2 {
-                return -10
-            } else {
-                return -3
-            }
-        }
-    }
-    
-    return 0
-    
-}
-
-func chanceDeltaLevelGoal(propsedGoalChanceModel: AnyChanceModel<LevelGoal>, lastLevelGoals: [LevelGoal]) -> AnyChanceModel<LevelGoal> {
-    guard !lastLevelGoals.isEmpty else { return propsedGoalChanceModel }
-    
-    
-    let delta = lastLevelGoals.reduce(Float(0), { prevDeltaTotal, lastLevelGoal in
-        var totalDelta: Float = 0
-        switch (lastLevelGoal.tileType, propsedGoalChanceModel.thing.tileType) {
-        case (.pillar, .pillar):
-            totalDelta -= propsedGoalChanceModel.chance / 2
-            
-        case let (.rock(lhsColor, _, _), .rock(rhsColor, _,  _)):
-            switch (lhsColor, rhsColor) {
-            case (.brown, .brown), (.red, .red), (.blue, .blue), (.purple, .purple):
-                totalDelta -= propsedGoalChanceModel.chance / 2
-            case (_, .brown):
-                totalDelta += propsedGoalChanceModel.chance * 1.5
-            default:
-                break
-            }
-            
-        case (.monster, .monster):
-            totalDelta -= propsedGoalChanceModel.chance / 2
-            
-        default:
-            break
-            
-        }
-        
-        return prevDeltaTotal + totalDelta
-        
-    })
-    
-    return AnyChanceModel(thing: propsedGoalChanceModel.thing, chance: propsedGoalChanceModel.chance + delta)
-    
-}
-
-func chanceDeltaEncasementOffer(encasedOfferChanceModel: ChanceModel, playerData: EntityModel, lastLevelFeatures: LevelFeatures?) -> ChanceModel {
-    guard let features = lastLevelFeatures, !features.encasements.isEmpty else { return encasedOfferChanceModel }
-    var totalDelta: Float = 0
-    let delta = features.encasements.reduce(Float(0), { prev, tile in
-        var totalDelta: Float = 0
-        // touch luck
-        let oldOffer = tile.tileType
-        let newOffer = encasedOfferChanceModel.tileType
-        switch (oldOffer, newOffer) {
-            
-            // monster was the old offer
-        case (.monster, .monster):
-            totalDelta -= 15
-        case (.monster, .exit):
-            totalDelta -= 5
-        case (.monster, .item), (.monster, .offer):
-            totalDelta += 5
-            
-            // exit was the old offer
-        case (.exit, .monster):
-            totalDelta -= 10
-        case (.exit, .exit):
-            totalDelta -= 10
-        case (.exit, .item), (.exit, .offer):
-            totalDelta += 5
-            
-            // offered an rune or item last level?
-        case (.offer, .exit):
-            totalDelta += 5
-        case (.offer, .monster):
-            totalDelta += 0
-        case (.offer, .offer):
-            totalDelta -= 4
-        case (.offer, .item):
-            totalDelta -= 4
-            
-            // got offered gems last level?
-        case (.item, .exit):
-            totalDelta += 15
-        case (.item, .monster):
-            totalDelta += 15
-        case (.item, .item):
-            totalDelta -= 20
-        case (.item, .offer):
-            totalDelta -= 0
-            
-        case (_, _):
-            totalDelta += 0
-        }
-        
-        return prev + totalDelta
-    })
-    totalDelta += delta
-    
-    return ChanceModel(tileType: encasedOfferChanceModel.tileType, chance: max(1, encasedOfferChanceModel.chance + totalDelta))
-}
-
 
 class Level: Codable, Hashable {
     
@@ -1083,12 +509,18 @@ class Level: Codable, Hashable {
         }
 #endif
         
-        var offers = [StoreOffer]()
-        var allUnlockables = otherUnlockables
-        allUnlockables.append(contentsOf: startingUnlockables)
-        offers.append(contentsOf: tierItems(tier: tier, depth: depth, unlockables: allUnlockables, playerData: playerData, randomSource: randomSource, lastLevelOffers: lastLevelOffers))
+        let lastLevelOffers = runModel?.lastLevelOffers(currentDepth: depth)
+        let allPastLevelOffers = runModel?.allPastLevelOffers(currentDepth: depth)
         
+        let offers = tierOptions(tier: tier, depth: depth, startingUnlockabls: startingUnlockables, otherUnlockabls: otherUnlockables, lastLevelsOffering: lastLevelOffers, allPastLevelOffers: allPastLevelOffers, playerData: playerData, randomSource: randomSource)
         return offers
+        
+//        var offers = [StoreOffer]()
+//        var allUnlockables = otherUnlockables
+//        allUnlockables.append(contentsOf: startingUnlockables)
+//        offers.append(contentsOf: tierItems(tier: tier, depth: depth, unlockables: allUnlockables, playerData: playerData, randomSource: randomSource, lastLevelOffers: lastLevelOffers))
+//
+//        return offers
         
     }
     
@@ -1103,9 +535,9 @@ class Level: Codable, Hashable {
     
     private func tierItems(tier: StoreOfferTier, depth: Depth, unlockables: [Unlockable], playerData: EntityModel, randomSource: GKLinearCongruentialRandomSource, lastLevelOffers: [StoreOffer]?) -> [StoreOffer] {
         
+//        return tierItems(from: <#T##[StoreOfferBucket]#>, tier: <#T##StoreOfferTier#>, depth: <#T##Depth#>, unlockables: <#T##[Unlockable]#>, playerData: <#T##EntityModel#>, randomSource: <#T##GKLinearCongruentialRandomSource#>, lastLevelOffers: <#T##[StoreOffer]?#>, allPastLevelOFfers: <#T##[StoreOffer]?#>)
+        
         if tier == 1 {
-            // always offer at least 1 heal
-            
             let healingOptions =
             unlockables
                 .filter { unlockable in
@@ -1120,9 +552,13 @@ class Level: Codable, Hashable {
                     return !healingOptions.contains(unlockable) && unlockable.canAppearInRun && unlockable.item.tier == tier
                 }
             
-            guard let otherOptionOne = otherOptions.randomElement(favorWhere: { $0.recentlyPurchasedAndHasntSpawnedYet }) else {  preconditionFailure("There must always be at least 1 other unlockable at tier 1 that isn't healing")}
+            let chosenOtherOptions = randomSource.chooseElements(choose: 2, fromArray: otherOptions)
             
-            guard let otherOptionTwo = otherOptions.randomElement(favorWhere: { $0.recentlyPurchasedAndHasntSpawnedYet }) else {  preconditionFailure("There must always be at least 1 other unlockable at tier 1 that isn't healing")}
+            guard let otherOptionOne = otherOptions.randomElement(favorWhere: { $0.recentlyPurchasedAndHasntSpawnedYet }) else {  preconditionFailure("There must always be at least 1 other unlockable at tier 1 that isn't healing")
+            }
+            
+            guard let otherOptionTwo = otherOptions.randomElement(favorWhere: { $0.recentlyPurchasedAndHasntSpawnedYet }) else {  preconditionFailure("There must always be at least 1 other unlockable at tier 1 that isn't healing")
+            }
             
             
             var healthChance:Float = 33
@@ -1263,278 +699,668 @@ class Level: Codable, Hashable {
     
 }
 
-private func encasementsOptions(depth: Depth, size: EncasementSize) -> [EncasementCoords] {
+func chanceDeltaOfferDodge(playerData player: EntityModel, modifier: Float) -> Float {
+    var delta = Float(0)
+    if player.dodge > 40 {
+        delta = -100
+    } else if player.dodge > 35 {
+        delta = -25
+    } else if player.dodge > 30 {
+        delta = -21
+    } else if player.dodge > 25 {
+        delta = -18
+    } else if player.dodge > 20 {
+        delta = -10
+    } else if player.dodge > 15 {
+        delta = -8
+    } else if player.dodge > 10 {
+        delta = -7
+    } else if player.dodge > 5 {
+        delta = 5
+    } else if player.dodge > 0 {
+        delta = 8
+    }
+    
+    return delta * modifier
+}
+
+func chanceDeltaOfferLuck(playerData player: EntityModel, modifier: Float) -> Float {
+    var delta = Float(0)
+    if player.luck > 70 {
+        delta = -100
+    } else if player.luck > 60 {
+        delta = -25
+    } else if player.luck > 50 {
+        delta = -21
+    } else if player.luck > 40 {
+        delta = -18
+    } else if player.luck > 30 {
+        delta = -10
+    } else if player.luck > 25 {
+        delta = -8
+    } else if player.luck > 10 {
+        delta = -7
+    } else if player.luck > 5 {
+        delta = 5
+    } else if player.luck > 0 {
+        delta = 8
+    }
+    
+    return delta * modifier
+}
+
+func chanceOfferUtilBucket(pastLevelOffers: [StoreOfferBucket]?, modifier: Float) -> Float {
+    let numberPastLevels = pastLevelOffers?.filter( { $0.type == .util }).count ?? 0
+    var delta = Float(0)
+    if numberPastLevels > 2 {
+        delta = -10
+    } else if numberPastLevels > 1 {
+        delta = -5
+    } else {
+        delta = 10
+    }
+    
+    return delta * modifier
+}
+
+// TODO: think this through
+func chanceDeltaOfferWealthBucket(playerData: EntityModel, unlockables: [Unlockable], currentChance: Float) -> Float {
+    var deltaChance = Float(1)
+    let totalUnlockables = Float(unlockables.count)
+    let totalOwnedUnlockables = Float(unlockables.filter { $0.canAppearInRun }.count)
+    
+    if totalOwnedUnlockables < totalUnlockables / 5 {
+        deltaChance = 4
+    } else if totalOwnedUnlockables < totalUnlockables / 3 {
+        deltaChance = 3
+    } else if totalOwnedUnlockables < totalUnlockables / 2 {
+        deltaChance = 1.5
+    } else if totalOwnedUnlockables < totalUnlockables / 3 * 4 {
+        deltaChance = 1.25
+    } else {
+        deltaChance = 0.75
+    }
+    
+    return max(1, currentChance * deltaChance)
+    
+}
+
+func chanceDeltaOfferRuneBucket(playerData: EntityModel, allPastLevelOffers: [StoreOfferBucket]?, modifier: Float, depth: Depth) -> Float
+{
+    guard let pickaxe = playerData.pickaxe else { return  0 }
+    var totalDelta = Float(0)
+    let runeSlots = pickaxe.runeSlots
+    let runes = pickaxe.runes.count
+    
+    if runeSlots - runes >= 4 {
+        totalDelta += 10
+    } else if runeSlots - runes >= 3 {
+        totalDelta += 7
+    } else if runeSlots - runes >= 2 {
+        totalDelta += 5
+    } else if runeSlots - runes >= 1 {
+        totalDelta += 3
+    } else {
+        totalDelta -= 5
+    }
+    
+    let numberOfRuneOffered = allPastLevelOffers?.filter( { $0.type == .rune }).count ?? 0
+    
     switch depth {
     case 0, 1, 2:
-        return []
-    case 3, 4:
-        // board size = 8
-        // no mediums in the board size 8 realm
-        if size == .small {
-            let encasementOption1: EncasementCoords = .init(middleTile: TileCoord(0, 0), outerTiles: [TileCoord(1, 0), TileCoord(0, 1)])
-            let encasementOption2: EncasementCoords = .init(middleTile: TileCoord(7, 0), outerTiles: [TileCoord(6, 0), TileCoord(7, 1)])
-            let encasementOption3: EncasementCoords = .init(middleTile: TileCoord(7, 7), outerTiles: [TileCoord(7, 6), TileCoord(6, 7)])
-            let encasementOption4: EncasementCoords = .init(middleTile: TileCoord(0, 7), outerTiles: [TileCoord(0, 6), TileCoord(1, 7)])
-            
-            return [encasementOption1, encasementOption2, encasementOption3, encasementOption4]
-        } else if size == .medium {
-            let mediumCornerOption1: EncasementCoords = .init(middleTile: TileCoord(0, 0), outerTiles: [TileCoord(2, 0), TileCoord(1, 1), TileCoord(0, 2)])
-            let mediumCornerOption2: EncasementCoords = .init(middleTile: TileCoord(7, 0), outerTiles: [TileCoord(5, 0), TileCoord(6, 1), TileCoord(7, 2)])
-            let mediumCornerOption3: EncasementCoords = .init(middleTile: TileCoord(7, 7), outerTiles: [TileCoord(7, 5), TileCoord(6, 6), TileCoord(5, 7)])
-            let mediumCornerOption4: EncasementCoords = .init(middleTile: TileCoord(0, 7), outerTiles: [TileCoord(0, 5), TileCoord(1, 6), TileCoord(2, 7)])
-            return [mediumCornerOption1, mediumCornerOption2, mediumCornerOption3, mediumCornerOption4]
+        if numberOfRuneOffered >= 2 {
+            totalDelta -= 30
+        } else if numberOfRuneOffered >= 1 {
+            totalDelta -= 20
+        } else {
+            totalDelta += 0
         }
-        else if size == .large {
-            let encasementOption1: EncasementCoords = .init(middleTile: TileCoord(2, 2), outerTiles: [TileCoord(2, 1), TileCoord(1, 2), TileCoord(2, 3), TileCoord(3, 2)])
-            let encasementOption2: EncasementCoords = .init(middleTile: TileCoord(5, 2), outerTiles: [TileCoord(4, 2), TileCoord(5, 1), TileCoord(6, 2), TileCoord(5, 3)])
-            let encasementOption3: EncasementCoords = .init(middleTile: TileCoord(5, 5), outerTiles: [TileCoord(4, 5), TileCoord(5, 4), TileCoord(6, 5), TileCoord(5, 6)])
-            let encasementOption4: EncasementCoords = .init(middleTile: TileCoord(2, 5), outerTiles: [TileCoord(2, 4), TileCoord(1, 5), TileCoord(3, 5), TileCoord(2, 6)])
-            
-            return [encasementOption1, encasementOption2, encasementOption3, encasementOption4]
+    case 3:
+        if numberOfRuneOffered >= 3 {
+            totalDelta -= 40
+        } else if numberOfRuneOffered >= 2 {
+            totalDelta -= 30
+        } else if numberOfRuneOffered >= 1 {
+            totalDelta += 0
+        } else {
+            // you deserve a ruin
+            totalDelta += 20
         }
         
-    case 5..<bossLevelDepthNumber:
-        if size == .small {
-            let cornerOption1: EncasementCoords = .init(middleTile: TileCoord(0, 0), outerTiles: [TileCoord(1, 0), TileCoord(0, 1)])
-            let cornerOption2: EncasementCoords = .init(middleTile: TileCoord(8, 0), outerTiles: [TileCoord(7, 0), TileCoord(8, 1)])
-            let cornerOption3: EncasementCoords = .init(middleTile: TileCoord(8, 8), outerTiles: [TileCoord(8, 7), TileCoord(7, 8)])
-            let cornerOption4: EncasementCoords = .init(middleTile: TileCoord(0, 8), outerTiles: [TileCoord(0, 7), TileCoord(1, 8)])
-            return  [cornerOption1, cornerOption2, cornerOption3, cornerOption4]
+    case 4:
+        if numberOfRuneOffered >= 3 {
+            totalDelta -= 40
+        } else if numberOfRuneOffered >= 2 {
+            totalDelta -= 30
+        } else if numberOfRuneOffered >= 1 {
+            totalDelta -= 20
+        } else {
+            // you deserve a ruin
+            totalDelta += 500
         }
-        else if size == .medium {
-            let sideOption1: EncasementCoords = .init(middleTile: TileCoord(4, 0), outerTiles: [TileCoord(3, 0), TileCoord(5, 0), TileCoord(4, 1)])
-            let sideOption4: EncasementCoords = .init(middleTile: TileCoord(0, 4), outerTiles: [TileCoord(0, 3), TileCoord(0, 5), TileCoord(1, 4)])
-            let sideOption2: EncasementCoords = .init(middleTile: TileCoord(8, 4), outerTiles: [TileCoord(8, 3), TileCoord(8, 5), TileCoord(7, 4)])
-            let sideOption3: EncasementCoords = .init(middleTile: TileCoord(4, 8), outerTiles: [TileCoord(5, 8), TileCoord(3, 8), TileCoord(4, 7)])
-            return [sideOption1, sideOption2, sideOption3, sideOption4]
-        } else if size == .large {
-            let encasementOption1: EncasementCoords = .init(middleTile: TileCoord(2, 2), outerTiles: [TileCoord(2, 1), TileCoord(2, 3), TileCoord(1, 2), TileCoord(3, 2)])
-            let encasementOption2: EncasementCoords = .init(middleTile: TileCoord(4, 1), outerTiles: [TileCoord(4, 0), TileCoord(4, 2), TileCoord(5, 1), TileCoord(3, 1)])
-            let encasementOption3: EncasementCoords = .init(middleTile: TileCoord(6, 2), outerTiles: [TileCoord(6, 1), TileCoord(6, 3), TileCoord(7, 2), TileCoord(5, 2)])
-            let encasementOption4: EncasementCoords = .init(middleTile: TileCoord(7, 4), outerTiles: [TileCoord(7, 3), TileCoord(7, 5), TileCoord(6, 4), TileCoord(8, 4)])
-            let encasementOption5: EncasementCoords = .init(middleTile: TileCoord(6, 6), outerTiles: [TileCoord(6, 5), TileCoord(6, 7), TileCoord(5, 6), TileCoord(7, 6)])
-            let encasementOption6: EncasementCoords = .init(middleTile: TileCoord(4, 7), outerTiles: [TileCoord(4, 6), TileCoord(4, 8), TileCoord(3, 7), TileCoord(5, 7)])
-            let encasementOption7: EncasementCoords = .init(middleTile: TileCoord(2, 6), outerTiles: [TileCoord(2, 5), TileCoord(2, 7), TileCoord(1, 6), TileCoord(3, 6)])
-            let encasementOption8: EncasementCoords = .init(middleTile: TileCoord(1, 4), outerTiles: [TileCoord(1, 3), TileCoord(1, 5), TileCoord(0, 4), TileCoord(2, 4)])
-            let encasementOption9: EncasementCoords = .init(middleTile: TileCoord(4, 4), outerTiles: [TileCoord(4, 3), TileCoord(4, 5), TileCoord(3, 4), TileCoord(5, 4)])
-            
-            /// choose the outer encasements
-            return [encasementOption1, encasementOption2, encasementOption3, encasementOption4, encasementOption5, encasementOption6, encasementOption7, encasementOption8, encasementOption9]
+        
+    case 5, 6:
+        if numberOfRuneOffered >= 5 {
+            totalDelta -= 50
+        } else if numberOfRuneOffered >= 4 {
+            totalDelta -= 40
+        } else if numberOfRuneOffered >= 3 {
+            totalDelta -= 30
+        } else if numberOfRuneOffered >= 2 {
+            totalDelta -= 20
+        } else if numberOfRuneOffered >= 1 {
+            totalDelta += 10
+        } else {
+            // you deserve a ruin
+            totalDelta += 1000
         }
+        
+    case 7, 8:
+        if numberOfRuneOffered >= 5 {
+            totalDelta -= 50
+        } else if numberOfRuneOffered >= 4 {
+            totalDelta -= 40
+        } else if numberOfRuneOffered >= 3 {
+            totalDelta -= 30
+        } else if numberOfRuneOffered >= 2 {
+            totalDelta += 10
+        } else if numberOfRuneOffered >= 1 {
+            totalDelta += 20
+        } else {
+            // you deserve a ruin
+            totalDelta += 5000
+        }
+        
+    default:
+        totalDelta += 5000
+    }
     
-    case bossLevelDepthNumber:
-        let encasement1 = EncasementCoords(middleTile: TileCoord(6, 4), outerTiles: [TileCoord(7, 4), TileCoord(5, 4), TileCoord(6, 3), TileCoord(6, 5)])
-        let encasement2 = EncasementCoords(middleTile: TileCoord(2, 4), outerTiles: [TileCoord(3, 4), TileCoord(1, 4), TileCoord(2, 3), TileCoord(2, 5)])
+    
+    return totalDelta * modifier
+}
 
-        return [encasement1, encasement2]
+
+/// Weights the different bucket options.
+func chanceDeltaStoreOfferBuckets(_ buckets: [AnyChanceModel<StoreOfferBucket>], lastLevelOfferings: [StoreOfferBucket]?, allPastLevelOffers: [StoreOfferBucket]?, playerData: EntityModel, depth: Depth, unlockables: [Unlockable]) -> [AnyChanceModel<StoreOfferBucket>] {
+    
+    
+    var healthBucketChance = buckets.filter { $0.thing.type == .health }.reduce(Float(0), { prev, current in return prev + current.chance })
+    var dodgeBucketChance = buckets.filter { $0.thing.type == .dodge }.reduce(Float(0), { prev, current in return prev + current.chance })
+    var luckBucketChance = buckets.filter { $0.thing.type == .luck }.reduce(Float(0), { prev, current in return prev + current.chance })
+    var utilBucketChance = buckets.filter { $0.thing.type == .util }.reduce(Float(0), { prev, current in return prev + current.chance })
+    var wealthBucketChance = buckets.filter { $0.thing.type == .wealth }.reduce(Float(0), { prev, current in return prev + current.chance })
+    var runeBucketChance = buckets.filter { $0.thing.type == .rune }.reduce(Float(0), { prev, current in return prev + current.chance })
+    
+    for bucket in buckets {
+        switch (depth, bucket.thing.type) {
+        case (0, .health), (1, .health), (2, .health):
+            healthBucketChance += chanceDeltaOfferHealth(playerData: playerData, modifer: 0.25)
+        case (3, .health), (4, .health), (5, .health):
+            healthBucketChance += chanceDeltaOfferHealth(playerData: playerData, modifer: 0.50)
+        case (6, .health), (7, .health), (8, .health):
+            healthBucketChance += chanceDeltaOfferHealth(playerData: playerData)
+            
+        case (_, .dodge):
+            dodgeBucketChance += chanceDeltaOfferDodge(playerData: playerData, modifier: 1)
+            
+        case (_, .luck):
+            luckBucketChance += chanceDeltaOfferLuck(playerData: playerData, modifier: 1)
+            
+        case (_, .util):
+            utilBucketChance += chanceOfferUtilBucket(pastLevelOffers: lastLevelOfferings, modifier: 1)
+            
+        case (_, .wealth):
+            wealthBucketChance = chanceDeltaOfferWealthBucket(playerData: playerData, unlockables: unlockables, currentChance: wealthBucketChance)
+            
+        case (_, .rune):
+            runeBucketChance += chanceDeltaOfferRuneBucket(playerData: playerData, allPastLevelOffers: allPastLevelOffers, modifier: 1.0, depth: depth)
+            
+        default:
+            break
+        }
+        
+    }
+    healthBucketChance = max(1, healthBucketChance)
+    luckBucketChance = max(1, luckBucketChance)
+    dodgeBucketChance = max(1, dodgeBucketChance)
+    wealthBucketChance = max(1, wealthBucketChance)
+    utilBucketChance = max(1, utilBucketChance)
+    runeBucketChance = max(1, runeBucketChance)
+    
+    return buckets.map { bucket in
+        switch bucket.thing.type {
+        case .health:
+            return AnyChanceModel(thing: StoreOfferBucket(type: bucket.thing.type), chance: healthBucketChance)
+        case .luck:
+            return AnyChanceModel(thing: StoreOfferBucket(type: bucket.thing.type), chance: luckBucketChance)
+        case .dodge:
+            return AnyChanceModel(thing: StoreOfferBucket(type: bucket.thing.type), chance: dodgeBucketChance)
+        case .wealth:
+            return AnyChanceModel(thing: StoreOfferBucket(type: bucket.thing.type), chance: wealthBucketChance)
+        case .util:
+            return AnyChanceModel(thing: StoreOfferBucket(type: bucket.thing.type), chance: utilBucketChance)
+        case .rune:
+            return AnyChanceModel(thing: StoreOfferBucket(type: bucket.thing.type), chance: runeBucketChance)
+        }
+        
+    }
+}
+        
+func tierOptions(tier: StoreOfferTier, depth: Depth, startingUnlockabls: [Unlockable], otherUnlockabls: [Unlockable], lastLevelsOffering: [StoreOffer]?, allPastLevelOffers: [StoreOffer]?, playerData: EntityModel, randomSource: GKLinearCongruentialRandomSource) -> [StoreOffer] {
+    
+    
+    let pastLevelOfferBuckets = lastLevelsOffering?.compactMap { StoreOfferBucket.bucket(for: $0.type) }
+    let allPastLevelOfferBuckets = allPastLevelOffers?.compactMap { StoreOfferBucket.bucket(for: $0.type) }
+    
+    let chosenBucketOne: AnyChanceModel<StoreOfferBucket>?
+    let chosenBucketTwo: AnyChanceModel<StoreOfferBucket>?
+    
+    switch tier {
+    case 1:
+        let healthBucketChanceModel = AnyChanceModel(thing: StoreOfferBucket(type: .health), chance: 1/5)
+        let luckBucketChanceModel = AnyChanceModel(thing: StoreOfferBucket(type: .luck), chance: 1/5)
+        let dodgeBucketChanceModel = AnyChanceModel(thing: StoreOfferBucket(type: .dodge), chance: 1/5)
+        let utilBucketChanceModel = AnyChanceModel(thing: StoreOfferBucket(type: .util), chance: 1/5)
+        let wealthBucketChanceModel = AnyChanceModel(thing: StoreOfferBucket(type: .wealth), chance: 1/5)
+        
+        let nonweightBuckets = [healthBucketChanceModel, luckBucketChanceModel, dodgeBucketChanceModel, utilBucketChanceModel, wealthBucketChanceModel]
+        let weightedBuckets = chanceDeltaStoreOfferBuckets(nonweightBuckets, lastLevelOfferings: pastLevelOfferBuckets, allPastLevelOffers: allPastLevelOfferBuckets, playerData: playerData, depth: depth, unlockables: otherUnlockabls)
+        
+        chosenBucketOne = randomSource.chooseElementWithChance(weightedBuckets)
+        chosenBucketTwo = randomSource.chooseElementWithChance(weightedBuckets)
+
+
+    case 2:
+        let healthBucketChanceModel = AnyChanceModel(thing: StoreOfferBucket(type: .health), chance: 1/6)
+        let luckBucketChanceModel = AnyChanceModel(thing: StoreOfferBucket(type: .luck), chance: 1/6)
+        let dodgeBucketChanceModel = AnyChanceModel(thing: StoreOfferBucket(type: .dodge), chance: 1/6)
+        let utilBucketChanceModel = AnyChanceModel(thing: StoreOfferBucket(type: .util), chance: 1/6)
+        let wealthBucketChanceModel = AnyChanceModel(thing: StoreOfferBucket(type: .wealth), chance: 1/6)
+        let runeBucketChanceModel = AnyChanceModel(thing: StoreOfferBucket(type: .wealth), chance: 1/6)
+        
+        let nonweightBuckets = [healthBucketChanceModel, luckBucketChanceModel, dodgeBucketChanceModel, utilBucketChanceModel, wealthBucketChanceModel, runeBucketChanceModel]
+        let weightedBuckets = chanceDeltaStoreOfferBuckets(nonweightBuckets, lastLevelOfferings: pastLevelOfferBuckets, allPastLevelOffers: allPastLevelOfferBuckets, playerData: playerData, depth: depth, unlockables: otherUnlockabls)
+        
+        chosenBucketOne = randomSource.chooseElementWithChance(weightedBuckets)
+        chosenBucketTwo = randomSource.chooseElementWithChance(weightedBuckets)
+        
+    default:
+        chosenBucketOne = nil
+        chosenBucketTwo = nil
+    }
+    
+    guard let chosenBucketOne = chosenBucketOne, let chosenBucketTwo = chosenBucketTwo else {
+        GameLogger.shared.log(prefix: "[Bug]", message: "No buckets chosen for the store offers")
+        return []
+    }
+    
+    let items = tierItems(from: [chosenBucketOne.thing, chosenBucketTwo.thing], tier: tier, depth: depth, unlockables: otherUnlockabls, playerData: playerData, randomSource: randomSource, lastLevelOffers: lastLevelsOffering, allPastLevelOFfers: allPastLevelOffers)
+    
+    
+    return items
+}
+
+// Wraps each store offer in a chance model with equal chance to choose any of them
+func baseChanceForOffers(potentialItems: [StoreOffer]) -> [AnyChanceModel<StoreOffer>] {
+    
+    var choiceWithChance: [AnyChanceModel<StoreOffer>] = []
+    
+    for offer in potentialItems {
+        let allOptions = max(1, Float(potentialItems.count))
+        choiceWithChance.append(.init(thing: offer, chance: 1/allOptions))
+    }
+    
+    return choiceWithChance
+}
+
+func deltaChanceOfferHealth(playerData: EntityModel, depth: Depth, storeOffer: StoreOffer, tier: StoreOfferTier, currentChance: Float) -> Float {
+    let offerType = storeOffer.type
+    let currentHp = Float(playerData.hp)
+    let originalHp = Float(playerData.originalHp)
+    func maxIntendedHealthPerDepth(_ depth: Depth) -> Float {
+        switch depth {
+        case 0, 1:
+            return 5
+        case 2, 3:
+            return 6
+        case 4, 5:
+            return 7
+        case 6, 7:
+            return 8
+        case 8, 9:
+            return 10
+        default:
+            return 5
+        }
+    }
+    
+    var currentChance = currentChance
+    
+    if offerType == .plusOneMaxHealth {
+        if originalHp >= maxIntendedHealthPerDepth(depth) {
+            currentChance *= 0.25
+        } else if originalHp >= maxIntendedHealthPerDepth(depth) - 1 {
+            currentChance *= 0.5
+        } else {
+            currentChance *= 1.2
+        }
+    } else if offerType == .plusTwoMaxHealth {
+        if originalHp >= maxIntendedHealthPerDepth(depth) {
+            currentChance *= 0.0
+        } else if originalHp >= maxIntendedHealthPerDepth(depth) - 1 {
+            currentChance *= 0.25
+        } else if originalHp >= maxIntendedHealthPerDepth(depth) - 2 {
+            currentChance *= 0.5
+        } else {
+            currentChance *= 1.2
+        }
+    }
+
+    var healingPotionMultipler = Float(1)
+    switch depth {
+    case 0, 1, 2:
+        if currentHp < originalHp/4 {
+            healingPotionMultipler = 2
+        } else if currentHp < originalHp/3 {
+            healingPotionMultipler = 1.75
+        } else if currentHp < originalHp/2 {
+            healingPotionMultipler = 1.5
+        } else {
+            healingPotionMultipler = 0.5
+        }
+    case 3, 4, 5:
+        if currentHp < originalHp/4 {
+            healingPotionMultipler = 2
+        } else if currentHp < originalHp/3 {
+            healingPotionMultipler = 1.75
+        } else if currentHp < originalHp/2 {
+            healingPotionMultipler = 1.5
+        } else if currentHp < originalHp/4 * 3 {
+            healingPotionMultipler = 1.25
+        } else {
+            healingPotionMultipler = 0.87
+        }
+    case 6, 7, 8:
+        if currentHp < originalHp/4 {
+            healingPotionMultipler = 1.75
+        } else if currentHp < originalHp/3 {
+            healingPotionMultipler = 1.5
+        } else if currentHp < originalHp/2 {
+            healingPotionMultipler = 1.25
+        } else if currentHp < originalHp/4 * 3 {
+            healingPotionMultipler = 1.1
+        } else {
+            healingPotionMultipler = 1
+        }
+        
     default:
         break
-        
+
     }
-    return []
+    
+    if offerType == .lesserHeal || offerType == .greaterHeal {
+        currentChance *= healingPotionMultipler
+    }
+    
+        
+    return max(1, currentChance)
 }
 
-
-/// Call this with equal encasementChanceModel.count and encasementSizes.count
-/// Call with no ecnasement chance model or no encasement sizes to just get normal pillars
-private func potentialEncasementPillarCoords(depth: Int, randomSource: GKLinearCongruentialRandomSource, encasementChanceModel: [ChanceModel], encasementSizes: [EncasementSize]) -> (pillars: [LevelStartTiles], encasements: [LevelStartTiles]) {
+func deltaChanceOfferUtilWealth(storeOfferChance: AnyChanceModel<StoreOffer>, allPastLevelOffers: [StoreOffer]?) -> Float {
+    var delta = Float(1)
     
-    // early return if no encasements should be created
-    if encasementChanceModel.isEmpty || encasementSizes.isEmpty {
-        return (pillars: pillarsForDepth(depth: depth, randomSource: randomSource), encasements: [])
+    let sameTierOffersInPast = allPastLevelOffers?.filter({ $0.tier == storeOfferChance.thing.tier })
+    let noneWereThisOffer = sameTierOffersInPast?.allSatisfy({ alreadyOffered in
+        return alreadyOffered != storeOfferChance.thing
+    }) ?? false
+
+    if noneWereThisOffer {
+        let sameTierOfferCount = Float(sameTierOffersInPast?.count ?? 0)
+        delta += (sameTierOfferCount * 0.1)
+    } else {
+        delta -= 0.25
     }
     
-    var pillarCoords: [LevelStartTiles] = []
-    var mutableEncasementChanceModel = encasementChanceModel
-    for size in encasementSizes {
-        let choices = encasementsOptions(depth: depth, size: size)
+    return max(1, delta * storeOfferChance.chance)
+}
+
+func deltaChanceOfferDodgeLuck(offerChance: AnyChanceModel<StoreOffer>, depth: Depth) -> Float {
+    var deltaChance = Float(1)
+    switch (depth, offerChance.thing.type) {
+    case (0, .fourLeafClover), (1, .fourLeafClover), (2, .fourLeafClover):
+        deltaChance = 2
+    case (0, .horseshoe), (1, .horseshoe), (2, .horseshoe):
+        deltaChance = 1
+    case (0, .luckyCat), (1, .luckyCat), (2, .luckyCat):
+        deltaChance = 0.5
+    case (3, .fourLeafClover), (4, .fourLeafClover), (5, .fourLeafClover):
+        deltaChance = 0.75
+    case (3, .horseshoe), (4, .horseshoe), (5, .horseshoe):
+        deltaChance = 1.25
+    case (3, .luckyCat), (4, .luckyCat), (5, .luckyCat):
+        deltaChance = 0.75
+    case (6, .fourLeafClover), (7, .fourLeafClover), (8, .fourLeafClover):
+        deltaChance = 0.5
+    case (6, .horseshoe), (7, .horseshoe), (8, .horseshoe):
+        deltaChance = 1
+    case (6, .luckyCat), (7, .luckyCat), (8, .luckyCat):
+        deltaChance = 1.5
         
-        // avoid choosing encasement options that have a shared tile coord with already chosen encasement options
-        if let chosenEncasement = randomSource.chooseElement(choices, avoidBlock: { potentialChoice in
-            // when should we avoid?
-            // when any element in pillar coords overlaps with any element with potential choice
-            for coord in potentialChoice.allCoords {
-                if pillarCoords.map( { $0.tileCoord }).contains(coord) {
-                    return true
-                }
-            }
-            return false
-        }) {
-            // create the pillars by matching up colors randomly
-            pillarCoords.append(contentsOf: matchupPillarsRandomly(colors: ShiftShaft_Color.pillarCases, coordinatess: chosenEncasement.outerTiles))
+    // dodge stuff
+    case (0, .sandals), (1, .sandals), (2, .sandals):
+        deltaChance = 2
+    case (0, .runningShoes), (1, .runningShoes), (2, .runningShoes):
+        deltaChance = 1
+    case (0, .wingedBoots), (1, .wingedBoots), (2, .wingedBoots):
+        deltaChance = 0.5
+        
+    case (3, .sandals), (4, .sandals), (5, .sandals):
+        deltaChance = 0.75
+    case (3, .runningShoes), (4, .runningShoes), (5, .runningShoes):
+        deltaChance = 1.25
+    case (3, .wingedBoots), (4, .wingedBoots), (5, .wingedBoots):
+        deltaChance = 0.75
+        
+    case (6, .sandals), (7, .sandals), (8, .sandals):
+        deltaChance = 0.5
+    case (6, .runningShoes), (7, .runningShoes), (8, .runningShoes):
+        deltaChance = 1.0
+    case (6, .wingedBoots), (7, .wingedBoots), (8, .wingedBoots):
+        deltaChance = 1.25
+
+    default:
+        break
+    }
             
-            /// choose a random item/monster/exit/offer to throw into the middle tile
-            if let randomTile = randomSource.chooseElementWithChance(mutableEncasementChanceModel)?.tileType {
-                let encasedLevelStartTile = LevelStartTiles(tileType: randomTile, tileCoord: chosenEncasement.middleTile)
-                pillarCoords.append(encasedLevelStartTile)
-                
-                /// dont choose this option again
-                mutableEncasementChanceModel.removeFirst { chanceModel in
-                    return chanceModel.tileType == randomTile
-                }
+            
+    return max(1, deltaChance)
+
+}
+
+func deltaChanceOfferRune(offerChance: AnyChanceModel<StoreOffer>, playerData: EntityModel) -> Float {
+    guard let color = offerChance.thing.rune?.progressColor else { return offerChance.chance }
+    guard let runes = playerData.pickaxe?.runes else { return offerChance.chance }
+    let simiarRunes = Float(runes.map { $0.progressColor }.filter { $0 == color }.count)
+    
+    var deltaChance = Float(1)
+    deltaChance -= (0.25) * simiarRunes
+    
+    if simiarRunes == 0 {
+        deltaChance += 0.25
+    }
+    
+    return offerChance.chance * deltaChance
+}
+
+func deltaChanceForOffer(offerChances: [AnyChanceModel<StoreOffer>], recentlyPurchasedAndShouldSpawn: [StoreOffer], playerData: EntityModel, depth: Depth, tier: StoreOfferTier, lastLevelOffers: [StoreOffer]?, allPastLevelOffers: [StoreOffer]?) -> [AnyChanceModel<StoreOffer>] {
+    
+    var newOfferChances: [AnyChanceModel<StoreOffer>] = []
+    for offerChance in offerChances {
+        var newChance = Float(1)
+        switch StoreOfferBucket.bucket(for: offerChance.thing.type).type {
+        case .health:
+            newChance = deltaChanceOfferHealth(playerData: playerData, depth: depth, storeOffer: offerChance.thing, tier: tier, currentChance: offerChance.chance)
+            
+        case .util, .wealth:
+            newChance = deltaChanceOfferUtilWealth(storeOfferChance: offerChance, allPastLevelOffers: allPastLevelOffers)
+            
+        case .dodge, .luck:
+            newChance = deltaChanceOfferDodgeLuck(offerChance: offerChance, depth: depth)
+            
+        case .rune:
+            newChance = deltaChanceOfferRune(offerChance: offerChance, playerData: playerData)
+            
+        }
+        
+        if recentlyPurchasedAndShouldSpawn.contains(offerChance.thing) {
+            newChance *= 1000
+        }
+        
+        newOfferChances.append(.init(thing: offerChance.thing, chance: newChance))
+        
+    }
+    
+    return newOfferChances
+}
+
+func tierItems(from buckets: [StoreOfferBucket], tier: StoreOfferTier, depth: Depth, unlockables: [Unlockable], playerData: EntityModel, randomSource: GKLinearCongruentialRandomSource, lastLevelOffers: [StoreOffer]?, allPastLevelOFfers: [StoreOffer]?) -> [StoreOffer] {
+    
+    var chosenOffers: [StoreOffer] = []
+    
+    for bucket in buckets {
+        let availableBucketItems = unlockables
+            .filter { unlockable in
+                return unlockable.canAppearInRun
+                && unlockable.item.tier == tier
+                && bucket.contains(offerType: unlockable.item.type)
+            }.map {
+                $0.item
             }
-        }
-    }
-    
-    return (pillars: [], encasements: pillarCoords)
-}
+        
+        let recentlyPurchasedSpawnedItems = unlockables
+            .filter { unlockable in
+                return unlockable.canAppearInRun
+                && unlockable.item.tier == tier
+                && bucket.contains(offerType: unlockable.item.type)
+                && unlockable.recentlyPurchasedAndHasntSpawnedYet
+            }.map {
+                $0.item
+            }
 
-private func matchupPillarsRandomly(colors: [ShiftShaft_Color] = ShiftShaft_Color.pillarCases, coordinatess: [TileCoord]) -> [LevelStartTiles] {
-    var pillarColors = colors
-    var coords = coordinatess
-    var pillarCoordinates: [LevelStartTiles] = []
-    
-    // create PillarCoordinates randoming selecting elements from pillarColors and coords
-    while pillarCoordinates.count < coordinatess.count {
-        if pillarColors.isEmpty {
-            pillarColors = colors.shuffled()
-        }
         
-        let (remainingColors, randomColor) = pillarColors.dropRandom()
-        let (remainingCoords, randomCoord) = coords.dropRandom()
+        let availableOffersWithChance = baseChanceForOffers(potentialItems: availableBucketItems)
+        let availbleOffersWithWeightChance = deltaChanceForOffer(offerChances: availableOffersWithChance, recentlyPurchasedAndShouldSpawn: recentlyPurchasedSpawnedItems, playerData: playerData, depth: depth, tier: tier, lastLevelOffers: lastLevelOffers, allPastLevelOffers: allPastLevelOFfers)
         
-        pillarColors = remainingColors
-        coords = remainingCoords
         
-        if let color = randomColor, let coord = randomCoord {
-            let pillarTile = TileType.pillar(PillarData(color: color, health: 3))
-            let pillarCoord = LevelStartTiles(tileType: pillarTile, tileCoord: coord)
-            pillarCoordinates.append(pillarCoord)
-        }
+        chosenOffers = randomSource.chooseElementsWithChance(availbleOffersWithWeightChance, choices: 2).map { $0.thing }
+        
         
     }
     
-    return pillarCoordinates
-}
-
-fileprivate func pillarsForDepth(depth: Depth, randomSource: GKLinearCongruentialRandomSource) -> [LevelStartTiles] {
-    switch depth {
-    case 0, 1, 2: return []
-    case 3, 4: return lowLevelPillars(randomSource: randomSource)
-    case 5, 6: return midLevelPillars(randomSource: randomSource)
-    case 7, 8, 9: return highLevelPillars(randomSource: randomSource)
-    default: return []
-    }
-}
-
-fileprivate func lowLevelPillars(randomSource: GKLinearCongruentialRandomSource) -> [LevelStartTiles] {
-    let coords: [TileCoord] = [
-        TileCoord(5, 4), TileCoord(3, 4),
-    ]
-    
-    let coords2: [TileCoord] = [
-        TileCoord(1, 1), TileCoord(6, 6)
-    ]
-    
-    let coords3: [TileCoord] = [
-        TileCoord(4, 1), TileCoord(3, 6)
-    ]
-    
-    let coords4: [TileCoord] = [
-        TileCoord(3, 4), TileCoord(4, 3),
-    ]
-    
-    let coords5: [TileCoord] = [
-        TileCoord(4, 0), TileCoord(3, 7),
-    ]
-    
-    
-    if let chosenCoords = randomSource.chooseElement([coords, coords2, coords3, coords4, coords5]) {
-        return matchupPillarsRandomly(coordinatess: chosenCoords)
-    } else {
-        return []
-    }
+    return chosenOffers
 }
 
 
-fileprivate func midLevelPillars(randomSource: GKLinearCongruentialRandomSource) -> [LevelStartTiles] {
-    let coords: [TileCoord] = [
-        TileCoord(3, 3), TileCoord(5, 3),
-        TileCoord(3, 5), TileCoord(5, 5)
-    ]
-    
-    let coords2: [TileCoord] = [
-        TileCoord(1, 4), TileCoord(3, 4), TileCoord(5, 4), TileCoord(7, 4)
-    ]
-    
-    let coords3: [TileCoord] = [
-        TileCoord(6, 2), TileCoord(2, 2),
-        TileCoord(2, 6), TileCoord(6, 6)
-    ]
-    
-    let coords4: [TileCoord] = [
-        TileCoord(8, 3), TileCoord(8, 5),
-        TileCoord(0, 3), TileCoord(0, 5)
-    ]
-    
-    let coords5: [TileCoord] = [
-        TileCoord(7, 1), TileCoord(1, 1),
-        TileCoord(4, 4),
-        TileCoord(7, 7), TileCoord(1, 7)
-    ]
-    
-    let coords6: [TileCoord] = [
-        TileCoord(8, 4), TileCoord(4, 8),
-        TileCoord(4, 4),
-        TileCoord(0, 4), TileCoord(4, 0)
-    ]
-    
-    if let chosenCoords = randomSource.chooseElement([coords, coords2, coords3, coords4, coords5, coords6]) {
-        return matchupPillarsRandomly(coordinatess: chosenCoords)
-    } else {
-        return []
-    }
-}
 
-fileprivate func highLevelPillars(randomSource: GKLinearCongruentialRandomSource, avoid: [LevelStartTiles] = []) -> [LevelStartTiles] {
-    let coords: [TileCoord] = [
-        TileCoord(1, 8), TileCoord(0, 7), TileCoord(0, 8),
-        TileCoord(8, 0), TileCoord(7, 0), TileCoord(8, 1)
-    ]
     
-    let coords2: [TileCoord] = [
-        TileCoord(3, 0), TileCoord(4, 0), TileCoord(5, 0),
-        TileCoord(3, 8), TileCoord(4, 8), TileCoord(5, 8)
-    ]
+    /// TIER 1
+    // create chances for health items
+    // create chance for luck items
+    // create chance for gem items
+    // create chance for dodge items
+    // create chance for other potion items
     
-    let coords3: [TileCoord] = [
-        TileCoord(7, 3), TileCoord(6, 4), TileCoord(7, 5),
-        TileCoord(1, 3), TileCoord(2, 4), TileCoord(1, 5),
-    ]
     
-    let coords4: [TileCoord] = [
-        TileCoord(5, 3), TileCoord(5, 4),TileCoord(5, 5),
-        TileCoord(4, 4),
-        TileCoord(3, 3), TileCoord(3, 4),TileCoord(3, 5),
-    ]
+    /// TIER 2
+    // create chance for health items
+    // create chance for luck items
+    // create chance for gem itms
+    // create chance for dodge items
+    // create chance for rune items
+    // create chance for other items
+    // create chance for rune slot items
     
-    let coords5: [TileCoord] = [
-        TileCoord(4, 3), TileCoord(4, 4), TileCoord(4, 5),
-        TileCoord(8, 4), TileCoord(7, 4),
-        TileCoord(0, 4), TileCoord(1, 4),
-    ]
     
-    let coords6: [TileCoord] = [
-        TileCoord(8, 0), TileCoord(7, 1),
-        TileCoord(0, 0), TileCoord(1, 1),
-        TileCoord(1, 7), TileCoord(0, 8),
-        TileCoord(7, 7), TileCoord(8, 8),
-    ]
+    /// RUNES
+    /// liquify monsters
+    /// crush
+    /// fiery rage
+    ///
+    /// bubble up
+    /// get swifty
+    /// teleport to exit
+    ///
+    /// transform rock
+    /// vortex
+    /// move earth
+    ///
+    /// rain embers
+    /// fireball
+    /// drill down
+    ///
+    ///
+    /// HEALTH
+    /// Lesser
+    /// Greater
+    /// plus 1
+    /// plus 2
+    ///
+    /// DODGE
+    /// Sandals
+    /// Running Shoes
+    /// Winged Boots
+    ///
+    /// LUCK
+    /// four leaf
+    /// horseshoe
+    /// lucky cat
+    ///
+    /// UTIL
+    /// snake eyes
+    /// transmogrify
+    /// kill monster
+    /// chest
+    /// greater rune potion
+    /// pickaxe slot
+    /// EScape
+    ///
+    /// WEALTH
+    /// gem magnet
+    /// liquify monsters
+    /// infusion
+    /// 25 gems
+    /// 50 gems
+    ///
+    ///
+    ///
     
-    let allCoords = [coords, coords2, coords3, coords4, coords5, coords6]
-    
-    // filter out any set of coords that contains someone from avoid
-    let possibleCoords = allCoords.filter { coords in
-        return coords.allSatisfy { coord in
-            !avoid
-                .map { $0.tileCoord }
-                .contains(coord)
-        }
-    }
-    if let chosenCoords = randomSource.chooseElement(possibleCoords) {
-        return matchupPillarsRandomly(coordinatess: chosenCoords)
-    } else {
-        return []
-    }
-    
-}
+    /// Random Chance
+    /// First choose two buckets
+    /// - runes
+    /// - health
+    /// - dodge
+    /// - luck
+    /// - wealth
+    /// - util
+    /// They can be the same bucket.
+    /// Tier 1.
+    /// Choose from
+    /// health, dodge, luck, wealth and util
+    /// 1/5 base chance for first bucket
+    /// 1/5 base chance for second bucket
+    /// +A% depending on players health
+    /// +B% depnding on what was offered last level
+    ///
+    /// Tier 2 (just add rune)
+    /// Choose from health, dodge, luck wealth and util
+    ///
+    /// Then within each bucket, choose 1 item. The items must be different from one another (only important if we choose the same bucket).
+    ///  base chance of anything is 1/x where x is the number of items unlocked
+    ///  6 items? 1/6 % chance for each one to appear
+    ///  +A% for health items, depending on your health
+    ///  +B% of a non-health item if the other item is health related ??
+    ///  +C% based on the rarity of the item
+    ///  +D% base on the player's luck rating and the item's rarity
+    ///  +E% based on the number of rounds this item hasnt shown up this run
+    ///  +F% (rune offers) they have not been offered a rune yet
+    ///  -Int.min% if that item is already picked

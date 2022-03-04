@@ -1241,7 +1241,7 @@ extension Board {
         
         for coord in randomlyChosenMonsters {
             // TODO: the amount given by the Rune should be modeled somewhere else
-            newTiles[coord.row][coord.col] = Tile(type: .item(Item(type: .gem, amount: 10)))
+            newTiles[coord.row][coord.col] = Tile(type: .item(Item(type: .gem, amount: 15)))
             tileTransformation.append(.init(coord, coord))
         }
         

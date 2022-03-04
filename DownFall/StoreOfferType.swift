@@ -131,7 +131,7 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
     var numberOfTargets: Int {
         switch self {
         case .liquifyMonsters:
-            return 5
+            return 3
         default:
             return 0
         }
@@ -140,7 +140,7 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
     var effectAmount: Int {
         switch self {
         case .liquifyMonsters:
-            return 10
+            return 15
         case .transmogrifyPotion:
             return 50
         default:

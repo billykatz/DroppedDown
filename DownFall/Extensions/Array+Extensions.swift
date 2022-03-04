@@ -120,6 +120,15 @@ extension Array {
             return randomElement()
         }
     }
+    
+//    func randomElement(favorWhere: (Element) -> Bool, avoid: (Element) -> Bool) -> Element? {
+//        if let firstIndex = self.firstIndex(where: favorWhere) {
+//            if avoid (self[firstIndex])
+//            return self[firstIndex]
+//        } else {
+//            return randomElement()
+//        }
+//    }
 }
 
 extension Array where Element == SpriteAction {

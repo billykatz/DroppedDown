@@ -9,6 +9,83 @@
 import SpriteKit
 
 typealias StoreOfferTier = Int
+enum StoreOfferBucketType: String, Codable, Hashable {
+    case health
+    case wealth
+    case util
+    case rune
+    case dodge
+    case luck
+}
+
+struct StoreOfferBucket: Equatable {
+    let type: StoreOfferBucketType
+    
+    func contains(offerType: StoreOfferType) -> Bool {
+        switch (self.type, offerType) {
+        case (.health, .plusOneMaxHealth), (.health, .plusTwoMaxHealth), (.health, .lesserHeal), (.health, .greaterHeal):
+            return true
+            
+        case (.wealth, .liquifyMonsters), (.wealth, .infusion), (.wealth, .gemMagnet), (.wealth, .gems):
+            return true
+            
+        case (.util, .runeSlot), (.util, .killMonsterPotion), (.util, .chest), (.util, .transmogrifyPotion), (.util, .snakeEyes), (.util, .greaterRuneSpiritPotion), (.util, .escape):
+            return true
+            
+        case (.luck, .luckyCat), (.luck, .horseshoe), (.luck, .fourLeafClover):
+            return true
+            
+        case (.dodge, .sandals), (.dodge, .runningShoes), (.dodge, .wingedBoots):
+            return true
+            
+        case (.rune, .rune):
+            return true
+            
+        default:
+            return false
+        }
+    }
+    
+    static func bucket(for offerType: StoreOfferType) -> StoreOfferBucket {
+        switch offerType {
+        case .plusOneMaxHealth, .plusTwoMaxHealth, .lesserHeal, .greaterHeal:
+            return StoreOfferBucket(type: .health)
+            
+        case .liquifyMonsters,
+            .infusion,
+            .gemMagnet,
+            .gems:
+            return StoreOfferBucket(type: .wealth)
+            
+        case .runeSlot,
+            .killMonsterPotion,
+            .chest,
+            .transmogrifyPotion,
+            .snakeEyes,
+            .greaterRuneSpiritPotion,
+            .escape:
+            return StoreOfferBucket(type: .util)
+            
+        case
+            .luckyCat,
+            .horseshoe,
+            .fourLeafClover,
+            .luck:
+            return StoreOfferBucket(type: .luck)
+            
+        case
+            .sandals,
+            .runningShoes,
+            .wingedBoots,
+            .dodge:
+            return StoreOfferBucket(type: .dodge)
+            
+        case .rune:
+            return StoreOfferBucket(type: .rune)
+            
+        }
+    }
+}
 
 struct StoreOffer: Codable, Hashable, Identifiable {
     

@@ -71,6 +71,7 @@
 		28C6446C2746E27000098C3C /* BossView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28C6446B2746E27000098C3C /* BossView.swift */; };
 		28C6446E27488DC200098C3C /* BossHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28C6446D27488DC100098C3C /* BossHelpers.swift */; };
 		28C64470274892A200098C3C /* SKAction+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28C6446F274892A200098C3C /* SKAction+Extensions.swift */; };
+		28C6F2C527D16C2A002882AB /* LevelHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28C6F2C427D16C2A002882AB /* LevelHelpers.swift */; };
 		28C806AA26F3C3D500135E29 /* StatTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28C806A926F3C3D500135E29 /* StatTracker.swift */; };
 		28CAFA7B26A0F2F000151CA8 /* CodexItemAnimatingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28CAFA7A26A0F2F000151CA8 /* CodexItemAnimatingView.swift */; };
 		28D29AD4270B7E9D001AD50D /* RuneReplacementInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D29AD3270B7E9D001AD50D /* RuneReplacementInfoView.swift */; };
@@ -321,6 +322,7 @@
 		28C6446B2746E27000098C3C /* BossView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BossView.swift; sourceTree = "<group>"; };
 		28C6446D27488DC100098C3C /* BossHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BossHelpers.swift; sourceTree = "<group>"; };
 		28C6446F274892A200098C3C /* SKAction+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SKAction+Extensions.swift"; sourceTree = "<group>"; };
+		28C6F2C427D16C2A002882AB /* LevelHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelHelpers.swift; sourceTree = "<group>"; };
 		28C806A926F3C3D500135E29 /* StatTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatTracker.swift; sourceTree = "<group>"; };
 		28CAFA7A26A0F2F000151CA8 /* CodexItemAnimatingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexItemAnimatingView.swift; sourceTree = "<group>"; };
 		28D29AD3270B7E9D001AD50D /* RuneReplacementInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneReplacementInfoView.swift; sourceTree = "<group>"; };
@@ -733,6 +735,7 @@
 			isa = PBXGroup;
 			children = (
 				3D4A471023B3D34F000165FB /* LevelModel.swift */,
+				28C6F2C427D16C2A002882AB /* LevelHelpers.swift */,
 				28AFE00E27CE7AE800B72B14 /* ChanceModel.swift */,
 				28AFE00C27CE7ABA00B72B14 /* LevelStartTiles.swift */,
 				28AFE00A27CE787400B72B14 /* LevelGoal.swift */,
@@ -1504,6 +1507,7 @@
 				28AFE00B27CE787400B72B14 /* LevelGoal.swift in Sources */,
 				289EF394275A95C400138F34 /* MonsterDiesModel.swift in Sources */,
 				3DA4E8972290A88C006E90D1 /* EntityModel.swift in Sources */,
+				28C6F2C527D16C2A002882AB /* LevelHelpers.swift in Sources */,
 				3D06390722EEB53C00C4D5E9 /* ComputingState.swift in Sources */,
 				2842570A26EFE82600C96CCC /* CodexPriceView.swift in Sources */,
 				288330F7274FDB400070A1E8 /* ConfirmShuffleView.swift in Sources */,
@@ -1750,7 +1754,7 @@
 				CODE_SIGN_ENTITLEMENTS = "DownFall/Shift Shaft.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = G6N5X5RF9Q;
 				INFOPLIST_FILE = DownFall/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
@@ -1774,7 +1778,7 @@
 				CODE_SIGN_ENTITLEMENTS = "DownFall/Shift Shaft.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = G6N5X5RF9Q;
 				INFOPLIST_FILE = DownFall/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;

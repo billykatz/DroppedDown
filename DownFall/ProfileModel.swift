@@ -149,8 +149,12 @@ class Profile: Codable, Equatable {
         }
         
         var newStats = stats
+        print("+++++++++++++++++++++")
+        print("Stat before \(newStats[statIndex].debugDescription())")
+        print("Updating with: \(stat.debugDescription())")
         newStats[statIndex] = newStats[statIndex].updateStatAmount(amount, overwrite: overwriteIfLarger)
-        
+        print("State after \(newStats[statIndex].debugDescription())")
+        print("+++++++++++++++++++++")
         return Profile(name: name, player: player, currentRun: currentRun, stats: newStats, unlockables: unlockables, startingUnlockbles: startingUnlockbles)
     }
     

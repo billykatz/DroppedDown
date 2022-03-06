@@ -173,7 +173,6 @@ class ProfileViewModel {
         // revive
         newPlayerData = newPlayerData.revive()
         
-        
         /// Update Profile
         /// update profile with new player
         var newProfile = profile.updatePlayer(newPlayerData)

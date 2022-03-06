@@ -119,7 +119,7 @@ class RunStatTracker {
     }
     
     private func addStat(_ stat: Statistics, amount: Int) {
-        if let index = runStats.firstIndex(where: { $0.fuzzyEqual(rhs: stat)} ) {
+        if let index = runStats.firstIndex(where: { $0 == stat } ) {
             runStats[index] = runStats[index].updateStatAmount(amount, overwrite: stat.statType.overwriteIfLarger)
         } else {
             runStats.append(stat)

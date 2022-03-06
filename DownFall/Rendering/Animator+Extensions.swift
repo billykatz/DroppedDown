@@ -15,7 +15,7 @@ extension Animator {
         var spriteActions: [SpriteAction] = []
         for pillarsThatTakeDamage in pillarsThatTakeDamage {
             let sprite = sprites[pillarsThatTakeDamage.tileCoord]
-            if let takesDamage = sprite.pillarCrumble() {
+            if let takesDamage = sprite.pillarCrumble(false) {
                 spriteActions.append(takesDamage)
             }
         }

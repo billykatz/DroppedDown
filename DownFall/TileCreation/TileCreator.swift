@@ -188,7 +188,7 @@ class TileCreator: TileStrategy {
         guard specialGems < level.maxSpawnGems + Int(extraChanceBasedOnLuck) else { return false }
         
         let baseChance: Float = 2
-        let extraChanceBasedOnTilesSinceLast = Float(numberOfTilesSinceLastGemDropped) / 10
+        let extraChanceBasedOnTilesSinceLast = Float(numberOfTilesSinceLastGemDropped) / 50
         let totalShouldHoldGemChance = baseChance + extraChanceBasedOnTilesSinceLast + extraChanceBasedOnLuck
         let shouldNotHoldGemChance = 100 - totalShouldHoldGemChance
         

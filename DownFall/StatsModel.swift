@@ -98,7 +98,7 @@ struct Statistics: Codable, Equatable, Identifiable {
     }
     
     func fuzzyEqual(rhs: Statistics) -> Bool {
-        return self.statType == rhs.statType
+        return self == rhs
     }
     
     func updateStatAmount(_ amount: Int, overwrite: Bool) -> Statistics {

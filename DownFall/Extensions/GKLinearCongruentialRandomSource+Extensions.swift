@@ -118,13 +118,19 @@ extension GKLinearCongruentialRandomSource {
         guard !array.isEmpty else { return [] }
         guard choices < array.count else { return array }
         var chosenElements: [Element] = []
+        var availableChoices = array
         
         var maxTries = 30
         while chosenElements.count < choices && maxTries > 0 {
-            if let chosen = chooseElementWithChance(array) {
-                if !chosenElements.contains(chosen) {
+            if let chosen = chooseElementWithChance(availableChoices) {
+                if availableChoices.contains(chosen) {
+                    if let idx = availableChoices.firstIndex(of: chosen) {
+                        availableChoices.remove(at: idx)
+                    }
                     chosenElements.append(chosen)
                 }
+            } else {
+                print("-----")
             }
             maxTries -= 1
         }

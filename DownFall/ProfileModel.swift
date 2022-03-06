@@ -116,7 +116,7 @@ class Profile: Codable, Equatable {
     func applyUnlockables(to player: EntityModel) -> EntityModel {
         var newPlayer = player
         for unlockable in unlockables {
-            if unlockable.applysToBasePlayer && unlockable.isUnlocked && unlockable.isPurchased {
+            if unlockable.applysToBasePlayer && unlockable.isPurchased {
                 newPlayer = newPlayer.applyEffect(unlockable.item.effect)
             }
         }

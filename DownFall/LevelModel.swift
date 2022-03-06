@@ -843,6 +843,7 @@ func tierOptions(tier: StoreOfferTier, depth: Depth, startingUnlockabls: [Unlock
 //        chosenBucketOne = randomSource.chooseElementWithChance(weightedBuckets)
 //        chosenBucketTwo = randomSource.chooseElementWithChance(weightedBuckets)
         let buckets = randomSource.chooseElementsWithChance(weightedBuckets, choices: 2)
+        guard buckets.count == 2 else { preconditionFailure() }
         chosenBucketOne = buckets.first
         chosenBucketTwo = buckets.last
 
@@ -862,6 +863,12 @@ func tierOptions(tier: StoreOfferTier, depth: Depth, startingUnlockabls: [Unlock
         let buckets = randomSource.chooseElementsWithChance(weightedBuckets, choices: 2)
         chosenBucketOne = buckets.first
         chosenBucketTwo = buckets.last
+        
+        if let chosen2 = chosenBucketTwo, let chosen1 = chosenBucketOne,
+           chosen2.thing == chosen1.thing
+        {
+            print(("======="))
+        }
 //        chosenBucketOne = randomSource.chooseElementWithChance(weightedBuckets)
 //        chosenBucketTwo = randomSource.chooseElementWithChance(weightedBuckets)
         
@@ -890,7 +897,7 @@ func baseChanceForOffers(potentialItems: [StoreOffer]) -> [AnyChanceModel<StoreO
     
     for offer in potentialItems {
         let allOptions = max(1, Float(potentialItems.count))
-        choiceWithChance.append(.init(thing: offer, chance: 1/allOptions))
+        choiceWithChance.append(.init(thing: offer, chance: 1/allOptions * 100))
     }
     
     return choiceWithChance
@@ -1105,7 +1112,7 @@ func deltaChanceForOffer(offerChances: [AnyChanceModel<StoreOffer>], recentlyPur
         }
         
         if recentlyPurchasedAndShouldSpawn.contains(offerChance.thing) {
-            newChance *= 1000
+            newChance *= 10000
         }
         
         if newChance > 0 {

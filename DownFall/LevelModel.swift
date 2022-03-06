@@ -1112,7 +1112,7 @@ func deltaChanceForOffer(offerChances: [AnyChanceModel<StoreOffer>], recentlyPur
         }
         
         if recentlyPurchasedAndShouldSpawn.contains(offerChance.thing) {
-            newChance *= 10000
+            newChance *= 1000
         }
         
         if newChance > 0 {

@@ -2292,9 +2292,7 @@ extension Board {
                   let defenderPosition = defenderPostion,
                   case .pillar (let data) = tiles[defenderPosition].type {
             //just note that the monster attacked
-            // and the pillar takes one damage
             tiles[attackerPosition.x][attackerPosition.y] = Tile(type: TileType.monster(monsterModel.didAttack()))
-            pillarsThatTakeDamage.append(.init(tileType: .pillar(data), tileCoord: defenderPosition))
             
             /// I purposefully hid some monsters in the Pillars in the boss level.  I think it better if they dont destroy the pillars they are trapped in
             /// I have been a mistake so ill just leave this code in here

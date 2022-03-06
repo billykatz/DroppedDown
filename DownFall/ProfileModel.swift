@@ -143,7 +143,10 @@ class Profile: Codable, Equatable {
     func updateStatistic(_ stat: Statistics, amount: Int, overwriteIfLarger: Bool = false) -> Profile {
         guard (!overwriteIfLarger || (overwriteIfLarger && amount > firstStat(stat)?.amount ?? 0)),
               let statIndex = firstIndexStat(stat)
-        else { return self }
+        else {
+            print("couln't find stat \(stat.debugDescription())")
+            return self
+        }
         
         var newStats = stats
         newStats[statIndex] = newStats[statIndex].updateStatAmount(amount, overwrite: overwriteIfLarger)
@@ -153,11 +156,11 @@ class Profile: Codable, Equatable {
     
     func firstStat(_ stat: Statistics) -> Statistics? {
         return stats.first(where: { playerStat in
-            playerStat.statType == stat.statType &&
-                playerStat.rockColor == stat.rockColor &&
-                playerStat.gemColor == stat.gemColor &&
-                playerStat.runeType == stat.runeType &&
-                playerStat.monsterType == stat.monsterType
+            playerStat.statType == stat.statType
+            && playerStat.rockColor == stat.rockColor
+            && playerStat.gemColor == stat.gemColor
+            && playerStat.runeType == stat.runeType
+            && playerStat.monsterType == stat.monsterType
             
         })
 

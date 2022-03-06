@@ -63,6 +63,22 @@ struct Statistics: Codable, Equatable, Identifiable {
     let amount: Int
     let statType: StatisticType
     let id: UUID
+    
+    func debugDescription() -> String {
+        return
+        """
+        \(rockColor != nil ? rockColor!.humanReadable : "") \(gemColor != nil ? gemColor!.humanReadable : "") \(monsterType != nil ? monsterType!.humanReadable : "")  statType: \(statType) amount :\(amount)
+        """
+        
+    }
+    
+    static func ==(_ lhs: Statistics, _ rhs: Statistics) -> Bool {
+        return lhs.rockColor == rhs.rockColor
+        && lhs.gemColor == rhs.gemColor
+        && lhs.monsterType == rhs.monsterType
+        && lhs.runeType == rhs.runeType
+        && lhs.statType == rhs.statType
+    }
      
     init(rockColor: ShiftShaft_Color? = nil, gemColor: ShiftShaft_Color? = nil, monsterType: EntityModel.EntityType? = nil, runeType: RuneType? = nil, amount: Int, statType: StatisticType) {
         self.rockColor = rockColor
@@ -82,31 +98,7 @@ struct Statistics: Codable, Equatable, Identifiable {
     }
     
     func fuzzyEqual(rhs: Statistics) -> Bool {
-        let lhs = self
-        switch (lhs.statType, rhs.statType) {
-        case (.rocksDestroyed, .rocksDestroyed): return true
-        case (.totalRocksDestroyed, .totalRocksDestroyed): return true
-        case (.largestRockGroupDestroyed, .largestRockGroupDestroyed): return true
-        case (.gemsCollected, .gemsCollected): return true
-        case (.totalGemsCollected, .totalGemsCollected): return true
-        case (.lowestDepthReached, .lowestDepthReached): return true
-        case (.distanceFallen, .distanceFallen): return true
-        case (.counterClockwiseRotations, .counterClockwiseRotations): return true
-        case (.clockwiseRotations, .clockwiseRotations): return true
-        case (.monstersKilled, .monstersKilled): return true
-        case (.totalMonstersKilled, .totalMonstersKilled): return true
-        case (.monstersKilledInARow, .monstersKilledInARow): return true
-        case (.damageTaken, .damageTaken): return true
-        case (.healthHealed, .healthHealed): return true
-        case (.damageDealt, .damageDealt): return true
-        case (.attacksDodged, .attacksDodged): return true
-        case (.totalWins, .totalWins): return true
-        case (.totalLoses, .totalLoses): return true
-        case (.runeUses, .runeUses): return true
-        case (.totalRuneUses, .totalRuneUses): return true
-        default: return false
-
-        }
+        return self.statType == rhs.statType
     }
     
     func updateStatAmount(_ amount: Int, overwrite: Bool) -> Statistics {
@@ -227,6 +219,7 @@ extension Statistics {
                 Statistics.totalMonstersKilled,
                 Statistics.monstersKilledInARow,
                 Statistics.damageTaken,
+                Statistics.damageDealt,
                 Statistics.healthHealed,
                 Statistics.totalLoses,
                 Statistics.totalWins,

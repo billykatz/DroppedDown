@@ -101,14 +101,8 @@ class ProfileViewModel {
     
     func isUnlocked(unlockableStat: Statistics, playerStats: [Statistics]) -> Bool {
         for stat in playerStats {
-            if stat.statType == unlockableStat.statType
-                && stat.rockColor == unlockableStat.rockColor
-                && stat.gemColor == unlockableStat.gemColor
-                && stat.monsterType == unlockableStat.monsterType
-                && stat.runeType == unlockableStat.runeType {
-                
+            if stat == unlockableStat {
                 return stat.amount >= unlockableStat.amount
-                
             }
         }
         return false
@@ -140,6 +134,7 @@ class ProfileViewModel {
     
     func nilCurrenRun() {
         profileSubject.value.currentRun = nil
+        saveProfile(profileSubject.value)
     }
     
     func deletePlayerData() {

@@ -161,7 +161,7 @@ struct CodexView: View {
 //                        GeometryReader { reader in
                             Spacer()
                             Text("")
-                            .frame(width: UIScreen.main.bounds.size.width, height: 200, alignment: .bottom)
+                            .frame(width: UIScreen.main.bounds.size.width, height: 100, alignment: .bottom)
                                 .background(
                                     LinearGradient(gradient: Gradient(colors: [.clear, .black]), startPoint: .top, endPoint: .bottom)
                                     )

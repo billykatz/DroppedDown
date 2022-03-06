@@ -56,7 +56,7 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
     }
     
     private func presentMainMenu(transition: SKTransition? = nil, allowContinueRun: Bool = true) {
-        guard let mainMenu = mainMenuScene else { fatalError("Unable to unwrap the main menu scene")}
+        guard let mainMenu = mainMenuScene else { fatalError("Unable to unwrap the main menu scene") }
         mainMenu.playerModel = profileViewModel?.profile.player
         
         if allowContinueRun && (profileViewModel?.profile.currentRun != nil && profileViewModel?.profile.currentRun != .zero) {

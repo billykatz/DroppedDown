@@ -117,7 +117,7 @@ struct LevelConstructor {
                 .rock(color: .blue, holdsGem: false, groupCount: 0): 33,
                 .rock(color: .purple, holdsGem: false, groupCount: 0): 33,
                 //                    .rock(color: .brown, holdsGem: false, groupCount: 0): 25
-            ]
+                ]
             )
             
         default:

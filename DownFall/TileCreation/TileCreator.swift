@@ -184,34 +184,31 @@ class TileCreator: TileStrategy {
         guard !tutorialConductor.isTutorial else { return false }
         guard !level.isBossLevel else { return false }
         
-        let extraGemsBasedOnLuck = playerData.luck / 5
-        let extraChanceBasedOnLuck = extraGemsBasedOnLuck * 2
-        guard specialGems < level.maxSpawnGems + extraGemsBasedOnLuck else { return false }
+        let extraChanceBasedOnLuck = Float(playerData.luck) / 10
+        guard specialGems < level.maxSpawnGems + Int(extraChanceBasedOnLuck) else { return false }
         
-        let weight = 100
-        let index = randomSource.nextInt() % weight
-        let baseChance = 2
-        let extraChance = extraChanceBasedOnLuck
-        let moreChanceBasedOnLastTimeAGemDropped = numberOfTilesSinceLastGemDropped / 10
-        let totalChance = baseChance + extraChance + moreChanceBasedOnLastTimeAGemDropped
-        if (0..<totalChance).contains(index) {
-            numberOfTilesSinceLastGemDropped = 0
+        let baseChance: Float = 2
+        let extraChanceBasedOnTilesSinceLast = Float(numberOfTilesSinceLastGemDropped) / 10
+        let totalShouldHoldGemChance = baseChance + extraChanceBasedOnTilesSinceLast + extraChanceBasedOnLuck
+        let shouldNotHoldGemChance = 100 - totalShouldHoldGemChance
+        
+        let shouldHoldGemChanceModel: AnyChanceModel<Bool> = AnyChanceModel(thing: true, chance: totalShouldHoldGemChance)
+        let shouldNotHoldGemChanceModel: AnyChanceModel<Bool> = AnyChanceModel(thing: false, chance: shouldNotHoldGemChance)
+        
+        let choice = randomSource.chooseElementWithChance([shouldHoldGemChanceModel, shouldNotHoldGemChanceModel])
+        
+        //
+        if choice?.thing ?? false {
             if rockColor != .brown {
                 specialGems += 1
+                numberOfTilesSinceLastGemDropped = 0
                 return true
             } else {
                 return false
             }
+
         } else {
-            let shouldSpawn = spawnAtleastOneGem
-            if rockColor != .brown {
-                specialGems += 1
-                spawnAtleastOneGem = false
-                return shouldSpawn
-            } else {
-                return false
-            }
-            
+            return false
         }
     }
     
@@ -339,7 +336,7 @@ class TileCreator: TileStrategy {
         
         var newTiles: [Tile] = []
         
-        //just add a bunchhhhhhh of rocks
+        // just add a bunchhhhhhh of rocks
         while (newTiles.count < boardSize * boardSize) {
             let nextTile = Tile(type: randomRock([], playerData: playerData))
             

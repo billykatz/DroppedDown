@@ -1174,7 +1174,6 @@ extension Board {
 }
 
 //MARK: - Use Rune
-
 extension Board {
     
     private func useRune(_ rune: Rune, on allTargets: AllTarget, input: Input) -> [Transformation] {
@@ -1192,8 +1191,9 @@ extension Board {
         switch rune.type {
         case .rainEmbers:
             return [useRainEmeberRune(rune: rune, tiles: tiles, allTarget: allTargets, input: input)]
+            
         case .fireball:
-            return [removeAndReplaces(from: tiles, specificCoord: targets, input: input, monsterDeathType: .rune)]
+            return [useRainEmeberRune(rune: rune, tiles: tiles, allTarget: allTargets, input: input)]
             
         case .getSwifty:
             guard let firstTarget = targets.first, targets.count == 2 else {
@@ -1203,10 +1203,13 @@ extension Board {
             
         case .transformRock:
             return [transform(targets, into: TileType.rock(color: .purple, holdsGem: false, groupCount: 0), input: input)]
+            
         case .bubbleUp:
             return [bubbleUp(targets.first!, input: input)]
+            
         case .flameWall, .flameColumn:
             return [flameLine(tiles: tiles, targets: targets, input: input)]
+            
         case .vortex:
             return [vortex(tiles: tiles, targets: targets, input: input)]
             

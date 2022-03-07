@@ -255,13 +255,22 @@ class Referee {
                     
                     let (nonBlockedAttackedTiles, allAttackedTileArray) = attackedTiles(from: potentialMonsterPosition)
 
-                    for attackedTile in nonBlockedAttackedTiles {
+                    for attackedTile in nonBlockedAttackedTiles.sorted(by: { tileCoordA, tileCoordB in
+                        if case TileType.player = tiles[tileCoordA].type {
+                            return true
+                        } else if case TileType.player = tiles[tileCoordB].type {
+                            return true
+                        } else {
+                            return false
+                        }
+                    }) {
                         if case TileType.player = tiles[attackedTile].type {
                             return Input(.attack(attackType: monsterData.attack.type,
                                                  attacker: potentialMonsterPosition,
                                                  defender: attackedTile,
                                                  affectedTiles: nonBlockedAttackedTiles,
-                                                 dodged: false, attackerIsPlayer: false))
+                                                 dodged: false,
+                                                 attackerIsPlayer: false))
                         } else if case TileType.pillar = tiles[attackedTile].type,
                             allAttackedTileArray.contains(where: { (coord) -> Bool in
                                 if case TileType.player = tiles[coord].type {

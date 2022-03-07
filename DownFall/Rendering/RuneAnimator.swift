@@ -49,7 +49,35 @@ extension Animator {
             
             animate(spriteActions) { completion() }
             
-        case .rainEmbers, .fireball:
+        case .rainEmbers:
+            var spriteActions: [SpriteAction] = []
+            guard let pp = getTilePosition(.player(.playerZero), tiles: endTiles) else {
+                completion()
+                return
+            }
+            
+            var delay = 0.0
+            for tileTrans in tileTransformation {
+                let (fireballDuration, fireballAnimation) = createFireballAnimation(sprites: sprites, from: pp, to: tileTrans.initial, delayBeforeShoot: delay, spriteForeground: spriteForeground, runeAnimation: runeAnimation)
+                
+                if let screenShake = shakeScreen(duration: 0.25, ampX: 15, ampY: 15, delayBefore: fireballDuration) {
+                    spriteActions.append(screenShake)
+                }
+                
+                if case TileType.monster = sprites[tileTrans.initial].type {
+                    let spriteAction = createMonsterDyingAnimation(sprite: sprites[tileTrans.initial], durationWaitBefore: fireballDuration)
+                    spriteActions.append(spriteAction)
+                }
+                
+                spriteActions.append(fireballAnimation)
+                delay += 0.5
+            }
+            
+            animate(spriteActions) { completion() }
+
+            
+            
+        case .fireball:
             
             var spriteActions: [SpriteAction] = []
             guard let pp = getTilePosition(.player(.playerZero), tiles: endTiles) else {
@@ -203,6 +231,8 @@ extension Animator {
         default: break
         }
     }
+    
+//    func createRainEmbers
     
     func createFlashAnimation(delayBefore: TimeInterval, spriteToFlash: SKSpriteNode, numberOfFlash: Int, lengthOfFlash: TimeInterval, lengthBetweenFlash: TimeInterval, removeFromParent: Bool) -> [SpriteAction] {
         var spriteActions: [SpriteAction] = []

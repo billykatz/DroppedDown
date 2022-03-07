@@ -1190,7 +1190,9 @@ extension Board {
         
         let targets = allTargets.allTargetAssociatedCoords
         switch rune.type {
-        case .rainEmbers, .fireball:
+        case .rainEmbers:
+            return [useRainEmeberRune(rune: rune, tiles: tiles, allTarget: allTargets, input: input)]
+        case .fireball:
             return [removeAndReplaces(from: tiles, specificCoord: targets, input: input, monsterDeathType: .rune)]
             
         case .getSwifty:
@@ -1249,6 +1251,29 @@ extension Board {
         return Transformation(transformation: tileTransformation, inputType: input.type, endTiles: self.tiles)
         
     }
+    
+    private func useRainEmeberRune(rune: Rune, tiles: [[Tile]], allTarget: AllTarget, input: Input) -> Transformation {
+        var newTiles = tiles
+        var tileTransformation : [TileTransformation] = []
+        var monstersKilled: [MonsterDies] = []
+        
+        // this rune uses up to 5 targets so either we max it out based on the rune or we only use some of the targets
+        let targets = min(rune.targets ?? 0, allTarget.allTargetAssociatedCoords.count)
+        let randomlyChosenMonsters = allTarget.allTargetAssociatedCoords.choose(random: targets)
+        
+        for coord in randomlyChosenMonsters {
+            if case TileType.monster(let monsterData) = newTiles[coord.row][coord.col].type {
+                newTiles[coord.row][coord.col] = .empty
+                tileTransformation.append(.init(coord, coord))
+                monstersKilled.append(MonsterDies(tileType: .monster(monsterData), tileCoord: coord, deathType: .rune))
+            }
+        }
+        
+        self.tiles = newTiles
+        return Transformation(transformation: tileTransformation, inputType: input.type, endTiles: self.tiles, monstersDies: monstersKilled)
+        
+    }
+
     
     private func transform(_ coords: [TileCoord], into type: TileType, input: Input) -> Transformation {
         

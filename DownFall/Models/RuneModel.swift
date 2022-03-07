@@ -381,7 +381,7 @@ struct Rune: Hashable, Codable {
                 description: "Fling 3 fireballs at random monsters.",
                 flavorText: "Fire is my second favorite word, second only to `combustion.` - Mack the Wizard",
                 targets: 3,
-                targetTypes: [TileType.monster(.zero)],
+                targetTypes: [.monster(.zero)],
                 targetInput: .random,
                 targetAmountType: .upToAmount,
                 constrainedTargets: nil,

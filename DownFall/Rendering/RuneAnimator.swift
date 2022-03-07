@@ -56,26 +56,11 @@ extension Animator {
                 return
             }
             
-            var delay = 0.0
-            for tileTrans in tileTransformation {
-                let (fireballDuration, fireballAnimation) = createFireballAnimation(sprites: sprites, from: pp, to: tileTrans.initial, delayBeforeShoot: delay, spriteForeground: spriteForeground, runeAnimation: runeAnimation)
-                
-                if let screenShake = shakeScreen(duration: 0.25, ampX: 15, ampY: 15, delayBefore: fireballDuration) {
-                    spriteActions.append(screenShake)
-                }
-                
-                if case TileType.monster = sprites[tileTrans.initial].type {
-                    let spriteAction = createMonsterDyingAnimation(sprite: sprites[tileTrans.initial], durationWaitBefore: fireballDuration)
-                    spriteActions.append(spriteAction)
-                }
-                
-                spriteActions.append(fireballAnimation)
-                delay += 0.5
-            }
+            let actions = createRuneWithFireballAnimation(delayBefore: delayBefore, sprites: sprites, tileCoords: tileTransformation.map { $0.initial }, playerPosition: pp, spriteForeground: spriteForeground, runeAnimationSpriteSheet: runeAnimation)
+            
+            spriteActions.append(contentsOf: actions)
             
             animate(spriteActions) { completion() }
-
-            
             
         case .fireball:
             
@@ -85,22 +70,9 @@ extension Animator {
                 return
             }
             
-            var delay = 0.0
-            for target in affectedTiles {
-                let (fireballDuration, fireballAnimation) = createFireballAnimation(sprites: sprites, from: pp, to: target, delayBeforeShoot: delay, spriteForeground: spriteForeground, runeAnimation: runeAnimation)
-                
-                if let screenShake = shakeScreen(duration: 0.25, ampX: 15, ampY: 15, delayBefore: fireballDuration) {
-                    spriteActions.append(screenShake)
-                }
-                
-                if case TileType.monster = sprites[target].type {
-                    let spriteAction = createMonsterDyingAnimation(sprite: sprites[target], durationWaitBefore: fireballDuration)
-                    spriteActions.append(spriteAction)
-                }
-                
-                spriteActions.append(fireballAnimation)
-                delay += 0.5
-            }
+            let actions = createRuneWithFireballAnimation(delayBefore: delayBefore, sprites: sprites, tileCoords: affectedTiles, playerPosition: pp, spriteForeground: spriteForeground, runeAnimationSpriteSheet: runeAnimation)
+            
+            spriteActions.append(contentsOf: actions)
             
             animate(spriteActions) { completion() }
             
@@ -232,7 +204,28 @@ extension Animator {
         }
     }
     
-//    func createRainEmbers
+    func createRuneWithFireballAnimation(delayBefore: TimeInterval, sprites: [[DFTileSpriteNode]], tileCoords: [TileCoord], playerPosition: TileCoord, spriteForeground: SKNode, runeAnimationSpriteSheet: SpriteSheet) -> [SpriteAction] {
+        var spriteActions: [SpriteAction] = []
+        
+        var delay = 0.0
+        for tileCoord in tileCoords {
+            let (fireballDuration, fireballAnimation) = createFireballAnimation(sprites: sprites, from: playerPosition, to: tileCoord, delayBeforeShoot: delay, spriteForeground: spriteForeground, runeAnimation: runeAnimationSpriteSheet)
+            
+            if let screenShake = shakeScreen(duration: 0.25, ampX: 15, ampY: 15, delayBefore: fireballDuration) {
+                spriteActions.append(screenShake)
+            }
+            
+            if case TileType.monster = sprites[tileCoord].type {
+                let spriteAction = createMonsterDyingAnimation(sprite: sprites[tileCoord], durationWaitBefore: fireballDuration)
+                spriteActions.append(spriteAction)
+            }
+            
+            spriteActions.append(fireballAnimation)
+            delay += 0.5
+        }
+        
+        return spriteActions
+    }
     
     func createFlashAnimation(delayBefore: TimeInterval, spriteToFlash: SKSpriteNode, numberOfFlash: Int, lengthOfFlash: TimeInterval, lengthBetweenFlash: TimeInterval, removeFromParent: Bool) -> [SpriteAction] {
         var spriteActions: [SpriteAction] = []

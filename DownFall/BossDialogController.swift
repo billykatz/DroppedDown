@@ -173,7 +173,7 @@ class BossDialogController {
         
         /// Messages containing hints about the poison attacks
         if case BossStateType.targetAttack(let attack) = bossPhase.bossState.stateType {
-            switch attack {
+            switch attack.type {
             case .dynamite:
                 let numberBefore = userDefaults.integer(forKey: UserDefaults.numberOfTimesSeenDynamiteTargetKey)
                 userDefaults.set(numberBefore+1, forKey: UserDefaults.numberOfTimesSeenDynamiteTargetKey)

@@ -215,14 +215,40 @@ struct MonsterSpawned: Hashable {
     let coord: TileCoord
 }
 
+enum PoisonAttackType: String, Codable,  Hashable {
+    case columnDown
+    case rowLeftToRight
+    
+    static var random: PoisonAttackType {
+        return [columnDown, rowLeftToRight].randomElement()!
+    }
+}
+
+struct PoisonAttack: Codable, Hashable {
+    let index: Int
+    let attackType: PoisonAttackType
+}
+
 /// Returns a dictionary with BossAttackTypes as keys with an array of attack targets as the value.
 func attacked(tiles: [[Tile]], by attacks: [BossAttackType]) -> [BossAttackType: [TileCoord]] {
     
+    let playerPosition = getTilePosition(.player(.zero), tiles: tiles) ?? .zero
     let untargetable: Set<TileCoord> = nonAttackableCoords(tiles: tiles)
     
-    var columnsAttacked = Set<Int>()
+    var posionAttacks = Set<PoisonAttack>()
     var monstersSpawned = Set<MonsterSpawned>()
     var bombsSpawned = Set<TileCoord>()
+    
+    func numberOfAttacksTargetingPlayer() -> Int {
+        var targetsPlayer = 0
+        for attack in posionAttacks {
+            if attack.index == playerPosition.row || attack.index == playerPosition.col {
+                targetsPlayer += 1
+            }
+        }
+        return targetsPlayer
+    }
+    
     for attack in attacks {
         let monstersSpawnedCoord = monstersSpawned.map { $0.coord }
         switch attack {
@@ -231,8 +257,36 @@ func attacked(tiles: [[Tile]], by attacks: [BossAttackType]) -> [BossAttackType:
             bombsSpawned.insert(randomCoord(in: tiles, notIn: nonTargetable))
         case .poison:
             // each posion attack spawns two attacked columns, that's why we did this twice
-            columnsAttacked.insert(Int.random(tiles.count, notInSet: columnsAttacked))
-            columnsAttacked.insert(Int.random(tiles.count, notInSet: columnsAttacked))
+            var newPoisonAttacks = Set<PoisonAttack>()
+            var maxTries = 100
+            while newPoisonAttacks.count < 2 && maxTries > 0 {
+                if numberOfAttacksTargetingPlayer() < 2 {
+                    // create an + patter on the player
+                    let rowIdx = playerPosition.row
+                    let rowDirection: PoisonAttackType =  .rowLeftToRight
+                    let rowAttack: PoisonAttack = PoisonAttack(index: rowIdx, attackType: rowDirection)
+                    let colIdx = playerPosition.col
+                    let colDirection: PoisonAttackType = .columnDown
+                    let colAttack: PoisonAttack = PoisonAttack(index: colIdx, attackType: colDirection)
+                    newPoisonAttacks.insert(rowAttack)
+                    newPoisonAttacks.insert(colAttack)
+                    
+                } else {
+                    // choose random ones
+                    let index = Int.random(tiles.count)
+                    let direction = PoisonAttackType.random
+                    
+                    let attack = PoisonAttack(index: index, attackType: direction)
+                    if !newPoisonAttacks.contains(attack) {
+                        newPoisonAttacks.insert(attack)
+                    }
+                }
+                
+                maxTries -= 1
+            }
+            
+            posionAttacks = posionAttacks.union(newPoisonAttacks)
+            
         case .spawnMonster(withType: let monsterType):
             let nonTargetable = bombsSpawned.union(monstersSpawnedCoord).union(untargetable)
             let randomCoord = randomCoord(in: tiles, notIn: nonTargetable)
@@ -242,19 +296,27 @@ func attacked(tiles: [[Tile]], by attacks: [BossAttackType]) -> [BossAttackType:
     }
     
     
-    var columnCoords: [TileCoord] = []
+    var poisonAttackCoords: [TileCoord] = []
     for row in 0..<tiles.count {
         for col in 0..<tiles.count {
-            if columnsAttacked.contains(col) {
-                columnCoords.append(TileCoord(row, col))
+            for attack in posionAttacks {
+                if attack.attackType == .columnDown {
+                    if attack.index == col {
+                        poisonAttackCoords.append(TileCoord(row, col))
+                    }
+                } else {
+                    if attack.index == row {
+                        poisonAttackCoords.append(TileCoord(row, col))
+                    }
+                }
             }
         }
     }
     
     
     var result: [BossAttackType: [TileCoord]] = [:]
-    if !columnCoords.isEmpty {
-        result[.poison] = columnCoords
+    if !poisonAttackCoords.isEmpty {
+        result[.poison] = poisonAttackCoords
     }
     if !bombsSpawned.isEmpty {
         result[.dynamite] = Array(bombsSpawned)

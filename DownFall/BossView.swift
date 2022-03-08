@@ -94,18 +94,18 @@ class BossView: SKSpriteNode {
     
     func handleBossTurnStart(phase: BossPhase, transformation: Transformation? = nil) {
         switch phase.bossState.stateType {
-        case .targetAttack(type: let type):
+        case .targetAttack(type: let attack):
             if let dynamiteTargets = phase.bossState.targets.whatToAttack?[.dynamite],
-               type == .dynamite {
+               attack.type == .dynamite {
                 showDynamiteReticles(dynamiteTargets)
             }
             
             if let poisonTargets = phase.bossState.poisonAttackColumns,
-               type == .poison {
+               attack.type == .poison {
                 showPoisonReticles(poisonTargets)
             }
             
-            if case BossAttackType.spawnMonster = type {
+            if case BossAttackType.spawnMonster = attack.type {
                 let spawnMonsterTargets = phase.bossState.targets.whereToSpawnMonstersCoordinates
                 showSpawnSpiderReticles(spawnMonsterTargets)
             }

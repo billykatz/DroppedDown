@@ -1184,7 +1184,7 @@ extension Renderer {
         }
     }
     
-    private func showBossTargetsWhatToAttack(in transformation: [Transformation], bossPhase: BossPhase, attackType: BossAttackType) {
+    private func showBossTargetsWhatToAttack(in transformation: [Transformation], bossPhase: BossPhase, attackType: BossAttack) {
         // get the correct targets from the BossPhase
         // update (Cori's) and show the retices on the screen
         guard let trans = transformation.first else {
@@ -1192,15 +1192,15 @@ extension Renderer {
             return
         }
         
-        if attackType == .dynamite {
+        if attackType.type == .dynamite {
             animator.animateBossRearingUp(delayBefore: 0.0, reversed: false) { [weak self] in
                 self?.animationsFinished(endTiles: trans.endTiles)
             }
-        } else if attackType == .poison {
+        } else if attackType.type == .poison {
             animator.animateGettingReadyToPoisonAttack(delayBefore: 0.0) { [weak self] in
                 self?.animationsFinished(endTiles: trans.endTiles)
             }
-        } else if case BossAttackType.spawnMonster = attackType {
+        } else if case BossAttackType.spawnMonster = attackType.type {
             let monstersSpawn = bossPhase.bossState.targets.monsterTypesSpawned
             animator.animateGettingReadyToSpawnMonsters(delayBefore: 0.0, monsterTypes: monstersSpawn) { [weak self] in
                 self?.animationsFinished(endTiles: trans.endTiles)
@@ -1256,7 +1256,7 @@ extension Renderer {
         
     }
     
-    private func showBossAttacks(in transformation: [Transformation], bossPhase: BossPhase, attackType: BossAttackType) {
+    private func showBossAttacks(in transformation: [Transformation], bossPhase: BossPhase, attackType: BossAttack) {
         guard let trans = transformation.first, let endTiles = trans.endTiles else {
             animationsFinished(endTiles: transformation.first?.endTiles)
             return
@@ -1310,7 +1310,7 @@ extension Renderer {
             } else { completion() }
         }
         
-        switch attackType {
+        switch attackType.type {
         case .dynamite:
             animateDyamiate { [weak self] in
                 self?.animationsFinished(endTiles: transformation.first?.endTiles)

@@ -43,12 +43,35 @@ enum BossAttackType: Hashable, Codable, CustomStringConvertible {
     }
 }
 
+struct BossAttack: Codable, Hashable {
+    let type: BossAttackType
+    var poisonAttack: [PoisonAttack]?
+    
+    static var poisonType: BossAttack {
+        return BossAttack(type: .poison)
+    }
+    
+    static var dynamiteType: BossAttack {
+        return BossAttack(type: .dynamite)
+    }
+    
+    static var spawnMonster: BossAttack {
+        return BossAttack(type: .defaultSpawnMonster)
+    }
+    
+    init (type: BossAttackType, poisonAttacks: [PoisonAttack]? = nil) {
+        self.type = type
+        self.poisonAttack = poisonAttacks
+    }
+    
+}
+
 enum BossStateType: Hashable, Codable, CustomStringConvertible {
     case intro
     case targetEat
     case eats
-    case targetAttack(type: BossAttackType)
-    case attack(type: BossAttackType)
+    case targetAttack(type: BossAttack)
+    case attack(type: BossAttack)
     case rests
     case phaseChange
     case targetSuperAttack
@@ -62,10 +85,10 @@ enum BossStateType: Hashable, Codable, CustomStringConvertible {
             return "Target Eats"
         case .eats:
             return "Eats"
-        case .targetAttack(let type):
-            return "Target Attack - \(type.description)"
-        case .attack(let type):
-            return "Attacks - \(type.description)"
+        case .targetAttack(let attack):
+            return "Target Attack - \(attack.type.description)"
+        case .attack(let attack):
+            return "Attacks - \(attack.type.description)"
         case .rests:
             return "Rests"
         case .phaseChange:
@@ -163,7 +186,8 @@ struct BossState: Codable, Hashable, CustomStringConvertible {
     
     public var poisonAttackColumns: [Int]? {
         let thingsToAttack = targets.whatToAttack ?? targets.attack ?? nil
-        guard let attacks = thingsToAttack, let poisonTargets = attacks[.poison] else { return nil }
+        guard let attacks = thingsToAttack,
+                let poisonTargets = attacks[.poison] else { return nil }
         
         var poisonColumns = Set<Int>()
         for target in poisonTargets {
@@ -242,20 +266,15 @@ struct BossState: Codable, Hashable, CustomStringConvertible {
             
         case .eats:
             // after eating, there is a chance the super attack is charge in which case we would advance to super attaack targeting
-//            if superAttackIsCharged(eatenRocks: eatenRocks) {
-//                return .targetSuperAttack
-//            } else {
-            // choose the correct targeting mode to start in
             if (targets.whatToAttack ?? [:]).keys.contains(where: { $0 == .dynamite }) {
-                return .targetAttack(type: .dynamite)
+                return .targetAttack(type: BossAttack.dynamiteType)
             } else if (targets.whatToAttack ?? [:]).keys.contains(where: { $0 == .poison }) {
-                return .targetAttack(type: .poison)
+                return .targetAttack(type: BossAttack.poisonType)
             } else if targets.whatToAttackContainsSpawnMonster {
-                return .targetAttack(type: .defaultSpawnMonster)
+                return .targetAttack(type: BossAttack.spawnMonster)
             } else {
                 return.rests
             }
-//            }
             
         case let .targetAttack(type: type):
             return .attack(type: type)
@@ -267,18 +286,18 @@ struct BossState: Codable, Hashable, CustomStringConvertible {
             // 3. Spawn Spider
             
             // Depending on what rocks the Boss eats, it may not go in that exact order
-            switch type {
+            switch type.type {
             case .dynamite:
                 if (targets.whatToAttack ?? [:]).keys.contains(where: { $0 == .poison }) {
-                    return .targetAttack(type: .poison)
+                    return .targetAttack(type: .poisonType)
                 } else if targets.whatToAttackContainsSpawnMonster {
-                    return .targetAttack(type: .defaultSpawnMonster)
+                    return .targetAttack(type: .spawnMonster)
                 } else {
                     return.rests
                 }
             case .poison:
                 if targets.whatToAttackContainsSpawnMonster {
-                    return .targetAttack(type: .defaultSpawnMonster)
+                    return .targetAttack(type: .spawnMonster)
                 } else {
                     return .rests
                 }
@@ -421,7 +440,6 @@ struct BossPhase: Codable, Hashable {
             
             // lets calculate the phase change targets
             let nextPhaseChangeTargets: BossPhaseTargets = calculatePhaseChangeTargets(nextPhase: nextBossPhaseType, tiles: tiles)
-//            let nextPhaseChangeTagets = BossPhaseTargets(createPillars: calculatePhaseChangeTargets(nextPhase: nextBossPhaseType, tiles: tiles), spawnMonsters: nil, throwRocks: nil)
             
             // grab the extra number of columns
             let numberOfAdditionalColumns = (nextPhaseChangeTargets.createPillars?.count ?? 0) * 3

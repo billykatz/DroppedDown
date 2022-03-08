@@ -403,7 +403,7 @@ class Board: Equatable {
     }
     
     // Only excutes attacks for the single AttackType that is past in.
-    private func bossExecutesAttacks(input: Input, attackType executeAttackType: BossAttackType) -> Transformation {
+    private func bossExecutesAttacks(input: Input, attackType executeAttackType: BossAttack) -> Transformation {
         guard case let InputType.bossTurnStart(phase) = input.type else { return .zero }
         var tileTransformations: [TileTransformation] = []
         
@@ -411,7 +411,7 @@ class Board: Equatable {
         // dealt with separately because we need to understand the relationship of the tiles to the ones above it because pillars block the poison damage
         
         if let attackedColumns = phase.bossState.poisonAttackColumns,
-           executeAttackType == .poison
+           executeAttackType.type == .poison
         {
             for col in attackedColumns {
                 var hitPillarShouldStop = false
@@ -446,10 +446,10 @@ class Board: Equatable {
         if let bossAttackDict = phase.bossState.targets.attack {
             bossAttackDict.forEach { (attackType, coords) in
                 coords.forEach { coord in
-                    if attackType == .dynamite, executeAttackType == .dynamite {
+                    if attackType == .dynamite, executeAttackType.type == .dynamite {
                         tiles[coord.row][coord.column] = Tile(type: .dynamite(.init(count: 3, hasBeenDecremented: false)))
                         
-                    } else if case BossAttackType.spawnMonster = executeAttackType,
+                    } else if case BossAttackType.spawnMonster = executeAttackType.type,
                               case BossAttackType.spawnMonster(withType: let monsterType) = attackType,
                               let tile = tileCreator.monsterWithType(monsterType) {
                         tiles[coord.row][coord.column] = tile

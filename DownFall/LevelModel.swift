@@ -477,8 +477,10 @@ class Level: Codable, Hashable {
         if depth == testLevelDepthNumber {
             if tier == 1 {
                 return [
-                    StoreOffer.offer(type: .rune(.rune(for: .drillDown)), tier: 1),
-                    StoreOffer.offer(type: .gemMagnet, tier: 1),
+                    StoreOffer.offer(type: .lesserHeal, tier: 1),
+                    StoreOffer.offer(type: .greaterHeal, tier: 1),
+//                    StoreOffer.offer(type: .rune(.rune(for: .drillDown)), tier: 1),
+//                    StoreOffer.offer(type: .gemMagnet, tier: 1),
                 ]
             } else {
                 return [

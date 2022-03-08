@@ -68,6 +68,12 @@ extension HapticGenerator {
             playStyle(.light)
         case .attack:
             playStyle(.heavy)
+        case .transformation(let trans):
+            if let first = trans.first {
+                if first.playerTookDamage != nil {
+                    playStyle(.heavy)
+                }
+            }
         default:
             ()
         }

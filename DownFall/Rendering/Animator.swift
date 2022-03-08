@@ -304,13 +304,32 @@ struct Animator {
         animate([SpriteAction(sprite: offerSprite, action: finalizedAction)], completion: completion)
     }
     
-    func animateGold(goldSprites: [SKSpriteNode], gained: Int, from startPosition: CGPoint, to targetPosition: CGPoint, in hud: HUD, completion: @escaping () -> Void) {
+    func animateGold(item: Item, gained: Int, from startPosition: CGPoint, to targetPosition: CGPoint, in hud: HUD, completion: @escaping () -> Void) {
         var index = 0
         
         var moveToSpeedGain = 0.001
         var goldSpeedGain = 0.0001
         
-        let animations: [SpriteAction] = goldSprites.map { sprite in
+        var addedSprites: [SKSpriteNode] = []
+        for _ in 0..<item.amount {
+            let identifier: String
+            if item.color == nil {
+                identifier = Item.randomColorGem
+            } else {
+                identifier = item.textureName
+            }
+            let sprite = SKSpriteNode(texture: SKTexture(imageNamed: identifier),
+                                      color: .clear,
+                                      size: Style.Board.goldGainSize)
+            sprite.position = startPosition
+            sprite.zPosition = 100_000
+            foreground?.addChild(sprite)
+            addedSprites.append(sprite)
+        }
+
+        
+        
+        let animations: [SpriteAction] = addedSprites.map { sprite in
             let waitDuration = max(0.01, (Double(index) * (AnimationSettings.Board.goldWaitTime - goldSpeedGain)))
             let wait = SKAction.wait(forDuration: waitDuration)
             let toPosition = sprite.frame.center.translate(xOffset: CGFloat.random(in: AnimationSettings.Gem.randomXOffsetRange), yOffset: CGFloat.random(in: AnimationSettings.Gem.randomYOffsetRange))
@@ -329,8 +348,8 @@ struct Animator {
             let tickUpHudCounter = SKAction.run { [index] in
                 hud.incrementCurrencyCountByOne()
                 
-                if index == goldSprites.count/2 {
-                    hud.showTotalGemGain(goldSprites.count)
+                if index == addedSprites.count/2 {
+                    hud.showTotalGemGain(addedSprites.count)
                 }
             }
             

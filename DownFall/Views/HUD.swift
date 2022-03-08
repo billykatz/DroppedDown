@@ -162,7 +162,7 @@ class HUD: SKSpriteNode {
         // display the player's dodge
         let dodgeNode = SKSpriteNode(texture: SKTexture(imageNamed: Identifiers.dodgeSprite), size: Style.HUD.dodgeLuckStatSize)
         dodgeNode.position = CGPoint.alignVertically(dodgeNode.frame, relativeTo: gemLabel.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: Style.Padding.most * 2, translatedToBounds: true)
-        dodgeSprite = dodgeNode
+        self.dodgeSprite = dodgeNode
         
         let dodgeAmountNode = ParagraphNode(text: "\(data.dodge)", paragraphWidth: self.size.width, fontColor: .lightText)
         dodgeAmountNode.position = CGPoint.alignVertically(dodgeAmountNode.frame, relativeTo: dodgeNode.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: Style.Padding.most, translatedToBounds:  true)
@@ -170,7 +170,7 @@ class HUD: SKSpriteNode {
         // display the player's luck
         let luckNode = SKSpriteNode(texture: SKTexture(imageNamed: Identifiers.luckSprite), size: Style.HUD.dodgeLuckStatSize)
         luckNode.position = CGPoint.alignVertically(luckNode.frame, relativeTo: dodgeAmountNode.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: Style.Padding.most * 2, translatedToBounds: true)
-        luckSprite = luckNode
+        self.luckSprite = luckNode
         
         
         let luckAmountNode = ParagraphNode(text: "\(data.luck)", paragraphWidth: self.size.width, fontColor: .lightText)
@@ -188,15 +188,17 @@ class HUD: SKSpriteNode {
     }
     
     func targetSprite(for offerType: StoreOfferType) -> SKSpriteNode? {
-        switch offerType {
+        switch StoreOfferBucket.bucket(for: offerType).type {
+        case .rune, .util:
+            return nil
         case .dodge:
             return dodgeSprite
         case .luck:
             return luckSprite
-        case .greaterHeal, .lesserHeal, .plusTwoMaxHealth, .plusOneMaxHealth:
+        case .health:
             return healthSprite
-        default:
-            return nil
+        case .wealth:
+            return gemSpriteNode
         }
 
     }

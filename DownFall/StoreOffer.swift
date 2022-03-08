@@ -223,6 +223,13 @@ struct StoreOffer: Codable, Hashable, Identifiable {
         }
         return nil
     }
+    
+    var gemAmount: Int? {
+        if case StoreOfferType.gems(let amount) = self.type {
+            return amount
+        }
+        return nil
+    }
 }
 
 extension StoreOffer {

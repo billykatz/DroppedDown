@@ -1081,7 +1081,7 @@ extension Board {
         
         
         /// move all gems to the player
-        for coord in tileCoords(for: tiles, of: [.gem]) {
+        for coord in tileCoords(for: tiles, of: [.gem, .offer(.offer(type: .gems(amount: 50), tier: 2))]) {
             if case TileType.item(let item) = tiles[coord].type {
                 let startCoord = coord
                 let endCoord = playerCoord
@@ -1092,6 +1092,19 @@ extension Board {
                 
                 collectGemCount += item.amount
             }
+            
+            if case TileType.offer(let offer) = tiles[coord].type,
+               let gemAmount = offer.gemAmount {
+                let startCoord = coord
+                let endCoord = playerCoord
+                
+                tileTransformation.append(TileTransformation(startCoord, endCoord))
+                
+                newTiles[startCoord.row][startCoord.col] = .empty
+                
+                collectGemCount += gemAmount
+            }
+
         }
         
         // update the player carry to reflec thte new gems

@@ -496,11 +496,11 @@ class Level: Codable, Hashable {
             if tier == 1 {
                 return [
                     StoreOffer.offer(type: .rune(.rune(for: .drillDown)), tier: 1),
-                    StoreOffer.offer(type: .greaterRuneSpiritPotion, tier: 1),
+                    StoreOffer.offer(type: .gemMagnet, tier: 1),
                 ]
             } else {
                 return [
-                    StoreOffer.offer(type: .wingedBoots, tier: 2),
+                    StoreOffer.offer(type: .gems(amount: 50), tier: 2),
                     StoreOffer.offer(type: .runeSlot, tier: 2)
                 ]
                 

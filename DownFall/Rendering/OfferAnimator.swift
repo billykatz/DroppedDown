@@ -836,16 +836,30 @@ extension Animator {
             let coord = targetTileType.target
             let type = targetTileType.type
             
+            var gemAmount = 0
             if case TileType.item(let item) = type {
+                gemAmount = item.amount
+            } else if case TileType.offer(let offer) = type, let amount = offer.gemAmount {
+                gemAmount += amount
+            }
+            
+            if gemAmount > 0{
                 
-                totalGemsCollected += item.amount
+                totalGemsCollected += gemAmount
                 let waitPerGem = 0.07
                 var zPosition: CGFloat = 1_000_000
                 
                 sprites[coord.row][coord.col].alpha = 0.0
                 
-                for amount in 1..<item.amount+1 {
-                    let sprite = SKSpriteNode(texture: SKTexture(imageNamed: type.textureString()), size: CGSize(widthHeight: tileSize))
+                
+                for amount in 1..<gemAmount+1 {
+                    var textureString = ""
+                    if case TileType.item(let item) = type {
+                        textureString = item.color == nil ? Item.randomColorGem : item.textureName
+                    } else if case TileType.offer = type {
+                        textureString = Item.randomColorGem
+                    }
+                    let sprite = SKSpriteNode(texture: SKTexture(imageNamed: textureString), size: CGSize(widthHeight: tileSize))
                     
                     /// add each gem sprite to the foreground
                     let position = positionInForeground(coord)

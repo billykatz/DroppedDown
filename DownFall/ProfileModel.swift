@@ -14,9 +14,9 @@ class Profile: Codable, Equatable {
         return lhs.name == rhs.name
     }
 
-    static var debugProfile = Profile(name: "debug", player: .lotsOfCash, currentRun: nil, stats: Statistics.startingStats, unlockables: Unlockable.debugUnlockables, startingUnlockbles: [])
+    static var debugProfile = Profile(name: "debug", player: .lotsOfCash, currentRun: nil, stats: Statistics.startingStats, unlockables: Unlockable.debugUnlockables, startingUnlockbles: [], pastRunSeeds: [])
     
-    static var zero = Profile(name: "zero", player: .zero, currentRun: nil, stats: [], unlockables: [], startingUnlockbles: [])
+    static var zero = Profile(name: "zero", player: .zero, currentRun: nil, stats: [], unlockables: [], startingUnlockbles: [], pastRunSeeds: [])
     
     let name: String
     let player: EntityModel
@@ -25,6 +25,7 @@ class Profile: Codable, Equatable {
     let stats: [Statistics]
     let unlockables: [Unlockable]
     let startingUnlockbles: [Unlockable]
+    var pastRunSeeds: [UInt64]
     
     
     /// for now this is just the number of unlockables unlocked
@@ -41,16 +42,18 @@ class Profile: Codable, Equatable {
         case unlockables
         case startingUnlockables
         case bossWins
+        case pastRunSeeds
 
     }
     
-    init(name: String, player: EntityModel, currentRun: RunModel?, stats: [Statistics], unlockables: [Unlockable], startingUnlockbles: [Unlockable]) {
+    init(name: String, player: EntityModel, currentRun: RunModel?, stats: [Statistics], unlockables: [Unlockable], startingUnlockbles: [Unlockable], pastRunSeeds: [UInt64]) {
         self.name = name
         self.player = player
         self.currentRun = currentRun
         self.stats = stats
         self.unlockables = unlockables
         self.startingUnlockbles = startingUnlockbles
+        self.pastRunSeeds = pastRunSeeds
     }
     
     func encode(to encoder: Encoder) throws {
@@ -62,6 +65,7 @@ class Profile: Codable, Equatable {
         try container.encode(stats, forKey: .stats)
         try container.encode(unlockables, forKey: .unlockables)
         try container.encode(startingUnlockbles, forKey: .startingUnlockables)
+        try container.encode(pastRunSeeds, forKey: .pastRunSeeds)
     }
 
     required init(from decoder: Decoder) throws {
@@ -71,6 +75,7 @@ class Profile: Codable, Equatable {
         player = try container.decode(EntityModel.self, forKey: .player)
         currentRun = try? container.decode(RunModel.self, forKey: .currentRun)
         randomRune = try? container.decode(Rune.self, forKey: .randomRune)
+        pastRunSeeds = (try? container.decode([UInt64].self, forKey: .pastRunSeeds)) ?? []
         
         if let stats = try? container.decode([Statistics].self, forKey: .stats) {
             var updatedStates = Statistics.startingStats
@@ -84,6 +89,7 @@ class Profile: Codable, Equatable {
         } else {
             stats = Statistics.startingStats
         }
+        
         
         if let unlockables = try? container.decode([Unlockable].self, forKey: .unlockables) {
             self.unlockables = unlockables
@@ -124,20 +130,30 @@ class Profile: Codable, Equatable {
     }
     
     func updatePlayer(_ entityModel: EntityModel) -> Profile {
-        return Profile(name: name, player: entityModel, currentRun: currentRun, stats: stats, unlockables: unlockables, startingUnlockbles: startingUnlockbles)
+        return Profile(name: name, player: entityModel, currentRun: currentRun, stats: stats, unlockables: unlockables, startingUnlockbles: startingUnlockbles, pastRunSeeds: pastRunSeeds)
     }
     
     func updateBossWins() -> Profile {
-        return Profile(name: name, player: player, currentRun: currentRun, stats: stats, unlockables: unlockables, startingUnlockbles: startingUnlockbles)
+        return Profile(name: name, player: player, currentRun: currentRun, stats: stats, unlockables: unlockables, startingUnlockbles: startingUnlockbles, pastRunSeeds: pastRunSeeds)
     }
     
+    func updatePastRunSeeds(_ seed: UInt64) -> Profile {
+        var newSeeds = pastRunSeeds
+        if !pastRunSeeds.contains(seed) {
+            newSeeds.append(seed)
+        }
+        return Profile(name: name, player: player, currentRun: currentRun, stats: stats, unlockables: unlockables, startingUnlockbles: startingUnlockbles, pastRunSeeds: newSeeds)
+    }
+    
+
+    
     func updateRunModel(_ currentRun: RunModel?) -> Profile {
-        return Profile(name: name, player: player, currentRun: currentRun, stats: stats, unlockables: unlockables, startingUnlockbles: startingUnlockbles)
+        return Profile(name: name, player: player, currentRun: currentRun, stats: stats, unlockables: unlockables, startingUnlockbles: startingUnlockbles, pastRunSeeds: pastRunSeeds)
     }
     
     
     func updateStatistics(_ newStats: [Statistics]) -> Profile {
-        return Profile(name: name, player: player, currentRun: currentRun, stats: newStats, unlockables: unlockables, startingUnlockbles: startingUnlockbles)
+        return Profile(name: name, player: player, currentRun: currentRun, stats: newStats, unlockables: unlockables, startingUnlockbles: startingUnlockbles, pastRunSeeds: pastRunSeeds)
     }
     
     func updateStatistic(_ stat: Statistics, amount: Int, overwriteIfLarger: Bool = false) -> Profile {
@@ -149,13 +165,17 @@ class Profile: Codable, Equatable {
         }
         
         var newStats = stats
+#if DEBUG
         print("+++++++++++++++++++++")
         print("Stat before \(newStats[statIndex].debugDescription())")
         print("Updating with: \(stat.debugDescription())")
+#endif
         newStats[statIndex] = newStats[statIndex].updateStatAmount(amount, overwrite: overwriteIfLarger)
+#if DEBUG
         print("State after \(newStats[statIndex].debugDescription())")
         print("+++++++++++++++++++++")
-        return Profile(name: name, player: player, currentRun: currentRun, stats: newStats, unlockables: unlockables, startingUnlockbles: startingUnlockbles)
+#endif
+        return Profile(name: name, player: player, currentRun: currentRun, stats: newStats, unlockables: unlockables, startingUnlockbles: startingUnlockbles, pastRunSeeds: pastRunSeeds)
     }
     
     func firstStat(_ stat: Statistics) -> Statistics? {
@@ -183,7 +203,7 @@ class Profile: Codable, Equatable {
     
     func updateAllUnlockables(_ newUnlockables: [Unlockable], startingUnlockables: [Unlockable]? = nil) -> Profile {
         let newStartingUnlockables = startingUnlockables ?? startingUnlockbles
-        return Profile(name: name, player: player, currentRun: currentRun, stats: stats, unlockables: newUnlockables, startingUnlockbles: newStartingUnlockables)
+        return Profile(name: name, player: player, currentRun: currentRun, stats: stats, unlockables: newUnlockables, startingUnlockbles: newStartingUnlockables, pastRunSeeds: pastRunSeeds)
         
     }
     
@@ -192,7 +212,7 @@ class Profile: Codable, Equatable {
         var newUnlockables = unlockables
         newUnlockables[index] = unlockable.didTapOn()
         
-        return Profile(name: name, player: player, currentRun: currentRun, stats: stats, unlockables: newUnlockables, startingUnlockbles: startingUnlockbles)
+        return Profile(name: name, player: player, currentRun: currentRun, stats: stats, unlockables: newUnlockables, startingUnlockbles: startingUnlockbles, pastRunSeeds: pastRunSeeds)
         
     }
 
@@ -203,7 +223,7 @@ class Profile: Codable, Equatable {
         var newUnlockables = unlockables
         newUnlockables[index] = newUnlockable.purchase()
         
-        return Profile(name: name, player: newPlayer, currentRun: currentRun, stats: stats, unlockables: newUnlockables, startingUnlockbles: startingUnlockbles)
+        return Profile(name: name, player: newPlayer, currentRun: currentRun, stats: stats, unlockables: newUnlockables, startingUnlockbles: startingUnlockbles, pastRunSeeds: pastRunSeeds)
         
     }
     

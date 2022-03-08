@@ -12,6 +12,11 @@ import Combine
 // This class is meant to interact with the Profile model
 // It is also responsible for making sure we save the Profile after every major update.
 class ProfileViewModel {
+    
+    struct Constants {
+        static let tag = String(describing: ProfileViewModel.self)
+    }
+    
     lazy var profilePublisher: AnyPublisher<Profile, Never> = profileSubject.eraseToAnyPublisher()
     private lazy var profileSubject = CurrentValueSubject<Profile, Never>(.zero)
     
@@ -177,18 +182,29 @@ class ProfileViewModel {
         /// update profile with new player
         var newProfile = profile.updatePlayer(newPlayerData)
         
-        // update stats
-        for stat in currentRun?.stats ?? [] {
-            let overwrite = stat.statType.overwriteIfLarger
-            newProfile = newProfile.updateStatistic(stat, amount: stat.amount, overwriteIfLarger: overwrite)
+        /// we can hit this code path with "stale" runs and i think this is the quickest way to avoid duplicate stat counting.
+        if let seed = currentRun?.seed, !profile.pastRunSeeds.contains(seed) {
+            // update stats
+            for stat in currentRun?.stats ?? [] {
+                let overwrite = stat.statType.overwriteIfLarger
+                newProfile = newProfile.updateStatistic(stat, amount: stat.amount, overwriteIfLarger: overwrite)
+            }
+            
+            // update lowest depth if needed
+            newProfile = newProfile.updateStatistic(.lowestDepthReached, amount: currentRun?.depth ?? 0, overwriteIfLarger: true)
+        } else {
+            GameLogger.shared.log(prefix: Constants.tag, message: "Finished Run.  Not double saving stats.")
         }
         
-        /// when a palyer abandon's a run (and we hit this code path)
+        /// when a finishes a run (and we hit this code path)
         /// we want to nil out the player's current run.
         newProfile = newProfile.updateRunModel(nil)
         
-        // update lowest depth if needed
-        newProfile = newProfile.updateStatistic(.lowestDepthReached, amount: currentRun?.depth ?? 0, overwriteIfLarger: true)
+        
+        // save the seed so that we don't accidently double count thing in the future
+        if let seed = currentRun?.seed {
+            newProfile = profile.updatePastRunSeeds(seed)
+        }
         
         // save profile
         saveProfile(newProfile)
@@ -215,18 +231,28 @@ class ProfileViewModel {
         /// update profile with new player
         var newProfile = profile.updatePlayer(newPlayerData)
         
-        // update stats
-        for stat in currentRun.stats {
-            let overwrite = stat.statType.overwriteIfLarger
-            newProfile = newProfile.updateStatistic(stat, amount: stat.amount, overwriteIfLarger: overwrite)
+        
+        /// we can hit this code path with "stale" runs and i think this is the quickest way to avoid duplicate stat counting.
+        if !profile.pastRunSeeds.contains(currentRun.seed) {
+            // update stats
+            for stat in currentRun.stats {
+                let overwrite = stat.statType.overwriteIfLarger
+                newProfile = newProfile.updateStatistic(stat, amount: stat.amount, overwriteIfLarger: overwrite)
+            }
+            // update lowest depth if needed
+            newProfile = newProfile.updateStatistic(.lowestDepthReached, amount: currentRun.depth, overwriteIfLarger: true)
+        } else {
+            GameLogger.shared.log(prefix: Constants.tag, message: "Abandoned Run.  Not double saving stats")
         }
         
         /// when a palyer abandon's a run (and we hit this code path)
         /// we want to nil out the player's current run.
         newProfile = newProfile.updateRunModel(nil)
         
-        // update lowest depth if needed
-        newProfile = newProfile.updateStatistic(.lowestDepthReached, amount: currentRun.depth, overwriteIfLarger: true)
+        
+        // save the seed so that we don't accidently double count thing in the future
+        newProfile = profile.updatePastRunSeeds(currentRun.seed)
+        
         
         // save profile
         saveProfile(newProfile)

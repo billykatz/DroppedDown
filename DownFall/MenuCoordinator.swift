@@ -24,6 +24,7 @@ protocol MenuCoordinating: AnyObject {
     var levelCoordinator: LevelCoordinating { get }
     
     func finishGame(playerData updatedPlayerData: EntityModel, currentRun: RunModel)
+    func finishGameAfterGameLose(playerData updatedPlayerData: EntityModel, currentRun: RunModel)
     func loadedProfile(_ profile: Profile, hasLaunchedBefore: Bool)
     
     /// exposed so that we can save the profile
@@ -60,7 +61,15 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
         mainMenu.playerModel = profileViewModel?.profile.player
         
         if allowContinueRun && (profileViewModel?.profile.currentRun != nil && profileViewModel?.profile.currentRun != .zero) {
-            mainMenu.runToContinue = profileViewModel?.profile.currentRun
+            if let seed = profileViewModel?.profile.currentRun?.seed,
+               let profile = profileViewModel?.profile,
+               !profile.pastRunSeeds.contains(seed)
+            {
+                mainMenu.runToContinue = profileViewModel?.profile.currentRun
+            } else {
+                mainMenu.runToContinue = nil
+            }
+            
         } else {
             mainMenu.runToContinue = nil
         }
@@ -98,6 +107,12 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
     func continueRun() {
         levelCoordinator.loadRun(profileViewModel!.profile.currentRun, profile: profileViewModel!.profile)
         MenuMusicManager.shared.gameIsPlaying = true
+    }
+    
+    /// Updates and saves the player data based on the current run
+    /// Optionally directly navigates to the store (soon will be removed)
+    func finishGameAfterGameLose(playerData updatedPlayerData: EntityModel, currentRun: RunModel) {
+        profileViewModel?.finishRun(playerData: updatedPlayerData, currentRun: currentRun)
     }
     
     /// Updates and saves the player data based on the current run

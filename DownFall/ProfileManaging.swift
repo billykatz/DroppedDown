@@ -222,6 +222,8 @@ class ProfileLoadingManager: ProfileManaging {
                     GameLogger.shared.log(prefix: Constants.tag, message: "Loaded: \(loadedProfile?.progress ?? 0)")
                     GameLogger.shared.log(prefix: Constants.tag, message: "New \(newProfile.progress)")
                     GameLogger.shared.log(prefix: Constants.tag, message: "saving new profile")
+                    GameLogger.shared.log(prefix: Constants.tag, message: "Loaded profile has null run \(loadedProfile?.currentRun == nil)")
+                    GameLogger.shared.log(prefix: Constants.tag, message: "New profile has null run \(newProfile.currentRun == nil)")
                     return saveProfileLocallyAndRemotely(newProfile, localPlayer: localPlayer, uuidKey: Constants.playerUUIDKey, userDefaultsClient: userDefaultClient, isAuthenticated: localPlayer.isAuthenticated(), fileManagerClient: fileManagerClient, profileCodingClient: profileCodingClient)
                 } else {
                     GameLogger.shared.log(prefix: Constants.tag, message: "not saving profile because remote is further")
@@ -413,7 +415,7 @@ func createLocalProfile(playerUUIDKey: String, userDefaultClient: UserDefaultCli
             /// save the profile with the uuid as the name
             /// copy all other defaults
             // @TODO: Create a progressable model from a JSON file
-            let newProfile = Profile(name: uuid, player: profile.player, currentRun: nil, stats: Statistics.startingStats, unlockables: Unlockable.unlockables(), startingUnlockbles: Unlockable.startingUnlockedUnlockables)
+            let newProfile = Profile(name: uuid, player: profile.player, currentRun: nil, stats: Statistics.startingStats, unlockables: Unlockable.unlockables(), startingUnlockbles: Unlockable.startingUnlockedUnlockables, pastRunSeeds: [])
             
             /// encode the new profile into data
             let jsonData = try profileCodingClient.encoder.encode(newProfile)

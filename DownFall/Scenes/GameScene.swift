@@ -13,6 +13,7 @@ import Foundation
 
 protocol GameSceneCoordinatingDelegate: AnyObject {
     func navigateToMainMenu(_ scene: SKScene, playerData: EntityModel)
+    func finishRunAfterGameLost(playerData: EntityModel)
     func goToNextArea(updatedPlayerData: EntityModel)
     func saveState()
 }
@@ -222,6 +223,13 @@ class GameScene: SKScene {
             
             // set this so the player sees the FTUE for dying
             UserDefaults.standard.setValue(true, forKey: UserDefaults.shouldSeeDiedForTheFirstTimeKey)
+            
+            // finish up the run
+            guard let board = self.board,
+                  let playerIndex = tileIndices(of: .player(.zero), in: board.tiles).first,
+                case let TileType.player(data) = board.tiles[playerIndex].type else { return }
+            gameSceneDelegate?.finishRunAfterGameLost(playerData: data)
+            
         } else if case InputType.transformation(let trans) = input.type {
             if let offers = trans.first?.offers {
                 profileViewModel?.updateUnlockablesHaveSpawned(offers: offers)

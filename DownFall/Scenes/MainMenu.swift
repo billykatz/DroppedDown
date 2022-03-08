@@ -53,7 +53,6 @@ class MainMenu: SKScene {
     
     weak var mainMenuDelegate: MainMenuDelegate?
     var playerModel: EntityModel?
-    var hasRunToContinue: Bool?
     var runToContinue: RunModel?
     
     lazy var detectedSavedGameMenu: MenuSpriteNode = {

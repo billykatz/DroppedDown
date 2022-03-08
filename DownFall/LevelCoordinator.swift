@@ -144,6 +144,11 @@ class LevelCoordinator: LevelCoordinating, GameSceneCoordinatingDelegate, CodexC
         
     }
     
+    func finishRunAfterGameLost(playerData: EntityModel) {
+        self.runModel = self.saveAllState()
+        self.delegate?.finishGameAfterGameLose(playerData: playerData, currentRun: self.runModel)
+    }
+    
     
     // removes the current game scene and then triggers presentation of the next area
     func goToNextArea(updatedPlayerData: EntityModel) {

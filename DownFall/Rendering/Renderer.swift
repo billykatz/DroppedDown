@@ -1264,7 +1264,7 @@ extension Renderer {
         
         
         func animateDyamiate(completion:  @escaping () -> Void) {
-            if let dynamiteAttacks = bossPhase.bossState.targets.attack?[.dynamite] {
+            if let dynamiteAttacks = bossPhase.bossState.targets.attack?[.dynamiteType] {
                 let dynaTypes: [TileType] = tileTypesOf(TileType.dynamite(DynamiteFuse.init(count: 3, hasBeenDecremented: false)), in: endTiles)
                 let targets = positionsInForeground(at: dynamiteAttacks)
                 
@@ -1304,9 +1304,8 @@ extension Renderer {
         }
         
         func animatePoison(completion: @escaping () -> Void) {
-            if let attackedColumns = bossPhase.bossState.poisonAttackColumns,
-               let affectedTiles = trans.tileTransformation {
-                animator.animateBossPoisonAttack(spriteForeground, targetedColumns: attackedColumns, targetedTiles: affectedTiles, sprites: sprites, tileSize: tileSize, playableRect: playableRect, completion: completion)
+            if let poisonAttacks = attackType.poisonAttack {
+                animator.animateBossPoisonAttack(spriteForeground, poisonAttacks: poisonAttacks, transformation: trans, sprites: sprites, tileSize: tileSize, playableRect: playableRect, completion: completion)
             } else { completion() }
         }
         

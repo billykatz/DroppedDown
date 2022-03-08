@@ -406,37 +406,79 @@ class Board: Equatable {
     private func bossExecutesAttacks(input: Input, attackType executeAttackType: BossAttack) -> Transformation {
         guard case let InputType.bossTurnStart(phase) = input.type else { return .zero }
         var tileTransformations: [TileTransformation] = []
+        var poisonColumnAttacks: [[TileCoord]] = []
+        var poisonRowAttacks: [[TileCoord]] = []
         
         // posion attack
         // dealt with separately because we need to understand the relationship of the tiles to the ones above it because pillars block the poison damage
         
-        if let attackedColumns = phase.bossState.poisonAttackColumns,
-           executeAttackType.type == .poison
+        if let poisonAttacks = executeAttackType.poisonAttack
         {
-            for col in attackedColumns {
-                var hitPillarShouldStop = false
-                for row in (0..<tiles.count).reversed() {
-                    if hitPillarShouldStop { break }
-                    
-                    let coord = TileCoord(row, col)
-                    switch tiles[coord].type {
-                    case .pillar:
-                        tileTransformations.append(TileTransformation(coord, coord))
-                        hitPillarShouldStop = true
+            for attack in poisonAttacks {
+                var attacks: [TileCoord] = []
+                if attack.attackType == .columnDown {
+                    let col = attack.index
+                    var hitPillarShouldStop = false
+                    for row in (0..<tiles.count).reversed() {
+                        if hitPillarShouldStop { break }
                         
-                    case .player(let playerData):
-                        var newPlayer = playerData.wasAttacked(for: 1, from: .north)
-                        if playerData.isDead {
-                            newPlayer = newPlayer.update(killedBy: .lavaHorse)
+                        let coord = TileCoord(row, col)
+                        switch tiles[coord].type {
+                        case .pillar:
+                            attacks.append(coord)
+                            tileTransformations.append(TileTransformation(coord, coord))
+                            hitPillarShouldStop = true
+                            
+                        case .player(let playerData):
+                            var newPlayer = playerData.wasAttacked(for: 1, from: .north)
+                            if playerData.isDead {
+                                newPlayer = newPlayer.update(killedBy: .lavaHorse)
+                            }
+                            
+                            tiles[row][col] = Tile(type: .player(newPlayer))
+                            attacks.append(coord)
+                            tileTransformations.append(TileTransformation(coord, coord))
+                            
+                        default:
+                            attacks.append(coord)
+                            tileTransformations.append(TileTransformation(coord, coord))
+                            break
                         }
-                        
-                        tiles[row][col] = Tile(type: .player(newPlayer))
-                        tileTransformations.append(TileTransformation(coord, coord))
-                        
-                    default:
-                        tileTransformations.append(TileTransformation(coord, coord))
-                        break
                     }
+                    
+                    poisonColumnAttacks.append(attacks)
+
+                } else {
+                    let row = attack.index
+                    var hitPillarShouldStop = false
+                    for col in (0..<tiles.count) {
+                        if hitPillarShouldStop { break }
+                        
+                        let coord = TileCoord(row, col)
+                        switch tiles[coord].type {
+                        case .pillar:
+                            attacks.append(coord)
+                            tileTransformations.append(TileTransformation(coord, coord))
+                            hitPillarShouldStop = true
+                            
+                        case .player(let playerData):
+                            var newPlayer = playerData.wasAttacked(for: 1, from: .west)
+                            if playerData.isDead {
+                                newPlayer = newPlayer.update(killedBy: .lavaHorse)
+                            }
+                            
+                            tiles[row][col] = Tile(type: .player(newPlayer))
+                            attacks.append(coord)
+                            tileTransformations.append(TileTransformation(coord, coord))
+                            
+                        default:
+                            attacks.append(coord)
+                            tileTransformations.append(TileTransformation(coord, coord))
+                            break
+                        }
+                    }
+                    poisonRowAttacks.append(attacks)
+
                 }
             }
             
@@ -446,11 +488,11 @@ class Board: Equatable {
         if let bossAttackDict = phase.bossState.targets.attack {
             bossAttackDict.forEach { (attackType, coords) in
                 coords.forEach { coord in
-                    if attackType == .dynamite, executeAttackType.type == .dynamite {
+                    if attackType.type == .dynamite, executeAttackType.type == .dynamite {
                         tiles[coord.row][coord.column] = Tile(type: .dynamite(.init(count: 3, hasBeenDecremented: false)))
                         
                     } else if case BossAttackType.spawnMonster = executeAttackType.type,
-                              case BossAttackType.spawnMonster(withType: let monsterType) = attackType,
+                              case BossAttackType.spawnMonster(withType: let monsterType) = attackType.type,
                               let tile = tileCreator.monsterWithType(monsterType) {
                         tiles[coord.row][coord.column] = tile
                     }
@@ -458,7 +500,11 @@ class Board: Equatable {
             }
         }
         
-        return Transformation(transformation: tileTransformations.isEmpty ? nil : tileTransformations, inputType: .bossTurnStart(phase), endTiles: self.tiles)
+        return Transformation(transformation: tileTransformations.isEmpty ? nil : tileTransformations,
+                              inputType: .bossTurnStart(phase),
+                              endTiles: self.tiles,
+                              poisonColumnAttacks: poisonColumnAttacks.isEmpty ? nil : poisonColumnAttacks,
+                              poisonRowAttacks: poisonRowAttacks.isEmpty ? nil: poisonRowAttacks)
         
     }
     

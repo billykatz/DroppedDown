@@ -230,7 +230,7 @@ struct PoisonAttack: Codable, Hashable {
 }
 
 /// Returns a dictionary with BossAttackTypes as keys with an array of attack targets as the value.
-func attacked(tiles: [[Tile]], by attacks: [BossAttackType]) -> [BossAttackType: [TileCoord]] {
+func attacked(tiles: [[Tile]], by attacks: [BossAttackType]) -> [BossAttack: [TileCoord]] {
     
     let playerPosition = getTilePosition(.player(.zero), tiles: tiles) ?? .zero
     let untargetable: Set<TileCoord> = nonAttackableCoords(tiles: tiles)
@@ -277,7 +277,7 @@ func attacked(tiles: [[Tile]], by attacks: [BossAttackType]) -> [BossAttackType:
                     let direction = PoisonAttackType.random
                     
                     let attack = PoisonAttack(index: index, attackType: direction)
-                    if !newPoisonAttacks.contains(attack) {
+                    if !newPoisonAttacks.contains(attack) && !posionAttacks.contains(attack) {
                         newPoisonAttacks.insert(attack)
                     }
                 }
@@ -314,17 +314,20 @@ func attacked(tiles: [[Tile]], by attacks: [BossAttackType]) -> [BossAttackType:
     }
     
     
-    var result: [BossAttackType: [TileCoord]] = [:]
+    var result: [BossAttack: [TileCoord]] = [:]
     if !poisonAttackCoords.isEmpty {
-        result[.poison] = poisonAttackCoords
+        let attackType = BossAttack(type: .poison, poisonAttacks: Array(posionAttacks))
+        result[attackType] = poisonAttackCoords
     }
     if !bombsSpawned.isEmpty {
-        result[.dynamite] = Array(bombsSpawned)
+        let attackType = BossAttack(type: .dynamite)
+        result[attackType] = Array(bombsSpawned)
     }
     if !monstersSpawned.isEmpty {
         // TODO: Make it so that we choose a random monster based on other monsters we have chosen and the boss phase
         for monstersSpawn in Array(monstersSpawned) {
-            let bossAttack = BossAttackType.spawnMonster(withType: monstersSpawn.monsterType)
+            let bossAttackType = BossAttackType.spawnMonster(withType: monstersSpawn.monsterType)
+            let bossAttack = BossAttack(type: bossAttackType)
             if var entry = result[bossAttack] {
                 entry.append(monstersSpawn.coord)
                 result[bossAttack] = entry
@@ -337,12 +340,12 @@ func attacked(tiles: [[Tile]], by attacks: [BossAttackType]) -> [BossAttackType:
     
 }
 
-func validateAndUpdatePlannedAttacks(in tiles: [[Tile]], plannedAttacks: [BossAttackType: [TileCoord]]?) ->  [BossAttackType: [TileCoord]]? {
+func validateAndUpdatePlannedAttacks(in tiles: [[Tile]], plannedAttacks: [BossAttack: [TileCoord]]?) ->  [BossAttack: [TileCoord]]? {
     guard let plannedAttacks = plannedAttacks else { return nil }
     var updatedAttacks = plannedAttacks
     var nonAttackable = nonAttackableCoords(tiles: tiles)
     for (plannedAttack, plannedCoords) in plannedAttacks {
-        switch plannedAttack {
+        switch plannedAttack.type {
         case .poison:
             // poison will never target something illegally following the players turn
             break

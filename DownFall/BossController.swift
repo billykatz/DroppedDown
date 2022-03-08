@@ -105,17 +105,17 @@ enum BossStateType: Hashable, Codable, CustomStringConvertible {
 struct BossTargets: Codable, Hashable {
     var whatToEat: [TileCoord]?
     var eats: [TileCoord]?
-    var whatToAttack: [BossAttackType: [TileCoord]]?
-    var attack: [BossAttackType: [TileCoord]]?
+    var whatToAttack: [BossAttack: [TileCoord]]?
+    var attack: [BossAttack: [TileCoord]]?
     var superAttack: [BossSuperAttackType: [TileCoord]]?
     
     var spawnMonsterAttacks: [(BossAttackType, [TileCoord])] {
         let initalValue: [(BossAttackType, [TileCoord])] = []
         return (attack ?? [:]).reduce(initalValue, { prev, entry in
             let (key, value) = entry
-            if case BossAttackType.spawnMonster = key {
+            if case BossAttackType.spawnMonster = key.type {
                 var newResult = prev
-                newResult.append((key, value))
+                newResult.append((key.type, value))
                 return newResult
             } else {
                 return prev
@@ -128,9 +128,9 @@ struct BossTargets: Codable, Hashable {
         let initalValue: [(BossAttackType, [TileCoord])] = []
         let attacks = (whatToAttack ?? [:]).reduce(initalValue, { prev, entry in
             let (key, value) = entry
-            if case BossAttackType.spawnMonster = key {
+            if case BossAttackType.spawnMonster = key.type {
                 var newResult = prev
-                newResult.append((key, value))
+                newResult.append((key.type, value))
                 return newResult
             } else {
                 return prev
@@ -160,7 +160,7 @@ struct BossTargets: Codable, Hashable {
     var whereToSpawnMonstersCoordinates: [TileCoord] {
         var tileCoords: [TileCoord] = []
         for (key, value) in whatToAttack ?? [:] {
-            if case BossAttackType.spawnMonster = key {
+            if case BossAttackType.spawnMonster = key.type {
                 tileCoords.append(contentsOf: value)
             }
         }
@@ -170,7 +170,7 @@ struct BossTargets: Codable, Hashable {
     
     var whatToAttackContainsSpawnMonster: Bool {
         return (whatToAttack ?? [:]).keys.contains(where: {
-            if case BossAttackType.spawnMonster = $0 {
+            if case BossAttackType.spawnMonster = $0.type {
                 return true
             } else {
                 return false
@@ -187,7 +187,7 @@ struct BossState: Codable, Hashable, CustomStringConvertible {
     public var poisonAttackColumns: [Int]? {
         let thingsToAttack = targets.whatToAttack ?? targets.attack ?? nil
         guard let attacks = thingsToAttack,
-                let poisonTargets = attacks[.poison] else { return nil }
+                let poisonTargets = attacks[.poisonType] else { return nil }
         
         var poisonColumns = Set<Int>()
         for target in poisonTargets {
@@ -266,9 +266,9 @@ struct BossState: Codable, Hashable, CustomStringConvertible {
             
         case .eats:
             // after eating, there is a chance the super attack is charge in which case we would advance to super attaack targeting
-            if (targets.whatToAttack ?? [:]).keys.contains(where: { $0 == .dynamite }) {
+            if (targets.whatToAttack ?? [:]).keys.contains(where: { $0.type == .dynamite }) {
                 return .targetAttack(type: BossAttack.dynamiteType)
-            } else if (targets.whatToAttack ?? [:]).keys.contains(where: { $0 == .poison }) {
+            } else if (targets.whatToAttack ?? [:]).keys.contains(where: { $0.type == .poison }) {
                 return .targetAttack(type: BossAttack.poisonType)
             } else if targets.whatToAttackContainsSpawnMonster {
                 return .targetAttack(type: BossAttack.spawnMonster)
@@ -288,8 +288,11 @@ struct BossState: Codable, Hashable, CustomStringConvertible {
             // Depending on what rocks the Boss eats, it may not go in that exact order
             switch type.type {
             case .dynamite:
-                if (targets.whatToAttack ?? [:]).keys.contains(where: { $0 == .poison }) {
-                    return .targetAttack(type: .poisonType)
+                if let attack = (targets.whatToAttack ?? [:]).keys.first(where: { $0.type == .poison }),
+                   let poisonAttack = attack.poisonAttack
+                {
+                    return .targetAttack(type: BossAttack(type: .poison, poisonAttacks: poisonAttack))
+                    
                 } else if targets.whatToAttackContainsSpawnMonster {
                     return .targetAttack(type: .spawnMonster)
                 } else {
@@ -323,7 +326,7 @@ struct BossState: Codable, Hashable, CustomStringConvertible {
         return targetRocksToEat(in: tiles, numberRocksToEat: numberOfRocksToEat)
     }
     
-    private func targetsToAttack(in tiles: [[Tile]], with attacks: [BossAttackType]?) -> [BossAttackType: [TileCoord]] {
+    private func targetsToAttack(in tiles: [[Tile]], with attacks: [BossAttackType]?) -> [BossAttack: [TileCoord]] {
         guard let attacks = attacks else { return [:] }
         return attacked(tiles: tiles, by: attacks)
         

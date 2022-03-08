@@ -95,13 +95,12 @@ class BossView: SKSpriteNode {
     func handleBossTurnStart(phase: BossPhase, transformation: Transformation? = nil) {
         switch phase.bossState.stateType {
         case .targetAttack(type: let attack):
-            if let dynamiteTargets = phase.bossState.targets.whatToAttack?[.dynamite],
+            if let dynamiteTargets = phase.bossState.targets.whatToAttack?[.dynamiteType],
                attack.type == .dynamite {
                 showDynamiteReticles(dynamiteTargets)
             }
             
-            if let poisonTargets = phase.bossState.poisonAttackColumns,
-               attack.type == .poison {
+            if let poisonTargets = attack.poisonAttack {
                 showPoisonReticles(poisonTargets)
             }
             
@@ -141,16 +140,32 @@ class BossView: SKSpriteNode {
         }
     }
     
-    func showPoisonReticles(_ poisonColumns: [Int]) {
-        for column in poisonColumns {
-            let poisonReticleSize = CGSize(width: tileSize, height: 48 / (109/tileSize))
-            let poisonReticle = SKSpriteNode(texture: SKTexture(imageNamed: Constants.poisonReticleName), size: poisonReticleSize)
-            let topSprite = sprites[sprites.count-1][column]
-            
-            poisonReticle.position = CGPoint.position(poisonReticle.frame, inside: topSprite.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: -20, translatedToBounds: true)
-            
-            poisonColumnsTargetToAttack.append(poisonReticle)
-            containerView.addChild(poisonReticle)
+    func showPoisonReticles(_ poisonAttacks: [PoisonAttack]) {
+        for attack in poisonAttacks {
+            if attack.attackType == .columnDown {
+                let column = attack.index
+                let poisonReticleSize = CGSize(width: tileSize, height: 48 / (109/tileSize))
+                let poisonReticle = SKSpriteNode(texture: SKTexture(imageNamed: Constants.poisonReticleName), size: poisonReticleSize)
+                let topSprite = sprites[sprites.count-1][column]
+                
+                poisonReticle.position = CGPoint.position(poisonReticle.frame, inside: topSprite.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: -30, translatedToBounds: true)
+                
+                poisonColumnsTargetToAttack.append(poisonReticle)
+                containerView.addChild(poisonReticle)
+                
+            } else {
+                let row = attack.index
+                let poisonReticleSize = CGSize(width: tileSize, height: 48 / (109/tileSize))
+                let poisonReticle = SKSpriteNode(texture: SKTexture(imageNamed: Constants.poisonReticleName), size: poisonReticleSize)
+                let leftSprite = sprites[row][0]
+                poisonReticle.zRotation = .pi * 1 / 2
+                
+                poisonReticle.position = CGPoint.position(poisonReticle.frame, inside: leftSprite.frame, verticalAlign: .center, horizontalAnchor: .left, xOffset: -30, translatedToBounds: true)
+                
+                poisonColumnsTargetToAttack.append(poisonReticle)
+                containerView.addChild(poisonReticle)
+
+            }
         }
     }
     

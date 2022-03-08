@@ -231,10 +231,10 @@ func baseChanceEncasementOffers(depth: Depth, playerData: EntityModel, startingU
         return chanceModel
         
     case bossLevelDepthNumber:
-        let tier1Health: ChanceModel = .init(tileType: tier1HealthOption, chance: 16)
-        let tier2Health: ChanceModel = .init(tileType: tier2HealthOption, chance: 16)
-        let batMonsterChance1: ChanceModel = .init(tileType: batMonsterType, chance: 33)
-        let batMonsterChance2: ChanceModel = .init(tileType: batMonsterType, chance: 33)
+        let tier1Health: ChanceModel = .init(tileType: tier1HealthOption, chance: 33)
+        let tier2Health: ChanceModel = .init(tileType: tier2HealthOption, chance: 66)
+        let batMonsterChance1: ChanceModel = .init(tileType: batMonsterType, chance: 10000)
+        let batMonsterChance2: ChanceModel = .init(tileType: batMonsterType, chance: 10000)
         
         let chanceModel: [ChanceModel] = [
             tier1Health, tier2Health,
@@ -328,7 +328,7 @@ func baseChanceEncasementSize(depth: Depth) -> [AnyChanceModel<[EncasementSize]>
         return [justPillarsChance, largeSizeChance, mediumMediumSizeChance, mediumLargeSizeChance, largeLargeSizeChance]
 
     case bossLevelDepthNumber:
-        return [AnyChanceModel<[EncasementSize]>.init(thing: [.large, .large], chance: 100)]
+        return [AnyChanceModel<[EncasementSize]>.init(thing: [.large, .large, .large], chance: 100)]
         
     default:
         return[]
@@ -816,10 +816,11 @@ func encasementsOptions(depth: Depth, size: EncasementSize) -> [EncasementCoords
         }
     
     case bossLevelDepthNumber:
-        let encasement1 = EncasementCoords(middleTile: TileCoord(6, 4), outerTiles: [TileCoord(7, 4), TileCoord(5, 4), TileCoord(6, 3), TileCoord(6, 5)])
+        let encasement1 = EncasementCoords(middleTile: TileCoord(6, 6), outerTiles: [TileCoord(7, 6), TileCoord(5, 6), TileCoord(6, 5), TileCoord(6, 7)])
+        let encasement3 = EncasementCoords(middleTile: TileCoord(6, 2), outerTiles: [TileCoord(7, 2), TileCoord(5, 2), TileCoord(6, 1), TileCoord(6, 3)])
         let encasement2 = EncasementCoords(middleTile: TileCoord(2, 4), outerTiles: [TileCoord(3, 4), TileCoord(1, 4), TileCoord(2, 3), TileCoord(2, 5)])
 
-        return [encasement1, encasement2]
+        return [encasement1, encasement2, encasement3]
     default:
         break
         

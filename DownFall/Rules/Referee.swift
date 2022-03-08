@@ -256,10 +256,11 @@ class Referee {
                     let (nonBlockedAttackedTiles, allAttackedTileArray) = attackedTiles(from: potentialMonsterPosition)
 
                     for attackedTile in nonBlockedAttackedTiles.sorted(by: { tileCoordA, tileCoordB in
+                        
                         if case TileType.player = tiles[tileCoordA].type {
                             return true
                         } else if case TileType.player = tiles[tileCoordB].type {
-                            return true
+                            return false
                         } else {
                             return false
                         }

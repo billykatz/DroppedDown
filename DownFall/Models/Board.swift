@@ -2329,6 +2329,7 @@ extension Board {
         var dodged = false
         var attackerIsPlayer = false
         var pillarsThatTakeDamage: [PillarTakesDamage] = []
+        var playersTookDamage: [TileCoord] = []
         
         
         //TODO: DRY, extract and shorten this code
@@ -2377,6 +2378,10 @@ extension Board {
             tiles[defenderPosition.x][defenderPosition.y] = Tile(type: TileType.player(newDefenderData))
             
             dodged = defenderDodged
+            
+            if !dodged {
+                playersTookDamage.append(defenderPosition)
+            }
         } else if case let .player(playerModel) = tiles[attackerPosition].type,
                   defenderPostion == nil {
             //just note that the player attacked
@@ -2410,7 +2415,9 @@ extension Board {
                                                           attackerIsPlayer: attackerIsPlayer
                                                          ),
                               endTiles: self.tiles,
-                              pillarsTakeDamage: pillarsThatTakeDamage.isEmpty ? nil : pillarsThatTakeDamage )
+                              pillarsTakeDamage: pillarsThatTakeDamage.isEmpty ? nil : pillarsThatTakeDamage,
+                              playerTookDamage: playersTookDamage.isEmpty ? nil : playersTookDamage
+        )
     }
 }
 

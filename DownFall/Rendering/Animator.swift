@@ -1243,12 +1243,14 @@ struct Animator {
 
         }
         
-        for amount in transformation.playerTookDamage ?? [] {
+
+        for _ in transformation.playerTookDamage ?? [] {
             if let playerCoord = playerCoord(sprites),
                 case TileType.player(let data) = sprites[playerCoord].type,
-               let playerTakesDamage = createPlayerTakeDamageAnimation(delayBefore: waitBefore/8*7, sprites: sprites, playerPosition: playerCoord, playerData: data, damageAmount: 1, showRedScreen: true) {
+               let playerTakesDamage = createPlayerTakeDamageAnimation(delayBefore: waitBefore/2, sprites: sprites, playerPosition: playerCoord, playerData: data, damageAmount: 1, showRedScreen: true) {
                 spriteActions.append(contentsOf: playerTakesDamage)
             }
+            waitBefore += 0.25
         }
         
         animate(spriteActions, completion: completion)
@@ -1387,7 +1389,8 @@ struct Animator {
         guard let foreground = foreground, let tileSize = tileSize else {
             return nil
         }
-        let playerForegroundPosition = sprites[playerPosition].position
+        let playerSprite = sprites[playerPosition]
+//        let playerForegroundPosition = playerSprite.position
         let cgTileSize = CGSize(widthHeight: tileSize)
         var spriteActions: [SpriteAction] = []
         var waitBefore = delayBefore
@@ -1404,14 +1407,14 @@ struct Animator {
         let fullHeartSprite = SKSpriteNode(texture: SKTexture(imageNamed: "fullHeart"), size: cgTileSize)
         let subtractSprite = ParagraphNode(text: "-", paragraphWidth: 100, fontSize: 250, fontColor: .lightBarRed, fontType: .legacy)
         
-        fullHeartSprite.position = playerForegroundPosition.translate(xOffset: 40, yOffset: 0)
+        fullHeartSprite.position = .zero.translate(xOffset: 40, yOffset: 0)
         fullHeartSprite.zPosition = 100_000_000
-        subtractSprite.position = playerForegroundPosition.translate(xOffset: -50, yOffset: tileSize/4)
+        subtractSprite.position = .zero.translate(xOffset: -50, yOffset: tileSize/4)
         subtractSprite.zPosition = 100_000_000
         
         let waitThenAdd = SKAction.run {
-            foreground.addChild(fullHeartSprite)
-            foreground.addChild(subtractSprite)
+            playerSprite.animatingLayer.addChild(fullHeartSprite)
+            playerSprite.animatingLayer.addChild(subtractSprite)
         }.waitBefore(delay: waitBefore)
         
         let moveDuration: TimeInterval = 1.0
@@ -1432,11 +1435,6 @@ struct Animator {
         spriteActions.append(.init(foreground, waitThenAdd))
         spriteActions.append(fullHeartAction)
         spriteActions.append(subtractAction)
-        
-        
-//        if showRedScreen, let redScreen = createScreenEdgesFlashRed(delayBefore: waitBefore + halfPlayerHurtDuration) {
-//            spriteActions.append(redScreen)
-//        }
         
         return spriteActions
 

@@ -257,7 +257,7 @@ class Renderer: SKSpriteNode {
                 }
                 
             case .attack:
-                animateAttack(attackInput: inputType, endTiles: trans.endTiles)
+                animateAttack(attackInput: inputType, transformation: trans, endTiles: trans.endTiles)
                 
             case .gameWin:
                 if !level.isBossLevel {
@@ -514,8 +514,15 @@ class Renderer: SKSpriteNode {
         
     }
     
-    private func animateAttack(attackInput: InputType, endTiles: [[Tile]]?) {
-        guard let tiles = endTiles else {
+    private func animateAttack(attackInput: InputType, transformation: Transformation, endTiles: [[Tile]]?) {
+        guard let tiles = endTiles,
+    case InputType.attack(_,
+                                _,
+                                let defenderPosition,
+                                _,
+                                let defenderDodged,
+                                _
+    ) = attackInput else {
             animationsFinished(endTiles: endTiles)
             return
         }

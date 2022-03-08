@@ -98,19 +98,19 @@ struct Unlockable: Codable, Identifiable, Equatable, Hashable {
             Unlockable(stat: .oneThousandRocks, item: StoreOffer.offer(type: .dodge(amount: 3), tier: 1), purchaseAmount: 50, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
             
             // tier 2
-            Unlockable(stat: .fiveThousandRocks, item: StoreOffer.offer(type: .plusOneMaxHealth, tier: 2), purchaseAmount: 200, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
-            Unlockable(stat: .fiveThousandRocks, item: StoreOffer.offer(type: .luck(amount: 3), tier: 2), purchaseAmount: 200, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
-            Unlockable(stat: .fiveThousandRocks, item: StoreOffer.offer(type: .dodge(amount: 3), tier: 2), purchaseAmount: 200, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .fourThousandRocks, item: StoreOffer.offer(type: .plusOneMaxHealth, tier: 2), purchaseAmount: 200, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .fourThousandRocks, item: StoreOffer.offer(type: .luck(amount: 3), tier: 2), purchaseAmount: 200, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .fourThousandRocks, item: StoreOffer.offer(type: .dodge(amount: 3), tier: 2), purchaseAmount: 200, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
             
             // tier 3
-            Unlockable(stat: .reachDepth8, item: StoreOffer.offer(type: .plusOneMaxHealth, tier: 3), purchaseAmount: 500, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
-            Unlockable(stat: .reachDepth8, item: StoreOffer.offer(type: .luck(amount: 4), tier: 3), purchaseAmount: 350, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
-            Unlockable(stat: .reachDepth8, item: StoreOffer.offer(type: .dodge(amount: 4), tier: 3), purchaseAmount: 350, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .reachDepth8, item: StoreOffer.offer(type: .plusOneMaxHealth, tier: 3), purchaseAmount: 400, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .reachDepth8, item: StoreOffer.offer(type: .luck(amount: 4), tier: 3), purchaseAmount: 300, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .reachDepth8, item: StoreOffer.offer(type: .dodge(amount: 4), tier: 3), purchaseAmount: 300, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
             
             // tier 4
             Unlockable(stat: .beatTheBossOnce, item: StoreOffer.offer(type: .plusOneMaxHealth, tier: 4), purchaseAmount: 1000, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
-            Unlockable(stat: .beatTheBossOnce, item: StoreOffer.offer(type: .luck(amount: 5), tier: 4), purchaseAmount: 750, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
-            Unlockable(stat: .beatTheBossOnce, item: StoreOffer.offer(type: .dodge(amount: 5), tier: 4), purchaseAmount: 750, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .beatTheBossOnce, item: StoreOffer.offer(type: .luck(amount: 5), tier: 4), purchaseAmount: 600, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .beatTheBossOnce, item: StoreOffer.offer(type: .dodge(amount: 5), tier: 4), purchaseAmount: 600, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
             
             /// tier 5
             Unlockable(stat: .beatTheBossFiveTimes, item: StoreOffer.offer(type: .plusOneMaxHealth, tier: 5), purchaseAmount: 2000, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
@@ -120,56 +120,56 @@ struct Unlockable: Codable, Identifiable, Equatable, Hashable {
             // AVAILABLE IN RUNS
             
             // HEALTH
-            Unlockable(stat: .twoThousandRocks, item: StoreOffer.offer(type: .greaterHeal, tier: 1), purchaseAmount: 500, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
-            Unlockable(stat: .twoThousandRocks, item: StoreOffer.offer(type: .plusTwoMaxHealth, tier: 2), purchaseAmount: 500, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .twoThousandRocks, item: StoreOffer.offer(type: .greaterHeal, tier: 1), purchaseAmount: 200, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .twoThousandRocks, item: StoreOffer.offer(type: .plusTwoMaxHealth, tier: 2), purchaseAmount: 250, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
             
             
             /// Runes
             ///
             /// RED
-            Unlockable(stat: .threeThousandRedRocks, item: StoreOffer.offer(type: .rune(Rune.rune(for: .drillDown)), tier: 2), purchaseAmount: 500, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
-            Unlockable(stat: .fiveThousandRedRocks, item: StoreOffer.offer(type: .rune(Rune.rune(for: .rainEmbers)), tier: 2), purchaseAmount: 750, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .threeThousandRedRocks, item: StoreOffer.offer(type: .rune(Rune.rune(for: .drillDown)), tier: 2), purchaseAmount: 300, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .fiveThousandRedRocks, item: StoreOffer.offer(type: .rune(Rune.rune(for: .rainEmbers)), tier: 2), purchaseAmount: 500, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
             
             ///
             /// BLOOD
             ///
-            Unlockable(stat: .monstersKilled100, item: StoreOffer.offer(type: .rune(Rune.rune(for: .fieryRage)), tier: 2), purchaseAmount: 500, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
-            Unlockable(stat: .monstersKilled500, item: StoreOffer.offer(type: .rune(Rune.rune(for: .monsterCrush)), tier: 2), purchaseAmount: 750, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
-            Unlockable(stat: .monstersKilled750, item: StoreOffer.offer(type: .rune(Rune.rune(for: .liquifyMonsters)), tier: 2), purchaseAmount: 1000, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .monstersKilled50, item: StoreOffer.offer(type: .rune(Rune.rune(for: .fieryRage)), tier: 2), purchaseAmount: 300, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .monstersKilled250, item: StoreOffer.offer(type: .rune(Rune.rune(for: .monsterCrush)), tier: 2), purchaseAmount: 500, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .monstersKilled250, item: StoreOffer.offer(type: .rune(Rune.rune(for: .liquifyMonsters)), tier: 2), purchaseAmount: 750, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
             
             ///
             /// PURPLE
             ///
-            Unlockable(stat: .threeThousandPurpleRocks, item: StoreOffer.offer(type: .rune(Rune.rune(for: .vortex)), tier: 2), purchaseAmount: 500, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
-            Unlockable(stat: .fiveThousandPurpleRocks, item: StoreOffer.offer(type: .rune(Rune.rune(for: .moveEarth)), tier: 2), purchaseAmount: 750, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .threeThousandPurpleRocks, item: StoreOffer.offer(type: .rune(Rune.rune(for: .vortex)), tier: 2), purchaseAmount: 300, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .fiveThousandPurpleRocks, item: StoreOffer.offer(type: .rune(Rune.rune(for: .moveEarth)), tier: 2), purchaseAmount: 500, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
             
             ///
             /// BLUE
             ///
-            Unlockable(stat: .threeThousandBlueRocks, item: StoreOffer.offer(type: .rune(Rune.rune(for: .teleportation)), tier: 2), purchaseAmount: 500, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
-            Unlockable(stat: .fiveThousandBlueRocks, item: StoreOffer.offer(type: .rune(Rune.rune(for: .bubbleUp)), tier: 2), purchaseAmount: 750, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .threeThousandBlueRocks, item: StoreOffer.offer(type: .rune(Rune.rune(for: .teleportation)), tier: 2), purchaseAmount: 300, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .fiveThousandBlueRocks, item: StoreOffer.offer(type: .rune(Rune.rune(for: .bubbleUp)), tier: 2), purchaseAmount: 500, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
             
             
             
             // rune slots
-            Unlockable(stat: .largestGroup40, item: StoreOffer.offer(type: .runeSlot, tier: 1), purchaseAmount: 1000, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
-            Unlockable(stat: .beatTheBossOnce, item: StoreOffer.offer(type: .runeSlot, tier: 2), purchaseAmount: 1000, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .largestGroup40, item: StoreOffer.offer(type: .runeSlot, tier: 1), purchaseAmount: 500, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .beatTheBossOnce, item: StoreOffer.offer(type: .runeSlot, tier: 2), purchaseAmount: 750, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
             Unlockable(stat: .monstersKilled1000, item: StoreOffer.offer(type: .runeSlot, tier: 3), purchaseAmount: 1000, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
 
             
             
             // Luck and dodge stuff
-            Unlockable(stat: .oneHundredAttacksDodged, item: StoreOffer.offer(type: .wingedBoots, tier: 2), purchaseAmount: 250, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
-            Unlockable(stat: .fiveThousandGems, item: StoreOffer.offer(type: .luckyCat, tier: 2), purchaseAmount: 250, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .oneHundredAttacksDodged, item: StoreOffer.offer(type: .wingedBoots, tier: 2), purchaseAmount: 200, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .fiveThousandGems, item: StoreOffer.offer(type: .luckyCat, tier: 2), purchaseAmount: 200, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
             
             // Other items
-            Unlockable(stat: .largestGroup35, item: StoreOffer.offer(type: .liquifyMonsters, tier: 1), purchaseAmount: 500, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
-            Unlockable(stat: .largestGroup30, item: StoreOffer.offer(type: .infusion, tier: 1), purchaseAmount: 500, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
-            Unlockable(stat: .largestGroup25, item: StoreOffer.offer(type: .escape, tier: 1), purchaseAmount: 500, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
-            Unlockable(stat: .largestGroup20, item: StoreOffer.offer(type: .gemMagnet, tier: 1), purchaseAmount: 500, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .largestGroup35, item: StoreOffer.offer(type: .liquifyMonsters, tier: 1), purchaseAmount: 250, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .largestGroup30, item: StoreOffer.offer(type: .infusion, tier: 1), purchaseAmount: 250, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .largestGroup25, item: StoreOffer.offer(type: .escape, tier: 1), purchaseAmount: 150, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .largestGroup20, item: StoreOffer.offer(type: .gemMagnet, tier: 1), purchaseAmount: 200, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
             
-            Unlockable(stat: .batKilled100, item: StoreOffer.offer(type: .greaterRuneSpiritPotion, tier: 2), purchaseAmount: 350, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
-            Unlockable(stat: .sallyKilled100, item: StoreOffer.offer(type: .killMonsterPotion, tier: 2), purchaseAmount: 350, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .batKilled100, item: StoreOffer.offer(type: .greaterRuneSpiritPotion, tier: 2), purchaseAmount: 250, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .sallyKilled100, item: StoreOffer.offer(type: .killMonsterPotion, tier: 2), purchaseAmount: 300, isPurchased: false, isUnlocked: false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
         ]
     }
     

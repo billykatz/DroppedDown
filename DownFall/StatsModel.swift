@@ -243,6 +243,7 @@ extension Statistics {
     static var fiveHundredRocks = Self.init(amount: 500, statType: .totalRocksDestroyed)
     static var oneThousandRocks = Self.init(amount: 1000, statType: .totalRocksDestroyed)
     static var twoThousandRocks = Self.init(amount: 2000, statType: .totalRocksDestroyed)
+    static var fourThousandRocks = Self.init(amount: 4000, statType: .totalRocksDestroyed)
     static var fiveThousandRocks = Self.init(amount: 5000, statType: .totalRocksDestroyed)
     static var tenThousandRocks = Self.init(amount: 10000, statType: .totalRocksDestroyed)
     static var twentyThousandRocks = Self.init(amount: 20000, statType: .totalRocksDestroyed)
@@ -283,6 +284,7 @@ extension Statistics {
     static var sallyKilled100 = Self.init(monsterType: .sally, amount: 100, statType: .monstersKilled)
     static var batKilled100 = Self.init(monsterType: .bat, amount: 100, statType: .monstersKilled)
     
+    static var monstersKilled50 = Self.init(amount: 50, statType: .totalMonstersKilled)
     static var monstersKilled100 = Self.init(amount: 100, statType: .totalMonstersKilled)
     static var monstersKilled250 = Self.init(amount: 250, statType: .totalMonstersKilled)
     static var monstersKilled500 = Self.init(amount: 500, statType: .totalMonstersKilled)

@@ -340,21 +340,11 @@ enum BossPhaseType: String, Codable {
     case third
     case dead
     
-    var columnsToGrow: Int {
-        switch self {
-        case .first: return 0 // return 3
-        case .second: return 3 // return 4
-        case .third: return 5
-        case .dead: return 0
-        }
-
-    }
-    
     var rocksToEat: Int {
         switch self {
-        case .first: return 5 // return 3
-        case .second: return 6 // return 4
-        case .third: return 7
+        case .first: return 6
+        case .second: return 7
+        case .third: return 8
         case .dead: return 0
         }
     }
@@ -364,9 +354,9 @@ enum BossPhaseType: String, Codable {
         case .first:
             return 0
         case .second:
-            return 5
+            return 6
         case .third:
-            return 7
+            return 8
         case .dead:
             return 0
         }
@@ -385,8 +375,8 @@ enum BossPhaseType: String, Codable {
     var monstersToSpawn: Int {
         switch self {
         case .first: return 0
-        case .second: return 3
-        case .third: return 6
+        case .second: return 4
+        case .third: return 8
         case .dead: return 0
         }
     }

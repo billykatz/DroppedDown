@@ -82,6 +82,32 @@ func randomCoord(in tiles: [[Tile]]?, notIn set: Set<TileCoord>) -> TileCoord {
     return tileCoord
 }
 
+func randomCoordNearPlayerOrRotated(in tiles: [[Tile]], notIn: Set<TileCoord>) -> TileCoord {
+    guard let pp = getTilePosition(.player(.zero), tiles: tiles) else { return .zero }
+    let rotatePp2 = pp.rotated(times: 1, boardSize: tiles.count)
+    let rotatePp3 = pp.rotated(times: 2, boardSize: tiles.count)
+    let rotatePp4 = pp.rotated(times: 3, boardSize: tiles.count)
+    let boardSize = tiles.count
+    let upperbound = boardSize
+    
+    var rotatePositions = [pp, rotatePp2, rotatePp4, rotatePp3]
+    var newCoord = pp
+    
+    while (notIn.contains(newCoord)) {
+        if rotatePositions.isEmpty,
+           let randomPosition = [pp, rotatePp2, rotatePp4, rotatePp3].randomElement()
+        {
+            newCoord = randomCoord(in: tiles, notIn: notIn, nearby: randomPosition, in: 0...1)
+        } else {
+            rotatePositions = Array(rotatePositions.dropFirst())
+            if let next = rotatePositions.first {
+                newCoord = next
+            }
+        }
+    }
+    return newCoord
+}
+
 // attamptes to find a random coord with the closed range of the target.
 // if it fails after 30 attempts it increase the range and tries again.
 func randomCoord(in tiles: [[Tile]]?, notIn set: Set<TileCoord>, nearby target: TileCoord, in range: ClosedRange<CGFloat>, specificTypeChecker: ((TileType) -> Bool)? = nil ) -> TileCoord {
@@ -187,6 +213,29 @@ func nonGrowableCoords(tiles: [[Tile]]) -> Set<TileCoord> {
     return reservedCoords
 }
 
+/// Returns all "targetable" tiles when the boss wants to throw dyamite or spawn a minion
+func nonTargetableCoords(tiles: [[Tile]]) -> Set<TileCoord> {
+    var reservedCoords = Set<TileCoord>()
+    for row in 0..<tiles.count {
+        for col in 0..<tiles.count {
+            let coord = TileCoord(row, col)
+            switch tiles[row][col].type {
+            case .rock(color: let color, _, _):
+                if color == .brown || color == .green {
+                    reservedCoords.insert(coord)
+                } else {
+                    // purposefully left blank
+                }
+            case .monster, .pillar, .offer, .item, .dynamite:
+                reservedCoords.insert(coord)
+            default:
+                break
+            }
+        }
+    }
+    return reservedCoords
+}
+
 /// Returns all "attackable" tiles when the boss wants to throw dyamite or spawn a minion
 func nonAttackableCoords(tiles: [[Tile]]) -> Set<TileCoord> {
     var reservedCoords = Set<TileCoord>()
@@ -229,38 +278,41 @@ struct PoisonAttack: Codable, Hashable {
     let attackType: PoisonAttackType
 }
 
+func numberOfAttacksTargetingPlayer(playerPosition: TileCoord, newPoisonAttacks: Set<PoisonAttack>) -> Int {
+    var targetsPlayer = 0
+    for attack in newPoisonAttacks {
+        if attack.index == playerPosition.row || attack.index == playerPosition.col {
+            targetsPlayer += 1
+        }
+    }
+    return targetsPlayer
+}
+
+
 /// Returns a dictionary with BossAttackTypes as keys with an array of attack targets as the value.
 func attacked(tiles: [[Tile]], by attacks: [BossAttackType]) -> [BossAttack: [TileCoord]] {
     
     let playerPosition = getTilePosition(.player(.zero), tiles: tiles) ?? .zero
-    let untargetable: Set<TileCoord> = nonAttackableCoords(tiles: tiles)
+    let untargetable: Set<TileCoord> = nonTargetableCoords(tiles: tiles)
     
     var posionAttacks = Set<PoisonAttack>()
     var monstersSpawned = Set<MonsterSpawned>()
     var bombsSpawned = Set<TileCoord>()
     
-    func numberOfAttacksTargetingPlayer() -> Int {
-        var targetsPlayer = 0
-        for attack in posionAttacks {
-            if attack.index == playerPosition.row || attack.index == playerPosition.col {
-                targetsPlayer += 1
-            }
-        }
-        return targetsPlayer
-    }
-    
+
     for attack in attacks {
         let monstersSpawnedCoord = monstersSpawned.map { $0.coord }
         switch attack {
         case .dynamite:
             let nonTargetable = bombsSpawned.union(monstersSpawnedCoord).union(untargetable)
-            bombsSpawned.insert(randomCoord(in: tiles, notIn: nonTargetable))
+            let targetedTile = randomCoordNearPlayerOrRotated(in: tiles, notIn: nonTargetable)
+            bombsSpawned.insert(targetedTile)
         case .poison:
             // each posion attack spawns two attacked columns, that's why we did this twice
             var newPoisonAttacks = Set<PoisonAttack>()
             var maxTries = 100
-            while newPoisonAttacks.count < 2 && maxTries > 0 {
-                if numberOfAttacksTargetingPlayer() < 2 {
+            while newPoisonAttacks.count < 3 && maxTries > 0 {
+                if numberOfAttacksTargetingPlayer(playerPosition: playerPosition, newPoisonAttacks: posionAttacks.union(newPoisonAttacks)) < 2 {
                     // create an + patter on the player
                     let rowIdx = playerPosition.row
                     let rowDirection: PoisonAttackType =  .rowLeftToRight
@@ -341,14 +393,72 @@ func attacked(tiles: [[Tile]], by attacks: [BossAttackType]) -> [BossAttack: [Ti
 }
 
 func validateAndUpdatePlannedAttacks(in tiles: [[Tile]], plannedAttacks: [BossAttack: [TileCoord]]?) ->  [BossAttack: [TileCoord]]? {
-    guard let plannedAttacks = plannedAttacks else { return nil }
+    guard let plannedAttacks = plannedAttacks, let playerPosition = getTilePosition(.player(.zero), tiles: tiles) else { return nil }
     var updatedAttacks = plannedAttacks
+    
+    var updatePosionAttacks = Set<PoisonAttack>()
+
     var nonAttackable = nonAttackableCoords(tiles: tiles)
-    for (plannedAttack, plannedCoords) in plannedAttacks {
+    for (index, (plannedAttack, plannedCoords)) in plannedAttacks.enumerated() {
         switch plannedAttack.type {
         case .poison:
-            // poison will never target something illegally following the players turn
+            // each posion attack spawns two attacked columns, that's why we did this twice
+//            var newPoisonAttacks = Set<PoisonAttack>()
+//            var maxTries = 100
+//            while newPoisonAttacks.count < plannedAttack.poisonAttack?.count ?? -1 && maxTries > 0 {
+//                if numberOfAttacksTargetingPlayer(playerPosition: playerPosition, newPoisonAttacks: updatePosionAttacks) < 2 {
+//                    // create an + patter on the player
+//                    let rowIdx = playerPosition.row
+//                    let rowDirection: PoisonAttackType =  .rowLeftToRight
+//                    let rowAttack: PoisonAttack = PoisonAttack(index: rowIdx, attackType: rowDirection)
+//                    let colIdx = playerPosition.col
+//                    let colDirection: PoisonAttackType = .columnDown
+//                    let colAttack: PoisonAttack = PoisonAttack(index: colIdx, attackType: colDirection)
+//                    newPoisonAttacks.insert(rowAttack)
+//                    newPoisonAttacks.insert(colAttack)
+//
+//                } else {
+//                    // choose random ones
+//                    let index = Int.random(tiles.count)
+//                    let direction = PoisonAttackType.random
+//
+//                    let attack = PoisonAttack(index: index, attackType: direction)
+//                    if !newPoisonAttacks.contains(attack) && !updatePosionAttacks.contains(attack) {
+//                        newPoisonAttacks.insert(attack)
+//                    }
+//                }
+//
+//                maxTries -= 1
+//            }
+//
+//            updatePosionAttacks = updatePosionAttacks.union(newPoisonAttacks)
+//
+//            let posionAttacks = Array(updatePosionAttacks)
+//            var poisonAttackCoords: [TileCoord] = []
+//            for row in 0..<tiles.count {
+//                for col in 0..<tiles.count {
+//                    for attack in posionAttacks {
+//                        if attack.attackType == .columnDown {
+//                            if attack.index == col {
+//                                poisonAttackCoords.append(TileCoord(row, col))
+//                            }
+//                        } else {
+//                            if attack.index == row {
+//                                poisonAttackCoords.append(TileCoord(row, col))
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//
+//            let newKey = BossAttack(type: .poison, poisonAttacks: posionAttacks)
+//            let index = updatedAttacks.index(updatedAttacks.startIndex, offsetBy: index)
+//            updatedAttacks.remove(at: index)
+//            updatedAttacks[newKey] = poisonAttackCoords
+            
             break
+
+            
         case .dynamite, .spawnMonster:
             // dyamite should only ever target a rock
             var newCoords: [TileCoord] = []

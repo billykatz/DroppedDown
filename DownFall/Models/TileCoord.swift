@@ -189,6 +189,27 @@ struct TileCoord: Codable, Hashable {
         return nil
     }
     
+    func rotated(times: Int, boardSize: Int) -> TileCoord {
+        var coord = self
+        if times == 1 {
+            let endRow = boardSize - coord.col - 1
+            let endCol = coord.row
+            coord = .init(endRow, endCol)
+        } else if times == 2 {
+            coord = .init(boardSize - coord.col - 1, boardSize - coord.row - 1)
+        } else if times == 3 {
+            let endRow = coord.col
+            let endCol = boardSize - coord.row - 1
+            coord = .init(endRow, endCol)
+        }
+        return coord
+        
+        /// example
+        /// 2 row, 3 col
+        /// 9-3 = 6 row, col 2
+        /// 6 - 2
+    }
+    
     func coordsAbove(boardSize: Int) -> [TileCoord] {
         var coordinates: [TileCoord] = []
         for row in x+1..<Int(boardSize) {

@@ -404,27 +404,9 @@ class Level: Codable, Hashable {
             
             goalChances.append(contentsOf: [rockGoalChance, monsterGoalChance, pillarGoalChance, brownGoalChance])
             
-        case 9:
-            let monsterAmount = 20
-            let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 60)
-            let brownRockGoal = randomRockGoal([.brown], amount: 12)
-            let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
-            let pillarGoal = LevelGoal.pillarGoal(amount: (totalPillarAmount))
-            if offeredGemAmount > 0 {
-                let gemGoal = LevelGoal.gemGoal(amount: offeredGemAmount)
-                let gemGoalChance = AnyChanceModel(thing: gemGoal, chance: 100)
-                goalChances.append(gemGoalChance)
-            }
-            
-            let rockGoalChance = AnyChanceModel(thing: rockGoal, chance: 20)
-            let monsterGoalChance = AnyChanceModel(thing: monsterGoal, chance: 20)
-            let pillarGoalChance = AnyChanceModel(thing: pillarGoal, chance: 20)
-            let brownGoalChance = AnyChanceModel(thing: brownRockGoal, chance: 20)
-            
-            goalChances.append(contentsOf: [rockGoalChance, monsterGoalChance, pillarGoalChance, brownGoalChance])
         case bossLevelDepthNumber:
             return [LevelGoal.bossGoal()]
-            
+                
         case 10...Int.max:
             let monsterAmount = Int.random(in: 10...15)
             let rockGoal = randomRockGoal([.red, .purple, .blue], amount: Int.random(lower: 60, upper: 75, interval: 5))

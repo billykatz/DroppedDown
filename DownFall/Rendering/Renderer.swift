@@ -541,9 +541,14 @@ class Renderer: SKSpriteNode {
                     sprite.showAttackTiming(frequency, turns)
                 } else if case let TileType.offer(offer) = tiles[row][col].type {
                     sprite.showOfferTier(offer)
+                    
+                    if let amount = offer.gemAmount {
+                        sprite.showAmount(amount)
+                    }
                 } else if case TileType.item = tiles[row][col].type {
                     sprite.showAmount()
                 }
+
                 spriteForeground.addChild(sprite)
             }
         }

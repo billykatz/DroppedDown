@@ -181,9 +181,13 @@ class DFTileSpriteNode: SKSpriteNode {
         removeChild(with: "attackIndicator")
     }
     
-    func showAmount() {
-        guard case TileType.item(let item) = self.type else  { return }
-        let amount = item.amount
+    func showAmount(_ amountToShow: Int? = nil) {
+        var amount = amountToShow
+        
+        if case TileType.item(let item) = self.type {
+            amount = item.amount
+        }
+        guard let amount = amount, amount > 0 else { return }
 
         let fontSize: CGFloat
         let width: CGFloat
@@ -192,10 +196,10 @@ class DFTileSpriteNode: SKSpriteNode {
             width = self.size.width*0.45
         } else if amount < 100 {
             fontSize = 48
-            width = self.size.width*0.52
+            width = self.size.width*0.64
         } else {
             fontSize = 46
-            width = self.size.width*0.60
+            width = self.size.width*0.68
         }
         
         let background = SKShapeNode(rectOf: CGSize(width: width, height: self.size.height*0.35), cornerRadius: 16.0)

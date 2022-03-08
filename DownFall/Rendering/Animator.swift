@@ -1045,12 +1045,21 @@ struct Animator {
                     }
                 }
                 
+                if neighbor.isPlayerSprite,
+                   let playerCoord = playerCoord(sprites),
+                       case TileType.player(let data) = sprites[playerCoord].type,
+                   let playerTakesDamage = createPlayerTakeDamageAnimation(delayBefore: waitBetweenDynamiteExplosionDuration, sprites: sprites, playerPosition: playerCoord, playerData: data, damageAmount: 1, showRedScreen: true) {
+                       spriteActions.append(contentsOf: playerTakesDamage)
+                   
+               }
+                
                 let allAction = SKAction.sequence([waitBeforeStarting, explodeAndScale, hideNeighbor, smokeAndFade, .removeFromParent()])
                 
                 spriteActions.append(SpriteAction(emptySprite, allAction))
                 
             }
         }
+
         
         animate(spriteActions, completion: completion)
         
@@ -1234,6 +1243,14 @@ struct Animator {
 
         }
         
+        for amount in transformation.playerTookDamage ?? [] {
+            if let playerCoord = playerCoord(sprites),
+                case TileType.player(let data) = sprites[playerCoord].type,
+               let playerTakesDamage = createPlayerTakeDamageAnimation(delayBefore: waitBefore/8*7, sprites: sprites, playerPosition: playerCoord, playerData: data, damageAmount: 1, showRedScreen: true) {
+                spriteActions.append(contentsOf: playerTakesDamage)
+            }
+        }
+        
         animate(spriteActions, completion: completion)
     }
     
@@ -1343,4 +1360,85 @@ struct Animator {
         animate([spriteAction], completion: completion)
     }
     
+    func createScreenEdgesFlashRed(delayBefore: TimeInterval) -> SpriteAction? {
+        guard let playableRect = playableRect,
+ let foreground = foreground else {
+            return nil
+        }
+
+        let redBackground = SKSpriteNode(texture: SKTexture(imageNamed: "player-hurt-background-red"), size: CGSize(width: playableRect.size.width, height: playableRect.size.width*2.1))
+        
+        redBackground.alpha = 0.0
+        redBackground.position = .zero
+        redBackground.zPosition = 100_000_000_000
+        
+        foreground.addChild(redBackground)
+        
+        let fadeUpQuickly = SKAction.fadeAlpha(to: 1.0, duration: 0.05)
+        let fadeDownQuickly = SKAction.fadeAlpha(to: 0.0, duration: 0.1)
+        
+        let fadeFadeRemove = SKAction.sequence(fadeUpQuickly, fadeDownQuickly, .removeFromParent()).waitBefore(delay: delayBefore)
+        
+        return .init(redBackground, fadeFadeRemove)
+
+    }
+    
+    func createPlayerTakeDamageAnimation(delayBefore: TimeInterval, sprites: [[DFTileSpriteNode]], playerPosition: TileCoord, playerData: EntityModel, damageAmount: Int, showRedScreen: Bool)-> [SpriteAction]? {
+        guard let foreground = foreground, let tileSize = tileSize else {
+            return nil
+        }
+        let playerForegroundPosition = sprites[playerPosition].position
+        let cgTileSize = CGSize(widthHeight: tileSize)
+        var spriteActions: [SpriteAction] = []
+        var waitBefore = delayBefore
+        
+        let playerTakeDamage = playerData.animation(of: .hurt) ?? []
+        let playerGettingHurtAnimation = SKAction.animate(with: playerTakeDamage, timePerFrame: timePerFrame()).waitBefore(delay: waitBefore)
+        let playerAction = SpriteAction(sprites[playerPosition], playerGettingHurtAnimation)
+        
+        spriteActions.append(playerAction)
+        
+        let halfPlayerHurtDuration = timePerFrame() * 7 / 2
+        waitBefore += halfPlayerHurtDuration
+        
+        let fullHeartSprite = SKSpriteNode(texture: SKTexture(imageNamed: "fullHeart"), size: cgTileSize)
+        let subtractSprite = ParagraphNode(text: "-", paragraphWidth: 100, fontSize: 250, fontColor: .lightBarRed, fontType: .legacy)
+        
+        fullHeartSprite.position = playerForegroundPosition.translate(xOffset: 40, yOffset: 0)
+        fullHeartSprite.zPosition = 100_000_000
+        subtractSprite.position = playerForegroundPosition.translate(xOffset: -50, yOffset: tileSize/4)
+        subtractSprite.zPosition = 100_000_000
+        
+        let waitThenAdd = SKAction.run {
+            foreground.addChild(fullHeartSprite)
+            foreground.addChild(subtractSprite)
+        }.waitBefore(delay: waitBefore)
+        
+        let moveDuration: TimeInterval = 1.0
+        let startSmall = SKAction.scale(by: 0.25, duration: 0.0)
+        let moveUp = SKAction.moveBy(x: 0.0, y: 300, duration: moveDuration)
+        let moveLeft = SKAction.moveBy(x: -100, y: 0.0, duration: moveDuration)
+        let fade = SKAction.fadeAlpha(to: 0.25, duration: moveDuration)
+        let scale = SKAction.scale(by: 10.0, duration: moveDuration)
+        
+        let moveFadeAndScale = SKAction.group([startSmall, moveUp, fade, scale])
+        let moveFadeScaleRemove = SKAction.sequence(moveFadeAndScale, .removeFromParent())
+        
+        let subtractSignMoveFadeAndScale = SKAction.group([startSmall, moveUp, moveLeft, fade, scale])
+        let subtractSignMoveFadeScaleRemove = SKAction.sequence(subtractSignMoveFadeAndScale, .removeFromParent())
+        let fullHeartAction = SpriteAction(fullHeartSprite, moveFadeScaleRemove)
+        let subtractAction = SpriteAction(subtractSprite, subtractSignMoveFadeScaleRemove)
+        
+        spriteActions.append(.init(foreground, waitThenAdd))
+        spriteActions.append(fullHeartAction)
+        spriteActions.append(subtractAction)
+        
+        
+//        if showRedScreen, let redScreen = createScreenEdgesFlashRed(delayBefore: waitBefore + halfPlayerHurtDuration) {
+//            spriteActions.append(redScreen)
+//        }
+        
+        return spriteActions
+
+    }
 }

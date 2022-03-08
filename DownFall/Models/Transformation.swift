@@ -20,8 +20,10 @@ struct Transformation: Hashable {
     var monstersDies: [MonsterDies]?
     var pillarsTakeDamage: [PillarTakesDamage]?
     
-    var poisonColumnAttacks: [[TileCoord]]? = nil
-    var poisonRowAttacks: [[TileCoord]]? = nil
+    var poisonColumnAttacks: [[TileCoord]]?
+    var poisonRowAttacks: [[TileCoord]]?
+    
+    var playerTookDamage: [TileCoord]?
     
     
     
@@ -36,7 +38,8 @@ struct Transformation: Hashable {
          monstersDies: [MonsterDies]? = nil,
          pillarsTakeDamage: [PillarTakesDamage]? = nil,
          poisonColumnAttacks: [[TileCoord]]? = nil,
-         poisonRowAttacks: [[TileCoord]]? = nil
+         poisonRowAttacks: [[TileCoord]]? = nil,
+         playerTookDamage: [TileCoord]? = nil
     ) {
         self.tileTransformation = tileTransformation
         self.inputType = inputType
@@ -50,6 +53,7 @@ struct Transformation: Hashable {
         self.pillarsTakeDamage = pillarsTakeDamage
         self.poisonColumnAttacks = poisonColumnAttacks
         self.poisonRowAttacks = poisonRowAttacks
+        self.playerTookDamage = playerTookDamage
     }
     
     static var zero : Transformation {

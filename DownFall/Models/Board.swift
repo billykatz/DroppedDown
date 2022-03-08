@@ -408,6 +408,7 @@ class Board: Equatable {
         var tileTransformations: [TileTransformation] = []
         var poisonColumnAttacks: [[TileCoord]] = []
         var poisonRowAttacks: [[TileCoord]] = []
+        var playerTookDamage: [TileCoord] = []
         
         // posion attack
         // dealt with separately because we need to understand the relationship of the tiles to the ones above it because pillars block the poison damage
@@ -437,6 +438,7 @@ class Board: Equatable {
                             
                             tiles[row][col] = Tile(type: .player(newPlayer))
                             attacks.append(coord)
+                            playerTookDamage.append(coord)
                             tileTransformations.append(TileTransformation(coord, coord))
                             
                         default:
@@ -469,6 +471,7 @@ class Board: Equatable {
                             
                             tiles[row][col] = Tile(type: .player(newPlayer))
                             attacks.append(coord)
+                            playerTookDamage.append(coord)
                             tileTransformations.append(TileTransformation(coord, coord))
                             
                         default:
@@ -504,7 +507,9 @@ class Board: Equatable {
                               inputType: .bossTurnStart(phase),
                               endTiles: self.tiles,
                               poisonColumnAttacks: poisonColumnAttacks.isEmpty ? nil : poisonColumnAttacks,
-                              poisonRowAttacks: poisonRowAttacks.isEmpty ? nil: poisonRowAttacks)
+                              poisonRowAttacks: poisonRowAttacks.isEmpty ? nil : poisonRowAttacks,
+                              playerTookDamage: playerTookDamage.isEmpty ? nil : playerTookDamage
+        )
         
     }
     
@@ -796,6 +801,7 @@ class Board: Equatable {
         
         var removedRocksAndPillars: [TileCoord] = []
         var explodedDynamiteCoords: [TileCoord] = []
+        var playerTookDamage: [TileCoord] = []
         
         let orderedDynamite = Array(dynamiteCoords)
             .map { coord -> (TileCoord, DynamiteFuse) in
@@ -829,6 +835,7 @@ class Board: Equatable {
                             tiles[neighborCoord.row][neighborCoord.column] = Tile(type: .dynamite(DynamiteFuse(count: 0, hasBeenDecremented: false)))
                         case .player(let playerData):
                             tiles[neighborCoord.row][neighborCoord.column] = Tile(type: .player(playerData.wasAttacked(for: 1, from: neighborCoord.direction(relative: coord) ?? .east)))
+                            playerTookDamage.append(coord)
                         case .monster(let monsterData):
                             tiles[neighborCoord.row][neighborCoord.column] = Tile(type: .monster(monsterData.wasAttacked(for: 1, from: neighborCoord.direction(relative: coord) ?? .east)))
                         case .rock, .pillar, .gem:
@@ -862,7 +869,7 @@ class Board: Equatable {
             
         }
         let explodedDyanmiteTileTrans = explodedDynamiteCoords.map { TileTransformation($0, $0) }
-        let dynamiteTransformation = Transformation(transformation: explodedDyanmiteTileTrans, inputType: input.type, endTiles: tiles)
+        let dynamiteTransformation = Transformation(transformation: explodedDyanmiteTileTrans, inputType: input.type, endTiles: tiles, playerTookDamage: playerTookDamage.isEmpty ? nil : playerTookDamage)
         
         if explodedDyanmiteTileTrans.isEmpty {
             return [dynamiteTransformation]

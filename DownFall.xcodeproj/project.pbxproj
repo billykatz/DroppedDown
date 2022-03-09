@@ -25,7 +25,6 @@
 		2834737F26E94CFC0096F3DE /* StatsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2834737E26E94CFC0096F3DE /* StatsModel.swift */; };
 		283CBBD926A8A88E00B1F7C9 /* CodexItemModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 283CBBD826A8A88E00B1F7C9 /* CodexItemModalView.swift */; };
 		283CBBDB26A8A9E100B1F7C9 /* SwiftUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 283CBBDA26A8A9E100B1F7C9 /* SwiftUIView.swift */; };
-		283DA67F27CEA892009C5224 /* shift-shaft-menu-music-gold.wav in Resources */ = {isa = PBXBuildFile; fileRef = 283DA67D27CEA890009C5224 /* shift-shaft-menu-music-gold.wav */; };
 		283DA68027CEA892009C5224 /* shift-shaft-nonBoss-level-music-gold.wav in Resources */ = {isa = PBXBuildFile; fileRef = 283DA67E27CEA892009C5224 /* shift-shaft-nonBoss-level-music-gold.wav */; };
 		283DC778271892BC002A499A /* TutorialConductor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 283DC777271892BC002A499A /* TutorialConductor.swift */; };
 		283DC77A2718A831002A499A /* DialogueOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 283DC7792718A831002A499A /* DialogueOverlay.swift */; };
@@ -48,6 +47,7 @@
 		2886E84026F030750014FA5D /* UIViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886E83F26F030750014FA5D /* UIViewController+Extensions.swift */; };
 		2886E84326F031050014FA5D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886E84226F031050014FA5D /* SettingsView.swift */; };
 		2886E84526F197D00014FA5D /* PlayerStatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886E84426F197D00014FA5D /* PlayerStatView.swift */; };
+		289DCA4727D9282500EE9F3A /* shift-shaft-menu-music-gold.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 289DCA4627D9282400EE9F3A /* shift-shaft-menu-music-gold.m4a */; };
 		289EF394275A95C400138F34 /* MonsterDiesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 289EF393275A95C400138F34 /* MonsterDiesModel.swift */; };
 		28A36C3627A1FCD3008252DA /* BossDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A36C3527A1FCD3008252DA /* BossDialog.swift */; };
 		28A36C3827A1FF82008252DA /* BossDialogOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A36C3727A1FF82008252DA /* BossDialogOverlay.swift */; };
@@ -275,7 +275,6 @@
 		2834737E26E94CFC0096F3DE /* StatsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsModel.swift; sourceTree = "<group>"; };
 		283CBBD826A8A88E00B1F7C9 /* CodexItemModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexItemModalView.swift; sourceTree = "<group>"; };
 		283CBBDA26A8A9E100B1F7C9 /* SwiftUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIView.swift; sourceTree = "<group>"; };
-		283DA67D27CEA890009C5224 /* shift-shaft-menu-music-gold.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "shift-shaft-menu-music-gold.wav"; sourceTree = "<group>"; };
 		283DA67E27CEA892009C5224 /* shift-shaft-nonBoss-level-music-gold.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "shift-shaft-nonBoss-level-music-gold.wav"; sourceTree = "<group>"; };
 		283DC777271892BC002A499A /* TutorialConductor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialConductor.swift; sourceTree = "<group>"; };
 		283DC7792718A831002A499A /* DialogueOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogueOverlay.swift; sourceTree = "<group>"; };
@@ -299,6 +298,7 @@
 		2886E83F26F030750014FA5D /* UIViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extensions.swift"; sourceTree = "<group>"; };
 		2886E84226F031050014FA5D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		2886E84426F197D00014FA5D /* PlayerStatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerStatView.swift; sourceTree = "<group>"; };
+		289DCA4627D9282400EE9F3A /* shift-shaft-menu-music-gold.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = "shift-shaft-menu-music-gold.m4a"; sourceTree = "<group>"; };
 		289EF393275A95C400138F34 /* MonsterDiesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonsterDiesModel.swift; sourceTree = "<group>"; };
 		28A36C3527A1FCD3008252DA /* BossDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BossDialog.swift; sourceTree = "<group>"; };
 		28A36C3727A1FF82008252DA /* BossDialogOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BossDialogOverlay.swift; sourceTree = "<group>"; };
@@ -934,7 +934,7 @@
 			children = (
 				2882DF2827CAB67400149899 /* SnapshotHelper.swift */,
 				2882DF1527CA963500149899 /* shift-shaft-boss-loop.wav */,
-				283DA67D27CEA890009C5224 /* shift-shaft-menu-music-gold.wav */,
+				289DCA4627D9282400EE9F3A /* shift-shaft-menu-music-gold.m4a */,
 				283DA67E27CEA892009C5224 /* shift-shaft-nonBoss-level-music-gold.wav */,
 				287053B7275AE8D100B84929 /* background-music.wav */,
 				28C64464274463C500098C3C /* Boss */,
@@ -1312,6 +1312,7 @@
 				287053B8275AE8D100B84929 /* background-music.wav in Resources */,
 				283DA68027CEA892009C5224 /* shift-shaft-nonBoss-level-music-gold.wav in Resources */,
 				58C37F2425AB94ED00F6D164 /* pickaxe.mp3 in Resources */,
+				289DCA4727D9282500EE9F3A /* shift-shaft-menu-music-gold.m4a in Resources */,
 				3D528FDF2155BD7300EF65CA /* Assets.xcassets in Resources */,
 				3DB270A522ADBD0100D9BF8B /* player.png in Resources */,
 				589E156E25ABA324004A6D46 /* collectGem.mp3 in Resources */,
@@ -1321,7 +1322,6 @@
 				589E156225AB9BE7004A6D46 /* mineRocks.wav in Resources */,
 				3DF0A6B32379CC4600941305 /* pixel-font.ttf in Resources */,
 				589E157825ABA9D7004A6D46 /* goalCompleted.mp3 in Resources */,
-				283DA67F27CEA892009C5224 /* shift-shaft-menu-music-gold.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -203,7 +203,7 @@ class ProfileViewModel {
         
         // save the seed so that we don't accidently double count thing in the future
         if let seed = currentRun?.seed {
-            newProfile = profile.updatePastRunSeeds(seed)
+            newProfile = newProfile.updatePastRunSeeds(seed)
         }
         
         // save profile
@@ -251,7 +251,7 @@ class ProfileViewModel {
         
         
         // save the seed so that we don't accidently double count thing in the future
-        newProfile = profile.updatePastRunSeeds(currentRun.seed)
+        newProfile = newProfile.updatePastRunSeeds(currentRun.seed)
         
         
         // save profile

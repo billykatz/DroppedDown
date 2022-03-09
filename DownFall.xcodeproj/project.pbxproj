@@ -41,13 +41,13 @@
 		2881F29127C1972200DC83DA /* OfferAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2881F29027C1972200DC83DA /* OfferAnimator.swift */; };
 		2881F29327C33D6C00DC83DA /* Bool+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2881F29227C33D6C00DC83DA /* Bool+Extensions.swift */; };
 		2882DF1027C99C2F00149899 /* RuneAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2882DF0F27C99C2F00149899 /* RuneAnimator.swift */; };
-		2882DF1727CA963500149899 /* shift-shaft-boss-loop.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2882DF1527CA963500149899 /* shift-shaft-boss-loop.wav */; };
 		288330F7274FDB400070A1E8 /* ConfirmShuffleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 288330F6274FDB400070A1E8 /* ConfirmShuffleView.swift */; };
 		2886E83E26F0303B0014FA5D /* SettingsCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886E83D26F0303B0014FA5D /* SettingsCoordinator.swift */; };
 		2886E84026F030750014FA5D /* UIViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886E83F26F030750014FA5D /* UIViewController+Extensions.swift */; };
 		2886E84326F031050014FA5D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886E84226F031050014FA5D /* SettingsView.swift */; };
 		2886E84526F197D00014FA5D /* PlayerStatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886E84426F197D00014FA5D /* PlayerStatView.swift */; };
 		289DCA4727D9282500EE9F3A /* shift-shaft-menu-music-gold.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 289DCA4627D9282400EE9F3A /* shift-shaft-menu-music-gold.m4a */; };
+		289DCA4927D92AFD00EE9F3A /* shift-shaft-boss-loop.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 289DCA4827D92A5100EE9F3A /* shift-shaft-boss-loop.m4a */; };
 		289EF394275A95C400138F34 /* MonsterDiesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 289EF393275A95C400138F34 /* MonsterDiesModel.swift */; };
 		28A36C3627A1FCD3008252DA /* BossDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A36C3527A1FCD3008252DA /* BossDialog.swift */; };
 		28A36C3827A1FF82008252DA /* BossDialogOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A36C3727A1FF82008252DA /* BossDialogOverlay.swift */; };
@@ -291,7 +291,6 @@
 		2881F29027C1972200DC83DA /* OfferAnimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfferAnimator.swift; sourceTree = "<group>"; };
 		2881F29227C33D6C00DC83DA /* Bool+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bool+Extensions.swift"; sourceTree = "<group>"; };
 		2882DF0F27C99C2F00149899 /* RuneAnimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneAnimator.swift; sourceTree = "<group>"; };
-		2882DF1527CA963500149899 /* shift-shaft-boss-loop.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "shift-shaft-boss-loop.wav"; sourceTree = "<group>"; };
 		2882DF2827CAB67400149899 /* SnapshotHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SnapshotHelper.swift; path = fastlane/SnapshotHelper.swift; sourceTree = SOURCE_ROOT; };
 		288330F6274FDB400070A1E8 /* ConfirmShuffleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmShuffleView.swift; sourceTree = "<group>"; };
 		2886E83D26F0303B0014FA5D /* SettingsCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsCoordinator.swift; sourceTree = "<group>"; };
@@ -299,6 +298,7 @@
 		2886E84226F031050014FA5D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		2886E84426F197D00014FA5D /* PlayerStatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerStatView.swift; sourceTree = "<group>"; };
 		289DCA4627D9282400EE9F3A /* shift-shaft-menu-music-gold.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = "shift-shaft-menu-music-gold.m4a"; sourceTree = "<group>"; };
+		289DCA4827D92A5100EE9F3A /* shift-shaft-boss-loop.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = "shift-shaft-boss-loop.m4a"; sourceTree = "<group>"; };
 		289EF393275A95C400138F34 /* MonsterDiesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonsterDiesModel.swift; sourceTree = "<group>"; };
 		28A36C3527A1FCD3008252DA /* BossDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BossDialog.swift; sourceTree = "<group>"; };
 		28A36C3727A1FF82008252DA /* BossDialogOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BossDialogOverlay.swift; sourceTree = "<group>"; };
@@ -933,7 +933,7 @@
 			isa = PBXGroup;
 			children = (
 				2882DF2827CAB67400149899 /* SnapshotHelper.swift */,
-				2882DF1527CA963500149899 /* shift-shaft-boss-loop.wav */,
+				289DCA4827D92A5100EE9F3A /* shift-shaft-boss-loop.m4a */,
 				289DCA4627D9282400EE9F3A /* shift-shaft-menu-music-gold.m4a */,
 				283DA67E27CEA892009C5224 /* shift-shaft-nonBoss-level-music-gold.wav */,
 				287053B7275AE8D100B84929 /* background-music.wav */,
@@ -1297,7 +1297,6 @@
 				589E15A525ABCB0F004A6D46 /* gameLose.mp3 in Resources */,
 				589E159925ABC706004A6D46 /* exitUnblocked.mp3 in Resources */,
 				3DA4E8952290A7B4006E90D1 /* gloop.png in Resources */,
-				2882DF1727CA963500149899 /* shift-shaft-boss-loop.wav in Resources */,
 				586319C224C1FF890090CD6D /* newProfile.json in Resources */,
 				3D528FD62154A50300EF65CA /* GameScene.sks in Resources */,
 				589E156825ABA1AC004A6D46 /* gemAppears.mp3 in Resources */,
@@ -1320,6 +1319,7 @@
 				589E159325ABC3D1004A6D46 /* enemyHitsPlayer.mp3 in Resources */,
 				28EBD55827C9593B004C46B6 /* PixelMiddle.ttf in Resources */,
 				589E156225AB9BE7004A6D46 /* mineRocks.wav in Resources */,
+				289DCA4927D92AFD00EE9F3A /* shift-shaft-boss-loop.m4a in Resources */,
 				3DF0A6B32379CC4600941305 /* pixel-font.ttf in Resources */,
 				589E157825ABA9D7004A6D46 /* goalCompleted.mp3 in Resources */,
 			);
@@ -1754,7 +1754,7 @@
 				CODE_SIGN_ENTITLEMENTS = "DownFall/Shift Shaft.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 17;
+				CURRENT_PROJECT_VERSION = 18;
 				DEVELOPMENT_TEAM = G6N5X5RF9Q;
 				INFOPLIST_FILE = DownFall/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
@@ -1778,7 +1778,7 @@
 				CODE_SIGN_ENTITLEMENTS = "DownFall/Shift Shaft.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 17;
+				CURRENT_PROJECT_VERSION = 18;
 				DEVELOPMENT_TEAM = G6N5X5RF9Q;
 				INFOPLIST_FILE = DownFall/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;

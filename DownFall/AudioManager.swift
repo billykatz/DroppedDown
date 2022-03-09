@@ -77,13 +77,23 @@ class AudioManager: NSObject, AVAudioPlayerDelegate {
         
         backgroundMusicThread.sync { [weak self] in
             do {
-                let resourceName = isBossLevel ? "shift-shaft-boss-loop" : "shift-shaft-nonBoss-level-music-gold"
-                if let backgroundMusicPath = Bundle.main.path(forResource: resourceName, ofType: "wav") {
-                    let url = URL(fileURLWithPath: backgroundMusicPath)
-                    self?.backgroundMusicPlayer = try AVAudioPlayer(contentsOf: url)
-                    self?.backgroundMusicPlayer?.prepareToPlay()
+                if isBossLevel {
+                    if let backgroundMusicPath = Bundle.main.path(forResource: "shift-shaft-boss-loop", ofType: "m4a") {
+                        let url = URL(fileURLWithPath: backgroundMusicPath)
+                        self?.backgroundMusicPlayer = try AVAudioPlayer(contentsOf: url)
+                        self?.backgroundMusicPlayer?.prepareToPlay()
+                    } else {
+                        print("no music")
+                    }
+
                 } else {
-                    print("no music")
+                    if let backgroundMusicPath = Bundle.main.path(forResource: "shift-shaft-nonBoss-level-music-gold", ofType: "wav") {
+                        let url = URL(fileURLWithPath: backgroundMusicPath)
+                        self?.backgroundMusicPlayer = try AVAudioPlayer(contentsOf: url)
+                        self?.backgroundMusicPlayer?.prepareToPlay()
+                    } else {
+                        print("no music")
+                    }
                 }
             }
             catch(let err) {

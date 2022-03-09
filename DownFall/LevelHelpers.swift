@@ -336,129 +336,6 @@ func baseChanceEncasementSize(depth: Depth) -> [AnyChanceModel<[EncasementSize]>
 }
 
 
-func chanceDeltaOfferHealth(playerData: EntityModel, currentChance: Float, modifier: Float) -> Float {
-    var delta: Float = 1
-    let currHealth = Float(playerData.hp)
-    let maxHealth = Float(playerData.originalHp)
-    if currHealth <= maxHealth / 4  {
-        delta = 3
-    }
-    else if currHealth <= maxHealth / 3 {
-        delta = 2
-    } else if currHealth <= maxHealth / 2  {
-        delta = 1.5
-    } else if currHealth == maxHealth {
-        delta = 0.75
-    } else {
-        delta = 1
-    }
-    
-    return delta * currentChance * modifier
-}
-
-func chanceDeltaOfferRune(playerData: EntityModel, currentChance: Float, lastLevelOfferings: [StoreOffer]?) -> Float {
-    guard let pickaxe = playerData.pickaxe else { return 0 }
-    
-    var delta: Float = 0
-    let offeredARuneLastLevel = lastLevelOfferings?.contains(where: { $0.rune != nil })
-    
-    switch (pickaxe.isAtMaxCapacity(), offeredARuneLastLevel) {
-    case (true, true):
-        delta += -10
-    case (true, false):
-        delta += 10
-    case (false, true):
-        delta += 0
-    case (false, false):
-        delta += 15
-    case (true, .none):
-        delta += -20
-    case (false, .none):
-        delta += 0
-    default:
-        delta += 0
-    }
-    
-    return max(1, currentChance+delta)
-    
-}
-
-func chanceDeltaOfferRuneSlot(playerData: EntityModel, currentChance: Float, lastLevelOfferings: [StoreOffer]?) -> Float {
-    guard let pickaxe = playerData.pickaxe else { return 0 }
-    
-    var delta: Float = 0
-    let offeredARuneSlotLastLevel = lastLevelOfferings?.contains(where: { $0.type == .runeSlot })
-    
-    switch (pickaxe.isAtMaxCapacity(), offeredARuneSlotLastLevel) {
-    case (true, true):
-        delta += 15
-    case (true, false):
-        delta += 20
-    case (false, true):
-        delta += -30
-    case (false, false):
-        delta += 0
-    case (true, .none):
-        delta += 25
-    case (false, .none):
-        delta += -15
-    default:
-        delta += 0
-    }
-    return max(1, currentChance + delta)
-}
-
-func chanceDeltaOfferHealthInEncasement(playerData: EntityModel, currentChance: Float) -> Float {
-    var delta: Float = 1
-    if Double(playerData.hp) <= Double(playerData.originalHp) / 4  {
-        delta = 15
-    }
-    else if Double(playerData.hp) <= Double(playerData.originalHp) / 3 {
-        delta = 10
-    } else if Double(playerData.hp) <= Double(playerData.originalHp) / 2  {
-        delta = 5
-    } else if playerData.hp == playerData.originalHp {
-        delta = -20
-    } else {
-        delta = 0
-    }
-    
-    return max(1, currentChance + delta)
-}
-
-
-func chanceDeltaOfferRuneInEncasement(playerData: EntityModel, currentChance: Float) -> Float {
-    guard let pickaxe = playerData.pickaxe else { return 0 }
-    
-    var delta: Float = 0
-    
-    if pickaxe.isAtMaxCapacity() {
-        delta += -10
-    } else {
-        delta += 10
-    }
-    
-    return max(1, currentChance+delta)
-    
-}
-
-func chanceDeltaOfferRuneSlotInEncasement(playerData: EntityModel, currentChance: Float) -> Float {
-    guard let pickaxe = playerData.pickaxe else { return 0 }
-    
-    var delta: Float = 0
-    
-    if pickaxe.isAtMaxCapacity() {
-        delta += 10
-    } else {
-        delta += -10
-    }
-    
-    return max(1, currentChance+delta)
-    
-}
-
-
-
 
 func chanceDeltaEncasement(numberOfEncasements: Int, depth: Depth, lastLevelFeatures: LevelFeatures?) -> Float {
     guard let lastLevelFeatures = lastLevelFeatures else {
@@ -559,11 +436,11 @@ func chanceDeltaEncasementOffer(encasedOfferChanceModel: ChanceModel, playerData
             
             // offered an rune or item last level?
         case (.offer, .exit):
-            totalDelta += 5
+            totalDelta += 10
         case (.offer, .monster):
             totalDelta += 0
         case (.offer, .offer):
-            totalDelta -= 4
+            totalDelta -= 8
         case (.offer, .item):
             totalDelta -= 4
             

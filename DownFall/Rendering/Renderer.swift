@@ -830,8 +830,7 @@ extension Renderer {
     
     private func collectItem(for transformation: Transformation, amount: Int, atCoord coord: TileCoord, textureName: String, inputType: InputType, randomColor: Bool = false) {
         computeNewBoard(for: transformation) { [weak self] in
-            guard let self = self, let endTiles = transformation.endTiles,
-                  case let InputType.collectItem(_, item, _) = inputType
+            guard let self = self, let endTiles = transformation.endTiles
             else {
                 self?.animationsFinished(endTiles: transformation.endTiles)
                 return
@@ -845,15 +844,25 @@ extension Renderer {
                                 
                 var targetPosition = self.hud.convert(self.hud.gemSpriteNode?.frame.center ?? .zero, to: self.foreground)
                 
+                var extractedItem: Item = .zero
                 if case let InputType.collectItem(_, item, _) = inputType,
                    let goalIndex = self.levelGoalTracker.typeAdvancesGoal(type: TileType.item(item)) {
                     let goalOrigin = self.levelGoalView.originForGoalView(index: goalIndex)
                     let gemGoalPosition  = self.levelGoalView.convert(goalOrigin, to: self.spriteForeground)
                     
                     targetPosition = gemGoalPosition
+                    extractedItem = item
+                } else if case let InputType.collectOffer(_, offer, _, _) = inputType,
+                            let offerAmount = offer.gemAmount {
+                    extractedItem = Item(type: .gem, amount: offerAmount)
+                    if let goalIndex = self.levelGoalTracker.typeAdvancesGoal(type: TileType.item(extractedItem)) {
+                        let goalOrigin = self.levelGoalView.originForGoalView(index: goalIndex)
+                        let gemGoalPosition  = self.levelGoalView.convert(goalOrigin, to: self.spriteForeground)
+                        targetPosition = gemGoalPosition
+                    }
                 }
                 
-                self.animator.animateGold(item: item, gained: amount, from: startPoint, to: targetPosition, in: self.hud) { [weak self] in self?.animationsFinished(endTiles: transformation.endTiles) }
+                self.animator.animateGold(item: extractedItem, gained: amount, from: startPoint, to: targetPosition, in: self.hud) { [weak self] in self?.animationsFinished(endTiles: transformation.endTiles) }
             }
         }
         

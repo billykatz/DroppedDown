@@ -173,7 +173,7 @@ class Level: Codable, Hashable {
         var reservedOffers = Set<StoreOffer>()
         
         let randomSource = GKLinearCongruentialRandomSource(seed: randomSeed)
-        let firstTierOffers = level.itemsInTier(1, playerData: playerData).filter( { $0.type != .snakeEyes } )
+        let firstTierOffers = level.itemsInTier(1, playerData: playerData)//.filter( { $0.tier == 1 && $0.type != .snakeEyes } )
         
         if !firstTierOffers.isEmpty {
             reservedOffers = reservedOffers.union(firstTierOffers)
@@ -184,7 +184,7 @@ class Level: Codable, Hashable {
         
         reservedOffers.removeAll()
         
-        let secondTierOffers = level.itemsInTier(2, playerData: playerData).filter( { $0.type != .snakeEyes } )
+        let secondTierOffers = level.itemsInTier(2, playerData: playerData)//.filter( { $0.tier == 2 && $0.type != .snakeEyes } )
         
         if !secondTierOffers.isEmpty {
             reservedOffers = reservedOffers.union(secondTierOffers)
@@ -344,6 +344,7 @@ class Level: Codable, Hashable {
             
         case 5:
             let monsterAmount = 7
+            let totalPillarAmount = Int(0.8*Float(totalPillarAmount))
             let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 40)
             let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
             let pillarGoal = LevelGoal.pillarGoal(amount: totalPillarAmount)
@@ -361,6 +362,7 @@ class Level: Codable, Hashable {
             
         case 6:
             let monsterAmount = 9
+            let totalPillarAmount = Int(0.75*Float(totalPillarAmount))
             let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 45)
             let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
             let pillarGoal = LevelGoal.pillarGoal(amount: totalPillarAmount)
@@ -374,6 +376,7 @@ class Level: Codable, Hashable {
             
         case 7:
             let monsterAmount = 12
+            let totalPillarAmount = Int(0.7*Float(totalPillarAmount))
             let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 50)
             let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
             let pillarGoal = LevelGoal.pillarGoal(amount: totalPillarAmount)
@@ -391,6 +394,7 @@ class Level: Codable, Hashable {
             
         case 8:
             let monsterAmount = 15
+            let totalPillarAmount = Int(0.65*Float(totalPillarAmount))
             let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 55)
             let brownRockGoal = randomRockGoal([.brown], amount: 6)
             let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
@@ -482,14 +486,14 @@ class Level: Codable, Hashable {
             if tier == 1 {
                 return [
                     StoreOffer.offer(type: .gems(amount: 15), tier: 1),
-                    StoreOffer.offer(type: .infusion, tier: 1),
+                    StoreOffer.offer(type: .snakeEyes, tier: 1),
 //                    StoreOffer.offer(type: .rune(.rune(for: .drillDown)), tier: 1),
 //                    StoreOffer.offer(type: .gemMagnet, tier: 1),
                 ]
             } else {
                 return [
                     StoreOffer.offer(type: .gems(amount: 50), tier: 2),
-                    StoreOffer.offer(type: .infusion, tier: 2)
+                    StoreOffer.offer(type: .snakeEyes, tier: 2)
                 ]
                 
             }
@@ -1026,14 +1030,18 @@ func deltaChanceOfferHealth(playerData: EntityModel, depth: Depth, storeOffer: S
 func deltaChanceOfferUtilWealth(storeOfferChance: AnyChanceModel<StoreOffer>, allPastLevelOffers: [StoreOffer]?) -> Float {
     var delta = Float(1)
     
+    // all the same offer items from this tier
     let sameTierOffersInPast = allPastLevelOffers?.filter({ $0.tier == storeOfferChance.thing.tier })
+    
+    // none of the offers were this
     let noneWereThisOffer = sameTierOffersInPast?.allSatisfy({ alreadyOffered in
         return alreadyOffered != storeOfferChance.thing
     }) ?? false
 
     if noneWereThisOffer {
-        let sameTierOfferCount = Float(sameTierOffersInPast?.count ?? 0)
-        delta += (sameTierOfferCount * 0.1)
+        // add
+//        let sameTierOfferCount = Float(sameTierOffersInPast?.count ?? 0)
+        delta = 3
     } else if storeOfferChance.thing.type == .runeSlot {
         // make these pretty rare to force the player to interact with the store
         delta = 0.75

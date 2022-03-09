@@ -1075,8 +1075,8 @@ extension Board {
                 })
                 
                 // replace first tier offers
-                if tierOffers.count == currentTierOfferings.count {
-                    for idx in 0..<tierOffers.count {
+                for idx in 0..<tierOffers.count {
+                    if currentTierOfferings.count > idx {
                         let currentOfferingCoord = currentTierOfferings[idx].1
                         newTiles[currentOfferingCoord.row][currentOfferingCoord.col] = Tile(type: .offer(tierOffers[idx]))
                         tileTransformations.append(.init(currentOfferingCoord, currentOfferingCoord))

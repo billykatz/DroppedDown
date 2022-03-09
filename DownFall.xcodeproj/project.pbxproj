@@ -35,7 +35,6 @@
 		2842BABF26A0EC740021CD0B /* CodexItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2842BABE26A0EC740021CD0B /* CodexItemView.swift */; };
 		2842BAC126A0EEC10021CD0B /* StoreOfferType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2842BAC026A0EEC10021CD0B /* StoreOfferType.swift */; };
 		284F2EC32731DB3C00032088 /* FTUEConductor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 284F2EC22731DB3C00032088 /* FTUEConductor.swift */; };
-		287053B8275AE8D100B84929 /* background-music.wav in Resources */ = {isa = PBXBuildFile; fileRef = 287053B7275AE8D100B84929 /* background-music.wav */; };
 		28806D91276AB8A000C4627B /* BossSprite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28806D90276AB8A000C4627B /* BossSprite.swift */; };
 		2881F28F27C02FFD00DC83DA /* CodexWalletView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2881F28E27C02FFD00DC83DA /* CodexWalletView.swift */; };
 		2881F29127C1972200DC83DA /* OfferAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2881F29027C1972200DC83DA /* OfferAnimator.swift */; };
@@ -285,7 +284,6 @@
 		2842BABE26A0EC740021CD0B /* CodexItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexItemView.swift; sourceTree = "<group>"; };
 		2842BAC026A0EEC10021CD0B /* StoreOfferType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreOfferType.swift; sourceTree = "<group>"; };
 		284F2EC22731DB3C00032088 /* FTUEConductor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FTUEConductor.swift; sourceTree = "<group>"; };
-		287053B7275AE8D100B84929 /* background-music.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "background-music.wav"; sourceTree = "<group>"; };
 		28806D90276AB8A000C4627B /* BossSprite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BossSprite.swift; sourceTree = "<group>"; };
 		2881F28E27C02FFD00DC83DA /* CodexWalletView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexWalletView.swift; sourceTree = "<group>"; };
 		2881F29027C1972200DC83DA /* OfferAnimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfferAnimator.swift; sourceTree = "<group>"; };
@@ -936,7 +934,6 @@
 				289DCA4827D92A5100EE9F3A /* shift-shaft-boss-loop.m4a */,
 				289DCA4627D9282400EE9F3A /* shift-shaft-menu-music-gold.m4a */,
 				283DA67E27CEA892009C5224 /* shift-shaft-nonBoss-level-music-gold.wav */,
-				287053B7275AE8D100B84929 /* background-music.wav */,
 				28C64464274463C500098C3C /* Boss */,
 				284F2EC12731DB2400032088 /* FTUE */,
 				283DC776271892A2002A499A /* Tutorial */,
@@ -1308,7 +1305,6 @@
 				589E157425ABA8CE004A6D46 /* TBD.mp3 in Resources */,
 				280CD177276AB20D00052EB5 /* BossTestScene.sks in Resources */,
 				28EBD55927C9593B004C46B6 /* PixelHigh.ttf in Resources */,
-				287053B8275AE8D100B84929 /* background-music.wav in Resources */,
 				283DA68027CEA892009C5224 /* shift-shaft-nonBoss-level-music-gold.wav in Resources */,
 				58C37F2425AB94ED00F6D164 /* pickaxe.mp3 in Resources */,
 				289DCA4727D9282500EE9F3A /* shift-shaft-menu-music-gold.m4a in Resources */,

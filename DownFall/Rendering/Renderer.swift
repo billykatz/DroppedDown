@@ -198,9 +198,9 @@ class Renderer: SKSpriteNode {
         }
         levelGoalView.makeUITestAccessible(label: "levelGoalView", traits: .none, scene: scene)
         
-        #if DEBUG
-//        foreground.addChild(bossDebugView)
-        #endif
+#if DEBUG
+        //        foreground.addChild(bossDebugView)
+#endif
         
         // Register for Dispatch
         Dispatch.shared.register { [weak self] input in
@@ -292,7 +292,7 @@ class Renderer: SKSpriteNode {
                 } else {
                     collectOffer(transformations, offer: offer, atTilecoord: playerCoord, discardOffer: .zero, discardedOfferTileCoord: .zero)
                 }
-
+                
                 
             case let .collectItem(coord, item, _):
                 collectItem(for: trans, amount: item.amount, atCoord: coord, textureName: item.textureName, inputType: inputType)
@@ -413,7 +413,7 @@ class Renderer: SKSpriteNode {
             
         case .gameLose(let type):
             if let playerCoord = getTilePosition(.player(.zero), sprites: self.sprites),
-                    case TileType.player(let data) = sprites[playerCoord].type {
+               case TileType.player(let data) = sprites[playerCoord].type {
                 
                 animator.animateGameLost(playerData: data, playerSprite: sprites[playerCoord], delayBefore: 0.5) { [gameRecapView, menuForeground, foreground, runStatTracker] in
                     gameRecapView.showGameRecap(win: false, killedBy: type, with: runStatTracker.runStats)
@@ -516,16 +516,16 @@ class Renderer: SKSpriteNode {
     
     private func animateAttack(attackInput: InputType, transformation: Transformation, endTiles: [[Tile]]?) {
         guard let tiles = endTiles,
-    case InputType.attack(_,
-                                _,
-                                let defenderPosition,
-                                _,
-                                let defenderDodged,
-                                _
-    ) = attackInput else {
-            animationsFinished(endTiles: endTiles)
-            return
-        }
+              case InputType.attack(_,
+                                    _,
+                                    let defenderPosition,
+                                    _,
+                                    let defenderDodged,
+                                    _
+              ) = attackInput else {
+                  animationsFinished(endTiles: endTiles)
+                  return
+              }
         
         animator.animate(attackInputType: attackInput,
                          foreground: foreground,
@@ -555,7 +555,7 @@ class Renderer: SKSpriteNode {
                 } else if case TileType.item = tiles[row][col].type {
                     sprite.showAmount()
                 }
-
+                
                 spriteForeground.addChild(sprite)
             }
         }
@@ -711,7 +711,7 @@ class Renderer: SKSpriteNode {
     }
 }
 
- 
+
 // MARK:  - Collecting and Offer
 extension Renderer {
     
@@ -736,7 +736,7 @@ extension Renderer {
                     sprite.zPosition = 100_000
                     spriteForeground.addChild(sprite)
                 }
-
+                
                 
                 animator.animateCollectRune(runeSprite: sprite, targetPosition: targetPoint) { [weak self] in
                     self?.computeNewBoard(for: trans.first) { [weak self] in
@@ -791,7 +791,7 @@ extension Renderer {
             // Pass in a custom completion block to computeNewBoard so that we can animate the items effect
             computeNewBoard(for: removeAndReplaceTrans) { [weak self, animator, hud, backpackView] in
                 guard let self = self,
-                        let targetTiles = second.tileTransformation?.compactMap( { $0.initial }),
+                      let targetTiles = second.tileTransformation?.compactMap( { $0.initial }),
                       let endTiles = second.endTiles
                 else { preconditionFailure("this is bad") }
                 
@@ -841,19 +841,20 @@ extension Renderer {
             self.add(sprites: self.sprites, tiles: endTiles)
             
             if let startPoint = self.positionsInForeground(at: [coord]).first {
-                                
+                
                 var targetPosition = self.hud.convert(self.hud.gemSpriteNode?.frame.center ?? .zero, to: self.foreground)
                 
                 var extractedItem: Item = .zero
-                if case let InputType.collectItem(_, item, _) = inputType,
-                   let goalIndex = self.levelGoalTracker.typeAdvancesGoal(type: TileType.item(item)) {
-                    let goalOrigin = self.levelGoalView.originForGoalView(index: goalIndex)
-                    let gemGoalPosition  = self.levelGoalView.convert(goalOrigin, to: self.spriteForeground)
-                    
-                    targetPosition = gemGoalPosition
+                if case let InputType.collectItem(_, item, _) = inputType {
                     extractedItem = item
+                    if let goalIndex = self.levelGoalTracker.typeAdvancesGoal(type: TileType.item(item)) {
+                        let goalOrigin = self.levelGoalView.originForGoalView(index: goalIndex)
+                        let gemGoalPosition  = self.levelGoalView.convert(goalOrigin, to: self.spriteForeground)
+                        
+                        targetPosition = gemGoalPosition
+                    }
                 } else if case let InputType.collectOffer(_, offer, _, _) = inputType,
-                            let offerAmount = offer.gemAmount {
+                          let offerAmount = offer.gemAmount {
                     extractedItem = Item(type: .gem, amount: offerAmount)
                     if let goalIndex = self.levelGoalTracker.typeAdvancesGoal(type: TileType.item(extractedItem)) {
                         let goalOrigin = self.levelGoalView.originForGoalView(index: goalIndex)
@@ -900,7 +901,7 @@ extension Renderer {
               let newTiles = transformation.newTiles,
               let shiftDown = transformation.shiftDown
         else {
-            #warning("I removed the precondition failure here because I wanted to use this function to end all rune use animations.  I would check here for any strange bugs around animating.")
+#warning("I removed the precondition failure here because I wanted to use this function to end all rune use animations.  I would check here for any strange bugs around animating.")
             completion?() ?? animationsFinished(endTiles: endTiles)
             return
         }
@@ -984,7 +985,7 @@ extension Renderer {
                 additionalWaiting += animation.duration * 0.55 // dont wait for the entire animation
                 
                 removedAnimations.append(animation)
-            
+                
             }
             
             // MARK: Decremt the dynamite fuses and explode
@@ -1186,14 +1187,14 @@ extension Renderer {
         // purpposefully called immediately so this animation can be interupted
         animationsFinished(endTiles: transformation.first?.endTiles)
     }
-
+    
     
     private func showBossEatsRocks(in transformation: [Transformation], bossPhase: BossPhase) {
         guard let rockEatTrans = transformation.first,
-                let removeAndReplace = transformation.last else {
-            animationsFinished(endTiles: transformation.last?.endTiles)
-            return
-        }
+              let removeAndReplace = transformation.last else {
+                  animationsFinished(endTiles: transformation.last?.endTiles)
+                  return
+              }
         
         animator.animateBossEatingRocks(sprites: sprites, foreground: spriteForeground, transformation: rockEatTrans) { [weak self] in
             self?.computeNewBoard(for: removeAndReplace)
@@ -1410,17 +1411,17 @@ extension Renderer {
             }
             else {
                 return false
-
+                
             }
         }
         
         for spriteCoord in touchedSprites {
             let sprite = spriteCoord.0
             let newTileCoord = spriteCoord.1
-                
+            
             InputQueue.append(
-              Input(.touchBegan(newTileCoord,
-                                sprite.type))
+                Input(.touchBegan(newTileCoord,
+                                  sprite.type))
             )
             return
         }
@@ -1466,7 +1467,7 @@ extension Renderer {
             }
             else {
                 return false
-
+                
             }
         }
         

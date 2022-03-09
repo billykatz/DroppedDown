@@ -945,9 +945,9 @@ func deltaChanceOfferHealth(playerData: EntityModel, depth: Depth, storeOffer: S
         case 2, 3:
             return 6
         case 4, 5:
-            return 7
-        case 6, 7:
             return 8
+        case 6, 7:
+            return 9
         case 8, 9:
             return 10
         default:
@@ -959,21 +959,24 @@ func deltaChanceOfferHealth(playerData: EntityModel, depth: Depth, storeOffer: S
     
     if offerType == .plusOneMaxHealth {
         if originalHp >= maxIntendedHealthPerDepth(depth) {
-            currentChance *= 0.25
+            currentChance = 0.25
         } else if originalHp >= maxIntendedHealthPerDepth(depth) - 1 {
-            currentChance *= 0.5
+            currentChance = 0.5
         } else {
-            currentChance *= 1.2
+            currentChance = 1.2
         }
     } else if offerType == .plusTwoMaxHealth {
         if originalHp >= maxIntendedHealthPerDepth(depth) {
-            currentChance *= 0.0
+            currentChance = 0.0
         } else if originalHp >= maxIntendedHealthPerDepth(depth) - 1 {
-            currentChance *= 0.25
+            currentChance = 0.25
         } else if originalHp >= maxIntendedHealthPerDepth(depth) - 2 {
-            currentChance *= 0.5
-        } else {
-            currentChance *= 1.2
+            currentChance = 0.5
+        } else if originalHp >= maxIntendedHealthPerDepth(depth) - 3 {
+            currentChance = 0.8
+        }
+        else {
+            currentChance = 1.2
         }
     }
 
@@ -986,8 +989,12 @@ func deltaChanceOfferHealth(playerData: EntityModel, depth: Depth, storeOffer: S
             healingPotionMultipler = 1.75
         } else if currentHp < originalHp/2 {
             healingPotionMultipler = 1.5
+        } else if currentHp < originalHp/4 * 3 {
+            healingPotionMultipler = 1.25
+        } else if currentHp < originalHp/6 * 5 {
+            healingPotionMultipler = 1.15
         } else {
-            healingPotionMultipler = 0.5
+            healingPotionMultipler = 1
         }
     case 3, 4, 5:
         if currentHp < originalHp/4 {
@@ -998,18 +1005,22 @@ func deltaChanceOfferHealth(playerData: EntityModel, depth: Depth, storeOffer: S
             healingPotionMultipler = 1.5
         } else if currentHp < originalHp/4 * 3 {
             healingPotionMultipler = 1.25
+        } else if currentHp < originalHp/6 * 5 {
+            healingPotionMultipler = 1.15
         } else {
-            healingPotionMultipler = 0.87
+            healingPotionMultipler = 1
         }
     case 6, 7, 8:
         if currentHp < originalHp/4 {
-            healingPotionMultipler = 1.75
+            healingPotionMultipler = 2
         } else if currentHp < originalHp/3 {
-            healingPotionMultipler = 1.5
+            healingPotionMultipler = 1.75
         } else if currentHp < originalHp/2 {
-            healingPotionMultipler = 1.25
+            healingPotionMultipler = 1.5
         } else if currentHp < originalHp/4 * 3 {
-            healingPotionMultipler = 1.1
+            healingPotionMultipler = 1.25
+        } else if currentHp < originalHp/6 * 5 {
+            healingPotionMultipler = 1.15
         } else {
             healingPotionMultipler = 1
         }

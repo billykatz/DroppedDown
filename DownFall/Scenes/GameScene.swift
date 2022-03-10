@@ -375,9 +375,8 @@ extension GameScene {
             self.touchWasSwipe = false
         }
 
-        if touchWasSwipe {
-            self.rotatePreview?.touchesEnded()
-        }
+        // Note: it is ok to send ever tough end even to the Rotate Preview View.  It only sends input if we are expecting a rotate preview finish.
+        self.rotatePreview?.touchesEnded()
         
         if touchWasCanceled && !touchWasSwipe {
             touchWasCanceled = false
@@ -401,6 +400,7 @@ extension GameScene {
     /// We try to digest the top of the queue every frame
     override func update(_ currentTime: TimeInterval) {
         guard let input = InputQueue.pop() else { return }
+        print("Sending input \(input.type)")
         Dispatch.shared.send(input)
     }
 }

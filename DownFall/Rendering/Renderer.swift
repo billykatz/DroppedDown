@@ -220,25 +220,36 @@ class Renderer: SKSpriteNode {
     }
     
     private func renderTransformation(_ transformations: [Transformation]) {
-        print("Renderer will render a transformation. \(String(describing: transformations.first?.inputType))")
+        if let firstInputType = transformations.first?.inputType {
+            GameLogger.shared.logDebug(prefix: Constants.tag, message: "Renderer will render a transformation. \(firstInputType)")
+        } else {
+            GameLogger.shared.logDebug(prefix: Constants.tag, message: "Renderer will render a transformation. ------ ")
+        }
         if let trans = transformations.first, let inputType = trans.inputType {
             switch inputType {
             case .rotateCounterClockwise(let preview), .rotateClockwise(let preview):
                 if !preview {
+                    GameLogger.shared.logDebug(prefix: Constants.tag, message: "\(inputType). preview = false ")
                     let tileTrans = trans.tileTransformation!
                     var spriteActions: [SpriteAction] = []
                     for tileTran in tileTrans {
                         let position = sprites[tileTran.end.row][tileTran.end.column].position
-                        spriteActions.append(SpriteAction(sprite: sprites[tileTran.initial.row][tileTran.initial.column], action: SKAction.move(to: position, duration: AnimationSettings.RotatePreview.finishQuickRotateSpeed)))
+                        let action = SKAction.move(to: position, duration: AnimationSettings.RotatePreview.finishQuickRotateSpeed)
+                        action.timingMode = .easeOut
+                        spriteActions.append(SpriteAction(sprite: sprites[tileTran.initial.row][tileTran.initial.column], action: action))
                     }
+                    GameLogger.shared.logDebug(prefix: Constants.tag, message: "\(inputType). preview = false. starting animations.")
                     animator.animate(spriteActions) { [weak self] in
                         guard let self = self else { return }
+                        GameLogger.shared.logDebug(prefix: Constants.tag, message: "\(inputType). preview = false. finishing animations.")
                         self.animationsFinished(endTiles: trans.endTiles, ref: true)
                     }
                     
                     return
                 }
+                GameLogger.shared.logDebug(prefix: Constants.tag, message: "\(inputType). preview = true.")
                 rotatePreview(for: transformations)
+                
             case .touch:
                 //TODO: sometimes remove and replace has a monster for the touch(_, type).  not sure why
                 if trans.newTiles != nil {

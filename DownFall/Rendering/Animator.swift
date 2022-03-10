@@ -22,7 +22,10 @@ struct Animator {
         static let poisonDropSpriteSheetName = "poison-drop-sprite-sheet-8"
         static let runeDrillDownSpriteSheetName4 = "rune-drilldown-spriteSheet4"
         static let monsterCrushSpriteName = "rune-monsterCrush-frame-1"
+        
+        static let tag = String(describing: Animator.self)
     }
+    
 
     let foreground: SKNode?
     let tileSize: CGFloat?
@@ -603,7 +606,6 @@ struct Animator {
         return spriteActions
     }
 
-
     
     func animate(_ spriteActions: [SpriteAction], completion: @escaping () -> Void) {
         if spriteActions.count == 0 { completion() }
@@ -613,7 +615,7 @@ struct Animator {
             let sprite = spriteAction.sprite
             sprite.run(spriteAction.action) { [spriteAction, sprite] in
                 numActions -= 1
-                print(numActions)
+                GameLogger.shared.logDebug(prefix: Constants.tag, message: "Animation actions: \(numActions)")
                 if spriteAction.removeFromParentWhenComplete {
                     sprite.removeFromParent()
                 }

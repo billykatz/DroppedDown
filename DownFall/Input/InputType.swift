@@ -128,100 +128,104 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
     var debugDescription: String {
         switch self {
         case .transformation(let trans):
-            return "Transformation \(String(describing: trans.first?.inputType))"
+            if let firstInputType = trans.first?.inputType {
+                return "transformation \(String(describing: firstInputType))"
+            } else {
+                return "transformation"
+            }
         case .touch:
             return "Touch"
         case .rotateCounterClockwise:
-            return "Rotate Counter clockwise"
+            return "rotateCounterClockwise"
         case .rotateClockwise:
-            return "Rotate clockwise"
+            return "rotateClockwise"
         case .monsterDies:
-            return "Monster Dies"
+            return "monsterDies"
         case .gameWin:
-            return "Game Win"
+            return "gameWin"
         case .gameLose:
-            return "Game Lose"
+            return "gameLose"
         case .play:
-            return "Play"
+            return "play"
         case .pause:
-            return "Pause"
+            return "pause"
         case .animationsFinished:
-            return "Animations Finished"
+            return "animationsFinished"
         case .playAgain:
-            return "Play Again"
+            return "playAgain"
         case .reffingFinished(let newTurn):
-            return "Reffing Finished. New Turn? \(newTurn)"
+            return "reffingFinished. newTurn? \(newTurn)"
         case .attack(_, let attacker, let defender, _, _, _):
-            return "Attacked from \(attacker) to \(String(describing: defender))"
+            return "attack. Attacked from \(attacker) to \(String(describing: defender))"
         case .boardBuilt:
-            return "Board has been built"
+            return "boardBuilt"
         case .boardLoaded:
-            return "Board has been loaded"
+            return "boardLoaded"
         
         case .collectItem:
-            return "Player collects an item"
+            return "collectItem"
         case .collectChestOffer:
-            return "Player collects offer from chest"
+            return "collectChestOffer"
             
         case .selectLevel:
-            return "Select Level"
+            return "selectLevel"
         case .newTurn:
-            return "New Turn"
+            return "newTurn"
         case .touchBegan:
-            return "Touch began"
+            return "touchBegan"
         case .visitStore:
-            return "Visiting store between levels"
+            return "visitStore"
         case .runeUseCanceled:
-            return "Item use canceled"
+            return "runeUseCanceled"
         case .runeUseSelected:
-            return "Item use selected"
+            return "runeUseSelected"
         case .runeUsed(let ability, let targets):
             return "\(ability.textureName) used on targets \(targets.allTargetCoords)"
         case .decrementDynamites:
-            return "Decrement the dynamite fuses"
+            return "decrementDynamites"
         case .rotatePreview:
-            return "Rotate preview"
+            return "rotatePreview"
         case .rotatePreviewFinish:
-            return "Rotate finish"
+            return "rotatePreviewFinish"
         case .refillEmpty:
-            return "Refill empty tiles"
+            return "refillEmpty"
         case .tileDetail:
-            return "Tile detail"
+            return "tileDetail"
         case .unlockExit:
-            return "Unlock Exit"
+            return "unlockExit"
         case .levelGoalDetail:
-            return "Level Goal Detail"
+            return "levelGoalDetail"
         case .goalCompleted:
-            return "Goal was completed"
+            return "goalCompleted"
         case .collectOffer(_, let offer, _, _):
-            return "Player collects \(offer.textureName)"
+            return "collectOffer. offer: \(offer.textureName)"
         case .runeReplacement(_, _, let promptedByChest):
-            return "Rune Replacement flow. Prompted by chest \(promptedByChest)"
+            return "runeReplacement. promptedByChest? \(promptedByChest)"
         case .runeReplaced:
-            return "Rune replaced"
+            return "runeReplaced"
         case .foundRuneDiscarded:
-            return "Found rune discarded"
+            return "foundRuneDiscarded"
         case .loseAndGoToStore:
-            return "Lose and go to store"
+            return "loseAndGoToStore"
             
         // tutorial stuff
         case .tutorialPhaseStart:
-            return "Tutorial - phase start"
+            return "tutorialPhaseStart"
         case .tutorialPhaseEnd:
-            return "Tutorial - phase end"
+            return "tutorialPhaseEnd"
             
         // boss stuff
         case .bossTurnStart(let phase):
-            return "Boss Turn Start. Phase: \(phase.bossPhaseType.rawValue). State: \(String.init(describing: phase.bossState.stateType))"
+            return "bossTurnStart. Phase: \(phase.bossPhaseType.rawValue). State: \(String.init(describing: phase.bossState.stateType))"
         case .bossPhaseStart(let phase):
-            return "Boss Phase Start. Phase: \(phase.bossPhaseType.rawValue). State: \(String.init(describing: phase.bossState.stateType))"
+            return "bossPhaseStart. Phase: \(phase.bossPhaseType.rawValue). State: \(String.init(describing: phase.bossState.stateType))"
             
         // no more moves
         case .noMoreMoves:
-            return "No more moves"
+            return "noMoreMoves"
             
         case  .noMoreMovesConfirm(let payTwoHearts, let pay25Percent):
-            return "No more move confirmation. Pay 2 hearts? \(payTwoHearts). Pay 25%? \(pay25Percent)."
+            return "noMoreMovesConfirm. Pay 2 hearts? \(payTwoHearts). Pay 25%? \(pay25Percent)."
             
             
         }

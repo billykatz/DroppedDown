@@ -10,6 +10,10 @@ import SpriteKit
 
 class RotatePreviewView {
     
+    struct Constants {
+        static let tag = String(describing: RotatePreviewView.self)
+    }
+    
     private var sprites: [[DFTileSpriteNode]] = []
     private var originalPosition: [[CGPoint]] = []
     private var finalPosition: [[CGPoint]] = []
@@ -20,11 +24,18 @@ class RotatePreviewView {
     private var distanceTraveledRatio: CGFloat = 0
     private let returnToStartRatio = CGFloat(0.33)
     
+    private var isExpectingRotatePreviewFinish: Bool = false
+    
     init() {
         Dispatch.shared.register { [weak self] (input) in
             switch input.type {
             case let .rotatePreview(sprites, rotateTrans):
+                GameLogger.shared.logDebug(prefix: Constants.tag, message: "received rotatePreview")
                 self?.preview(sprites: sprites, rotateTransformation: rotateTrans)
+                self?.isExpectingRotatePreviewFinish = true
+            case .rotatePreviewFinish:
+                GameLogger.shared.logDebug(prefix: Constants.tag, message: "Preview finished receieved")
+                self?.isExpectingRotatePreviewFinish = false
             default:
                 ()
             }
@@ -107,7 +118,14 @@ class RotatePreviewView {
         }
         
         
-        guard !sprites.isEmpty, !originalPosition.isEmpty else { return }
+        guard !sprites.isEmpty, !originalPosition.isEmpty else {
+            GameLogger.shared.logDebug(prefix: Constants.tag, message: "early exit because sprites is empty \(sprites.isEmpty) or original positions are empty \(originalPosition.isEmpty)")
+            if isExpectingRotatePreviewFinish {
+                GameLogger.shared.logDebug(prefix: Constants.tag, message: "expecting preview finish. Sending it")
+                InputQueue.append(Input(.rotatePreviewFinish([], nil)))
+            }
+            return
+        }
         var spriteActions: [SpriteAction] = []
         let returnToStart = distanceTraveledRatio < returnToStartRatio
         for row in 0..<sprites.count {
@@ -117,7 +135,10 @@ class RotatePreviewView {
             }
         }
         
-        InputQueue.append(Input(.rotatePreviewFinish(spriteActions, returnToStart ? nil : originalInput)))
+        GameLogger.shared.logDebug(prefix: Constants.tag, message: "Send rotate prview finish. Expected? \(isExpectingRotatePreviewFinish)")
+        if isExpectingRotatePreviewFinish {
+            InputQueue.append(Input(.rotatePreviewFinish(spriteActions, returnToStart ? nil : originalInput)))
+        }
     }
     
 }

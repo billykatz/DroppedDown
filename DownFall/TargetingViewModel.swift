@@ -211,8 +211,6 @@ class TargetingViewModel: Targeting {
                     
                 }
             }
-            // this makes sure that the view looks right if the player taps on a rune during an animation
-            self.didDeselect()
             
         case .newTurn:
             guard let tiles = input.endTilesStruct else { return }
@@ -225,6 +223,9 @@ class TargetingViewModel: Targeting {
                 inventory = playerData.runes ?? []
                 runeSlotsUpdated?(runeSlots, runes)
             }
+            
+            // this makes sure that the view looks right if the player taps on a rune during an animation
+            self.didDeselect()
             
         case .boardBuilt, .boardLoaded:
             guard let tiles = input.endTilesStruct else { return }

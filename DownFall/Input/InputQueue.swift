@@ -31,19 +31,35 @@ struct Input: Hashable, CustomDebugStringConvertible {
 }
 
 struct InputQueue {
+    
+    struct Constants {
+        static let tag = String(describing: InputQueue.self)
+    }
+    
     static var history: [Input] = []
     static var queue: [Input] = []
     static var gameState = AnyGameState(PlayState())
     
     /// Attempts to append the input given the current game state
     static func append(_ input: Input, given: AnyGameState = gameState) {
+#if DEBUG
+        GameLogger.shared.log(prefix: Constants.tag, message: "[Input Queue] Begin append method \(input.type). Current state \(gameState.state)")
+#endif
         
         if gameState.shouldAppend(input) {
+#if DEBUG
+            GameLogger.shared.log(prefix: Constants.tag, message: "[Input Queue] Appending \(input.type)")
+#endif
             queue.append(input)
             return
         }
-        
-        print("\(input.type) is being ignored. Current game state is \(gameState.state). The last input was \(String(describing: history.first))")
+#if DEBUG
+        if let first = history.first {
+            GameLogger.shared.log(prefix: Constants.tag, message: "[Input Queue] \(input.type) is being ignored. Current game state is \(gameState.state). The last input was \(first)")
+        } else {
+            GameLogger.shared.log(prefix: Constants.tag, message: "[Input Queue] \(input.type) is being ignored. Current game state is \(gameState.state). No history")
+        }
+#endif
         
     }
     
@@ -65,10 +81,18 @@ struct InputQueue {
             } else {
                 history.insert(input, at: history.startIndex)
                 gameState.enter(input)
-                print("Entering \(gameState.state) with \(input)")
+#if DEBUG
+                GameLogger.shared.log(prefix: Constants.tag, message: "[Input Queue] Entering \(gameState.state) with \(input).  Last game state \(oldGameState.state)")
+                print()
                 if case let InputType.transformation(trans) = input.type {
-                    print("The transformation is \(String(describing: trans.first?.inputType))")
+                    if let first = trans.first?.inputType {
+                        GameLogger.shared.log(prefix: Constants.tag, message: "[Input Queue] The transformation is \(first))")
+                        print()
+                    } else {
+                        GameLogger.shared.log(prefix: Constants.tag, message: "[Input Queue] No transformation")
+                    }
                 }
+#endif
             }
         }
         

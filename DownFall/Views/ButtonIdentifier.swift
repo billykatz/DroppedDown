@@ -66,6 +66,8 @@ enum ButtonIdentifier: String {
     case mainMenuStats
     case mainMenuFeedback
     
+    case mainMenuSwipeScreenshot
+    
     case continueRun
     case discardFoundRune
     case swapRunes
@@ -260,6 +262,11 @@ enum ButtonIdentifier: String {
             return "Worried"
         case .bossStomps:
             return "Stomps"
+            
+            
+        /// screen shot stuff
+        case .mainMenuSwipeScreenshot:
+            return "Swipe"
         }
     }
 }

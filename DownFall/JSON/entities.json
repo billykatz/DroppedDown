@@ -329,6 +329,11 @@
                     "animationFilename": "sallyProjectileMid",
                     "numberOfFrames": 1,
                     "animationType": "projectileMid"
+                },
+                {
+                    "animationFilename": "sally-dead-10",
+                    "numberOfFrames": 10,
+                    "animationType": "dying"
                 }
             ],
             "carry": {

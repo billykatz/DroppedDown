@@ -385,7 +385,7 @@ class DFTileSpriteNode: SKSpriteNode {
         switch self.type {
         case .monster(let monsterData):
             switch monsterData.type {
-            case .rat, .alamo, .bat, .dragon:
+            case .rat, .alamo, .bat, .dragon, .sally:
                 let animationModel = monsterData.animations.first { $0.animationType == .dying }
                 let animationFrames = animationModel?.animationTextures ?? []
                 let waitBefore = SKAction.wait(forDuration: durationWaitBefore)

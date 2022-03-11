@@ -97,8 +97,9 @@ class GameViewController: UIViewController {
         let levelCoordinator = LevelCoordinator(gameSceneNode: gameScene, entities: entities, tutorialConductor: tutorialConductor, view: view)
         let codexCoordinator = CodexCoordinator(viewController: self.navigationController!, delegate: levelCoordinator)
         let settingsCoordinator = SettingsCoordinator(viewController: self.navigationController!)
+        let creditsCoordinator = CreditsCoordinator(viewController: self.navigationController!)
         
-        self.menuCoordinator = MenuCoordinator(levelCoordinator: levelCoordinator, codexCoordinator: codexCoordinator, settingsCoordinator: settingsCoordinator, tutorialConductor: tutorialConductor, view: view)
+        self.menuCoordinator = MenuCoordinator(levelCoordinator: levelCoordinator, codexCoordinator: codexCoordinator, settingsCoordinator: settingsCoordinator, tutorialConductor: tutorialConductor, creditsCoordinator: creditsCoordinator,  view: view)
         self.levelCoordinator = levelCoordinator
         self.levelCoordinator?.delegate = menuCoordinator
         

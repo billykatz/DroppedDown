@@ -37,6 +37,7 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
     var view: SKView
     var levelCoordinator: LevelCoordinating
     var codexCoordinator: CodexCoordinator
+    var creditsCoordinator: CreditsCoordinator
     var settingsCoordinator: SettingsCoordinator
     var profileViewModel: ProfileViewModel?
     var tutorialConductor: TutorialConductor?
@@ -48,11 +49,12 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
         return scene
     }()
     
-    init(levelCoordinator: LevelCoordinating, codexCoordinator: CodexCoordinator, settingsCoordinator: SettingsCoordinator, tutorialConductor: TutorialConductor, view: SKView) {
+    init(levelCoordinator: LevelCoordinating, codexCoordinator: CodexCoordinator, settingsCoordinator: SettingsCoordinator, tutorialConductor: TutorialConductor, creditsCoordinator: CreditsCoordinator, view: SKView) {
         self.levelCoordinator = levelCoordinator
         self.codexCoordinator = codexCoordinator
         self.settingsCoordinator = settingsCoordinator
         self.tutorialConductor = tutorialConductor
+        self.creditsCoordinator = creditsCoordinator
         self.view = view
     }
     
@@ -151,5 +153,9 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
     
     func setUpPowerupScreenshot() {
         profileViewModel?.setUpPowerUpScreenShot()
+    }
+    
+    func goToCredits() {
+        creditsCoordinator.presentCredits()
     }
 }

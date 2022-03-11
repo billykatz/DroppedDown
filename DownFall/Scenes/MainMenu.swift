@@ -16,6 +16,7 @@ protocol MainMenuDelegate: AnyObject {
     func abandonRun()
     func goToTestScene()
     func setUpPowerupScreenshot()
+    func goToCredits()
 }
 
 class MainMenu: SKScene {
@@ -81,6 +82,15 @@ class MainMenu: SKScene {
     }()
     
     override func didMove(to view: SKView) {
+//        for family in UIFont.familyNames
+//        {
+//           print("\(family)")
+//           for names in UIFont.fontNames(forFamilyName: family)
+//           {
+//               print("== \(names)")
+//           }
+//        }
+//        
         isAccessibilityElement = false
         background = self.childNode(withName: "background") as? SKSpriteNode
         background.color = UIColor.backgroundGray
@@ -131,19 +141,34 @@ class MainMenu: SKScene {
         
         
         /// Feedback button
-        let feedbackButton = ShiftShaft_Button(size: .buttonMainMenu, delegate: self, identifier: .mainMenuFeedback, image: SKSpriteNode(imageNamed: Constants.blankButtonName), shape: .rectangle, addTextLabel: true, fontType: .small, fontSize: 120.0)
+//        let feedbackButton = ShiftShaft_Button(size: .buttonMainMenu, delegate: self, identifier: .mainMenuFeedback, image: SKSpriteNode(imageNamed: Constants.blankButtonName), shape: .rectangle, addTextLabel: true, fontType: .small, fontSize: 120.0)
+//
+//        feedbackButton.position = CGPoint.alignHorizontally(statsViewButton.frame,
+//                                                            relativeTo: statsViewButton.frame,
+//                                                            horizontalAnchor: .center,
+//                                                            verticalAlign: .bottom,
+//                                                            verticalPadding: Constants.buttonPadding,
+//                                                            translatedToBounds: true)
+//        feedbackButton.zPosition = 0
+//
+//        buttonContainer.addChild(feedbackButton)
+//        feedbackButton.alpha = 0
+//        feedbackButton.run(buttonFadeInAction)
         
-        feedbackButton.position = CGPoint.alignHorizontally(statsViewButton.frame,
+        /// Feedback button
+        let creditsButton = ShiftShaft_Button(size: .buttonMainMenu, delegate: self, identifier: .mainMenuCredits, image: SKSpriteNode(imageNamed: Constants.blankButtonName), shape: .rectangle, addTextLabel: true, fontType: .small, fontSize: 120.0)
+        
+        creditsButton.position = CGPoint.alignHorizontally(creditsButton.frame,
                                                             relativeTo: statsViewButton.frame,
                                                             horizontalAnchor: .center,
                                                             verticalAlign: .bottom,
                                                             verticalPadding: Constants.buttonPadding,
                                                             translatedToBounds: true)
-        feedbackButton.zPosition = 0
+        creditsButton.zPosition = 0
         
-        buttonContainer.addChild(feedbackButton)
-        feedbackButton.alpha = 0
-        feedbackButton.run(buttonFadeInAction)
+        buttonContainer.addChild(creditsButton)
+        creditsButton.alpha = 0
+        creditsButton.run(buttonFadeInAction)
         
         
         // animate the buttons to move slightly up
@@ -198,7 +223,7 @@ class MainMenu: SKScene {
             let testUIButton = ShiftShaft_Button(size: CGSize(width: 100, height: 75), delegate: self, identifier: .mainMenuSwipeScreenshot, image: SKSpriteNode(imageNamed: Constants.blankButtonName), shape: .rectangle, addTextLabel: true, fontType: .small, fontSize: 22.0)
             
             testUIButton.position = CGPoint.alignHorizontally(testUIButton.frame,
-                                                                 relativeTo: feedbackButton.frame,
+                                                                 relativeTo: creditsButton.frame,
                                                                  horizontalAnchor: .center,
                                                                  verticalAlign: .bottom,
                                                                  verticalPadding: Constants.buttonPadding,
@@ -354,6 +379,9 @@ extension MainMenu: ButtonDelegate {
             
         case .mainMenuSwipeScreenshot:
             mainMenuDelegate?.setUpPowerupScreenshot()
+            
+        case .mainMenuCredits:
+            mainMenuDelegate?.goToCredits()
             
         default:
             ()

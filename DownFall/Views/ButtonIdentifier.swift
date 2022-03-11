@@ -65,6 +65,7 @@ enum ButtonIdentifier: String {
     // Main Menu
     case mainMenuStats
     case mainMenuFeedback
+    case mainMenuCredits
     
     case mainMenuSwipeScreenshot
     
@@ -147,6 +148,8 @@ enum ButtonIdentifier: String {
             return "Cancel"
         case .backpackConfirm:
             return "Confirm"
+            
+        // MAIN MENU BUTTONS
         case .mainMenu, .pausedExitToMainMenu:
             return "Exit to Menu"
         case .tutorialPausedExitToMainMenu:
@@ -155,6 +158,10 @@ enum ButtonIdentifier: String {
             return "(Not recommended)\nSkip tutorial"
         case .mainMenuContinueTutorial:
             return "Continue tutorial"
+        case .mainMenuCredits:
+            return "Credits"
+            
+            
         case .cycleLevel:
             return "Level select"
         case .seeInventory:
@@ -267,6 +274,7 @@ enum ButtonIdentifier: String {
         /// screen shot stuff
         case .mainMenuSwipeScreenshot:
             return "Swipe"
+        
         }
     }
 }

@@ -21,6 +21,8 @@
 		2811272126863E4A00F96043 /* PlayerClientExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2811272026863E4A00F96043 /* PlayerClientExtensions.swift */; };
 		281D43B027A9CB8F00D00376 /* MenuMusicManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 281D43AF27A9CB8F00D00376 /* MenuMusicManager.swift */; };
 		281D43B627AB0B4700D00376 /* BossDialogController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 281D43B527AB0B4700D00376 /* BossDialogController.swift */; };
+		281FC63027DC050600D2205F /* CreditsCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 281FC62F27DC050600D2205F /* CreditsCoordinator.swift */; };
+		281FC63327DC055200D2205F /* CreditsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 281FC63227DC055200D2205F /* CreditsView.swift */; };
 		2831B6A6274C787B00F90626 /* GameRecapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2831B6A5274C787B00F90626 /* GameRecapView.swift */; };
 		2834737F26E94CFC0096F3DE /* StatsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2834737E26E94CFC0096F3DE /* StatsModel.swift */; };
 		283CBBD926A8A88E00B1F7C9 /* CodexItemModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 283CBBD826A8A88E00B1F7C9 /* CodexItemModalView.swift */; };
@@ -54,6 +56,7 @@
 		289EF394275A95C400138F34 /* MonsterDiesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 289EF393275A95C400138F34 /* MonsterDiesModel.swift */; };
 		28A36C3627A1FCD3008252DA /* BossDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A36C3527A1FCD3008252DA /* BossDialog.swift */; };
 		28A36C3827A1FF82008252DA /* BossDialogOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A36C3727A1FF82008252DA /* BossDialogOverlay.swift */; };
+		28A5294A27DC0E5800DAFC35 /* Betatesters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A5294927DC0E5700DAFC35 /* Betatesters.swift */; };
 		28A836C4268FE57F00D96C48 /* JSONCoding+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A836C3268FE57F00D96C48 /* JSONCoding+Extensions.swift */; };
 		28A836C6268FE97B00D96C48 /* ProfileCodingClient+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A836C5268FE97B00D96C48 /* ProfileCodingClient+Extensions.swift */; };
 		28AE3AC126A6000600BCE56A /* CodexCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AE3AC026A6000600BCE56A /* CodexCoordinator.swift */; };
@@ -273,6 +276,8 @@
 		2811272026863E4A00F96043 /* PlayerClientExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerClientExtensions.swift; sourceTree = "<group>"; };
 		281D43AF27A9CB8F00D00376 /* MenuMusicManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuMusicManager.swift; sourceTree = "<group>"; };
 		281D43B527AB0B4700D00376 /* BossDialogController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BossDialogController.swift; sourceTree = "<group>"; };
+		281FC62F27DC050600D2205F /* CreditsCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditsCoordinator.swift; sourceTree = "<group>"; };
+		281FC63227DC055200D2205F /* CreditsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditsView.swift; sourceTree = "<group>"; };
 		2831B6A5274C787B00F90626 /* GameRecapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameRecapView.swift; sourceTree = "<group>"; };
 		2834737E26E94CFC0096F3DE /* StatsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsModel.swift; sourceTree = "<group>"; };
 		283CBBD826A8A88E00B1F7C9 /* CodexItemModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexItemModalView.swift; sourceTree = "<group>"; };
@@ -307,6 +312,7 @@
 		289EF393275A95C400138F34 /* MonsterDiesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonsterDiesModel.swift; sourceTree = "<group>"; };
 		28A36C3527A1FCD3008252DA /* BossDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BossDialog.swift; sourceTree = "<group>"; };
 		28A36C3727A1FF82008252DA /* BossDialogOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BossDialogOverlay.swift; sourceTree = "<group>"; };
+		28A5294927DC0E5700DAFC35 /* Betatesters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Betatesters.swift; sourceTree = "<group>"; };
 		28A836C3268FE57F00D96C48 /* JSONCoding+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "JSONCoding+Extensions.swift"; sourceTree = "<group>"; };
 		28A836C5268FE97B00D96C48 /* ProfileCodingClient+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileCodingClient+Extensions.swift"; sourceTree = "<group>"; };
 		28AE3AC026A6000600BCE56A /* CodexCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexCoordinator.swift; sourceTree = "<group>"; };
@@ -547,6 +553,15 @@
 				5894A44D24C379C800FBF839 /* LoadingScene.sks */,
 			);
 			name = "Scene Files (.sks)";
+			sourceTree = "<group>";
+		};
+		281FC63127DC053F00D2205F /* Credits */ = {
+			isa = PBXGroup;
+			children = (
+				281FC63227DC055200D2205F /* CreditsView.swift */,
+				28A5294927DC0E5700DAFC35 /* Betatesters.swift */,
+			);
+			path = Credits;
 			sourceTree = "<group>";
 		};
 		283DC776271892A2002A499A /* Tutorial */ = {
@@ -948,6 +963,7 @@
 				280C354226F50E7E00BBE8F7 /* Run */,
 				28C806A826F3C3C500135E29 /* StatTracking */,
 				2886E84126F030F70014FA5D /* OptionsSwiftUI */,
+				281FC63127DC053F00D2205F /* Credits */,
 				28B7274226A0E8FA00F349ED /* Codex */,
 				58D56B5425AB91F8002D1337 /* Sound */,
 				586319C024C1FF530090CD6D /* Defaults */,
@@ -1111,6 +1127,7 @@
 				2886E83D26F0303B0014FA5D /* SettingsCoordinator.swift */,
 				58A1C82A24CB3CAF00302183 /* MenuCoordinator.swift */,
 				28AE3AC026A6000600BCE56A /* CodexCoordinator.swift */,
+				281FC62F27DC050600D2205F /* CreditsCoordinator.swift */,
 			);
 			name = Coordinators;
 			sourceTree = "<group>";
@@ -1375,6 +1392,7 @@
 				3D6AACE4222CD38E00C77B24 /* Controls.swift in Sources */,
 				280831FC2683A3F600EFAEC3 /* ProfileModel.swift in Sources */,
 				3D4F569622B88A90003695D8 /* HapticGenerator.swift in Sources */,
+				281FC63027DC050600D2205F /* CreditsCoordinator.swift in Sources */,
 				3D3D31EC23ABEFA8002B87EE /* LevelConstructor.swift in Sources */,
 				3D7EF45E21D18DAB00A2D9E8 /* TileTransformation.swift in Sources */,
 				3DB270A722AE065300D9BF8B /* Data+Extensions.swift in Sources */,
@@ -1437,6 +1455,7 @@
 				28831DD127DAC2FE008FCC0D /* LevelModel+TestScreenshots.swift in Sources */,
 				28C644682745B22F00098C3C /* BossDebugView.swift in Sources */,
 				280CD173276AADEF00052EB5 /* BossTestScene.swift in Sources */,
+				281FC63327DC055200D2205F /* CreditsView.swift in Sources */,
 				28C6446A2746C84F00098C3C /* CGVector+Extensions.swift in Sources */,
 				28A36C3827A1FF82008252DA /* BossDialogOverlay.swift in Sources */,
 				3DE87C9022374C2C00D750CF /* ShiftShaft_Button.swift in Sources */,
@@ -1498,6 +1517,7 @@
 				582CF3F02442553000AA2A95 /* FillableCircle.swift in Sources */,
 				3DD5AA0D2398025400FB63F4 /* Styling.swift in Sources */,
 				280CD176276AAFED00052EB5 /* BossTestView.swift in Sources */,
+				28A5294A27DC0E5800DAFC35 /* Betatesters.swift in Sources */,
 				2834737F26E94CFC0096F3DE /* StatsModel.swift in Sources */,
 				580EF10024E0F083003D312B /* RunScope.swift in Sources */,
 				5893899F245E7D0E00350A2E /* StoreOffer.swift in Sources */,

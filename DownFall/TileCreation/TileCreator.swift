@@ -325,6 +325,20 @@ class TileCreator: TileStrategy {
             }
             
             return (newTutorialBoard, true)
+        } else if let screenShotBoard = self.boardForScreenshots() {
+            var board: [[Tile]] = Array.init(repeating: Array.init(repeating: .empty, count: 6), count: 6)
+            
+            for row in 0..<screenShotBoard.count {
+                for col in 0..<screenShotBoard.count {
+                    board[row][col] = screenShotBoard[row][col]
+//                    if screenShotBoard[row][col].type == .player(.zero) {
+//                        board[row][col] = Tile(type: .player(playerData))
+//                    } else {
+//                    }
+                }
+            }
+            return (board, true)
+
         }
         
         // early return to load the load tiles we have loaded

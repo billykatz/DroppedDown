@@ -27,7 +27,6 @@ class GameScene: SKScene {
         
         static let tag = String(describing: GameScene.self)
     }
-    
     // only strong reference to the Board
     private var board: Board?
     
@@ -82,6 +81,10 @@ class GameScene: SKScene {
     
     private var numberOfPreviousBossWins: Int = 0
     
+    #if DEBUG
+    // screenshot helper
+    private var screenshotHelper: ScreenshotHelper?
+    #endif
     required init?(coder aDecoder: NSCoder) { super.init(coder: aDecoder) }
     
     /// Creates an instance of board and does preparation neccessary for didMove(to:) to be called
@@ -159,6 +162,11 @@ class GameScene: SKScene {
         
         // preview view
         self.rotatePreview = RotatePreviewView()
+        
+#if DEBUG
+        // screen shot helper
+        self.screenshotHelper = ScreenshotHelper(rotatePreview: rotatePreview, foreground: foreground, playableRect: size.playableRect)
+#endif
     
         // create the renderer
         self.renderer = Renderer(playableRect: size.playableRect,

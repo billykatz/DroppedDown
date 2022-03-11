@@ -21,6 +21,48 @@ class UITestRunningChecker {
         #endif
         return uiTestAreRunning
     }
+    
+    var testSwipeScreenShot: Bool {
+        var uiTestAreRunning = false
+        #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("-isSwipeScreenshot") {
+            uiTestAreRunning = true
+        }
+        #endif
+        return uiTestAreRunning
+    }
+    
+    var testMatchThreeScreenShot: Bool {
+        var uiTestAreRunning = false
+        #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("-isMatchThreeScreenshot") {
+            uiTestAreRunning = true
+        }
+        #endif
+        return uiTestAreRunning
+    }
+    
+    var testPowerUpScreenShot: Bool {
+        var uiTestAreRunning = false
+        #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("-isPowerUpScreenShot") {
+            uiTestAreRunning = true
+        }
+        #endif
+        return uiTestAreRunning
+    }
+    
+    var testIsCrushScreenShot: Bool {
+        var uiTestAreRunning = false
+        #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("-isCrushScreenShot") {
+            uiTestAreRunning = true
+        }
+        #endif
+        return uiTestAreRunning
+    }
+
+
 }
 
 extension OSLog {
@@ -41,12 +83,18 @@ class GameLogger: TextOutputStream {
 
     func log(prefix: String, message: String) {
         os_log("%s: %s", log: OSLog.shiftShaft, prefix, message)
+        if (UITestRunningChecker.shared.testsAreRunning) {
+            print("\(prefix): \(message)")
+        }
     }
     
     func logDebug(prefix: String, message: String) {
-#if DEBUG
+//#if DEBUG
         os_log("%s: %s", log: OSLog.shiftShaftDebug, prefix, message)
-#endif
+        if (UITestRunningChecker.shared.testsAreRunning) {
+            print("\(prefix): \(message)")
+        }
+//#endif
     }
 
     func fatalLog(prefix: String, message: String) {

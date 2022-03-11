@@ -113,7 +113,9 @@ class RunModel: Codable, Equatable {
         else {
             var nextDepthNumber = 0
             #if DEBUG
-            nextDepthNumber = UserDefaults.standard.integer(forKey: UserDefaults.startingDepthLevelKey)
+            if !UITestRunningChecker.shared.testsAreRunning {
+                nextDepthNumber = UserDefaults.standard.integer(forKey: UserDefaults.startingDepthLevelKey)
+            }
             #endif
             nextDepth = nextDepthNumber
         }

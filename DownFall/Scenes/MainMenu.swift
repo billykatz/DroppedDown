@@ -15,6 +15,7 @@ protocol MainMenuDelegate: AnyObject {
     func continueRun()
     func abandonRun()
     func goToTestScene()
+    func setUpPowerupScreenshot()
 }
 
 class MainMenu: SKScene {
@@ -205,7 +206,7 @@ class MainMenu: SKScene {
         
         buttonContainer.addChild(testUIButton)
         testUIButton.alpha = 0
-        testUIButton.makeUITestAccessible(label: "testButton", traits: .button, scene: self)
+        testUIButton.makeUITestAccessible(label: "snapShotSwipe", traits: .button, scene: self)
         testUIButton.run(buttonFadeInAction)
 
         #endif
@@ -349,6 +350,9 @@ extension MainMenu: ButtonDelegate {
             let newTexture = SKTexture(imageNamed: "toggle-\(onOff)")
             toggleIcon.texture = newTexture
             
+            
+        case .mainMenuSwipeScreenshot:
+            mainMenuDelegate?.setUpPowerupScreenshot()
             
         default:
             ()

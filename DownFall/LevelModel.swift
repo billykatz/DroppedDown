@@ -280,6 +280,11 @@ class Level: Codable, Hashable {
             .compactMap { $0.tileType.gemAmount }
             .reduce(0, +)
         
+#if DEBUG
+        if let goals = createScreenShotLevelGoals() {
+            return goals
+        }
+#endif
         
         var goalChances: [AnyChanceModel<LevelGoal>] = []
         switch depth {

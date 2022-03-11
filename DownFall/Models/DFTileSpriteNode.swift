@@ -154,6 +154,11 @@ class DFTileSpriteNode: SKSpriteNode {
     
     func showAttackTiming(_ frequency: Int,
                           _ turns: Int) {
+        #if DEBUG
+        if UITestRunningChecker.shared.testsAreRunning {
+            return
+        }
+        #endif
         
         let size = CGSize(width: self.frame.width * 0.1, height: frame.height * 0.1)
         
@@ -182,6 +187,11 @@ class DFTileSpriteNode: SKSpriteNode {
     }
     
     func showAmount(_ amountToShow: Int? = nil) {
+        #if DEBUG
+        if UITestRunningChecker.shared.testsAreRunning {
+            return
+        }
+        #endif
         var amount = amountToShow
         
         if case TileType.item(let item) = self.type {
@@ -196,10 +206,10 @@ class DFTileSpriteNode: SKSpriteNode {
             width = self.size.width*0.45
         } else if amount < 100 {
             fontSize = 48
-            width = self.size.width*0.64
+            width = self.size.width*0.60
         } else {
             fontSize = 46
-            width = self.size.width*0.68
+            width = self.size.width*0.64
         }
         
         let background = SKShapeNode(rectOf: CGSize(width: width, height: self.size.height*0.35), cornerRadius: 16.0)

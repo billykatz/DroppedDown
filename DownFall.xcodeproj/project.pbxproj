@@ -40,6 +40,10 @@
 		2881F29127C1972200DC83DA /* OfferAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2881F29027C1972200DC83DA /* OfferAnimator.swift */; };
 		2881F29327C33D6C00DC83DA /* Bool+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2881F29227C33D6C00DC83DA /* Bool+Extensions.swift */; };
 		2882DF1027C99C2F00149899 /* RuneAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2882DF0F27C99C2F00149899 /* RuneAnimator.swift */; };
+		28831DCD27DAB56D008FCC0D /* TestScreenshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28831DCC27DAB56D008FCC0D /* TestScreenshotHelper.swift */; };
+		28831DCF27DAB717008FCC0D /* TileCreator+Screenshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28831DCE27DAB717008FCC0D /* TileCreator+Screenshot.swift */; };
+		28831DD127DAC2FE008FCC0D /* LevelModel+TestScreenshots.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28831DD027DAC2FE008FCC0D /* LevelModel+TestScreenshots.swift */; };
+		28831DD327DAC66F008FCC0D /* ProfileViewModel+ScreenshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28831DD227DAC66F008FCC0D /* ProfileViewModel+ScreenshotHelper.swift */; };
 		288330F7274FDB400070A1E8 /* ConfirmShuffleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 288330F6274FDB400070A1E8 /* ConfirmShuffleView.swift */; };
 		2886E83E26F0303B0014FA5D /* SettingsCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886E83D26F0303B0014FA5D /* SettingsCoordinator.swift */; };
 		2886E84026F030750014FA5D /* UIViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886E83F26F030750014FA5D /* UIViewController+Extensions.swift */; };
@@ -55,7 +59,6 @@
 		28AE3AC126A6000600BCE56A /* CodexCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AE3AC026A6000600BCE56A /* CodexCoordinator.swift */; };
 		28AE3AC526A6113900BCE56A /* CodexBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AE3AC426A6113900BCE56A /* CodexBackgroundView.swift */; };
 		28AFDFFF27CAC1D700B72B14 /* Shift_ShaftUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AFDFFE27CAC1D700B72B14 /* Shift_ShaftUITests.swift */; };
-		28AFE00127CAC1D700B72B14 /* Shift_ShaftUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AFE00027CAC1D700B72B14 /* Shift_ShaftUITestsLaunchTests.swift */; };
 		28AFE00727CAC22500B72B14 /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2882DF2827CAB67400149899 /* SnapshotHelper.swift */; };
 		28AFE00927CD60A400B72B14 /* Unlockables+Debug.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AFE00827CD60A400B72B14 /* Unlockables+Debug.swift */; };
 		28AFE00B27CE787400B72B14 /* LevelGoal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AFE00A27CE787400B72B14 /* LevelGoal.swift */; };
@@ -290,6 +293,10 @@
 		2881F29227C33D6C00DC83DA /* Bool+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bool+Extensions.swift"; sourceTree = "<group>"; };
 		2882DF0F27C99C2F00149899 /* RuneAnimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneAnimator.swift; sourceTree = "<group>"; };
 		2882DF2827CAB67400149899 /* SnapshotHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SnapshotHelper.swift; path = fastlane/SnapshotHelper.swift; sourceTree = SOURCE_ROOT; };
+		28831DCC27DAB56D008FCC0D /* TestScreenshotHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestScreenshotHelper.swift; sourceTree = "<group>"; };
+		28831DCE27DAB717008FCC0D /* TileCreator+Screenshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TileCreator+Screenshot.swift"; sourceTree = "<group>"; };
+		28831DD027DAC2FE008FCC0D /* LevelModel+TestScreenshots.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LevelModel+TestScreenshots.swift"; sourceTree = "<group>"; };
+		28831DD227DAC66F008FCC0D /* ProfileViewModel+ScreenshotHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileViewModel+ScreenshotHelper.swift"; sourceTree = "<group>"; };
 		288330F6274FDB400070A1E8 /* ConfirmShuffleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmShuffleView.swift; sourceTree = "<group>"; };
 		2886E83D26F0303B0014FA5D /* SettingsCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsCoordinator.swift; sourceTree = "<group>"; };
 		2886E83F26F030750014FA5D /* UIViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extensions.swift"; sourceTree = "<group>"; };
@@ -306,7 +313,6 @@
 		28AE3AC426A6113900BCE56A /* CodexBackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexBackgroundView.swift; sourceTree = "<group>"; };
 		28AFDFFC27CAC1D700B72B14 /* Shift-ShaftUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Shift-ShaftUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		28AFDFFE27CAC1D700B72B14 /* Shift_ShaftUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shift_ShaftUITests.swift; sourceTree = "<group>"; };
-		28AFE00027CAC1D700B72B14 /* Shift_ShaftUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shift_ShaftUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		28AFE00827CD60A400B72B14 /* Unlockables+Debug.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Unlockables+Debug.swift"; sourceTree = "<group>"; };
 		28AFE00A27CE787400B72B14 /* LevelGoal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelGoal.swift; sourceTree = "<group>"; };
 		28AFE00C27CE7ABA00B72B14 /* LevelStartTiles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelStartTiles.swift; sourceTree = "<group>"; };
@@ -582,7 +588,6 @@
 			isa = PBXGroup;
 			children = (
 				28AFDFFE27CAC1D700B72B14 /* Shift_ShaftUITests.swift */,
-				28AFE00027CAC1D700B72B14 /* Shift_ShaftUITestsLaunchTests.swift */,
 			);
 			path = "Shift-ShaftUITests";
 			sourceTree = "<group>";
@@ -707,6 +712,7 @@
 			isa = PBXGroup;
 			children = (
 				3DA0087C21E6D1960017D8DA /* TileCreator.swift */,
+				28831DCE27DAB717008FCC0D /* TileCreator+Screenshot.swift */,
 				3DC072C023748D100046F224 /* Quadrant.swift */,
 				3DD36ECA21E5B86100AC4873 /* TileStrategy.swift */,
 			);
@@ -733,6 +739,7 @@
 			isa = PBXGroup;
 			children = (
 				3D4A471023B3D34F000165FB /* LevelModel.swift */,
+				28831DD027DAC2FE008FCC0D /* LevelModel+TestScreenshots.swift */,
 				28C6F2C427D16C2A002882AB /* LevelHelpers.swift */,
 				28AFE00E27CE7AE800B72B14 /* ChanceModel.swift */,
 				28AFE00C27CE7ABA00B72B14 /* LevelStartTiles.swift */,
@@ -759,6 +766,7 @@
 				280CD174276AAE3700052EB5 /* Scene Files (.sks) */,
 				280CD172276AADEF00052EB5 /* BossTestScene.swift */,
 				3DF2925320A37FEE006671AC /* GameScene.swift */,
+				28831DCC27DAB56D008FCC0D /* TestScreenshotHelper.swift */,
 				3D674C9422C9D6640003AEB4 /* MainMenu.swift */,
 				5894A44F24C37A1100FBF839 /* LoadingScene.swift */,
 			);
@@ -1129,6 +1137,7 @@
 				3D2C757422C854F8009ABD36 /* ItemModel.swift */,
 				58C9735024969CA100288133 /* ProfileManaging.swift */,
 				2842570726EF2EFC00C96CCC /* ProfileViewModel.swift */,
+				28831DD227DAC66F008FCC0D /* ProfileViewModel+ScreenshotHelper.swift */,
 				280831FB2683A3F600EFAEC3 /* ProfileModel.swift */,
 			);
 			name = Progress;
@@ -1336,7 +1345,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				28AFE00127CAC1D700B72B14 /* Shift_ShaftUITestsLaunchTests.swift in Sources */,
 				28AFDFFF27CAC1D700B72B14 /* Shift_ShaftUITests.swift in Sources */,
 				28AFE00727CAC22500B72B14 /* SnapshotHelper.swift in Sources */,
 			);
@@ -1347,6 +1355,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				58A1C82B24CB3CAF00302183 /* MenuCoordinator.swift in Sources */,
+				28831DCD27DAB56D008FCC0D /* TestScreenshotHelper.swift in Sources */,
 				3DD72595239DC4FE005933B2 /* MenuType.swift in Sources */,
 				5894B17A24607422003B86F1 /* EffectModel.swift in Sources */,
 				3D4F569422B33B44003695D8 /* Helpers.swift in Sources */,
@@ -1425,6 +1434,7 @@
 				3D00A0F923AAC813007E2D8B /* Identifiers.swift in Sources */,
 				3DA0A37A22FFAECE0041EF34 /* UIFont+Extensions.swift in Sources */,
 				28A36C3627A1FCD3008252DA /* BossDialog.swift in Sources */,
+				28831DD127DAC2FE008FCC0D /* LevelModel+TestScreenshots.swift in Sources */,
 				28C644682745B22F00098C3C /* BossDebugView.swift in Sources */,
 				280CD173276AADEF00052EB5 /* BossTestScene.swift in Sources */,
 				28C6446A2746C84F00098C3C /* CGVector+Extensions.swift in Sources */,
@@ -1451,6 +1461,7 @@
 				283F21F926E30D5200108D4D /* ProgressableModel.swift in Sources */,
 				3DE87C8E2235D05300D750CF /* MenuSpriteNode.swift in Sources */,
 				28CAFA7B26A0F2F000151CA8 /* CodexItemAnimatingView.swift in Sources */,
+				28831DCF27DAB717008FCC0D /* TileCreator+Screenshot.swift in Sources */,
 				3D6AACE1222C997800C77B24 /* Header.swift in Sources */,
 				28DCCB802762C649004E70A8 /* AnimatorCombat.swift in Sources */,
 				2886E84326F031050014FA5D /* SettingsView.swift in Sources */,
@@ -1507,6 +1518,7 @@
 				3D06390722EEB53C00C4D5E9 /* ComputingState.swift in Sources */,
 				2842570A26EFE82600C96CCC /* CodexPriceView.swift in Sources */,
 				288330F7274FDB400070A1E8 /* ConfirmShuffleView.swift in Sources */,
+				28831DD327DAC66F008FCC0D /* ProfileViewModel+ScreenshotHelper.swift in Sources */,
 				28A836C4268FE57F00D96C48 /* JSONCoding+Extensions.swift in Sources */,
 				3D674C9522C9D6640003AEB4 /* MainMenu.swift in Sources */,
 				58A4B91D2472E5620011624A /* TileTypeChanceModel.swift in Sources */,

@@ -68,6 +68,8 @@ class RotatePreviewView {
         guard !sprites.isEmpty, !tileTransformation.isEmpty, !originalPosition.isEmpty,
             let inputType = self.rotateInputType else { return }
         
+        GameLogger.shared.logDebug(prefix: Constants.tag, message: "Touches Moved distance: \(distance)")
+        
         // determine the total distance we must moved
         let totalDistance: CGFloat
         if case InputType.rotateClockwise = inputType {
@@ -98,8 +100,6 @@ class RotatePreviewView {
                 
                 /// set the new position
                 sprite.position = newSpritePosition
-
-                
                 
             }
         }

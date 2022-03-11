@@ -602,6 +602,12 @@ class Renderer: SKSpriteNode {
                 sprites[row].append(sprite)
                 sprites[row][col].position = CGPoint(x: x, y: y)
                 
+                #if DEBUG
+                if isPlayer {
+                    sprites[row][col].zPosition = 25_000
+                }
+                #endif
+                
                 if let (glow, spin) = sprite.glow() {
                     sprite.addChild(glow)
                     glow.run(spin)
@@ -1519,3 +1525,9 @@ extension Renderer: SettingsDelegate {
         InputQueue.append(Input(.pause))
     }
 }
+
+#if DEBUG
+extension Renderer {
+//    func sendRotatePreview
+}
+#endif

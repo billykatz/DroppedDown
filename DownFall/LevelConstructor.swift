@@ -49,6 +49,12 @@ struct LevelConstructor {
     }
     
     static func boardSize(depth: Depth) -> Int {
+        
+        #if DEBUG
+        if UITestRunningChecker.shared.testsAreRunning {
+            return 6
+        }
+        #endif
         switch depth {
         case 0, 1:
             return 7

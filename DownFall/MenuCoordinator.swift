@@ -148,4 +148,8 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
 
         }
     }
+    
+    func setUpPowerupScreenshot() {
+        profileViewModel?.setUpPowerUpScreenShot()
+    }
 }

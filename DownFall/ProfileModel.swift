@@ -33,6 +33,10 @@ class Profile: Codable, Equatable {
         return unlockables.filter { $0.isPurchased }.count
     }
     
+    var secondaryProgress: Int {
+        return pastRunSeeds.count
+    }
+    
     enum CodingKeys: String, CodingKey {
         case name
         case player
@@ -238,7 +242,7 @@ class Profile: Codable, Equatable {
         var newUnlockables = Unlockable.unlockables()
         for oldUnlockable in unlockables {
             if let index = newUnlockables.firstIndex(of: oldUnlockable) {
-                print(newUnlockables[index].id)
+//                print(newUnlockables[index].id)
                 let newUnlockable = newUnlockables[index]
                 let updatedUnlockable = oldUnlockable.update(stat: newUnlockable.stat,
                                                              item: newUnlockable.item,
@@ -255,16 +259,16 @@ class Profile: Codable, Equatable {
         
 #if DEBUG
         /// print this shit so we can debug
-        print("---------UNLOCKABLES--------")
-        print("---------START--------")
-        print(newUnlockables.count)
-        var count = 1
-        newUnlockables.forEach { updatedUnlockable in
-            print(count)
-            count += 1
-            updatedUnlockable.debugDescription()
-        }
-        print("---------END--------")
+//        print("---------UNLOCKABLES--------")
+//        print("---------START--------")
+//        print(newUnlockables.count)
+//        var count = 1
+//        newUnlockables.forEach { updatedUnlockable in
+//            print(count)
+//            count += 1
+//            updatedUnlockable.debugDescription()
+//        }
+//        print("---------END--------")
 #endif
         let newStartingUnlockable = Unlockable.startingUnlockedUnlockables
         

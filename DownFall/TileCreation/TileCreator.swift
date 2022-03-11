@@ -331,10 +331,6 @@ class TileCreator: TileStrategy {
             for row in 0..<screenShotBoard.count {
                 for col in 0..<screenShotBoard.count {
                     board[row][col] = screenShotBoard[row][col]
-//                    if screenShotBoard[row][col].type == .player(.zero) {
-//                        board[row][col] = Tile(type: .player(playerData))
-//                    } else {
-//                    }
                 }
             }
             return (board, true)

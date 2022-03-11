@@ -349,7 +349,7 @@ class Level: Codable, Hashable {
             
         case 5:
             let monsterAmount = 7
-            let totalPillarAmount = Int(0.8*Float(totalPillarAmount))
+            let totalPillarAmount = createTotalPillarGoalAmount(totalPillars: totalPillarAmount, depth: depth, randomSource: randomSource, previousLevelGoals: previousLevelGoals)
             let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 40)
             let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
             let pillarGoal = LevelGoal.pillarGoal(amount: totalPillarAmount)
@@ -367,7 +367,7 @@ class Level: Codable, Hashable {
             
         case 6:
             let monsterAmount = 9
-            let totalPillarAmount = Int(0.75*Float(totalPillarAmount))
+            let totalPillarAmount = createTotalPillarGoalAmount(totalPillars: totalPillarAmount, depth: depth, randomSource: randomSource, previousLevelGoals: previousLevelGoals)
             let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 45)
             let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
             let pillarGoal = LevelGoal.pillarGoal(amount: totalPillarAmount)
@@ -381,13 +381,13 @@ class Level: Codable, Hashable {
             
         case 7:
             let monsterAmount = 12
-            let totalPillarAmount = Int(0.7*Float(totalPillarAmount))
+            let totalPillarAmount = createTotalPillarGoalAmount(totalPillars: totalPillarAmount, depth: depth, randomSource: randomSource, previousLevelGoals: previousLevelGoals)
             let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 50)
             let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
             let pillarGoal = LevelGoal.pillarGoal(amount: totalPillarAmount)
             if offeredGemAmount > 0 {
                 let gemGoal = LevelGoal.gemGoal(amount: offeredGemAmount)
-                let gemGoalChance = AnyChanceModel(thing: gemGoal, chance: 100)
+                let gemGoalChance = AnyChanceModel(thing: gemGoal, chance: 200)
                 goalChances.append(gemGoalChance)
             }
             
@@ -399,14 +399,14 @@ class Level: Codable, Hashable {
             
         case 8:
             let monsterAmount = 15
-            let totalPillarAmount = Int(0.65*Float(totalPillarAmount))
+            let totalPillarAmount = createTotalPillarGoalAmount(totalPillars: totalPillarAmount, depth: depth, randomSource: randomSource, previousLevelGoals: previousLevelGoals)
             let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 55)
             let brownRockGoal = randomRockGoal([.brown], amount: 6)
             let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
             let pillarGoal = LevelGoal.pillarGoal(amount: totalPillarAmount)
             if offeredGemAmount > 0 {
                 let gemGoal = LevelGoal.gemGoal(amount: offeredGemAmount)
-                let gemGoalChance = AnyChanceModel(thing: gemGoal, chance: 100)
+                let gemGoalChance = AnyChanceModel(thing: gemGoal, chance: 200)
                 goalChances.append(gemGoalChance)
             }
             
@@ -574,9 +574,9 @@ func chanceDeltaOfferHealth(playerData: EntityModel, currentChance: Float, modif
     } else if currHealth <= maxHealth / 4 * 3 {
         delta = 2.5
     } else if currHealth == maxHealth {
-        delta = 0.75
+        delta = 1.25
     } else {
-        delta = 1.5
+        delta = 2
     }
     
     return delta * currentChance * modifier
@@ -993,11 +993,11 @@ func deltaChanceOfferHealth(playerData: EntityModel, depth: Depth, storeOffer: S
         } else if currentHp < originalHp/3 {
             healingPotionMultipler = 1.75
         } else if currentHp < originalHp/2 {
-            healingPotionMultipler = 1.5
+            healingPotionMultipler = 1.65
         } else if currentHp < originalHp/4 * 3 {
-            healingPotionMultipler = 1.25
+            healingPotionMultipler = 1.5
         } else if currentHp < originalHp/6 * 5 {
-            healingPotionMultipler = 1.15
+            healingPotionMultipler = 1.25
         } else {
             healingPotionMultipler = 1
         }
@@ -1007,11 +1007,11 @@ func deltaChanceOfferHealth(playerData: EntityModel, depth: Depth, storeOffer: S
         } else if currentHp < originalHp/3 {
             healingPotionMultipler = 1.75
         } else if currentHp < originalHp/2 {
-            healingPotionMultipler = 1.5
+            healingPotionMultipler = 1.65
         } else if currentHp < originalHp/4 * 3 {
-            healingPotionMultipler = 1.25
+            healingPotionMultipler = 1.5
         } else if currentHp < originalHp/6 * 5 {
-            healingPotionMultipler = 1.15
+            healingPotionMultipler = 1.25
         } else {
             healingPotionMultipler = 1
         }
@@ -1021,11 +1021,11 @@ func deltaChanceOfferHealth(playerData: EntityModel, depth: Depth, storeOffer: S
         } else if currentHp < originalHp/3 {
             healingPotionMultipler = 1.75
         } else if currentHp < originalHp/2 {
-            healingPotionMultipler = 1.5
+            healingPotionMultipler = 1.65
         } else if currentHp < originalHp/4 * 3 {
-            healingPotionMultipler = 1.25
+            healingPotionMultipler = 1.5
         } else if currentHp < originalHp/6 * 5 {
-            healingPotionMultipler = 1.15
+            healingPotionMultipler = 1.25
         } else {
             healingPotionMultipler = 1
         }
@@ -1056,7 +1056,6 @@ func deltaChanceOfferUtilWealth(storeOfferChance: AnyChanceModel<StoreOffer>, al
 
     if noneWereThisOffer {
         // add
-//        let sameTierOfferCount = Float(sameTierOffersInPast?.count ?? 0)
         delta = 3
     } else if storeOfferChance.thing.type == .runeSlot {
         // make these pretty rare to force the player to interact with the store
@@ -1214,107 +1213,40 @@ func tierItems(from buckets: [StoreOfferBucket], tier: StoreOfferTier, depth: De
     return chosenOffers
 }
 
+func createTotalPillarGoalAmount(totalPillars: Int, depth: Int, randomSource: GKLinearCongruentialRandomSource, previousLevelGoals: [LevelGoal]?) -> Int {
+    
+    var totalPillarAmount = Float(totalPillars)
+    
+    switch depth {
+    case 0, 1, 2:
+        totalPillarAmount *= 0
+        
+    case 3, 4, 5:
+        let chance1 = AnyChanceModel<Float>(thing: 0.5, chance: 33)
+        let chance2 = AnyChanceModel<Float>(thing: 0.65, chance: 33)
+        let chance3 = AnyChanceModel<Float>(thing: 0.8, chance: 33)
+        
+        if let chosen = randomSource.chooseElementWithChance([chance1, chance2, chance3]) {
+            totalPillarAmount *= chosen.thing
+        }
+        
+    case 6, 7, 8:
+        let chance1 = AnyChanceModel<Float>(thing: 0.4, chance: 25)
+        let chance2 = AnyChanceModel<Float>(thing: 0.55, chance: 25)
+        let chance3 = AnyChanceModel<Float>(thing: 0.7, chance: 25)
+        let chance4 = AnyChanceModel<Float>(thing: 0.85, chance: 25)
+        
+        if let chosen = randomSource.chooseElementWithChance([chance1, chance2, chance3, chance4]) {
+            totalPillarAmount *= chosen.thing
+        }
+        
+    case bossLevelDepthNumber:
+        totalPillarAmount *= 0
+        
+    default:
+        totalPillarAmount *= 0
+    }
+    
+    return Int(totalPillarAmount)
 
-
-    
-    /// TIER 1
-    // create chances for health items
-    // create chance for luck items
-    // create chance for gem items
-    // create chance for dodge items
-    // create chance for other potion items
-    
-    
-    /// TIER 2
-    // create chance for health items
-    // create chance for luck items
-    // create chance for gem itms
-    // create chance for dodge items
-    // create chance for rune items
-    // create chance for other items
-    // create chance for rune slot items
-    
-    
-    /// RUNES
-    /// liquify monsters
-    /// crush
-    /// fiery rage
-    ///
-    /// bubble up
-    /// get swifty
-    /// teleport to exit
-    ///
-    /// transform rock
-    /// vortex
-    /// move earth
-    ///
-    /// rain embers
-    /// fireball
-    /// drill down
-    ///
-    ///
-    /// HEALTH
-    /// Lesser
-    /// Greater
-    /// plus 1
-    /// plus 2
-    ///
-    /// DODGE
-    /// Sandals
-    /// Running Shoes
-    /// Winged Boots
-    ///
-    /// LUCK
-    /// four leaf
-    /// horseshoe
-    /// lucky cat
-    ///
-    /// UTIL
-    /// snake eyes
-    /// transmogrify
-    /// kill monster
-    /// chest
-    /// greater rune potion
-    /// pickaxe slot
-    /// EScape
-    ///
-    /// WEALTH
-    /// gem magnet
-    /// liquify monsters
-    /// infusion
-    /// 25 gems
-    /// 50 gems
-    ///
-    ///
-    ///
-    
-    /// Random Chance
-    /// First choose two buckets
-    /// - runes
-    /// - health
-    /// - dodge
-    /// - luck
-    /// - wealth
-    /// - util
-    /// They can be the same bucket.
-    /// Tier 1.
-    /// Choose from
-    /// health, dodge, luck, wealth and util
-    /// 1/5 base chance for first bucket
-    /// 1/5 base chance for second bucket
-    /// +A% depending on players health
-    /// +B% depnding on what was offered last level
-    ///
-    /// Tier 2 (just add rune)
-    /// Choose from health, dodge, luck wealth and util
-    ///
-    /// Then within each bucket, choose 1 item. The items must be different from one another (only important if we choose the same bucket).
-    ///  base chance of anything is 1/x where x is the number of items unlocked
-    ///  6 items? 1/6 % chance for each one to appear
-    ///  +A% for health items, depending on your health
-    ///  +B% of a non-health item if the other item is health related ??
-    ///  +C% based on the rarity of the item
-    ///  +D% base on the player's luck rating and the item's rarity
-    ///  +E% based on the number of rounds this item hasnt shown up this run
-    ///  +F% (rune offers) they have not been offered a rune yet
-    ///  -Int.min% if that item is already picked
+}

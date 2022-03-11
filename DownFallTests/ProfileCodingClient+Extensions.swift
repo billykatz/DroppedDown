@@ -37,11 +37,11 @@ extension Unlockable {
 
 extension ProfileDecodingClient {
     static let test = Self { profileType, data in
-        return Profile(name: "test-uuid", player: .playerZero, currentRun: nil, stats: [], unlockables: [], startingUnlockbles: [])
+        return Profile(name: "test-uuid", player: .playerZero, currentRun: nil, stats: [], unlockables: [], startingUnlockbles: [], pastRunSeeds: [])
     }
     
     static let progress10 = Self { profileType, data in
-        return Profile(name: "test-uuid", player: .playerZero, currentRun: nil, stats: [], unlockables: Unlockable.testUnlockablesOnePurchased, startingUnlockbles: [])
+        return Profile(name: "test-uuid", player: .playerZero, currentRun: nil, stats: [], unlockables: Unlockable.testUnlockablesOnePurchased, startingUnlockbles: [], pastRunSeeds: [])
         
     }
 }

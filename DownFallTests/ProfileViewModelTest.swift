@@ -80,7 +80,7 @@ class ProfileViewModelTest: XCTestCase {
         
         /// save the profile with the uuid as the name
         /// copy all other defaults
-        let newProfile = Profile(name: "", player: .zero, currentRun: nil, stats: [], unlockables: [], startingUnlockbles: [])
+        let newProfile = Profile(name: "", player: .zero, currentRun: nil, stats: [], unlockables: [], startingUnlockbles: [], pastRunSeeds: [])
         
         XCTAssertEqual(expectedProfiles.last!?.currentRun, newProfile.currentRun)
             
@@ -121,7 +121,7 @@ class ProfileViewModelTest: XCTestCase {
         
         
         
-        let saveProfile = Profile(name: "test-uuid-1", player: .playerZero, currentRun: nil, stats: [], unlockables: Unlockable.testUnlockablesOnePurchased, startingUnlockbles: [])
+        let saveProfile = Profile(name: "test-uuid-1", player: .playerZero, currentRun: nil, stats: [], unlockables: Unlockable.testUnlockablesOnePurchased, startingUnlockbles: [], pastRunSeeds: [])
         
         profileViewModel.authenicatedSubject.send(true)
         profileViewModel.saveProfile(saveProfile)
@@ -172,7 +172,7 @@ class ProfileViewModelTest: XCTestCase {
         // profiles are received on the main thread
         mainScheduler.advance()
         
-        let saveProfile = Profile(name: "test-uuid-1", player: .playerZero, currentRun: nil, stats: [], unlockables: [], startingUnlockbles: [])
+        let saveProfile = Profile(name: "test-uuid-1", player: .playerZero, currentRun: nil, stats: [], unlockables: [], startingUnlockbles: [], pastRunSeeds: [])
         
         profileViewModel.authenicatedSubject.send(true)
         profileViewModel.saveProfile(saveProfile)
@@ -223,7 +223,7 @@ class ProfileViewModelTest: XCTestCase {
         mainScheduler.advance()
         
         let saveName = "SaveThisOne\(UUID())"
-        let saveProfile = Profile(name: saveName, player: .playerZero, currentRun: nil, stats: [], unlockables: Unlockable.testUnlockablesOnePurchased, startingUnlockbles: [])
+        let saveProfile = Profile(name: saveName, player: .playerZero, currentRun: nil, stats: [], unlockables: Unlockable.testUnlockablesOnePurchased, startingUnlockbles: [], pastRunSeeds: [])
         
         
         profileViewModel.saveProfile(saveProfile)
@@ -233,7 +233,7 @@ class ProfileViewModelTest: XCTestCase {
         mainScheduler.advance()
         
         
-        let nextProfie = Profile(name: "this-one-is-not", player: .playerZero, currentRun: nil, stats: [], unlockables: Unlockable.testUnlockablesNonePurchased, startingUnlockbles: [])
+        let nextProfie = Profile(name: "this-one-is-not", player: .playerZero, currentRun: nil, stats: [], unlockables: Unlockable.testUnlockablesNonePurchased, startingUnlockbles: [], pastRunSeeds: [])
 
         
         profileViewModel.saveProfile(nextProfie)

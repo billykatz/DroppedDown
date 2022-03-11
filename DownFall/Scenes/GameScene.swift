@@ -165,7 +165,9 @@ class GameScene: SKScene {
         
 #if DEBUG
         // screen shot helper
-        self.screenshotHelper = ScreenshotHelper(rotatePreview: rotatePreview, foreground: foreground, playableRect: size.playableRect)
+        if UITestRunningChecker.shared.testsAreRunning {
+            self.screenshotHelper = ScreenshotHelper(rotatePreview: rotatePreview, foreground: foreground, playableRect: size.playableRect)
+        }
 #endif
     
         // create the renderer

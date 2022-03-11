@@ -114,9 +114,10 @@ extension TileCreator {
             return crushScreenshot()
         }
         else {
-            return []
+            return nil
         }
         #endif
+        return nil
     }
 
     

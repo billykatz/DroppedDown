@@ -107,8 +107,10 @@ class Shift_ShaftUITests: XCTestCase {
         
         let newgameButton = app.buttons["newGame"]
         newgameButton.tap()
+        app.buttons["Start Run"].tap()
+        app.otherElements["levelGoalView"].tap()
 
-        snapshot("04Powerup")
+        snapshot("04Upgrade")
     }
 
     func testScreenshotCrush() throws {

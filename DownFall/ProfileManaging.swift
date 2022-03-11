@@ -221,12 +221,13 @@ class ProfileLoadingManager: ProfileManaging {
                 if loadedProfile?.progress ?? 0 <= newProfile.progress || (UITestRunningChecker.shared.testsAreRunning){
                     GameLogger.shared.log(prefix: Constants.tag, message: "Loaded: \(loadedProfile?.progress ?? 0)")
                     GameLogger.shared.log(prefix: Constants.tag, message: "New \(newProfile.progress)")
-                    GameLogger.shared.log(prefix: Constants.tag, message: "saving new profile")
+                    GameLogger.shared.log(prefix: Constants.tag, message: "saving new profile with name \(newProfile.name)")
+                    GameLogger.shared.log(prefix: Constants.tag, message: "Overwriting old provile with name \(loadedProfile?.name ?? "")")
                     GameLogger.shared.log(prefix: Constants.tag, message: "Loaded profile has null run \(loadedProfile?.currentRun == nil)")
                     GameLogger.shared.log(prefix: Constants.tag, message: "New profile has null run \(newProfile.currentRun == nil)")
                     return saveProfileLocallyAndRemotely(newProfile, localPlayer: localPlayer, uuidKey: Constants.playerUUIDKey, userDefaultsClient: userDefaultClient, isAuthenticated: localPlayer.isAuthenticated(), fileManagerClient: fileManagerClient, profileCodingClient: profileCodingClient)
                 } else {
-                    GameLogger.shared.log(prefix: Constants.tag, message: "not saving profile because remote is further")
+                    GameLogger.shared.log(prefix: Constants.tag, message: "not saving profile because remote is further: \(newProfile.name)")
                     throw ProfileError.localProfileHasNotProgressedFurtherThanRemoteProfile
                 }
             }
@@ -310,7 +311,7 @@ func saveProfileLocallyAndRemotely(_ profile: Profile, localPlayer: PlayerClient
         .catch { error in
             return Future<Profile, Error> { promise in
                 if (!isAuthenticated) { promise(.success(profile)) }
-                else { promise(.failure(error)) }
+                else { promise(.success(profile)) }
             }
         }
     
@@ -476,7 +477,15 @@ fileprivate func progressedFuther(lhs: Profile, rhs: Profile) -> Profile {
     if rhsIsPurchased > lhsIsPurchased { return rhs }
     else if lhsIsPurchased > rhsIsPurchased { return lhs }
     else {
-        // they equal on another
-        return rhsIsUnlocked > lhsIsUnlocked ? rhs : lhs
+        // they equal on another then check tie breaker
+        if lhs.secondaryProgress > rhs.secondaryProgress {
+            return lhs
+        } else if rhs.secondaryProgress > lhs.secondaryProgress {
+            // give the final tie to the local profile.
+            return rhs
+        } else {
+            //final tie breaker, what has more stuff unlocked
+            return rhsIsUnlocked > lhsIsUnlocked ? rhs : lhs
+        }
     }
 }

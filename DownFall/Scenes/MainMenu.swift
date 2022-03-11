@@ -194,21 +194,22 @@ class MainMenu: SKScene {
         
         
         #if DEBUG
-        let testUIButton = ShiftShaft_Button(size: CGSize(width: 100, height: 75), delegate: self, identifier: .mainMenuSwipeScreenshot, image: SKSpriteNode(imageNamed: Constants.blankButtonName), shape: .rectangle, addTextLabel: true, fontType: .small, fontSize: 22.0)
-        
-        testUIButton.position = CGPoint.alignHorizontally(testUIButton.frame,
-                                                             relativeTo: feedbackButton.frame,
-                                                             horizontalAnchor: .center,
-                                                             verticalAlign: .bottom,
-                                                             verticalPadding: Constants.buttonPadding,
-                                                             translatedToBounds: true)
-        testUIButton.zPosition = 0
-        
-        buttonContainer.addChild(testUIButton)
-        testUIButton.alpha = 0
-        testUIButton.makeUITestAccessible(label: "snapShotSwipe", traits: .button, scene: self)
-        testUIButton.run(buttonFadeInAction)
-
+        if UITestRunningChecker.shared.testsAreRunning {
+            let testUIButton = ShiftShaft_Button(size: CGSize(width: 100, height: 75), delegate: self, identifier: .mainMenuSwipeScreenshot, image: SKSpriteNode(imageNamed: Constants.blankButtonName), shape: .rectangle, addTextLabel: true, fontType: .small, fontSize: 22.0)
+            
+            testUIButton.position = CGPoint.alignHorizontally(testUIButton.frame,
+                                                                 relativeTo: feedbackButton.frame,
+                                                                 horizontalAnchor: .center,
+                                                                 verticalAlign: .bottom,
+                                                                 verticalPadding: Constants.buttonPadding,
+                                                                 translatedToBounds: true)
+            testUIButton.zPosition = 0
+            
+            buttonContainer.addChild(testUIButton)
+            testUIButton.alpha = 0
+            testUIButton.makeUITestAccessible(label: "snapShotSwipe", traits: .button, scene: self)
+            testUIButton.run(buttonFadeInAction)
+        }
         #endif
         
     }

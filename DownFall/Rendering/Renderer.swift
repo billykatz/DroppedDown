@@ -603,7 +603,7 @@ class Renderer: SKSpriteNode {
                 sprites[row][col].position = CGPoint(x: x, y: y)
                 
                 #if DEBUG
-                if isPlayer {
+                if isPlayer && UITestRunningChecker.shared.testsAreRunning {
                     sprites[row][col].zPosition = 25_000
                 }
                 #endif

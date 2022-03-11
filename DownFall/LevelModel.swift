@@ -196,23 +196,34 @@ class Level: Codable, Hashable {
         return newOffers
     }
     
-    public func randomItemOrRune(offersOnBoard: [StoreOffer]) -> StoreOffer {
+    public func randomItemOrRune(playerData: EntityModel, offersOnBoard: [StoreOffer]) -> StoreOffer {
         // pool of items
         var allUnlockables = Set<Unlockable>(self.startingUnlockables)
-        allUnlockables.formUnion(self.otherUnlockables)
+        let otherUnlockables = self.otherUnlockables.filter({
+            if let runes = playerData.pickaxe?.runes, let unlockableRune = $0.item.rune {
+                return !runes.contains(unlockableRune)
+            } else {
+                return true
+            }
+        })
+        allUnlockables.formUnion(otherUnlockables)
+        
+        let unlockables = Array(allUnlockables)
         
         // reserve items
         var reservedOffers = Set<StoreOffer>()
         reservedOffers.formUnion(offersOnBoard)
         
-        var newOffer: StoreOffer? = allUnlockables.randomElement()?.item
-        var maxTries: Int = 30
-        while reservedOffers.contains(newOffer ?? .zero) && maxTries > 0 {
-            newOffer = allUnlockables.randomElement()?.item
-            maxTries -= 1
+        let randomSource = GKLinearCongruentialRandomSource(seed: randomSeed)
+        if let chosen = randomSource.chooseElement(unlockables, avoidBlock: { unlockable in
+            return reservedOffers.contains(unlockable.item)
+        }) {
+            return chosen.item
+        } else if !unlockables.isEmpty {
+            return unlockables.first!.item
+        } else {
+            return .offer(type: .plusOneMaxHealth, tier: 1)
         }
-        
-        return newOffer!
     }
     
     
@@ -560,7 +571,92 @@ class Level: Codable, Hashable {
     
 }
 
-func chanceDeltaOfferHealth(playerData: EntityModel, currentChance: Float, modifier: Float) -> Float {
+//MARK: - Buckets
+/// Weights the different bucket options.
+func chanceDeltaStoreOfferBuckets(_ buckets: [AnyChanceModel<StoreOfferBucket>], lastLevelOfferings: [StoreOfferBucket]?, allPastLevelOffers: [StoreOfferBucket]?, playerData: EntityModel, depth: Depth, unlockables: [Unlockable]) -> [AnyChanceModel<StoreOfferBucket>] {
+    
+    GameLogger.shared.log(prefix: "LevelModel", message: "~~~~~~~~ Choosing Buckets ~~~~~~~ ")
+    
+    var healthBucketChance = buckets.filter { $0.thing.type == .health }.reduce(Float(0), { prev, current in return prev + current.chance })
+    var dodgeBucketChance = buckets.filter { $0.thing.type == .dodge }.reduce(Float(0), { prev, current in return prev + current.chance })
+    var luckBucketChance = buckets.filter { $0.thing.type == .luck }.reduce(Float(0), { prev, current in return prev + current.chance })
+    var utilBucketChance = buckets.filter { $0.thing.type == .util }.reduce(Float(0), { prev, current in return prev + current.chance })
+    var wealthBucketChance = buckets.filter { $0.thing.type == .wealth }.reduce(Float(0), { prev, current in return prev + current.chance })
+    var runeBucketChance = buckets.filter { $0.thing.type == .rune }.reduce(Float(0), { prev, current in return prev + current.chance })
+    
+    for bucket in buckets {
+        switch (depth, bucket.thing.type) {
+        case (0, .health), (1, .health), (2, .health):
+            GameLogger.shared.log(prefix: "LevelModel", message: "Old \(bucket.thing.type) chance is \(healthBucketChance)")
+            healthBucketChance = chanceDeltaOfferHealthBucket(playerData: playerData, currentChance: healthBucketChance, modifier: 1.0)
+            
+        case (3, .health), (4, .health), (5, .health):
+            GameLogger.shared.log(prefix: "LevelModel", message: "Old \(bucket.thing.type) chance is \(healthBucketChance)")
+            healthBucketChance = chanceDeltaOfferHealthBucket(playerData: playerData, currentChance: healthBucketChance, modifier: 0.9)
+            
+        case (6, .health), (7, .health), (8, .health):
+            GameLogger.shared.log(prefix: "LevelModel", message: "Old \(bucket.thing.type) chance is \(healthBucketChance)")
+            healthBucketChance = chanceDeltaOfferHealthBucket(playerData: playerData, currentChance: healthBucketChance, modifier: 0.8)
+            
+        case (_, .dodge):
+            GameLogger.shared.log(prefix: "LevelModel", message: "Old \(bucket.thing.type) chance is \(dodgeBucketChance)")
+            dodgeBucketChance = chanceDeltaOfferDodgeBucket(playerData: playerData, modifier: 1, currentChance: dodgeBucketChance, lastLevelOfferBuckets: lastLevelOfferings)
+            
+        case (_, .luck):
+            GameLogger.shared.log(prefix: "LevelModel", message: "Old \(bucket.thing.type) chance is \(luckBucketChance)")
+            luckBucketChance = chanceDeltaOfferLuckBucket(playerData: playerData, modifier: 1, currentChance: luckBucketChance, lastLevelOfferBuckets: lastLevelOfferings)
+            
+        case (_, .util):
+            GameLogger.shared.log(prefix: "LevelModel", message: "Old \(bucket.thing.type) chance is \(utilBucketChance)")
+            utilBucketChance = chanceOfferUtilBucket(pastLevelOffers: lastLevelOfferings, modifier: 1, currentChance: utilBucketChance)
+            
+        case (_, .wealth):
+            GameLogger.shared.log(prefix: "LevelModel", message: "Old \(bucket.thing.type) chance is \(wealthBucketChance)")
+            wealthBucketChance = chanceDeltaOfferWealthBucket(playerData: playerData, unlockables: unlockables, currentChance: wealthBucketChance)
+            
+        case (_, .rune):
+            GameLogger.shared.log(prefix: "LevelModel", message: "Old \(bucket.thing.type) chance is \(runeBucketChance)")
+            runeBucketChance = chanceDeltaOfferRuneBucket(playerData: playerData, allPastLevelOffers: allPastLevelOffers, modifier: 1.0, depth: depth, currentChance: runeBucketChance)
+            
+        default:
+            break
+        }
+        
+    }
+    healthBucketChance = max(0.01, healthBucketChance)
+    luckBucketChance = max(0.01, luckBucketChance)
+    dodgeBucketChance = max(0.01, dodgeBucketChance)
+    wealthBucketChance = max(0.01, wealthBucketChance)
+    utilBucketChance = max(0.01, utilBucketChance)
+    runeBucketChance = max(0.01, runeBucketChance)
+    
+    return buckets.map { bucket in
+        switch bucket.thing.type {
+        case .health:
+            GameLogger.shared.log(prefix: "LevelModel", message: "New \(bucket.thing.type) chance is \(healthBucketChance)")
+            return AnyChanceModel(thing: StoreOfferBucket(type: bucket.thing.type), chance: healthBucketChance)
+        case .luck:
+            GameLogger.shared.log(prefix: "LevelModel", message: "New \(bucket.thing.type) chance is \(luckBucketChance)")
+            return AnyChanceModel(thing: StoreOfferBucket(type: bucket.thing.type), chance: luckBucketChance)
+        case .dodge:
+            GameLogger.shared.log(prefix: "LevelModel", message: "New \(bucket.thing.type) chance is \(dodgeBucketChance)")
+            return AnyChanceModel(thing: StoreOfferBucket(type: bucket.thing.type), chance: dodgeBucketChance)
+        case .wealth:
+            GameLogger.shared.log(prefix: "LevelModel", message: "New \(bucket.thing.type) chance is \(wealthBucketChance)")
+            return AnyChanceModel(thing: StoreOfferBucket(type: bucket.thing.type), chance: wealthBucketChance)
+        case .util:
+            GameLogger.shared.log(prefix: "LevelModel", message: "New \(bucket.thing.type) chance is \(utilBucketChance)")
+            return AnyChanceModel(thing: StoreOfferBucket(type: bucket.thing.type), chance: utilBucketChance)
+        case .rune:
+            GameLogger.shared.log(prefix: "LevelModel", message: "New \(bucket.thing.type) chance is \(runeBucketChance)")
+            return AnyChanceModel(thing: StoreOfferBucket(type: bucket.thing.type), chance: runeBucketChance)
+        }
+        
+    }
+}
+        
+
+func chanceDeltaOfferHealthBucket(playerData: EntityModel, currentChance: Float, modifier: Float) -> Float {
     var delta: Float = 1
     let currHealth = Float(playerData.hp)
     let maxHealth = Float(playerData.originalHp)
@@ -573,10 +669,10 @@ func chanceDeltaOfferHealth(playerData: EntityModel, currentChance: Float, modif
         delta = 3
     } else if currHealth <= maxHealth / 4 * 3 {
         delta = 2.5
-    } else if currHealth == maxHealth {
-        delta = 1.25
-    } else {
+    } else if currHealth <= maxHealth / 6 * 5 {
         delta = 2
+    } else {
+        delta = 1.25
     }
     
     return delta * currentChance * modifier
@@ -584,7 +680,7 @@ func chanceDeltaOfferHealth(playerData: EntityModel, currentChance: Float, modif
 
 
 
-func chanceDeltaOfferDodge(playerData player: EntityModel, modifier: Float, currentChance: Float) -> Float {
+func chanceDeltaOfferDodgeBucket(playerData player: EntityModel, modifier: Float, currentChance: Float, lastLevelOfferBuckets: [StoreOfferBucket]?) -> Float {
     var delta = Float(1)
     if player.dodge > 40 {
         delta = 0.1
@@ -606,10 +702,18 @@ func chanceDeltaOfferDodge(playerData player: EntityModel, modifier: Float, curr
         delta = 1.2
     }
     
+    let dodgeOfferedLastLevel = (lastLevelOfferBuckets ?? []).filter{ $0.type == StoreOfferBucketType.dodge }.count
+    if dodgeOfferedLastLevel == 1 {
+        delta *= 0.5
+    } else if dodgeOfferedLastLevel == 2  {
+        delta *= 0.2
+    }
+    
+    
     return currentChance * delta * modifier
 }
 
-func chanceDeltaOfferLuck(playerData player: EntityModel, modifier: Float, currentChance: Float) -> Float {
+func chanceDeltaOfferLuckBucket(playerData player: EntityModel, modifier: Float, currentChance: Float, lastLevelOfferBuckets: [StoreOfferBucket]?) -> Float {
     var delta = Float(1)
     if player.luck > 70 {
         delta = 0.1
@@ -629,6 +733,14 @@ func chanceDeltaOfferLuck(playerData player: EntityModel, modifier: Float, curre
         delta = 0.95
     } else if player.luck > 0 {
         delta = 1.1
+    }
+    
+    
+    let luckOfferedLastLevel = (lastLevelOfferBuckets ?? []).filter{  $0.type == StoreOfferBucketType.luck }.count
+    if luckOfferedLastLevel == 1 {
+        delta *= 0.5
+    } else if luckOfferedLastLevel == 2  {
+        delta *= 0.2
     }
     
     return currentChance * delta * modifier
@@ -774,88 +886,8 @@ func chanceDeltaOfferRuneBucket(playerData: EntityModel, allPastLevelOffers: [St
 }
 
 
-/// Weights the different bucket options.
-func chanceDeltaStoreOfferBuckets(_ buckets: [AnyChanceModel<StoreOfferBucket>], lastLevelOfferings: [StoreOfferBucket]?, allPastLevelOffers: [StoreOfferBucket]?, playerData: EntityModel, depth: Depth, unlockables: [Unlockable]) -> [AnyChanceModel<StoreOfferBucket>] {
-    
-    
-    var healthBucketChance = buckets.filter { $0.thing.type == .health }.reduce(Float(0), { prev, current in return prev + current.chance })
-    var dodgeBucketChance = buckets.filter { $0.thing.type == .dodge }.reduce(Float(0), { prev, current in return prev + current.chance })
-    var luckBucketChance = buckets.filter { $0.thing.type == .luck }.reduce(Float(0), { prev, current in return prev + current.chance })
-    var utilBucketChance = buckets.filter { $0.thing.type == .util }.reduce(Float(0), { prev, current in return prev + current.chance })
-    var wealthBucketChance = buckets.filter { $0.thing.type == .wealth }.reduce(Float(0), { prev, current in return prev + current.chance })
-    var runeBucketChance = buckets.filter { $0.thing.type == .rune }.reduce(Float(0), { prev, current in return prev + current.chance })
-    
-    for bucket in buckets {
-        switch (depth, bucket.thing.type) {
-        case (0, .health), (1, .health), (2, .health):
-            GameLogger.shared.log(prefix: "LevelModel", message: "Old \(bucket.thing.type) chance is \(healthBucketChance)")
-            healthBucketChance = chanceDeltaOfferHealth(playerData: playerData, currentChance: healthBucketChance, modifier: 1.0)
-            
-        case (3, .health), (4, .health), (5, .health):
-            GameLogger.shared.log(prefix: "LevelModel", message: "Old \(bucket.thing.type) chance is \(healthBucketChance)")
-            healthBucketChance = chanceDeltaOfferHealth(playerData: playerData, currentChance: healthBucketChance, modifier: 0.9)
-            
-        case (6, .health), (7, .health), (8, .health):
-            GameLogger.shared.log(prefix: "LevelModel", message: "Old \(bucket.thing.type) chance is \(healthBucketChance)")
-            healthBucketChance = chanceDeltaOfferHealth(playerData: playerData, currentChance: healthBucketChance, modifier: 0.8)
-            
-        case (_, .dodge):
-            GameLogger.shared.log(prefix: "LevelModel", message: "Old \(bucket.thing.type) chance is \(dodgeBucketChance)")
-            dodgeBucketChance = chanceDeltaOfferDodge(playerData: playerData, modifier: 1, currentChance: dodgeBucketChance)
-            
-        case (_, .luck):
-            GameLogger.shared.log(prefix: "LevelModel", message: "Old \(bucket.thing.type) chance is \(luckBucketChance)")
-            luckBucketChance = chanceDeltaOfferLuck(playerData: playerData, modifier: 1, currentChance: luckBucketChance)
-            
-        case (_, .util):
-            GameLogger.shared.log(prefix: "LevelModel", message: "Old \(bucket.thing.type) chance is \(utilBucketChance)")
-            utilBucketChance = chanceOfferUtilBucket(pastLevelOffers: lastLevelOfferings, modifier: 1, currentChance: utilBucketChance)
-            
-        case (_, .wealth):
-            GameLogger.shared.log(prefix: "LevelModel", message: "Old \(bucket.thing.type) chance is \(wealthBucketChance)")
-            wealthBucketChance = chanceDeltaOfferWealthBucket(playerData: playerData, unlockables: unlockables, currentChance: wealthBucketChance)
-            
-        case (_, .rune):
-            GameLogger.shared.log(prefix: "LevelModel", message: "Old \(bucket.thing.type) chance is \(runeBucketChance)")
-            runeBucketChance = chanceDeltaOfferRuneBucket(playerData: playerData, allPastLevelOffers: allPastLevelOffers, modifier: 1.0, depth: depth, currentChance: runeBucketChance)
-            
-        default:
-            break
-        }
-        
-    }
-    healthBucketChance = max(0.01, healthBucketChance)
-    luckBucketChance = max(0.01, luckBucketChance)
-    dodgeBucketChance = max(0.01, dodgeBucketChance)
-    wealthBucketChance = max(0.01, wealthBucketChance)
-    utilBucketChance = max(0.01, utilBucketChance)
-    runeBucketChance = max(0.01, runeBucketChance)
-    
-    return buckets.map { bucket in
-        switch bucket.thing.type {
-        case .health:
-            GameLogger.shared.log(prefix: "LevelModel", message: "New \(bucket.thing.type) chance is \(healthBucketChance)")
-            return AnyChanceModel(thing: StoreOfferBucket(type: bucket.thing.type), chance: healthBucketChance)
-        case .luck:
-            GameLogger.shared.log(prefix: "LevelModel", message: "New \(bucket.thing.type) chance is \(luckBucketChance)")
-            return AnyChanceModel(thing: StoreOfferBucket(type: bucket.thing.type), chance: luckBucketChance)
-        case .dodge:
-            GameLogger.shared.log(prefix: "LevelModel", message: "New \(bucket.thing.type) chance is \(dodgeBucketChance)")
-            return AnyChanceModel(thing: StoreOfferBucket(type: bucket.thing.type), chance: dodgeBucketChance)
-        case .wealth:
-            GameLogger.shared.log(prefix: "LevelModel", message: "New \(bucket.thing.type) chance is \(wealthBucketChance)")
-            return AnyChanceModel(thing: StoreOfferBucket(type: bucket.thing.type), chance: wealthBucketChance)
-        case .util:
-            GameLogger.shared.log(prefix: "LevelModel", message: "New \(bucket.thing.type) chance is \(utilBucketChance)")
-            return AnyChanceModel(thing: StoreOfferBucket(type: bucket.thing.type), chance: utilBucketChance)
-        case .rune:
-            GameLogger.shared.log(prefix: "LevelModel", message: "New \(bucket.thing.type) chance is \(runeBucketChance)")
-            return AnyChanceModel(thing: StoreOfferBucket(type: bucket.thing.type), chance: runeBucketChance)
-        }
-        
-    }
-}
-        
+// MARK: - Offers
+
 func tierOptions(tier: StoreOfferTier, depth: Depth, startingUnlockabls: [Unlockable], otherUnlockabls: [Unlockable], lastLevelsOffering: [StoreOffer]?, allPastLevelOffers: [StoreOffer]?, playerData: EntityModel, randomSource: GKLinearCongruentialRandomSource) -> [StoreOffer] {
     
     
@@ -939,7 +971,8 @@ func baseChanceForOffers(potentialItems: [StoreOffer]) -> [AnyChanceModel<StoreO
     return choiceWithChance
 }
 
-func deltaChanceOfferHealth(playerData: EntityModel, depth: Depth, storeOffer: StoreOffer, tier: StoreOfferTier, currentChance: Float) -> Float {
+func deltaChanceOfferHealth(playerData: EntityModel, depth: Depth, storeOffer: StoreOffer, tier: StoreOfferTier, currentChance: Float, lastLevelOffers: [StoreOffer]?) -> Float {
+    
     let offerType = storeOffer.type
     let currentHp = Float(playerData.hp)
     let originalHp = Float(playerData.originalHp)
@@ -960,28 +993,41 @@ func deltaChanceOfferHealth(playerData: EntityModel, depth: Depth, storeOffer: S
         }
     }
     
-    var currentChance = currentChance
+    
+    var maxHealthChance = Float(1)
     
     if offerType == .plusOneMaxHealth {
         if originalHp >= maxIntendedHealthPerDepth(depth) {
-            currentChance = 0.25
+            maxHealthChance = 0.1
         } else if originalHp >= maxIntendedHealthPerDepth(depth) - 1 {
-            currentChance = 0.5
+            maxHealthChance = 0.25
         } else {
-            currentChance = 1.2
+            switch depth {
+            case 0, 1, 2, 3, 4:
+                maxHealthChance = 1.5
+            case 5, 6, 7, 8:
+                maxHealthChance = 0.5
+            default:
+                maxHealthChance =  1
+            }
+
         }
     } else if offerType == .plusTwoMaxHealth {
         if originalHp >= maxIntendedHealthPerDepth(depth) {
-            currentChance = 0.0
+            maxHealthChance = 0.1
         } else if originalHp >= maxIntendedHealthPerDepth(depth) - 1 {
-            currentChance = 0.25
+            maxHealthChance = 0.2
         } else if originalHp >= maxIntendedHealthPerDepth(depth) - 2 {
-            currentChance = 0.5
-        } else if originalHp >= maxIntendedHealthPerDepth(depth) - 3 {
-            currentChance = 0.8
-        }
-        else {
-            currentChance = 1.2
+            maxHealthChance = 0.4
+        } else {
+            switch depth {
+            case 0, 1, 2, 3, 4:
+                maxHealthChance = 1.5
+            case 5, 6, 7, 8:
+                maxHealthChance = 0.5
+            default:
+                maxHealthChance =  1
+            }
         }
     }
 
@@ -1035,12 +1081,62 @@ func deltaChanceOfferHealth(playerData: EntityModel, depth: Depth, storeOffer: S
 
     }
     
+    
+    var chanceModifier = Float(1)
     if offerType == .lesserHeal || offerType == .greaterHeal {
-        currentChance = healingPotionMultipler
+        chanceModifier = healingPotionMultipler
+    } else {
+        // + max health
+        chanceModifier = maxHealthChance
+    }
+    
+    // change offer chances based on what we offered last round
+    for lastOffer in lastLevelOffers ?? [] {
+        switch (lastOffer.type, offerType) {
+            
+        // offered
+        case (.lesserHeal, .lesserHeal):
+            chanceModifier *= 0.5
+        case (.lesserHeal, .greaterHeal):
+            chanceModifier *= 2
+        case (.lesserHeal, .plusOneMaxHealth):
+            chanceModifier *= 2
+        case (.lesserHeal, .plusTwoMaxHealth):
+            chanceModifier *= 2
+            
+        case (.greaterHeal, .greaterHeal):
+            chanceModifier *= 0.5
+        case (.greaterHeal, .lesserHeal):
+            chanceModifier *= 2
+        case (.greaterHeal, .plusOneMaxHealth):
+            chanceModifier *= 2
+        case (.greaterHeal, .plusTwoMaxHealth):
+            chanceModifier *= 2
+            
+        case (.plusOneMaxHealth, .plusOneMaxHealth):
+            chanceModifier *= 0.5
+        case (.plusOneMaxHealth, .plusTwoMaxHealth):
+            chanceModifier *= 2
+        case (.plusOneMaxHealth, .lesserHeal):
+            chanceModifier *= 2
+        case (.plusOneMaxHealth, .greaterHeal):
+            chanceModifier *= 2
+            
+        case (.plusTwoMaxHealth, .plusTwoMaxHealth):
+            chanceModifier *= 0.5
+        case (.plusTwoMaxHealth, .plusOneMaxHealth):
+            chanceModifier *= 2
+        case (.plusTwoMaxHealth, .lesserHeal):
+            chanceModifier *= 2
+        case (.plusTwoMaxHealth, .greaterHeal):
+            chanceModifier *= 2
+        default:
+            chanceModifier *= 1
+        }
     }
     
         
-    return max(0.1, currentChance)
+    return max(0.1, currentChance * chanceModifier)
 }
 
 func deltaChanceOfferUtilWealth(storeOfferChance: AnyChanceModel<StoreOffer>, allPastLevelOffers: [StoreOffer]?) -> Float {
@@ -1117,7 +1213,7 @@ func deltaChanceOfferDodgeLuck(offerChance: AnyChanceModel<StoreOffer>, depth: D
     }
             
             
-    return max(1, deltaChance)
+    return max(1, deltaChance * offerChance.chance)
 
 }
 
@@ -1148,7 +1244,7 @@ func deltaChanceForOffer(offerChances: [AnyChanceModel<StoreOffer>], recentlyPur
         var newChance = Float(1)
         switch StoreOfferBucket.bucket(for: offerChance.thing.type).type {
         case .health:
-            newChance = deltaChanceOfferHealth(playerData: playerData, depth: depth, storeOffer: offerChance.thing, tier: tier, currentChance: offerChance.chance)
+            newChance = deltaChanceOfferHealth(playerData: playerData, depth: depth, storeOffer: offerChance.thing, tier: tier, currentChance: offerChance.chance, lastLevelOffers: lastLevelOffers)
             
         case .util, .wealth:
             newChance = deltaChanceOfferUtilWealth(storeOfferChance: offerChance, allPastLevelOffers: allPastLevelOffers)
@@ -1175,10 +1271,10 @@ func deltaChanceForOffer(offerChances: [AnyChanceModel<StoreOffer>], recentlyPur
 }
 
 func tierItems(from buckets: [StoreOfferBucket], tier: StoreOfferTier, depth: Depth, allUnlockables: [Unlockable], playerData: EntityModel, randomSource: GKLinearCongruentialRandomSource, lastLevelOffers: [StoreOffer]?, allPastLevelOFfers: [StoreOffer]?) -> [StoreOffer] {
-    
     var chosenOffers: [StoreOffer] = []
     
     for bucket in buckets {
+        GameLogger.shared.log(prefix: "LevelModel", message: "Begin choosing offers form buckets \(bucket.type)")
         let availableBucketItems = allUnlockables
             .filter { unlockable in
                 return unlockable.canAppearInRun
@@ -1197,13 +1293,26 @@ func tierItems(from buckets: [StoreOfferBucket], tier: StoreOfferTier, depth: De
             }.map {
                 $0.item
             }
-
         
         let availableOffersWithChance = baseChanceForOffers(potentialItems: availableBucketItems)
         let availbleOffersWithWeightChance = deltaChanceForOffer(offerChances: availableOffersWithChance, recentlyPurchasedAndShouldSpawn: recentlyPurchasedSpawnedItems, playerData: playerData, depth: depth, tier: tier, lastLevelOffers: lastLevelOffers, allPastLevelOffers: allPastLevelOFfers)
         
+        #if DEBUG
+        GameLogger.shared.log(prefix: "LevelModel", message: "---- Available items ---- ")
+        for (idx, offer) in availableBucketItems.enumerated() {
+            GameLogger.shared.log(prefix: "LevelModel", message: "(\(idx)) Type:\(offer.type) Tier:\(offer.tier)")
+            if let baseChanceModel = availableOffersWithChance.filter({ $0.thing == offer }).first {
+                GameLogger.shared.log(prefix: "LevelModel", message: "\tBase Chance: \(baseChanceModel.chance)")
+            }
+            if let weightedChanceModel = availbleOffersWithWeightChance.filter({ $0.thing == offer }).first {
+                GameLogger.shared.log(prefix: "LevelModel", message: "\tWeighted Chance: \(weightedChanceModel.chance)")
+            }
+        }
+        #endif
+        
         
         if let random = randomSource.chooseElementWithChance(availbleOffersWithWeightChance).map( { $0.thing }) {
+            GameLogger.shared.log(prefix: "LevelModel", message: "Chosen offer: \(random.type).\(random.tier)")
             chosenOffers.append(random)
         }
         

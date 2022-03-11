@@ -41,6 +41,15 @@ class Shift_ShaftUITests: XCTestCase {
         let newgameButton = app.buttons["newGame"]
         newgameButton.tap()
         app.buttons["Start Run"].tap()
+
+        let exp = expectation(description: "Test after 1 seconds")
+        let result = XCTWaiter.wait(for: [exp], timeout: 1)
+        if result == XCTWaiter.Result.timedOut {
+            XCTAssert(true)
+        } else {
+            XCTFail("Delay interrupted")
+        }
+        
         app.otherElements["levelGoalView"].tap()
 
                                                                 
@@ -108,6 +117,15 @@ class Shift_ShaftUITests: XCTestCase {
         let newgameButton = app.buttons["newGame"]
         newgameButton.tap()
         app.buttons["Start Run"].tap()
+        
+        let exp = expectation(description: "Test after 1 seconds")
+        let result = XCTWaiter.wait(for: [exp], timeout: 1)
+        if result == XCTWaiter.Result.timedOut {
+            XCTAssert(true)
+        } else {
+            XCTFail("Delay interrupted")
+        }
+        
         app.otherElements["levelGoalView"].tap()
 
         snapshot("04Upgrade")
@@ -123,6 +141,15 @@ class Shift_ShaftUITests: XCTestCase {
         let newgameButton = app.buttons["newGame"]
         newgameButton.tap()
         app.buttons["Start Run"].tap()
+        
+        let exp = expectation(description: "Test after 1 seconds")
+        let result = XCTWaiter.wait(for: [exp], timeout: 1)
+        if result == XCTWaiter.Result.timedOut {
+            XCTAssert(true)
+        } else {
+            XCTFail("Delay interrupted")
+        }
+        
         app.otherElements["levelGoalView"].tap()
 
         

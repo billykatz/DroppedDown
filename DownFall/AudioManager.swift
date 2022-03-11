@@ -124,10 +124,6 @@ class AudioManager: NSObject, AVAudioPlayerDelegate {
 
     
     func playBackgroundMusic() {
-        #if DEBUG
-        fadeInDuration = UserDefaults.standard.float(forKey: UserDefaults.musicFadeInDurationKey)
-        #endif
-
         if !UserDefaults.standard.bool(forKey: UserDefaults.muteMusicKey) {
             backgroundMusicThread.sync(execute: { [backgroundMusicPlayer, musicVolume, fadeInDuration] in
                 backgroundMusicPlayer?.setVolume(0, fadeDuration: 0)

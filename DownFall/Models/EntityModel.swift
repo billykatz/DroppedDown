@@ -247,7 +247,9 @@ struct EntityModel: Equatable, Codable {
     
     func doesDodge() -> Bool {
         if self.type == .player {
-            return (1...dodge+1).contains(Int.random(100))
+            let randomNumber = Int.random(100) + 1
+            let dodgeRande = -1...dodge
+            return dodgeRande.contains(randomNumber)
         }
         return false
     }

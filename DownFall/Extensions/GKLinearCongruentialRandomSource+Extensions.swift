@@ -15,6 +15,11 @@ extension GKLinearCongruentialRandomSource {
 }
 
 extension GKLinearCongruentialRandomSource {
+    
+    struct Constants {
+        static let tag = "LevelModel"
+    }
+    
     func procsGivenChance(_ chance: Float) -> Bool {
         let nextFloat = nextUniform()
         if chance >= nextFloat * 100 {
@@ -97,19 +102,27 @@ extension GKLinearCongruentialRandomSource {
         guard !array.isEmpty else { return nil }
         let nextFloat = nextUniform()
         
-        let totalChances = array.reduce(0, { prev, current in return prev + current.chance }) * nextFloat
-        var chosenNumber = totalChances.rounded(.towardZero)
+        for (idx, element) in array.enumerated() {
+            GameLogger.shared.log(prefix: Constants.tag, message: "(\(idx)) chance is \(element.chance)")
+            
+        }
+        let totalChances = array.reduce(0, { prev, current in return prev + current.chance })
+        GameLogger.shared.log(prefix: Constants.tag, message: "Total chance is \(totalChances)")
+        var chosenNumber = (totalChances * nextFloat).rounded(.towardZero)
+        GameLogger.shared.log(prefix: Constants.tag, message: "Chosen float is \(nextFloat)")
+        GameLogger.shared.log(prefix: Constants.tag, message: "Chosen number is \(chosenNumber)")
         
         // we want the current chance number to encompass the valid remaining
-//        var runningTotal
-        for chanceModel in array {
+        for (idx, chanceModel) in array.enumerated() {
             if chanceModel.chance >= chosenNumber {
+                GameLogger.shared.log(prefix: Constants.tag, message: "(\(idx)) was chosen")
                 return chanceModel
             } else {
                 chosenNumber -= chanceModel.chance
             }
         }
         
+        GameLogger.shared.log(prefix: Constants.tag, message: "Final options chosen")
         return array.last!
     }
 

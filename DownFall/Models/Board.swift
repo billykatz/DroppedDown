@@ -992,7 +992,9 @@ extension Board {
     }
     
     func useChest(input: Input) -> Transformation? {
-        guard let pp = playerPosition else { return nil }
+        guard let pp = playerPosition,
+              case TileType.player(let playerData) = tiles[pp].type
+        else { return nil }
         var tileTransformation: [TileTransformation] = []
         
         let otherOffers: [StoreOffer] = tiles(where: { tileType in
@@ -1005,7 +1007,7 @@ extension Board {
         }
         
         // get the random item or rune
-        let randomItemOrRune = level.randomItemOrRune(offersOnBoard: otherOffers)
+        let randomItemOrRune = level.randomItemOrRune(playerData: playerData, offersOnBoard: otherOffers)
         tileTransformation.append(.init(pp, pp))
         
         return Transformation(transformation: tileTransformation, inputType: input.type, endTiles: self.tiles, offers: [randomItemOrRune])

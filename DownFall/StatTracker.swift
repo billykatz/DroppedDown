@@ -61,9 +61,13 @@ class RunStatTracker {
             
         case .collectOffer(_, let offer, _, _):
             if offer.type == .lesserHeal {
-                self.addStat(Statistics(amount: 1, statType: .healthHealed), amount: 1)
+                self.addStat(Statistics(amount: 1, statType: .healthHealed), amount: offer.type.healAmount)
             } else if offer.type == .greaterHeal {
-                self.addStat(Statistics(amount: 2, statType: .healthHealed), amount: 2)
+                self.addStat(Statistics(amount: 2, statType: .healthHealed), amount: offer.type.healAmount)
+            } else if offer.type == .plusOneMaxHealth {
+                self.addStat(Statistics(amount: 1, statType: .healthHealed), amount: 1)
+            } else if offer.type == .plusTwoMaxHealth {
+                self.addStat(Statistics(amount: 1, statType: .healthHealed), amount: 2)
             }
             
         case .gameWin:

@@ -1014,11 +1014,20 @@ func tierOptions(tier: StoreOfferTier, depth: Depth, startingUnlockabls: [Unlock
         GameLogger.shared.log(prefix: "[LevelModel]", message: "Finished weight bucket chances")
         
         let buckets = randomSource.chooseElementsWithChance(weightedBuckets, choices: 2)
-        guard buckets.count == 2 else { preconditionFailure() }
-        GameLogger.shared.log(prefix: "[LevelModel]", message: "Chose \(buckets.first!.thing.type)")
-        GameLogger.shared.log(prefix: "[LevelModel]", message: "Chose \(buckets.last!.thing.type)")
-        chosenBucketOne = buckets.first
-        chosenBucketTwo = buckets.last
+        if buckets.count == 0 {
+            chosenBucketOne = nonweightBuckets[0]
+            chosenBucketTwo = nonweightBuckets[1]
+            GameLogger.shared.log(prefix: "[LevelModel]", message: "Buckets is equal to 0")
+        } else if buckets.count == 1 {
+            chosenBucketOne = buckets.first
+            chosenBucketTwo = nonweightBuckets[0]
+            GameLogger.shared.log(prefix: "[LevelModel]", message: "Buckets is equal to 1")
+        } else {
+            GameLogger.shared.log(prefix: "[LevelModel]", message: "Chose \(buckets.first!.thing.type)")
+            GameLogger.shared.log(prefix: "[LevelModel]", message: "Chose \(buckets.last!.thing.type)")
+            chosenBucketOne = buckets.first
+            chosenBucketTwo = buckets.last
+        }
 
 
     case 2:
@@ -1036,11 +1045,20 @@ func tierOptions(tier: StoreOfferTier, depth: Depth, startingUnlockabls: [Unlock
         GameLogger.shared.log(prefix: "[LevelModel]", message: "Finished weight bucket chances")
         
         let buckets = randomSource.chooseElementsWithChance(weightedBuckets, choices: 2)
-        chosenBucketOne = buckets.first
-        chosenBucketTwo = buckets.last
-        
-        GameLogger.shared.log(prefix: "[LevelModel]", message: "Chose \(buckets.first!.thing.type)")
-        GameLogger.shared.log(prefix: "[LevelModel]", message: "Chose \(buckets.last!.thing.type)")
+        if buckets.count == 0 {
+            chosenBucketOne = nonweightBuckets[0]
+            chosenBucketTwo = nonweightBuckets[1]
+            GameLogger.shared.log(prefix: "[LevelModel]", message: "Buckets is equal to 0")
+        } else if buckets.count == 1 {
+            chosenBucketOne = buckets.first
+            chosenBucketTwo = nonweightBuckets[0]
+            GameLogger.shared.log(prefix: "[LevelModel]", message: "Buckets is equal to 1")
+        } else {
+            GameLogger.shared.log(prefix: "[LevelModel]", message: "Chose \(buckets.first!.thing.type)")
+            GameLogger.shared.log(prefix: "[LevelModel]", message: "Chose \(buckets.last!.thing.type)")
+            chosenBucketOne = buckets.first
+            chosenBucketTwo = buckets.last
+        }
         
     default:
         chosenBucketOne = nil

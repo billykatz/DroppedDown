@@ -248,7 +248,7 @@ class Renderer: SKSpriteNode {
                     return
                 }
                 GameLogger.shared.logDebug(prefix: Constants.tag, message: "\(inputType). preview = true.")
-                rotatePreview(for: transformations)
+                InputQueue.append(Input(.rotatePreview(sprites, trans)))
                 
             case .touch:
                 //TODO: sometimes remove and replace has a monster for the touch(_, type).  not sure why
@@ -583,8 +583,8 @@ class Renderer: SKSpriteNode {
     }
     
     private func createSprites(from tiles: [[Tile]]?) -> [[DFTileSpriteNode]] {
-        guard let tiles = tiles else { preconditionFailure() }
-        guard tiles.count == Int(boardSize) else { fatalError("For now, the board must be a square, and the boardSize must match the tiles.count") }
+        guard let tiles = tiles, tiles.count == Int(boardSize) else { preconditionFailure("We need tiles to continue and for the board to be a sqaure.") }
+
         var x : CGFloat = 0
         var y : CGFloat = 0
         var sprites: [[DFTileSpriteNode]] = []
@@ -631,14 +631,6 @@ class Renderer: SKSpriteNode {
     
     private func debugMenu() -> MenuSpriteNode {
         return MenuSpriteNode(.debug, playableRect: self.playableRect, precedence: .menu, level: self.level)
-    }
-    
-    /// Attach the sprites to the input so that another object can rotate the board for us
-    private func rotatePreview(for transformations: [Transformation]) {
-        guard let rotateTrans = transformations.first else {
-            preconditionFailure("We should have a transformation")
-        }
-        InputQueue.append(Input(.rotatePreview(sprites, rotateTrans)))
     }
     
     private func refillEmptyTiles(with transformation: Transformation, completion: (() -> ())? = nil) {

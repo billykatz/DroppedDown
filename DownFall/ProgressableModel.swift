@@ -143,7 +143,7 @@ class CodexViewModel: ObservableObject {
     }
     
     
-    func relevantStatForUnlockable(_ unlockable: Unlockable) -> Statistics {
+    func relevantStatForUnlockable(_ unlockable: Unlockable) -> Statistics? {
         guard let stat = statData.first(where:
                                             { stat in
                                                 stat.statType == unlockable.stat.statType
@@ -151,57 +151,57 @@ class CodexViewModel: ObservableObject {
                                                     && stat.gemColor == unlockable.stat.gemColor
                                                     && stat.monsterType == unlockable.stat.monsterType
                                                     && stat.runeType == unlockable.stat.runeType
-                                            }) else { preconditionFailure() }
+                                            }) else { return nil }
         return stat
     }
     
     func amountNeededToUnlock(_ unlockable: Unlockable) -> Int {
-        return relevantStatForUnlockable(unlockable).amount
+        return relevantStatForUnlockable(unlockable)?.amount ?? 0
     }
     
     func unlockAt(_ unlockable: Unlockable) -> String {
         let target = unlockable.stat.amount
         let relevantPlayerStat = relevantStatForUnlockable(unlockable)
-        let current = relevantPlayerStat.amount
+        let current = relevantPlayerStat?.amount ?? 0
         
         var value: String = ""
         var subject: String = ""
         
-        if let rockColor = relevantPlayerStat.rockColor {
+        if let rockColor = relevantPlayerStat?.rockColor {
             value += "Mine"
             subject = "\(rockColor) rocks"
-        } else if let gemColor = relevantPlayerStat.gemColor {
+        } else if let gemColor = relevantPlayerStat?.gemColor {
             value += "Collect"
             subject = "\(gemColor) gems"
-        } else if let monsterType = relevantPlayerStat.monsterType {
+        } else if let monsterType = relevantPlayerStat?.monsterType {
             value += "Kill"
             subject = "\(monsterType.humanReadable) monsters"
-        } else if let runeType = relevantPlayerStat.runeType {
+        } else if let runeType = relevantPlayerStat?.runeType {
             value += "Use \(runeType.humanReadable)"
             subject = "times"
-        } else if relevantPlayerStat.statType == .totalRocksDestroyed {
+        } else if let statType = relevantPlayerStat?.statType, statType == .totalRocksDestroyed {
             value += "Mine"
             subject = "rocks"
-        } else if relevantPlayerStat.statType == .totalGemsCollected {
+        } else if let statType = relevantPlayerStat?.statType, statType == .totalGemsCollected {
             value += "Collect"
             subject = "gems"
-        } else if relevantPlayerStat.statType == .totalMonstersKilled {
+        } else if let statType = relevantPlayerStat?.statType, statType == .totalMonstersKilled {
             value += "Kill"
             subject = "monsters"
-        } else if relevantPlayerStat.statType == .totalRuneUses {
+        } else if let statType = relevantPlayerStat?.statType, statType == .totalRuneUses {
             value += "Use runes"
             subject = "times"
-        } else if relevantPlayerStat.statType == .largestRockGroupDestroyed {
+        } else if let statType = relevantPlayerStat?.statType, statType == .largestRockGroupDestroyed {
             return "Mine a group of \(target) rocks to unlock this."
-        } else if relevantPlayerStat.statType == .lowestDepthReached {
+        } else if let statType = relevantPlayerStat?.statType, statType == .lowestDepthReached {
             return "Reach depth \(target) to unlock this."
-        } else if relevantPlayerStat.statType == .totalWins {
+        } else if let statType = relevantPlayerStat?.statType, statType == .totalWins {
             if target == 1 {
                 return "Defeat the boss to unlock this"
             } else {
                 return "Defeat the boss \(target) times to unlock this"
             }
-        } else if relevantPlayerStat.statType == .attacksDodged {
+        } else if let statType = relevantPlayerStat?.statType, statType == .attacksDodged {
             value += "Dodge"
             subject = "attacks"
         }

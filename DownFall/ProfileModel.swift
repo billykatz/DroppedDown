@@ -212,7 +212,9 @@ class Profile: Codable, Equatable {
     }
     
     func didTapOnUnlockable(_ unlockable: Unlockable) -> Profile {
-        guard let index = unlockables.firstIndex(of: unlockable) else { preconditionFailure("Unlockable must be in the array") }
+        guard let index = unlockables.firstIndex(of: unlockable) else {
+            return self
+        }
         var newUnlockables = unlockables
         newUnlockables[index] = unlockable.didTapOn()
         
@@ -222,7 +224,9 @@ class Profile: Codable, Equatable {
 
     
     func updateUnlockables(_ newUnlockable: Unlockable) -> Profile {
-        guard let index = unlockables.firstIndex(of: newUnlockable) else { preconditionFailure("Unlockable must be in the array") }
+        guard let index = unlockables.firstIndex(of: newUnlockable) else {
+            return self
+        }
         let newPlayer = player.spend(amount: newUnlockable.purchaseAmount)
         var newUnlockables = unlockables
         newUnlockables[index] = newUnlockable.purchase()

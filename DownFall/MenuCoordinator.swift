@@ -125,7 +125,7 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
     }
     
     func statsViewSelected() {
-        guard let profileViewModel = profileViewModel else { preconditionFailure() }
+        guard let profileViewModel = profileViewModel else { preconditionFailure("Profile view model needed to view stats") }
         settingsCoordinator.presentSettingsView(profileViewModel: profileViewModel)
     }
     
@@ -137,18 +137,15 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
         profileViewModel?.givePlayerARandomRune()
     }
     
-    func menuStore() {
-        guard let profileViewModel = profileViewModel else { preconditionFailure() }
-        codexCoordinator.presentCodexView(profileViewModel: profileViewModel)
-    }
-    
     func goToTestScene() {
+        #if DEBUG
         if let scene = GKScene(fileNamed: "BossTestScene")!.rootNode as? BossTestScene {
             scene.scaleMode = .aspectFill
             scene.commonInit()
             view.presentScene(scene)
 
         }
+        #endif
     }
     
     func setUpPowerupScreenshot() {

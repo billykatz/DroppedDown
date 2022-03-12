@@ -21,7 +21,7 @@ struct LevelConstructor {
         
         return Level(
             depth: depth,
-            monsterTypeRatio: monsterTypes(depth: depth),
+            monsterTypeRatio: monsterTypes(depth: depth, isTutorial: isTutorial),
             monsterCountStart: monsterCountStart(depth: depth),
             maxMonsterOnBoardRatio: maxMonsterOnBoardRatio(depth: depth),
             boardSize: boardSize(depth: depth),
@@ -140,7 +140,7 @@ struct LevelConstructor {
     }
     
     
-    static func monsterTypes(depth: Depth) -> [EntityModel.EntityType: RangeModel] {
+    static func monsterTypes(depth: Depth, isTutorial: Bool) -> [EntityModel.EntityType: RangeModel] {
         func matchUp(_ types: [EntityModel.EntityType], range: RangeModel, subRanges: Int) -> [EntityModel.EntityType: RangeModel] {
             guard types.count == subRanges else { fatalError("The number of types nust match the number of subranges") }
             let dividedMonsterRanges = range.divivdedIntoSubRanges(subRanges)
@@ -154,6 +154,9 @@ struct LevelConstructor {
         }
         
         switch depth {
+        case 0 where isTutorial:
+            let ratRange = RangeModel(lower: 0, upper: 100)
+            return [.rat: ratRange]
         case 0, 1:
             let ratRange = RangeModel(lower: 0, upper: 50)
             let alamoRange = ratRange.next(50)

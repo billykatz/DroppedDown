@@ -16,12 +16,13 @@ struct StatButton: View {
     
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 15.0)
-                .frame(width: frame.width, height: frame.height, alignment: .center)
             Text(add ? " +" : " -")
                 .font(font)
                 .foregroundColor(Color(textColor))
                 .padding(.trailing, 8)
+                .zIndex(10)
+            RoundedRectangle(cornerRadius: 15.0)
+                .frame(width: frame.width, height: frame.height, alignment: .center)
         }
     }
 }
@@ -303,9 +304,22 @@ struct PlayerStatsView: View {
     
     let columns: [GridItem] = [.init(.flexible(minimum: 200), alignment: .leading)]
     
+    @State var hiddenTrigger = 0
     
     var body: some View {
         ScrollView{
+            if (hiddenTrigger >= 0) {
+                ForEach(playerStatistics) {  stat in
+                    if (StatisticType.statTypeIsInGame(stat.statType) && hiddenTrigger >= 0) {
+                        StatView(viewModel: viewModel, stat: stat)
+                            .padding(EdgeInsets(top: 10.0, leading: 8.0, bottom: 10.0, trailing: 8.0))
+                    }
+                }.onReceive(viewModel.profilePublisher, perform: { profile in
+                    playerStatistics = profile.stats
+                    gemAmount = viewModel.gemAmount
+                    hiddenTrigger += 1
+                })
+            }
 #if DEBUG
 ResetDataView(action: viewModel.deletePlayerData)
 #endif
@@ -340,15 +354,7 @@ ResetDataView(action: viewModel.deletePlayerData)
                 
                 #endif
             }.background(Color(UIColor.backgroundGray))
-            ForEach(playerStatistics) {  stat in
-                if (StatisticType.statTypeIsInGame(stat.statType)) {
-                    StatView(viewModel: viewModel, stat: stat)
-                        .padding(EdgeInsets(top: 10.0, leading: 8.0, bottom: 10.0, trailing: 8.0))
-                }
-            }.onReceive(viewModel.profilePublisher, perform: { profile in
-                playerStatistics = profile.stats
-                gemAmount = viewModel.gemAmount
-            })
+            
         }
     }
 }

@@ -243,6 +243,13 @@ class Profile: Codable, Equatable {
         for oldUnlockable in unlockables {
             if let index = newUnlockables.firstIndex(of: oldUnlockable) {
 //                print(newUnlockables[index].id)
+                print("---------Unlockable will be carried over--------")
+                print(oldUnlockable.item.textureName)
+                print("\tisPurchased: \(oldUnlockable.isPurchased)")
+                print("\tisUnlocked: \(oldUnlockable.isUnlocked)")
+                print("\trecently: \(oldUnlockable.recentlyPurchasedAndHasntSpawnedYet)")
+                print("\thasBeenTappedOnByPlayer \(oldUnlockable.hasBeenTappedOnByPlayer)")
+                print("Is present and will be updated ")
                 let newUnlockable = newUnlockables[index]
                 let updatedUnlockable = oldUnlockable.update(stat: newUnlockable.stat,
                                                              item: newUnlockable.item,
@@ -254,22 +261,26 @@ class Profile: Codable, Equatable {
                                                              hasBeenTappedOnByPlayer: oldUnlockable.hasBeenTappedOnByPlayer)
                 newUnlockables[index] = updatedUnlockable
                 
+            } else {
+                print("---------Delete unlockable--------")
+                print(oldUnlockable.item.textureName)
+                print("is not present in the new unlockables... deleting it ")
             }
         }
         
-#if DEBUG
-        /// print this shit so we can debug
-//        print("---------UNLOCKABLES--------")
-//        print("---------START--------")
-//        print(newUnlockables.count)
-//        var count = 1
-//        newUnlockables.forEach { updatedUnlockable in
-//            print(count)
-//            count += 1
-//            updatedUnlockable.debugDescription()
-//        }
-//        print("---------END--------")
-#endif
+//#if DEBUG
+//        / print this shit so we can debug
+        print("---------UNLOCKABLES--------")
+        print("---------START--------")
+        print(newUnlockables.count)
+        var count = 1
+        newUnlockables.forEach { updatedUnlockable in
+            print(count)
+            count += 1
+            updatedUnlockable.debugDescription()
+        }
+        print("---------END--------")
+//#endif
         let newStartingUnlockable = Unlockable.startingUnlockedUnlockables
         
         return self.updateAllUnlockables(newUnlockables, startingUnlockables: newStartingUnlockable)

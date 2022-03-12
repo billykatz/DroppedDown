@@ -85,17 +85,20 @@ class ProfileViewModel {
     }
     
     func updateStat(amount: Int, stat: Statistics) {
-        var newStatistics: [Statistics] = []
+        var newProfile = profile
+//        var newStatistics: [Statistics] = []
         for playerStat in profile.stats {
-            var newStat = playerStat
+//            var newStat = playerStat
             if (stat == playerStat) {
-                newStat = stat.updateStatAmount(amount, overwrite: stat.statType.overwriteIfLarger)
+//                newStat = stat.updateStatAmount(amount, overwrite: stat.statType.overwriteIfLarger)
+                newProfile = newProfile.updateStatistic(stat, amount: amount, overwriteIfLarger: stat.statType.overwriteIfLarger)
+                
             }
             
-            newStatistics.append(newStat)
+//            newStatistics.append(newStat)
         }
         
-        let newProfile = profile.updateStatistics(newStatistics)
+//        let newProfile = profile.updateStatistics(newStatistics)
         profileSubject.send(newProfile)
     }
     

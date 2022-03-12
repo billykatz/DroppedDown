@@ -1,15 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "test-highlight-level-goals-large.png",
+      "filename" : "test-highlight-level-goals-large 1.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "test-highlight-level-goals-large 1@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "test-highlight-level-goals-large 1@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

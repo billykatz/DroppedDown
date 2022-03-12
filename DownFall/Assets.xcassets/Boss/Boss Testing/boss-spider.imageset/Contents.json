@@ -1,15 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "boss-spider-head.png",
+      "filename" : "boss-spider-head 1.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "boss-spider-head 1@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "boss-spider-head 1@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

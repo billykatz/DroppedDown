@@ -1,15 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "tooth-close-animation.png",
+      "filename" : "tooth-close-animation 1.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "tooth-close-animation 1@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "tooth-close-animation 1@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

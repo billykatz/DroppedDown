@@ -1,15 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "boss-spider-animation-tooth-chomp-first-half-9.png",
+      "filename" : "boss-spider-animation-tooth-chomp-first-half-9 1.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "boss-spider-animation-tooth-chomp-first-half-9 1@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "boss-spider-animation-tooth-chomp-first-half-9 1@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

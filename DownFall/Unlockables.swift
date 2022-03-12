@@ -167,9 +167,9 @@ struct Unlockable: Codable, Identifiable, Equatable, Hashable {
             Unlockable(stat: .oneThousandRocks, item: StoreOffer.offer(type: .dodge(amount: 3), tier: 1), purchaseAmount: 50, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
             
             // tier 2
-            Unlockable(stat: .fourThousandRocks, item: StoreOffer.offer(type: .plusOneMaxHealth, tier: 2), purchaseAmount: 200, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
-            Unlockable(stat: .fourThousandRocks, item: StoreOffer.offer(type: .luck(amount: 3), tier: 2), purchaseAmount: 200, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
-            Unlockable(stat: .fourThousandRocks, item: StoreOffer.offer(type: .dodge(amount: 3), tier: 2), purchaseAmount: 200, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .fourThousandRocks, item: StoreOffer.offer(type: .plusOneMaxHealth, tier: 2), purchaseAmount: 150, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .fourThousandRocks, item: StoreOffer.offer(type: .luck(amount: 3), tier: 2), purchaseAmount: 150, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .fourThousandRocks, item: StoreOffer.offer(type: .dodge(amount: 3), tier: 2), purchaseAmount: 150, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
             
             // tier 3
             Unlockable(stat: .reachDepth7, item: StoreOffer.offer(type: .plusOneMaxHealth, tier: 3), purchaseAmount: 350, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),

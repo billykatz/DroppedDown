@@ -414,7 +414,6 @@ class TileCreator: TileStrategy {
                 //        let exitQuadrant = playerQuadrant
                 let exitPosition = exitQuadrant.randomCoord(for: boardSize, notIn: reservedSet)
                 reservedSet.insert(exitPosition)
-                
                 tiles[exitPosition.x][exitPosition.y] = Tile(type: .exit(blocked: true))
             }
         }

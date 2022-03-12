@@ -213,13 +213,6 @@ struct StatView: View {
     let viewModel: ProfileViewModel
     let stat: Statistics
     
-    
-    var statExtra: String {
-        let value: Any? = stat.gemColor ?? stat.rockColor ?? stat.monsterType ?? stat.runeType
-        if value == nil { return "" }
-        return " - \(String(describing: value!))"
-    }
-    
     var body: some View {
         HStack {
             #if DEBUG
@@ -230,9 +223,11 @@ struct StatView: View {
                 viewModel.updateStat(amount: 50, stat: stat)
             })
             #endif
-            Text("\(stat.statType.rawValue)\(statExtra)")
+            Text(stat.humanReadableForStatView())
+                .font(.statsStatFont)
             Spacer()
             Text(verbatim: "\(stat.amount)")
+                .font(.statsStatFont)
         }
 
     }
@@ -346,8 +341,10 @@ ResetDataView(action: viewModel.deletePlayerData)
                 #endif
             }.background(Color(UIColor.backgroundGray))
             ForEach(playerStatistics) {  stat in
-                StatView(viewModel: viewModel, stat: stat)
-                    .padding(EdgeInsets(top: 0.0, leading: 4.0, bottom: 0.0, trailing: 20.0))
+                if (StatisticType.statTypeIsInGame(stat.statType)) {
+                    StatView(viewModel: viewModel, stat: stat)
+                        .padding(EdgeInsets(top: 10.0, leading: 8.0, bottom: 10.0, trailing: 8.0))
+                }
             }.onReceive(viewModel.profilePublisher, perform: { profile in
                 playerStatistics = profile.stats
                 gemAmount = viewModel.gemAmount

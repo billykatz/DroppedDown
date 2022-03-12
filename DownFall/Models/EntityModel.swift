@@ -92,6 +92,28 @@ struct EntityModel: Equatable, Codable {
             }
         }
         
+        var humanReadableTypeName: String {
+            switch self {
+            case .bat:
+                return "Bat"
+            case .rat:
+                return "Rat"
+            case .dragon:
+                return "Dragon"
+            case .alamo:
+                return "Tree"
+            case .sally:
+                return "Salamander"
+            case .player:
+                return "Player"
+            case .spider:
+                return "Spider"
+            default:
+                return self.rawValue
+            }
+        }
+
+        
         var textureString: String {
             return self.rawValue
         }

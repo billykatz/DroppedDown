@@ -19,4 +19,6 @@ extension Font {
     static let creditsSubTitleCodexFont = Font(UIFont.creditsSubTitleCodexFont)
     static let creditsNameCodexFont = Font(UIFont.creditsNameCodexFont)
     static let creditsBigNameCodexFont = Font(UIFont.creditsBigNameCodexFont)
+    
+    static let statsStatFont = Font(UIFont.statsStatCodexFont)
 }

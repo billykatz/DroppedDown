@@ -82,15 +82,7 @@ class MainMenu: SKScene {
     }()
     
     override func didMove(to view: SKView) {
-//        for family in UIFont.familyNames
-//        {
-//           print("\(family)")
-//           for names in UIFont.fontNames(forFamilyName: family)
-//           {
-//               print("== \(names)")
-//           }
-//        }
-//        
+
         isAccessibilityElement = false
         background = self.childNode(withName: "background") as? SKSpriteNode
         background.color = UIColor.backgroundGray

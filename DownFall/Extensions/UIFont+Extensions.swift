@@ -29,6 +29,7 @@ extension UIFont {
     static let creditsNameCodexFont = UIFont(name: UIFont.smallPixelFontName, size: 40.0)!
     static let creditsBigNameCodexFont = UIFont(name: UIFont.middlePixelFontName, size: 60.0)!
     
+    static let statsStatCodexFont = UIFont(name: UIFont.smallPixelFontName, size: 30.0)!
 }
 
 enum UIFontType: String {

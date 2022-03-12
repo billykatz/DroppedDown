@@ -53,6 +53,34 @@ enum StatisticType: String, Codable {
             return false
         }
     }
+    
+    static func statTypeIsInGame(_ statType: StatisticType) -> Bool {
+        switch statType {
+        case .rocksDestroyed,
+            .totalRocksDestroyed,
+            .largestRockGroupDestroyed,
+            .totalGemsCollected,
+            .lowestDepthReached,
+            .monstersKilled,
+            .totalMonstersKilled,
+            .damageTaken,
+            .healthHealed,
+            .attacksDodged,
+            .totalWins,
+            .totalLoses,
+            .totalRuneUses:
+            return true
+            
+        case .runeUses,
+        .damageDealt,
+        .gemsCollected,
+        .distanceFallen,
+        .counterClockwiseRotations,
+        .clockwiseRotations,
+        .monstersKilledInARow:
+            return false
+        }
+    }
 }
 
 struct Statistics: Codable, Equatable, Identifiable {
@@ -65,11 +93,95 @@ struct Statistics: Codable, Equatable, Identifiable {
     let id: UUID
     
     func debugDescription() -> String {
-        return
-        """
+        return """
         \(rockColor != nil ? rockColor!.humanReadable : "") \(gemColor != nil ? gemColor!.humanReadable : "") \(monsterType != nil ? monsterType!.humanReadable : "")  statType: \(statType) amount :\(amount)
         """
         
+    }
+    
+    func humanReadableForStatView() -> String {
+        switch self.statType {
+        case .rocksDestroyed:
+            if let rockColor = rockColor {
+                return "\(rockColor.humanReadable) rocks destroyed"
+            } else {
+                return "Rocks destroyed"
+            }
+            
+        case .totalRocksDestroyed:
+            return "Total rocks destroyed"
+            
+        case .largestRockGroupDestroyed:
+            return "Largest group of rocks"
+        
+        // gems
+        case .gemsCollected:
+            if let gemColor = gemColor {
+                return "\(gemColor.humanReadable) gems collected"
+            } else {
+                return "Gems collected"
+            }
+            
+            
+        case .totalGemsCollected:
+            return "Total gems collected"
+        
+        // distance/depth
+        case .lowestDepthReached:
+            return "Lowest depth level reached"
+        case .distanceFallen:
+            return "Distance fallen"
+            
+        // Rotations
+        case .counterClockwiseRotations:
+            return "Counter-clockwise rotations"
+        case .clockwiseRotations:
+            return "Clockwise rotations"
+            
+        // Monsters
+        case .monstersKilled:
+            if let monsterType = monsterType {
+                return "\(monsterType.humanReadableTypeName) monsters killed"
+            } else {
+                return "Monsters killed"
+            }
+        case .totalMonstersKilled:
+            return "Total monsters killed"
+            
+        case .monstersKilledInARow:
+            return "Most monsters killed in a row"
+            
+        // Damage/health
+        case .damageTaken:
+            return "Damage taken"
+            
+        case .healthHealed:
+            return "Health healed"
+            
+        case .damageDealt:
+            return "Damage dealt"
+            
+        case .attacksDodged:
+            return "Attacks dodged"
+        
+        // win/lose
+        case .totalWins:
+            return "Total wins"
+            
+        case .totalLoses:
+            return "Total runs"
+            
+        // runes
+        case .runeUses:
+            if let rune = runeType {
+                return "Total uses of \(rune.humanReadable)"
+            } else {
+                return "Total uses of rune"
+            }
+        case .totalRuneUses:
+            return "Total rune uses"
+            
+        }
     }
     
     static func ==(_ lhs: Statistics, _ rhs: Statistics) -> Bool {

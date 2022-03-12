@@ -91,13 +91,8 @@ class RuneDetailView: SKSpriteNode, ButtonDelegate {
     }
     
     private func shouldEnableConfirmButton(allTargets: AllTarget) -> Bool {
-        guard let rune = viewModel.rune else { return false }
+        guard let _ = viewModel.rune else { return false }
         return allTargets.areLegal
-//        && (
-//            rune.targets == allTargets.targets.count
-//            ||
-//            (rune.targetAmountType == .upToAmount && !allTargets.allTargetAssociatedCoords.isEmpty)
-//        )
     }
     
     public func enableButton(_ enable: Bool, targets: AllTarget) {

@@ -381,7 +381,7 @@ enum TileType: Hashable, CaseIterable, Codable {
     }
     
     public var sparkleSheetName: SpriteSheet? {
-        precondition(self.isRock, "Only call this for rocks")
+        guard self.isRock else { return nil }
         
         switch self {
         case .rock(color: let color, holdsGem: let hasGem, groupCount: let groupCount):
@@ -456,7 +456,7 @@ enum TileType: Hashable, CaseIterable, Codable {
             case .green:
                 return "greenRock\(withGemSuffix)\(gemTierSuffix)"
             case .blood:
-                fatalError()
+                return ""
             }
         case .pillar(let data):
             switch data.color {
@@ -468,10 +468,8 @@ enum TileType: Hashable, CaseIterable, Codable {
                 return "brownPillar\(data.health)Health"
             case .red:
                 return "redPillar\(data.health)Health"
-            case .green:
-                preconditionFailure("Shouldnt be here")
-            case .blood:
-                fatalError()
+            case .green, .blood:
+                return ""
             }
             
         default:
@@ -566,7 +564,7 @@ extension TileType {
         case .offer(let offer):
             return offer.description
         default:
-            preconditionFailure("We probably shouldnt be here. Investigate")
+            return ""
         }
     }
 }

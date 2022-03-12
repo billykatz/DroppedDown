@@ -58,7 +58,7 @@ extension HapticGenerator {
             rigidGenerator.impactOccurred()
             
         @unknown default:
-            fatalError()
+            break
         }
     }
     

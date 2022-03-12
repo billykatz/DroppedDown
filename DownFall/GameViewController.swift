@@ -134,8 +134,9 @@ class GameViewController: UIViewController {
         GameLogger.shared.log(prefix: Constants.tag, message: "Saving the profile")
         
         guard var profile = menuCoordinator?.profileViewModel?.profile else {
-            GameLogger.shared.fatalLog(prefix: Constants.tag, message: "Cannot continue without the profile")
-            fatalError()
+            return nil
+//            GameLogger.shared.fatalLog(prefix: Constants.tag, message: "Cannot continue without the profile")
+//            fatalError()
         }
 
         

@@ -118,6 +118,7 @@ class TileCreator: TileStrategy {
         let totalNumber = level.monsterTypeRatio.values.max { (first, second) -> Bool in
             return first.upper < second.upper
         }
+        
         guard let upperRange = totalNumber?.upper else {
             fatalError("We need the max number or else we cannot continue")
             

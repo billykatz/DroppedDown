@@ -393,7 +393,8 @@ struct EntityModel: Equatable, Codable {
             
             return self
         default:
-            preconditionFailure("Youll want to implement future cases here")
+            #warning("You'll want to implement new cases here in the future")
+            return self
         }
     }
     

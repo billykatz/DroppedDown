@@ -65,7 +65,7 @@ struct LevelConstructor {
         case testLevelDepthNumber:
             return 8
         default:
-            fatalError()
+            return 9
         }
     }
     

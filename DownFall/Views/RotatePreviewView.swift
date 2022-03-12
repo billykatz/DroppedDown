@@ -89,7 +89,7 @@ class RotatePreviewView {
                     tileTrans.initial == TileCoord(spriteRow, spriteCol)
                 }
                 
-                guard let tileTrans = transformation else { fatalError() }
+                guard let tileTrans = transformation else { return }
                 
                 let sprite = sprites[spriteRow][spriteCol]
                 let originalSpritePosition = originalPosition[tileTrans.initial.row][tileTrans.initial.column]

@@ -472,7 +472,7 @@ class TargetingViewModel: Targeting {
      - Returns: Nothing
      */
     public func didTarget(_ coord: TileCoord) {
-        guard let rune = rune else { preconditionFailure("We cant target if we dont have an ability set") }
+        guard let rune = rune else { return }
         
         if rune.targetInput == .random {
             return

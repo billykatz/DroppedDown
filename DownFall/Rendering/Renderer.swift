@@ -1372,7 +1372,6 @@ extension Renderer {
               let removeAndReplaceTrans = transformations.last else {
                   animationsFinished(endTiles: dynamiteTransformation.endTiles)
                   return
-                  //            preconditionFailure("This is hardcoded to work with two transformations. The first for exploding the dynamite and the second for the remove and replace") }
               }
         
         let dynamiteCoords = dynamiteTileTrans.map { $0.initial }

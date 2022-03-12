@@ -27,7 +27,7 @@ struct CarryModel: Codable, Equatable {
     }
     
     func pay(_ price: Int, inCurrency currency: Currency) -> CarryModel {
-        guard price <= total(in: currency) else { fatalError("You need to make sure oyu have enough funds to pay before calling this") }
+        guard price <= total(in: currency) else { fatalError("You need to make sure you have enough funds to pay before calling this") }
         let itemType: Item.ItemType = .gem
         
         return CarryModel(items: items.map { item in

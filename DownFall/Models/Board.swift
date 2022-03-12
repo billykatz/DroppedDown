@@ -9,6 +9,11 @@
 import CoreGraphics
 
 class Board: Equatable {
+    
+    struct Constants {
+        static let tag = String(describing: Board.self)
+    }
+    
     static func == (lhs: Board, rhs: Board) -> Bool {
         return false
     }
@@ -804,11 +809,11 @@ class Board: Equatable {
         var playerTookDamage: [TileCoord] = []
         
         let orderedDynamite = Array(dynamiteCoords)
-            .map { coord -> (TileCoord, DynamiteFuse) in
+            .compactMap { coord -> (TileCoord, DynamiteFuse)? in
                 if case TileType.dynamite(let fuse) = tiles[coord].type {
                     return (coord, fuse)
                 } else {
-                    fatalError()
+                    return nil
                 }
                 
             }.sorted { first, second in
@@ -1118,7 +1123,7 @@ extension Board {
             
             tileTransformation.append(.init(nearbyTargetCoord, nearbyTargetCoord))
         } else {
-            preconditionFailure("The chosen coord must be a rock!")
+            GameLogger.shared.log(prefix: Constants.tag, message: "[Bug] The nearby tile was not a rock.")
         }
         
         
@@ -1248,7 +1253,7 @@ extension Board {
         guard let playerData = playerEntityData,
               let pp = playerPosition else {
                   /// no update for the player is needed
-                  preconditionFailure("Failed")
+                  preconditionFailure("We need a player tile to complete this transformation")
               }
         
         /// by doing this we have recorded the progress of the runes.
@@ -1299,7 +1304,9 @@ extension Board {
         case .liquifyMonsters:
             return [useLiquifyMonsterRune(rune: rune, tiles: tiles, allTarget: allTargets, input: input)]
             
-        default: fatalError()
+        default:
+            return []
+            
         }
         
     }
@@ -1858,7 +1865,7 @@ extension Board {
             case .offer, .gem, .empty:
                 intermediateTiles[coord.x][coord.y] = Tile.empty
             default:
-                preconditionFailure("We should only use this for rocks, pillars and monsters. Dynamite adds a few more items to the list including gems.")
+                preconditionFailure("We should only use this for rocks, pillars, monsters + all the tiles associated with Dynamite exploding.")
             }
         }
         

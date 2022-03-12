@@ -14,8 +14,8 @@ extension Data {
             do {
                 return try Data(contentsOf: URL(fileURLWithPath: path), options: .mappedIfSafe)
             }
-            catch {
-                fatalError()
+            catch let err {
+                GameLogger.shared.fatalLog(prefix: "[Data Extension]", message: "Error loading json file. \(err)")
             }
         }
         return nil

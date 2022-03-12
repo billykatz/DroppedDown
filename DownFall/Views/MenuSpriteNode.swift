@@ -723,7 +723,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             }
             
         default:
-            fatalError("These buttons dont appear in game")
+            break
         }
     }
 }

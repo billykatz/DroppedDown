@@ -1256,7 +1256,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1310;
-				LastUpgradeCheck = 1200;
+				LastUpgradeCheck = 1310;
 				ORGANIZATIONNAME = "William Katz LLC";
 				TargetAttributes = {
 					28AFDFFB27CAC1D700B72B14 = {
@@ -1818,7 +1818,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.williamKatz.DroppedDown;
 				PRODUCT_NAME = "Shift Shaft";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_COMPILATION_MODE = singlefile;
+				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

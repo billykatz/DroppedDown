@@ -2337,7 +2337,6 @@ extension Board {
         var defender: EntityModel
         var dodged = false
         var attackerIsPlayer = false
-        var pillarsThatTakeDamage: [PillarTakesDamage] = []
         var playersTookDamage: [TileCoord] = []
         
         
@@ -2398,18 +2397,10 @@ extension Board {
             
         } else if case let .monster(monsterModel) = tiles[attackerPosition].type,
                   let defenderPosition = defenderPostion,
-                  case .pillar (let data) = tiles[defenderPosition].type {
+                  case .pillar = tiles[defenderPosition].type {
             //just note that the monster attacked
             tiles[attackerPosition.x][attackerPosition.y] = Tile(type: TileType.monster(monsterModel.didAttack()))
             
-            /// I purposefully hid some monsters in the Pillars in the boss level.  I think it better if they dont destroy the pillars they are trapped in
-            /// I have been a mistake so ill just leave this code in here
-            //            if data.health == 1 {
-            //                tiles[defenderPosition.x][defenderPosition.y] = Tile.empty
-            //            } else {
-            //                tiles[defenderPosition.x][defenderPosition.y] = Tile(type: .pillar(PillarData(color: data.color, health: data.health - 1)))
-            //
-            //            }
         } else if case let .monster(monsterModel) = tiles[attackerPosition].type,
                   defenderPostion == nil {
             //just note that the monster attacked
@@ -2424,7 +2415,6 @@ extension Board {
                                                           attackerIsPlayer: attackerIsPlayer
                                                          ),
                               endTiles: self.tiles,
-                              pillarsTakeDamage: pillarsThatTakeDamage.isEmpty ? nil : pillarsThatTakeDamage,
                               playerTookDamage: playersTookDamage.isEmpty ? nil : playersTookDamage
         )
     }

@@ -252,7 +252,7 @@ extension Animator {
     }
     
     func createLiquifyMonstersAnimation(delayBefore: TimeInterval, sprites: [[DFTileSpriteNode]], targetTileTypes: [TargetTileType]) -> [SpriteAction]? {
-        guard let foreground = foreground, let tileSize = tileSize else { return nil }
+        guard let _ = foreground, let tileSize = tileSize else { return nil }
         var spriteActions: [SpriteAction] = []
         let cgTileSize = CGSize(widthHeight: tileSize)
         var waitBefore = delayBefore
@@ -311,7 +311,6 @@ extension Animator {
 
             /// get each monster sprite and show it poofing
             let smokeAnimation = smokeAnimation
-            let scaleSmokeAnimation = SKAction.scale(by: 3, duration: smokeAnimation.duration)
             let poofSeq = SKAction.sequence(smokeAnimation).waitBefore(delay: waitBefore)
             let spriteToRunAction = monsterSprite
 

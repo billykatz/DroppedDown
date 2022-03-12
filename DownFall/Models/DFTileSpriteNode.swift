@@ -41,25 +41,10 @@ class DFTileSpriteNode: SKSpriteNode {
                 trackSprite.zPosition = Precedence.background.rawValue
                 addChild(trackSprite)
             }
-        case .offer(let offer):
-//            if offer.hasSpriteSheet, let columns = offer.spriteSheetColumns, let spriteSheetName = offer.spriteSheetName {
-//                let spriteSheet = SpriteSheet(texture: SKTexture(imageNamed: spriteSheetName), rows: 1, columns: columns)
-//
-//                let firstTexture = spriteSheet.firstTexture()
-//
-//                let animation = SKAction.animate(with: spriteSheet.animationFrames(), timePerFrame: 0.1)
-//                let repeatAction = SKAction.repeatForever(animation)
-//                
-//                super.init(texture: firstTexture,
-//                           color: .clear,
-//                           size: CGSize(width: width*0.75, height: height*0.75))
-//
-//                self.run(repeatAction)
-//            } else {
-                super.init(texture: SKTexture(imageNamed: type.textureString()),
-                           color: .clear,
-                           size: CGSize(width: width*0.75, height: height*0.75))
-//            }
+        case .offer:
+            super.init(texture: SKTexture(imageNamed: type.textureString()),
+                       color: .clear,
+                       size: CGSize(width: width*0.75, height: height*0.75))
         default:
             super.init(texture: SKTexture(imageNamed: type.textureString()),
                        color: .clear,

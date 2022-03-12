@@ -527,13 +527,7 @@ class Renderer: SKSpriteNode {
     
     private func animateAttack(attackInput: InputType, transformation: Transformation, endTiles: [[Tile]]?) {
         guard let tiles = endTiles,
-              case InputType.attack(_,
-                                    _,
-                                    let defenderPosition,
-                                    _,
-                                    let defenderDodged,
-                                    _
-              ) = attackInput else {
+              case InputType.attack = attackInput else {
                   animationsFinished(endTiles: endTiles)
                   return
               }

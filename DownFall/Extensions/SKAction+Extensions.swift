@@ -24,7 +24,7 @@ extension SKAction {
     }
 
     func setTimingMode(_ timingMode: SKActionTimingMode) -> SKAction {
-        var newAction = self
+        let newAction = self
         newAction.timingMode = timingMode
         return newAction
     }

@@ -87,8 +87,6 @@ func randomCoordNearPlayerOrRotated(in tiles: [[Tile]], notIn: Set<TileCoord>) -
     let rotatePp2 = pp.rotated(times: 1, boardSize: tiles.count)
     let rotatePp3 = pp.rotated(times: 2, boardSize: tiles.count)
     let rotatePp4 = pp.rotated(times: 3, boardSize: tiles.count)
-    let boardSize = tiles.count
-    let upperbound = boardSize
     
     var rotatePositions = [pp, rotatePp2, rotatePp4, rotatePp3]
     var newCoord = pp
@@ -393,71 +391,14 @@ func attacked(tiles: [[Tile]], by attacks: [BossAttackType]) -> [BossAttack: [Ti
 }
 
 func validateAndUpdatePlannedAttacks(in tiles: [[Tile]], plannedAttacks: [BossAttack: [TileCoord]]?) ->  [BossAttack: [TileCoord]]? {
-    guard let plannedAttacks = plannedAttacks, let playerPosition = getTilePosition(.player(.zero), tiles: tiles) else { return nil }
+    guard let plannedAttacks = plannedAttacks, let _ = getTilePosition(.player(.zero), tiles: tiles) else { return nil }
     var updatedAttacks = plannedAttacks
-    
-    var updatePosionAttacks = Set<PoisonAttack>()
 
     var nonAttackable = nonAttackableCoords(tiles: tiles)
-    for (index, (plannedAttack, plannedCoords)) in plannedAttacks.enumerated() {
+    for (plannedAttack, plannedCoords) in plannedAttacks {
         switch plannedAttack.type {
         case .poison:
-            // each posion attack spawns two attacked columns, that's why we did this twice
-//            var newPoisonAttacks = Set<PoisonAttack>()
-//            var maxTries = 100
-//            while newPoisonAttacks.count < plannedAttack.poisonAttack?.count ?? -1 && maxTries > 0 {
-//                if numberOfAttacksTargetingPlayer(playerPosition: playerPosition, newPoisonAttacks: updatePosionAttacks) < 2 {
-//                    // create an + patter on the player
-//                    let rowIdx = playerPosition.row
-//                    let rowDirection: PoisonAttackType =  .rowLeftToRight
-//                    let rowAttack: PoisonAttack = PoisonAttack(index: rowIdx, attackType: rowDirection)
-//                    let colIdx = playerPosition.col
-//                    let colDirection: PoisonAttackType = .columnDown
-//                    let colAttack: PoisonAttack = PoisonAttack(index: colIdx, attackType: colDirection)
-//                    newPoisonAttacks.insert(rowAttack)
-//                    newPoisonAttacks.insert(colAttack)
-//
-//                } else {
-//                    // choose random ones
-//                    let index = Int.random(tiles.count)
-//                    let direction = PoisonAttackType.random
-//
-//                    let attack = PoisonAttack(index: index, attackType: direction)
-//                    if !newPoisonAttacks.contains(attack) && !updatePosionAttacks.contains(attack) {
-//                        newPoisonAttacks.insert(attack)
-//                    }
-//                }
-//
-//                maxTries -= 1
-//            }
-//
-//            updatePosionAttacks = updatePosionAttacks.union(newPoisonAttacks)
-//
-//            let posionAttacks = Array(updatePosionAttacks)
-//            var poisonAttackCoords: [TileCoord] = []
-//            for row in 0..<tiles.count {
-//                for col in 0..<tiles.count {
-//                    for attack in posionAttacks {
-//                        if attack.attackType == .columnDown {
-//                            if attack.index == col {
-//                                poisonAttackCoords.append(TileCoord(row, col))
-//                            }
-//                        } else {
-//                            if attack.index == row {
-//                                poisonAttackCoords.append(TileCoord(row, col))
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//
-//            let newKey = BossAttack(type: .poison, poisonAttacks: posionAttacks)
-//            let index = updatedAttacks.index(updatedAttacks.startIndex, offsetBy: index)
-//            updatedAttacks.remove(at: index)
-//            updatedAttacks[newKey] = poisonAttackCoords
-            
             break
-
             
         case .dynamite, .spawnMonster:
             // dyamite should only ever target a rock

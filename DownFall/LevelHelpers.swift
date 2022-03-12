@@ -83,11 +83,11 @@ func baseChanceEncasementOffers(depth: Depth, playerData: EntityModel, startingU
         randomRune1 = rune
     }
     
-    var randomRune2: Rune = .rune(for: .fireball)
-    if let rune = randomRune(playerData: playerData, startingUnlockables: startingUnlockables, otherUnlockables: otherUnlockables) {
-        randomRune2 = rune
-    }
-    
+//    var randomRune2: Rune = .rune(for: .fireball)
+//    if let rune = randomRune(playerData: playerData, startingUnlockables: startingUnlockables, otherUnlockables: otherUnlockables) {
+//        randomRune2 = rune
+//    }
+//    
     // health and items
     let tier1HealthOption: TileType = .offer(.offer(type: randomTier1HealthOption.type, tier: 3))
     let tier1NonHealthOption: TileType = .offer(.offer(type: randomTier1NonHealthOption.type, tier: 3))
@@ -96,7 +96,7 @@ func baseChanceEncasementOffers(depth: Depth, playerData: EntityModel, startingU
     
     // just runes and slots
     let rune1Type: TileType = .offer(.offer(type: .rune(.rune(for: randomRune1.type)), tier: 3))
-    let rune2Type: TileType = .offer(.offer(type: .rune(.rune(for: randomRune2.type)), tier: 3))
+//    let rune2Type: TileType = .offer(.offer(type: .rune(.rune(for: randomRune2.type)), tier: 3))
     let runeSlot: TileType = .offer(.offer(type: .runeSlot, tier: 3))
     
     // monster types

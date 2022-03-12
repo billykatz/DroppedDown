@@ -23,6 +23,107 @@ class Level: Codable, Hashable {
     
     static let zero = Level(depth: 0, monsterTypeRatio: [:], monsterCountStart: 0, maxMonsterOnBoardRatio: 0.0, boardSize: 0, tileTypeChances: TileTypeChanceModel(chances: [.empty: 1]), maxSpawnGems: 0, goalProgress: [], savedBossPhase: nil, gemsSpawned: 0, monsterSpawnTurnTimer: 0, startingUnlockables: [], otherUnlockables: [], randomSeed: 12345, isTutorial: false, runModel: nil)
     
+    enum CodingKeys: String, CodingKey {
+        case depth
+        case monsterTypeRatio
+        case monsterCountStart
+        case maxMonsterOnBoardRatio
+        case boardSize
+        case tileTypeChances
+        case maxSpawnGems
+        case goalProgress
+        case savedBossPhase
+        case gemsSpawned
+        case monsterSpawnTurnTimer
+        case startingUnlockables
+        case otherUnlockables
+        case randomSeed
+        case isTutorial
+        case offers
+        case goals
+        case levelFeatures
+        // run model purposely left out to avoid circular references
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(depth, forKey: .depth)
+        try container.encode(monsterTypeRatio, forKey: .monsterTypeRatio)
+        try container.encode(monsterCountStart, forKey: .monsterCountStart)
+        try container.encode(boardSize, forKey: .boardSize)
+        try container.encode(tileTypeChances, forKey: .tileTypeChances)
+        try container.encode(maxSpawnGems, forKey: .maxSpawnGems)
+        try container.encode(savedBossPhase, forKey: .savedBossPhase)
+        try container.encode(gemsSpawned, forKey: .gemsSpawned)
+        try container.encode(monsterSpawnTurnTimer, forKey: .monsterSpawnTurnTimer)
+        try container.encode(startingUnlockables, forKey: .startingUnlockables)
+        try container.encode(otherUnlockables, forKey: .otherUnlockables)
+        try container.encode(randomSeed, forKey: .randomSeed)
+        try container.encode(isTutorial, forKey: .isTutorial)
+        try container.encode(goalProgress, forKey: .goalProgress)
+        try container.encode(goals, forKey: .goals)
+        try container.encode(offers, forKey: .offers)
+        try container.encode(levelFeatures, forKey: .levelFeatures)
+    }
+    
+    required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        depth = try container.decode(Int.self, forKey: .depth)
+        monsterTypeRatio = try container.decode([EntityModel.EntityType: RangeModel].self, forKey: .monsterTypeRatio)
+        monsterCountStart = try container.decode(Int.self, forKey: .monsterCountStart)
+        maxMonsterOnBoardRatio = try container.decode(Double.self, forKey: .maxMonsterOnBoardRatio)
+        boardSize = try container.decode(Int.self, forKey: .boardSize)
+        tileTypeChances = try container.decode(TileTypeChanceModel.self, forKey: .tileTypeChances)
+        maxSpawnGems = try container.decode(Int.self, forKey: .maxSpawnGems)
+        gemsSpawned = try container.decode(Int.self, forKey: .gemsSpawned)
+        monsterSpawnTurnTimer = try container.decode(Int.self, forKey: .monsterSpawnTurnTimer)
+        startingUnlockables = try container.decode([Unlockable].self, forKey: .startingUnlockables)
+        otherUnlockables = try container.decode([Unlockable].self, forKey: .otherUnlockables)
+        goalProgress = try container.decode([GoalTracking].self, forKey: .goalProgress)
+        goals = try container.decode([LevelGoal].self, forKey: .goals)
+        
+        if let offers = try? container.decode([StoreOffer].self, forKey: .offers) {
+            self.offers = offers
+        } else {
+            offers = []
+        }
+        
+        if let isTutorial = try? container.decode(Bool.self, forKey: .isTutorial) {
+            self.isTutorial = isTutorial
+        } else {
+            isTutorial = false
+        }
+        
+        // added in 0.8.1
+        if let randomSeed = try? container.decode(UInt64.self, forKey: .randomSeed) {
+            self.randomSeed = randomSeed
+        } else {
+            randomSeed = UInt64.random(in: UInt64.min...UInt64.max)
+            
+        }
+        
+        // added in 0.8.1
+        if let savedBossPhase = try? container.decode(BossPhase.self, forKey: .savedBossPhase) {
+            self.savedBossPhase = savedBossPhase
+        } else {
+            if depth == bossLevelDepthNumber {
+                savedBossPhase = BossPhase.init(numberOfColumns: 36)
+            } else {
+                self.savedBossPhase = nil
+            }
+        }
+        
+        if let levelFeatures = try? container.decode(LevelFeatures.self, forKey: .levelFeatures) {
+            self.levelFeatures = levelFeatures
+        } else {
+            self.levelFeatures = nil
+        }
+        
+        // run model purposefully left out because it is passed in on Level construction from the RunModel
+        runModel = nil
+    }
+    
     let depth: Depth
     let monsterTypeRatio: [EntityModel.EntityType: RangeModel]
     let monsterCountStart: Int
@@ -30,17 +131,20 @@ class Level: Codable, Hashable {
     let boardSize: Int
     let tileTypeChances: TileTypeChanceModel
     let maxSpawnGems: Int
-    var goalProgress: [GoalTracking]
-    var savedBossPhase: BossPhase?
     var gemsSpawned: Int
     var monsterSpawnTurnTimer: Int
     let startingUnlockables: [Unlockable]
     let otherUnlockables: [Unlockable]
     let randomSeed: UInt64
     let isTutorial: Bool
-    weak var runModel: RunModel?
-    
+    var goalProgress: [GoalTracking]
+    var savedBossPhase: BossPhase?
+    public var offers: [StoreOffer] = []
+    public var goals: [LevelGoal] = []
     public var levelFeatures: LevelFeatures?
+    weak var runModel: RunModel?
+
+    
     public var levelStartTiles: [LevelStartTiles] {
         if let all = levelFeatures?.levelStartTiles {
             return all
@@ -49,9 +153,6 @@ class Level: Codable, Hashable {
         }
     }
     
-    public var offers: [StoreOffer] = []
-    
-    public var goals: [LevelGoal] = []
     
     
     public var isBossLevel: Bool {

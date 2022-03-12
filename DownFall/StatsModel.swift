@@ -362,6 +362,7 @@ extension Statistics {
     
     // blue rocks
     static var oneThousandBlueRocks = Self.init(rockColor: .blue, amount: 1000, statType: .rocksDestroyed)
+    static var twoThousandBlueRocks = Self.init(rockColor: .blue, amount: 2000, statType: .rocksDestroyed)
     static var threeThousandBlueRocks = Self.init(rockColor: .blue, amount: 3000, statType: .rocksDestroyed)
     static var fiveThousandBlueRocks = Self.init(rockColor: .blue, amount: 5000, statType: .rocksDestroyed)
     
@@ -429,7 +430,8 @@ extension Statistics {
     // reach depth
     static let reachDepth5 = Self.init(amount: 5, statType: .lowestDepthReached)
     static let reachDepth6 = Self.init(amount: 6, statType: .lowestDepthReached)
-    static let reachDepth8 = Self.init(amount: 8, statType: .lowestDepthReached)
+    static let reachDepth7 = Self.init(amount: 8, statType: .lowestDepthReached)
+    static let reachDepth8 = Self.init(amount: 7, statType: .lowestDepthReached)
     static let reachDepth10 = Self.init(amount: 10, statType: .lowestDepthReached)
     
     // largest group

@@ -428,6 +428,7 @@ extension Statistics {
     
     // reach depth
     static let reachDepth5 = Self.init(amount: 5, statType: .lowestDepthReached)
+    static let reachDepth6 = Self.init(amount: 6, statType: .lowestDepthReached)
     static let reachDepth8 = Self.init(amount: 8, statType: .lowestDepthReached)
     static let reachDepth10 = Self.init(amount: 10, statType: .lowestDepthReached)
     

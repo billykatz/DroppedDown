@@ -221,10 +221,9 @@ struct Unlockable: Codable, Identifiable, Equatable, Hashable {
             
             
             // rune slots
-            Unlockable(stat: .largestGroup40, item: StoreOffer.offer(type: .runeSlot, tier: 1), purchaseAmount: 500, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .reachDepth6, item: StoreOffer.offer(type: .runeSlot, tier: 1), purchaseAmount: 500, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
             Unlockable(stat: .beatTheBossOnce, item: StoreOffer.offer(type: .runeSlot, tier: 2), purchaseAmount: 750, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
             Unlockable(stat: .monstersKilled1000, item: StoreOffer.offer(type: .runeSlot, tier: 3), purchaseAmount: 1000, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
-
             
             
             // Luck and dodge stuff
@@ -286,7 +285,6 @@ struct Unlockable: Codable, Identifiable, Equatable, Hashable {
             
             
             /// TIER 2 - UTIL
-            Unlockable(stat: stat, item: StoreOffer.offer(type: .killMonsterPotion, tier: 2), purchaseAmount: 100, isPurchased: true, isUnlocked: true, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
             Unlockable(stat: stat, item: StoreOffer.offer(type: .chest, tier: 2), purchaseAmount: 100, isPurchased: true, isUnlocked: true, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
             Unlockable(stat: stat, item: StoreOffer.offer(type: .snakeEyes, tier: 2), purchaseAmount: 100, isPurchased: true, isUnlocked: true, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
             

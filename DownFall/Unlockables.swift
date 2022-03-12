@@ -18,6 +18,73 @@ struct Unlockable: Codable, Identifiable, Equatable, Hashable {
         hasher.combine(id)
     }
     
+    enum CodingKeys: String, CodingKey {
+        case stat
+        case item
+        case purchaseAmount
+        case isPurchased
+        case isUnlocked
+        case applysToBasePlayer
+        case recentlyPurchasedAndHasntSpawnedYet
+        case hasBeenTappedOnByPlayer
+    }
+    
+    init(
+    stat: Statistics,
+    item: StoreOffer,
+    purchaseAmount: Int,
+    isPurchased: Bool,
+    isUnlocked: Bool,
+    applysToBasePlayer: Bool,
+    recentlyPurchasedAndHasntSpawnedYet: Bool,
+    hasBeenTappedOnByPlayer: Bool
+    ) {
+        self.stat = stat
+        self.item = item
+        self.purchaseAmount = purchaseAmount
+        self.isPurchased = isPurchased
+        self.isUnlocked = isUnlocked
+        self.applysToBasePlayer = applysToBasePlayer
+        self.recentlyPurchasedAndHasntSpawnedYet = recentlyPurchasedAndHasntSpawnedYet
+        self.hasBeenTappedOnByPlayer = hasBeenTappedOnByPlayer
+    }
+
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(stat, forKey: .stat)
+        try container.encode(item, forKey: .item)
+        try container.encode(purchaseAmount, forKey: .purchaseAmount)
+        try container.encode(isPurchased, forKey: .isPurchased)
+        try container.encode(isUnlocked, forKey: .isUnlocked)
+        try container.encode(applysToBasePlayer, forKey: .applysToBasePlayer)
+        try container.encode(recentlyPurchasedAndHasntSpawnedYet, forKey: .recentlyPurchasedAndHasntSpawnedYet)
+        try container.encode(hasBeenTappedOnByPlayer, forKey: .hasBeenTappedOnByPlayer)
+    }
+    
+    
+    
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        stat = try container.decode(Statistics.self, forKey: .stat)
+        item = try container.decode(StoreOffer.self, forKey: .item)
+        purchaseAmount = try container.decode(Int.self, forKey: .purchaseAmount)
+        isPurchased = try container.decode(Bool.self, forKey: .isPurchased)
+        isUnlocked = try container.decode(Bool.self, forKey: .isUnlocked)
+        applysToBasePlayer = try container.decode(Bool.self, forKey: .applysToBasePlayer)
+        recentlyPurchasedAndHasntSpawnedYet = try container.decode(Bool.self, forKey: .recentlyPurchasedAndHasntSpawnedYet)
+        
+        if let hasBeenTapped = try? container.decode(Bool.self, forKey: .hasBeenTappedOnByPlayer) {
+            hasBeenTappedOnByPlayer = hasBeenTapped
+        } else {
+            hasBeenTappedOnByPlayer = isPurchased
+        }
+    }
+
+    
+    // v 0.8
     let stat: Statistics
     let item: StoreOffer
     let purchaseAmount: Int
@@ -25,6 +92,8 @@ struct Unlockable: Codable, Identifiable, Equatable, Hashable {
     let isUnlocked: Bool
     let applysToBasePlayer: Bool
     var recentlyPurchasedAndHasntSpawnedYet: Bool
+    
+    // new in v 0.8.1
     var hasBeenTappedOnByPlayer: Bool
     
     var canAppearInRun: Bool {

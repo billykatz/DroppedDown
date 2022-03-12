@@ -514,7 +514,7 @@ class Level: Codable, Hashable {
             let monsterAmount = 15
             let totalPillarAmount = createTotalPillarGoalAmount(totalPillars: totalPillarAmount, depth: depth, randomSource: randomSource, previousLevelGoals: previousLevelGoals)
             let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 55)
-            let brownRockGoal = randomRockGoal([.brown], amount: 6)
+            let brownRockGoal = randomRockGoal([.brown], amount: 7)
             let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
             let pillarGoal = LevelGoal.pillarGoal(amount: totalPillarAmount)
             if offeredGemAmount > 0 {
@@ -526,7 +526,7 @@ class Level: Codable, Hashable {
             let rockGoalChance = AnyChanceModel(thing: rockGoal, chance: 20)
             let monsterGoalChance = AnyChanceModel(thing: monsterGoal, chance: 20)
             let pillarGoalChance = AnyChanceModel(thing: pillarGoal, chance: 20)
-            let brownGoalChance = AnyChanceModel(thing: brownRockGoal, chance: 15)
+            let brownGoalChance = AnyChanceModel(thing: brownRockGoal, chance: 20)
             
             goalChances.append(contentsOf: [rockGoalChance, monsterGoalChance, pillarGoalChance, brownGoalChance])
             
@@ -1451,8 +1451,8 @@ func createTotalPillarGoalAmount(totalPillars: Int, depth: Int, randomSource: GK
         totalPillarAmount *= 0
         
     case 3, 4, 5:
-        let chance1 = AnyChanceModel<Float>(thing: 0.5, chance: 33)
-        let chance2 = AnyChanceModel<Float>(thing: 0.65, chance: 33)
+        let chance1 = AnyChanceModel<Float>(thing: 0.55, chance: 33)
+        let chance2 = AnyChanceModel<Float>(thing: 0.66, chance: 33)
         let chance3 = AnyChanceModel<Float>(thing: 0.8, chance: 33)
         
         if let chosen = randomSource.chooseElementWithChance([chance1, chance2, chance3]) {
@@ -1460,9 +1460,9 @@ func createTotalPillarGoalAmount(totalPillars: Int, depth: Int, randomSource: GK
         }
         
     case 6, 7, 8:
-        let chance1 = AnyChanceModel<Float>(thing: 0.4, chance: 25)
-        let chance2 = AnyChanceModel<Float>(thing: 0.55, chance: 25)
-        let chance3 = AnyChanceModel<Float>(thing: 0.7, chance: 25)
+        let chance1 = AnyChanceModel<Float>(thing: 0.55, chance: 25)
+        let chance2 = AnyChanceModel<Float>(thing: 0.66, chance: 25)
+        let chance3 = AnyChanceModel<Float>(thing: 0.75, chance: 25)
         let chance4 = AnyChanceModel<Float>(thing: 0.85, chance: 25)
         
         if let chosen = randomSource.chooseElementWithChance([chance1, chance2, chance3, chance4]) {

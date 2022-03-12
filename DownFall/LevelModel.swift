@@ -1270,12 +1270,12 @@ func deltaChanceOfferUtilWealth(storeOfferChance: AnyChanceModel<StoreOffer>, al
         return alreadyOffered != storeOfferChance.thing
     }) ?? false
 
-    if noneWereThisOffer {
+    if storeOfferChance.thing.type == .runeSlot {
+        delta = 0.75
+    }
+    else if noneWereThisOffer {
         // add
         delta = 3
-    } else if storeOfferChance.thing.type == .runeSlot {
-        // make these pretty rare to force the player to interact with the store
-        delta = 0.75
     }
     else {
         delta -= 0.25

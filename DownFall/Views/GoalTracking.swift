@@ -105,6 +105,8 @@ struct GoalTracking: Codable, Hashable {
                 return (.lightBarRed, .darkBarRed)
             case .rock(.purple, _, _):
                 return (.lightBarPurple, .darkBarPurple)
+            case .rock(.brown, _, _):
+                return (.lightBarBrown, .darkBarBrown)
             case .monster:
                 return (.lightBarMonster, .darkBarMonster)
             case .gem:

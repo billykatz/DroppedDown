@@ -60,6 +60,9 @@ extension UIColor {
     static let darkBarPillar = UIColor(rgb: 0x4C7D44)
     static let lightBarBlood = UIColor(rgb: 0xD22E35)
     static let darkBarBlood = UIColor(rgb: 0x9A1F2F)
+    
+    static let lightBarBrown = UIColor(rgb: 0xB58759)
+    static let darkBarBrown = UIColor(rgb: 0x654425)
 
     /// Rune colors
     static let goldOutlineDull = UIColor(rgb: 0x9E8B2C)

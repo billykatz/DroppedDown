@@ -23,7 +23,7 @@ fileprivate func menuHeight(type: MenuType) -> CGFloat {
     case .detectedSavedGame, .detectedSavedTutorial:
         return 800
     case .options, .tutorialOptions:
-        return 1050
+        return 750
         
     default:
         return 300
@@ -390,7 +390,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             titleNode.position = CGPoint.position(titleNode.frame, inside: containerFrame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most * 2)
             
             
-            let bodyText = "You can access the tutorial again from the Stats menu"
+            let bodyText = "There is no way to replay the tutorial."
             let bodyNode = ParagraphNode.labelNode(text: bodyText, paragraphWidth: menuSizeWidth * 0.90,
                                                    fontSize: .fontLargeSize, textAlignment: .center)
             
@@ -398,18 +398,9 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             
             bodyNode.zPosition = precedence.rawValue
             
-            let body2Text = "You will lose all progress but keep any gems you earned."
-            let body2Node = ParagraphNode.labelNode(text: body2Text, paragraphWidth: menuSizeWidth * 0.90,
-                                                    fontSize: .fontMediumSize, textAlignment: .center)
-            
-            body2Node.position = CGPoint.alignHorizontally(body2Node.frame, relativeTo: bodyNode.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.most, translatedToBounds: true)
-            
-            body2Node.zPosition = precedence.rawValue
-            
             
             containerView?.addChild(titleNode)
             containerView?.addChild(bodyNode)
-            containerView?.addChild(body2Node)
             
             let noResume = ShiftShaft_Button(size: buttonSize,
                                              delegate: buttonDelegate ?? self,
@@ -544,22 +535,22 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
             containerView?.addChild(backButton)
             
             
-            let soundButton = ShiftShaft_Button(size: buttonSize,
-                                                delegate: buttonDelegate ?? self,
-                                                identifier: .toggleSound,
-                                                precedence: precedence,
-                                                fontSize: .fontLargeSize,
-                                                fontColor: .black,
-                                                backgroundColor: .buttonGray)
-            soundButton.position = CGPoint.alignHorizontally(soundButton.frame, relativeTo: backButton.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: Style.Padding.more * 2, translatedToBounds: true)
-            containerView?.addChild(soundButton)
-            
-            let onOff = UserDefaults.standard.bool(forKey: UserDefaults.muteSoundKey) ? "off" : "on"
-            let soundIcon = SKSpriteNode(texture: SKTexture(imageNamed: "sound-\(onOff)"), size: CGSize(width: 75, height: 75))
-            soundIcon.name = Constants.soundIconName
-            soundIcon.position = CGPoint.alignVertically(soundIcon.frame, relativeTo: soundButton.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: Style.Padding.most, translatedToBounds: true)
-            
-            containerView?.addChild(soundIcon)
+//            let soundButton = ShiftShaft_Button(size: buttonSize,
+//                                                delegate: buttonDelegate ?? self,
+//                                                identifier: .toggleSound,
+//                                                precedence: precedence,
+//                                                fontSize: .fontLargeSize,
+//                                                fontColor: .black,
+//                                                backgroundColor: .buttonGray)
+//            soundButton.position = CGPoint.alignHorizontally(soundButton.frame, relativeTo: backButton.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: Style.Padding.more * 2, translatedToBounds: true)
+//            containerView?.addChild(soundButton)
+//
+//            let onOff = UserDefaults.standard.bool(forKey: UserDefaults.muteSoundKey) ? "off" : "on"
+//            let soundIcon = SKSpriteNode(texture: SKTexture(imageNamed: "sound-\(onOff)"), size: CGSize(width: 75, height: 75))
+//            soundIcon.name = Constants.soundIconName
+//            soundIcon.position = CGPoint.alignVertically(soundIcon.frame, relativeTo: soundButton.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: Style.Padding.most, translatedToBounds: true)
+//
+//            containerView?.addChild(soundIcon)
             
             
             let musicButton = ShiftShaft_Button(size: buttonSize,
@@ -569,7 +560,7 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
                                                 fontSize: .fontLargeSize,
                                                 fontColor: .black,
                                                 backgroundColor: .buttonGray)
-            musicButton.position = CGPoint.alignHorizontally(musicButton.frame, relativeTo: soundButton.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: Style.Padding.more * 2, translatedToBounds: true)
+            musicButton.position = CGPoint.alignHorizontally(musicButton.frame, relativeTo: backButton.frame, horizontalAnchor: .center, verticalAlign: .top, verticalPadding: Style.Padding.more * 2, translatedToBounds: true)
             containerView?.addChild(musicButton)
             
             let musicOnOff = UserDefaults.standard.bool(forKey: UserDefaults.muteMusicKey) ? "off" : "on"

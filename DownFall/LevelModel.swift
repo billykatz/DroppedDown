@@ -50,6 +50,7 @@ class Level: Codable, Hashable {
         try container.encode(depth, forKey: .depth)
         try container.encode(monsterTypeRatio, forKey: .monsterTypeRatio)
         try container.encode(monsterCountStart, forKey: .monsterCountStart)
+        try container.encode(maxMonsterOnBoardRatio, forKey: .maxMonsterOnBoardRatio)
         try container.encode(boardSize, forKey: .boardSize)
         try container.encode(tileTypeChances, forKey: .tileTypeChances)
         try container.encode(maxSpawnGems, forKey: .maxSpawnGems)

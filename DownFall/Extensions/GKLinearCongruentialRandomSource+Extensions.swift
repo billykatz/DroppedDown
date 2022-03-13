@@ -44,6 +44,7 @@ extension GKLinearCongruentialRandomSource {
         let chosenIndex =  Int(totalChances.rounded(.towardZero))
         var chosen = array[chosenIndex]
         
+        var maxTries = 100
         while shouldAvoid(chosen) {
             var nextFloat = nextUniform()
             if nextFloat == 1 {
@@ -52,6 +53,11 @@ extension GKLinearCongruentialRandomSource {
             let totalChances = Float(array.count) * nextFloat
             let chosenIndex =  Int(totalChances.rounded(.towardZero))
             chosen = array[chosenIndex]
+            
+            maxTries -= 1
+            if maxTries < 0 {
+                return nil
+            }
         }
         
         return chosen

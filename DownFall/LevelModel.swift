@@ -287,15 +287,7 @@ class Level: Codable, Hashable {
         reservedOffers.removeAll()
         
         // remove any runes that the player has from this offer pool
-        let secondTierOffers = level.itemsInTier(2, playerData: playerData).filter { storeOffer in
-            if let rune = storeOffer.rune,
-               let playerRunes = playerData.pickaxe?.runes
-            {
-                return !playerRunes.contains(rune)
-            } else {
-                return true
-            }
-        }
+        let secondTierOffers = level.itemsInTier(2, playerData: playerData)
         
         if !secondTierOffers.isEmpty {
             reservedOffers = reservedOffers.union(secondTierOffers)
@@ -310,14 +302,7 @@ class Level: Codable, Hashable {
     public func randomItemOrRune(playerData: EntityModel, offersOnBoard: [StoreOffer]) -> StoreOffer {
         // pool of items
         var allUnlockables = Set<Unlockable>(self.startingUnlockables)
-        let otherUnlockables = self.otherUnlockables.filter({
-            if let runes = playerData.pickaxe?.runes, let unlockableRune = $0.item.rune {
-                return !runes.contains(unlockableRune)
-            } else {
-                return true
-            }
-        })
-        allUnlockables.formUnion(otherUnlockables)
+        allUnlockables.formUnion(self.otherUnlockables)
         
         let unlockables = Array(allUnlockables)
         
@@ -331,13 +316,17 @@ class Level: Codable, Hashable {
                 return true
             } else if case StoreOfferType.gems = unlockable.item.type {
                 return true
+            } else if unlockable.applysToBasePlayer {
+                // get rid of boring lucks and dodges
+                return true
+            } else if let runes = playerData.pickaxe?.runes,
+                      let unlockableRune = unlockable.item.rune {
+                return runes.contains(unlockableRune)
             } else {
                 return false
             }
         }) {
             return chosen.item
-        } else if !unlockables.isEmpty {
-            return unlockables.first!.item
         } else {
             return .offer(type: .plusOneMaxHealth, tier: 1)
         }
@@ -816,7 +805,7 @@ func chanceDeltaOfferDodgeLuckBucket(playerData player: EntityModel, modifier: F
         dodgeDelta = 0.9
     } else if player.dodge > 5 {
         dodgeDelta = 1.2
-    } else if player.dodge > 0 {
+    } else if player.dodge >= 0 {
         dodgeDelta = 1.4
     }
     
@@ -844,7 +833,7 @@ func chanceDeltaOfferDodgeLuckBucket(playerData player: EntityModel, modifier: F
         luckDelta = 0.9
     } else if player.luck > 5 {
         luckDelta = 1.1
-    } else if player.luck > 0 {
+    } else if player.luck >= 0 {
         luckDelta = 1.4
     }
 

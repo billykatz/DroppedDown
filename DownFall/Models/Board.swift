@@ -720,6 +720,15 @@ class Board: Equatable {
     }
     
     
+    private func addRowBelowPlayerToReservedCoords(_ coords: Set<TileCoord>, playerPosition pp: TileCoord) -> Set<TileCoord>{
+        var newCoords = coords
+        if  isWithinBounds(pp.rowBelow) {
+            newCoords.insert(pp.rowBelow)
+        }
+        return newCoords
+        
+    }
+    
     private func completedGoals(_ goals: [GoalTracking], inputType: InputType) -> Transformation {
         
         /// keep track of how many goals we have awarded so far.
@@ -733,10 +742,9 @@ class Board: Equatable {
         let playerQuadrant = Quadrant.quadrant(of: pp, in: boardSize)
         var transformedTiles: [TileTransformation] = []
         var reservedCoords = self.reservedCoords()
+        reservedCoords = addRowBelowPlayerToReservedCoords(reservedCoords, playerPosition: pp)
         
-        if  isWithinBounds(pp.rowBelow) {
-            reservedCoords.insert(pp.rowBelow)
-        }
+        
         var offers: [StoreOffer] = []
         for (idx, _) in goals.enumerated() {
             // get a random coord not in the reserved set
@@ -1219,7 +1227,8 @@ extension Board {
         // TODO: model this somewhere
         let transmogrifyRange: ClosedRange<CGFloat> = 0...2
         
-        let reservedCoords = reservedCoords()
+        var reservedCoords = reservedCoords()
+        reservedCoords = addRowBelowPlayerToReservedCoords(reservedCoords, playerPosition: pp)
         
         // grab a random rock nearby
         let nearbyTargetCoord = randomCoord(in: tiles, notIn: reservedCoords, nearby: pp, in: transmogrifyRange, specificTypeChecker: { $0.isARock })

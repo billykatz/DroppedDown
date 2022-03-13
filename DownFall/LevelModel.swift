@@ -318,7 +318,13 @@ class Level: Codable, Hashable {
         
         let randomSource = GKLinearCongruentialRandomSource(seed: randomSeed)
         if let chosen = randomSource.chooseElement(unlockables, avoidBlock: { unlockable in
-            return reservedOffers.contains(unlockable.item)
+            if reservedOffers.contains(unlockable.item) {
+                return true
+            } else if case StoreOfferType.gems = unlockable.item.type {
+                return true
+            } else {
+                return false
+            }
         }) {
             return chosen.item
         } else if !unlockables.isEmpty {
@@ -437,6 +443,7 @@ class Level: Codable, Hashable {
             
         case 3:
             
+            let totalPillarAmount = createTotalPillarGoalAmount(totalPillars: totalPillarAmount, depth: depth, randomSource: randomSource, previousLevelGoals: previousLevelGoals)
             let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 30)
             let monsterGoal = LevelGoal.killMonsterGoal(amount: 4)
             let pillarGoal = LevelGoal.pillarGoal(amount: totalPillarAmount)
@@ -450,6 +457,7 @@ class Level: Codable, Hashable {
             
         case 4:
             let monsterAmount = 5
+            let totalPillarAmount = createTotalPillarGoalAmount(totalPillars: totalPillarAmount, depth: depth, randomSource: randomSource, previousLevelGoals: previousLevelGoals)
             let rockGoal = randomRockGoal([.red, .purple, .blue], amount: 35)
             let monsterGoal = LevelGoal.killMonsterGoal(amount: monsterAmount)
             let pillarGoal = LevelGoal.pillarGoal(amount: totalPillarAmount)
@@ -1259,7 +1267,7 @@ func deltaChanceOfferHealth(playerData: EntityModel, depth: Depth, storeOffer: S
     return max(0.1, currentChance * chanceModifier)
 }
 
-func deltaChanceOfferUtilWealth(storeOfferChance: AnyChanceModel<StoreOffer>, allPastLevelOffers: [StoreOffer]?) -> Float {
+func deltaChanceOfferUtilWealth(storeOfferChance: AnyChanceModel<StoreOffer>, playerData: EntityModel, allUnlockables: [Unlockable], allPastLevelOffers: [StoreOffer]?) -> Float {
     var delta = Float(1)
     
     // all the same offer items from this tier
@@ -1269,9 +1277,26 @@ func deltaChanceOfferUtilWealth(storeOfferChance: AnyChanceModel<StoreOffer>, al
     let noneWereThisOffer = sameTierOffersInPast?.allSatisfy({ alreadyOffered in
         return alreadyOffered != storeOfferChance.thing
     }) ?? false
+    
 
     if storeOfferChance.thing.type == .runeSlot {
-        delta = 0.75
+        let numberUnlockRunes = allUnlockables.filter { $0.item.rune != nil }.filter( { $0.canAppearInRun }).count
+        let numberOfPlayerRuneSlots = playerData.pickaxe?.runeSlots ?? 0
+        
+        // if you only have X potential runes then you dont need any more rune slots
+        if numberUnlockRunes <= numberOfPlayerRuneSlots {
+            delta = 0
+        } else if numberOfPlayerRuneSlots == 4 {
+            delta = 0
+        } else if numberOfPlayerRuneSlots == 3 {
+            delta = 0.1
+        } else  if numberOfPlayerRuneSlots == 2 {
+            delta = 0.25
+        } else if numberOfPlayerRuneSlots == 1 {
+            delta = 0.75
+        } else {
+            delta = 0.85
+        }
     }
     else if noneWereThisOffer {
         // add
@@ -1357,7 +1382,7 @@ func deltaChanceOfferRune(offerChance: AnyChanceModel<StoreOffer>, playerData: E
     return offerChance.chance * deltaChance
 }
 
-func deltaChanceForOffer(offerChances: [AnyChanceModel<StoreOffer>], recentlyPurchasedAndShouldSpawn: [StoreOffer], playerData: EntityModel, depth: Depth, tier: StoreOfferTier, lastLevelOffers: [StoreOffer]?, allPastLevelOffers: [StoreOffer]?) -> [AnyChanceModel<StoreOffer>] {
+func deltaChanceForOffer(offerChances: [AnyChanceModel<StoreOffer>], recentlyPurchasedAndShouldSpawn: [StoreOffer], playerData: EntityModel, depth: Depth, tier: StoreOfferTier, lastLevelOffers: [StoreOffer]?, allPastLevelOffers: [StoreOffer]?, allUnlockables: [Unlockable]) -> [AnyChanceModel<StoreOffer>] {
     
     var newOfferChances: [AnyChanceModel<StoreOffer>] = []
     for offerChance in offerChances {
@@ -1367,7 +1392,7 @@ func deltaChanceForOffer(offerChances: [AnyChanceModel<StoreOffer>], recentlyPur
             newChance = deltaChanceOfferHealth(playerData: playerData, depth: depth, storeOffer: offerChance.thing, tier: tier, currentChance: offerChance.chance, lastLevelOffers: lastLevelOffers)
             
         case .util, .wealth:
-            newChance = deltaChanceOfferUtilWealth(storeOfferChance: offerChance, allPastLevelOffers: allPastLevelOffers)
+            newChance = deltaChanceOfferUtilWealth(storeOfferChance: offerChance, playerData: playerData, allUnlockables: allUnlockables, allPastLevelOffers: allPastLevelOffers)
             
         case .dodge, .luck:
             newChance = deltaChanceOfferDodgeLuck(offerChance: offerChance, depth: depth)
@@ -1415,7 +1440,7 @@ func tierItems(from buckets: [StoreOfferBucket], tier: StoreOfferTier, depth: De
             }
         
         let availableOffersWithChance = baseChanceForOffers(potentialItems: availableBucketItems)
-        let availbleOffersWithWeightChance = deltaChanceForOffer(offerChances: availableOffersWithChance, recentlyPurchasedAndShouldSpawn: recentlyPurchasedSpawnedItems, playerData: playerData, depth: depth, tier: tier, lastLevelOffers: lastLevelOffers, allPastLevelOffers: allPastLevelOFfers)
+        let availbleOffersWithWeightChance = deltaChanceForOffer(offerChances: availableOffersWithChance, recentlyPurchasedAndShouldSpawn: recentlyPurchasedSpawnedItems, playerData: playerData, depth: depth, tier: tier, lastLevelOffers: lastLevelOffers, allPastLevelOffers: allPastLevelOFfers, allUnlockables: allUnlockables)
         
         #if DEBUG
         GameLogger.shared.log(prefix: "LevelModel", message: "---- Available items ---- ")

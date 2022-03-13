@@ -97,7 +97,7 @@ struct Unlockable: Codable, Identifiable, Equatable, Hashable {
     var hasBeenTappedOnByPlayer: Bool
     
     var canAppearInRun: Bool {
-        return isUnlocked && isPurchased && !applysToBasePlayer
+        return isPurchased && !applysToBasePlayer
     }
     
     var id: String {

@@ -82,7 +82,22 @@ class LevelGoalTracker: LevelGoalTracking {
             trackLevelGoal(with: trans)
             
         case .newTurn:
-            checkForCompletedGoals()
+            if checkForCompletedGoals() {
+                // left blank
+                // we need to send the completed goal input
+            } else {
+                if let tiles = input.endTilesStruct,
+                    let exit = getTilePosition(.exit(blocked: true), tiles: tiles),
+                    case TileType.exit(let blocked) = tiles[exit].type,
+                   blocked
+                {
+                    if goalProgress.allSatisfy({
+                        $0.hasBeenRewarded && $0.isCompleted
+                    }) {
+                        InputQueue.append(Input(.unlockExit))
+                    }
+                }
+            }
             
         case .boardBuilt, .boardLoaded:
             goalIsUpdatedSubject.send(goalProgress)
@@ -109,7 +124,7 @@ class LevelGoalTracker: LevelGoalTracking {
         }
     }
     
-    private func checkForCompletedGoals() {
+    private func checkForCompletedGoals() -> Bool {
         var completedUnAwardedGoals: [GoalTracking] = []
         var allGoalsCompleted = true
         for (idx, goal) in goalProgress.enumerated(){
@@ -129,10 +144,11 @@ class LevelGoalTracker: LevelGoalTracking {
             }
         }
         
-        guard !completedUnAwardedGoals.isEmpty else { return }
+        guard !completedUnAwardedGoals.isEmpty else { return false }
         
         // send input saying that goals were completed
         InputQueue.append(Input(.goalCompleted(completedUnAwardedGoals, allGoalsCompleted: allGoalsCompleted)))
+        return true
     }
     
     private func countPillars(in tiles: [[Tile]]) {

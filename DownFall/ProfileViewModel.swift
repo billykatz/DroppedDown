@@ -272,5 +272,30 @@ class ProfileViewModel {
         
         saveProfile(newProfile)
     }
+    
+    func canShowReviewRequest() -> Bool {
+        if let totalGames = profile.stats.first(where: { stat in
+            stat.statType == .totalLoses
+        }) {
+            return totalGames.amount > 4
+        } else {
+            return false
+        }
+        
+        
+    }
+    
+    func canShowReviewRequestLongTimePlayer() -> Bool {
+        if let totalGames = profile.stats.first(where: { stat in
+            stat.statType == .totalLoses
+        }) {
+            return totalGames.amount > 15
+        } else {
+            return false
+        }
+        
+        
+    }
+
 
 }

@@ -227,6 +227,23 @@ class GameScene: SKScene {
             
             self.tutorialConductor?.setTutorialCompleted(playerDied: false)
             
+            guard let board = self.board,
+                  let playerIndex = tileIndices(of: .player(.zero), in: board.tiles).first,
+                case let TileType.player(data) = board.tiles[playerIndex].type else { return }
+
+            
+            // request the palyer's review if they just finish level 2 or 3 and they have a rune
+            if profileViewModel?.canShowReviewRequest() ?? false,
+               (level?.depth ?? 0) == 2,
+               !(data.pickaxe?.runes.isEmpty ?? true)
+            {
+                AppStoreReviewManager.requestReviewIfAppropriate()
+            }
+            // some lower skilled players might take longer to get there, but I still want them to review after 25 games
+            else if profileViewModel?.canShowReviewRequestLongTimePlayer() ?? false,
+                      (level?.depth ?? 0) > 0 {
+                AppStoreReviewManager.requestReviewIfAppropriate()
+            }
         } else if case InputType.gameLose = input.type {
             
             self.tutorialConductor?.setTutorialCompleted(playerDied: true)

@@ -442,7 +442,8 @@ extension Animator {
         waitBefore += moveDuration
         
         // create all the items possible
-        var itemsToShow: [StoreOffer] = StoreOfferType.allCases.filter { $0 != finalOffer.type }.map { StoreOffer.offer(type: $0, tier: 1) }.shuffled()
+        //drop half of the items to show
+        var itemsToShow: [StoreOffer] = StoreOfferType.allCases.filter { $0 != finalOffer.type }.map { StoreOffer.offer(type: $0, tier: 1) }.enumerated().filter { $0.0.isEven }.map { $0.1 }.shuffled()
         itemsToShow.append(finalOffer)
         
         // show each one for a moment and then show the next one

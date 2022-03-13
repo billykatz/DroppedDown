@@ -286,7 +286,16 @@ class Level: Codable, Hashable {
         
         reservedOffers.removeAll()
         
-        let secondTierOffers = level.itemsInTier(2, playerData: playerData)//.filter( { $0.tier == 2 && $0.type != .snakeEyes } )
+        // remove any runes that the player has from this offer pool
+        let secondTierOffers = level.itemsInTier(2, playerData: playerData).filter { storeOffer in
+            if let rune = storeOffer.rune,
+               let playerRunes = playerData.pickaxe?.runes
+            {
+                return !playerRunes.contains(rune)
+            } else {
+                return true
+            }
+        }
         
         if !secondTierOffers.isEmpty {
             reservedOffers = reservedOffers.union(secondTierOffers)

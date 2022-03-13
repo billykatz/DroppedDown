@@ -48,7 +48,7 @@ class RunStatTracker {
         case .transformation(let trans):
             self.handleTransformation(trans)
             
-        case .gameLose:
+        case .gameLose, .playAgain:
             self.addStat(Statistics(amount: 1, statType: .totalLoses), amount: 1)
             
         case .runeUsed(let rune, _):
@@ -73,6 +73,7 @@ class RunStatTracker {
         case .gameWin:
             if level.isBossLevel {
                 self.addStat(Statistics(amount: 1, statType: .totalWins), amount: 1)
+                self.addStat(Statistics(amount: 1, statType: .totalLoses), amount: 1)
             }
             
         default:

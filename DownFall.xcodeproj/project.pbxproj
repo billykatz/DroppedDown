@@ -61,6 +61,7 @@
 		28A836C6268FE97B00D96C48 /* ProfileCodingClient+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A836C5268FE97B00D96C48 /* ProfileCodingClient+Extensions.swift */; };
 		28AE3AC126A6000600BCE56A /* CodexCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AE3AC026A6000600BCE56A /* CodexCoordinator.swift */; };
 		28AE3AC526A6113900BCE56A /* CodexBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AE3AC426A6113900BCE56A /* CodexBackgroundView.swift */; };
+		28AF8E0027DE6AF9001315A5 /* ReviewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AF8DFF27DE6AF9001315A5 /* ReviewController.swift */; };
 		28AFDFFF27CAC1D700B72B14 /* Shift_ShaftUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AFDFFE27CAC1D700B72B14 /* Shift_ShaftUITests.swift */; };
 		28AFE00727CAC22500B72B14 /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2882DF2827CAB67400149899 /* SnapshotHelper.swift */; };
 		28AFE00927CD60A400B72B14 /* Unlockables+Debug.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AFE00827CD60A400B72B14 /* Unlockables+Debug.swift */; };
@@ -317,6 +318,7 @@
 		28A836C5268FE97B00D96C48 /* ProfileCodingClient+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileCodingClient+Extensions.swift"; sourceTree = "<group>"; };
 		28AE3AC026A6000600BCE56A /* CodexCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexCoordinator.swift; sourceTree = "<group>"; };
 		28AE3AC426A6113900BCE56A /* CodexBackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexBackgroundView.swift; sourceTree = "<group>"; };
+		28AF8DFF27DE6AF9001315A5 /* ReviewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewController.swift; sourceTree = "<group>"; };
 		28AFDFFC27CAC1D700B72B14 /* Shift-ShaftUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Shift-ShaftUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		28AFDFFE27CAC1D700B72B14 /* Shift_ShaftUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shift_ShaftUITests.swift; sourceTree = "<group>"; };
 		28AFE00827CD60A400B72B14 /* Unlockables+Debug.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Unlockables+Debug.swift"; sourceTree = "<group>"; };
@@ -597,6 +599,14 @@
 				2886E84426F197D00014FA5D /* PlayerStatView.swift */,
 			);
 			name = OptionsSwiftUI;
+			sourceTree = "<group>";
+		};
+		28AF8DFE27DE6AEE001315A5 /* AppStore */ = {
+			isa = PBXGroup;
+			children = (
+				28AF8DFF27DE6AF9001315A5 /* ReviewController.swift */,
+			);
+			name = AppStore;
 			sourceTree = "<group>";
 		};
 		28AFDFFD27CAC1D700B72B14 /* Shift-ShaftUITests */ = {
@@ -953,6 +963,7 @@
 		3DF2924C20A37FEE006671AC /* DownFall */ = {
 			isa = PBXGroup;
 			children = (
+				28AF8DFE27DE6AEE001315A5 /* AppStore */,
 				2882DF2827CAB67400149899 /* SnapshotHelper.swift */,
 				289DCA4827D92A5100EE9F3A /* shift-shaft-boss-loop.m4a */,
 				289DCA4627D9282400EE9F3A /* shift-shaft-menu-music-gold.m4a */,
@@ -1436,6 +1447,7 @@
 				3D30A42B2217F63500AFA1E1 /* TileCoord.swift in Sources */,
 				3D58468C22A632F100EDD845 /* AttackModel.swift in Sources */,
 				28C6446E27488DC200098C3C /* BossHelpers.swift in Sources */,
+				28AF8E0027DE6AF9001315A5 /* ReviewController.swift in Sources */,
 				2842570626EF2ACB00C96CCC /* Unlockables.swift in Sources */,
 				28DCCB7E27616809004E70A8 /* RuneDetailViewModel.swift in Sources */,
 				3D06390922EEB54E00C4D5E9 /* ReffingState.swift in Sources */,

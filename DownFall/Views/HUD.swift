@@ -191,10 +191,16 @@ class HUD: SKSpriteNode {
         switch StoreOfferBucket.bucket(for: offerType).type {
         case .rune, .util:
             return nil
-        case .dodge:
-            return dodgeSprite
-        case .luck:
-            return luckSprite
+        case .dodgeLuck:
+            switch offerType {
+            case .sandals, .runningShoes, .wingedBoots, .dodge:
+                return dodgeSprite
+            case .fourLeafClover, .horseshoe, .luckyCat, .luck:
+                return luckSprite
+            default:
+                return nil
+            }
+            
         case .health:
             return healthSprite
         case .wealth:

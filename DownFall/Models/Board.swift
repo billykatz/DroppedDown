@@ -733,6 +733,10 @@ class Board: Equatable {
         let playerQuadrant = Quadrant.quadrant(of: pp, in: boardSize)
         var transformedTiles: [TileTransformation] = []
         var reservedCoords = self.reservedCoords()
+        
+        if  isWithinBounds(pp.rowBelow) {
+            reservedCoords.insert(pp.rowBelow)
+        }
         var offers: [StoreOffer] = []
         for (idx, _) in goals.enumerated() {
             // get a random coord not in the reserved set

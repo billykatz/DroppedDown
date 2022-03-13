@@ -14,8 +14,7 @@ enum StoreOfferBucketType: String, Codable, Hashable {
     case wealth
     case util
     case rune
-    case dodge
-    case luck
+    case dodgeLuck
 }
 
 struct StoreOfferBucket: Equatable {
@@ -32,10 +31,10 @@ struct StoreOfferBucket: Equatable {
         case (.util, .runeSlot), (.util, .killMonsterPotion), (.util, .chest), (.util, .transmogrifyPotion), (.util, .snakeEyes), (.util, .greaterRuneSpiritPotion), (.util, .escape):
             return true
             
-        case (.luck, .luckyCat), (.luck, .horseshoe), (.luck, .fourLeafClover):
+        case (.dodgeLuck, .luckyCat), (.dodgeLuck, .horseshoe), (.dodgeLuck, .fourLeafClover):
             return true
             
-        case (.dodge, .sandals), (.dodge, .runningShoes), (.dodge, .wingedBoots):
+        case (.dodgeLuck, .sandals), (.dodgeLuck, .runningShoes), (.dodgeLuck, .wingedBoots):
             return true
             
         case (.rune, .rune):
@@ -71,14 +70,14 @@ struct StoreOfferBucket: Equatable {
             .horseshoe,
             .fourLeafClover,
             .luck:
-            return StoreOfferBucket(type: .luck)
+            return StoreOfferBucket(type: .dodgeLuck)
             
         case
             .sandals,
             .runningShoes,
             .wingedBoots,
             .dodge:
-            return StoreOfferBucket(type: .dodge)
+            return StoreOfferBucket(type: .dodgeLuck)
             
         case .rune:
             return StoreOfferBucket(type: .rune)

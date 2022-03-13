@@ -77,7 +77,7 @@ struct GoalTracking: Codable, Hashable {
                 case .gem:
                     return "Collect \(target) gem\(target > 1 ? "s" : "")"
                 case .pillar:
-                    return "Destroy \(target) individual pillars\(target > 1 ? "s" : "")"
+                    return "Destroy \(target) individual pillar\(target > 1 ? "s" : "")"
                 default:
                     return ""
                 }

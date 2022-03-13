@@ -199,12 +199,26 @@ struct Rune: Hashable, Codable {
     var fullDescription: String {
         """
         Effect: \(description)
-        Charges: Mine \(cooldown) \(rechargeTypeString)\(cooldown > 1 ? "s" : "").
+        Charges: \(rechargeVerbString) \(cooldown) \(rechargeTypeString)\(cooldown > 1 ? "s" : "").
         """
     }
     
+    var rechargeVerbString: String {
+        if let first = rechargeType.first {
+            if case TileType.monster = first {
+                return "Destroy"
+            } else {
+                return "Mine"
+            }
+        }
+        return ""
+    }
+
     var rechargeTypeString: String {
         if let first = rechargeType.first {
+            if case TileType.monster = first {
+                return "monster"
+            }
             return first.humanReadable
         }
         return ""

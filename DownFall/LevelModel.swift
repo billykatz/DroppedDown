@@ -1450,20 +1450,20 @@ func createTotalPillarGoalAmount(totalPillars: Int, depth: Int, randomSource: GK
     case 0, 1, 2:
         totalPillarAmount *= 0
         
-    case 3, 4, 5:
-        let chance1 = AnyChanceModel<Float>(thing: 0.55, chance: 33)
-        let chance2 = AnyChanceModel<Float>(thing: 0.66, chance: 33)
+    case 3, 4:
+        let chance1 = AnyChanceModel<Float>(thing: 0.6, chance: 33)
+        let chance2 = AnyChanceModel<Float>(thing: 0.7, chance: 33)
         let chance3 = AnyChanceModel<Float>(thing: 0.8, chance: 33)
         
         if let chosen = randomSource.chooseElementWithChance([chance1, chance2, chance3]) {
             totalPillarAmount *= chosen.thing
         }
         
-    case 6, 7, 8:
-        let chance1 = AnyChanceModel<Float>(thing: 0.55, chance: 25)
-        let chance2 = AnyChanceModel<Float>(thing: 0.66, chance: 25)
-        let chance3 = AnyChanceModel<Float>(thing: 0.75, chance: 25)
-        let chance4 = AnyChanceModel<Float>(thing: 0.85, chance: 25)
+    case 5, 6, 7, 8:
+        let chance1 = AnyChanceModel<Float>(thing: 0.6, chance: 25)
+        let chance2 = AnyChanceModel<Float>(thing: 0.7, chance: 25)
+        let chance3 = AnyChanceModel<Float>(thing: 0.8, chance: 25)
+        let chance4 = AnyChanceModel<Float>(thing: 0.9, chance: 25)
         
         if let chosen = randomSource.chooseElementWithChance([chance1, chance2, chance3, chance4]) {
             totalPillarAmount *= chosen.thing

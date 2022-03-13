@@ -641,61 +641,61 @@ func encasementsOptions(depth: Depth, size: EncasementSize) -> [EncasementCoords
         // board size = 8
         // no mediums in the board size 8 realm
         if size == .small {
-            let encasementOption1: EncasementCoords = .init(middleTile: TileCoord(0, 0), outerTiles: [TileCoord(1, 0), TileCoord(0, 1)])
-            let encasementOption2: EncasementCoords = .init(middleTile: TileCoord(7, 0), outerTiles: [TileCoord(6, 0), TileCoord(7, 1)])
-            let encasementOption3: EncasementCoords = .init(middleTile: TileCoord(7, 7), outerTiles: [TileCoord(7, 6), TileCoord(6, 7)])
-            let encasementOption4: EncasementCoords = .init(middleTile: TileCoord(0, 7), outerTiles: [TileCoord(0, 6), TileCoord(1, 7)])
+            let encasementOption1: EncasementCoords = .init(middleTile: TileCoord(0, 0), outerTiles: [TileCoord(1, 0), TileCoord(0, 1)], otherTiles: [])
+            let encasementOption2: EncasementCoords = .init(middleTile: TileCoord(7, 0), outerTiles: [TileCoord(6, 0), TileCoord(7, 1)], otherTiles: [])
+            let encasementOption3: EncasementCoords = .init(middleTile: TileCoord(7, 7), outerTiles: [TileCoord(7, 6), TileCoord(6, 7)], otherTiles: [])
+            let encasementOption4: EncasementCoords = .init(middleTile: TileCoord(0, 7), outerTiles: [TileCoord(0, 6), TileCoord(1, 7)], otherTiles: [])
             
             return [encasementOption1, encasementOption2, encasementOption3, encasementOption4]
         } else if size == .medium {
-            let mediumCornerOption1: EncasementCoords = .init(middleTile: TileCoord(0, 0), outerTiles: [TileCoord(2, 0), TileCoord(1, 1), TileCoord(0, 2)])
-            let mediumCornerOption2: EncasementCoords = .init(middleTile: TileCoord(7, 0), outerTiles: [TileCoord(5, 0), TileCoord(6, 1), TileCoord(7, 2)])
-            let mediumCornerOption3: EncasementCoords = .init(middleTile: TileCoord(7, 7), outerTiles: [TileCoord(7, 5), TileCoord(6, 6), TileCoord(5, 7)])
-            let mediumCornerOption4: EncasementCoords = .init(middleTile: TileCoord(0, 7), outerTiles: [TileCoord(0, 5), TileCoord(1, 6), TileCoord(2, 7)])
+            let mediumCornerOption1: EncasementCoords = .init(middleTile: TileCoord(0, 0), outerTiles: [TileCoord(2, 0), TileCoord(1, 1), TileCoord(0, 2)], otherTiles: [TileCoord(1, 0), TileCoord(0, 1)])
+            let mediumCornerOption2: EncasementCoords = .init(middleTile: TileCoord(7, 0), outerTiles: [TileCoord(5, 0), TileCoord(6, 1), TileCoord(7, 2)], otherTiles: [TileCoord(6, 0), TileCoord(7, 1)])
+            let mediumCornerOption3: EncasementCoords = .init(middleTile: TileCoord(7, 7), outerTiles: [TileCoord(7, 5), TileCoord(6, 6), TileCoord(5, 7)], otherTiles: [TileCoord(6, 7), TileCoord(7, 6)])
+            let mediumCornerOption4: EncasementCoords = .init(middleTile: TileCoord(0, 7), outerTiles: [TileCoord(0, 5), TileCoord(1, 6), TileCoord(2, 7)], otherTiles: [TileCoord(0, 6), TileCoord(1, 7)])
             return [mediumCornerOption1, mediumCornerOption2, mediumCornerOption3, mediumCornerOption4]
         }
         else if size == .large {
-            let encasementOption1: EncasementCoords = .init(middleTile: TileCoord(2, 2), outerTiles: [TileCoord(2, 1), TileCoord(1, 2), TileCoord(2, 3), TileCoord(3, 2)])
-            let encasementOption2: EncasementCoords = .init(middleTile: TileCoord(5, 2), outerTiles: [TileCoord(4, 2), TileCoord(5, 1), TileCoord(6, 2), TileCoord(5, 3)])
-            let encasementOption3: EncasementCoords = .init(middleTile: TileCoord(5, 5), outerTiles: [TileCoord(4, 5), TileCoord(5, 4), TileCoord(6, 5), TileCoord(5, 6)])
-            let encasementOption4: EncasementCoords = .init(middleTile: TileCoord(2, 5), outerTiles: [TileCoord(2, 4), TileCoord(1, 5), TileCoord(3, 5), TileCoord(2, 6)])
+            let encasementOption1: EncasementCoords = .init(middleTile: TileCoord(2, 2), outerTiles: [TileCoord(2, 1), TileCoord(1, 2), TileCoord(2, 3), TileCoord(3, 2)], otherTiles: [])
+            let encasementOption2: EncasementCoords = .init(middleTile: TileCoord(5, 2), outerTiles: [TileCoord(4, 2), TileCoord(5, 1), TileCoord(6, 2), TileCoord(5, 3)], otherTiles: [])
+            let encasementOption3: EncasementCoords = .init(middleTile: TileCoord(5, 5), outerTiles: [TileCoord(4, 5), TileCoord(5, 4), TileCoord(6, 5), TileCoord(5, 6)], otherTiles: [])
+            let encasementOption4: EncasementCoords = .init(middleTile: TileCoord(2, 5), outerTiles: [TileCoord(2, 4), TileCoord(1, 5), TileCoord(3, 5), TileCoord(2, 6)], otherTiles: [])
             
             return [encasementOption1, encasementOption2, encasementOption3, encasementOption4]
         }
         
     case 5..<bossLevelDepthNumber:
         if size == .small {
-            let cornerOption1: EncasementCoords = .init(middleTile: TileCoord(0, 0), outerTiles: [TileCoord(1, 0), TileCoord(0, 1)])
-            let cornerOption2: EncasementCoords = .init(middleTile: TileCoord(8, 0), outerTiles: [TileCoord(7, 0), TileCoord(8, 1)])
-            let cornerOption3: EncasementCoords = .init(middleTile: TileCoord(8, 8), outerTiles: [TileCoord(8, 7), TileCoord(7, 8)])
-            let cornerOption4: EncasementCoords = .init(middleTile: TileCoord(0, 8), outerTiles: [TileCoord(0, 7), TileCoord(1, 8)])
+            let cornerOption1: EncasementCoords = .init(middleTile: TileCoord(0, 0), outerTiles: [TileCoord(1, 0), TileCoord(0, 1)], otherTiles: [])
+            let cornerOption2: EncasementCoords = .init(middleTile: TileCoord(8, 0), outerTiles: [TileCoord(7, 0), TileCoord(8, 1)], otherTiles: [])
+            let cornerOption3: EncasementCoords = .init(middleTile: TileCoord(8, 8), outerTiles: [TileCoord(8, 7), TileCoord(7, 8)], otherTiles: [])
+            let cornerOption4: EncasementCoords = .init(middleTile: TileCoord(0, 8), outerTiles: [TileCoord(0, 7), TileCoord(1, 8)], otherTiles: [])
             return  [cornerOption1, cornerOption2, cornerOption3, cornerOption4]
         }
         else if size == .medium {
-            let sideOption1: EncasementCoords = .init(middleTile: TileCoord(4, 0), outerTiles: [TileCoord(3, 0), TileCoord(5, 0), TileCoord(4, 1)])
-            let sideOption4: EncasementCoords = .init(middleTile: TileCoord(0, 4), outerTiles: [TileCoord(0, 3), TileCoord(0, 5), TileCoord(1, 4)])
-            let sideOption2: EncasementCoords = .init(middleTile: TileCoord(8, 4), outerTiles: [TileCoord(8, 3), TileCoord(8, 5), TileCoord(7, 4)])
-            let sideOption3: EncasementCoords = .init(middleTile: TileCoord(4, 8), outerTiles: [TileCoord(5, 8), TileCoord(3, 8), TileCoord(4, 7)])
+            let sideOption1: EncasementCoords = .init(middleTile: TileCoord(4, 0), outerTiles: [TileCoord(3, 0), TileCoord(5, 0), TileCoord(4, 1)], otherTiles: [])
+            let sideOption4: EncasementCoords = .init(middleTile: TileCoord(0, 4), outerTiles: [TileCoord(0, 3), TileCoord(0, 5), TileCoord(1, 4)], otherTiles: [])
+            let sideOption2: EncasementCoords = .init(middleTile: TileCoord(8, 4), outerTiles: [TileCoord(8, 3), TileCoord(8, 5), TileCoord(7, 4)], otherTiles: [])
+            let sideOption3: EncasementCoords = .init(middleTile: TileCoord(4, 8), outerTiles: [TileCoord(5, 8), TileCoord(3, 8), TileCoord(4, 7)], otherTiles: [])
             return [sideOption1, sideOption2, sideOption3, sideOption4]
         } else if size == .large {
-            let encasementOption1: EncasementCoords = .init(middleTile: TileCoord(2, 2), outerTiles: [TileCoord(2, 1), TileCoord(2, 3), TileCoord(1, 2), TileCoord(3, 2)])
-            let encasementOption2: EncasementCoords = .init(middleTile: TileCoord(4, 1), outerTiles: [TileCoord(4, 0), TileCoord(4, 2), TileCoord(5, 1), TileCoord(3, 1)])
-            let encasementOption3: EncasementCoords = .init(middleTile: TileCoord(6, 2), outerTiles: [TileCoord(6, 1), TileCoord(6, 3), TileCoord(7, 2), TileCoord(5, 2)])
-            let encasementOption4: EncasementCoords = .init(middleTile: TileCoord(7, 4), outerTiles: [TileCoord(7, 3), TileCoord(7, 5), TileCoord(6, 4), TileCoord(8, 4)])
-            let encasementOption5: EncasementCoords = .init(middleTile: TileCoord(6, 6), outerTiles: [TileCoord(6, 5), TileCoord(6, 7), TileCoord(5, 6), TileCoord(7, 6)])
-            let encasementOption6: EncasementCoords = .init(middleTile: TileCoord(4, 7), outerTiles: [TileCoord(4, 6), TileCoord(4, 8), TileCoord(3, 7), TileCoord(5, 7)])
-            let encasementOption7: EncasementCoords = .init(middleTile: TileCoord(2, 6), outerTiles: [TileCoord(2, 5), TileCoord(2, 7), TileCoord(1, 6), TileCoord(3, 6)])
-            let encasementOption8: EncasementCoords = .init(middleTile: TileCoord(1, 4), outerTiles: [TileCoord(1, 3), TileCoord(1, 5), TileCoord(0, 4), TileCoord(2, 4)])
-            let encasementOption9: EncasementCoords = .init(middleTile: TileCoord(4, 4), outerTiles: [TileCoord(4, 3), TileCoord(4, 5), TileCoord(3, 4), TileCoord(5, 4)])
+            let encasementOption1: EncasementCoords = .init(middleTile: TileCoord(2, 2), outerTiles: [TileCoord(2, 1), TileCoord(2, 3), TileCoord(1, 2), TileCoord(3, 2)], otherTiles: [])
+            let encasementOption2: EncasementCoords = .init(middleTile: TileCoord(4, 1), outerTiles: [TileCoord(4, 0), TileCoord(4, 2), TileCoord(5, 1), TileCoord(3, 1)], otherTiles: [])
+            let encasementOption3: EncasementCoords = .init(middleTile: TileCoord(6, 2), outerTiles: [TileCoord(6, 1), TileCoord(6, 3), TileCoord(7, 2), TileCoord(5, 2)], otherTiles: [])
+            let encasementOption4: EncasementCoords = .init(middleTile: TileCoord(7, 4), outerTiles: [TileCoord(7, 3), TileCoord(7, 5), TileCoord(6, 4), TileCoord(8, 4)], otherTiles: [])
+            let encasementOption5: EncasementCoords = .init(middleTile: TileCoord(6, 6), outerTiles: [TileCoord(6, 5), TileCoord(6, 7), TileCoord(5, 6), TileCoord(7, 6)], otherTiles: [])
+            let encasementOption6: EncasementCoords = .init(middleTile: TileCoord(4, 7), outerTiles: [TileCoord(4, 6), TileCoord(4, 8), TileCoord(3, 7), TileCoord(5, 7)], otherTiles: [])
+            let encasementOption7: EncasementCoords = .init(middleTile: TileCoord(2, 6), outerTiles: [TileCoord(2, 5), TileCoord(2, 7), TileCoord(1, 6), TileCoord(3, 6)], otherTiles: [])
+            let encasementOption8: EncasementCoords = .init(middleTile: TileCoord(1, 4), outerTiles: [TileCoord(1, 3), TileCoord(1, 5), TileCoord(0, 4), TileCoord(2, 4)], otherTiles: [])
+            let encasementOption9: EncasementCoords = .init(middleTile: TileCoord(4, 4), outerTiles: [TileCoord(4, 3), TileCoord(4, 5), TileCoord(3, 4), TileCoord(5, 4)], otherTiles: [])
             
             /// choose the outer encasements
             return [encasementOption1, encasementOption2, encasementOption3, encasementOption4, encasementOption5, encasementOption6, encasementOption7, encasementOption8, encasementOption9]
         }
     
     case bossLevelDepthNumber:
-        let encasement1 = EncasementCoords(middleTile: TileCoord(6, 6), outerTiles: [TileCoord(7, 6), TileCoord(5, 6), TileCoord(6, 5), TileCoord(6, 7)])
-        let encasement3 = EncasementCoords(middleTile: TileCoord(6, 2), outerTiles: [TileCoord(7, 2), TileCoord(5, 2), TileCoord(6, 1), TileCoord(6, 3)])
-        let encasement2 = EncasementCoords(middleTile: TileCoord(2, 4), outerTiles: [TileCoord(3, 4), TileCoord(1, 4), TileCoord(2, 3), TileCoord(2, 5)])
+        let encasement1 = EncasementCoords(middleTile: TileCoord(6, 6), outerTiles: [TileCoord(7, 6), TileCoord(5, 6), TileCoord(6, 5), TileCoord(6, 7)], otherTiles: [])
+        let encasement3 = EncasementCoords(middleTile: TileCoord(6, 2), outerTiles: [TileCoord(7, 2), TileCoord(5, 2), TileCoord(6, 1), TileCoord(6, 3)], otherTiles: [])
+        let encasement2 = EncasementCoords(middleTile: TileCoord(2, 4), outerTiles: [TileCoord(3, 4), TileCoord(1, 4), TileCoord(2, 3), TileCoord(2, 5)], otherTiles: [])
 
         return [encasement1, encasement2, encasement3]
     default:
@@ -743,6 +743,14 @@ func potentialEncasementPillarCoords(depth: Int, randomSource: GKLinearCongruent
                 mutableEncasementChanceModel.removeFirst { chanceModel in
                     return chanceModel.tileType == randomTile
                 }
+            }
+            
+            // some encasements have extra tiles that are contained in the encasement but arent special.  Just turn them into random rocks
+            for coord in chosenEncasement.otherTiles {
+                let randomRockColor = ShiftShaft_Color.randomColor
+                let rockTile = TileType.rock(color: randomRockColor, holdsGem: false, groupCount: 1)
+                let otherStartTile = LevelStartTiles(tileType: rockTile, tileCoord: coord)
+                pillarCoords.append(otherStartTile)
             }
         }
     }

@@ -352,6 +352,7 @@ extension Statistics {
     static var fiveRocks = Self.init(amount: 5, statType: .totalRocksDestroyed)
     static var fiftyRocks = Self.init(amount: 50, statType: .totalRocksDestroyed)
     static var oneHundredRocks = Self.init(amount: 100, statType: .totalRocksDestroyed)
+    static var twoHundredFiftyRocks = Self.init(amount: 250, statType: .totalRocksDestroyed)
     static var fiveHundredRocks = Self.init(amount: 500, statType: .totalRocksDestroyed)
     static var oneThousandRocks = Self.init(amount: 1000, statType: .totalRocksDestroyed)
     static var twoThousandRocks = Self.init(amount: 2000, statType: .totalRocksDestroyed)
@@ -440,4 +441,6 @@ extension Statistics {
     static var largestGroup30 = Self.init(amount: 30, statType: .largestRockGroupDestroyed)
     static var largestGroup25 = Self.init(amount: 25, statType: .largestRockGroupDestroyed)
     static var largestGroup20 = Self.init(amount: 20, statType: .largestRockGroupDestroyed)
+    static var largestGroup15 = Self.init(amount: 15, statType: .largestRockGroupDestroyed)
+    static var largestGroup10 = Self.init(amount: 10, statType: .largestRockGroupDestroyed)
 }

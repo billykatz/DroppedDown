@@ -136,6 +136,17 @@ struct TeamNameView: View {
     }
 }
 
+struct VersionView: View {
+    let versionString = "Version: \(Bundle.main.appVersionLong) (\(Bundle.main.appBuild))"
+    
+    var body: some View {
+        Text(versionString)
+            .font(.creditsNameCodexFont)
+            .multilineTextAlignment(.center)
+    }
+
+}
+
 struct CreditsView: View {
     var body: some View {
         ScrollView {
@@ -145,6 +156,7 @@ struct CreditsView: View {
             BetaTesterView()
             ThankYou()
             LinkTree()
+            VersionView()
             Spacer().frame(height: 20)
         }
     }

@@ -322,6 +322,9 @@ class Level: Codable, Hashable {
             } else if let runes = playerData.pickaxe?.runes,
                       let unlockableRune = unlockable.item.rune {
                 return runes.contains(unlockableRune)
+            } else if unlockable.item.type == .chest {
+                // get rid of chests
+                return true
             } else {
                 return false
             }

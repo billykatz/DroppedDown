@@ -82,8 +82,55 @@ func boardHasMoreMoves(tiles: [[Tile]]) -> Bool {
             let tileCoord = TileCoord(row, col)
             let tile = tiles[tileCoord]
             switch tile.type {
-            case .empty, .dynamite:
+            case .dynamite:
                 hasMoreMoves = true
+            case .empty:
+                var hasPathToLeft = true
+                var hasPathToRight = true
+                var hasPathAbove = true
+                var hasPathBelow = true
+                // check columns to the left
+                if row > 0 {
+                    for innerColumn in 0..<row {
+                        let tileCoord = TileCoord(row, innerColumn)
+                        if case TileType.pillar = tiles[tileCoord].type {
+                            hasPathToLeft = false
+                        }
+                    }
+                }
+                // check columns to the right
+                if row <= tiles.count-1 {
+                    for innerColumn in row+1..<tiles.count {
+                        let tileCoord = TileCoord(row, innerColumn)
+                        if case TileType.pillar = tiles[tileCoord].type {
+                            hasPathToRight = false
+                        }
+                    }
+                }
+                
+                // check rows below
+                if col > 0 {
+                    for innerRow in 0..<col {
+                        let tileCoord = TileCoord(innerRow, col)
+                        if case TileType.pillar = tiles[tileCoord].type {
+                            hasPathBelow = false
+                        }
+                        
+                    }
+                }
+                // check all rows above
+                if col >= tiles.count-1 {
+                    for innerRow in col..<tiles.count {
+                        let tileCoord = TileCoord(innerRow, col)
+                        if case TileType.pillar = tiles[tileCoord].type {
+                            hasPathAbove = false
+                        }
+                    }
+                }
+
+                hasMoreMoves = hasPathToLeft || hasPathToRight || hasPathAbove || hasPathBelow
+                
+                
                 
             case .rock(_, _, let groupCount):
                 if groupCount >= 3 {

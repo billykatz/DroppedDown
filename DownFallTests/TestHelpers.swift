@@ -30,7 +30,7 @@ extension Level {
         
         
         let tileChances = TileTypeChanceModel(chances: [.rock(color: .blue, holdsGem: false, groupCount: 0):5, .rock(color: .red, holdsGem: false, groupCount: 0): 5])
-        return Level(depth: 0, monsterTypeRatio: LevelConstructor.monsterTypes(depth: 0), monsterCountStart: 2, maxMonsterOnBoardRatio: 0.7, boardSize: 4, tileTypeChances: tileChances, maxSpawnGems: 0, goalProgress: [], savedBossPhase: nil, gemsSpawned: 0, monsterSpawnTurnTimer: 0, startingUnlockables: [], otherUnlockables: [], randomSeed: 0, isTutorial: false, runModel: nil)
+        return Level(depth: 0, monsterTypeRatio: LevelConstructor.monsterTypes(depth: 0, isTutorial: false), monsterCountStart: 2, maxMonsterOnBoardRatio: 0.7, boardSize: 4, tileTypeChances: tileChances, maxSpawnGems: 0, goalProgress: [], savedBossPhase: nil, gemsSpawned: 0, monsterSpawnTurnTimer: 0, startingUnlockables: [], otherUnlockables: [], randomSeed: 0, isTutorial: false, runModel: nil)
         
     }
 }

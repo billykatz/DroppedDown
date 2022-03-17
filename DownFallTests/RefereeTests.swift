@@ -335,7 +335,7 @@ class RefereeTests: XCTestCase {
                      [.purplePillar, .empty,  .purplePillar, .noGroupRock],
                      [.noGroupRock, .purplePillar, .noGroupRock, .noGroupRock],
                      [Tile(type: .normalPlayer), .noGroupRock, .noGroupRock, .noGroupRock]]
-        let expected = Input(.reffingFinished(newTurn: false)).type
+        let expected = Input(.noMoreMoves).type
         let actual = Referee().enforceRules(tiles).type
         
         XCTAssertNotEqual(expected, actual)

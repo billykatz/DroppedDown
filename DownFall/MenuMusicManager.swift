@@ -18,7 +18,34 @@ class MenuMusicManager {
     let menuMusicThread = DispatchQueue(label: "MenuMusicManager.menuMusicThread", qos: .userInitiated)
     let musicVolume: Float = 0.5
     
-    var menuMusicPlayer: AVAudioPlayer?
+    var _menuMusicPlayer: AVAudioPlayer?
+    var menuMusicPlayer: AVAudioPlayer? {
+        if let musicPlayer = _menuMusicPlayer {
+            return musicPlayer
+        } else {
+            do {
+                let resourceName = "shift-shaft-menu-music-gold"
+                if let backgroundMusicPath = Bundle.main.path(forResource: resourceName, ofType: "m4a") {
+                    let url = URL(fileURLWithPath: backgroundMusicPath)
+                    if !AVAudioSession.sharedInstance().isOtherAudioPlaying {
+                        self._menuMusicPlayer = try AVAudioPlayer(contentsOf: url)
+                        self._menuMusicPlayer?.prepareToPlay()
+                    }
+                    return _menuMusicPlayer
+                } else {
+                    return nil
+                    print("no music")
+                }
+                
+                
+            }
+            catch(let err) {
+                return nil
+                GameLogger.shared.log(prefix: MenuMusicManager.tag, message: "Failed to load menu music \(err)")
+            }
+        }
+        
+    }
     var observer: NSKeyValueObservation?
     var muted: Bool = false {
         didSet {
@@ -33,29 +60,6 @@ class MenuMusicManager {
     }
     
     init() {
-        menuMusicThread.sync { [weak self] in
-            do {
-                let resourceName = "shift-shaft-menu-music-gold"
-                if let backgroundMusicPath = Bundle.main.path(forResource: resourceName, ofType: "m4a") {
-                    let url = URL(fileURLWithPath: backgroundMusicPath)
-                    self?.menuMusicPlayer = try AVAudioPlayer(contentsOf: url)
-                    self?.menuMusicPlayer?.prepareToPlay()
-                } else {
-                    print("no music")
-                }
-
-            }
-            catch(let err) {
-                GameLogger.shared.log(prefix: MenuMusicManager.tag, message: "Failed to load menu music \(err)")
-            }
-        }
-        
-        menuMusicThread.async { [weak self] in
-            self?.observer = UserDefaults.standard.observe(\.muteMusic, options: [.new], changeHandler: { [weak self] (defaults, change) in
-                let isMuted = change.newValue ?? true
-                self?.muted = isMuted
-            })
-        }
 
     }
     

@@ -9,6 +9,7 @@
 import UIKit
 import SpriteKit
 import GameplayKit
+import AVKit
 
 class GameViewController: UIViewController {
     
@@ -35,6 +36,17 @@ class GameViewController: UIViewController {
             }
             profileHasLoaded = true
             loadingSceneNode?.fadeOut {
+                // Get the singleton instance.
+                let audioSession = AVAudioSession.sharedInstance()
+                do {
+                    // Set the audio session category, mode, and options.
+                    try audioSession.setCategory(.soloAmbient, mode: .default, options: [])
+//                    try audioSession.setActive(true)
+                } catch {
+                    print("Failed to set audio session category.")
+                }
+                
+                
                 let hasLaunchedBefore = UserDefaults.standard.bool(forKey: UserDefaults.hasLaunchedBeforeKey)
                 self.menuCoordinator?.loadedProfile(profile, hasLaunchedBefore: hasLaunchedBefore)
                 
@@ -44,6 +56,8 @@ class GameViewController: UIViewController {
                     UserDefaults.standard.setValue(true, forKey: UserDefaults.showGroupNumberKey)
                     UserDefaults.standard.setValue(true, forKey: UserDefaults.hasLaunchedBeforeKey)
                 }
+                
+                
             }
         }
     }
@@ -93,13 +107,17 @@ class GameViewController: UIViewController {
         let ftueMetagameConductor = FTUEConductor()
         self.ftueMetagameConductor = ftueMetagameConductor
         
+        // setup music manager
+        let gameMusicManager = GameMusicManager()
+        
         /// setup the coordinators
-        let levelCoordinator = LevelCoordinator(gameSceneNode: gameScene, entities: entities, tutorialConductor: tutorialConductor, view: view)
+        let levelCoordinator = LevelCoordinator(gameSceneNode: gameScene, entities: entities, tutorialConductor: tutorialConductor, view: view, gameMusicManger: gameMusicManager)
         let codexCoordinator = CodexCoordinator(viewController: self.navigationController!, delegate: levelCoordinator)
         let settingsCoordinator = SettingsCoordinator(viewController: self.navigationController!)
         let creditsCoordinator = CreditsCoordinator(viewController: self.navigationController!)
         
-        self.menuCoordinator = MenuCoordinator(levelCoordinator: levelCoordinator, codexCoordinator: codexCoordinator, settingsCoordinator: settingsCoordinator, tutorialConductor: tutorialConductor, creditsCoordinator: creditsCoordinator,  view: view)
+        
+        self.menuCoordinator = MenuCoordinator(levelCoordinator: levelCoordinator, codexCoordinator: codexCoordinator, settingsCoordinator: settingsCoordinator, tutorialConductor: tutorialConductor, creditsCoordinator: creditsCoordinator, gameMusicManager: gameMusicManager,  view: view)
         self.levelCoordinator = levelCoordinator
         self.levelCoordinator?.delegate = menuCoordinator
         

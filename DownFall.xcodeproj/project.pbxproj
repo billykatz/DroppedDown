@@ -59,6 +59,7 @@
 		28A5294A27DC0E5800DAFC35 /* Betatesters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A5294927DC0E5700DAFC35 /* Betatesters.swift */; };
 		28A836C4268FE57F00D96C48 /* JSONCoding+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A836C3268FE57F00D96C48 /* JSONCoding+Extensions.swift */; };
 		28A836C6268FE97B00D96C48 /* ProfileCodingClient+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A836C5268FE97B00D96C48 /* ProfileCodingClient+Extensions.swift */; };
+		28AC697F27E40BB30039C921 /* GameMusicManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AC697E27E40BB30039C921 /* GameMusicManager.swift */; };
 		28AE3AC126A6000600BCE56A /* CodexCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AE3AC026A6000600BCE56A /* CodexCoordinator.swift */; };
 		28AE3AC526A6113900BCE56A /* CodexBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AE3AC426A6113900BCE56A /* CodexBackgroundView.swift */; };
 		28AF8E0027DE6AF9001315A5 /* ReviewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AF8DFF27DE6AF9001315A5 /* ReviewController.swift */; };
@@ -242,7 +243,7 @@
 		58B39BD723D21C9600915858 /* BackpackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58B39BD623D21C9600915858 /* BackpackView.swift */; };
 		58C37F2425AB94ED00F6D164 /* pickaxe.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 58C37F2325AB94ED00F6D164 /* pickaxe.mp3 */; };
 		58C9735124969CA100288133 /* ProfileManaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C9735024969CA100288133 /* ProfileManaging.swift */; };
-		58D56B4F25AB90DB002D1337 /* AudioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58D56B4E25AB90DB002D1337 /* AudioManager.swift */; };
+		58D56B4F25AB90DB002D1337 /* LevelAudioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58D56B4E25AB90DB002D1337 /* LevelAudioManager.swift */; };
 		58DCC9842451FBC700DC7AD8 /* RuneContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58DCC9832451FBC700DC7AD8 /* RuneContainerView.swift */; };
 /* End PBXBuildFile section */
 
@@ -316,6 +317,7 @@
 		28A5294927DC0E5700DAFC35 /* Betatesters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Betatesters.swift; sourceTree = "<group>"; };
 		28A836C3268FE57F00D96C48 /* JSONCoding+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "JSONCoding+Extensions.swift"; sourceTree = "<group>"; };
 		28A836C5268FE97B00D96C48 /* ProfileCodingClient+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileCodingClient+Extensions.swift"; sourceTree = "<group>"; };
+		28AC697E27E40BB30039C921 /* GameMusicManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameMusicManager.swift; sourceTree = "<group>"; };
 		28AE3AC026A6000600BCE56A /* CodexCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexCoordinator.swift; sourceTree = "<group>"; };
 		28AE3AC426A6113900BCE56A /* CodexBackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexBackgroundView.swift; sourceTree = "<group>"; };
 		28AF8DFF27DE6AF9001315A5 /* ReviewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewController.swift; sourceTree = "<group>"; };
@@ -503,7 +505,7 @@
 		58B39BD623D21C9600915858 /* BackpackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackpackView.swift; sourceTree = "<group>"; };
 		58C37F2325AB94ED00F6D164 /* pickaxe.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = pickaxe.mp3; sourceTree = "<group>"; };
 		58C9735024969CA100288133 /* ProfileManaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileManaging.swift; sourceTree = "<group>"; };
-		58D56B4E25AB90DB002D1337 /* AudioManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioManager.swift; sourceTree = "<group>"; };
+		58D56B4E25AB90DB002D1337 /* LevelAudioManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelAudioManager.swift; sourceTree = "<group>"; };
 		58DCC9832451FBC700DC7AD8 /* RuneContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneContainerView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -1176,7 +1178,8 @@
 			children = (
 				284F2EC427335B9600032088 /* Music */,
 				58D56B5725AB9215002D1337 /* SoundFiles */,
-				58D56B4E25AB90DB002D1337 /* AudioManager.swift */,
+				28AC697E27E40BB30039C921 /* GameMusicManager.swift */,
+				58D56B4E25AB90DB002D1337 /* LevelAudioManager.swift */,
 				281D43AF27A9CB8F00D00376 /* MenuMusicManager.swift */,
 			);
 			name = Sound;
@@ -1422,7 +1425,7 @@
 				28D29AD6270B82DC001AD50D /* RuneReplacementEmptyPanelView.swift in Sources */,
 				281D43B027A9CB8F00D00376 /* MenuMusicManager.swift in Sources */,
 				582CF3EC2442391900AA2A95 /* FillableBar.swift in Sources */,
-				58D56B4F25AB90DB002D1337 /* AudioManager.swift in Sources */,
+				58D56B4F25AB90DB002D1337 /* LevelAudioManager.swift in Sources */,
 				28C806AA26F3C3D500135E29 /* StatTracker.swift in Sources */,
 				3DC072BB2373AF510046F224 /* SwipeRecognizerView.swift in Sources */,
 				5605D6D321CC2DF400C1C5C2 /* DFTileSpriteNode.swift in Sources */,
@@ -1553,6 +1556,7 @@
 				28831DD327DAC66F008FCC0D /* ProfileViewModel+ScreenshotHelper.swift in Sources */,
 				28A836C4268FE57F00D96C48 /* JSONCoding+Extensions.swift in Sources */,
 				3D674C9522C9D6640003AEB4 /* MainMenu.swift in Sources */,
+				28AC697F27E40BB30039C921 /* GameMusicManager.swift in Sources */,
 				58A4B91D2472E5620011624A /* TileTypeChanceModel.swift in Sources */,
 				2842BABF26A0EC740021CD0B /* CodexItemView.swift in Sources */,
 				28DF00882772B5140071E384 /* Animator+Extensions.swift in Sources */,

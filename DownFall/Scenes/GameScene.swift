@@ -55,9 +55,6 @@ class GameScene: SKScene {
     // stat tracker
     private var runStatTracker: RunStatTracker?
     
-    // audio listener
-    private var audioListener: AudioEventListener?
-    
     // tutorial
     private var tutorialConductor: TutorialConductor?
     
@@ -81,6 +78,8 @@ class GameScene: SKScene {
     
     private var numberOfPreviousBossWins: Int = 0
     
+    private var gameMusicManager: GameMusicManager?
+    
     #if DEBUG
     // screenshot helper
     private var screenshotHelper: ScreenshotHelper?
@@ -98,7 +97,8 @@ class GameScene: SKScene {
                            loadedTiles: [[Tile]]? = [],
                            tutorialConductor: TutorialConductor,
                            profileViewModel: ProfileViewModel?,
-                           numberOfPreviousBossWins: Int
+                           numberOfPreviousBossWins: Int,
+                           gameMusicManager: GameMusicManager
     ) {
         self.profileViewModel = profileViewModel
         
@@ -134,10 +134,6 @@ class GameScene: SKScene {
         board = Board.build(tileCreator: tileCreator, difficulty: difficulty, level: level, tutorialConductor: tutorialConductor)
         self.boardSize = boardSize
         
-        // create the audio listener
-        let audioManager = AudioManager(sceneNode: foreground, isBossLevel: level.isBossLevel)
-        audioListener = AudioEventListener(audioManager: audioManager)
-        
         // start the tutorial conductor
         tutorialConductor.startHandlingInput()
         
@@ -153,7 +149,7 @@ class GameScene: SKScene {
             referee?.setWinRule(NonBossWin())
         }
         
-        
+        self.gameMusicManager = gameMusicManager
     }
     
     override func didMove(to view: SKView) {
@@ -192,6 +188,8 @@ class GameScene: SKScene {
         TurnWatcher.shared.register()
         // create haptic generator
         generator.register()
+        gameMusicManager?.register()
+        
         
     }
     
@@ -269,12 +267,11 @@ class GameScene: SKScene {
         renderer = nil
         foreground = nil
         gameSceneDelegate = nil
-//        generator = nil
         rotatePreview = nil
-        audioListener = nil
         runStatTracker = nil
         bossController = nil
         swipeRecognizerView?.removeFromSuperview()
+        gameMusicManager = nil
         InputQueue.reset()
         Dispatch.shared.reset()
         print("deiniting")

@@ -20,6 +20,7 @@ class CodexCoordinator {
     private let navigationController: UINavigationController
     var profileViewModel: ProfileViewModel?
     private weak var delegate: CodexCoordinatorDelegate?
+    private var startRunCallback: () -> Void = { }
     
     init(viewController: UINavigationController, delegate: CodexCoordinatorDelegate?) {
         self.navigationController = viewController
@@ -31,7 +32,7 @@ class CodexCoordinator {
         
     }
     
-    func presentCodexView(profileViewModel: ProfileViewModel) {
+    func presentCodexView(profileViewModel: ProfileViewModel, startRunCallback: @escaping () -> Void ) {
         self.profileViewModel = profileViewModel
         let viewModel = CodexViewModel(profileViewModel: profileViewModel, codexCoordinator: self)
         let codexView = CodexView(viewModel: viewModel, selectedIndex: 0)
@@ -48,6 +49,8 @@ class CodexCoordinator {
         
         hostingViewController.navigationItem.titleView = titleLabel
         navigationController.pushViewController(hostingViewController, animated: true)
+        
+        self.startRunCallback = startRunCallback
     }
     
     func updateUnlockable(_ unlockable: Unlockable) {
@@ -61,6 +64,8 @@ class CodexCoordinator {
     func startRunPressed() {
         //        hostingViewController.dismiss(animated: true)
         navigationController.popViewController(animated: true)
+        startRunCallback()
         delegate?.startRunPressed()
+        
     }
 }

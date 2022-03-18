@@ -55,85 +55,82 @@ enum Sound: CaseIterable {
 }
 
 
-class AudioManager: NSObject, AVAudioPlayerDelegate {
+class LevelAudioManager {
     
     let audioThread = DispatchQueue(label: "audioThread", qos: .userInitiated)
     let backgroundMusicThread = DispatchQueue(label: "musicThread", qos: .userInitiated)
     
-    let audioNode: SKAudioNode
-    var backgroundMusicPlayer: AVAudioPlayer?
-    let musicVolume: Float = 0.5
-    var fadeInDuration: Float = 2.5
-    
-    var observer: NSKeyValueObservation?
-    
-    var isBossLevel: Bool
-    
-    init(sceneNode: SKNode, isBossLevel: Bool) {
-        self.audioNode = SKAudioNode()
-        self.isBossLevel = isBossLevel
-        
-        super.init()
-        
-        backgroundMusicThread.sync { [weak self] in
+    var _backgroundMusicPlayer: AVAudioPlayer?
+    var backgroundMusicPlayer: AVAudioPlayer? {
+        if let musicPlayer = _backgroundMusicPlayer {
+            return musicPlayer
+        } else {
             do {
                 if isBossLevel {
                     if let backgroundMusicPath = Bundle.main.path(forResource: "shift-shaft-boss-loop", ofType: "m4a") {
                         let url = URL(fileURLWithPath: backgroundMusicPath)
-                        self?.backgroundMusicPlayer = try AVAudioPlayer(contentsOf: url)
-                        self?.backgroundMusicPlayer?.prepareToPlay()
+//                        if !AVAudioSession.sharedInstance().isOtherAudioPlaying {
+                            self._backgroundMusicPlayer = try AVAudioPlayer(contentsOf: url)
+                            self._backgroundMusicPlayer?.prepareToPlay()
+//                        }
+                        return self._backgroundMusicPlayer
                     } else {
-                        print("no music")
+                        return nil
                     }
 
                 } else {
                     if let backgroundMusicPath = Bundle.main.path(forResource: "shift-shaft-nonBoss-level-music-gold", ofType: "wav") {
                         let url = URL(fileURLWithPath: backgroundMusicPath)
-                        self?.backgroundMusicPlayer = try AVAudioPlayer(contentsOf: url)
-                        self?.backgroundMusicPlayer?.prepareToPlay()
+//                        if !AVAudioSession.sharedInstance().isOtherAudioPlaying {
+                            self._backgroundMusicPlayer = try AVAudioPlayer(contentsOf: url)
+                            self._backgroundMusicPlayer?.prepareToPlay()
+//                        }
+                        return self._backgroundMusicPlayer
                     } else {
+                        return nil
                         print("no music")
                     }
                 }
             }
             catch(let err) {
+                return nil
                 print(err)
             }
-        }
-        
-        backgroundMusicThread.async { [weak self] in
-            self?.observer = UserDefaults.standard.observe(\.muteMusic, options: [.new], changeHandler: { [weak self] (defaults, change) in
-                let isMuted = change.newValue ?? true
-                if (isMuted) {
-                    self?.stopBackgroundMusic()
-                } else {
-                    self?.playBackgroundMusic()
-                }
-            })
-        }
 
+        }
+    }
+    let musicVolume: Float = 0.5
+    var fadeInDuration: Float = 2.5
+    
+    var observer: NSKeyValueObservation?
+    
+    var isBossLevel: Bool = false
+    
+    init() {
         
-        sceneNode.addChild(self.audioNode)
             
-//        loadAllSounds()
     }
     
     deinit {
         observer?.invalidate()
     }
+    
+    func playBackgroundMusicBoardBuild() {
+        if !AVAudioSession.sharedInstance().isOtherAudioPlaying {
+            playBackgroundMusic()
+        }
+    }
 
     
     func playBackgroundMusic() {
-        if !UserDefaults.standard.bool(forKey: UserDefaults.muteMusicKey) {
-            backgroundMusicThread.sync(execute: { [backgroundMusicPlayer, musicVolume, fadeInDuration] in
-                backgroundMusicPlayer?.setVolume(0, fadeDuration: 0)
-                backgroundMusicPlayer?.play()
-                backgroundMusicPlayer?.setVolume(musicVolume, fadeDuration: TimeInterval(fadeInDuration))
-                
-                // negative value means that it will loop
-                backgroundMusicPlayer?.numberOfLoops = -1
-            })
-        }
+        backgroundMusicThread.sync(execute: { [backgroundMusicPlayer, musicVolume, fadeInDuration] in
+            backgroundMusicPlayer?.setVolume(0, fadeDuration: 0)
+            backgroundMusicPlayer?.play()
+            backgroundMusicPlayer?.setVolume(musicVolume, fadeDuration: TimeInterval(fadeInDuration))
+            
+            // negative value means that it will loop
+            backgroundMusicPlayer?.numberOfLoops = -1
+        })
     }
     
     func stopBackgroundMusic() {
@@ -183,7 +180,7 @@ class AudioManager: NSObject, AVAudioPlayerDelegate {
 
 class AudioEventListener {
     
-    init(audioManager: AudioManager) {
+    init(audioManager: LevelAudioManager) {
         Dispatch.shared.register { (input) in
             switch input.type {
             case .transformation(let transformations):
@@ -230,7 +227,7 @@ class AudioEventListener {
             case .playAgain, .loseAndGoToStore:
                 audioManager.stopBackgroundMusic()
             case .boardBuilt, .boardLoaded:
-                audioManager.playBackgroundMusic()
+                audioManager.playBackgroundMusicBoardBuild()
                 
             default:
                 break

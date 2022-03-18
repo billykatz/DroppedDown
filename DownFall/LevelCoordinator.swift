@@ -34,17 +34,19 @@ class LevelCoordinator: LevelCoordinating, GameSceneCoordinatingDelegate, CodexC
     var entities: EntitiesModel?
     let tutorialConductor: TutorialConductor
     let view: SKView
+    var gameMusicManager: GameMusicManager
     
     var profileViewModel: ProfileViewModel?
     
     /// Set default so we dont have to deal with optionality
     private(set) var runModel: RunModel = .zero
     
-    init(gameSceneNode: GameScene, entities: EntitiesModel, tutorialConductor: TutorialConductor, view: SKView) {
+    init(gameSceneNode: GameScene, entities: EntitiesModel, tutorialConductor: TutorialConductor, view: SKView, gameMusicManger: GameMusicManager) {
         self.gameSceneNode = gameSceneNode
         self.entities = entities
         self.tutorialConductor = tutorialConductor
         self.view = view
+        self.gameMusicManager = gameMusicManger
         
     }
     
@@ -52,6 +54,9 @@ class LevelCoordinator: LevelCoordinating, GameSceneCoordinatingDelegate, CodexC
         gameSceneNode?.prepareForReuse()
         if let scene = GKScene(fileNamed: "GameScene")?.rootNode as? GameScene,
            let entities = entities {
+            // set this field so the music manager knows what level to play
+            gameMusicManager.isBossLevel = level.isBossLevel
+            
             gameSceneNode = scene
             gameSceneNode!.scaleMode = .aspectFill
             gameSceneNode!.gameSceneDelegate = self
@@ -65,7 +70,8 @@ class LevelCoordinator: LevelCoordinating, GameSceneCoordinatingDelegate, CodexC
                                       loadedTiles: savedTiles,
                                       tutorialConductor: tutorialConductor,
                                       profileViewModel: profileViewModel,
-                                      numberOfPreviousBossWins: runModel.numberOfBossWins())
+                                      numberOfPreviousBossWins: runModel.numberOfBossWins(),
+                                      gameMusicManager: gameMusicManager)
             
             view.presentScene(gameSceneNode, transition: .moveIn(with: .left, duration: 0.65))
             view.ignoresSiblingOrder = true

@@ -41,6 +41,7 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
     var settingsCoordinator: SettingsCoordinator
     var profileViewModel: ProfileViewModel?
     var tutorialConductor: TutorialConductor?
+    var gameMusicManager: GameMusicManager
     
     private lazy var mainMenuScene: MainMenu? = {
         guard let scene = GKScene(fileNamed: Identifiers.mainMenuScene)?.rootNode as? MainMenu else { return nil }
@@ -49,12 +50,13 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
         return scene
     }()
     
-    init(levelCoordinator: LevelCoordinating, codexCoordinator: CodexCoordinator, settingsCoordinator: SettingsCoordinator, tutorialConductor: TutorialConductor, creditsCoordinator: CreditsCoordinator, view: SKView) {
+    init(levelCoordinator: LevelCoordinating, codexCoordinator: CodexCoordinator, settingsCoordinator: SettingsCoordinator, tutorialConductor: TutorialConductor, creditsCoordinator: CreditsCoordinator, gameMusicManager: GameMusicManager, view: SKView) {
         self.levelCoordinator = levelCoordinator
         self.codexCoordinator = codexCoordinator
         self.settingsCoordinator = settingsCoordinator
         self.tutorialConductor = tutorialConductor
         self.creditsCoordinator = creditsCoordinator
+        self.gameMusicManager = gameMusicManager
         self.view = view
     }
     
@@ -78,9 +80,6 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
 
         view.presentScene(mainMenu, transition: transition)
         view.ignoresSiblingOrder = true
-        
-        MenuMusicManager.shared.gameIsPlaying = false
-        MenuMusicManager.shared.playBackgroundMusic()
 
     }
     
@@ -92,23 +91,27 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
         self.profileViewModel = ProfileViewModel(profile: profile)
         levelCoordinator.profileViewModel = profileViewModel
         if hasLaunchedBefore {
+            gameMusicManager.isInMainMenu = true
             presentMainMenu()
         } else {
             // This springs us into the tutorial
             profileViewModel?.nilCurrenRun()
             levelCoordinator.loadRun(nil, profile: profileViewModel!.profile)
-            MenuMusicManager.shared.gameIsPlaying = true
+            gameMusicManager.isInMainMenu = false
         }
     }
     
     func newGame(_ playerModel: EntityModel?) {
         profileViewModel?.nilCurrenRun()
-        codexCoordinator.presentCodexView(profileViewModel: profileViewModel!)
+        codexCoordinator.presentCodexView(profileViewModel: profileViewModel!) { [weak self] in
+            // start run callback, turn off main menu music
+            self?.gameMusicManager.isInMainMenu = false 
+        }
     }
     
     func continueRun() {
         levelCoordinator.loadRun(profileViewModel!.profile.currentRun, profile: profileViewModel!.profile)
-        MenuMusicManager.shared.gameIsPlaying = true
+        gameMusicManager.isInMainMenu = false
     }
     
     /// Updates and saves the player data based on the current run
@@ -122,6 +125,7 @@ class MenuCoordinator: MenuCoordinating, MainMenuDelegate {
     func finishGame(playerData updatedPlayerData: EntityModel, currentRun: RunModel) {
         profileViewModel?.finishRun(playerData: updatedPlayerData, currentRun: currentRun)
         presentMainMenu(transition: SKTransition.fade(withDuration: 0.2), allowContinueRun: false)
+        gameMusicManager.isInMainMenu = true
     }
     
     func statsViewSelected() {

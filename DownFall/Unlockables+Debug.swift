@@ -14,7 +14,7 @@ extension Unlockable {
         [
             
             // Player Updates
-            Unlockable(stat: .fiveRocks, item: StoreOffer.offer(type: .plusOneMaxHealth, tier: 1), purchaseAmount: 0, isPurchased: false, isUnlocked: true, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .fiveRocks, item: StoreOffer.offer(type: .plusOneMaxHealth, tier: 1), purchaseAmount: 0, isPurchased: true, isUnlocked: true, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
             Unlockable(stat: .oneThousandRocks, item: StoreOffer.offer(type: .luck(amount: 5), tier: 1), purchaseAmount: 50, isPurchased: false, isUnlocked: true, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: true),
             Unlockable(stat: .oneThousandRocks, item: StoreOffer.offer(type: .dodge(amount: 5), tier: 1), purchaseAmount: 50, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
             

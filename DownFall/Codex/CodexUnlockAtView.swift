@@ -12,12 +12,37 @@ struct CodexUnlockAtView: View {
     let unlockable: Unlockable
     let progress: Int
     let progressString: String
-    let lineWidth: CGFloat = 10.0
+    var lineWidth: CGFloat {
+        if unlockable.isPurchased {
+            return 10
+        } else {
+            return 10
+        }
+        
+    }
     
     
     var trimTo: CGFloat {
         return CGFloat(progress) / CGFloat(unlockable.stat.amount)
     }
+    
+    var circleSize: CGFloat {
+        if unlockable.isPurchased {
+            return 125
+        } else {
+            return 125
+        }
+    }
+     
+    var imageSize: CGFloat {
+        if unlockable.isPurchased {
+            return 60
+        } else {
+            return 60
+        }
+    }
+        
+        
     
     var body: some View {
         VStack {
@@ -36,9 +61,9 @@ struct CodexUnlockAtView: View {
                     .foregroundColor(Color(unlockable.stat.color))
                 Image(unlockable.stat.textureName)
                     .resizable()
-                    .frame(width: 60, height: 60)
+                    .frame(width: imageSize, height: imageSize)
                 
-            }.frame(width: 125, height: 125)
+            }.frame(width: circleSize, height: circleSize)
             Text("\(min(unlockable.stat.amount,progress)) / \(unlockable.stat.amount)")
                 .font(.titleCodexFont).foregroundColor(.white).multilineTextAlignment(.center)
             if (progress < unlockable.stat.amount) {
@@ -50,7 +75,7 @@ struct CodexUnlockAtView: View {
                     .fixedSize(horizontal: false, vertical: true)
                     .padding()
                     .frame(maxWidth: .infinity, alignment: .center)
-            } else {
+            } else if !unlockable.isPurchased {
                 Text("Unlocked")
                     .font(.codexFont)
                     .foregroundColor(.white)
@@ -66,7 +91,7 @@ struct CodexUnlockAtView: View {
 
 struct CodexUnlockAtView_Previews: PreviewProvider {
     static var previews: some View {
-        CodexUnlockAtView(unlockable: Unlockable.debugStartingUnlockables.first!, progress: 55, progressString: "Mine 45 more blue rocks to unlock this")
+        CodexUnlockAtView(unlockable: Unlockable.debugStartingUnlockables.first!, progress: 45, progressString: "Mine 45 more blue rocks to unlock this")
             .background(Color.gray).frame(height: 500.0)
     }
 }

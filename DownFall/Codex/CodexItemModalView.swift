@@ -29,14 +29,20 @@ struct CodexItemModalDescriptionView: View {
 
     var body: some View {
         if (unlockable.isUnlocked) {
-            Text(unlockable.item.body)
-                .font(.codexFont)
-                .foregroundColor(.white)
-                .lineLimit(nil)
-                .multilineTextAlignment(.center)
-                .fixedSize(horizontal: false, vertical: true)
-                .padding()
-        } else if !unlockable.isPurchased {
+                Text(unlockable.item.body)
+                    .font(.codexFont)
+                    .foregroundColor(.white)
+                    .lineLimit(nil)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding()
+            if (unlockable.isPurchased) {
+                CodexUnlockAtView(unlockable: unlockable,
+                                  progress: relevantProgress,
+                                  progressString: relevantPlayerStat)
+            
+            }
+        } else {
             CodexUnlockAtView(unlockable: unlockable,
                               progress: relevantProgress,
                               progressString: relevantPlayerStat)
@@ -49,9 +55,9 @@ struct CodexItemModalApplicationView: View {
     let appliesToBaseCharacter: Bool
     
     var body: some View {
-        Text("Purchased")
-            .font(.titleCodexFont)
-            .foregroundColor(.white)
+//        Text("You own this.")
+//            .font(.titleCodexFont)
+//            .foregroundColor(.white)
         if (appliesToBaseCharacter) {
             Text("This upgrade has been applied to your character.")
                 .font(.codexFont)

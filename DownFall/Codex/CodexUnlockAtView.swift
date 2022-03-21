@@ -63,6 +63,19 @@ struct CodexUnlockAtView: View {
                     .resizable()
                     .frame(width: imageSize, height: imageSize)
                 
+                if unlockable.isPurchased {
+                    VStack {
+                        Spacer().frame(width: 10, height: 125)
+                        Circle()
+                            .foregroundColor(Color(unlockable.stat.color))
+                            .frame(width: 30, height: 30)
+                            .overlay(Image("checkMark")
+                                .resizable()
+                                .frame(width: 25, height: 25)
+                            )
+                    }
+                }
+                
             }.frame(width: circleSize, height: circleSize)
             Text("\(min(unlockable.stat.amount,progress)) / \(unlockable.stat.amount)")
                 .font(.titleCodexFont).foregroundColor(.white).multilineTextAlignment(.center)

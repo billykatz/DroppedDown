@@ -131,10 +131,6 @@ func boardHasMoreMoves(tiles: [[Tile]]) -> Bool {
                 if hasPathToLeft || hasPathToRight || hasPathAbove || hasPathBelow {
                     hasMoreMoves = true
                 }
-
-//                hasMoreMoves =
-                
-                
                 
             case .rock(_, _, let groupCount):
                 if groupCount >= 3 {
@@ -155,38 +151,63 @@ func boardHasMoreMoves(tiles: [[Tile]]) -> Bool {
                 // check to see if it is only the teleport rune
                 
                 guard let chargedRunes = data.pickaxe?.runes.filter({ $0.isCharged }).count else { continue }
-                if chargedRunes > 1 {
+                // only two runes require specific moves/boards to be able to be used. So if the player has 3 charge runes then they can definitely move
+                if chargedRunes > 2 {
                     hasMoreMoves = true
                 }
-                // the only charged rune is the teleport rune.  Check to see if the exit is encased
-                else if let pickaxe = data.pickaxe,
-                            pickaxe.runes.contains(where: { $0.type == .teleportation }) {
-                    if let exitCoord = getTilePosition(.exit(blocked: true), tiles: tiles) {
-                        // check all the neigbors
-                        let neighbors = Array<TileCoord>((exitCoord.orthogonalNeighbors).compactMap( {
-                            if isWithinBounds($0, within: tiles) {
-                                return $0
-                            } else {
-                                return nil
-                            }
-                        }))
-                        var pillarCount = 0
-                        for neighbor in neighbors {
-                            if case TileType.pillar = tiles[neighbor].type {
-                                pillarCount += 1
+                else if chargedRunes >= 1, let pickaxe = data.pickaxe {
+                    
+                    // one of the charge runes is monster crush
+                    if let rune = pickaxe.runes.first(where: { $0.type == .monsterCrush }),
+                        rune.isCharged {
+                        var groupof3Monsters = false
+                        for row in 0..<tiles.count {
+                            for col in 0..<tiles[row].count {
+                                if case TileType.monster = tiles[row][col].type {
+                                    if findNeighbors(in: tiles, of: TileCoord(row, col), boardSize: tiles.count, killMonsters: true).0.count >= 3 {
+                                        groupof3Monsters = true
+                                    }
+                                }
                             }
                         }
                         
-                        if pillarCount >= neighbors.count {
-                            // purposefully left blank.  We should override other has more moves
-                        } else {
+                        if groupof3Monsters {
                             hasMoreMoves = true
                         }
-                    }
+                    }   
+                    
+                    // one of the charge runes is monster crush
+                    if let rune = pickaxe.runes.first(where: { $0.type == .teleportation }),
+                        rune.isCharged {
+                        if let exitCoord = getTilePosition(.exit(blocked: true), tiles: tiles) {
+                            // check all the neigbors
+                            let neighbors = Array<TileCoord>((exitCoord.orthogonalNeighbors).compactMap( {
+                                if isWithinBounds($0, within: tiles) {
+                                    return $0
+                                } else {
+                                    return nil
+                                }
+                            }))
+                            var pillarCount = 0
+                            for neighbor in neighbors {
+                                if case TileType.pillar = tiles[neighbor].type {
+                                    pillarCount += 1
+                                }
+                            }
+                            
+                            if pillarCount >= neighbors.count {
+                                // purposefully left blank.  We should override other has more moves
+                            } else {
+                                hasMoreMoves = true
+                            }
+                        }
+
                 }
-                // they have a charged rune that they should be able to use
-                else if chargedRunes > 0 {
-                    hasMoreMoves = true
+                    
+                    // pickaxe has a rune that is not teleport and not monster crush and IS charged
+                    if pickaxe.runes.contains(where: { $0.type != .teleportation && $0.type != .monsterCrush && $0.isCharged }) {
+                        hasMoreMoves = true
+                    }
                 }
                 
             default:
@@ -233,6 +254,7 @@ func valid(neighbor: TileCoord?, for currCoord: TileCoord?, boardSize: Int) -> B
 }
 
 /// Find all contiguous neighbors of the same color as the tile that was tapped
+/// If kill monsters is set to yes then it searches for monsters
 func findNeighbors(in tiles: [[Tile]], of coord: TileCoord, boardSize: Int, killMonsters: Bool = false) -> ([TileCoord], [TileCoord]) {
     let (x,y) = coord.tuple
     guard

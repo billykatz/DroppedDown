@@ -260,6 +260,7 @@ class RefereeTests: XCTestCase {
     
     }
     
+    // MARK: - No More Moves
     func testRefereeNotGameOverBecauseThereIsAGroupOfRocks() {
         
         let tiles = [[.noGroupRock, .noGroupRock, .noGroupRock, .threeGroupRock],
@@ -325,10 +326,6 @@ class RefereeTests: XCTestCase {
     
     }
     
-    // So this only happens when there is a internal "pocket" of empty spaces created by unmovable tiles like pillars surrounding an empty tile
-    // The logic to actual figure out if there is a "pocket" is complicated and I likely wont get to it
-    // TODO: This is purposefully left in because currently we do not support this which limits level design. We should try to implement an algorithm that checks if the empty tiles can draw a line from themeselves to the edge of the board without touching a pillar.  If a empty tile can do that in any direction, then it's possible there are moves left.  If all empty tiles cannot do that, then there are truly no more moves.
-    //
     func testRefereeShouldRecognizeNoMoreMoves() {
         
         let tiles = [[.noGroupRock, .purplePillar, .purplePillar, .noGroupRock],
@@ -395,6 +392,8 @@ class RefereeTests: XCTestCase {
         XCTAssertEqual(expected, actual)
     }
     
+    // MARK: - No More Moves Teleport
+    
     // No moves excet a charged teleport rune
     func testRefereeShouldRecognizeThere_Are_MoreMovesWithRune() {
         
@@ -409,7 +408,6 @@ class RefereeTests: XCTestCase {
     
     }
     
-    // No moves excet a charged teleport rune
     func testRefereeShouldRecognizeThere_Are_No_MoreMovesEvenWithTeleportBecauseExitIsEncased() {
         
         let tiles = [[.noGroupRock, .purplePillar, .purplePillar, .noGroupRock],
@@ -430,6 +428,64 @@ class RefereeTests: XCTestCase {
                      [.purplePillar, .exit,  .purplePillar, .noGroupRock],
                      [.noGroupRock, .purplePillar, .noGroupRock, .noGroupRock],
                      [Tile(type: .normalPlayerWithTeleportationAndFieryRage), .noGroupRock, .noGroupRock, .noGroupRock]]
+        let expected = Input(.reffingFinished(newTurn: false)).type
+        let actual = Referee().enforceRules(tiles).type
+        
+        XCTAssertEqual(expected, actual)
+    
+    }
+    
+    // MARK: - No More Moves Monster Crush
+    
+    func testRefereeShouldRecognize_AreNo_MoreMoves_WithUncharged_MonsterCrushRune() {
+        
+        let tiles = [
+            [.noGroupRock,              .purplePillar,  .monster(.alamoZero),  .monster(.batZero)],
+            [.purplePillar,             .purplePillar,  .noGroupRock,             .monster(.batZero)],
+            [.noGroupRock,              .purplePillar,  .noGroupRock,             .purplePillar],
+            [Tile(type: .normalPlayerWithUnchargedMonsterCrush), .purplePillar,  .purplePillar,      .noGroupRock]]
+        let expected = Input(.noMoreMoves).type
+        let actual = Referee().enforceRules(tiles).type
+        
+        XCTAssertEqual(expected, actual)
+    
+    }
+    
+    func testRefereeShouldRecognize_Are_MoreMoves_WithCharged_MonsterCrushRune_WithGroupOfThreeMonsters() {
+        
+        let tiles = [
+            [.noGroupRock,              .purplePillar,  .monster(.alamoZero),  .monster(.batZero)],
+            [.purplePillar,             .purplePillar,  .noGroupRock,             .monster(.batZero)],
+            [.noGroupRock,              .purplePillar,  .noGroupRock,             .purplePillar],
+            [Tile(type: .normalPlayerWithChargedMonsterCrush), .purplePillar,  .purplePillar,      .noGroupRock]]
+        let expected = Input(.reffingFinished(newTurn: false)).type
+        let actual = Referee().enforceRules(tiles).type
+        
+        XCTAssertEqual(expected, actual)
+    
+    }
+
+    func testRefereeShouldRecognize_Are_MoreMoves_WithCharged_MonsterCrushRune_WithNo_GroupOfThreeMonsters() {
+        
+        let tiles = [
+            [.noGroupRock,              .purplePillar,  .monster(.alamoZero),  .purplePillar],
+            [.purplePillar,             .purplePillar,  .noGroupRock,             .monster(.batZero)],
+            [.noGroupRock,              .purplePillar,  .noGroupRock,             .purplePillar],
+            [Tile(type: .normalPlayerWithChargedMonsterCrush), .purplePillar,  .purplePillar,      .noGroupRock]]
+        let expected = Input(.noMoreMoves).type
+        let actual = Referee().enforceRules(tiles).type
+        
+        XCTAssertEqual(expected, actual)
+    
+    }
+    
+    func testRefereeShouldRecognize_Are_MoreMoves_WithUncharged_MonsterCrushRune_WithNo_GroupOfThreeMonsters_WithChargedFieryRage() {
+        
+        let tiles = [
+            [.noGroupRock,              .purplePillar,  .monster(.alamoZero),  .purplePillar],
+            [.purplePillar,             .purplePillar,  .noGroupRock,             .monster(.batZero)],
+            [.noGroupRock,              .purplePillar,  .noGroupRock,             .purplePillar],
+            [Tile(type: .normalPlayerWithChargedMonsterCrushAndFieryRage), .purplePillar,  .purplePillar,      .noGroupRock]]
         let expected = Input(.reffingFinished(newTurn: false)).type
         let actual = Referee().enforceRules(tiles).type
         

@@ -162,6 +162,22 @@ extension TileType {
         let fieryRageRune = Rune.rune(for: .fieryRage, isCharged: true)
         return createPlayer(pickaxe: Pickaxe(runeSlots: 2, runes: [teleportRune, fieryRageRune]))
     }
+    
+    static var normalPlayerWithUnchargedMonsterCrush: TileType {
+        let rune = Rune.rune(for: .monsterCrush, isCharged: false)
+        return createPlayer(pickaxe: Pickaxe(runeSlots: 1, runes: [rune]))
+    }
+
+    static var normalPlayerWithChargedMonsterCrush: TileType {
+        let rune = Rune.rune(for: .monsterCrush, isCharged: true)
+        return createPlayer(pickaxe: Pickaxe(runeSlots: 1, runes: [rune]))
+    }
+    
+    static var normalPlayerWithChargedMonsterCrushAndFieryRage: TileType {
+        let rune = Rune.rune(for: .monsterCrush, isCharged: false)
+        let rune2 = Rune.rune(for: .fieryRage, isCharged: true)
+        return createPlayer(pickaxe: Pickaxe(runeSlots: 2, runes: [rune, rune2]))
+    }
 
     
 

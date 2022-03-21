@@ -55,9 +55,6 @@ struct CodexItemModalApplicationView: View {
     let appliesToBaseCharacter: Bool
     
     var body: some View {
-//        Text("You own this.")
-//            .font(.titleCodexFont)
-//            .foregroundColor(.white)
         if (appliesToBaseCharacter) {
             Text("This upgrade has been applied to your character.")
                 .font(.codexFont)

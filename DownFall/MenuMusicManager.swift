@@ -33,20 +33,20 @@ class MenuMusicManager {
                     }
                     return _menuMusicPlayer
                 } else {
+                    GameLogger.shared.log(prefix: "[MenuMusicManager]", message: "Failed to load music file")
                     return nil
-                    print("no music")
                 }
                 
                 
             }
             catch(let err) {
+                GameLogger.shared.log(prefix: "[MenuMusicManager]", message: "Failed to load \(err)")
                 return nil
-                GameLogger.shared.log(prefix: MenuMusicManager.tag, message: "Failed to load menu music \(err)")
             }
         }
         
     }
-    var observer: NSKeyValueObservation?
+    
     var muted: Bool = false {
         didSet {
             decideToPlayOrStopMusic()
@@ -59,16 +59,8 @@ class MenuMusicManager {
         }
     }
     
-    init() {
-
-    }
-    
     var shouldPlay: Bool {
         return !muted && !(menuMusicPlayer?.isPlaying ?? true) && !UserDefaults.standard.bool(forKey: UserDefaults.muteMusicKey) && !gameIsPlaying
-    }
-    
-    deinit {
-        observer?.invalidate()
     }
     
     func decideToPlayOrStopMusic() {

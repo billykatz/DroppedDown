@@ -12,37 +12,22 @@ struct CodexUnlockAtView: View {
     let unlockable: Unlockable
     let progress: Int
     let progressString: String
-    var lineWidth: CGFloat {
-        if unlockable.isPurchased {
-            return 10
-        } else {
-            return 10
-        }
-        
-    }
-    
     
     var trimTo: CGFloat {
         return CGFloat(progress) / CGFloat(unlockable.stat.amount)
     }
     
+    var lineWidth: CGFloat {
+        return 10
+    }
+    
     var circleSize: CGFloat {
-        if unlockable.isPurchased {
-            return 125
-        } else {
-            return 125
-        }
+        return 125
     }
      
     var imageSize: CGFloat {
-        if unlockable.isPurchased {
-            return 60
-        } else {
-            return 60
-        }
+        return 60
     }
-        
-        
     
     var body: some View {
         VStack {

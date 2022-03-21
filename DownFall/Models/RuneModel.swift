@@ -848,7 +848,7 @@ struct Rune: Hashable, Codable {
                 cooldown: 6,
                 rechargeType: [TileType.monster(.zero)],
                 rechargeMinimum: 1,
-                rechargeCurrent: 0,
+                rechargeCurrent: isCharged ? 6 : 0,
                 progressColor: .blood,
                 maxDistanceBetweenTargets: CGFloat.greatestFiniteMagnitude,
                 animationTextureName: "rune-destroy-monsters-on-board-animation-sprite-sheet",

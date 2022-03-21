@@ -60,6 +60,10 @@ class LevelAudioManager {
     let audioThread = DispatchQueue(label: "audioThread", qos: .userInitiated)
     let backgroundMusicThread = DispatchQueue(label: "musicThread", qos: .userInitiated)
     
+    let musicVolume: Float = 0.5
+    var fadeInDuration: Float = 2.5
+    
+    var isBossLevel: Bool = false
     var _backgroundMusicPlayer: AVAudioPlayer?
     var backgroundMusicPlayer: AVAudioPlayer? {
         if let musicPlayer = _backgroundMusicPlayer {
@@ -69,50 +73,32 @@ class LevelAudioManager {
                 if isBossLevel {
                     if let backgroundMusicPath = Bundle.main.path(forResource: "shift-shaft-boss-loop", ofType: "m4a") {
                         let url = URL(fileURLWithPath: backgroundMusicPath)
-//                        if !AVAudioSession.sharedInstance().isOtherAudioPlaying {
-                            self._backgroundMusicPlayer = try AVAudioPlayer(contentsOf: url)
-                            self._backgroundMusicPlayer?.prepareToPlay()
-//                        }
+                        self._backgroundMusicPlayer = try AVAudioPlayer(contentsOf: url)
+                        self._backgroundMusicPlayer?.prepareToPlay()
                         return self._backgroundMusicPlayer
                     } else {
+                        GameLogger.shared.log(prefix: "[LevelAudioManager]", message: "Failed to load boss music file")
                         return nil
                     }
-
+                    
                 } else {
                     if let backgroundMusicPath = Bundle.main.path(forResource: "shift-shaft-nonBoss-level-music-gold", ofType: "wav") {
                         let url = URL(fileURLWithPath: backgroundMusicPath)
-//                        if !AVAudioSession.sharedInstance().isOtherAudioPlaying {
-                            self._backgroundMusicPlayer = try AVAudioPlayer(contentsOf: url)
-                            self._backgroundMusicPlayer?.prepareToPlay()
-//                        }
+                        self._backgroundMusicPlayer = try AVAudioPlayer(contentsOf: url)
+                        self._backgroundMusicPlayer?.prepareToPlay()
                         return self._backgroundMusicPlayer
                     } else {
+                        GameLogger.shared.log(prefix: "[LevelAudioManager]", message: "Failed to load non-boss music file")
                         return nil
-                        print("no music")
                     }
                 }
             }
             catch(let err) {
+                GameLogger.shared.log(prefix: "[LevelAudioManager]", message: "Failed to load \(err)")
                 return nil
-                print(err)
             }
-
-        }
-    }
-    let musicVolume: Float = 0.5
-    var fadeInDuration: Float = 2.5
-    
-    var observer: NSKeyValueObservation?
-    
-    var isBossLevel: Bool = false
-    
-    init() {
-        
             
-    }
-    
-    deinit {
-        observer?.invalidate()
+        }
     }
     
     func playBackgroundMusicBoardBuild() {
@@ -145,34 +131,15 @@ class LevelAudioManager {
     }
     
     func loadAllSounds() {
-        for sound in Sound.allCases {
-            playSound(sound, silent: true)
-        }
+        // purposefully left blank.
     }
     
     func playSound(_ sound: Sound, waitForCompletion: Bool = false, silent: Bool = false) {
-//        audioThread.async { [weak self] in
-//            let rockSound = SKAction.playSoundFileNamed(sound.filename, waitForCompletion: waitForCompletion)
-//
-//            if !silent && !UserDefaults.standard.bool(forKey: UserDefaults.muteSoundKey) {
-//                self?.audioNode.run(rockSound)
-//            }
-//
-//        }
+        // purposefully left blank.
     }
     
     func sequenceSounds(_ sounds: [Sound]) {
-//        var soundActions = [SKAction]()
-//        for sound in sounds {
-//            soundActions.append(SKAction.playSoundFileNamed(sound.filename, waitForCompletion: true))
-//        }
-//        
-//        audioThread.async { [weak self] in
-//            if !UserDefaults.standard.bool(forKey: UserDefaults.muteSoundKey) {
-//                self?.audioNode.run(SKAction.sequence(soundActions))
-//            }
-//
-//        }
+        // purposefully left blank.
     }
 
 }
@@ -181,57 +148,55 @@ class LevelAudioManager {
 class AudioEventListener {
     
     init(audioManager: LevelAudioManager) {
-        Dispatch.shared.register { (input) in
-            switch input.type {
-            case .transformation(let transformations):
-                if let trans = transformations.first, let inputType = trans.inputType {
-                    switch inputType {
-                    case .touch:
-                        if trans.newTiles != nil {
-                            audioManager.playSound(.mineRocks)
-                            
-                            if trans.removedTilesContainGem ?? false {
-                                audioManager.playSound(.gemAppears)
-                            }
-                        } else {
-                            audioManager.playSound(.pickaxe)
-                        }
-                    default:
-                        break
-                    }
-                }
-            case .collectItem:
-                audioManager.playSound(.collectGem)
-            case .goalCompleted(_, allGoalsCompleted: let allCompleted):
-                if allCompleted {
-                    audioManager.sequenceSounds([.goalCompleted, .exitUnblocked])
-                } else {
-                    audioManager.playSound(.goalCompleted)
-                }
-                
-            case .attack(attackType: _, attacker: _, defender: _, affectedTiles: _, dodged: _, attackerIsPlayer: let attackerIsPlayer):
-                if attackerIsPlayer {
-                    audioManager.playSound(.playerHitsEnemy)
-                } else {
-                    audioManager.playSound(.enemyHitsPlayer)
-                }
-                
-            case .gameWin:
-                audioManager.playSound(.levelComplete)
-                audioManager.stopBackgroundMusic()
-            
-            case .gameLose:
-                audioManager.playSound(.gameLose)
-                audioManager.stopBackgroundMusic()
-                
-            case .playAgain, .loseAndGoToStore:
-                audioManager.stopBackgroundMusic()
-            case .boardBuilt, .boardLoaded:
-                audioManager.playBackgroundMusicBoardBuild()
-                
-            default:
-                break
-            }
-        }
+//        Dispatch.shared.register { (input) in
+//            switch input.type {
+//            case .transformation(let transformations):
+//                if let trans = transformations.first, let inputType = trans.inputType {
+//                    switch inputType {
+//                    case .touch:
+//                        if trans.newTiles != nil {
+//                            audioManager.playSound(.mineRocks)
+//
+//                            if trans.removedTilesContainGem ?? false {
+//                                audioManager.playSound(.gemAppears)
+//                            }
+//                        } else {
+//                            audioManager.playSound(.pickaxe)
+//                        }
+//                    default:
+//                        break
+//                    }
+//                }
+//            case .collectItem:
+//                audioManager.playSound(.collectGem)
+//            case .goalCompleted(_, allGoalsCompleted: let allCompleted):
+//                if allCompleted {
+//                    audioManager.sequenceSounds([.goalCompleted, .exitUnblocked])
+//                } else {
+//                    audioManager.playSound(.goalCompleted)
+//                }
+//
+//            case .attack(attackType: _, attacker: _, defender: _, affectedTiles: _, dodged: _, attackerIsPlayer: let attackerIsPlayer):
+//                if attackerIsPlayer {
+//                    audioManager.playSound(.playerHitsEnemy)
+//                } else {
+//                    audioManager.playSound(.enemyHitsPlayer)
+//                }
+//
+//            case .gameWin:
+//                audioManager.playSound(.levelComplete)
+//                audioManager.stopBackgroundMusic()
+//
+//            case .gameLose:
+//                audioManager.playSound(.gameLose)
+//                audioManager.stopBackgroundMusic()
+//
+//            case .playAgain, .loseAndGoToStore:
+//                audioManager.stopBackgroundMusic()
+//
+//            default:
+//                break
+//            }
+//        }
     }
 }

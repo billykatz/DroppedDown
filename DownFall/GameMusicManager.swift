@@ -53,32 +53,34 @@ class GameMusicManager {
     private func decideToPlay(isMuted: Bool, fromTappingUnmute: Bool, fromStartingLevel: Bool) {
         self.isMuted = isMuted
         
-        if isMuted {
-            // is something else playing?
-            if !AVAudioSession.sharedInstance().isOtherAudioPlaying {
-                if isInMainMenu {
-                    menuMusicManager.stopBackgroundMusic()
-                } else {
-                    levelMusicManager.stopBackgroundMusic()
-                }
-            }
-        } else {
-            if !AVAudioSession.sharedInstance().isOtherAudioPlaying {
-                if isInMainMenu {
-                    menuMusicManager.playBackgroundMusic()
-                } else {
-                    menuMusicManager.stopBackgroundMusic()
-                }
-                
-                if fromStartingLevel {
-                    levelMusicManager.playBackgroundMusic()
+        gameMusicThread.async {
+            if isMuted {
+                // is something else playing?
+                if !AVAudioSession.sharedInstance().isOtherAudioPlaying {
+                    if isInMainMenu {
+                        menuMusicManager.stopBackgroundMusic()
+                    } else {
+                        levelMusicManager.stopBackgroundMusic()
+                    }
                 }
             } else {
-                if fromTappingUnmute {
+                if !AVAudioSession.sharedInstance().isOtherAudioPlaying {
                     if isInMainMenu {
                         menuMusicManager.playBackgroundMusic()
                     } else {
+                        menuMusicManager.stopBackgroundMusic()
+                    }
+                    
+                    if fromStartingLevel {
                         levelMusicManager.playBackgroundMusic()
+                    }
+                } else {
+                    if fromTappingUnmute {
+                        if isInMainMenu {
+                            menuMusicManager.playBackgroundMusic()
+                        } else {
+                            levelMusicManager.playBackgroundMusic()
+                        }
                     }
                 }
             }
@@ -100,11 +102,10 @@ class GameMusicManager {
             levelMusicManager.isBossLevel = self.isBossLevel
             decideToPlay(isMuted: isMuted, fromTappingUnmute: false, fromStartingLevel: true)
             
-        case .gameLose, .gameWin:
-            levelMusicManager.stopBackgroundMusic()
-            
-        case .playAgain:
-            levelMusicManager.stopBackgroundMusic()
+        case .gameLose, .gameWin, .playAgain:
+            if !AVAudioSession.sharedInstance().isOtherAudioPlaying {
+                levelMusicManager.stopBackgroundMusic()
+            }
             
         default:
             ()

@@ -119,7 +119,7 @@ func boardHasMoreMoves(tiles: [[Tile]]) -> Bool {
                     }
                 }
                 // check all rows above
-                if col >= tiles.count-1 {
+                if col <= tiles.count-1 {
                     for innerRow in col..<tiles.count {
                         let tileCoord = TileCoord(innerRow, col)
                         if case TileType.pillar = tiles[tileCoord].type {
@@ -127,8 +127,12 @@ func boardHasMoreMoves(tiles: [[Tile]]) -> Bool {
                         }
                     }
                 }
+                
+                if hasPathToLeft || hasPathToRight || hasPathAbove || hasPathBelow {
+                    hasMoreMoves = true
+                }
 
-                hasMoreMoves = hasPathToLeft || hasPathToRight || hasPathAbove || hasPathBelow
+//                hasMoreMoves =
                 
                 
                 
@@ -148,7 +152,40 @@ func boardHasMoreMoves(tiles: [[Tile]]) -> Bool {
                 
             case .player(let data):
                 // the player can use their rune that is already charged
-                if (data.pickaxe?.runes.filter({ $0.isCharged }).count ?? 0) >= 1 {
+                // check to see if it is only the teleport rune
+                
+                guard let chargedRunes = data.pickaxe?.runes.filter({ $0.isCharged }).count else { continue }
+                if chargedRunes > 1 {
+                    hasMoreMoves = true
+                }
+                // the only charged rune is the teleport rune.  Check to see if the exit is encased
+                else if let pickaxe = data.pickaxe,
+                            pickaxe.runes.contains(where: { $0.type == .teleportation }) {
+                    if let exitCoord = getTilePosition(.exit(blocked: true), tiles: tiles) {
+                        // check all the neigbors
+                        let neighbors = Array<TileCoord>((exitCoord.orthogonalNeighbors).compactMap( {
+                            if isWithinBounds($0, within: tiles) {
+                                return $0
+                            } else {
+                                return nil
+                            }
+                        }))
+                        var pillarCount = 0
+                        for neighbor in neighbors {
+                            if case TileType.pillar = tiles[neighbor].type {
+                                pillarCount += 1
+                            }
+                        }
+                        
+                        if pillarCount >= neighbors.count {
+                            // purposefully left blank.  We should override other has more moves
+                        } else {
+                            hasMoreMoves = true
+                        }
+                    }
+                }
+                // they have a charged rune that they should be able to use
+                else if chargedRunes > 0 {
                     hasMoreMoves = true
                 }
                 

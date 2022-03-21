@@ -106,7 +106,9 @@ extension TileType {
                              attack: AttackModel = AttackModel.pickaxe,
                              type: EntityModel.EntityType = .player,
                              carry: CarryModel = .zero,
-                             animations: [AnimationModel] = []) -> TileType {
+                             animations: [AnimationModel] = [],
+                             pickaxe: Pickaxe? = nil
+    ) -> TileType {
         return TileType.player(EntityModel(originalHp: originalHp,
                                            hp: hp,
                                            name: name,
@@ -114,7 +116,7 @@ extension TileType {
                                            type: type,
                                            carry: carry,
                                            animations: animations,
-                                           pickaxe: Pickaxe(runeSlots: 0, runes: []),
+                                           pickaxe: pickaxe ?? Pickaxe(runeSlots: 1, runes: []),
                                            effects: [],
                                            dodge:0,
                                            luck: 0,
@@ -149,6 +151,20 @@ extension TileType {
     static var normalPlayer: TileType {
         return createPlayer()
     }
+    
+    static var normalPlayerWithTeleportation: TileType {
+        let teleportRune = Rune.rune(for: .teleportation, isCharged: true)
+        return createPlayer(pickaxe: Pickaxe(runeSlots: 1, runes: [teleportRune]))
+    }
+    
+    static var normalPlayerWithTeleportationAndFieryRage: TileType {
+        let teleportRune = Rune.rune(for: .teleportation, isCharged: true)
+        let fieryRageRune = Rune.rune(for: .fieryRage, isCharged: true)
+        return createPlayer(pickaxe: Pickaxe(runeSlots: 2, runes: [teleportRune, fieryRageRune]))
+    }
+
+    
+
     
     
     static var strongPlayer: TileType {

@@ -338,7 +338,102 @@ class RefereeTests: XCTestCase {
         let expected = Input(.noMoreMoves).type
         let actual = Referee().enforceRules(tiles).type
         
-        XCTAssertNotEqual(expected, actual)
+        XCTAssertEqual(expected, actual)
+    
+    }
+    
+    func testRefereeShouldRecognizeNoMoreMoves_ForAPocketOfEmpties() {
+        
+        let tiles = [
+            [.noGroupRock,              .purplePillar,  .purplePillar,  .noGroupRock],
+            [.purplePillar,             .empty,         .empty,         .purplePillar],
+            [.noGroupRock,              .purplePillar,  .empty,         .purplePillar],
+            [Tile(type: .normalPlayer), .purplePillar,  .purplePillar,  .noGroupRock]]
+        let expected = Input(.noMoreMoves).type
+        let actual = Referee().enforceRules(tiles).type
+        
+        XCTAssertEqual(expected, actual)
+    
+    }
+    
+    func testRefereeShouldRecognizeNoMoreMoves_ForTwoPocketsOfEmpties() {
+        
+        let tiles = [
+            [.noGroupRock,              .purplePillar,  .purplePillar,  .noGroupRock],
+            [.purplePillar,             .empty,         .purplePillar,  .purplePillar],
+            [.noGroupRock,              .purplePillar,  .empty,         .purplePillar],
+            [Tile(type: .normalPlayer), .purplePillar,  .purplePillar,  .noGroupRock]]
+        let expected = Input(.noMoreMoves).type
+        let actual = Referee().enforceRules(tiles).type
+        
+        XCTAssertEqual(expected, actual)
+    }
+    
+    func testRefereeShouldRecognizeThere_AreNo_MoreMoves_EvenWithRockInPocketOfEmpty() {
+        
+        let tiles = [
+            [.noGroupRock,              .purplePillar,  .purplePillar,  .noGroupRock],
+            [.purplePillar,             .noGroupRock,   .empty,         .purplePillar],
+            [.purplePillar,             .empty,         .purplePillar,  .purplePillar],
+            [Tile(type: .normalPlayer), .purplePillar,  .noGroupRock,   .noGroupRock]]
+        let expected = Input(.noMoreMoves).type
+        let actual = Referee().enforceRules(tiles).type
+        
+        XCTAssertEqual(expected, actual)
+    }
+    
+    func testRefereeShouldRecognizeThere_Are_MoreMoves_EvenWithRockInPocketOfEmpty_AndAnEmptySomewhereElse() {
+        
+        let tiles = [
+            [.noGroupRock,              .purplePillar,  .purplePillar,  .noGroupRock],
+            [.purplePillar,             .noGroupRock,   .empty,         .purplePillar],
+            [.purplePillar,             .empty,         .purplePillar,  .purplePillar],
+            [Tile(type: .normalPlayer), .purplePillar,  .noGroupRock,   .empty]]
+        let expected = Input(.refillEmpty).type
+        let actual = Referee().enforceRules(tiles).type
+        
+        XCTAssertEqual(expected, actual)
+    }
+    
+    // No moves excet a charged teleport rune
+    func testRefereeShouldRecognizeThere_Are_MoreMovesWithRune() {
+        
+        let tiles = [[.noGroupRock, .purplePillar, .purplePillar, .noGroupRock],
+                     [.purplePillar, .exit,  .noGroupRock, .noGroupRock],
+                     [.noGroupRock, .purplePillar, .noGroupRock, .noGroupRock],
+                     [Tile(type: .normalPlayerWithTeleportation), .noGroupRock, .noGroupRock, .noGroupRock]]
+        let expected = Input(.reffingFinished(newTurn: false)).type
+        let actual = Referee().enforceRules(tiles).type
+        
+        XCTAssertEqual(expected, actual)
+    
+    }
+    
+    // No moves excet a charged teleport rune
+    func testRefereeShouldRecognizeThere_Are_No_MoreMovesEvenWithTeleportBecauseExitIsEncased() {
+        
+        let tiles = [[.noGroupRock, .purplePillar, .purplePillar, .noGroupRock],
+                     [.purplePillar, .exit,  .purplePillar, .noGroupRock],
+                     [.noGroupRock, .purplePillar, .noGroupRock, .noGroupRock],
+                     [Tile(type: .normalPlayerWithTeleportation), .noGroupRock, .noGroupRock, .noGroupRock]]
+        let expected = Input(.noMoreMoves).type
+        let actual = Referee().enforceRules(tiles).type
+        
+        XCTAssertEqual(expected, actual)
+    
+    }
+    
+    // Ok, the exit is encased which means that teleport doesnt work.  But the palyer has another charged rune as well.
+    func testRefereeShouldRecognizeThere_Are_MoreMovesEvenWithTeleportBecauseExitIsEncased_Except_PlayerHasAnotherChargedRune() {
+        
+        let tiles = [[.noGroupRock, .purplePillar, .purplePillar, .noGroupRock],
+                     [.purplePillar, .exit,  .purplePillar, .noGroupRock],
+                     [.noGroupRock, .purplePillar, .noGroupRock, .noGroupRock],
+                     [Tile(type: .normalPlayerWithTeleportationAndFieryRage), .noGroupRock, .noGroupRock, .noGroupRock]]
+        let expected = Input(.reffingFinished(newTurn: false)).type
+        let actual = Referee().enforceRules(tiles).type
+        
+        XCTAssertEqual(expected, actual)
     
     }
 }

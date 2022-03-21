@@ -605,6 +605,8 @@ class Board: Equatable {
         
         // find the other offer of the same tier if it exist
         // it is possible for the other item not to exist in the case where a player discards a found rune when there pickaxe handle is full.  IN that case, the other offer from that tier is not discarded.
+        // it is alos possible when gemMagnet collects gems from an offer
+        // it is also possible with snake eyes that we dont want to remove the other offer
         var otherOfferTile: TileCoord?
         var otherOffer: StoreOffer?
         for (i, _) in tiles.enumerated() {

@@ -10,7 +10,6 @@ import SpriteKit
 import GameplayKit
 
 
-
 class Level: Codable, Hashable {
     
     struct Constants {
@@ -240,21 +239,29 @@ class Level: Codable, Hashable {
             if tilesSinceMonsterKilled < 18 {
                 return -1
             } else if tilesSinceMonsterKilled < 36 {
+                return 3
+            } else if tilesSinceMonsterKilled < 50 {
                 return 6
+            } else if tilesSinceMonsterKilled < 75 {
+                return 10
             } else {
-                return 17
+                return 15
             }
             
         case bossLevelDepthNumber:
             return -1
             
         case 7,8...Int.max:
-            if tilesSinceMonsterKilled < 15 {
+            if tilesSinceMonsterKilled < 18 {
                 return -1
-            } else if tilesSinceMonsterKilled < 30 {
+            } else if tilesSinceMonsterKilled < 34 {
+                return 4
+            } else if tilesSinceMonsterKilled < 50 {
                 return 7
+            } else if tilesSinceMonsterKilled < 75 {
+                return 10
             } else {
-                return 20
+                return 16
             }
             
             
@@ -262,6 +269,22 @@ class Level: Codable, Hashable {
             return -1
         }
     }
+    
+    public func reduceChanceOfAnotherMonsterSpawning() -> Int {
+        switch depth {
+        case 0, 1, 2:
+            return -2
+        case 3, 4:
+            return -4
+        case 5:
+            return -5
+        case 6, 7, 8:
+            return -6
+        default:
+            return 0
+        }
+    }
+
     
     public func itemsInTier(_ tier: StoreOfferTier, playerData: EntityModel) -> [StoreOffer] {
         let lastLevelOffers = runModel?.lastLevelOffers(currentDepth: depth)
@@ -322,8 +345,8 @@ class Level: Codable, Hashable {
             } else if let runes = playerData.pickaxe?.runes,
                       let unlockableRune = unlockable.item.rune {
                 return runes.contains(unlockableRune)
-            } else if unlockable.item.type == .chest {
-                // get rid of chests
+            } else if unlockable.item.type == .chest || unlockable.item.type == .snakeEyes {
+                // get rid of chests and other snake eyes
                 return true
             } else {
                 return false
@@ -646,7 +669,7 @@ class Level: Codable, Hashable {
         let lastLevelOffers = runModel?.lastLevelOffers(currentDepth: depth)
         let allPastLevelOffers = runModel?.allPastLevelOffers(currentDepth: depth)
         
-        let offers = tierOptions(tier: tier, depth: depth, startingUnlockabls: startingUnlockables, otherUnlockabls: otherUnlockables, lastLevelsOffering: lastLevelOffers, allPastLevelOffers: allPastLevelOffers, playerData: playerData, randomSource: randomSource)
+        let offers = tierOptions(tier: tier, depth: depth, startingUnlockables: startingUnlockables, otherUnlockables: otherUnlockables, lastLevelsOffering: lastLevelOffers, allPastLevelOffers: allPastLevelOffers, playerData: playerData, randomSource: randomSource)
         return offers
     }
     
@@ -699,7 +722,7 @@ class Level: Codable, Hashable {
 
 //MARK: - Buckets
 /// Weights the different bucket options.
-func chanceDeltaStoreOfferBuckets(_ buckets: [AnyChanceModel<StoreOfferBucket>], lastLevelOfferings: [StoreOfferBucket]?, allPastLevelOffers: [StoreOfferBucket]?, playerData: EntityModel, depth: Depth, unlockables: [Unlockable]) -> [AnyChanceModel<StoreOfferBucket>] {
+func chanceDeltaStoreOfferBuckets(_ buckets: [AnyChanceModel<StoreOfferBucket>], lastLevelOfferings: [StoreOfferBucket]?, allPastLevelOffers: [StoreOfferBucket]?, playerData: EntityModel, depth: Depth, startingUnlockales: [Unlockable], otherUnlockables: [Unlockable]) -> [AnyChanceModel<StoreOfferBucket>] {
     
     GameLogger.shared.log(prefix: "LevelModel", message: "~~~~~~~~ Level \(depth) ~~~~~~~ ")
     GameLogger.shared.log(prefix: "LevelModel", message: "~~~~~~~~ Weighting Buckets ~~~~~~~ ")
@@ -739,11 +762,13 @@ func chanceDeltaStoreOfferBuckets(_ buckets: [AnyChanceModel<StoreOfferBucket>],
             
         case (_, .wealth):
             GameLogger.shared.log(prefix: "LevelModel", message: "Old \(bucket.thing.type) chance is \(wealthBucketChance)")
-            wealthBucketChance = chanceDeltaOfferWealthBucket(playerData: playerData, unlockables: unlockables, currentChance: wealthBucketChance)
+            wealthBucketChance = chanceDeltaOfferWealthBucket(playerData: playerData, unlockables: otherUnlockables, currentChance: wealthBucketChance)
             
         case (_, .rune):
             GameLogger.shared.log(prefix: "LevelModel", message: "Old \(bucket.thing.type) chance is \(runeBucketChance)")
-            runeBucketChance = chanceDeltaOfferRuneBucket(playerData: playerData, allPastLevelOffers: allPastLevelOffers, modifier: 1.0, depth: depth, currentChance: runeBucketChance)
+            var allUnlockables = startingUnlockales
+            allUnlockables.append(contentsOf: otherUnlockables)
+            runeBucketChance = chanceDeltaOfferRuneBucket(playerData: playerData, allPastLevelOffers: allPastLevelOffers, modifier: 1.0, depth: depth, currentChance: runeBucketChance, allUnlockables: allUnlockables)
             
         default:
             break
@@ -934,20 +959,47 @@ func chanceDeltaOfferWealthBucket(playerData: EntityModel, unlockables: [Unlocka
     
 }
 
-func chanceDeltaOfferRuneBucket(playerData: EntityModel, allPastLevelOffers: [StoreOfferBucket]?, modifier: Float, depth: Depth, currentChance: Float) -> Float
+func chanceDeltaOfferRuneBucket(playerData: EntityModel, allPastLevelOffers: [StoreOfferBucket]?, modifier: Float, depth: Depth, currentChance: Float, allUnlockables: [Unlockable]) -> Float
 {
     guard let pickaxe = playerData.pickaxe else { return  0 }
     var totalDelta = Float(1)
     let runeSlots = pickaxe.runeSlots
     let runes = pickaxe.runes.count
     
-    let numberOfRuneOffered = allPastLevelOffers?.filter( { $0.type == .rune }).count ?? 0
+    let numberOfRuneOffered = allPastLevelOffers?.filter({ $0.type == .rune }).count ?? 0
+    let numbersOfRunesUnlock = allUnlockables.filter {  unlockable in
+        if case StoreOfferType.rune = unlockable.item.type {
+            return unlockable.canAppearInRun
+        } else {
+            return false
+        }
+    }.count
+    
+    let numberOfRunesLeftInPool = allUnlockables.filter {  unlockable in
+        if case StoreOfferType.rune(let rune) = unlockable.item.type {
+            if pickaxe.runes.contains(rune) {
+                // player has this
+                return false
+            } else {
+                // player does not have this and it may be able to appear in the run
+                return unlockable.canAppearInRun
+            }
+        } else {
+            return false
+        }
+    }.count
+
+    // if the palyer somehow has all the runes,
+    guard numberOfRunesLeftInPool > 0 else {
+        GameLogger.shared.log(prefix: "[LevelModel]", message: "Player has all unlocked runes right now")
+        return 0.01
+    }
     
     switch depth {
-    case 0, 1:
-        if numberOfRuneOffered >= 2 {
-            totalDelta = 0.25
-        } else if numberOfRuneOffered >= 1 {
+    case 0:
+        return 1
+    case 1:
+        if numberOfRuneOffered >= 1 {
             totalDelta = 0.5
         } else {
             totalDelta = 2.5
@@ -1013,7 +1065,7 @@ func chanceDeltaOfferRuneBucket(playerData: EntityModel, allPastLevelOffers: [St
             totalDelta = 1.2
         } else {
             // you deserve a ruin
-            totalDelta = 5000
+            totalDelta = 50000
         }
         
     default:
@@ -1029,7 +1081,30 @@ func chanceDeltaOfferRuneBucket(playerData: EntityModel, allPastLevelOffers: [St
     } else if runeSlots - runes >= 1 {
         totalDelta += 0.1
     } else if runeSlots - runes >= 0 {
-        totalDelta += 0.1
+        totalDelta += 0.0
+    }
+    
+    if runeSlots == 4 {
+        totalDelta += 0.5
+    } else if runeSlots == 3 {
+        totalDelta += 0.33
+    } else if runeSlots == 2 {
+        totalDelta += 0.25
+    } else if runeSlots == 1 {
+        totalDelta += 0.0
+    }
+    
+    // this player has many runes unlocked.  They are advanced. We should offer them more runes
+    if numberOfRunesLeftInPool > 10 {
+        totalDelta += 0.75
+    } else if numberOfRunesLeftInPool > 8 {
+        totalDelta += 0.5
+    } else if numberOfRunesLeftInPool > 5 {
+        totalDelta += 0.33
+    } else if numberOfRunesLeftInPool > 2 {
+        totalDelta += 0.15
+    } else {
+        totalDelta += 0
     }
     
     totalDelta = max(0.1, totalDelta)
@@ -1041,7 +1116,7 @@ func chanceDeltaOfferRuneBucket(playerData: EntityModel, allPastLevelOffers: [St
 
 // MARK: - Offers
 
-func tierOptions(tier: StoreOfferTier, depth: Depth, startingUnlockabls: [Unlockable], otherUnlockabls: [Unlockable], lastLevelsOffering: [StoreOffer]?, allPastLevelOffers: [StoreOffer]?, playerData: EntityModel, randomSource: GKLinearCongruentialRandomSource) -> [StoreOffer] {
+func tierOptions(tier: StoreOfferTier, depth: Depth, startingUnlockables: [Unlockable], otherUnlockables: [Unlockable], lastLevelsOffering: [StoreOffer]?, allPastLevelOffers: [StoreOffer]?, playerData: EntityModel, randomSource: GKLinearCongruentialRandomSource) -> [StoreOffer] {
     
     GameLogger.shared.log(prefix: "[LevelModel]", message: "~~~~~ Choose Tier Options \(tier) ~~~~~ ")
     let pastLevelOfferBuckets = lastLevelsOffering?.compactMap { StoreOfferBucket.bucket(for: $0.type) }
@@ -1060,7 +1135,7 @@ func tierOptions(tier: StoreOfferTier, depth: Depth, startingUnlockabls: [Unlock
         
         let nonweightBuckets = [healthBucketChanceModel, dodgeLuckBucketChanceModel, utilBucketChanceModel, wealthBucketChanceModel]
         GameLogger.shared.log(prefix: "[LevelModel]", message: "About to weight bucket chances")
-        let weightedBuckets = chanceDeltaStoreOfferBuckets(nonweightBuckets, lastLevelOfferings: pastLevelOfferBuckets, allPastLevelOffers: allPastLevelOfferBuckets, playerData: playerData, depth: depth, unlockables: otherUnlockabls)
+        let weightedBuckets = chanceDeltaStoreOfferBuckets(nonweightBuckets, lastLevelOfferings: pastLevelOfferBuckets, allPastLevelOffers: allPastLevelOfferBuckets, playerData: playerData, depth: depth, startingUnlockales: startingUnlockables, otherUnlockables: otherUnlockables)
         GameLogger.shared.log(prefix: "[LevelModel]", message: "Finished weight bucket chances")
         
         let buckets = randomSource.chooseElementsWithChance(weightedBuckets, choices: 2)
@@ -1091,7 +1166,7 @@ func tierOptions(tier: StoreOfferTier, depth: Depth, startingUnlockabls: [Unlock
         
         let nonweightBuckets = [healthBucketChanceModel, dodgeLuckBucketChanceModel, utilBucketChanceModel, wealthBucketChanceModel, runeBucketChanceModel]
         GameLogger.shared.log(prefix: "[LevelModel]", message: "About to weight bucket chances")
-        let weightedBuckets = chanceDeltaStoreOfferBuckets(nonweightBuckets, lastLevelOfferings: pastLevelOfferBuckets, allPastLevelOffers: allPastLevelOfferBuckets, playerData: playerData, depth: depth, unlockables: otherUnlockabls)
+        let weightedBuckets = chanceDeltaStoreOfferBuckets(nonweightBuckets, lastLevelOfferings: pastLevelOfferBuckets, allPastLevelOffers: allPastLevelOfferBuckets, playerData: playerData, depth: depth, startingUnlockales: startingUnlockables, otherUnlockables: otherUnlockables)
         GameLogger.shared.log(prefix: "[LevelModel]", message: "Finished weight bucket chances")
         
         let buckets = randomSource.chooseElementsWithChance(weightedBuckets, choices: 2)
@@ -1120,8 +1195,8 @@ func tierOptions(tier: StoreOfferTier, depth: Depth, startingUnlockabls: [Unlock
         return []
     }
     
-    var allUnlockables = startingUnlockabls
-    allUnlockables.append(contentsOf: otherUnlockabls)
+    var allUnlockables = startingUnlockables
+    allUnlockables.append(contentsOf: otherUnlockables)
     let items = tierItems(from: [chosenBucketOne.thing, chosenBucketTwo.thing], tier: tier, depth: depth, allUnlockables: allUnlockables, playerData: playerData, randomSource: randomSource, lastLevelOffers: lastLevelsOffering, allPastLevelOFfers: allPastLevelOffers)
     
     

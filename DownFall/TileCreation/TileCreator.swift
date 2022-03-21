@@ -225,9 +225,10 @@ class TileCreator: TileStrategy {
             switch nextTile.type {
             case .monster:
                 validTile = (!neighbors.contains {  $0.type == .monster(.zero) || $0.type == .player(.zero) } && !noMoreMonsters && !tutorialConductor.isTutorial) || (tutorialConductor.isTutorial && forceMonsters)
-                if validTile {
-                    print("Range: -1...\(level.monsterChanceOfShowingUp(tilesSinceMonsterKilled: level.monsterSpawnTurnTimer))")
-                }
+                
+                GameLogger.shared.log(prefix: "[TileCreator]", message: "Chance of a monster show up is \(level.monsterChanceOfShowingUp(tilesSinceMonsterKilled: level.monsterSpawnTurnTimer))")
+                GameLogger.shared.log(prefix: "[TileCreator]", message: "nMonster was created? \(validTile)")
+                
             case .rock(.red, _, _), .rock(.purple, _, _), .rock(.blue, _, _), .rock(.brown, _, _):
                 validTile = true
             case .exit, .player, .rock(.green, _, _), .empty, .pillar, .dynamite, .emptyGem, .item, .offer, .rock(color: .blood, _, _):
@@ -260,9 +261,11 @@ class TileCreator: TileStrategy {
         //keep track of when monster was last killed
         if monsterWasKilled {
             level.monsterSpawnTurnTimer = 0
+            GameLogger.shared.log(prefix: "[TileCreator]", message: "Monster killed. Resetting timer")
         } else {
             // keep track of how many tiles have been removed since the last monster
             level.monsterSpawnTurnTimer += tileCoords(for: tiles, of: .empty).count
+            GameLogger.shared.log(prefix: "[TileCreator]", message: "Monster spawn timer \(level.monsterSpawnTurnTimer). Tiles created \(tileCoords(for: tiles, of: .empty).count)")
         }
         
         for row in 0..<newTiles.count {
@@ -287,6 +290,9 @@ class TileCreator: TileStrategy {
                         shouldForceMonsters = false
                         if newTile.type == .monster(.zero) {
                             currMonsterCount += 1
+                            
+                            // We want to reduce the chance of another monster spawn, so every time a monster spawns we lower the monster spawn turn timer.
+                            level.monsterSpawnTurnTimer += level.reduceChanceOfAnotherMonsterSpawning()
                         }
                         newTiles[row][col] = newTile
                     }

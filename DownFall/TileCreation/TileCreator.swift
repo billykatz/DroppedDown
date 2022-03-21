@@ -292,7 +292,7 @@ class TileCreator: TileStrategy {
                             currMonsterCount += 1
                             
                             // We want to reduce the chance of another monster spawn, so every time a monster spawns we lower the monster spawn turn timer.
-                            level.monsterSpawnTurnTimer += level.reduceChanceOfAnotherMonsterSpawning()
+                            level.monsterSpawnTurnTimer += level.reduceChanceOfAnotherMonsterSpawning(tilesSinceMonsterKilled: level.monsterSpawnTurnTimer)
                         }
                         newTiles[row][col] = newTile
                     }

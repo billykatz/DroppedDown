@@ -270,16 +270,40 @@ class Level: Codable, Hashable {
         }
     }
     
-    public func reduceChanceOfAnotherMonsterSpawning() -> Int {
+    public func reduceChanceOfAnotherMonsterSpawning(tilesSinceMonsterKilled: Int) -> Int {
         switch depth {
         case 0, 1, 2:
-            return -2
+            return 0
         case 3, 4:
             return -4
-        case 5:
-            return -5
-        case 6, 7, 8:
-            return -6
+        case 5, 6:
+            if tilesSinceMonsterKilled < 18 {
+                // this code path should porbably never be hit
+                return 0
+            } else if tilesSinceMonsterKilled < 36 {
+                return -2
+            } else if tilesSinceMonsterKilled < 50 {
+                return -4
+            } else if tilesSinceMonsterKilled < 75 {
+                return -7
+            } else {
+                return -8
+            }
+
+        case 7, 8:
+            if tilesSinceMonsterKilled < 18 {
+                // this code path should porbably never be hit
+                return 0
+            } else if tilesSinceMonsterKilled < 34 {
+                return -2
+            } else if tilesSinceMonsterKilled < 50 {
+                return -4
+            } else if tilesSinceMonsterKilled < 75 {
+                return -7
+            } else {
+                return -8
+            }
+
         default:
             return 0
         }

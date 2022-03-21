@@ -354,7 +354,22 @@ class Level: Codable, Hashable {
         var allOptions =
         unlockables
             .filter { unlockable in
-                return unlockable.canAppearInRun && unlockable.item.tier == tier && (!reservedOffers.contains(unlockable.item) && unlockable.item.type != .snakeEyes)
+                return unlockable.canAppearInRun
+                && unlockable.item.tier == tier
+                && (!reservedOffers.contains(unlockable.item) && unlockable.item.type != .snakeEyes)
+            }
+            .filter { unlockable in
+                if let runes = playerData.pickaxe?.runes,
+                   let unlockableRune = unlockable.item.rune {
+                    if runes.contains(unlockableRune) {
+                        return false
+                    } else {
+                        return true
+                    }
+                } else {
+                    return true
+                }
+                
             }
         
         // grab as many as we need

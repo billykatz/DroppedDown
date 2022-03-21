@@ -129,7 +129,7 @@ struct TeamNameView: View {
                 Text("Art")
                     .font(.creditsSubTitleCodexFont)
                     .underline()
-                Text("Bailey Zanhiser")
+                Text("Bailey Zahniser")
                     .font(.creditsBigNameCodexFont)
             }
         }

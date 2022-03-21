@@ -431,8 +431,8 @@ extension Statistics {
     // reach depth
     static let reachDepth5 = Self.init(amount: 5, statType: .lowestDepthReached)
     static let reachDepth6 = Self.init(amount: 6, statType: .lowestDepthReached)
-    static let reachDepth7 = Self.init(amount: 8, statType: .lowestDepthReached)
-    static let reachDepth8 = Self.init(amount: 7, statType: .lowestDepthReached)
+    static let reachDepth8 = Self.init(amount: 8, statType: .lowestDepthReached)
+    static let reachDepth9 = Self.init(amount: 9, statType: .lowestDepthReached)
     static let reachDepth10 = Self.init(amount: 10, statType: .lowestDepthReached)
     
     // largest group

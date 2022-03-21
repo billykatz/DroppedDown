@@ -172,19 +172,19 @@ struct Unlockable: Codable, Identifiable, Equatable, Hashable {
             Unlockable(stat: .fourThousandRocks, item: StoreOffer.offer(type: .dodge(amount: 3), tier: 2), purchaseAmount: 150, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
             
             // tier 3
-            Unlockable(stat: .reachDepth7, item: StoreOffer.offer(type: .plusOneMaxHealth, tier: 3), purchaseAmount: 350, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
-            Unlockable(stat: .reachDepth7, item: StoreOffer.offer(type: .luck(amount: 4), tier: 3), purchaseAmount: 250, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
-            Unlockable(stat: .reachDepth7, item: StoreOffer.offer(type: .dodge(amount: 4), tier: 3), purchaseAmount: 250, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .reachDepth8, item: StoreOffer.offer(type: .plusOneMaxHealth, tier: 3), purchaseAmount: 350, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .reachDepth8, item: StoreOffer.offer(type: .luck(amount: 4), tier: 3), purchaseAmount: 250, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .reachDepth8, item: StoreOffer.offer(type: .dodge(amount: 4), tier: 3), purchaseAmount: 250, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
             
             // tier 4
-            Unlockable(stat: .beatTheBossOnce, item: StoreOffer.offer(type: .plusOneMaxHealth, tier: 4), purchaseAmount: 1000, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
-            Unlockable(stat: .beatTheBossOnce, item: StoreOffer.offer(type: .luck(amount: 5), tier: 4), purchaseAmount: 600, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
-            Unlockable(stat: .beatTheBossOnce, item: StoreOffer.offer(type: .dodge(amount: 5), tier: 4), purchaseAmount: 600, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .beatTheBossOnce, item: StoreOffer.offer(type: .plusOneMaxHealth, tier: 4), purchaseAmount: 2000, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .beatTheBossOnce, item: StoreOffer.offer(type: .luck(amount: 5), tier: 4), purchaseAmount: 1250, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .beatTheBossOnce, item: StoreOffer.offer(type: .dodge(amount: 5), tier: 4), purchaseAmount: 1250, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
             
             /// tier 5
-            Unlockable(stat: .beatTheBossFiveTimes, item: StoreOffer.offer(type: .plusOneMaxHealth, tier: 5), purchaseAmount: 2000, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
-            Unlockable(stat: .beatTheBossFiveTimes, item: StoreOffer.offer(type: .luck(amount: 5), tier: 5), purchaseAmount: 1250, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
-            Unlockable(stat: .beatTheBossFiveTimes, item: StoreOffer.offer(type: .dodge(amount: 5), tier: 5), purchaseAmount: 1250, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .monstersKilled500, item: StoreOffer.offer(type: .plusOneMaxHealth, tier: 5), purchaseAmount: 700, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .allRunesUses100, item: StoreOffer.offer(type: .luck(amount: 5), tier: 5), purchaseAmount: 500, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
+            Unlockable(stat: .largestGroup35, item: StoreOffer.offer(type: .dodge(amount: 5), tier: 5), purchaseAmount: 500, isPurchased: false, isUnlocked: false, applysToBasePlayer: true, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false),
             
             // AVAILABLE IN RUNS
             

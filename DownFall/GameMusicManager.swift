@@ -53,7 +53,7 @@ class GameMusicManager {
     private func decideToPlay(isMuted: Bool, fromTappingUnmute: Bool, fromStartingLevel: Bool) {
         self.isMuted = isMuted
         
-        gameMusicThread.async {
+        gameMusicThread.async { [isInMainMenu, menuMusicManager, levelMusicManager] in
             if isMuted {
                 // is something else playing?
                 if !AVAudioSession.sharedInstance().isOtherAudioPlaying {

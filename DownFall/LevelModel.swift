@@ -1250,13 +1250,13 @@ func deltaChanceOfferHealth(playerData: EntityModel, depth: Depth, storeOffer: S
         case 0, 1:
             return 5
         case 2, 3:
-            return 6
+            return 7
         case 4, 5:
-            return 8
-        case 6, 7:
             return 9
-        case 8, 9:
+        case 6, 7:
             return 10
+        case 8, 9:
+            return 12
         default:
             return 5
         }

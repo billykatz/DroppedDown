@@ -343,8 +343,8 @@ enum BossPhaseType: String, Codable {
     var rocksToEat: Int {
         switch self {
         case .first: return 6
-        case .second: return 7
-        case .third: return 8
+        case .second: return 8
+        case .third: return 9
         case .dead: return 0
         }
     }

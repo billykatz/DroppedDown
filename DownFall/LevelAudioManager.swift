@@ -110,6 +110,7 @@ class LevelAudioManager {
     
     func playBackgroundMusic() {
         backgroundMusicThread.sync(execute: { [backgroundMusicPlayer, musicVolume, fadeInDuration] in
+            backgroundMusicPlayer?.currentTime = 0
             backgroundMusicPlayer?.setVolume(0, fadeDuration: 0)
             backgroundMusicPlayer?.play()
             backgroundMusicPlayer?.setVolume(musicVolume, fadeDuration: TimeInterval(fadeInDuration))

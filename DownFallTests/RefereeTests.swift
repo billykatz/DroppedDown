@@ -383,17 +383,103 @@ class RefereeTests: XCTestCase {
     func testRefereeShouldRecognizeThere_Are_MoreMoves_WithAnEmptyWithAJaggedPathToSide() {
         
         let tiles = [
-            [.noGroupRock,              .purplePillar,  .purplePillar,  .noGroupRock, .noGroupRock],
-            [.purplePillar,             .noGroupRock,   .empty,         .noGroupRock, .purplePillar],
-            [.purplePillar,             .empty,         .purplePillar,  .purplePillar, .noGroupRock],
-            [Tile(type: .normalPlayer), .purplePillar,  .noGroupRock,   .noGroupRock, .noGroupRock],
-            [.noGroupRock,              .purplePillar,  .purplePillar,  .noGroupRock, .noGroupRock],
+            [.noGroupRock,              .purplePillar,  .purplePillar,  .noGroupRock,   .noGroupRock],
+            [.purplePillar,             .noGroupRock,   .empty,         .noGroupRock,   .purplePillar],
+            [.purplePillar,             .noGroupRock,   .purplePillar,  .purplePillar,  .noGroupRock],
+            [Tile(type: .normalPlayer), .purplePillar,  .noGroupRock,   .noGroupRock,   .noGroupRock],
+            [.noGroupRock,              .purplePillar,  .purplePillar,  .noGroupRock,   .noGroupRock],
         ]
         let expected = Input(.reffingFinished(newTurn: false)).type
         let actual = Referee().enforceRules(tiles).type
         
         XCTAssertEqual(expected, actual)
     }
+    
+    func testRefereeShouldRecognizeThere_AreNo_MoreMoves_PillarsOnEntirePerimeter() {
+        
+        let tiles = [
+            [.purplePillar,              .purplePillar,  .purplePillar,  .purplePillar,   .purplePillar],
+            [.purplePillar,             .noGroupRock,   .empty,         .noGroupRock,   .purplePillar],
+            [.purplePillar,             .noGroupRock,   .purplePillar,  .purplePillar,  .purplePillar],
+            [.purplePillar, Tile(type: .normalPlayer), .noGroupRock,   .noGroupRock,   .purplePillar],
+            [.purplePillar,              .purplePillar,  .purplePillar,  .purplePillar,   .purplePillar],
+        ]
+        let expected = Input(.noMoreMoves).type
+        let actual = Referee().enforceRules(tiles).type
+        
+        XCTAssertEqual(expected, actual)
+    }
+    
+    func testRefereeShouldRecognizeThere_AreNo_MoreMoves_PillarsOnEntirePerimeter_ExceptCorners() {
+        
+        let tiles = [
+            [.noGroupRock,              .purplePillar,  .purplePillar,  .purplePillar,   .noGroupRock],
+            [.purplePillar,             .noGroupRock,   .empty,         .noGroupRock,   .purplePillar],
+            [.purplePillar,             .noGroupRock,   .purplePillar,  .purplePillar,  .purplePillar],
+            [.purplePillar, Tile(type: .normalPlayer), .noGroupRock,   .noGroupRock,   .purplePillar],
+            [.noGroupRock,              .purplePillar,  .purplePillar,  .purplePillar,   .noGroupRock],
+        ]
+        let expected = Input(.noMoreMoves).type
+        let actual = Referee().enforceRules(tiles).type
+        
+        XCTAssertEqual(expected, actual)
+    }
+    
+    func testRefereeShouldRecognizeThere_Are_MoreMoves_PillarsOnEntirePerimeter_ExceptOneSpot() {
+        
+        let tiles = [
+            [.purplePillar,              .purplePillar,  .purplePillar,  .purplePillar,   .purplePillar],
+            [.purplePillar,             .noGroupRock,   .empty,         .noGroupRock,   .purplePillar],
+            [.purplePillar,             .noGroupRock,   .purplePillar,  .purplePillar,  .purplePillar],
+            [.purplePillar, Tile(type: .normalPlayer), .noGroupRock,   .noGroupRock,   .purplePillar],
+            [.purplePillar,              .noGroupRock,  .purplePillar,  .purplePillar,   .purplePillar],
+        ]
+        let expected = Input(.reffingFinished(newTurn: false)).type
+        let actual = Referee().enforceRules(tiles).type
+        
+        XCTAssertEqual(expected, actual)
+    }
+    
+    func testRefereeShouldRecognizeThere_Are_MoreMoves_BigBoard() {
+        
+        let tiles = [
+            [.purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar],
+            [.purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar],
+            [.purplePillar, .purplePillar, .noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock, .purplePillar],
+            [.purplePillar, .purplePillar, .noGroupRock, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .noGroupRock, .purplePillar],
+            [.purplePillar, .purplePillar, .noGroupRock, .purplePillar, .empty, .noGroupRock, .purplePillar, .purplePillar, .noGroupRock, .purplePillar],
+            [.purplePillar, .purplePillar, .noGroupRock, .purplePillar, .purplePillar, .noGroupRock, .purplePillar, .purplePillar, .noGroupRock, .purplePillar],
+            [.purplePillar, .purplePillar, .noGroupRock, .purplePillar, .purplePillar, .noGroupRock, .purplePillar, .purplePillar, .noGroupRock, .purplePillar],
+            [.purplePillar, .purplePillar, .noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock, .purplePillar, .purplePillar, .noGroupRock, .purplePillar],
+            [.noGroupRock, .noGroupRock, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .noGroupRock, .purplePillar],
+            [Tile(type: .normalPlayer), .noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock, .purplePillar],
+        ]
+        let expected = Input(.reffingFinished(newTurn: false)).type
+        let actual = Referee().enforceRules(tiles).type
+        
+        XCTAssertEqual(expected, actual)
+    }
+    
+    func testRefereeShouldRecognizeThere_AreNo_MoreMoves_BigBoard() {
+        
+        let tiles = [
+            [.noGroupRock, .purplePillar, .noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock, .purplePillar, .purplePillar, .noGroupRock],
+            [.purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar],
+            [.purplePillar, .noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock, .purplePillar],
+            [.noGroupRock, .purplePillar, .noGroupRock, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .noGroupRock, .purplePillar],
+            [.purplePillar, .purplePillar, .noGroupRock, .purplePillar, .empty, .noGroupRock, .purplePillar, .purplePillar, .noGroupRock, .purplePillar],
+            [.purplePillar, .noGroupRock, .noGroupRock, .noGroupRock, .purplePillar, .noGroupRock, .purplePillar, .purplePillar, .noGroupRock, .purplePillar],
+            [.purplePillar, .purplePillar, .noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock, .purplePillar, .purplePillar, .noGroupRock, .purplePillar],
+            [.purplePillar, .purplePillar, .noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock, .purplePillar, .purplePillar, .noGroupRock, .purplePillar],
+            [.purplePillar, .noGroupRock, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .noGroupRock, .purplePillar],
+            [Tile(type: .normalPlayer), .noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock, .purplePillar, .purplePillar],
+        ]
+        let expected = Input(.noMoreMoves).type
+        let actual = Referee().enforceRules(tiles).type
+        
+        XCTAssertEqual(expected, actual)
+    }
+
 
     
     func testRefereeShouldRecognizeThere_Are_MoreMoves_EvenWithRockInPocketOfEmpty_AndAnEmptySomewhereElse() {

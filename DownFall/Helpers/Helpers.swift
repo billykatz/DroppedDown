@@ -74,6 +74,49 @@ func isWithinBounds(_ tileCoord: TileCoord, within boardSize: Int) -> Bool {
         tileCol < boardSize
 }
 
+func isOnEdgeOfBoard(tileCoord: TileCoord, tiles:[[Tile]]) -> Bool {
+    return tileCoord.row == 0
+        || tileCoord.col == 0
+        || tileCoord.row == tiles.count-1
+        || tileCoord.col == tiles.count-1
+
+}
+
+// this func takes at tile coord and computes if it is possible to draw a path to the side of board by only visiting orthongnal neighbors and not passing through any pillars
+func hasPathToSide(tileCoord: TileCoord, tiles: [[Tile]]) -> Bool {
+    
+    var nodesToVisit: [TileCoord] = [tileCoord]
+    var nodesAlreadyVisited: [TileCoord] = []
+    
+    while !nodesToVisit.isEmpty {
+        let currentNode = nodesToVisit.removeFirst()
+        if isOnEdgeOfBoard(tileCoord: currentNode, tiles: tiles) {
+            return true
+        } else {
+            nodesAlreadyVisited.append(currentNode)
+        }
+        
+        let neighbors = Array(currentNode.orthogonalNeighbors)
+        let visitableNeighbors = neighbors
+            .compactMap { tileCoord -> TileCoord? in
+                if case TileType.pillar = tiles[tileCoord].type {
+                    return nil
+                } else {
+                    return tileCoord
+                }
+            }.filter {
+                !nodesAlreadyVisited.contains($0)
+            }
+
+        nodesToVisit.append(contentsOf: visitableNeighbors)
+        
+    }
+    
+    return false
+    
+    
+}
+
 func boardHasMoreMoves(tiles: [[Tile]]) -> Bool {
     var hasMoreMoves = false
     guard let playerCoord = getTilePosition(.player(.zero), tiles: tiles) else { return hasMoreMoves }
@@ -85,53 +128,10 @@ func boardHasMoreMoves(tiles: [[Tile]]) -> Bool {
             case .dynamite:
                 hasMoreMoves = true
             case .empty:
-                var hasPathToLeft = true
-                var hasPathToRight = true
-                var hasPathAbove = true
-                var hasPathBelow = true
-                // check columns to the left
-                if row > 0 {
-                    for innerColumn in 0..<row {
-                        let tileCoord = TileCoord(row, innerColumn)
-                        if case TileType.pillar = tiles[tileCoord].type {
-                            hasPathToLeft = false
-                        }
-                    }
-                }
-                // check columns to the right
-                if row <= tiles.count-1 {
-                    for innerColumn in row+1..<tiles.count {
-                        let tileCoord = TileCoord(row, innerColumn)
-                        if case TileType.pillar = tiles[tileCoord].type {
-                            hasPathToRight = false
-                        }
-                    }
-                }
-                
-                // check rows below
-                if col > 0 {
-                    for innerRow in 0..<col {
-                        let tileCoord = TileCoord(innerRow, col)
-                        if case TileType.pillar = tiles[tileCoord].type {
-                            hasPathBelow = false
-                        }
-                        
-                    }
-                }
-                // check all rows above
-                if col <= tiles.count-1 {
-                    for innerRow in col..<tiles.count {
-                        let tileCoord = TileCoord(innerRow, col)
-                        if case TileType.pillar = tiles[tileCoord].type {
-                            hasPathAbove = false
-                        }
-                    }
-                }
-                
-                if hasPathToLeft || hasPathToRight || hasPathAbove || hasPathBelow {
+                if hasPathToSide(tileCoord: tileCoord, tiles: tiles) {
                     hasMoreMoves = true
                 }
-                
+                                
             case .rock(_, _, let groupCount):
                 if groupCount >= 3 {
                     hasMoreMoves = true

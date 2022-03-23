@@ -233,7 +233,7 @@ class GameScene: SKScene {
             // request the palyer's review if they just finish level 2 or 3 and they have a rune
             if profileViewModel?.canShowReviewRequest() ?? false,
                ((level?.depth ?? 0) == 2 || (level?.depth ?? 0) == 1),
-               !(data.pickaxe?.runes.isEmpty ?? true)
+               !(data.pickaxe?.runes.isEmpty ?? false)
             {
                 AppStoreReviewManager.requestReviewIfAppropriate()
             }

@@ -119,10 +119,11 @@ func baseChanceEncasementOffers(depth: Depth, playerData: EntityModel, startingU
         let mediumMonsterChance: ChanceModel = .init(tileType: mediumMonsterType, chance: baseChance)
         let easyMonsterChance: ChanceModel = .init(tileType: easyMonsterType, chance: 20)
         let exitBlockedChance: ChanceModel = .init(tileType: blockExit, chance: 5)
+        let runeChance: ChanceModel = .init(tileType: rune1Type, chance: 5)
         
         let chanceModel: [ChanceModel] = [
-            randomHealthChance, randomNonHealthChance, mediumMonsterChance, easyMonsterChance, exitBlockedChance
-        ].map {
+            randomHealthChance, randomNonHealthChance, mediumMonsterChance, easyMonsterChance, exitBlockedChance, runeChance
+        ].compactMap {
             chanceDeltaEncasementOffer(encasedOfferChanceModel: $0, playerData: playerData, lastLevelFeatures: lastLevelFeatures)
         }
         
@@ -136,10 +137,11 @@ func baseChanceEncasementOffers(depth: Depth, playerData: EntityModel, startingU
         let mediumMonsterChance: ChanceModel = .init(tileType: mediumMonsterType, chance: 25)
         let hardMonsterChance: ChanceModel = .init(tileType: hardMonsterType, chance: 10)
         let exitBlockedChance: ChanceModel = .init(tileType: blockExit, chance: 10)
+        let runeChance: ChanceModel = .init(tileType: rune1Type, chance: 5)
         
         let chanceModel: [ChanceModel] = [
-            tier1Health, tier1NonHealth, hardMonsterChance, mediumMonsterChance, easyMonsterChance, exitBlockedChance
-        ].map {
+            tier1Health, tier1NonHealth, hardMonsterChance, mediumMonsterChance, easyMonsterChance, exitBlockedChance, runeChance
+        ].compactMap {
             chanceDeltaEncasementOffer(encasedOfferChanceModel: $0, playerData: playerData, lastLevelFeatures: lastLevelFeatures)
         }
         
@@ -153,7 +155,7 @@ func baseChanceEncasementOffers(depth: Depth, playerData: EntityModel, startingU
         let mediumMonsterChance: ChanceModel = .init(tileType: mediumMonsterType, chance: 15)
         let hardMonsterChance: ChanceModel = .init(tileType: hardMonsterType, chance: 25)
         let exitBlockedChance: ChanceModel = .init(tileType: blockExit, chance: 10)
-        let runeChance: ChanceModel = .init(tileType: rune1Type, chance: 5)
+        let runeChance: ChanceModel = .init(tileType: rune1Type, chance: 10)
         
         let chanceModel: [ChanceModel] = [
             tier1Health, tier1NonHealth,
@@ -161,7 +163,7 @@ func baseChanceEncasementOffers(depth: Depth, playerData: EntityModel, startingU
             easyMonsterChance, mediumMonsterChance, hardMonsterChance,
             exitBlockedChance,
             runeChance
-        ].map {
+        ].compactMap {
             chanceDeltaEncasementOffer(encasedOfferChanceModel: $0, playerData: playerData, lastLevelFeatures: lastLevelFeatures)
         }
         
@@ -185,7 +187,7 @@ func baseChanceEncasementOffers(depth: Depth, playerData: EntityModel, startingU
             mediumMonsterChance, hardMonsterChance, batMonsterChance,
             exitBlockedChance,
             runeChance
-        ].map {
+        ].compactMap {
             chanceDeltaEncasementOffer(encasedOfferChanceModel: $0, playerData: playerData, lastLevelFeatures: lastLevelFeatures)
         }
         
@@ -204,7 +206,7 @@ func baseChanceEncasementOffers(depth: Depth, playerData: EntityModel, startingU
             hardMonsterChance, batMonsterChance,
             exitBlockedChance,
             runeChance
-        ].map {
+        ].compactMap {
             chanceDeltaEncasementOffer(encasedOfferChanceModel: $0, playerData: playerData, lastLevelFeatures: lastLevelFeatures)
         }
         
@@ -216,7 +218,7 @@ func baseChanceEncasementOffers(depth: Depth, playerData: EntityModel, startingU
         let hardMonsterChance: ChanceModel = .init(tileType: hardMonsterType, chance: 10)
         let batMonsterChance: ChanceModel = .init(tileType: batMonsterType, chance: 25)
         let exitBlockedChance: ChanceModel = .init(tileType: blockExit, chance: 30)
-        let runeChance: ChanceModel = .init(tileType: rune1Type, chance: 5)
+        let runeChance: ChanceModel = .init(tileType: rune1Type, chance: 10)
         let runeSlotChance: ChanceModel = .init(tileType: runeSlot, chance: 5)
         
         let chanceModel: [ChanceModel] = [
@@ -224,7 +226,7 @@ func baseChanceEncasementOffers(depth: Depth, playerData: EntityModel, startingU
             hardMonsterChance, batMonsterChance,
             exitBlockedChance,
             runeChance, runeSlotChance
-        ].map {
+        ].compactMap {
             chanceDeltaEncasementOffer(encasedOfferChanceModel: $0, playerData: playerData, lastLevelFeatures: lastLevelFeatures)
         }
         
@@ -239,7 +241,7 @@ func baseChanceEncasementOffers(depth: Depth, playerData: EntityModel, startingU
         let chanceModel: [ChanceModel] = [
             tier1Health, tier2Health,
             batMonsterChance1, batMonsterChance2
-        ].map {
+        ].compactMap {
             chanceDeltaEncasementOffer(encasedOfferChanceModel: $0, playerData: playerData, lastLevelFeatures: lastLevelFeatures)
         }
         
@@ -408,9 +410,8 @@ func chanceDeltaLevelGoal(propsedGoalChanceModel: AnyChanceModel<LevelGoal>, las
     
 }
 
-func chanceDeltaEncasementOffer(encasedOfferChanceModel: ChanceModel, playerData: EntityModel, lastLevelFeatures: LevelFeatures?) -> ChanceModel {
+func chanceDeltaEncasementOffer(encasedOfferChanceModel: ChanceModel, playerData: EntityModel, lastLevelFeatures: LevelFeatures?) -> ChanceModel? {
     guard let features = lastLevelFeatures, !features.encasements.isEmpty else { return encasedOfferChanceModel }
-    var totalDelta: Float = 0
     let delta = features.encasements.reduce(Float(0), { prev, tile in
         var totalDelta: Float = 0
         // touch luck
@@ -444,7 +445,7 @@ func chanceDeltaEncasementOffer(encasedOfferChanceModel: ChanceModel, playerData
         case (.offer, .item):
             totalDelta -= 4
             
-            // got offered gems last level?
+        // got offered gems last level?
         case (.item, .exit):
             totalDelta += 15
         case (.item, .monster):
@@ -460,9 +461,48 @@ func chanceDeltaEncasementOffer(encasedOfferChanceModel: ChanceModel, playerData
         
         return prev + totalDelta
     })
+    var totalDelta: Float = 0
     totalDelta += delta
     
-    return ChanceModel(tileType: encasedOfferChanceModel.tileType, chance: max(1, encasedOfferChanceModel.chance + totalDelta))
+    let playerFloatLuck = Float(playerData.luck)
+    switch encasedOfferChanceModel.tileType {
+    case .item:
+        totalDelta += playerFloatLuck/5
+    case .offer:
+        totalDelta += playerFloatLuck/3
+    case .exit:
+        totalDelta -= playerFloatLuck/7
+    case .monster:
+        totalDelta -= playerFloatLuck/7
+    default:
+        totalDelta += 0
+    }
+    
+    
+    if let pickaxe = playerData.pickaxe {
+        if case TileType.offer(let offer) = encasedOfferChanceModel.tileType {
+            if offer.type == .runeSlot, pickaxe.runeSlots >= 4 {
+                // remove this from the pool
+                totalDelta = -1
+            } else if case StoreOfferType.rune = offer.type {
+                if pickaxe.runeSlots == 4 {
+                    totalDelta += 10
+                } else if pickaxe.runeSlots == 3 {
+                    totalDelta += 7
+                } else if pickaxe.runeSlots == 2 {
+                    totalDelta += 5
+                } else {
+                    totalDelta += 0
+                }
+            }
+        }
+    }
+    
+    if totalDelta < 0 {
+        return nil
+    } else {
+        return ChanceModel(tileType: encasedOfferChanceModel.tileType, chance: max(1, encasedOfferChanceModel.chance + totalDelta))
+    }
 }
 
 

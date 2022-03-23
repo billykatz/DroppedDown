@@ -214,7 +214,16 @@ struct Statistics: Codable, Equatable, Identifiable {
     }
     
     func updateStatAmount(_ amount: Int, overwrite: Bool) -> Statistics {
-        let newAmount = overwrite ? amount : self.amount + amount
+        let newAmount: Int
+        if overwrite {
+            if self.amount < amount {
+                newAmount = amount
+            } else {
+                newAmount = self.amount
+            }
+        } else {
+            newAmount = self.amount + amount
+        }
         return Self.init(rockColor: self.rockColor, gemColor: self.gemColor, monsterType: self.monsterType, runeType: self.runeType, amount: newAmount, statType: self.statType)
     }
     

@@ -379,7 +379,8 @@ struct EntityModel: Equatable, Codable {
             return update(pickaxe: pickaxe)
         case (.buff, .runeSlot):
             guard let pickaxe = pickaxe else { return self }
-            let newPickaxe = Pickaxe(runeSlots: pickaxe.runeSlots + 1, runes: pickaxe.runes)
+            // the most rune slots you have have is 4
+            let newPickaxe = Pickaxe(runeSlots: min(4, pickaxe.runeSlots + 1), runes: pickaxe.runes)
             return update(pickaxe: newPickaxe)
         case (.buff, .luck):
             return update(luck: luck + effect.amount)

@@ -82,7 +82,7 @@ class LevelAudioManager {
                     }
                     
                 } else {
-                    if let backgroundMusicPath = Bundle.main.path(forResource: "shift-shaft-nonBoss-level-music-gold", ofType: "wav") {
+                    if let backgroundMusicPath = Bundle.main.path(forResource: "shift-shaft-nonBoss-level-music-gold", ofType: "m4a") {
                         let url = URL(fileURLWithPath: backgroundMusicPath)
                         self._backgroundMusicPlayer = try AVAudioPlayer(contentsOf: url)
                         self._backgroundMusicPlayer?.prepareToPlay()

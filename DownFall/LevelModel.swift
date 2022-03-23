@@ -215,34 +215,44 @@ class Level: Codable, Hashable {
     }
     
     
-    public func monsterChanceOfShowingUp(tilesSinceMonsterKilled: Int) -> Int {
+    public func monsterChanceOfShowingUp(tilesSinceMonsterKilled: Int, numberOfMonstersOnBoard: Int) -> Int {
+        let maxMonstersOnBoard = self.maxMonsterOnBoardRatio * Double(self.boardSize)
+        let moreThanOneQuarterCapacity = (Double(numberOfMonstersOnBoard) / maxMonstersOnBoard) > 0.25
         switch depth {
         case 0,1:
-            if tilesSinceMonsterKilled < 20 {
+            let noChanceTileCount = moreThanOneQuarterCapacity ? 20 : 10
+            let slightChanceTileCount = moreThanOneQuarterCapacity ? 50 : 25
+            if tilesSinceMonsterKilled < noChanceTileCount {
                 return -1
-            } else if tilesSinceMonsterKilled < 50 {
+            } else if tilesSinceMonsterKilled < slightChanceTileCount {
                 return 3
             } else {
                 return 10
             }
             
         case 2,3,4:
-            if tilesSinceMonsterKilled < 20 {
+            let noChanceTileCount = moreThanOneQuarterCapacity ? 20 : 10
+            let slightChanceTileCount = moreThanOneQuarterCapacity ? 45 : 22
+            if tilesSinceMonsterKilled < noChanceTileCount {
                 return -1
-            } else if tilesSinceMonsterKilled < 45 {
+            } else if tilesSinceMonsterKilled < slightChanceTileCount {
                 return 5
             } else {
                 return 15
             }
             
         case 5, 6:
-            if tilesSinceMonsterKilled < 18 {
+            let noChanceTileCount = moreThanOneQuarterCapacity ? 18 : 9
+            let slightChanceTileCount = moreThanOneQuarterCapacity ? 36 : 18
+            let slightlyMoreChanceTileCount = moreThanOneQuarterCapacity ? 50 : 25
+            let higherChanceTileCount = moreThanOneQuarterCapacity ? 75 : 37
+            if tilesSinceMonsterKilled < noChanceTileCount {
                 return -1
-            } else if tilesSinceMonsterKilled < 36 {
+            } else if tilesSinceMonsterKilled < slightChanceTileCount {
                 return 3
-            } else if tilesSinceMonsterKilled < 50 {
+            } else if tilesSinceMonsterKilled < slightlyMoreChanceTileCount {
                 return 6
-            } else if tilesSinceMonsterKilled < 75 {
+            } else if tilesSinceMonsterKilled < higherChanceTileCount {
                 return 10
             } else {
                 return 15
@@ -252,13 +262,18 @@ class Level: Codable, Hashable {
             return -1
             
         case 7,8...Int.max:
-            if tilesSinceMonsterKilled < 18 {
+            
+            let noChanceTileCount = moreThanOneQuarterCapacity ? 18 : 9
+            let slightChanceTileCount = moreThanOneQuarterCapacity ? 34 : 17
+            let slightlyMoreChanceTileCount = moreThanOneQuarterCapacity ? 50 : 25
+            let higherChanceTileCount = moreThanOneQuarterCapacity ? 75 : 37
+            if tilesSinceMonsterKilled < noChanceTileCount {
                 return -1
-            } else if tilesSinceMonsterKilled < 34 {
+            } else if tilesSinceMonsterKilled < slightChanceTileCount {
                 return 4
-            } else if tilesSinceMonsterKilled < 50 {
+            } else if tilesSinceMonsterKilled < slightlyMoreChanceTileCount {
                 return 7
-            } else if tilesSinceMonsterKilled < 75 {
+            } else if tilesSinceMonsterKilled < higherChanceTileCount {
                 return 10
             } else {
                 return 16
@@ -270,43 +285,49 @@ class Level: Codable, Hashable {
         }
     }
     
-    public func reduceChanceOfAnotherMonsterSpawning(tilesSinceMonsterKilled: Int) -> Int {
+    public func reduceChanceOfAnotherMonsterSpawning(numberOfMonstersOnBoard: Int) -> Int {
+        let maxMonstersOnBoard = self.maxMonsterOnBoardRatio * Double(self.boardSize)
+        
+        let currentCapacity = (Double(numberOfMonstersOnBoard) / maxMonstersOnBoard)
         switch depth {
         case 0, 1, 2:
             return 0
         case 3, 4:
-            return -4
-        case 5, 6:
-            if tilesSinceMonsterKilled < 18 {
-                // this code path should porbably never be hit
-                return 0
-            } else if tilesSinceMonsterKilled < 36 {
+            if currentCapacity < 0.5 {
                 return -2
-            } else if tilesSinceMonsterKilled < 50 {
-                return -4
-            } else if tilesSinceMonsterKilled < 75 {
-                return -7
             } else {
+                return -4
+            }
+        case 5, 6:
+            if currentCapacity < 0.25 {
+                return -1
+            } else if currentCapacity < 0.5 {
+                return -2
+            } else if currentCapacity < 0.75 {
+                return -4
+            } else if currentCapacity <= 1 {
                 return -8
+            } else {
+                return 0
             }
 
         case 7, 8:
-            if tilesSinceMonsterKilled < 18 {
-                // this code path should porbably never be hit
-                return 0
-            } else if tilesSinceMonsterKilled < 34 {
+            if currentCapacity < 0.25 {
+                return -1
+            } else if currentCapacity < 0.5 {
                 return -2
-            } else if tilesSinceMonsterKilled < 50 {
+            } else if currentCapacity < 0.75 {
                 return -4
-            } else if tilesSinceMonsterKilled < 75 {
-                return -7
-            } else {
+            } else if currentCapacity <= 1 {
                 return -8
+            } else {
+                return 0
             }
 
         default:
             return 0
         }
+        
     }
 
     
@@ -372,7 +393,13 @@ class Level: Codable, Hashable {
             } else if unlockable.item.type == .chest || unlockable.item.type == .snakeEyes {
                 // get rid of chests and other snake eyes
                 return true
-            } else {
+            } else if unlockable.item.type == .runeSlot,
+                      playerData.pickaxe?.runeSlots ?? 0 >= 4 {
+                // get rid of the rune slot from the chest
+                return true
+            }
+            
+            else {
                 return false
             }
         }) {

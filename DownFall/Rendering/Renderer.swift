@@ -817,7 +817,7 @@ extension Renderer {
                         if case let StoreOfferType.rune(rune) = chestOffer.type,
                            case let TileType.player(data) = sprites[playerPosition].type,
                            let pickaxe = data.pickaxe,
-                           pickaxe.runeSlots < pickaxe.runes.count + 1 {
+                           pickaxe.runeSlots == pickaxe.runes.count {
                             InputQueue.append(Input(.runeReplacement(pickaxe, rune, promptedByChest: true)))
                         }  else {
                             InputQueue.append(Input(.collectChestOffer(offer: chestOffer)))

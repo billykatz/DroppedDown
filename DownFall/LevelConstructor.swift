@@ -45,7 +45,18 @@ struct LevelConstructor {
     
     static func maxSpawnGems(depth: Depth) -> Int {
         // spawn at least 1
-        return max(1, depthDivided(depth))
+        switch depth {
+        case 0, 1, 2, 3, 4, 5:
+            return max(1, depthDivided(depth))
+            
+        case 6, 7, 8:
+            // gems actually make these levels kinda hard
+            return 1
+            
+        default:
+            return max(1, depthDivided(depth))
+        }
+        
     }
     
     static func boardSize(depth: Depth) -> Int {

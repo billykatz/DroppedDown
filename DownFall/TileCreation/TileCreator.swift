@@ -87,14 +87,14 @@ class TileCreator: TileStrategy {
         self.loadedTiles = loadedTiles
     }
     
-    private func randomTile(given: Int, neighbors: [Tile], playerData: EntityModel, forceMonsters: Bool) -> TileType {
+    private func randomTile(given: Int, neighbors: [Tile], playerData: EntityModel, forceMonsters: Bool, numberOfMonstersOnBoard: Int) -> TileType {
         guard !forceMonsters else { return randomMonster() }
         guard !level.isBossLevel else { return randomRock([], playerData: playerData) }
         let weight = 98
         let index = abs(given) % (TileType.randomCases.count + weight)
         
         
-        let endRange = level.monsterChanceOfShowingUp(tilesSinceMonsterKilled: level.monsterSpawnTurnTimer)
+        let endRange = level.monsterChanceOfShowingUp(tilesSinceMonsterKilled: level.monsterSpawnTurnTimer, numberOfMonstersOnBoard: numberOfMonstersOnBoard)
         let monsterRange: ClosedRange<Int> = -1...endRange
         
         switch index {
@@ -103,7 +103,7 @@ class TileCreator: TileStrategy {
         case endRange+1...Int.max:
             return randomRock(neighbors, playerData: playerData)
         default:
-            preconditionFailure("Shouldnt be here")
+            return randomRock(neighbors, playerData: playerData)
         }
     }
     
@@ -185,7 +185,7 @@ class TileCreator: TileStrategy {
         guard !tutorialConductor.isTutorial else { return false }
         guard !level.isBossLevel else { return false }
         
-        let extraChanceBasedOnLuck = Float(playerData.luck) / 10
+        let extraChanceBasedOnLuck = Float(playerData.luck) / 15
         guard specialGems < level.maxSpawnGems + Int(extraChanceBasedOnLuck) else { return false }
         
         let baseChance: Float = 2
@@ -213,20 +213,20 @@ class TileCreator: TileStrategy {
         }
     }
     
-    private func randomTile(_ neighbors: [Tile], noMoreMonsters: Bool, playerData: EntityModel, forceMonsters: Bool) -> Tile {
+    private func randomTile(_ neighbors: [Tile], noMoreMonsters: Bool, playerData: EntityModel, forceMonsters: Bool, numberOfMonstersOnBoard: Int) -> Tile {
         
         /// This 100% gets set in the while loop
         var nextTile: Tile!
         
         var validTile = false
         while !validTile {
-            nextTile = Tile(type: randomTile(given: randomSource.nextInt(), neighbors: neighbors, playerData: playerData, forceMonsters: forceMonsters))
+            nextTile = Tile(type: randomTile(given: randomSource.nextInt(), neighbors: neighbors, playerData: playerData, forceMonsters: forceMonsters, numberOfMonstersOnBoard: numberOfMonstersOnBoard))
             
             switch nextTile.type {
             case .monster:
                 validTile = (!neighbors.contains {  $0.type == .monster(.zero) || $0.type == .player(.zero) } && !noMoreMonsters && !tutorialConductor.isTutorial) || (tutorialConductor.isTutorial && forceMonsters)
                 
-                GameLogger.shared.log(prefix: "[TileCreator]", message: "Chance of a monster show up is \(level.monsterChanceOfShowingUp(tilesSinceMonsterKilled: level.monsterSpawnTurnTimer))")
+                GameLogger.shared.log(prefix: "[TileCreator]", message: "Chance of a monster show up is \(level.monsterChanceOfShowingUp(tilesSinceMonsterKilled: level.monsterSpawnTurnTimer, numberOfMonstersOnBoard: numberOfMonstersOnBoard))")
                 GameLogger.shared.log(prefix: "[TileCreator]", message: "nMonster was created? \(validTile)")
                 
             case .rock(.red, _, _), .rock(.purple, _, _), .rock(.blue, _, _), .rock(.brown, _, _):
@@ -286,13 +286,14 @@ class TileCreator: TileStrategy {
                         let newTile = randomTile(neighbors,
                                                  noMoreMonsters: currMonsterCount >= maxMonsters,
                                                  playerData: playerData,
-                                                 forceMonsters: shouldForceMonsters)
+                                                 forceMonsters: shouldForceMonsters,
+                                                 numberOfMonstersOnBoard: currMonsterCount)
                         shouldForceMonsters = false
                         if newTile.type == .monster(.zero) {
                             currMonsterCount += 1
                             
                             // We want to reduce the chance of another monster spawn, so every time a monster spawns we lower the monster spawn turn timer.
-                            level.monsterSpawnTurnTimer += level.reduceChanceOfAnotherMonsterSpawning(tilesSinceMonsterKilled: level.monsterSpawnTurnTimer)
+                            level.monsterSpawnTurnTimer += level.reduceChanceOfAnotherMonsterSpawning(numberOfMonstersOnBoard: currMonsterCount)
                         }
                         newTiles[row][col] = newTile
                     }

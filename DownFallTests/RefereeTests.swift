@@ -460,6 +460,26 @@ class RefereeTests: XCTestCase {
         XCTAssertEqual(expected, actual)
     }
     
+    func testRefereeShouldRecognizeThere_Are_MoreMoves_BigBoard_ThreeGroupRock() {
+        
+        let tiles = [
+            [.threeGroupRock, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar],
+            [.purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar],
+            [.purplePillar, .purplePillar, .noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock, .purplePillar],
+            [.purplePillar, .purplePillar, .noGroupRock, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .noGroupRock, .purplePillar],
+            [.purplePillar, .purplePillar, .noGroupRock, .purplePillar, .empty, .noGroupRock, .purplePillar, .purplePillar, .noGroupRock, .purplePillar],
+            [.purplePillar, .purplePillar, .noGroupRock, .purplePillar, .purplePillar, .noGroupRock, .purplePillar, .purplePillar, .noGroupRock, .purplePillar],
+            [.purplePillar, .purplePillar, .noGroupRock, .purplePillar, .purplePillar, .noGroupRock, .purplePillar, .purplePillar, .noGroupRock, .purplePillar],
+            [.purplePillar, .purplePillar, .noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock, .purplePillar, .purplePillar, .noGroupRock, .purplePillar],
+            [.noGroupRock, .noGroupRock, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .purplePillar, .noGroupRock, .purplePillar],
+            [Tile(type: .normalPlayer), .noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock, .noGroupRock, .purplePillar],
+        ]
+        let expected = Input(.reffingFinished(newTurn: false)).type
+        let actual = Referee().enforceRules(tiles).type
+        
+        XCTAssertEqual(expected, actual)
+    }
+    
     func testRefereeShouldRecognizeThere_AreNo_MoreMoves_BigBoard() {
         
         let tiles = [

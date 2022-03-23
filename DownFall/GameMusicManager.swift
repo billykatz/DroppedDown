@@ -104,7 +104,9 @@ class GameMusicManager {
             
         case .gameLose, .gameWin, .playAgain:
             if !AVAudioSession.sharedInstance().isOtherAudioPlaying {
-                levelMusicManager.stopBackgroundMusic()
+                gameMusicThread.async { [levelMusicManager] in
+                    levelMusicManager.stopBackgroundMusic()
+                }
             }
             
         default:

@@ -36,17 +36,6 @@ class GameViewController: UIViewController {
             }
             profileHasLoaded = true
             loadingSceneNode?.fadeOut {
-                // Get the singleton instance.
-                let audioSession = AVAudioSession.sharedInstance()
-                do {
-                    // Set the audio session category, mode, and options.
-                    try audioSession.setCategory(.soloAmbient, mode: .default, options: [])
-//                    try audioSession.setActive(true)
-                } catch {
-                    print("Failed to set audio session category.")
-                }
-                
-                
                 let hasLaunchedBefore = UserDefaults.standard.bool(forKey: UserDefaults.hasLaunchedBeforeKey)
                 self.menuCoordinator?.loadedProfile(profile, hasLaunchedBefore: hasLaunchedBefore)
                 

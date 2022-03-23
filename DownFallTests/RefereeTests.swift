@@ -379,6 +379,23 @@ class RefereeTests: XCTestCase {
         XCTAssertEqual(expected, actual)
     }
     
+    
+    func testRefereeShouldRecognizeThere_Are_MoreMoves_WithAnEmptyWithAJaggedPathToSide() {
+        
+        let tiles = [
+            [.noGroupRock,              .purplePillar,  .purplePillar,  .noGroupRock, .noGroupRock],
+            [.purplePillar,             .noGroupRock,   .empty,         .noGroupRock, .purplePillar],
+            [.purplePillar,             .empty,         .purplePillar,  .purplePillar, .noGroupRock],
+            [Tile(type: .normalPlayer), .purplePillar,  .noGroupRock,   .noGroupRock, .noGroupRock],
+            [.noGroupRock,              .purplePillar,  .purplePillar,  .noGroupRock, .noGroupRock],
+        ]
+        let expected = Input(.reffingFinished(newTurn: false)).type
+        let actual = Referee().enforceRules(tiles).type
+        
+        XCTAssertEqual(expected, actual)
+    }
+
+    
     func testRefereeShouldRecognizeThere_Are_MoreMoves_EvenWithRockInPocketOfEmpty_AndAnEmptySomewhereElse() {
         
         let tiles = [

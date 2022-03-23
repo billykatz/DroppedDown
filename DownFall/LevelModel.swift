@@ -1470,8 +1470,13 @@ func deltaChanceOfferUtilWealth(storeOfferChance: AnyChanceModel<StoreOffer>, pl
         // add
         delta = 3
     }
-    else {
-        delta -= 0.25
+    
+    // all the same offer items from this tier
+    let sameExactOffers = allPastLevelOffers?.filter({ $0.tier == storeOfferChance.thing.tier && $0.type == storeOfferChance.thing.type })
+    
+    let sameExactOffersCount = Float(sameExactOffers?.count ?? 0)
+    if sameExactOffersCount > 0 {
+        delta /= min(3, sameExactOffersCount+1)
     }
     
     return max(0.01, delta * storeOfferChance.chance)
@@ -1530,7 +1535,7 @@ func deltaChanceOfferDodgeLuck(offerChance: AnyChanceModel<StoreOffer>, depth: D
 
 }
 
-func deltaChanceOfferRune(offerChance: AnyChanceModel<StoreOffer>, playerData: EntityModel) -> Float {
+func deltaChanceOfferRune(offerChance: AnyChanceModel<StoreOffer>, playerData: EntityModel, allPastOffers: [StoreOffer]) -> Float {
     guard let color = offerChance.thing.rune?.progressColor else { return offerChance.chance }
     guard let runes = playerData.pickaxe?.runes else { return offerChance.chance }
     let simiarRunes = Float(runes.map { $0.progressColor }.filter { $0 == color }.count)
@@ -1545,6 +1550,16 @@ func deltaChanceOfferRune(offerChance: AnyChanceModel<StoreOffer>, playerData: E
     // remove it form the options with a negative chance
     if runes.contains(offerChance.thing.rune ?? .zero) {
         deltaChance = -1
+    }
+    
+    // lower the chance if we were offered this before
+    for pastOffer in allPastOffers {
+        if case StoreOfferType.rune(let pastRune) = pastOffer.type,
+           case StoreOfferType.rune(let thisRune) = offerChance.thing.type,
+           pastRune.type == thisRune.type
+        {
+            deltaChance -= 0.5
+        }
     }
     
     return offerChance.chance * deltaChance
@@ -1566,12 +1581,12 @@ func deltaChanceForOffer(offerChances: [AnyChanceModel<StoreOffer>], recentlyPur
             newChance = deltaChanceOfferDodgeLuck(offerChance: offerChance, depth: depth)
             
         case .rune:
-            newChance = deltaChanceOfferRune(offerChance: offerChance, playerData: playerData)
+            newChance = deltaChanceOfferRune(offerChance: offerChance, playerData: playerData, allPastOffers: allPastLevelOffers ?? [])
             
         }
         
         if recentlyPurchasedAndShouldSpawn.contains(offerChance.thing) {
-            newChance *= 1000
+            newChance *= 100
         }
         
         if newChance > 0 {

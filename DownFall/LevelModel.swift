@@ -1012,21 +1012,16 @@ func chanceDeltaOfferWealthBucket(playerData: EntityModel, unlockables: [Unlocka
 
 func chanceDeltaOfferRuneBucket(playerData: EntityModel, allPastLevelOffers: [StoreOfferBucket]?, modifier: Float, depth: Depth, currentChance: Float, allUnlockables: [Unlockable]) -> Float
 {
-    guard let pickaxe = playerData.pickaxe else { return  0 }
+    guard let pickaxe = playerData.pickaxe else {
+        return 0
+    }
     var totalDelta = Float(1)
     let runeSlots = pickaxe.runeSlots
     let runes = pickaxe.runes.count
     
     let numberOfRuneOffered = allPastLevelOffers?.filter({ $0.type == .rune }).count ?? 0
-    let numbersOfRunesUnlock = allUnlockables.filter {  unlockable in
-        if case StoreOfferType.rune = unlockable.item.type {
-            return unlockable.canAppearInRun
-        } else {
-            return false
-        }
-    }.count
     
-    let numberOfRunesLeftInPool = allUnlockables.filter {  unlockable in
+    let numberOfRunesUnlockedLeftInPool = allUnlockables.filter {  unlockable in
         if case StoreOfferType.rune(let rune) = unlockable.item.type {
             if pickaxe.runes.contains(rune) {
                 // player has this
@@ -1040,15 +1035,15 @@ func chanceDeltaOfferRuneBucket(playerData: EntityModel, allPastLevelOffers: [St
         }
     }.count
 
-    // if the palyer somehow has all the runes,
-    guard numberOfRunesLeftInPool > 0 else {
+    // if the player somehow has all the runes,
+    guard numberOfRunesUnlockedLeftInPool > 0 else {
         GameLogger.shared.log(prefix: "[LevelModel]", message: "Player has all unlocked runes right now")
         return 0.01
     }
     
     switch depth {
     case 0:
-        return 1
+        totalDelta = 1
     case 1:
         if numberOfRuneOffered >= 1 {
             totalDelta = 0.5
@@ -1059,7 +1054,7 @@ func chanceDeltaOfferRuneBucket(playerData: EntityModel, allPastLevelOffers: [St
         if numberOfRuneOffered >= 2 {
             totalDelta = 0.25
         } else if numberOfRuneOffered >= 1 {
-            totalDelta = 0.5
+            totalDelta = 0.75
         } else {
             totalDelta = 10
         }
@@ -1124,13 +1119,13 @@ func chanceDeltaOfferRuneBucket(playerData: EntityModel, allPastLevelOffers: [St
     }
     
     if runeSlots - runes >= 4 {
-        totalDelta += 0.5
+        totalDelta += 0.75
     } else if runeSlots - runes >= 3 {
-        totalDelta += 0.33
+        totalDelta += 0.5
     } else if runeSlots - runes >= 2 {
-        totalDelta += 0.25
+        totalDelta += 0.33
     } else if runeSlots - runes >= 1 {
-        totalDelta += 0.1
+        totalDelta += 0.15
     } else if runeSlots - runes >= 0 {
         totalDelta += 0.0
     }
@@ -1146,13 +1141,13 @@ func chanceDeltaOfferRuneBucket(playerData: EntityModel, allPastLevelOffers: [St
     }
     
     // this player has many runes unlocked.  They are advanced. We should offer them more runes
-    if numberOfRunesLeftInPool > 10 {
+    if numberOfRunesUnlockedLeftInPool > 10 {
         totalDelta += 0.75
-    } else if numberOfRunesLeftInPool > 8 {
+    } else if numberOfRunesUnlockedLeftInPool > 8 {
         totalDelta += 0.5
-    } else if numberOfRunesLeftInPool > 5 {
+    } else if numberOfRunesUnlockedLeftInPool > 5 {
         totalDelta += 0.33
-    } else if numberOfRunesLeftInPool > 2 {
+    } else if numberOfRunesUnlockedLeftInPool > 2 {
         totalDelta += 0.15
     } else {
         totalDelta += 0

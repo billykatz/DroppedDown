@@ -354,9 +354,9 @@ enum BossPhaseType: String, Codable {
         case .first:
             return 0
         case .second:
-            return 6
+            return 4
         case .third:
-            return 8
+            return 6
         case .dead:
             return 0
         }
@@ -376,7 +376,7 @@ enum BossPhaseType: String, Codable {
         switch self {
         case .first: return 0
         case .second: return 4
-        case .third: return 8
+        case .third: return 6
         case .dead: return 0
         }
     }

@@ -1565,7 +1565,7 @@ extension Board {
                 let newRock = tileCreator.randomRock([], playerData: playerData)
                 newTiles[coord.row][coord.column] = Tile(type: newRock)
             default:
-                break
+                newTiles[coord.row][coord.column] = Tile(type: tiles[coord].type)
             }
         }
         

@@ -120,7 +120,8 @@ class TileCreator: TileStrategy {
         }
         
         guard let upperRange = totalNumber?.upper else {
-            fatalError("We need the max number or else we cannot continue")
+            let rat = entities.entity(with: .rat)!
+            return TileType.monster(rat)
             
         }
         
@@ -131,7 +132,8 @@ class TileCreator: TileStrategy {
             }
         }
         
-        fatalError("We should always return a random monster from this function.")
+        let rat = entities.entity(with: .rat)!
+        return TileType.monster(rat)
         
     }
     
@@ -177,7 +179,7 @@ class TileCreator: TileStrategy {
             }
         }
         
-        fatalError("The randomNumber should between 0 and \(randomNumber-1) should map to a TileType.")
+        return TileType.rock(color: ShiftShaft_Color.randomColor, holdsGem: false, groupCount: 0)
     }
     
     func shouldRockHoldGem(playerData: EntityModel, rockColor: ShiftShaft_Color, shouldSpawnAtleastOneGem: Bool) -> Bool {

@@ -1119,13 +1119,13 @@ func chanceDeltaOfferRuneBucket(playerData: EntityModel, allPastLevelOffers: [St
     }
     
     if runeSlots - runes >= 4 {
-        totalDelta += 0.75
+        totalDelta += 2.5
     } else if runeSlots - runes >= 3 {
-        totalDelta += 0.5
+        totalDelta += 1.5
     } else if runeSlots - runes >= 2 {
-        totalDelta += 0.33
+        totalDelta += 1.0
     } else if runeSlots - runes >= 1 {
-        totalDelta += 0.15
+        totalDelta += 0.33
     } else if runeSlots - runes >= 0 {
         totalDelta += 0.0
     }

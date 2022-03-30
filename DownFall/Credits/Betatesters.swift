@@ -17,7 +17,7 @@ let betaTesters = [
     BetaTester(name: "Anna Membrino"),
     BetaTester(name: "Michael Brenner"),
     BetaTester(name: "Nora Carr"),
-    BetaTester(name: "Keiren Kelly"),
+    BetaTester(name: "Kieren Kelly"),
     BetaTester(name: "Marc Rivero"),
     BetaTester(name: "Ben Katz"),
     BetaTester(name: "Henry Phan"),

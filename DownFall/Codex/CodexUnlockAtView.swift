@@ -14,7 +14,7 @@ struct CodexUnlockAtView: View {
     let progressString: String
     
     var trimTo: CGFloat {
-        return CGFloat(progress) / CGFloat(unlockable.stat.amount)
+        return CGFloat(progress) / CGFloat(unlockable.stat.statAmount)
     }
     
     var lineWidth: CGFloat {
@@ -62,9 +62,9 @@ struct CodexUnlockAtView: View {
                 }
                 
             }.frame(width: circleSize, height: circleSize)
-            Text("\(min(unlockable.stat.amount,progress)) / \(unlockable.stat.amount)")
+            Text("\(min(unlockable.stat.statAmount,progress)) / \(unlockable.stat.statAmount)")
                 .font(.titleCodexFont).foregroundColor(.white).multilineTextAlignment(.center)
-            if (progress < unlockable.stat.amount) {
+            if (progress < unlockable.stat.statAmount) {
                 Text(progressString)
                     .font(.codexFont)
                     .foregroundColor(.white)

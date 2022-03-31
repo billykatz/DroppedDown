@@ -156,13 +156,13 @@ class CodexViewModel: ObservableObject {
     }
     
     func amountNeededToUnlock(_ unlockable: Unlockable) -> Int {
-        return relevantStatForUnlockable(unlockable)?.amount ?? 0
+        return relevantStatForUnlockable(unlockable)?.statAmount ?? 0
     }
     
     func unlockAt(_ unlockable: Unlockable) -> String {
-        let target = unlockable.stat.amount
+        let target = unlockable.stat.statAmount
         let relevantPlayerStat = relevantStatForUnlockable(unlockable)
-        let current = relevantPlayerStat?.amount ?? 0
+        let current = relevantPlayerStat?.statAmount ?? 0
         
         var value: String = ""
         var subject: String = ""

@@ -88,7 +88,7 @@ struct Statistics: Codable, Equatable, Identifiable {
     let gemColor: ShiftShaft_Color?
     let monsterType: EntityModel.EntityType?
     let runeType: RuneType?
-    let amount: Int
+    private let amount: Int
     let statType: StatisticType
     let id: UUID
     
@@ -97,6 +97,15 @@ struct Statistics: Codable, Equatable, Identifiable {
         \(rockColor != nil ? rockColor!.humanReadable : "") \(gemColor != nil ? gemColor!.humanReadable : "") \(monsterType != nil ? monsterType!.humanReadable : "")  statType: \(statType) amount :\(amount)
         """
         
+    }
+    
+    var statAmount: Int {
+        switch self.statType {
+        case .lowestDepthReached:
+            return amount + 1
+        default:
+            return amount
+        }
     }
     
     func humanReadableForStatView() -> String {
@@ -438,11 +447,12 @@ extension Statistics {
     static var oneHundredAttacksDodged = Self.init(amount: 100, statType: .attacksDodged)
     
     // reach depth
+    // depth is indexed at 0 so the name matches the amount + 1
     static let reachDepth5 = Self.init(amount: 5, statType: .lowestDepthReached)
     static let reachDepth6 = Self.init(amount: 6, statType: .lowestDepthReached)
-    static let reachDepth8 = Self.init(amount: 8, statType: .lowestDepthReached)
-    static let reachDepth9 = Self.init(amount: 9, statType: .lowestDepthReached)
-    static let reachDepth10 = Self.init(amount: 10, statType: .lowestDepthReached)
+    static let reachDepth8 = Self.init(amount: 7, statType: .lowestDepthReached)
+    static let reachDepth9 = Self.init(amount: 8, statType: .lowestDepthReached)
+    static let reachDepth10 = Self.init(amount: 9, statType: .lowestDepthReached)
     
     // largest group
     static let largestGroup40 = Self.init(amount: 40, statType: .largestRockGroupDestroyed)

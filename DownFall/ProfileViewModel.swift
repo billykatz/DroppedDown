@@ -110,7 +110,7 @@ class ProfileViewModel {
     func isUnlocked(unlockableStat: Statistics, playerStats: [Statistics]) -> Bool {
         for stat in playerStats {
             if stat == unlockableStat {
-                return stat.amount >= unlockableStat.amount
+                return stat.statAmount >= unlockableStat.statAmount
             }
         }
         return false
@@ -196,11 +196,11 @@ class ProfileViewModel {
             // update stats
             for stat in currentRun?.stats ?? [] {
                 let overwrite = stat.statType.overwriteIfLarger
-                newProfile = newProfile.updateStatistic(stat, amount: stat.amount, overwriteIfLarger: overwrite)
+                newProfile = newProfile.updateStatistic(stat, amount: stat.statAmount, overwriteIfLarger: overwrite)
             }
             
             // update lowest depth if needed
-            newProfile = newProfile.updateStatistic(.lowestDepthReached, amount: currentRun?.depth ?? 0, overwriteIfLarger: true)
+            newProfile = newProfile.updateStatistic(.lowestDepthReached, amount: (currentRun?.depth ?? 0) + 1, overwriteIfLarger: true)
         } else {
             GameLogger.shared.log(prefix: Constants.tag, message: "Finished Run.  Not double saving stats.")
         }
@@ -246,7 +246,7 @@ class ProfileViewModel {
             // update stats
             for stat in currentRun.stats {
                 let overwrite = stat.statType.overwriteIfLarger
-                newProfile = newProfile.updateStatistic(stat, amount: stat.amount, overwriteIfLarger: overwrite)
+                newProfile = newProfile.updateStatistic(stat, amount: stat.statAmount, overwriteIfLarger: overwrite)
             }
             // update lowest depth if needed
             newProfile = newProfile.updateStatistic(.lowestDepthReached, amount: currentRun.depth, overwriteIfLarger: true)
@@ -277,7 +277,7 @@ class ProfileViewModel {
         if let totalGames = profile.stats.first(where: { stat in
             stat.statType == .totalLoses
         }) {
-            return totalGames.amount > 4
+            return totalGames.statAmount > 4
         } else {
             return false
         }
@@ -289,7 +289,7 @@ class ProfileViewModel {
         if let totalGames = profile.stats.first(where: { stat in
             stat.statType == .totalLoses
         }) {
-            return totalGames.amount > 15
+            return totalGames.statAmount > 15
         } else {
             return false
         }

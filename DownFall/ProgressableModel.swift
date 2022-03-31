@@ -197,7 +197,7 @@ class CodexViewModel: ObservableObject {
             return "Reach depth \(target) to unlock this."
         } else if let statType = relevantPlayerStat?.statType, statType == .totalWins {
             if target == 1 {
-                return "Defeat the boss to unlock this"
+                return "Defeat the boss on depth 10 to unlock this"
             } else {
                 return "Defeat the boss \(target) times to unlock this"
             }

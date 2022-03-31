@@ -784,6 +784,18 @@ func potentialEncasementPillarCoords(depth: Int, randomSource: GKLinearCongruent
                 mutableEncasementChanceModel.removeFirst { chanceModel in
                     return chanceModel.tileType == randomTile
                 }
+                
+                // We chose a offer of 25 or 50 gems
+                if case TileType.offer(let offer) = randomTile, case StoreOfferType.gems = offer.type {
+                    // we need to remove the other offers or else we could run into an issue where the level goal was to collect X gems but when they collect another offer the gems disappear.
+                    mutableEncasementChanceModel = mutableEncasementChanceModel.filter({ chanceModel in
+                        if case TileType.offer = chanceModel.tileType {
+                            return false
+                        } else {
+                            return true
+                        }
+                    })
+                }
             }
             
             // some encasements have extra tiles that are contained in the encasement but arent special.  Just turn them into random rocks

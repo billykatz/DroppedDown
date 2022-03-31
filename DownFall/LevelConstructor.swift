@@ -167,7 +167,6 @@ struct LevelConstructor {
             return 4
             
         }
-        return min(boardSize(depth: depth), depth + 2)
     }
     
     
@@ -228,8 +227,8 @@ struct LevelConstructor {
             let alamoRange = RangeModel(lower: 0, upper: 16)
             let dragonRange = alamoRange.next(18)
             let batRange = dragonRange.next(26)
-            let ratRange = batRange.next(10)
-            let sallyRange = ratRange.next(30)
+            let ratRange = batRange.next(15)
+            let sallyRange = ratRange.next(25)
             return [.rat: ratRange, .alamo: alamoRange, .dragon: dragonRange, .bat: batRange, .sally: sallyRange]
             
         case bossLevelDepthNumber:

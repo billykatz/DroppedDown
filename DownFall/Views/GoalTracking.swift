@@ -84,7 +84,7 @@ struct GoalTracking: Codable, Hashable {
             case .useRune:
                 return "Use runes \(target) time\(target > 1 ? "s" : "")"
             case .destroyBoss:
-                return "Defeat the boss"
+                return "Defeat the boss on depth 10"
             }
         }
         

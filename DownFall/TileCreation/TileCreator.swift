@@ -187,7 +187,11 @@ class TileCreator: TileStrategy {
         guard !tutorialConductor.isTutorial else { return false }
         guard !level.isBossLevel else { return false }
         
-        let extraChanceBasedOnLuck = Float(playerData.luck) / 15
+        var extraChanceBasedOnLuck = Float(playerData.luck) / 15
+        // gems ends up being really bad in the final levels, let's make it seem not as bad. 
+        if level.depth > 5 {
+            extraChanceBasedOnLuck = 0
+        }
         guard specialGems < level.maxSpawnGems + Int(extraChanceBasedOnLuck) else { return false }
         
         let baseChance: Float = 2

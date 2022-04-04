@@ -184,6 +184,14 @@ class LevelGoalTracker: LevelGoalTracking {
                 countPillars(in: trans.first?.endTiles ?? [])
             case .collectItem(_, let item, _):
                 advanceGoal(for: TileType.item(item), units: item.amount)
+                
+            case .collectOffer(collectedCoord: _, collectedOffer: let collectedOffer, discardedCoord: _, discardedOffer: _) :
+                if case  StoreOfferType.gems = collectedOffer.type {
+                    if let gemsCollected = collectedOffer.gemAmount {
+                        let gemItem = Item(type: .gem, amount: gemsCollected)
+                        advanceGoal(for: TileType.item(gemItem), units: gemsCollected)
+                    }
+                }
             default:
                 ()
             }

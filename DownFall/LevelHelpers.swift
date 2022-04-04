@@ -736,6 +736,7 @@ func encasementsOptions(depth: Depth, size: EncasementSize) -> [EncasementCoords
             /// choose the outer encasements
             return [encasementOption1, encasementOption2, encasementOption3, encasementOption4, encasementOption5, encasementOption6, encasementOption7, encasementOption8, encasementOption9]
         }
+        
     default:
         break
         

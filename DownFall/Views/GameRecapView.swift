@@ -125,19 +125,19 @@ class GameRecapView: SKNode {
         for stat in statistics {
             switch stat.statType {
             case .totalRocksDestroyed:
-                statNodes.append(createStat(title: "Rocks Mined:", amount: stat.amount))
+                statNodes.append(createStat(title: "Rocks Mined:", amount: stat.statAmount))
             case .largestRockGroupDestroyed:
-                statNodes.append(createStat(title: "Largest Rock Group:", amount: stat.amount))
+                statNodes.append(createStat(title: "Largest Rock Group:", amount: stat.statAmount))
             case .totalGemsCollected:
-                statNodes.append(createStat(title: "Gems Collected:", amount: stat.amount))
+                statNodes.append(createStat(title: "Gems Collected:", amount: stat.statAmount))
             case .totalRuneUses:
-                statNodes.append(createStat(title: "Rune Uses:", amount: stat.amount))
+                statNodes.append(createStat(title: "Rune Uses:", amount: stat.statAmount))
             case .totalMonstersKilled:
-                statNodes.append(createStat(title: "Monsters Killed:", amount: stat.amount))
+                statNodes.append(createStat(title: "Monsters Killed:", amount: stat.statAmount))
             case .damageTaken:
-                statNodes.append(createStat(title: "Damage Taken:", amount: stat.amount))
+                statNodes.append(createStat(title: "Damage Taken:", amount: stat.statAmount))
             case .healthHealed:
-                statNodes.append(createStat(title: "Health Healed:", amount: stat.amount))
+                statNodes.append(createStat(title: "Health Healed:", amount: stat.statAmount))
             default: break
             }
         }

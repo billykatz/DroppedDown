@@ -703,6 +703,14 @@ func encasementsOptions(depth: Depth, size: EncasementSize) -> [EncasementCoords
             return [encasementOption1, encasementOption2, encasementOption3, encasementOption4]
         }
         
+    
+    case bossLevelDepthNumber:
+        let encasement1 = EncasementCoords(middleTile: TileCoord(6, 6), outerTiles: [TileCoord(7, 6), TileCoord(5, 6), TileCoord(6, 5), TileCoord(6, 7)], otherTiles: [])
+        let encasement3 = EncasementCoords(middleTile: TileCoord(6, 2), outerTiles: [TileCoord(7, 2), TileCoord(5, 2), TileCoord(6, 1), TileCoord(6, 3)], otherTiles: [])
+        let encasement2 = EncasementCoords(middleTile: TileCoord(2, 4), outerTiles: [TileCoord(3, 4), TileCoord(1, 4), TileCoord(2, 3), TileCoord(2, 5)], otherTiles: [])
+
+        return [encasement1, encasement2, encasement3]
+        
     case 5..<bossLevelDepthNumber:
         if size == .small {
             let cornerOption1: EncasementCoords = .init(middleTile: TileCoord(0, 0), outerTiles: [TileCoord(1, 0), TileCoord(0, 1)], otherTiles: [])
@@ -731,13 +739,6 @@ func encasementsOptions(depth: Depth, size: EncasementSize) -> [EncasementCoords
             /// choose the outer encasements
             return [encasementOption1, encasementOption2, encasementOption3, encasementOption4, encasementOption5, encasementOption6, encasementOption7, encasementOption8, encasementOption9]
         }
-    
-    case bossLevelDepthNumber:
-        let encasement1 = EncasementCoords(middleTile: TileCoord(6, 6), outerTiles: [TileCoord(7, 6), TileCoord(5, 6), TileCoord(6, 5), TileCoord(6, 7)], otherTiles: [])
-        let encasement3 = EncasementCoords(middleTile: TileCoord(6, 2), outerTiles: [TileCoord(7, 2), TileCoord(5, 2), TileCoord(6, 1), TileCoord(6, 3)], otherTiles: [])
-        let encasement2 = EncasementCoords(middleTile: TileCoord(2, 4), outerTiles: [TileCoord(3, 4), TileCoord(1, 4), TileCoord(2, 3), TileCoord(2, 5)], otherTiles: [])
-
-        return [encasement1, encasement2, encasement3]
     default:
         break
         
@@ -782,6 +783,18 @@ func potentialEncasementPillarCoords(depth: Int, randomSource: GKLinearCongruent
                 /// dont choose this option again
                 mutableEncasementChanceModel.removeFirst { chanceModel in
                     return chanceModel.tileType == randomTile
+                }
+                
+                // We chose a offer of 25 or 50 gems
+                if case TileType.offer(let offer) = randomTile, case StoreOfferType.gems = offer.type {
+                    // we need to remove the other offers or else we could run into an issue where the level goal was to collect X gems but when they collect another offer the gems disappear.
+                    mutableEncasementChanceModel = mutableEncasementChanceModel.filter({ chanceModel in
+                        if case TileType.offer = chanceModel.tileType {
+                            return false
+                        } else {
+                            return true
+                        }
+                    })
                 }
             }
             

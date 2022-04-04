@@ -789,15 +789,15 @@ func chanceDeltaStoreOfferBuckets(_ buckets: [AnyChanceModel<StoreOfferBucket>],
         switch (depth, bucket.thing.type) {
         case (0, .health), (1, .health), (2, .health):
             GameLogger.shared.log(prefix: "LevelModel", message: "Old \(bucket.thing.type) chance is \(healthBucketChance)")
-            healthBucketChance = chanceDeltaOfferHealthBucket(playerData: playerData, currentChance: healthBucketChance, modifier: 1.0)
-            
+            healthBucketChance = chanceDeltaOfferHealthBucket(playerData: playerData, currentChance: healthBucketChance, modifier: 1.0, depth: depth)
+        
         case (3, .health), (4, .health), (5, .health):
             GameLogger.shared.log(prefix: "LevelModel", message: "Old \(bucket.thing.type) chance is \(healthBucketChance)")
-            healthBucketChance = chanceDeltaOfferHealthBucket(playerData: playerData, currentChance: healthBucketChance, modifier: 0.9)
+            healthBucketChance = chanceDeltaOfferHealthBucket(playerData: playerData, currentChance: healthBucketChance, modifier: 0.9, depth: depth)
             
         case (6, .health), (7, .health), (8, .health):
             GameLogger.shared.log(prefix: "LevelModel", message: "Old \(bucket.thing.type) chance is \(healthBucketChance)")
-            healthBucketChance = chanceDeltaOfferHealthBucket(playerData: playerData, currentChance: healthBucketChance, modifier: 0.8)
+            healthBucketChance = chanceDeltaOfferHealthBucket(playerData: playerData, currentChance: healthBucketChance, modifier: 0.8, depth: depth)
             
         case (_, .dodgeLuck):
             GameLogger.shared.log(prefix: "LevelModel", message: "Old \(bucket.thing.type) chance is \(dodgeLuckBucketChance)")
@@ -855,10 +855,12 @@ func chanceDeltaStoreOfferBuckets(_ buckets: [AnyChanceModel<StoreOfferBucket>],
 }
         
 
-func chanceDeltaOfferHealthBucket(playerData: EntityModel, currentChance: Float, modifier: Float) -> Float {
+func chanceDeltaOfferHealthBucket(playerData: EntityModel, currentChance: Float, modifier: Float, depth: Depth) -> Float {
     var delta: Float = 1
     let currHealth = Float(playerData.hp)
     let maxHealth = Float(playerData.originalHp)
+    
+    // gives buffs based on need to heal
     if currHealth <= maxHealth / 4  {
         delta = 5
     }
@@ -872,6 +874,20 @@ func chanceDeltaOfferHealthBucket(playerData: EntityModel, currentChance: Float,
         delta = 2
     } else {
         delta = 1.25
+    }
+    
+    // gives buffs based on max health
+    let totalUnderMaxHealthCap = maxIntendedHealthPerDepth(depth) - maxHealth
+    if totalUnderMaxHealthCap >= 4 {
+        delta += 4
+    } else if totalUnderMaxHealthCap >= 3 {
+        delta += 3
+    } else if totalUnderMaxHealthCap >= 2 {
+        delta += 2
+    } else if totalUnderMaxHealthCap >= 1 {
+        delta += 1.5
+    } else {
+        delta += 0
     }
     
     return delta * currentChance * modifier
@@ -941,39 +957,6 @@ func chanceDeltaOfferDodgeLuckBucket(playerData player: EntityModel, modifier: F
 
     return currentChance * ((dodgeDelta/2) + (luckDelta/2)) * modifier
 }
-
-//func chanceDeltaOfferLuckBucket(playerData player: EntityModel, modifier: Float, currentChance: Float, lastLevelOfferBuckets: [StoreOfferBucket]?) -> Float {
-//    var delta = Float(1)
-//    if player.luck > 70 {
-//        delta = 0.1
-//    } else if player.luck > 60 {
-//        delta = 0.2
-//    } else if player.luck > 50 {
-//        delta = 0.3
-//    } else if player.luck > 40 {
-//        delta = 0.5
-//    } else if player.luck > 30 {
-//        delta = 0.6
-//    } else if player.luck > 25 {
-//        delta = 0.8
-//    } else if player.luck > 10 {
-//        delta = 0.9
-//    } else if player.luck > 5 {
-//        delta = 0.95
-//    } else if player.luck > 0 {
-//        delta = 1.1
-//    }
-//
-//
-//    let luckOfferedLastLevel = (lastLevelOfferBuckets ?? []).filter{  $0.type == StoreOfferBucketType.luck }.count
-//    if luckOfferedLastLevel == 1 {
-//        delta *= 0.5
-//    } else if luckOfferedLastLevel == 2  {
-//        delta *= 0.2
-//    }
-//
-//    return currentChance * delta * modifier
-//}
 
 func chanceOfferUtilBucket(pastLevelOffers: [StoreOfferBucket]?, modifier: Float, currentChance: Float) -> Float {
     let numberPastLevels = pastLevelOffers?.filter( { $0.type == .util }).count ?? 0
@@ -1121,7 +1104,7 @@ func chanceDeltaOfferRuneBucket(playerData: EntityModel, allPastLevelOffers: [St
     if runeSlots - runes >= 4 {
         totalDelta += 2.5
     } else if runeSlots - runes >= 3 {
-        totalDelta += 1.5
+        totalDelta += 2.0
     } else if runeSlots - runes >= 2 {
         totalDelta += 1.0
     } else if runeSlots - runes >= 1 {
@@ -1131,9 +1114,9 @@ func chanceDeltaOfferRuneBucket(playerData: EntityModel, allPastLevelOffers: [St
     }
     
     if runeSlots == 4 {
-        totalDelta += 0.5
+        totalDelta += 0.75
     } else if runeSlots == 3 {
-        totalDelta += 0.33
+        totalDelta += 0.5
     } else if runeSlots == 2 {
         totalDelta += 0.25
     } else if runeSlots == 1 {
@@ -1144,11 +1127,11 @@ func chanceDeltaOfferRuneBucket(playerData: EntityModel, allPastLevelOffers: [St
     if numberOfRunesUnlockedLeftInPool > 10 {
         totalDelta += 0.75
     } else if numberOfRunesUnlockedLeftInPool > 8 {
-        totalDelta += 0.5
+        totalDelta += 0.6
     } else if numberOfRunesUnlockedLeftInPool > 5 {
-        totalDelta += 0.33
+        totalDelta += 0.4
     } else if numberOfRunesUnlockedLeftInPool > 2 {
-        totalDelta += 0.15
+        totalDelta += 0.2
     } else {
         totalDelta += 0
     }
@@ -1262,27 +1245,28 @@ func baseChanceForOffers(potentialItems: [StoreOffer]) -> [AnyChanceModel<StoreO
     return choiceWithChance
 }
 
+func maxIntendedHealthPerDepth(_ depth: Depth) -> Float {
+    switch depth {
+    case 0, 1:
+        return 5
+    case 2, 3:
+        return 7
+    case 4, 5:
+        return 9
+    case 6, 7:
+        return 10
+    case 8, 9:
+        return 12
+    default:
+        return 5
+    }
+}
+
 func deltaChanceOfferHealth(playerData: EntityModel, depth: Depth, storeOffer: StoreOffer, tier: StoreOfferTier, currentChance: Float, lastLevelOffers: [StoreOffer]?) -> Float {
     
     let offerType = storeOffer.type
     let currentHp = Float(playerData.hp)
     let originalHp = Float(playerData.originalHp)
-    func maxIntendedHealthPerDepth(_ depth: Depth) -> Float {
-        switch depth {
-        case 0, 1:
-            return 5
-        case 2, 3:
-            return 7
-        case 4, 5:
-            return 9
-        case 6, 7:
-            return 10
-        case 8, 9:
-            return 12
-        default:
-            return 5
-        }
-    }
     
     
     var maxHealthChance = Float(1)

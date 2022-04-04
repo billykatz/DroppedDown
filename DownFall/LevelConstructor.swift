@@ -167,22 +167,10 @@ struct LevelConstructor {
             return 4
             
         }
-        return min(boardSize(depth: depth), depth + 2)
     }
     
     
     static func monsterTypes(depth: Depth, isTutorial: Bool) -> [EntityModel.EntityType: RangeModel] {
-        func matchUp(_ types: [EntityModel.EntityType], range: RangeModel, subRanges: Int) -> [EntityModel.EntityType: RangeModel] {
-            guard types.count == subRanges else { fatalError("The number of types nust match the number of subranges") }
-            let dividedMonsterRanges = range.divivdedIntoSubRanges(subRanges)
-            var count = 0
-            return types.reduce([:], { (prior, type) -> [EntityModel.EntityType: RangeModel] in
-                var new = prior
-                new[type] = dividedMonsterRanges[count]
-                count += 1
-                return new
-            })
-        }
         
         switch depth {
         case 0 where isTutorial:
@@ -239,8 +227,8 @@ struct LevelConstructor {
             let alamoRange = RangeModel(lower: 0, upper: 16)
             let dragonRange = alamoRange.next(18)
             let batRange = dragonRange.next(26)
-            let ratRange = batRange.next(10)
-            let sallyRange = ratRange.next(30)
+            let ratRange = batRange.next(15)
+            let sallyRange = ratRange.next(25)
             return [.rat: ratRange, .alamo: alamoRange, .dragon: dragonRange, .bat: batRange, .sally: sallyRange]
             
         case bossLevelDepthNumber:
@@ -298,7 +286,10 @@ struct LevelConstructor {
             
             
         default:
-            fatalError()
+            let ratRange = RangeModel(lower: 0, upper: 50)
+            let alamoRange = ratRange.next(50)
+            return [.rat: ratRange, .alamo: alamoRange]
+
         }
     }
 }

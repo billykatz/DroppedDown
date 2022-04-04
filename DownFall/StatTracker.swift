@@ -101,7 +101,7 @@ class RunStatTracker {
             self.addStat(Statistics(rockColor: color, amount: removedCount, statType: .rocksDestroyed), amount: removedCount)
             self.addStat(Statistics(amount: removedCount, statType: .totalRocksDestroyed), amount: removedCount)
             
-            if removedCount > runStats.first(where: { $0.statType == .largestRockGroupDestroyed })?.amount ?? 0 {
+            if removedCount > runStats.first(where: { $0.statType == .largestRockGroupDestroyed })?.statAmount ?? 0 {
                 self.addStat(Statistics(amount: removedCount, statType: .largestRockGroupDestroyed), amount: removedCount)
             }
             

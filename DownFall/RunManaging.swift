@@ -128,7 +128,7 @@ class RunModel: Codable, Equatable {
     func numberOfBossWins() -> Int {
         for stat in stats {
             if stat.statType == .totalWins {
-                return stat.amount
+                return stat.statAmount
             }
         }
         return 0

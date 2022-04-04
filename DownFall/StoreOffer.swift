@@ -257,7 +257,7 @@ extension StoreOffer {
             
         case .luck(let amount):
             title = "Luck Up"
-            body = "Increase the frequency and overall number of gems you find by \(amount)%."
+            body = "Increases the chance of good things happening by \(amount)%."
             textureName = "luck"
             
         case .plusTwoMaxHealth:

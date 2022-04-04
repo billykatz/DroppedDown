@@ -99,7 +99,7 @@ class LevelCoordinator: LevelCoordinating, GameSceneCoordinatingDelegate, CodexC
         let freshRunModel = RunModel(player: playerData, seed: seed, savedTiles: nil, areas: [], goalTracking: [], stats: [], startingUnlockables: profile.startingUnlockbles, isTutorial: { return tutorialConductor.isTutorial })
         
         self.runModel = runModel ?? freshRunModel
-        RunScope.deepestDepth = profile.stats.filter( { $0.statType == .lowestDepthReached }).map { $0.amount }.first ?? 0
+        RunScope.deepestDepth = profile.stats.filter( { $0.statType == .lowestDepthReached }).map { $0.statAmount }.first ?? 0
         presentCurrentArea(updatedPlayerData: playerData)
     }
     

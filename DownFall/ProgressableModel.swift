@@ -156,13 +156,13 @@ class CodexViewModel: ObservableObject {
     }
     
     func amountNeededToUnlock(_ unlockable: Unlockable) -> Int {
-        return relevantStatForUnlockable(unlockable)?.amount ?? 0
+        return relevantStatForUnlockable(unlockable)?.statAmount ?? 0
     }
     
     func unlockAt(_ unlockable: Unlockable) -> String {
-        let target = unlockable.stat.amount
+        let target = unlockable.stat.statAmount
         let relevantPlayerStat = relevantStatForUnlockable(unlockable)
-        let current = relevantPlayerStat?.amount ?? 0
+        let current = relevantPlayerStat?.statAmount ?? 0
         
         var value: String = ""
         var subject: String = ""
@@ -197,7 +197,7 @@ class CodexViewModel: ObservableObject {
             return "Reach depth \(target) to unlock this."
         } else if let statType = relevantPlayerStat?.statType, statType == .totalWins {
             if target == 1 {
-                return "Defeat the boss to unlock this"
+                return "Defeat the boss on depth 10 to unlock this"
             } else {
                 return "Defeat the boss \(target) times to unlock this"
             }

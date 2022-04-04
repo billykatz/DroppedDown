@@ -227,7 +227,7 @@ struct StatView: View {
             Text(stat.humanReadableForStatView())
                 .font(.statsStatFont)
             Spacer()
-            Text(verbatim: "\(stat.amount)")
+            Text(verbatim: "\(stat.statAmount)")
                 .font(.statsStatFont)
         }
 

@@ -862,30 +862,30 @@ func chanceDeltaOfferHealthBucket(playerData: EntityModel, currentChance: Float,
     
     // gives buffs based on need to heal
     if currHealth <= maxHealth / 4  {
-        delta = 5
+        delta = 3.5
     }
     else if currHealth <= maxHealth / 3 {
-        delta = 4
+        delta = 3.0
     } else if currHealth <= maxHealth / 2  {
-        delta = 3
-    } else if currHealth <= maxHealth / 4 * 3 {
         delta = 2.5
+    } else if currHealth <= maxHealth / 4 * 3 {
+        delta = 2.0
     } else if currHealth <= maxHealth / 6 * 5 {
-        delta = 2
+        delta = 1.5
     } else {
-        delta = 1.25
+        delta = 1.0
     }
     
     // gives buffs based on max health
     let totalUnderMaxHealthCap = maxIntendedHealthPerDepth(depth) - maxHealth
     if totalUnderMaxHealthCap >= 4 {
-        delta += 4
+        delta += 1.75
     } else if totalUnderMaxHealthCap >= 3 {
-        delta += 3
+        delta += 1.25
     } else if totalUnderMaxHealthCap >= 2 {
-        delta += 2
+        delta += 0.75
     } else if totalUnderMaxHealthCap >= 1 {
-        delta += 1.5
+        delta += 0.5
     } else {
         delta += 0
     }

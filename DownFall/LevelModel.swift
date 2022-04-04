@@ -862,16 +862,16 @@ func chanceDeltaOfferHealthBucket(playerData: EntityModel, currentChance: Float,
     
     // gives buffs based on need to heal
     if currHealth <= maxHealth / 4  {
-        delta = 3.5
+        delta = 2.25
     }
     else if currHealth <= maxHealth / 3 {
-        delta = 3.0
-    } else if currHealth <= maxHealth / 2  {
-        delta = 2.5
-    } else if currHealth <= maxHealth / 4 * 3 {
         delta = 2.0
-    } else if currHealth <= maxHealth / 6 * 5 {
+    } else if currHealth <= maxHealth / 2  {
+        delta = 1.75
+    } else if currHealth <= maxHealth / 4 * 3 {
         delta = 1.5
+    } else if currHealth <= maxHealth / 6 * 5 {
+        delta = 1.25
     } else {
         delta = 1.0
     }
@@ -889,6 +889,8 @@ func chanceDeltaOfferHealthBucket(playerData: EntityModel, currentChance: Float,
     } else {
         delta += 0
     }
+    
+    delta = min(3.5, delta)
     
     return delta * currentChance * modifier
 }
@@ -1275,13 +1277,13 @@ func deltaChanceOfferHealth(playerData: EntityModel, depth: Depth, storeOffer: S
         if originalHp >= maxIntendedHealthPerDepth(depth) {
             maxHealthChance = 0.1
         } else if originalHp >= maxIntendedHealthPerDepth(depth) - 1 {
-            maxHealthChance = 0.25
+            maxHealthChance = 0.5
         } else {
             switch depth {
             case 0, 1, 2, 3, 4:
                 maxHealthChance = 1.5
             case 5, 6, 7, 8:
-                maxHealthChance = 0.5
+                maxHealthChance = 0.75
             default:
                 maxHealthChance =  1
             }
@@ -1291,15 +1293,15 @@ func deltaChanceOfferHealth(playerData: EntityModel, depth: Depth, storeOffer: S
         if originalHp >= maxIntendedHealthPerDepth(depth) {
             maxHealthChance = 0.1
         } else if originalHp >= maxIntendedHealthPerDepth(depth) - 1 {
-            maxHealthChance = 0.2
+            maxHealthChance = 0.33
         } else if originalHp >= maxIntendedHealthPerDepth(depth) - 2 {
-            maxHealthChance = 0.4
+            maxHealthChance = 0.66
         } else {
             switch depth {
             case 0, 1, 2, 3, 4:
                 maxHealthChance = 1.5
             case 5, 6, 7, 8:
-                maxHealthChance = 0.5
+                maxHealthChance = 0.75
             default:
                 maxHealthChance =  1
             }

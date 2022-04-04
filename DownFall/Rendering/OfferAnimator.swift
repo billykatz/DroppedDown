@@ -844,10 +844,10 @@ extension Animator {
                 gemAmount += amount
             }
             
-            if gemAmount > 0{
+            if gemAmount > 0 {
                 
                 totalGemsCollected += gemAmount
-                let waitPerGem = 0.07
+                let waitPerGem = 0.025
                 var zPosition: CGFloat = 1_000_000
                 
                 sprites[coord.row][coord.col].alpha = 0.0

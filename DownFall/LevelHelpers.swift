@@ -234,16 +234,13 @@ func baseChanceEncasementOffers(depth: Depth, playerData: EntityModel, startingU
         
     case bossLevelDepthNumber:
         let tier1Health: ChanceModel = .init(tileType: tier1HealthOption, chance: 33)
-        let tier2Health: ChanceModel = .init(tileType: tier2HealthOption, chance: 66)
-        let batMonsterChance1: ChanceModel = .init(tileType: batMonsterType, chance: 10000)
-        let batMonsterChance2: ChanceModel = .init(tileType: batMonsterType, chance: 10000)
+        let tier2Health: ChanceModel = .init(tileType: tier2HealthOption, chance: 33)
+        let batMonsterChance1: ChanceModel = .init(tileType: batMonsterType, chance: 33)
         
         let chanceModel: [ChanceModel] = [
             tier1Health, tier2Health,
-            batMonsterChance1, batMonsterChance2
-        ].compactMap {
-            chanceDeltaEncasementOffer(encasedOfferChanceModel: $0, playerData: playerData, lastLevelFeatures: lastLevelFeatures)
-        }
+            batMonsterChance1
+        ]
         
         return chanceModel
 

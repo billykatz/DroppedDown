@@ -702,6 +702,9 @@ class MenuSpriteNode: SKSpriteNode, ButtonDelegate {
 //            soundIcon.texture = newTexture
             
         case .toggleShowGroupNumber:
+            #if DEBUG
+            InputQueue.append(.init(.gameWin(2)))
+            #endif
             let show = UserDefaults.standard.bool(forKey: UserDefaults.showGroupNumberKey)
             UserDefaults.standard.setValue(!show, forKey: UserDefaults.showGroupNumberKey)
             

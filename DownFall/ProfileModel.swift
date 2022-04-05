@@ -161,7 +161,7 @@ class Profile: Codable, Equatable {
     }
     
     func updateStatistic(_ stat: Statistics, amount: Int, overwriteIfLarger: Bool = false) -> Profile {
-        guard (!overwriteIfLarger || (overwriteIfLarger && amount > firstStat(stat)?.statAmount ?? 0)),
+        guard (!overwriteIfLarger || (overwriteIfLarger && amount >= firstStat(stat)?.statAmount ?? 0)),
               let statIndex = firstIndexStat(stat)
         else {
             print("couln't find stat \(stat.debugDescription())")

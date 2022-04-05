@@ -200,7 +200,7 @@ class ProfileViewModel {
             }
             
             // update lowest depth if needed
-            newProfile = newProfile.updateStatistic(.lowestDepthReached, amount: (currentRun?.depth ?? 0) + 1, overwriteIfLarger: true)
+            newProfile = newProfile.updateStatistic(.lowestDepthReached, amount: currentRun?.depth ?? 0, overwriteIfLarger: true)
         } else {
             GameLogger.shared.log(prefix: Constants.tag, message: "Finished Run.  Not double saving stats.")
         }

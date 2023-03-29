@@ -132,20 +132,7 @@ class MainMenu: SKScene {
         statsViewButton.run(buttonFadeInAction)
         
         
-        /// Feedback button
-//        let feedbackButton = ShiftShaft_Button(size: .buttonMainMenu, delegate: self, identifier: .mainMenuFeedback, image: SKSpriteNode(imageNamed: Constants.blankButtonName), shape: .rectangle, addTextLabel: true, fontType: .small, fontSize: 120.0)
-//
-//        feedbackButton.position = CGPoint.alignHorizontally(statsViewButton.frame,
-//                                                            relativeTo: statsViewButton.frame,
-//                                                            horizontalAnchor: .center,
-//                                                            verticalAlign: .bottom,
-//                                                            verticalPadding: Constants.buttonPadding,
-//                                                            translatedToBounds: true)
-//        feedbackButton.zPosition = 0
-//
-//        buttonContainer.addChild(feedbackButton)
-//        feedbackButton.alpha = 0
-//        feedbackButton.run(buttonFadeInAction)
+       
         
         /// Feedback button
         let creditsButton = ShiftShaft_Button(size: .buttonMainMenu, delegate: self, identifier: .mainMenuCredits, image: SKSpriteNode(imageNamed: Constants.blankButtonName), shape: .rectangle, addTextLabel: true, fontType: .small, fontSize: 120.0)
@@ -161,6 +148,24 @@ class MainMenu: SKScene {
         buttonContainer.addChild(creditsButton)
         creditsButton.alpha = 0
         creditsButton.run(buttonFadeInAction)
+        
+//        #if DEBUG
+//        /// Feedback button
+//        let feedbackButton = ShiftShaft_Button(size: .buttonMainMenu, delegate: self, identifier: .mainMenuFeedback, image: SKSpriteNode(imageNamed: Constants.blankButtonName), shape: .rectangle, addTextLabel: true, fontType: .small, fontSize: 120.0)
+//
+//        feedbackButton.position = CGPoint.alignHorizontally(feedbackButton.frame,
+//                                                            relativeTo: creditsButton.frame,
+//                                                            horizontalAnchor: .center,
+//                                                            verticalAlign: .bottom,
+//                                                            verticalPadding: Constants.buttonPadding,
+//                                                            translatedToBounds: true)
+//        feedbackButton.zPosition = 0
+//
+//        buttonContainer.addChild(feedbackButton)
+//        feedbackButton.alpha = 0
+//        feedbackButton.run(buttonFadeInAction)
+//        
+//        #endif
         
         
         // animate the buttons to move slightly up

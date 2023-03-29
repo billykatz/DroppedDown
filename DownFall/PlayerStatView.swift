@@ -308,6 +308,9 @@ struct PlayerStatsView: View {
     
     var body: some View {
         ScrollView{
+#if DEBUG
+ResetDataView(action: viewModel.deletePlayerData)
+#endif
             if (hiddenTrigger >= 0) {
                 ForEach(playerStatistics) {  stat in
                     if (StatisticType.statTypeIsInGame(stat.statType) && hiddenTrigger >= 0) {
@@ -320,9 +323,7 @@ struct PlayerStatsView: View {
                     hiddenTrigger += 1
                 })
             }
-#if DEBUG
-ResetDataView(action: viewModel.deletePlayerData)
-#endif
+
 #if DEBUG
             MusicIntroFadeInDurationView()
 #endif

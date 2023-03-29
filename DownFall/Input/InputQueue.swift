@@ -83,7 +83,6 @@ struct InputQueue {
                 gameState.enter(input)
 #if DEBUG
                 GameLogger.shared.log(prefix: Constants.tag, message: "[Input Queue] Entering \(gameState.state) with \(input).  Last game state \(oldGameState.state)")
-                print()
                 if case let InputType.transformation(trans) = input.type {
                     if let first = trans.first?.inputType {
                         GameLogger.shared.log(prefix: Constants.tag, message: "[Input Queue] The transformation is \(first))")

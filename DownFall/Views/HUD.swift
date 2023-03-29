@@ -103,12 +103,14 @@ class HUD: SKSpriteNode {
             default:
                 ()
             }
-        case .boardBuilt,. boardLoaded:
+        case .boardBuilt, .boardLoaded:
             guard let tiles = input.endTilesStruct,
                   let playerPosition = getTilePosition(.player(.zero), tiles: tiles),
                   case let TileType.player(data) = tiles[playerPosition].type else { return }
             show(data)
             
+            // tiles = new Dictionary<Vector2, Tile>
+            // tiles[Vector2(1, 1)]
         default:
             ()
         }

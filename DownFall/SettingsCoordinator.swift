@@ -31,6 +31,8 @@ class SettingsCoordinator {
         let hostingViewController = UIHostingController(rootView: settingsView)
         hostingViewController.bottomBlack()
         
+        
+        viewController.setNavigationBarHidden(false, animated:true)
         viewController.pushViewController(hostingViewController, animated: true)
     }
     

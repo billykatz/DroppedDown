@@ -46,8 +46,10 @@ class CodexCoordinator {
         titleLabel.textAlignment = .center
         titleLabel.font = .bigTitleCodexFont
         
-        
         hostingViewController.navigationItem.titleView = titleLabel
+        hostingViewController.navigationItem.backButtonTitle = "Back"
+        
+        navigationController.setNavigationBarHidden(false, animated:true)
         navigationController.pushViewController(hostingViewController, animated: true)
         
         self.startRunCallback = startRunCallback
@@ -62,7 +64,6 @@ class CodexCoordinator {
     }
     
     func startRunPressed() {
-        //        hostingViewController.dismiss(animated: true)
         navigationController.popViewController(animated: true)
         startRunCallback()
         delegate?.startRunPressed()

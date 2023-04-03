@@ -39,6 +39,8 @@ class CreditsCoordinator {
         
         
         hostingViewController.navigationItem.titleView = titleLabel
+        
+        navigationController.setNavigationBarHidden(false, animated:true)
         navigationController.pushViewController(hostingViewController, animated: true)
     }
     

@@ -50,7 +50,8 @@ extension TileType {
                                             animations: [],
                                             effects: [],
                                             dodge:0,
-                                            luck: 0)
+                                            luck: 0,
+                                            killedBy: nil)
         )
     }
     
@@ -94,17 +95,20 @@ extension TileType {
                                             animations: animations,
                                             effects: [],
                                             dodge:0,
-                                            luck: 0
-                                            ))
+                                            luck: 0,
+                                            killedBy: nil)
+        )
     }
     
     static func createPlayer(originalHp: Int = 1,
                              hp: Int = 1,
-                             name: String = "player2",
+                             name: String = "player",
                              attack: AttackModel = AttackModel.pickaxe,
                              type: EntityModel.EntityType = .player,
                              carry: CarryModel = .zero,
-                             animations: [AnimationModel] = []) -> TileType {
+                             animations: [AnimationModel] = [],
+                             pickaxe: Pickaxe? = nil
+    ) -> TileType {
         return TileType.player(EntityModel(originalHp: originalHp,
                                            hp: hp,
                                            name: name,
@@ -112,10 +116,12 @@ extension TileType {
                                            type: type,
                                            carry: carry,
                                            animations: animations,
-                                           pickaxe: Pickaxe(runeSlots: 0, runes: []),
+                                           pickaxe: pickaxe ?? Pickaxe(runeSlots: 1, runes: []),
                                            effects: [],
                                            dodge:0,
-                                           luck: 0))
+                                           luck: 0,
+                                           killedBy: nil)
+        )
         
     }
     
@@ -145,6 +151,36 @@ extension TileType {
     static var normalPlayer: TileType {
         return createPlayer()
     }
+    
+    static var normalPlayerWithTeleportation: TileType {
+        let teleportRune = Rune.rune(for: .teleportation, isCharged: true)
+        return createPlayer(pickaxe: Pickaxe(runeSlots: 1, runes: [teleportRune]))
+    }
+    
+    static var normalPlayerWithTeleportationAndFieryRage: TileType {
+        let teleportRune = Rune.rune(for: .teleportation, isCharged: true)
+        let fieryRageRune = Rune.rune(for: .fieryRage, isCharged: true)
+        return createPlayer(pickaxe: Pickaxe(runeSlots: 2, runes: [teleportRune, fieryRageRune]))
+    }
+    
+    static var normalPlayerWithUnchargedMonsterCrush: TileType {
+        let rune = Rune.rune(for: .monsterCrush, isCharged: false)
+        return createPlayer(pickaxe: Pickaxe(runeSlots: 1, runes: [rune]))
+    }
+
+    static var normalPlayerWithChargedMonsterCrush: TileType {
+        let rune = Rune.rune(for: .monsterCrush, isCharged: true)
+        return createPlayer(pickaxe: Pickaxe(runeSlots: 1, runes: [rune]))
+    }
+    
+    static var normalPlayerWithChargedMonsterCrushAndFieryRage: TileType {
+        let rune = Rune.rune(for: .monsterCrush, isCharged: false)
+        let rune2 = Rune.rune(for: .fieryRage, isCharged: true)
+        return createPlayer(pickaxe: Pickaxe(runeSlots: 2, runes: [rune, rune2]))
+    }
+
+    
+
     
     
     static var strongPlayer: TileType {

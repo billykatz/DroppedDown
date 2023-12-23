@@ -7,6 +7,19 @@
 //
 
 enum ButtonIdentifier: String {
+    
+    case mainMenuAbandonTutorial
+    case mainMenuAbandonRun
+    case mainMenuContinueRun
+    case mainMenuContinueTutorial
+    
+    case yesAbandonRun
+    case doNotAbandonRun
+    case doNotAbandonTutorial
+    case yesSkipTutorial
+    
+    case runeReplacementCancel
+    
     case resume
     case playAgain
     case selectLevel
@@ -22,16 +35,20 @@ enum ButtonIdentifier: String {
     case purchase
     case sell
     case close
+    
+    // MARK:- Rune Use
     case backpack
     case backpackSelect
     case backpackCancel
     case backpackConfirm
+    case runeUseConfirmBeforeReady
+    
+    
     case mainMenu
+    case pausedExitToMainMenu
+    case tutorialPausedExitToMainMenu
     case cycleLevel
     case seeInventory
-    case shuffleBoard
-    case runeReplaceCancel
-    case runeReplaceConfirm
     case okay
     case sellHealth
     case buyHealth
@@ -44,16 +61,60 @@ enum ButtonIdentifier: String {
     case selectProfile
     case newProfile
     case resetData
-    case mainMenuOptions
-    case mainMenuStore
+    
+    // Main Menu
+    case mainMenuStats
+    case mainMenuFeedback
+    case mainMenuCredits
+    
+    case mainMenuSwipeScreenshot
+    
     case continueRun
     case discardFoundRune
     case swapRunes
+    
+    // Options
     case toggleSound
+    case toggleMusic
+    case toggleShowGroupNumber
+    
     case givePlayerRune
     case debugPause
     case debugWin
-    case debugLose
+    
+    case gameMenuOptions
+    case soundOptionsBack
+    
+    case tutorialMenuOptions
+    case tutorialSoundOptionsBack
+    
+    // game recap
+    case gameRecapViewBoard
+    case gameRecapShowRecap
+    
+    // shuffle board
+    case confirmShufflePay2Hearts
+    case confirmShufflePay25Percent
+    
+    
+    // Boss test scene buttons
+    case echoEffect
+    case walkEffect
+    case tiltHead
+    case chompTeeth
+    case lightBite
+    case angryEyes
+    case idlePhase1
+    case rockTrio
+    case rearUp
+    case groundPound
+    case resetPositions
+    case poisonBeamAttack
+    case webAttack
+    case eyesTurnRed
+    case oneEyeTurnsYellow
+    case worried
+    case bossStomps
     
     var title: String {
         switch self {
@@ -70,7 +131,7 @@ enum ButtonIdentifier: String {
         case .visitStore:
             return "Continue"
         case .newGame:
-            return "New Game"
+            return "New Run"
         case .back:
             return "Back"
         case .startTutorial:
@@ -87,18 +148,24 @@ enum ButtonIdentifier: String {
             return "Cancel"
         case .backpackConfirm:
             return "Confirm"
-        case .mainMenu:
-            return "Main Menu"
+            
+        // MAIN MENU BUTTONS
+        case .mainMenu, .pausedExitToMainMenu:
+            return "Exit to Menu"
+        case .tutorialPausedExitToMainMenu:
+            return "Skip Tutorial"
+        case .mainMenuAbandonTutorial:
+            return "(Not recommended)\nSkip tutorial"
+        case .mainMenuContinueTutorial:
+            return "Continue tutorial"
+        case .mainMenuCredits:
+            return "Credits"
+            
+            
         case .cycleLevel:
             return "Level select"
         case .seeInventory:
             return "Inventory"
-        case .shuffleBoard:
-            return "Pay 2 \u{2665}: Shuffle board"
-        case .runeReplaceCancel:
-            return "Cancel"
-        case .runeReplaceConfirm:
-            return "Confirm"
         case .okay:
             return "Okay"
         case .selectProfile:
@@ -107,27 +174,107 @@ enum ButtonIdentifier: String {
             return "Delete Remote profile"
         case .resetData:
             return "Reset Data"
-        case .mainMenuStore:
-            return "Store"
-        case .mainMenuOptions:
+        case .mainMenuStats:
             return "Stats"
         case .discardFoundRune:
-            return "Discard"
+            return "Discard Found Rune"
         case .swapRunes:
-            return "Swap"
+            return "Swap Runes"
         case .toggleSound:
-            return "Toggle Sound"
+            return "Sound"
+        case .toggleMusic:
+            return "Music"
+        case .toggleShowGroupNumber:
+            return "Rock Group Total"
         case .givePlayerRune:
             return "Give Player Random Rune"
+            
+            
         case .debugPause:
             return "Debug Pause"
         case .debugWin:
             return "Debug Win"
-        case .debugLose:
-            return "Debug Lose"
+            
+        case .yesAbandonRun, .mainMenuAbandonRun:
+            return "Abandon run"
         
-        case .wallet, .infoPopup, .storeItem, .backpack, .sellHealth, .buyHealth, .sellDodge, .buyDodge, .sellLuck, .buyLuck, .buyRuneSlot, .sellRuneSlot:
+        case .yesSkipTutorial:
+            return "Skip tutorial"
+            
+        case .doNotAbandonRun, .doNotAbandonTutorial:
+            return "Cancel"
+            
+        case .mainMenuContinueRun:
+            return "Continue run"
+            
+        case .mainMenuFeedback:
+            return "Feedback"
+            
+        case .soundOptionsBack, .tutorialSoundOptionsBack:
+            return "Back"
+        
+        case .gameMenuOptions, .tutorialMenuOptions:
+            return "Options"
+            
+        case .gameRecapViewBoard:
+            return "Show board"
+            
+        case .gameRecapShowRecap:
+            return "Show recap"
+            
+            
+        case .confirmShufflePay2Hearts:
+            return "Offer 2 hearts"
+        
+        case .confirmShufflePay25Percent:
+            return "Offer 25% of gems"
+            
+        
+        case .wallet, .infoPopup, .storeItem, .backpack, .sellHealth, .buyHealth, .sellDodge, .buyDodge, .sellLuck, .buyLuck, .buyRuneSlot, .sellRuneSlot, .runeReplacementCancel, .runeUseConfirmBeforeReady:
             return ""
+            
+            
+        // Boss Test Scene Button cases
+        case .echoEffect:
+            return "Echo"
+        case .walkEffect:
+            return "Walk"
+        case .tiltHead:
+            return "Tilt"
+        case .chompTeeth:
+            return "Chomp"
+        case .lightBite:
+            return "Bite"
+        case .angryEyes:
+            return "Angry Eyes"
+        case .idlePhase1:
+            return "Idle Phase 1"
+        case .rockTrio:
+            return "Rock Trio"
+        case .rearUp:
+            return "Rear Up"
+        case .groundPound:
+            return "Ground Pound"
+        case .resetPositions:
+            return "Reset Positions"
+        case .poisonBeamAttack:
+            return "Poison Beam"
+        case .webAttack:
+            return "Web Attack"
+        case .eyesTurnRed:
+            return "Eyes Red"
+        case .oneEyeTurnsYellow:
+            return "1 Eye Yellow"
+        case .worried:
+            return "Worried"
+        case .bossStomps:
+            return "Stomps"
+            
+            
+        /// screen shot stuff
+        case .mainMenuSwipeScreenshot:
+            return "Swipe"
+        
         }
     }
 }

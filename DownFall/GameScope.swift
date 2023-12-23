@@ -7,6 +7,7 @@
 //
 
 import CoreGraphics
+import UIKit
 
 /// Singleton to hold references to game-wide variables
 final class GameScope {
@@ -20,9 +21,21 @@ final class GameScope {
     var difficulty: Difficulty
     let profileManager: ProfileManaging = ProfileLoadingManager()
     
+    var screenSize: CGSize {
+        guard let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) else {
+            return .zero
+        }
+
+        let windowWidth = window.frame.width
+        let windowHeight = window.frame.height
+        return CGSize(width: windowWidth, height: windowHeight)
+    }
+    
     init(difficulty: Difficulty) {
         self.difficulty = difficulty
     }
+    
+    
     
     deinit {
         GameLogger.shared.log(prefix: Constants.tag, message: "GameScopre has been deinited")

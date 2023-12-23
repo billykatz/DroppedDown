@@ -1,0 +1,183 @@
+//
+//  BossView.swift
+//  DownFall
+//
+//  Created by Billy on 11/18/21.
+//  Copyright © 2021 William Katz LLC. All rights reserved.
+//
+
+import SpriteKit
+
+class BossView: SKSpriteNode {
+    
+    struct Constants {
+        static let yellowReticleName = "target-minion"
+        static let dynamiteReticleName = "target-dynamite"
+        static let poisonReticleName = "target-poison"
+    }
+    
+    public let bossSprite: BossSprite
+    private let tileSize: CGFloat
+    private let playableRect: CGRect
+    private let spriteProvider: () -> [[DFTileSpriteNode]]
+    private lazy var sprites: [[DFTileSpriteNode]] = {
+        return spriteProvider()
+    }()
+    
+    // all sprites are added to this container
+    private let containerView: SKSpriteNode
+    
+    private let bossDialogController: BossDialogController
+    private let bossDialogContainerView: SKSpriteNode
+    
+    
+    // state variables to reset the reticles when needed
+    private var dynamiteTargetToAttack: [SKSpriteNode] = []
+    private var poisonColumnsTargetToAttack: [SKSpriteNode] = []
+    private var spawnSpiderTargetToAttack: [SKSpriteNode] = []
+     
+    init(playableRect: CGRect, tileSize: CGFloat, numberOfPreviousBossWins: Int, spriteProvider: @escaping () -> [[DFTileSpriteNode]]) {
+        self.playableRect = playableRect
+        self.spriteProvider = spriteProvider
+        self.tileSize = tileSize
+        
+        self.containerView = SKSpriteNode(color: .clear, size: playableRect.size)
+        containerView.zPosition = 5_000
+        
+        /// BOSS DIALOG
+        self.bossDialogContainerView = SKSpriteNode(color: .clear, size: playableRect.size)
+        self.bossDialogController = BossDialogController(foreground: bossDialogContainerView, playableRect: playableRect, numberOfPreviousBossWins: numberOfPreviousBossWins)
+        
+        self.bossSprite = BossSprite(playableRect: playableRect)
+        
+        bossSprite.position = CGPoint.position(bossSprite.frame, inside: playableRect, verticalAlign: .top, horizontalAnchor: .center, yOffset: 240)
+        bossSprite.zPosition = 100_000
+        
+        super.init(texture: nil, color: .clear, size: playableRect.size)
+        
+        self.isUserInteractionEnabled = false
+        
+        addChild(containerView)
+        containerView.addChild(bossSprite)
+        
+        /// BOSS DIALOG
+        addChild(bossDialogContainerView)
+        
+        Dispatch.shared.register { [weak self] input in
+            self?.handleInput(input)
+        }
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func handleInput(_ input: Input) {
+        switch input.type {
+        case .transformation(let trans):
+            if let firstTrans = trans.first {
+                switch firstTrans.inputType {
+                case .bossTurnStart(let phase):
+                    handleBossTurnStart(phase: phase, transformation: firstTrans)
+                default:
+                    break
+                }
+            }
+        case .bossTurnStart(let phase):
+            handleBossTurnStart(phase: phase)
+        case .bossPhaseStart(let phase):
+            handleBossPhaseStart(phase: phase)
+        default:
+            break
+        }
+    }
+    
+    func handleBossTurnStart(phase: BossPhase, transformation: Transformation? = nil) {
+        switch phase.bossState.stateType {
+        case .targetAttack(type: let attack):
+            if let dynamiteTargets = phase.bossState.targets.whatToAttack?[.dynamiteType],
+               attack.type == .dynamite {
+                showDynamiteReticles(dynamiteTargets)
+            }
+            
+            if let poisonTargets = attack.poisonAttack {
+                showPoisonReticles(poisonTargets)
+            }
+            
+            if case BossAttackType.spawnMonster = attack.type {
+                let spawnMonsterTargets = phase.bossState.targets.whereToSpawnMonstersCoordinates
+                showSpawnSpiderReticles(spawnMonsterTargets)
+            }
+            
+        case .attack:
+            if (transformation != nil) {
+                resetReticles()
+            }
+        default:
+            break
+        }
+    }
+    
+    func handleBossPhaseStart(phase: BossPhase) {
+        resetReticles()
+    }
+    
+    
+    func resetReticles() {
+        dynamiteTargetToAttack.forEach { $0.removeFromParent() }
+        poisonColumnsTargetToAttack.forEach { $0.removeFromParent() }
+        spawnSpiderTargetToAttack.forEach { $0.removeFromParent() }
+    }
+    
+    
+    func showDynamiteReticles(_ dynamiteTargets: [TileCoord]) {
+        for target in dynamiteTargets {
+            let redReticle = SKSpriteNode(texture: SKTexture(imageNamed: Constants.dynamiteReticleName), size: CGSize(width: tileSize, height: tileSize))
+            let targetedTilePosition = sprites[target].position
+            redReticle.position = targetedTilePosition
+            dynamiteTargetToAttack.append(redReticle)
+            containerView.addChild(redReticle)
+        }
+    }
+    
+    func showPoisonReticles(_ poisonAttacks: [PoisonAttack]) {
+        for attack in poisonAttacks {
+            if attack.attackType == .columnDown {
+                let column = attack.index
+                let poisonReticleSize = CGSize(width: tileSize, height: 48 / (109/tileSize))
+                let poisonReticle = SKSpriteNode(texture: SKTexture(imageNamed: Constants.poisonReticleName), size: poisonReticleSize)
+                let topSprite = sprites[sprites.count-1][column]
+                
+                poisonReticle.position = CGPoint.position(poisonReticle.frame, inside: topSprite.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: -30, translatedToBounds: true)
+                
+                poisonColumnsTargetToAttack.append(poisonReticle)
+                containerView.addChild(poisonReticle)
+                
+            } else {
+                let row = attack.index
+                let poisonReticleSize = CGSize(width: tileSize, height: 48 / (109/tileSize))
+                let poisonReticle = SKSpriteNode(texture: SKTexture(imageNamed: Constants.poisonReticleName), size: poisonReticleSize)
+                let leftSprite = sprites[row][0]
+                poisonReticle.zRotation = .pi * 1 / 2
+                
+                poisonReticle.position = CGPoint.position(poisonReticle.frame, inside: leftSprite.frame, verticalAlign: .center, horizontalAnchor: .left, xOffset: -30, translatedToBounds: true)
+                
+                poisonColumnsTargetToAttack.append(poisonReticle)
+                containerView.addChild(poisonReticle)
+
+            }
+        }
+    }
+    
+    func showSpawnSpiderReticles(_ spiderTargets: [TileCoord]) {
+        for target in spiderTargets {
+            let yellowReticle = SKSpriteNode(texture: SKTexture(imageNamed: Constants.yellowReticleName), size: CGSize(width: tileSize, height: tileSize))
+            let targetedTilePosition = sprites[target].position
+            yellowReticle.position = targetedTilePosition
+            spawnSpiderTargetToAttack.append(yellowReticle)
+            containerView.addChild(yellowReticle)
+        }
+
+    }
+    
+}

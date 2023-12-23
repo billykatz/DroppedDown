@@ -17,7 +17,7 @@ extension Int: Sequence {
 }
 
 func entities() -> EntitiesModel {
-    guard let data = try! Data.data(from: "EntityTest") else {
+    guard let data = try! Data.data(from: "entities") else {
         return EntitiesModel(entities: [])
     }
     do {
@@ -32,8 +32,9 @@ extension Board {
     convenience init(tiles: [[Tile]]) {
         let tileCreator = TileCreator(entities(),
                                       difficulty: .normal,
-                                      level: Level.zero, randomSource: GKLinearCongruentialRandomSource())
-        self.init(tileCreator: tileCreator, tiles: tiles, level: Level.zero)
+                                      level: Level.zero, randomSource: GKLinearCongruentialRandomSource(), tutorialConductor: TutorialConductor())
+        self.init(tileCreator: tileCreator, tiles: tiles, level: Level.zero, boardLoaded: false,
+                  tutorialConductor: nil)
     }
 }
 
@@ -131,8 +132,8 @@ extension TileType {
 func win(_ board: Board) -> Builder {
     return { board in
         guard board.boardSize > 1 else { return board } //cant win if there is only 1 row
-        let playerPosition = typeCount(for: board.tiles, of: .player(.zero)).first
-        let exitPosition = typeCount(for: board.tiles, of: .exit(blocked: false)).first
+        let playerPosition = tileCoords(for: board.tiles, of: .player(.zero)).first
+        let exitPosition = tileCoords(for: board.tiles, of: .exit(blocked: false)).first
         var newTiles = board.tiles
         
         if let pp = playerPosition, let ep = exitPosition {
@@ -196,7 +197,7 @@ func playerAttacks(_ board: Board,
                    _ player: Tile = Tile(type: .player(.zero))) -> Builder {
     return { board in
         guard board.boardSize > 1 else { return board }
-        let playerPosition = typeCount(for: board.tiles, of: .player(.zero)).first
+        let playerPosition = tileCoords(for: board.tiles, of: .player(.zero)).first
         var newTiles = board.tiles
         
         if let pp = playerPosition{

@@ -15,9 +15,18 @@ struct AttackSlope: Hashable, Codable {
     
     static var playerPossibleAttacks: [AttackSlope] {
         return [
-            AttackSlope(over: -1, up: 0),
             AttackSlope(over: 0, up: 1),
             AttackSlope(over: 0, up: -1),
+            AttackSlope(over: -1, up: 0),
+            AttackSlope(over: 1, up: 0)
+        ]
+    }
+    
+    static var orthogonalDirectionAttacks: [AttackSlope] {
+        return [
+            AttackSlope(over: 0, up: 1),
+            AttackSlope(over: 0, up: -1),
+            AttackSlope(over: -1, up: 0),
             AttackSlope(over: 1, up: 0)
         ]
     }

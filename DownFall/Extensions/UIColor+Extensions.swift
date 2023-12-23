@@ -24,12 +24,21 @@ extension UIColor {
             blue: rgb & 0xFF
         )
     }
+    
+     // Menu
+    static let menuPurple = UIColor(rgb: 0x4c2f84)
+    static let menuBorderGray = UIColor(rgb: 0x6C717E)
+    
+    // Buttons
+    static let buttonDestructiveRed = UIColor(rgb: 0xCA0000)
+    static let buttonGray = UIColor(rgb: 0xc4c4c4)
+    
+    // BG Gray
     static let backgroundGray = UIColor(rgb: 0x262626)
     static let clayRed: UIColor = UIColor(rgb: 0x9c461f)
-    static let storeDarkGray = UIColor(rgb: 0x404040)
-    static let storeBlack = UIColor(rgb: 0x171717)
-    static let menuPurple = UIColor(rgb: 0x4c2f84)
+    
     static let foregroundBlue = UIColor(rgb: 0x6885ac)
+    static let tileDetailViewBackground = UIColor(rgb: 0xB2B5C2)
     static let eggshellWhite = UIColor(rgb: 0xc7c6c2)
     static let storeItemBackgroundNotSelected = UIColor(rgb: 0x8fa9af)
 
@@ -47,18 +56,22 @@ extension UIColor {
     static let lightBarGem = UIColor(rgb: 0x9edfc6)
     static let lightBarRune = UIColor(rgb: 0xafafaf)
     static let darkBarRune = UIColor(rgb: 0x817e7e)
-    static let lightBarPillar = UIColor(rgb: 0xe2eb3d)
-    static let darkBarPillar = UIColor(rgb: 0xd0d936)
+    static let lightBarPillar = UIColor(rgb: 0xA0D398)
+    static let darkBarPillar = UIColor(rgb: 0x4C7D44)
     static let lightBarBlood = UIColor(rgb: 0xD22E35)
     static let darkBarBlood = UIColor(rgb: 0x9A1F2F)
+    
+    static let lightBarBrown = UIColor(rgb: 0xB58759)
+    static let darkBarBrown = UIColor(rgb: 0x654425)
 
     /// Rune colors
     static let goldOutlineDull = UIColor(rgb: 0x9E8B2C)
     static let goldOutlineBright = UIColor(rgb: 0xFDD300)
     static let runeBackgroundColor = UIColor(rgb: 0x522B28)
     
-    /// Rune Deteail color
-    static let runeDetailColor = UIColor(rgb: 0x572d29)
+    /// Rune Detail color
+    static let runeDetailFillColor = UIColor(rgb: 0x572d29)
+    static let runeDetailBorderColor = UIColor(rgb: 0x512F2A)
     
     /// Confirmation button
     static let confirmButtonColor = UIColor(rgb: 0x177a31)
@@ -72,5 +85,22 @@ extension UIColor {
     static let codexRedText = UIColor(rgb: 0xFF5050)
     static let codexDarkGray = UIColor(rgb: 0x999999)
     static let codexButtonLightGray = UIColor(rgb: 0xDEDEDE)
+    
+    // Rune replacement
+    static let runeInfoBorder = UIColor(rgb: 0x924A29)
+    static let runeReplacementBackgroundFillBlue = UIColor(rgb: 0x314768)
+    static let runeReplacementBackgroundStrokeBlue = UIColor(rgb: 0x8091AB)
+    static let runeReplacementEmptyPanelBackground = UIColor(rgb: 0x182334)
+    
+    // Rune Use colors
+    static let runeChargedYellow = UIColor(rgb: 0xFDD300)
+    static let runeIllegalTargetsRed = UIColor(rgb: 0xFF0909)
+    
+    
+    // Dialogue
+    static let dialogueBoxBackground = UIColor(rgb: 0x508D9A)
+    
+    // GAme recap
+    static let gameRecapBlue = UIColor(rgb: 0x566C8F)
     
 }

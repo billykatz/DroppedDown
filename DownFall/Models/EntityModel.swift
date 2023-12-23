@@ -25,8 +25,28 @@ struct Pickaxe: Equatable, Codable, Hashable {
         })
     }
     
+    func replaceRune(_ runeToReplace: Rune, withNewRune newRune: Rune) -> Pickaxe {
+        return Pickaxe(runeSlots: self.runeSlots, runes: self.runes.map {
+            if $0 == runeToReplace {
+                return newRune
+            } else {
+                return $0
+            }
+        })
+    }
+    
     func isAtMaxCapacity() -> Bool {
         return runeSlots != Pickaxe.maxRuneSlots && runes.count == runeSlots
+    }
+    
+    func chargeAllRunes() -> Pickaxe {
+        var newRunes: [Rune] = []
+        for rune in runes {
+            let chargedRune = rune.fullyCharge()
+            newRunes.append(chargedRune)
+        }
+        let newPickaxe = Pickaxe(runeSlots: self.runeSlots, runes: newRunes)
+        return newPickaxe
     }
 }
 
@@ -36,7 +56,7 @@ struct EntityModel: Equatable, Codable {
     static let maxPlayerLuck = 15
     static let maxPlayerDodge = 15
     
-    enum EntityType: String, Codable, CaseIterable {
+    enum EntityType: String, Codable, CaseIterable, Hashable {
         case bat
         case rat
         case dragon
@@ -45,6 +65,11 @@ struct EntityModel: Equatable, Codable {
         case lavaHorse
         case player
         case sally
+        case spider
+        
+        static var monstersCases: [EntityType] {
+            return [.bat, .rat, .dragon, .alamo, .sally]
+        }
         
         var humanReadable: String {
             switch self {
@@ -53,29 +78,63 @@ struct EntityModel: Equatable, Codable {
             case .rat:
                 return "Matt the Rat"
             case .dragon:
-                return "Dragon"
+                return "Draz the Dragon"
             case .alamo:
                 return "Alamo the Tree"
             case .sally:
                 return "Sally the Salamander"
             case .player:
                 return "Player"
+            case .spider:
+                return "Spider Minion"
             default:
                 return self.rawValue
             }
+        }
+        
+        var humanReadableTypeName: String {
+            switch self {
+            case .bat:
+                return "Bat"
+            case .rat:
+                return "Rat"
+            case .dragon:
+                return "Dragon"
+            case .alamo:
+                return "Tree"
+            case .sally:
+                return "Salamander"
+            case .player:
+                return "Player"
+            case .spider:
+                return "Spider"
+            default:
+                return self.rawValue
+            }
+        }
+
+        
+        var textureString: String {
+            return self.rawValue
         }
     }
     
     static let playerCases: [EntityType] = [.player]
     
-    static let zero: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .rat, carry: .zero, animations: [], effects: [], dodge: 0, luck: 0)
+    static let zero: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .rat, carry: .zero, animations: [], effects: [], dodge: 0, luck: 0, killedBy: nil)
     
-    static let lotsOfCash: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .rat, carry: CarryModel(items: [Item(type: .gem, amount: 1000, color: .blue)]), animations: [], effects: [], dodge: 0, luck: 0)
+    static let ratZero: EntityModel = EntityModel(originalHp: 1, hp: 1, name: "rat", attack: .zero, type: .rat, carry: .zero, animations: [], effects: [], dodge: 0, luck: 0, killedBy: nil)
     
-    static let playerZero: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .player, carry: .zero, animations: [], pickaxe: Pickaxe(runeSlots: 0, runes: []), effects: [], dodge: 0, luck: 0)
+    static let batZero: EntityModel = EntityModel(originalHp: 1, hp: 1, name: "bat", attack: .zero, type: .bat, carry: .zero, animations: [], effects: [], dodge: 0, luck: 0, killedBy: nil)
+    
+    static let alamoZero: EntityModel = EntityModel(originalHp: 1, hp: 1, name: "alamo", attack: .zero, type: .bat, carry: .zero, animations: [], effects: [], dodge: 0, luck: 0, killedBy: nil)
+    
+    static let lotsOfCash: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .rat, carry: CarryModel(items: [Item(type: .gem, amount: 1000, color: .blue)]), animations: [], effects: [], dodge: 0, luck: 0, killedBy: nil)
+    
+    static let playerZero: EntityModel = EntityModel(originalHp: 0, hp: 0, name: "null", attack: .zero, type: .player, carry: .zero, animations: [], pickaxe: Pickaxe(runeSlots: 0, runes: []), effects: [], dodge: 0, luck: 0, killedBy: nil)
     
     static func zeroedEntity(type: EntityType) -> EntityModel {
-        return EntityModel(originalHp: 0, hp: 0, name: "", attack: .zero, type: type, carry: .zero, animations: [], effects: [], dodge: 0, luck: 0)
+        return EntityModel(originalHp: 0, hp: 0, name: "", attack: .zero, type: type, carry: .zero, animations: [], effects: [], dodge: 0, luck: 0, killedBy: nil)
     }
     
     let originalHp: Int
@@ -89,6 +148,7 @@ struct EntityModel: Equatable, Codable {
     var effects: [EffectModel]
     let dodge: Int
     let luck: Int
+    let killedBy: EntityType?
     
     private enum CodingKeys: String, CodingKey {
         case originalHp
@@ -102,6 +162,7 @@ struct EntityModel: Equatable, Codable {
         case effects
         case dodge
         case luck
+        case killedBy
     }
     
     public func update(originalHp: Int? = nil,
@@ -114,7 +175,8 @@ struct EntityModel: Equatable, Codable {
                        pickaxe: Pickaxe? = nil,
                        effects: [EffectModel]? = nil,
                        dodge: Int? = nil,
-                       luck: Int? = nil
+                       luck: Int? = nil,
+                       killedBy: EntityType? = nil
     ) -> EntityModel {
         let updatedOriginalHp = originalHp ?? self.originalHp
         let updatedHp = hp ?? self.hp
@@ -127,6 +189,7 @@ struct EntityModel: Equatable, Codable {
         let effects = effects ?? self.effects
         let dodge = dodge ?? self.dodge
         let luck = luck ?? self.luck
+        let killedBy = killedBy ?? self.killedBy
         
         return EntityModel(originalHp: updatedOriginalHp,
                            hp: updatedHp,
@@ -138,7 +201,9 @@ struct EntityModel: Equatable, Codable {
                            pickaxe: pickaxe,
                            effects: effects,
                            dodge: dodge,
-                           luck: luck
+                           luck: luck,
+                           killedBy: killedBy
+                           
         )
         
         
@@ -161,21 +226,28 @@ struct EntityModel: Equatable, Codable {
         return attack.attacksPerTurn - attack.attacksThisTurn > 0
     }
     
-    func recordRuneProgress(_ progressDictionary: [Rune: CGFloat]) -> EntityModel {
-        var newRunes: [Rune] = []
-        for rune in self.pickaxe?.runes ?? [] {
-            var newRune = rune
-            newRune.recordedProgress = progressDictionary[rune]
-            newRunes.append(newRune)
+    //TODO: Fix hack that hard codes player animations because the player entity modal is not updated with new animations
+    func animation(of animationType: AnimationType) -> [SKTexture]? {
+        switch self.type {
+        case .player:
+            switch animationType {
+            case .attack:
+                return SpriteSheet(textureName: "player-attack-12", columns: 12).animationFrames()
+            case .hurt:
+                return SpriteSheet(textureName: "player-hurt-7", columns: 7).animationFrames()
+            case .dying:
+                return SpriteSheet(textureName: "player-dying-11", columns: 11).animationFrames()
+            case .dodge:
+                return SpriteSheet(textureName: "player-dodge-11", columns: 11).animationFrames()
+            case .fall, .idle, .projectileStart, .projectileMid, .projectileEnd:
+                return nil
+            }
+        default:
+            guard let animations = animations.first(where: { $0.animationType == animationType })?.animationTextures else { return nil }
+            return animations
         }
         
-        let newPick = Pickaxe(runeSlots: self.pickaxe?.runeSlots ?? 0, runes: newRunes)
-        return update(pickaxe: newPick)
-    }
-    
-    func animation(of animationType: AnimationType) -> [SKTexture]? {
-        guard let animations = animations.first(where: { $0.animationType == animationType })?.animationTextures else { return nil }
-        return animations
+        
     }
     
     func keyframe(of animationType: AnimationType) -> Int? {
@@ -197,7 +269,9 @@ struct EntityModel: Equatable, Codable {
     
     func doesDodge() -> Bool {
         if self.type == .player {
-            return (1...dodge+1).contains(Int.random(100))
+            let randomNumber = Int.random(100) + 1
+            let dodgeRande = -1...dodge
+            return dodgeRande.contains(randomNumber)
         }
         return false
     }
@@ -305,16 +379,23 @@ struct EntityModel: Equatable, Codable {
             return update(pickaxe: pickaxe)
         case (.buff, .runeSlot):
             guard let pickaxe = pickaxe else { return self }
-            let newPickaxe = Pickaxe(runeSlots: pickaxe.runeSlots + 1, runes: pickaxe.runes)
+            // the most rune slots you have have is 4
+            let newPickaxe = Pickaxe(runeSlots: min(4, pickaxe.runeSlots + 1), runes: pickaxe.runes)
             return update(pickaxe: newPickaxe)
         case (.buff, .luck):
             return update(luck: luck + effect.amount)
         case (.buff, .dodge):
             return update(dodge: dodge + effect.amount)
-        case (.killMonster, _), (.transmogrify, _):
+        case (.killMonster, _), (.transmogrify, _), (.gemMagnet, _),
+            (.infusion, _), (.item, _), (.snakeEyes, _),
+            (.liquifyMonsters, _), (.chest, _), (.escape, _),
+            (.greaterRuneSpiritPotion, _)
+            :
+            
             return self
         default:
-            preconditionFailure("Youll want to implement future cases here")
+            #warning("You'll want to implement new cases here in the future")
+            return self
         }
     }
     
@@ -327,7 +408,7 @@ struct EntityModel: Equatable, Codable {
         var newRunes: [Rune] = []
         for rune in self.runes ?? [] {
             var newRune = rune
-            if rune.rechargeType.contains(tileType) {
+            if rune.rechargeType.contains(where: { TileType.fuzzyEquals($0, tileType)} ) {
                 newRune = rune.progress(count)
             }
             newRunes.append(newRune)
@@ -345,6 +426,19 @@ struct EntityModel: Equatable, Codable {
             newRunes.append(newRune)
         }
         return self.update(pickaxe: Pickaxe(runeSlots: pickaxe?.runeSlots ?? 0, runes: newRunes))
+    }
+    
+    
+    static let bossMonsters: [EntityType] = [.rat, .alamo, .bat, .dragon, .sally]
+    
+    static func monsterWithRandomType() -> EntityModel {
+        let randomMonsterTypes: [EntityType] = EntityModel.bossMonsters
+        let randomMonster: EntityType = randomMonsterTypes.randomElement()!
+        return EntityModel(originalHp: 1, hp: 1, name: randomMonster.textureString, attack: .zero, type: randomMonster, carry: .zero, animations: [], pickaxe: nil, effects: [], dodge: 0, luck: 0, killedBy: nil)
+    }
+    
+    static func monsterWithType(_ type: EntityType) -> EntityModel {
+        return EntityModel(originalHp: 1, hp: 1, name: type.textureString, attack: .zero, type: type, carry: .zero, animations: [], pickaxe: nil, effects: [], dodge: 0, luck: 0, killedBy: nil)
     }
     
 }

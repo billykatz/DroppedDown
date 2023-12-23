@@ -9,6 +9,47 @@
 import Foundation
 import SpriteKit
 
+extension SKNode: UIAccessibilityIdentification {
+    public var accessibilityIdentifier: String? {
+        get {
+            super.accessibilityLabel
+        }
+        set(accessibilityIdentifier) {
+            super.accessibilityLabel = accessibilityIdentifier
+        }
+    }
+
+    func makeUITestAccessible(label: String, traits: UIAccessibilityTraits) {
+
+        accessibilityLabel = label
+        isAccessibilityElement = true
+        accessibilityTraits = traits
+
+        if let scene = scene {
+            if scene.accessibilityElements == nil {
+                scene.accessibilityElements = [self]
+            } else {
+                scene.accessibilityElements?.append(self)
+            }
+        }
+    }
+    
+    func makeUITestAccessible(label: String, traits: UIAccessibilityTraits, scene: SKScene) {
+
+        accessibilityLabel = label
+        isAccessibilityElement = true
+        accessibilityTraits = traits
+
+        if scene.accessibilityElements == nil {
+            scene.accessibilityElements = [self]
+        } else {
+            scene.accessibilityElements?.append(self)
+        }
+    }
+
+}
+
+
 extension SKSpriteNode {
 
     func aspectFillToSize(fillSize: CGSize) {
@@ -59,6 +100,13 @@ class ShiftShaft_Button: SKShapeNode {
     /// Identifier passed in on init that ids the button on press
     public var identifier: ButtonIdentifier
     
+    /// view that is the visual button
+    private var buttonView: SKShapeNode?
+    private var grayOutButtonView: SKShapeNode?
+    
+    // set thru init or `enable()`
+    private var isDisabled: Bool = false
+    
     /// view to expand touch region of button
     private lazy var touchTargetExpandingView: SKSpriteNode = {
         let view = SKSpriteNode(texture: nil, color: .clear, size: self.frame.scale(by: Style.Button.touchzone, andYAmount: Style.Button.touchzone).size)
@@ -69,19 +117,12 @@ class ShiftShaft_Button: SKShapeNode {
         return view
     }()
     
-    /// view that is the visual button
-    private var buttonView: SKShapeNode?
-    private var grayOutButtonView: SKShapeNode?
-    
-    // set thru init or `enable()`
-    private var isDisabled: Bool = false
-    
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    
+
     /// Creates a button with a image represented in a SKSpriteNode
     init(size: CGSize,
          delegate: ButtonDelegate,
@@ -89,9 +130,13 @@ class ShiftShaft_Button: SKShapeNode {
          image: SKSpriteNode,
          shape: ButtonShape,
          precedence: Precedence = Precedence.aboveMenu,
+         aspectFillToSize: Bool = true,
          showSelection: Bool = true,
          disable: Bool = false,
-         addTextLabel: Bool = false) {
+         addTextLabel: Bool = false,
+         fontType: UIFontType = .legacy,
+         fontSize: CGFloat = .fontLargeSize
+    ) {
         self.buttonType = .image
         self.delegate = delegate
         self.identifier = identifier
@@ -131,10 +176,11 @@ class ShiftShaft_Button: SKShapeNode {
                               delegate: self,
                               precedence: precedence,
                               identifier: identifier,
-                              fontSize: .fontLargeSize,
-                              fontColor: .brown)
+                              fontSize: fontSize,
+                              fontColor: .brown,
+                              fontType: fontType)
             label.position = self.frame.center
-            label.zPosition = Precedence.menu.rawValue
+            label.zPosition = Precedence.button.rawValue
             
             // Add Label
             buttonView?.addChild(label)
@@ -143,7 +189,9 @@ class ShiftShaft_Button: SKShapeNode {
         
         // add the image
         image.zPosition = 0
-        image.aspectFillToSize(fillSize: size)
+        if (aspectFillToSize) {
+            image.aspectFillToSize(fillSize: size)
+        }
         addChildSafely(image)
         
         /// add the path
@@ -185,7 +233,8 @@ class ShiftShaft_Button: SKShapeNode {
          backgroundColor: UIColor = .clayRed,
          showSelection: Bool = true,
          addTextLabel: Bool = true,
-         disable: Bool = false) {
+         disable: Bool = false,
+         textAlignment: NSTextAlignment = .center) {
         
         //Set properties
         self.buttonType = .text
@@ -209,10 +258,10 @@ class ShiftShaft_Button: SKShapeNode {
         if !disable {
             let shadowPath = path
             let shadowShape = SKShapeNode(path: shadowPath)
-            shadowShape.color = .storeBlack
+            shadowShape.color = .black
             self.dropShadow = shadowShape
             // does this have to be hardcoded?
-            shadowShape.zPosition = -1
+            shadowShape.zPosition = -100000
             addChild(shadowShape)
         }
         
@@ -225,7 +274,8 @@ class ShiftShaft_Button: SKShapeNode {
                               precedence: precedence,
                               identifier: identifier,
                               fontSize: fontSize,
-                              fontColor: fontColor)
+                              fontColor: fontColor,
+                              textAlignment: textAlignment)
             label.position = self.frame.center
             label.zPosition = Precedence.menu.rawValue
             
@@ -257,6 +307,9 @@ class ShiftShaft_Button: SKShapeNode {
         
         /// set the color to clear
         self.color = .clear
+        
+        
+//        self.makeUITestAccessible(label: identifier.rawValue, traits: .button)
         
     }
     
@@ -293,7 +346,7 @@ class ShiftShaft_Button: SKShapeNode {
         if dropShadow == nil {
             let shadowPath = CGPath(roundedRect: CGRect(x: -frame.size.width/2, y: -frame.size.height/2 - dropShadowOffset, width: frame.size.width, height: frame.size.height), cornerWidth: 5.0, cornerHeight: 5.0, transform: nil)
             let shadowShape = SKShapeNode(path: shadowPath)
-            shadowShape.color = .storeBlack
+            shadowShape.color = .black
             self.dropShadow = shadowShape
             // does this have to be hardcoded?
             shadowShape.zPosition = -1

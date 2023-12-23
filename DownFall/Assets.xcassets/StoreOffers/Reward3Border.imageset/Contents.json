@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "Reward3Border.png",
+      "filename" : "green-square-stroke.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "Reward3Border@2x.png",
+      "filename" : "green-square-stroke@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "Reward3Border@3x.png",
+      "filename" : "green-square-stroke@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

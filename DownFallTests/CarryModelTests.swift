@@ -11,43 +11,28 @@ import XCTest
 
 class CarryModelTests: XCTestCase {
     func testTotal() {
-        let goldTotal = 30
-        let goldItem = Item(type: .gold, amount: goldTotal)
         let gemTotal = 3
         let gemItem = Item(type: .gem, amount: gemTotal)
-        let playerCarry = CarryModel(items: [goldItem, gemItem])
+        let playerCarry = CarryModel(items: [gemItem])
         
-        XCTAssertEqual(playerCarry.total(in: .gold), goldTotal)
         XCTAssertEqual(playerCarry.total(in: .gem), gemTotal)
     }
     
     func testPay() {
-        let goldTotal = 30
-        let goldItem = Item(type: .gold, amount: goldTotal)
         let gemTotal = 3
         let gemItem = Item(type: .gem, amount: gemTotal)
-        let playerCarry = CarryModel(items: [goldItem, gemItem])
-
-        var newCarry = playerCarry.pay(25, inCurrency: .gold)
-        XCTAssertEqual(newCarry.total(in: .gold), 5)
+        let playerCarry = CarryModel(items: [gemItem])
+        let newCarry = playerCarry.pay(2, inCurrency: .gem)
         
-        newCarry = newCarry.pay(2, inCurrency: .gem)
         XCTAssertEqual(newCarry.total(in: .gem), 1)
-        
     }
     
     func testEarn() {
-        let goldTotal = 30
-        let goldItem = Item(type: .gold, amount: goldTotal)
         let gemTotal = 3
         let gemItem = Item(type: .gem, amount: gemTotal)
-        let playerCarry = CarryModel(items: [goldItem, gemItem])
-
-        var newCarry = playerCarry.earn(45, inCurrency: .gold)
-        XCTAssertEqual(newCarry.total(in: .gold), 75)
+        let playerCarry = CarryModel(items: [gemItem])
+        let newCarry = playerCarry.earn(9, inCurrency: .gem)
         
-        newCarry = newCarry.earn(9, inCurrency: .gem)
         XCTAssertEqual(newCarry.total(in: .gem), 12)
-        
     }
 }

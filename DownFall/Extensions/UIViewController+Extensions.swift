@@ -15,7 +15,7 @@ extension UIViewController
         let colorBottomBlack = UIView()
         view.addSubview(colorBottomBlack)
         colorBottomBlack.translatesAutoresizingMaskIntoConstraints = false
-        colorBottomBlack.backgroundColor = .backgroundGray
+        colorBottomBlack.backgroundColor = .black
         
         let colorTopBlack = UIView()
         view.addSubview(colorTopBlack)

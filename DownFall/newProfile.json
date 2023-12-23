@@ -1,15 +1,15 @@
 {
     "name": "Profile Name",
-    "progress": 3,
+    "progress": 0,
     "deepestDepth": 0,
     "unlockables": [],
     "startingUnlockables": [],
     "stats": [],
     "player" :
-        { "name": "player3",
+        { "name": "player",
             "type": "player",
-            "originalHp": 3,
-            "hp": 3,
+            "originalHp": 2,
+            "hp": 2,
             "attack": {
                 "type": "targets",
                 "frequency" : 1,

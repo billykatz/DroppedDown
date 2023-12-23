@@ -53,6 +53,8 @@ struct GoalTracking: Codable, Hashable {
                     }
             case .useRune:
                 return "blankRune"
+            case .destroyBoss:
+                return "skullAndCrossbones"
             }
         }
         
@@ -64,23 +66,25 @@ struct GoalTracking: Codable, Hashable {
             switch levelGoalType {
             case .unlockExit:
                 switch tileType {
-                case .rock:
+                case .rock(let color, _, _):
                     if grouped {
-                        return "Mine \(target) groups of \(minimumAmount)+"
+                        return "Mine \(target) groups of at least \(minimumAmount) rocks"
                     } else {
-                        return "Mine \(target) rocks"
+                        return "Mine \(target) \(color.humanReadable.lowercased()) rocks"
                     }
                 case .monster:
-                    return "Destory \(target) monsters"
+                    return "Destroy \(target) monster\(target > 1 ? "s" : "")"
                 case .gem:
                     return "Collect \(target) gem\(target > 1 ? "s" : "")"
                 case .pillar:
-                    return "Destory \(target) individual pillars"
+                    return "Destroy \(target) individual pillar\(target > 1 ? "s" : "")"
                 default:
                     return ""
                 }
             case .useRune:
                 return "Use runes \(target) time\(target > 1 ? "s" : "")"
+            case .destroyBoss:
+                return "Defeat the boss on depth 10"
             }
         }
         
@@ -95,12 +99,14 @@ struct GoalTracking: Codable, Hashable {
         switch levelGoalType {
         case .unlockExit:
             switch self.tileType {
-            case .rock(.blue, _):
+            case .rock(.blue, _, _):
                 return (.lightBarBlue, .darkBarBlue)
-            case .rock(.red, _):
+            case .rock(.red, _, _):
                 return (.lightBarRed, .darkBarRed)
-            case .rock(.purple, _):
+            case .rock(.purple, _, _):
                 return (.lightBarPurple, .darkBarPurple)
+            case .rock(.brown, _, _):
+                return (.lightBarBrown, .darkBarBrown)
             case .monster:
                 return (.lightBarMonster, .darkBarMonster)
             case .gem:
@@ -112,6 +118,8 @@ struct GoalTracking: Codable, Hashable {
             }
         case .useRune:
             return (.lightBarRune, .darkBarRune)
+        case .destroyBoss:
+            return (.lightBarMonster, .darkBarMonster)
         }
     }
     

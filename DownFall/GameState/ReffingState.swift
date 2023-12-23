@@ -11,18 +11,19 @@ struct ReffingState: GameState {
     var state: ShiftShaft_State = .reffing
     
     func enter(_ input: Input) {
-        Referee.enterRules(input.endTilesStruct)
+        Referee.shared.enterRules(input.endTilesStruct)
     }
     
     func transitionState(given input: Input) -> AnyGameState? {
         switch input.type {
-        case .reffingFinished(true):
-            // check the global Turn Counter,
-            // that knows whether or not a "turn" happened
+        case .reffingFinished(newTurn: true):
+            // When newTurn is true then we need to alert the Board by entering computing state
+            // Then the board can do all the clean up necessary before starting a new turn
             return AnyGameState(ComputingState())
         case .reffingFinished(newTurn: false):
             return AnyGameState(PlayState())
-        case .attack, .monsterDies, .collectItem, .decrementDynamites, .refillEmpty, .collectOffer:
+        case .attack, .monsterDies, .collectItem, .decrementDynamites,
+                .refillEmpty, .collectOffer, .noMoreMoves, .noMoreMovesConfirm:
             return AnyGameState(ComputingState())
         case .runeReplacement:
             return AnyGameState(PauseState())

@@ -16,12 +16,16 @@ struct AnimatingState: GameState {
         switch input.type {
         case .animationsFinished(true):
             return AnyGameState(ReffingState())
-        case .animationsFinished(ref: false):
+        case .animationsFinished(false):
             return AnyGameState(PlayState())
         case .rotatePreview:
             return AnyGameState(AnimatingState())
         case .rotatePreviewFinish:
             return AnyGameState(ComputingState())
+        case .collectChestOffer:
+            return AnyGameState(ComputingState())
+        case .runeReplacement:
+            return AnyGameState(PauseState())
         default:
             return nil
         }

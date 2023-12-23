@@ -18,7 +18,9 @@ extension PlayerClient {
                 promise(.failure(ProfileError.failedToLoadRemoteProfile(nil)))
             }
         },
-        saveGameData: { _, _, _ in },
+        saveGameData: { _, _, _ in
+//            saveData(nil, nil)
+        },
         deleteGame: { _ in
             return Future { promise in
                 promise(.success(true))

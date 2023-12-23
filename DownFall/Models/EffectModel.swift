@@ -13,8 +13,16 @@ enum EffectType: String, Hashable, Codable {
     case debuff
     case refill
     case rune
+    case item
     case killMonster
     case transmogrify
+    case gemMagnet
+    case infusion
+    case snakeEyes
+    case liquifyMonsters
+    case chest
+    case escape
+    case greaterRuneSpiritPotion
 }
 
 enum StatType: String, Hashable, Codable {
@@ -36,5 +44,4 @@ struct EffectModel: Equatable, Hashable, Codable {
     var rune: Rune?
     var replaceRune: Rune?
     var wasApplied: Bool = false
-    let offerTier: Int
 }

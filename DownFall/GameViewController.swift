@@ -9,6 +9,7 @@
 import UIKit
 import SpriteKit
 import GameplayKit
+import AVKit
 
 class GameViewController: UIViewController {
     
@@ -23,25 +24,37 @@ class GameViewController: UIViewController {
     private var levelCoordinator: LevelCoordinating?
     private var menuCoordinator: MenuCoordinator?
     
-    // navigation contoller
-//    var navigationController: UINavigationController?
+    private var tutorialConductor: TutorialConductor?
+    private var ftueMetagameConductor: FTUEConductor?
+    
+    private var profileHasLoaded: Bool = false
     
     public var profile: Profile? = nil {
         didSet {
             guard let profile = profile else {
                 return
             }
+            profileHasLoaded = true
             loadingSceneNode?.fadeOut {
-                self.menuCoordinator?.loadedProfile(profile)
+                let hasLaunchedBefore = UserDefaults.standard.bool(forKey: UserDefaults.hasLaunchedBeforeKey)
+                self.menuCoordinator?.loadedProfile(profile, hasLaunchedBefore: hasLaunchedBefore)
+                
+                if !hasLaunchedBefore {
+                    // let's see if turning off sounds by defaults helps with crashes
+                    UserDefaults.standard.setValue(true, forKey: UserDefaults.muteSoundKey)
+                    UserDefaults.standard.setValue(true, forKey: UserDefaults.showGroupNumberKey)
+                    UserDefaults.standard.setValue(true, forKey: UserDefaults.hasLaunchedBeforeKey)
+                }
+                
+                
             }
         }
     }
     
     override func viewWillAppear(_ animated: Bool) {
         self.navigationController?.setNavigationBarHidden(true, animated: false)
-        
-        menuCoordinator?.viewWillAppear()
     }
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -75,12 +88,25 @@ class GameViewController: UIViewController {
             return GameLogger.shared.fatalLog(prefix: Constants.tag, message: "Lack of necessary information to init coordinators")
         }
         
+        /// set up the tutorial conductor
+        let tutorialConductor = TutorialConductor()
+        self.tutorialConductor = tutorialConductor
         
-        /// setup the coordinator
-        let levelCoordinator = LevelCoordinator(gameSceneNode: gameScene, entities: entities, view: view)
-        let codexCoordinator = CodexCoordinator(viewController: self.navigationController!)
+        // other FTUE conductor
+        let ftueMetagameConductor = FTUEConductor()
+        self.ftueMetagameConductor = ftueMetagameConductor
+        
+        // setup music manager
+        let gameMusicManager = GameMusicManager()
+        
+        /// setup the coordinators
+        let levelCoordinator = LevelCoordinator(gameSceneNode: gameScene, entities: entities, tutorialConductor: tutorialConductor, view: view, gameMusicManger: gameMusicManager)
+        let codexCoordinator = CodexCoordinator(viewController: self.navigationController!, delegate: levelCoordinator)
         let settingsCoordinator = SettingsCoordinator(viewController: self.navigationController!)
-        self.menuCoordinator = MenuCoordinator(levelCoordinator: levelCoordinator, codexCoordinator: codexCoordinator, settingsCoordinator: settingsCoordinator, view: view)
+        let creditsCoordinator = CreditsCoordinator(viewController: self.navigationController!)
+        
+        
+        self.menuCoordinator = MenuCoordinator(levelCoordinator: levelCoordinator, codexCoordinator: codexCoordinator, settingsCoordinator: settingsCoordinator, tutorialConductor: tutorialConductor, creditsCoordinator: creditsCoordinator, gameMusicManager: gameMusicManager,  view: view)
         self.levelCoordinator = levelCoordinator
         self.levelCoordinator?.delegate = menuCoordinator
         
@@ -88,7 +114,11 @@ class GameViewController: UIViewController {
     }
     
     override var shouldAutorotate: Bool {
-        return false
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            return false
+        } else {
+            return true
+        }
     }
 
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
@@ -105,12 +135,15 @@ class GameViewController: UIViewController {
     
     // save the current run if there is one
     // add it to the profile then returns the profile
-    func applicationDidEnterBackground() -> Profile {
+    func applicationDidEnterBackground() -> Profile? {
+        guard profileHasLoaded else { return nil }
+        
         GameLogger.shared.log(prefix: Constants.tag, message: "Saving the profile")
         
         guard var profile = menuCoordinator?.profileViewModel?.profile else {
-            GameLogger.shared.fatalLog(prefix: Constants.tag, message: "Cannot continue without the profile")
-            fatalError()
+            return nil
+//            GameLogger.shared.fatalLog(prefix: Constants.tag, message: "Cannot continue without the profile")
+//            fatalError()
         }
 
         

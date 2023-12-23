@@ -44,4 +44,33 @@ extension UserDefaults {
             }
         }
     }
+    
+    static let muteSoundKey = "muteSound"
+    static let soundVolumeKey = "soundVolume"
+    static let showGroupNumberKey = "showRockGroupNumber"
+    static let muteMusicKey = "muteMusic"
+    static let musicVolumeKey = "musicVolume"
+    
+    /// tutorial flags
+    static let hasLaunchedBeforeKey = "hasLaunchedBefore"
+    static let hasStartedTutorialKey = "hasStartedTutorial"
+    static let hasCompletedTutorialKey = "hasCompletedTutorial"
+    static let hasDiedDuringTutorialKey = "hasDiedDuringTutorial"
+    static let hasSkippedTutorialKey = "hasSkippedTutorial"
+    
+    // other FTUE flags
+    static let shouldSeeDiedForTheFirstTimeKey = "shouldSeeDiedForTheFirstTime"
+    static let hasSeenDiedForTheFirstTimeKey = "hasSeenDiedForTheFirstTime"
+    static let shouldShowCompletedTutorialKey = "shouldShowCompletedTutorial"
+    static let hasSeenCompletedTutorialKey = "hasSeenCompletedTutorial"
+    
+    static let hasSeenFirstRuneFTUEKey = "hasSeenFirstRuneFTUE"
+    static let hasSeenMinedFirstGemFTUEKey = "hasSeenMinedFirstGemFTUE"
+    static let hasSeenRuneChargedForTheFirstTimeFTUEKey = "hasSeenRuneChargedForTheFirstTimeFTUE"
+    
+    // MARK: DEBUG flags
+    static let startingDepthLevelKey = "startingDepthLevelKey"
+    
+    static let musicFadeInDurationKey = "musicFadeInDurationKey"
+    
 }

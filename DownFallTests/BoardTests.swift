@@ -31,10 +31,12 @@ struct MockBoardHelper {
     static func createBoard(_ type: Tile = Tile.greenRock, size: Int = 5) -> Board {
         let tc = TileCreator(entities(),
                              difficulty: .normal,
-                             level: .test, randomSource: GKLinearCongruentialRandomSource())
+                             level: .test, randomSource: GKLinearCongruentialRandomSource(), tutorialConductor: TutorialConductor())
         return Board(tileCreator: tc,
                      tiles: Array(repeating: row(of: type, by: size),  count: size),
-                     level: .test)
+                     level: .test,
+                     boardLoaded: false,
+                     tutorialConductor: nil)
     }
     
     static func createBoardWithRowOfSameColor(_ type: Tile = Tile.greenRock, size: Int = 5, rowIdx: Int = 0) -> Board {
@@ -43,7 +45,7 @@ struct MockBoardHelper {
         for col in 0..<size {
             tiles[rowIdx][col] = type
         }
-        return Board(tileCreator: board.tileCreator, tiles: tiles, level: .test)
+        return Board(tileCreator: board.tileCreator, tiles: tiles, level: .test, boardLoaded: false, tutorialConductor: nil)
     }
 }
 
@@ -60,9 +62,12 @@ class BoardTests: XCTestCase {
                       [.blueRock, .blueRock, .blueRock]]
         self.board = Board(tileCreator: TileCreator(entities(),
                                                     difficulty: .normal,
-                                                    level: .test, randomSource: GKLinearCongruentialRandomSource()),
+                                                    level: .test, randomSource: GKLinearCongruentialRandomSource(),
+                                                    tutorialConductor: TutorialConductor()),
                            tiles: tiles,
-                           level: .test)
+                           level: .test,
+                           boardLoaded: false,
+                           tutorialConductor: nil)
     }
     
     func testValidNeighbors() {
@@ -419,7 +424,7 @@ class BoardTests: XCTestCase {
         let actualTransformation: [TileTransformation] =
             board.removeAndReplace(from: board.tiles,
                                    tileCoord: TileCoord(0,0),
-                                   input: Input(.touch(TileCoord(0,0), .rock(color: .green, holdsGem: false))))
+                                   input: Input(.touch(TileCoord(0,0), .rock(color: .green, holdsGem: false, groupCount: 3))))
             .shiftDown!
         
         XCTAssertEqual(expectedTransformation.count, actualTransformation.count, "Shift down transformations should be the same")
@@ -452,7 +457,7 @@ class BoardTests: XCTestCase {
         
         let transformation = board.removeAndReplace(from: board.tiles,
                                                     tileCoord: TileCoord(0,0),
-                                                    input: Input(.touch(TileCoord(0,0), .rock(color: .purple, holdsGem: false))))
+                                                    input: Input(.touch(TileCoord(0,0), .rock(color: .purple, holdsGem: false, groupCount: 3))))
         
         let actualTransformation = transformation.shiftDown!
         
@@ -469,7 +474,7 @@ class BoardTests: XCTestCase {
                                       TileTransformation.init(TileCoord(3, 1), TileCoord(2, 1))]
         
         
-        let actualTransformation = board.removeAndReplace(from: board.tiles, tileCoord: TileCoord(0, 1), singleTile: true, input: Input(.touch(TileCoord(0,1), .rock(color: .green, holdsGem: false)))).shiftDown!
+        let actualTransformation = board.removeAndReplace(from: board.tiles, tileCoord: TileCoord(0, 1), singleTile: true, input: Input(.touch(TileCoord(0,1), .rock(color: .green, holdsGem: false, groupCount: 3)))).shiftDown!
         
         XCTAssertEqual(expectedTransformation.count, actualTransformation.count, "Shift down transformations should be the same")
         arrayEquality(actualTransformation, expectedTransformation)

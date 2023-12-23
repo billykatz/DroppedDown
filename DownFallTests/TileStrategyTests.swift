@@ -50,7 +50,7 @@ class TileStrategyTests: XCTestCase {
     func testTileStrategyAddsCorrectNumberOfMonstersForDifferentDifficulties() {
         for _ in 0..<3 { //repeat these test so can be more confident that not too many monsters are being added
             [Difficulty.easy, .normal, .hard].forEach { difficulty in
-                let tc = TileCreator.init(entities(), difficulty: difficulty, updatedEntity: .playerZero, level: .test, randomSource: GKLinearCongruentialRandomSource())
+                let tc = TileCreator.init(entities(), difficulty: difficulty, updatedEntity: .playerZero, level: .test, randomSource: GKLinearCongruentialRandomSource(), tutorialConductor: TestTutorialConductor())
                 
                 let newTiles = tc.board(difficulty: difficulty).0.reduce([], +)
                 let monsterCount = newTiles.filter { $0 == Tile(type: .monster(.zero)) }.count

@@ -14,3 +14,148 @@ extension GKLinearCongruentialRandomSource {
     }
 }
 
+extension GKLinearCongruentialRandomSource {
+    
+    struct Constants {
+        static let tag = "LevelModel"
+    }
+    
+    func procsGivenChance(_ chance: Float) -> Bool {
+        let nextFloat = nextUniform()
+        if chance >= nextFloat * 100 {
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    func chooseElement<Element>(_ array: [Element]) -> Element? {
+        guard !array.isEmpty else { return nil }
+        let nextFloat = nextUniform()
+        let totalChances = Float(array.count) * nextFloat
+        let chosenIndex =  Int(totalChances.rounded(.towardZero))
+        return array[chosenIndex]
+    }
+    
+    func chooseElement<Element>(_ array: [Element], avoidBlock shouldAvoid: (Element) -> Bool) -> Element? {
+        guard !array.isEmpty else { return nil }
+        let nextFloat = nextUniform()
+        let totalChances = Float(array.count) * nextFloat
+        let chosenIndex =  Int(totalChances.rounded(.towardZero))
+        var chosen = array[chosenIndex]
+        
+        var maxTries = 100
+        while shouldAvoid(chosen) {
+            var nextFloat = nextUniform()
+            if nextFloat == 1 {
+                nextFloat = 0.99
+            }
+            let totalChances = Float(array.count) * nextFloat
+            let chosenIndex =  Int(totalChances.rounded(.towardZero))
+            chosen = array[chosenIndex]
+            
+            maxTries -= 1
+            if maxTries < 0 {
+                return nil
+            }
+        }
+        
+        return chosen
+    }
+
+    
+    func chooseElements<Element>(choose: Int, fromArray array: [Element]) -> [Element] where Element: Equatable {
+        guard !array.isEmpty else { return [] }
+        guard choose < array.count else { return array }
+        var chosenElements: [Element] = []
+        var chooseFromArray = array
+        var maxTries = 30
+        while !chooseFromArray.isEmpty && maxTries > 0 && chosenElements.count < choose {
+            if let nextElement = chooseElement(chooseFromArray) {
+                chosenElements.append(nextElement)
+                if let idx = chosenElements.firstIndex(where: { element in
+                    return element == nextElement
+                }) {
+                    chooseFromArray.remove(at: idx)
+                }
+            } else {
+                maxTries -= 1
+            }
+        }
+        return chosenElements
+    }
+    
+    func chooseElementWithChance<Element>(_ array: [Element]) -> Element? where Element: ChanceModel {
+        guard !array.isEmpty else { return nil }
+        let nextFloat = nextUniform()
+        
+        let totalChances = array.reduce(0, { prev, current in return prev + current.chance }) * nextFloat
+        var chosenNumber = totalChances.rounded(.towardZero)
+        
+        // we want teh current chance number to encompassment the valid remainging
+        for chanceModel in array {
+            if chanceModel.chance >= chosenNumber {
+                return chanceModel
+            } else {
+                chosenNumber -= chanceModel.chance
+            }
+        }
+        
+        return array.last!
+    }
+    
+    func chooseElementWithChance<Element, T>(_ array: [Element]) -> Element? where Element: AnyChanceModel<T> {
+        guard !array.isEmpty else { return nil }
+        let nextFloat = nextUniform()
+        
+        for (idx, element) in array.enumerated() {
+            GameLogger.shared.log(prefix: Constants.tag, message: "(\(idx)) chance is \(element.chance)")
+            
+        }
+        let totalChances = array.reduce(0, { prev, current in return prev + current.chance })
+        GameLogger.shared.log(prefix: Constants.tag, message: "Total chance is \(totalChances)")
+        var chosenNumber = (totalChances * nextFloat).rounded(.towardZero)
+        GameLogger.shared.log(prefix: Constants.tag, message: "Chosen float is \(nextFloat)")
+        GameLogger.shared.log(prefix: Constants.tag, message: "Chosen number is \(chosenNumber)")
+        
+        // we want the current chance number to encompass the valid remaining
+        for (idx, chanceModel) in array.enumerated() {
+            if chanceModel.chance >= chosenNumber {
+                GameLogger.shared.log(prefix: Constants.tag, message: "(\(idx)) was chosen")
+                return chanceModel
+            } else {
+                chosenNumber -= chanceModel.chance
+            }
+        }
+        
+        GameLogger.shared.log(prefix: Constants.tag, message: "Final options chosen")
+        return array.last!
+    }
+
+    
+    func chooseElementsWithChance<Element, T>(_ array: [Element], choices: Int) -> [Element] where Element: AnyChanceModel<T> {
+        guard !array.isEmpty else { return [] }
+        guard choices < array.count else { return array }
+        var chosenElements: [Element] = []
+        var availableChoices = array
+        
+        var maxTries = 30
+        while chosenElements.count < choices && maxTries > 0 {
+            if let chosen = chooseElementWithChance(availableChoices) {
+                if availableChoices.contains(chosen) {
+                    if let idx = availableChoices.firstIndex(of: chosen) {
+                        availableChoices.remove(at: idx)
+                    }
+                    chosenElements.append(chosen)
+                }
+            } else {
+                print("-----")
+            }
+            maxTries -= 1
+        }
+        
+        return chosenElements
+    }
+    
+}
+

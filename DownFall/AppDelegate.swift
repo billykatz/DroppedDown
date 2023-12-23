@@ -68,7 +68,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         GameScope.shared.profileManager.saveProfile(profile)
         
-        GameLogger.shared.log(prefix: Constants.tag, message: "applicationWillResignActive exit")
+        GameLogger.shared.log(prefix: Constants.tag, message: "applicationDidEnterBackground exit")
     }
     
 }

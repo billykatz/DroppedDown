@@ -47,8 +47,9 @@ enum ProfileError: Error {
     case failedToSaveLocalProfile(Error?)
     case failureToSaveRemoteProfile(Error)
     case failedToLoadRemoteProfile(Error?)
+    
+    case gameCenterTurnedOff
 }
-
 /// This class is soley responsible for saving and loading game files from the local disk and iCloud
 class ProfileLoadingManager: ProfileManaging {
     
@@ -76,7 +77,7 @@ class ProfileLoadingManager: ProfileManaging {
     
     private var disposables = Set<AnyCancellable>()
     
-    init(localPlayer: PlayerClient = .live,
+    init(localPlayer: PlayerClient = .gameCenterTurnedOff,
          userDefaultClient: UserDefaultClient = .live,
          fileManagerClient: FileManagerClient = .live,
          profileCodingClient: ProfileCodingClient = .live,
@@ -88,7 +89,7 @@ class ProfileLoadingManager: ProfileManaging {
         self.profileCodingClient = profileCodingClient
         self.scheduler = scheduler
         self.mainQueue = mainQueue
-        self.authenicated = authenicatedSubject.eraseToAnyPublisher()
+        self.authenicated = authenicatedSubject.prepend(false).eraseToAnyPublisher()//.prepend(false).eraseToAnyPublisher()
     }
     
     /// Defines all business logic and kickoffs the pipeline by attempting to authenicate with GameCenter
@@ -96,25 +97,28 @@ class ProfileLoadingManager: ProfileManaging {
         
         /// Load the remote save file into data
         let loadRemoteData =
-            authenicated
-                .print("\(Constants.tag): Load remote data publisher", to: GameLogger.shared)
-                .flatMap { [localPlayer] _ in
-                    localPlayer.fetchGCSavedGames()
-                }
-                .flatMap( { [profileCodingClient] savedGames in
-                    loadSavedGame(savedGames.first, profileCodingClient: profileCodingClient)
-                })
-                .eraseToAnyPublisher()
+        authenicated
+            .print("\(Constants.tag): Load remote data publisher", to: GameLogger.shared)
+            .flatMap { [localPlayer] _ in
+                localPlayer.fetchGCSavedGames()
+            }
+            .flatMap( { [profileCodingClient] savedGames in
+                loadSavedGame(savedGames.first, profileCodingClient: profileCodingClient)
+            })
+            .eraseToAnyPublisher()
         
         /// Store the pipeline to fetch the UUID from user defaults and attempt to load the local profile
         let loadLocalProfilePublisher =
-            userDefaultClient
-                .fetchPlayerUUID(Constants.playerUUIDKey)
-                .print("\(Constants.tag): fetch local game files", to: GameLogger.shared)
-                .flatMap { [fileManagerClient, profileCodingClient] (uuid) -> Future<Profile?, Error> in
-                    return loadLocalProfile(pathPrefix: Constants.saveFilePath, name: uuid, fileManagerClient: fileManagerClient, profileCodingClient: profileCodingClient)
-                }
-                .eraseToAnyPublisher()
+        authenicated
+            .flatMap { [fileManagerClient, profileCodingClient, userDefaultClient] _ in
+                userDefaultClient
+                    .fetchPlayerUUID(Constants.playerUUIDKey)
+                    .print("\(Constants.tag): fetch local game files", to: GameLogger.shared)
+                    .flatMap { [fileManagerClient, profileCodingClient] (uuid) -> Future<Profile?, Error> in
+                        return loadLocalProfile(pathPrefix: Constants.saveFilePath, name: uuid, fileManagerClient: fileManagerClient, profileCodingClient: profileCodingClient)
+                    }
+                    .eraseToAnyPublisher()
+            }
         
         /// Zip the files together. No matter what we expect each inner pipeline to spit out at least one value
         let loadedProfilesZip = Publishers.CombineLatest(
@@ -127,36 +131,36 @@ class ProfileLoadingManager: ProfileManaging {
         )
         
         let resolveProfileConflict: AnyPublisher<Profile, Error> =
-            loadedProfilesZip
-                .print("\(Constants.tag): Resolve profile conflict", to: GameLogger.shared)
-                .eraseToAnyPublisher()
-                .tryMap ({ (saveFiles)  -> Profile in
-                    let (remote, local) = saveFiles
-                    if remote == nil , let local = local {
-                        /// load the local profile
-                        GameLogger.shared.log(prefix: Constants.tag, message: "Only local file found")
-                        return local
-                    } else if local == nil, let remote = remote {
-                        /// load the remote file
-                        GameLogger.shared.log(prefix: Constants.tag, message: "Only remote file found")
-                        return remote
-                    } else if let remote = remote, let local = local  {
-                        /// load the file which has more progress
-                        /// if there is a tie, then load the remote one
-                        let remoteProgressedFuther = remote.progress >= local.progress
-                        GameLogger.shared.log(prefix: Constants.tag, message: "Both local and remote file found. Loading \(remoteProgressedFuther ? remote: local)")
-                        return remoteProgressedFuther ? remote: local
-                    } else {
-                        /// this is likely a new player and needs to save a new profile
+        loadedProfilesZip
+            .print("\(Constants.tag): Resolve profile conflict", to: GameLogger.shared)
+            .eraseToAnyPublisher()
+            .tryMap ({ (saveFiles)  -> Profile in
+                let (remote, local) = saveFiles
+                if remote == nil , let local = local {
+                    /// load the local profile
+                    GameLogger.shared.log(prefix: Constants.tag, message: "Only local file found")
+                    return local
+                } else if local == nil, let remote = remote {
+                    /// load the remote file
+                    GameLogger.shared.log(prefix: Constants.tag, message: "Only remote file found")
+                    return remote
+                } else if let remote = remote, let local = local  {
+                    /// load the file which has more progress
+                    /// if there is a tie, then load the remote one
+                    let remoteProgressedFuther = remote.progress >= local.progress
+                    GameLogger.shared.log(prefix: Constants.tag, message: "Both local and remote file found. Loading \(remoteProgressedFuther ? remote: local)")
+                    return progressedFuther(lhs: remote, rhs: local)
+                } else {
+                    /// this is likely a new player and needs to save a new profile
                         GameLogger.shared.log(prefix: Constants.tag, message: "Neither local or remote file found.")
-                        throw ProfileError.failedToResolveProfiles
-                    }
-                })
-                .catch { [userDefaultClient, fileManagerClient, profileCodingClient] _ in
-                    return createLocalProfile(playerUUIDKey: Constants.playerUUIDKey, userDefaultClient: userDefaultClient, fileManagerClient: fileManagerClient, profileCodingClient: profileCodingClient)
-                        .eraseToAnyPublisher()
+                    throw ProfileError.failedToResolveProfiles
                 }
-                .eraseToAnyPublisher()
+            })
+            .catch { [userDefaultClient, fileManagerClient, profileCodingClient] _ in
+                return createLocalProfile(playerUUIDKey: Constants.playerUUIDKey, userDefaultClient: userDefaultClient, fileManagerClient: fileManagerClient, profileCodingClient: profileCodingClient)
+                    .eraseToAnyPublisher()
+            }
+            .eraseToAnyPublisher()
         
         /// Resolves the profile conflict
         /// re-saves the profiles locally and remotely
@@ -169,16 +173,19 @@ class ProfileLoadingManager: ProfileManaging {
         )
             .subscribe(on: scheduler)
             .receive(on: mainQueue)
+            .print("\(Constants.tag): Resolve profile conflict + authenticate", to: GameLogger.shared)
             .sink(receiveCompletion: { _ in },
                   receiveValue:
                     {  [loadedProfileSubject] value  in
-                        let (localProfile, _) = value
-                        if localProfile == Profile.zero {
-                            GameLogger.shared.fatalLog(prefix: Constants.tag, message: "Local profile failed to load")
-                        }
-                        GameLogger.shared.log(prefix: Constants.tag, message: "Loaded local profile with name: \(localProfile.name)")
-                        loadedProfileSubject.send(localProfile)
-                    })
+                var (localProfile, _) = value
+                if localProfile == Profile.zero {
+                    GameLogger.shared.fatalLog(prefix: Constants.tag, message: "Local profile failed to load")
+                }
+                GameLogger.shared.log(prefix: Constants.tag, message: "Loaded local profile with name: \(localProfile.name)")
+                
+                localProfile = localProfile.updateUnlockables()
+                loadedProfileSubject.send(localProfile)
+            })
             .store(in: &disposables)
         
         /// Start the authenicated process
@@ -188,6 +195,11 @@ class ProfileLoadingManager: ProfileManaging {
                 if let vc = viewController, showGCSignIn {
                     GameLogger.shared.log(prefix: Constants.tag, message: "Showing GameCenter Log in view controller.")
                     presenter.present(vc, animated: true)
+                    
+                } else if let error = error {
+                    GameLogger.shared.log(prefix: Constants.tag, message:"\(error.localizedDescription)")
+                    authenicatedSubject.send(localPlayer.isAuthenticated())
+                    
                 } else {
                     GameLogger.shared.log(prefix: Constants.tag, message: "Player is authenticated with GameCenter \(localPlayer.isAuthenticated())")
                     authenicatedSubject.send(localPlayer.isAuthenticated())
@@ -204,29 +216,34 @@ class ProfileLoadingManager: ProfileManaging {
             Just(loadedProfileSubject.value).setFailureType(to: Error.self),
             Just(profile).setFailureType(to: Error.self)
         )
-        .print("\(Constants.tag) Save Profile", to: GameLogger.shared)
-        .tryFlatMap { [localPlayer, userDefaultClient, fileManagerClient, profileCodingClient] (loadedProfile, newProfile) -> AnyPublisher<Profile, Error> in
-            if loadedProfile?.progress ?? 0 <= newProfile.progress {
-                GameLogger.shared.log(prefix: Constants.tag, message: "saving new profile")
-                return saveProfileLocallyAndRemotely(newProfile, localPlayer: localPlayer, uuidKey: Constants.playerUUIDKey, userDefaultsClient: userDefaultClient, isAuthenticated: localPlayer.isAuthenticated(), fileManagerClient: fileManagerClient, profileCodingClient: profileCodingClient)
-            } else {
-                GameLogger.shared.log(prefix: Constants.tag, message: "not saving profile because remote is further")
-                throw ProfileError.localProfileHasNotProgressedFurtherThanRemoteProfile
+            .print("\(Constants.tag) Save Profile", to: GameLogger.shared)
+            .tryFlatMap { [localPlayer, userDefaultClient, fileManagerClient, profileCodingClient] (loadedProfile, newProfile) -> AnyPublisher<Profile, Error> in
+                if loadedProfile?.progress ?? 0 <= newProfile.progress || (UITestRunningChecker.shared.testsAreRunning){
+                    GameLogger.shared.log(prefix: Constants.tag, message: "Loaded: \(loadedProfile?.progress ?? 0)")
+                    GameLogger.shared.log(prefix: Constants.tag, message: "New \(newProfile.progress)")
+                    GameLogger.shared.log(prefix: Constants.tag, message: "saving new profile with name \(newProfile.name)")
+                    GameLogger.shared.log(prefix: Constants.tag, message: "Overwriting old provile with name \(loadedProfile?.name ?? "")")
+                    GameLogger.shared.log(prefix: Constants.tag, message: "Loaded profile has null run \(loadedProfile?.currentRun == nil)")
+                    GameLogger.shared.log(prefix: Constants.tag, message: "New profile has null run \(newProfile.currentRun == nil)")
+                    return saveProfileLocallyAndRemotely(newProfile, localPlayer: localPlayer, uuidKey: Constants.playerUUIDKey, userDefaultsClient: userDefaultClient, isAuthenticated: localPlayer.isAuthenticated(), fileManagerClient: fileManagerClient, profileCodingClient: profileCodingClient)
+                } else {
+                    GameLogger.shared.log(prefix: Constants.tag, message: "not saving profile because remote is further: \(newProfile.name)")
+                    throw ProfileError.localProfileHasNotProgressedFurtherThanRemoteProfile
+                }
             }
-        }
-        .subscribe(on: scheduler)
-        .receive(on: mainQueue)
-        .sink(receiveCompletion: { completion in
-            switch completion {
-            case .failure(let err):
-                GameLogger.shared.log(prefix: Constants.tag, message: "Error saving local or remote \(err)")
-            case .finished:
-                GameLogger.shared.log(prefix: Constants.tag, message: "Successfully created and sync local and remote profiles")
-            }
-        }, receiveValue: { [loadedProfileSubject] profile in
-            loadedProfileSubject.send(profile)
-        })
-        .store(in: &disposables)
+            .subscribe(on: scheduler)
+            .receive(on: mainQueue)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .failure(let err):
+                    GameLogger.shared.log(prefix: Constants.tag, message: "Error saving local or remote \(err)")
+                case .finished:
+                    GameLogger.shared.log(prefix: Constants.tag, message: "Successfully created and sync local and remote profiles")
+                }
+            }, receiveValue: { [loadedProfileSubject] profile in
+                loadedProfileSubject.send(profile)
+            })
+            .store(in: &disposables)
     }
     
     /// Reset user defaults
@@ -288,21 +305,20 @@ class ProfileLoadingManager: ProfileManaging {
 }
 
 func saveProfileLocallyAndRemotely(_ profile: Profile, localPlayer: PlayerClient, uuidKey: String, userDefaultsClient: UserDefaultClient, isAuthenticated: Bool, fileManagerClient: FileManagerClient, profileCodingClient: ProfileCodingClient) -> AnyPublisher<Profile, Error> {
-        
+    
     let ignoreUnauthenicatedGameCenter =
-        saveProfileRemotely(profile, localPlayer: localPlayer, profileCodingClient: profileCodingClient)
+    saveProfileRemotely(profile, localPlayer: localPlayer, profileCodingClient: profileCodingClient)
         .catch { error in
             return Future<Profile, Error> { promise in
                 if (!isAuthenticated) { promise(.success(profile)) }
-                else { promise(.failure(error)) }
+                else { promise(.success(profile)) }
+            }
         }
-    }
-
-    return
-        Publishers.Merge(
-            saveProfileLocally(profile, uuidKey: uuidKey, userDefaultsClient: userDefaultsClient, fileManagerClient: fileManagerClient),
-            ignoreUnauthenicatedGameCenter
-        )
+    
+    return Publishers.Merge(
+        saveProfileLocally(profile, uuidKey: uuidKey, userDefaultsClient: userDefaultsClient, fileManagerClient: fileManagerClient),
+        ignoreUnauthenicatedGameCenter
+    )
         .eraseToAnyPublisher()
 }
 
@@ -311,23 +327,24 @@ func saveProfileLocallyAndRemotely(_ profile: Profile, localPlayer: PlayerClient
 func saveProfileRemotely(_ profile: Profile, localPlayer: PlayerClient, profileCodingClient: ProfileCodingClient) -> Future<Profile, Error> {
     return Future { promise in
         GameLogger.shared.log(prefix: ProfileLoadingManager.Constants.tag, message: "Saving profile to GameCenter")
+        promise(.failure(ProfileError.gameCenterTurnedOff))
         
-        let name = profile.name
-        do {
-            let data = try profileCodingClient.encoder.encode(profile)
-            localPlayer.saveGameData(data, name) { (savedGame, error) in
-                if let error = error {
-                    GameLogger.shared.log(prefix: ProfileLoadingManager.Constants.tag, message: "Error saving game file in Game Center with name \(name) due to error \(error)")
-                    promise(.failure(ProfileError.failureToSaveRemoteProfile(error)))
-                } else {
-                    GameLogger.shared.log(prefix: ProfileLoadingManager.Constants.tag, message: "Successfully save game file with name \(name)")
-                    promise(.success(profile))
-                }
-            }
-        } catch {
-            GameLogger.shared.log(prefix: ProfileLoadingManager.Constants.tag, message: "Failed to encode profile with error: \(error)")
-            promise(.failure(ProfileError.failureToSaveRemoteProfile(error)))
-        }
+//        let name = profile.name
+//        do {
+//            let data = try profileCodingClient.encoder.encode(profile)
+//            localPlayer.saveGameData(data, name) { (savedGame, error) in
+//                if let error = error {
+//                    GameLogger.shared.log(prefix: ProfileLoadingManager.Constants.tag, message: "Error saving game file in Game Center with name \(name) due to error \(error)")
+//                    promise(.failure(ProfileError.failureToSaveRemoteProfile(error)))
+//                } else {
+//                    GameLogger.shared.log(prefix: ProfileLoadingManager.Constants.tag, message: "Successfully save game file with name \(name)")
+//                    promise(.success(profile))
+//                }
+//            }
+//        } catch {
+//            GameLogger.shared.log(prefix: ProfileLoadingManager.Constants.tag, message: "Failed to encode profile with error: \(error)")
+//            promise(.failure(ProfileError.failureToSaveRemoteProfile(error)))
+//        }
     }
 }
 
@@ -399,7 +416,7 @@ func createLocalProfile(playerUUIDKey: String, userDefaultClient: UserDefaultCli
             /// save the profile with the uuid as the name
             /// copy all other defaults
             // @TODO: Create a progressable model from a JSON file
-            let newProfile = Profile(name: uuid, player: profile.player, currentRun: nil, stats: Statistics.startingStats, unlockables: Unlockable.unlockables, startingUnlockbles: Unlockable.startingUnlockedUnlockables)
+            let newProfile = Profile(name: uuid, player: profile.player, currentRun: nil, stats: Statistics.startingStats, unlockables: Unlockable.unlockables(), startingUnlockbles: Unlockable.startingUnlockedUnlockables, pastRunSeeds: [])
             
             /// encode the new profile into data
             let jsonData = try profileCodingClient.encoder.encode(newProfile)
@@ -443,6 +460,32 @@ func saveProfileLocally(_ profile: Profile, uuidKey: String, userDefaultsClient:
         } catch let err {
             GameLogger.shared.log(prefix: ProfileLoadingManager.Constants.tag, message: "Failed to save file locally at path \(pathURL)")
             promise(.failure(ProfileError.failedToSaveLocalProfile(err)))
+        }
+    }
+}
+
+/// This takes a look at two profiles and determines which one has progressed further
+/// First it compares purchased items
+/// If both profiles have the same amount of purchased items it compares the number of unlocked items
+fileprivate func progressedFuther(lhs: Profile, rhs: Profile) -> Profile {
+    let rhsIsPurchased = rhs.unlockables.filter { $0.isPurchased }.count
+    let lhsIsPurchased = lhs.unlockables.filter { $0.isPurchased }.count
+    
+    let rhsIsUnlocked = rhs.unlockables.filter { $0.isUnlocked }.count
+    let lhsIsUnlocked = lhs.unlockables.filter { $0.isUnlocked }.count
+    
+    if rhsIsPurchased > lhsIsPurchased { return rhs }
+    else if lhsIsPurchased > rhsIsPurchased { return lhs }
+    else {
+        // they equal on another then check tie breaker
+        if lhs.secondaryProgress > rhs.secondaryProgress {
+            return lhs
+        } else if rhs.secondaryProgress > lhs.secondaryProgress {
+            // give the final tie to the local profile.
+            return rhs
+        } else {
+            //final tie breaker, what has more stuff unlocked
+            return rhsIsUnlocked > lhsIsUnlocked ? rhs : lhs
         }
     }
 }

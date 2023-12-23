@@ -20,13 +20,13 @@ class RuneSlotView: SKSpriteNode {
     
     let viewModel: RuneSlotViewModel
     
-    init(viewModel: RuneSlotViewModel, size: CGSize) {
+    init(viewModel: RuneSlotViewModel, size: CGSize, justDisplayRune: Bool = false) {
         self.viewModel = viewModel
         super.init(texture: nil, color: .clear, size: size)
         
         isUserInteractionEnabled = true
         
-        setupView()
+        setupView(justDisplayRune: justDisplayRune)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -57,7 +57,7 @@ class RuneSlotView: SKSpriteNode {
     private var background: SKShapeNode {
         let background = SKShapeNode(rectOf: outline.frame.size.scale(by: Constants.backgroundScale))
         background.color = .runeBackgroundColor
-        background.zPosition = 1
+        background.zPosition = 5
         
         return background
     }
@@ -79,20 +79,22 @@ class RuneSlotView: SKSpriteNode {
         return progress
     }
     
-    private var runeSprite: SKSpriteNode? {
+    public lazy var runeSprite: SKSpriteNode? = {
         guard let textureName = viewModel.textureName else { return nil }
         let sprite = SKSpriteNode(texture: SKTexture(imageNamed: textureName), size: outline.frame.size.scale(by: Constants.runeScale))
         sprite.zPosition = Precedence.menu.rawValue
         
         return sprite
-    }
+    }()
     
-    func setupView() {
+    func setupView(justDisplayRune: Bool) {
 
+        addChildSafely(runeSprite)
+        
+        guard !justDisplayRune else { return }
         /// add the rune image view
         addChildSafely(outline)
         addChildSafely(background)
-        addChildSafely(runeSprite)
         addChildSafely(progress)
         
         /// show progress

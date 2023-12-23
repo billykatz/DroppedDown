@@ -46,5 +46,12 @@ enum AreaType: Codable, Equatable {
 struct Area: Codable, Equatable {
     let depth: Int
     let type: AreaType
+    
+    var level: Level? {
+        if case let AreaType.level(level) = type {
+            return level
+        }
+        return nil
+    }
         
 }

@@ -19,6 +19,8 @@ struct ComputingState: GameState {
                 return AnyGameState(ComputingState())
             } else if case .touchBegan? = trans.first?.inputType {
                 return AnyGameState(PlayState())
+            } else if case .noMoreMoves = trans.first?.inputType {
+                return AnyGameState(PauseState())
             }
             else {
                 return AnyGameState(AnimatingState())
@@ -26,7 +28,9 @@ struct ComputingState: GameState {
         case .tileDetail:
             return AnyGameState(PauseState())
         case .newTurn:
+            // The Board creates the newTurn when it receives a transformation with the input type "reffing finished"
             return AnyGameState(PlayState())
+            
         default:
             return nil
         }

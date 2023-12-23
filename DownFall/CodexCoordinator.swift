@@ -11,21 +11,28 @@ import UIKit
 import SwiftUI
 
 
+protocol CodexCoordinatorDelegate: AnyObject {
+    func startRunPressed()
+}
+
 class CodexCoordinator {
     
-    private let viewController: UINavigationController
+    private let navigationController: UINavigationController
     var profileViewModel: ProfileViewModel?
+    private weak var delegate: CodexCoordinatorDelegate?
+    private var startRunCallback: () -> Void = { }
     
-    init(viewController: UINavigationController) {
-        self.viewController = viewController
+    init(viewController: UINavigationController, delegate: CodexCoordinatorDelegate?) {
+        self.navigationController = viewController
+        self.delegate = delegate
         
-        self.viewController.navigationBar.barTintColor = .backgroundGray
-        self.viewController.navigationBar.tintColor = .white
-        self.viewController.navigationBar.isTranslucent = false
+        self.navigationController.navigationBar.barTintColor = .backgroundGray
+        self.navigationController.navigationBar.tintColor = .white
+        self.navigationController.navigationBar.isTranslucent = false
         
     }
     
-    func presentCodexView(profileViewModel: ProfileViewModel) {
+    func presentCodexView(profileViewModel: ProfileViewModel, startRunCallback: @escaping () -> Void ) {
         self.profileViewModel = profileViewModel
         let viewModel = CodexViewModel(profileViewModel: profileViewModel, codexCoordinator: self)
         let codexView = CodexView(viewModel: viewModel, selectedIndex: 0)
@@ -33,10 +40,32 @@ class CodexCoordinator {
         let hostingViewController = UIHostingController(rootView: codexView)
         hostingViewController.bottomBlack()
         
-        viewController.pushViewController(hostingViewController, animated: true)
+        let titleLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 100, height: 30))
+        titleLabel.textColor = UIColor.white
+        titleLabel.text = "Basecamp"
+        titleLabel.textAlignment = .center
+        titleLabel.font = .bigTitleCodexFont
+        
+        
+        hostingViewController.navigationItem.titleView = titleLabel
+        navigationController.pushViewController(hostingViewController, animated: true)
+        
+        self.startRunCallback = startRunCallback
     }
     
     func updateUnlockable(_ unlockable: Unlockable) {
-        profileViewModel?.updateUnlockables(unlockable)
+        profileViewModel?.purchaseUnlockables(unlockable)
+    }
+    
+    func didTapOn(_ unlockable: Unlockable) {
+        profileViewModel?.didTapOnUnlockable(unlockable)
+    }
+    
+    func startRunPressed() {
+        //        hostingViewController.dismiss(animated: true)
+        navigationController.popViewController(animated: true)
+        startRunCallback()
+        delegate?.startRunPressed()
+        
     }
 }

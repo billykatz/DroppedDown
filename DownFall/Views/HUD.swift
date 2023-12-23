@@ -8,11 +8,16 @@
 
 import SpriteKit
 
+enum HUDElement: String {
+    case health
+    case gems
+    case dodge
+    case luck
+}
+
 class HUD: SKSpriteNode {
     
     struct Constants {
-        static let threatIndicator = "threatIndicator"
-        static let shuffleBoardButton = "shuffleBoardButton"
         static let levelGoalIndicator = "levelGoalIndicator"
         
         static let dodgeAmountLabelName = "dodgeAmountLabelName"
@@ -22,19 +27,35 @@ class HUD: SKSpriteNode {
         static let gemAmountLabelName = "gemAmountLabelName"
     }
     
-    static func build(color: UIColor, size: CGSize, delegate: SettingsDelegate?) -> HUD {
+    static func build(color: UIColor, size: CGSize, delegate: SettingsDelegate?, level: Level) -> HUD {
         let header = HUD(texture: nil, color: .clear, size: size)
         
+        let settingsTapTarget = SKSpriteNode(texture: nil, size: Style.HUD.settingsTapTargetSize)
         let setting = SKSpriteNode(texture: SKTexture(imageNamed: Identifiers.settings), color: .clear , size: Style.HUD.settingsSize)
         
-        setting.name = Identifiers.settings
-        setting.position = CGPoint.position(setting.frame,
+        settingsTapTarget.name = Identifiers.settings
+        settingsTapTarget.position = CGPoint.position(setting.frame,
                                             inside: header.frame,
                                             verticalAlign: .top,
-                                            horizontalAnchor: .right)
-        setting.zPosition = 1_000_000
+                                            horizontalAnchor: .right,
+                                            xOffset: 80.0,
+                                            yOffset: -40.0
+                                            
+        )
+        settingsTapTarget.zPosition = 100_000_000_000
+        settingsTapTarget.addChild(setting)
         
-        header.addChild(setting)
+        header.addChild(settingsTapTarget)
+        
+        
+        let depthLevelTitle = ParagraphNode(text: "Depth", fontSize: .fontLargeSize, fontColor: .lightText)
+        let depthLevelNumber = ParagraphNode(text: level.humanReadableDepth, fontSize: .fontLargeSize, fontColor: .lightText)
+        depthLevelNumber.position = CGPoint.position(depthLevelNumber.frame, inside: header.frame, verticalAlign: .top, horizontalAnchor: .left, xOffset: 100, yOffset: 10)
+        depthLevelNumber.name = Identifiers.depthLevelLabel
+        depthLevelTitle.position = CGPoint.alignHorizontally(depthLevelTitle.frame, relativeTo: depthLevelNumber.frame, horizontalAnchor: .center, verticalAlign: .top, translatedToBounds: true)
+        depthLevelTitle.name = Identifiers.depthLevelLabel
+        header.addChild(depthLevelNumber)
+        header.addChild(depthLevelTitle)
         
         header.isUserInteractionEnabled = true
         header.delegate = delegate
@@ -67,47 +88,29 @@ class HUD: SKSpriteNode {
     
     //Mark: - Instance Methods
     
-    private func showAttack(attackInput: Input, endTiles: [[Tile]]?) {
-        if case InputType.attack(_,
-                                 _,
-                                 let defenderPosition,
-                                 _,
-                                 _,
-                                 _) = attackInput.type {
-            print("Defender position \(String(describing: defenderPosition))")
-        }
-        guard let tiles = endTiles else { return }
-        
-        for tile in tiles.flatMap({ $0 }) {
-            if case let TileType.player(playerData) = tile.type {
-                show(playerData)
-            }
-        }
-    }
-    
     func handle(_ input: Input) {
         switch input.type {
         case .transformation(let trans):
             guard let inputType = trans.first?.inputType else { return }
             switch inputType {
-            case .attack:
-                showAttack(attackInput: input, endTiles: trans.first!.endTiles)
-            case .itemUsed, .decrementDynamites, .shuffleBoard, .collectOffer, .gameWin:
+            case .runeUsed, .decrementDynamites, .gameWin, .noMoreMoves, .noMoreMovesConfirm, .attack, .bossTurnStart, .bossPhaseStart:
                 if let tiles = trans.first?.endTiles,
-                    let playerCoord = getTilePosition(.player(.zero), tiles: tiles),
-                    case TileType.player(let data) = tiles[playerCoord].type {
+                   let playerCoord = getTilePosition(.player(.zero), tiles: tiles),
+                   case TileType.player(let data) = tiles[playerCoord].type {
                     show(data)
                 }
                 
             default:
                 ()
             }
-        case .boardBuilt,. boardLoaded:
+        case .boardBuilt, .boardLoaded:
             guard let tiles = input.endTilesStruct,
-                let playerPosition = getTilePosition(.player(.zero), tiles: tiles),
-                case let TileType.player(data) = tiles[playerPosition].type else { return }
+                  let playerPosition = getTilePosition(.player(.zero), tiles: tiles),
+                  case let TileType.player(data) = tiles[playerPosition].type else { return }
             show(data)
-
+            
+            // tiles = new Dictionary<Vector2, Tile>
+            // tiles[Vector2(1, 1)]
         default:
             ()
         }
@@ -115,7 +118,7 @@ class HUD: SKSpriteNode {
     
     func show(_ data: EntityModel) {
         // Remove all the hearts so that we can redraw
-        self.removeAllChildren(exclude: [Identifiers.settings, Constants.threatIndicator, Constants.shuffleBoardButton, Constants.levelGoalIndicator])
+        self.removeAllChildren(exclude: [Identifiers.settings, Constants.levelGoalIndicator, Identifiers.depthLevelLabel])
         
         
         let identifier = Identifiers.fullHeart
@@ -161,7 +164,7 @@ class HUD: SKSpriteNode {
         // display the player's dodge
         let dodgeNode = SKSpriteNode(texture: SKTexture(imageNamed: Identifiers.dodgeSprite), size: Style.HUD.dodgeLuckStatSize)
         dodgeNode.position = CGPoint.alignVertically(dodgeNode.frame, relativeTo: gemLabel.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: Style.Padding.most * 2, translatedToBounds: true)
-        dodgeSprite = dodgeNode
+        self.dodgeSprite = dodgeNode
         
         let dodgeAmountNode = ParagraphNode(text: "\(data.dodge)", paragraphWidth: self.size.width, fontColor: .lightText)
         dodgeAmountNode.position = CGPoint.alignVertically(dodgeAmountNode.frame, relativeTo: dodgeNode.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: Style.Padding.most, translatedToBounds:  true)
@@ -169,7 +172,7 @@ class HUD: SKSpriteNode {
         // display the player's luck
         let luckNode = SKSpriteNode(texture: SKTexture(imageNamed: Identifiers.luckSprite), size: Style.HUD.dodgeLuckStatSize)
         luckNode.position = CGPoint.alignVertically(luckNode.frame, relativeTo: dodgeAmountNode.frame, horizontalAnchor: .right, verticalAlign: .center, horizontalPadding: Style.Padding.most * 2, translatedToBounds: true)
-        luckSprite = luckNode
+        self.luckSprite = luckNode
         
         
         let luckAmountNode = ParagraphNode(text: "\(data.luck)", paragraphWidth: self.size.width, fontColor: .lightText)
@@ -187,54 +190,174 @@ class HUD: SKSpriteNode {
     }
     
     func targetSprite(for offerType: StoreOfferType) -> SKSpriteNode? {
-        switch offerType {
-        case .dodge:
-            return dodgeSprite
-        case .luck:
-            return luckSprite
-        case .greaterHeal, .lesserHeal, .plusTwoMaxHealth, .plusOneMaxHealth:
-            return healthSprite
-        default:
+        switch StoreOfferBucket.bucket(for: offerType).type {
+        case .rune, .util:
             return nil
+        case .dodgeLuck:
+            switch offerType {
+            case .sandals, .runningShoes, .wingedBoots, .dodge:
+                return dodgeSprite
+            case .fourLeafClover, .horseshoe, .luckyCat, .luck:
+                return luckSprite
+            default:
+                return nil
+            }
+            
+        case .health:
+            return healthSprite
+        case .wealth:
+            return gemSpriteNode
         }
 
     }
     
-    func incrementStat(offer: StoreOfferType) {
+    func incrementStat(offer: StoreOfferType, updatedPlayerData: EntityModel?, totalToIncrement: Int) {
         switch offer {
         case .dodge(amount: let amount):
-            showIncreaseInStat(amountLabelName: Constants.dodgeAmountLabelName, amountIncrease: amount)
+            showIncreaseInStat(offerType: offer, amountIncrease: amount)
         case .luck(amount: let amount):
-            showIncreaseInStat(amountLabelName: Constants.luckAmountLabelName, amountIncrease: amount)
+            showIncreaseInStat(offerType: offer, amountIncrease: amount)
         case .greaterHeal:
-            showIncreaseInStat(amountLabelName: Constants.currentHealthAmountLabelName, amountIncrease: 2)
+            guard let updatedPlayerData = updatedPlayerData else {
+                return
+            }
+            let maxHealthGain = min(offer.healAmount, updatedPlayerData.originalHp - updatedPlayerData.hp)
+            showIncreaseInStat(offerType: offer, amountIncrease: maxHealthGain)
         case .lesserHeal:
-            showIncreaseInStat(amountLabelName: Constants.currentHealthAmountLabelName, amountIncrease: 1)
+            guard let updatedPlayerData = updatedPlayerData else {
+                return
+            }
+            let maxHealthGain = min(offer.healAmount, updatedPlayerData.originalHp - updatedPlayerData.hp)
+            showIncreaseInStat(offerType: offer, amountIncrease: maxHealthGain)
         case .plusTwoMaxHealth:
-            showIncreaseInStat(amountLabelName: Constants.totalHealthAmountLabelName, amountIncrease: 2)
+            showIncreaseInStat(offerType: offer, amountIncrease: 2)
         case .plusOneMaxHealth:
-            showIncreaseInStat(amountLabelName: Constants.totalHealthAmountLabelName, amountIncrease: 1)
+            showIncreaseInStat(offerType: offer, amountIncrease: 1)
         case .gems(let amount):
             showTotalGemGain(amount)
+        case .sandals, .runningShoes, .wingedBoots:
+            showIncreaseInStat(offerType: offer, amountIncrease: offer.dodgeAmount)
+        case .fourLeafClover, .horseshoe, .luckyCat:
+            showIncreaseInStat(offerType: offer, amountIncrease: offer.luckAmount)
+        case .gemMagnet:
+            showIncreaseInStat(offerType: offer, amountIncrease: totalToIncrement)
         default:
             return
         }
     }
     
-    private func showIncreaseInStat(amountLabelName: String, amountIncrease: Int) {
-        if let currencyLabel = self.childNode(withName: amountLabelName) as? ParagraphNode {
-            let oldPosition = currencyLabel.position
-
-            // show exaclty how much gold was gained as well
-            let gainedGoldLabel = ParagraphNode(text: "+\(amountIncrease)", paragraphWidth: Style.HUD.labelParagraphWidth, fontSize: .fontExtraLargeSize, fontColor: .goldOutlineBright)
-            gainedGoldLabel.position = oldPosition.translateVertically(40.0)
-            addChildSafely(gainedGoldLabel)
-            let moveUp = SKAction.move(by: CGVector(dx: 0, dy: 100), duration: AnimationSettings.HUD.goldGainedTime)
-            let moveAndFade = SKAction.group([moveUp, SKAction.fadeOut(withDuration: AnimationSettings.HUD.gemCountFadeTime)])
-            let sequence = SKAction.sequence([moveAndFade, SKAction.removeFromParent()])
-            gainedGoldLabel.run(sequence)
+    private func showIncreaseInStat(offerType: StoreOfferType, amountIncrease: Int) {
+        
+        showIncreaseInStatByOne(offer: offerType, amountIncrease: amountIncrease)
+        let waitTime = Double(amountIncrease) * 0.2 / 2
+        
+        if let labelNames = labelNameForOfferType(offer: offerType) {
+            for labelName in labelNames {
+                if let currencyLabel = self.childNode(withName: labelName) as? ParagraphNode {
+                    let oldPosition = currencyLabel.position
+                    
+                    // show exaclty how much gold was gained as well
+                    let gainedGoldLabel = ParagraphNode(text: "+\(amountIncrease)", paragraphWidth: Style.HUD.labelParagraphWidth, fontSize: .fontExtraLargeSize, fontColor: .goldOutlineBright)
+                    gainedGoldLabel.position = oldPosition.translateVertically(40.0)
+                    addChildSafely(gainedGoldLabel)
+                    let moveUp = SKAction.move(by: CGVector(dx: 0, dy: 100), duration: AnimationSettings.HUD.goldGainedTime)
+                    let moveAndFade = SKAction.group([moveUp, SKAction.fadeOut(withDuration: AnimationSettings.HUD.gemCountFadeTime)])
+                    let sequence = SKAction.sequence([SKAction.wait(forDuration: waitTime), moveAndFade, SKAction.removeFromParent()])
+                    gainedGoldLabel.run(sequence)
+                }
+            }
         }
-
+    }
+    
+//    public func positionOfHUDElement(_ hudELement: HUDElement) -> CGPoint {
+//        let position: CGPoint?
+//        switch hudELement {
+//        case .health:
+//            position = self.childNode(withName: Constants.currentHealthAmountLabelName)?.position
+//        case .gems:
+//            position = self.childNode(withName: Constants.gemAmountLabelName)?.position
+//        case .dodge:
+//            position = self.childNode(withName: Constants.dodgeAmountLabelName)?.position
+//        case .luck:
+//            position = self.childNode(withName: Constants.luckAmountLabelName)?.position
+//        }
+//
+//        return position ?? .zero
+//    }
+//
+//    private func labelNameForHUDElement(_ hudElement: HUDElement) -> [String]? {
+//        switch hudElement {
+//        case .health:
+//            return [Constants.currentHealthAmountLabelName]
+//        case .gems:
+//            return [Constants.gemAmountLabelName]
+//        case .dodge:
+//            return [Constants.dodgeAmountLabelName]
+//        case .luck:
+//            return [Constants.luckAmountLabelName]
+//        }
+//    }
+    
+    private func labelNameForOfferType(offer: StoreOfferType) -> [String]? {
+        switch offer {
+        case .dodge, .sandals, .runningShoes, .wingedBoots:
+            return [Constants.dodgeAmountLabelName]
+        case .luck, .fourLeafClover, .horseshoe, .luckyCat:
+            return [Constants.luckAmountLabelName]
+        case .greaterHeal:
+            return [Constants.currentHealthAmountLabelName]
+        case .lesserHeal:
+            return [Constants.currentHealthAmountLabelName]
+        case .plusTwoMaxHealth:
+            return [Constants.currentHealthAmountLabelName, Constants.totalHealthAmountLabelName]
+        case .plusOneMaxHealth:
+            return [Constants.currentHealthAmountLabelName, Constants.totalHealthAmountLabelName]
+        case .gemMagnet:
+            return [Constants.gemAmountLabelName]
+        default:
+            return nil
+        }
+    }
+    
+    private func showIncreaseInStatByOne(offer: StoreOfferType, amountIncrease: Int) {
+        if let currencyLabelIdentifiers = labelNameForOfferType(offer: offer) {
+            for currencyLabelIdentifier in currencyLabelIdentifiers {
+                
+                // some items tick up multiple stats like +1 max health
+                var actions: [SKAction] = []
+                var waitTime = 0.05
+                for _ in 1..<amountIncrease+1 {
+                    let addNewLabel = SKAction.run {
+                        if let currencyLabel = self.childNode(withName: currencyLabelIdentifier) as? ParagraphNode,
+                           let currentTotal = Int(currencyLabel.text) {
+                            
+                            let parent = currencyLabel.parent
+                            
+                            let newCurrencyLabel = ParagraphNode(text: "\(currentTotal + 1)", paragraphWidth: Style.HUD.labelParagraphWidth, fontSize: .fontExtraLargeSize, fontColor: .lightText)
+                            newCurrencyLabel.position = currencyLabel.position
+                            newCurrencyLabel.name = currencyLabelIdentifier
+                            
+                            // remove it
+                            currencyLabel.removeFromParent()
+                            
+                            //add the new one
+                            parent?.addChildSafely(newCurrencyLabel)
+                        }
+                    }
+                    
+                    let sequence = SKAction.sequence([SKAction.wait(forDuration: waitTime), addNewLabel ])
+                    sequence.timingMode = .easeOut
+                    actions.append(sequence)
+                    
+                }
+                waitTime += 0.05
+                
+                if let currencyLabel = self.childNode(withName: currencyLabelIdentifier) as? ParagraphNode {
+                    currencyLabel.parent?.run(SKAction.sequence(actions))
+                }
+                
+            }
+        }
     }
     
     func incrementCurrencyCountByOne() {
@@ -268,7 +391,8 @@ class HUD: SKSpriteNode {
             addChildSafely(gainedGoldLabel)
             let moveUp = SKAction.move(by: CGVector(dx: 0, dy: 100), duration: AnimationSettings.HUD.goldGainedTime)
             let moveAndFade = SKAction.group([moveUp, SKAction.fadeOut(withDuration: AnimationSettings.HUD.gemCountFadeTime)])
-            let sequence = SKAction.sequence([moveAndFade, SKAction.removeFromParent()])
+            let sequence = SKAction.sequence([moveAndFade, .removeFromParent()])
+            sequence.timingMode = .easeIn
             gainedGoldLabel.run(sequence)
         }
     }
@@ -280,21 +404,17 @@ class HUD: SKSpriteNode {
         for node in self.nodes(at: position) {
             if node.name == Identifiers.settings {
                 delegate?.settingsTapped()
-            } else if node.name == Constants.threatIndicator {
-                print("threatIndicator touched")
             }
         }
     }
     
 }
 
-extension HUD: ButtonDelegate {
-    func buttonTapped(_ button: ShiftShaft_Button) {
-        switch button.identifier {
-        case .shuffleBoard:
-            InputQueue.append(Input(.shuffleBoard))
-        default:
-            ()
-        }
-    }
-}
+//extension HUD: ButtonDelegate {
+//    func buttonTapped(_ button: ShiftShaft_Button) {
+//        switch button.identifier {
+//        default:
+//            ()
+//        }
+//    }
+//}

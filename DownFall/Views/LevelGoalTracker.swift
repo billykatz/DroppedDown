@@ -35,13 +35,15 @@ class LevelGoalTracker: LevelGoalTracking {
     
     public var goalProgress: [GoalTracking] = []
     
-    private let level: Level
+    public let level: Level
+    private let tutorialConductor: TutorialConductor
     private var pillarColor =  Set<ShiftShaft_Color>(ShiftShaft_Color.pillarCases)
     private var numberOfIndividualPillars: Int = 0
     private var numberOfGoalsCompleted = 0
     
-    init(level: Level) {
+    init(level: Level, tutorialConductor: TutorialConductor) {
         self.level = level
+        self.tutorialConductor = tutorialConductor
         
         // grab the current progress because the level could be saved
         self.goalProgress = level.goalProgress
@@ -80,25 +82,49 @@ class LevelGoalTracker: LevelGoalTracking {
             trackLevelGoal(with: trans)
             
         case .newTurn:
-            checkForCompletedGoals()
+            if checkForCompletedGoals() {
+                // left blank
+                // we need to send the completed goal input
+            } else {
+                if let tiles = input.endTilesStruct,
+                    let exit = getTilePosition(.exit(blocked: true), tiles: tiles),
+                    case TileType.exit(let blocked) = tiles[exit].type,
+                   blocked
+                {
+                    if goalProgress.allSatisfy({
+                        $0.hasBeenRewarded && $0.isCompleted
+                    }) {
+                        InputQueue.append(Input(.unlockExit))
+                    }
+                }
+            }
             
         case .boardBuilt, .boardLoaded:
             goalIsUpdatedSubject.send(goalProgress)
             countPillars(in: input.endTilesStruct ?? [])
-            InputQueue.append(Input(.levelGoalDetail(goalProgress)))
             
-        case .itemUsed:
+            
+            if tutorialConductor.shouldShowLevelGoalsAtStart && !level.isBossLevel {
+                InputQueue.append(Input(.levelGoalDetail(goalProgress)))
+            }
+            
+        case .runeUsed:
             advanceRuneUseGoal()
             
         case .goalCompleted(let completedGoals, _):
             goalCompletedSubject.send(completedGoals)
+            
+        case .tutorialPhaseEnd(let phase):
+            if phase == .thisIsTheExit {
+                InputQueue.append(Input(.levelGoalDetail(goalProgress)))
+            }
             
         default:
             return
         }
     }
     
-    private func checkForCompletedGoals() {
+    private func checkForCompletedGoals() -> Bool {
         var completedUnAwardedGoals: [GoalTracking] = []
         var allGoalsCompleted = true
         for (idx, goal) in goalProgress.enumerated(){
@@ -118,10 +144,11 @@ class LevelGoalTracker: LevelGoalTracking {
             }
         }
         
-        guard !completedUnAwardedGoals.isEmpty else { return }
+        guard !completedUnAwardedGoals.isEmpty else { return false }
         
         // send input saying that goals were completed
         InputQueue.append(Input(.goalCompleted(completedUnAwardedGoals, allGoalsCompleted: allGoalsCompleted)))
+        return true
     }
     
     private func countPillars(in tiles: [[Tile]]) {
@@ -155,12 +182,28 @@ class LevelGoalTracker: LevelGoalTracking {
                     advanceGoal(for: type, units: count)
                 }
                 countPillars(in: trans.first?.endTiles ?? [])
-            case .monsterDies(_, let type):
-                advanceGoal(for: .monster(EntityModel.zeroedEntity(type: type)), units: 1)
             case .collectItem(_, let item, _):
                 advanceGoal(for: TileType.item(item), units: item.amount)
+                
+            case .collectOffer(collectedCoord: _, collectedOffer: let collectedOffer, discardedCoord: _, discardedOffer: _) :
+                if case  StoreOfferType.gems = collectedOffer.type {
+                    if let gemsCollected = collectedOffer.gemAmount {
+                        let gemItem = Item(type: .gem, amount: gemsCollected)
+                        advanceGoal(for: TileType.item(gemItem), units: gemsCollected)
+                    }
+                }
             default:
                 ()
+            }
+        }
+        
+        for tran in trans {
+            if let monstersKilled = tran.monstersDies {
+                for monstersKill in monstersKilled {
+                    if case TileType.monster(let data) = monstersKill.tileType {
+                        advanceGoal(for: .monster(EntityModel.zeroedEntity(type: data.type)), units: 1)
+                    }
+                }
             }
         }
     }

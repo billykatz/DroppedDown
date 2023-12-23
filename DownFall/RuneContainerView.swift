@@ -45,9 +45,8 @@ class RuneContainerViewModel: RuneContainerViewModelable {
 
 class RuneContainerView: SKSpriteNode {
     let viewModel: RuneContainerViewModelable
-    let mode: ViewMode
     var runeSlotViewModels: [RuneSlotViewModel] = []
-    private var runeSlotViews:  [RuneSlotView] = []
+    public var runeSlotViews:  [RuneSlotView] = []
     var disposables = Set<AnyCancellable>()
     
     struct Constants {
@@ -55,9 +54,8 @@ class RuneContainerView: SKSpriteNode {
         static let runeDetailViewName = "runeDetailView"
     }
     
-    init(viewModel: RuneContainerViewModelable, mode: ViewMode, size: CGSize) {
+    init(viewModel: RuneContainerViewModelable, size: CGSize) {
         self.viewModel = viewModel
-        self.mode = mode
         super.init(texture: nil, color: .clear, size: size)
         isUserInteractionEnabled = true
         
@@ -76,22 +74,41 @@ class RuneContainerView: SKSpriteNode {
         return runeSlotView
     }
     
+    public func runeSlotViewForRune(_ rune: Rune) -> RuneSlotView? {
+        runeSlotViews.first { runeSlotView in
+            return runeSlotView.viewModel.rune == rune
+        }
+
+    }
     
-    public func enableButton(_ enabled: Bool) {
-        runeDetailView?.enableButton(enabled)
+    
+    public func enableButton(_ enabled: Bool, targets: AllTarget) {
+        runeDetailView?.enableButton(enabled, targets: targets)
     }
     
     private func runeWasTapped(rune: Rune?, progress: Int) {
+        /// WEIRD HACK
+        /// Order matters. When disableDetailView is set to false.  We only want to call the viewModel.runeWasTapped method
+        if viewModel.disableDetailView {
+            /// They have tapped on a rune slot, it maybe empty or have a rune
+            if let rune = rune {
+                // The player tapped on a full rune slot.  Let someone know that we should etner targeting move
+                viewModel.runeWasTapped?(rune)
+            }
+            return
+            
+        }
+        
+        /// WEIRD HACK cont...
+        /// Otherwise we want to first set up the rune detail view and then call rune was tapped so that the view gets info regarding the targeting. 
+        setupRuneDetailView(rune: rune, progress: progress)
+        
         /// They have tapped on a rune slot, it maybe empty or have a rune
         if let rune = rune {
             // The player tapped on a full rune slot.  Let someone know that we should etner targeting move
             viewModel.runeWasTapped?(rune)
         }
         
-        // TODO: I dont like that we have to set this flag.  Butttt, it is simple.  Potential refactor may be necessary
-        if viewModel.disableDetailView { return }
-        
-        setupRuneDetailView(rune: rune, progress: progress)
         toggleRuneSlots()
     }
     
@@ -112,10 +129,12 @@ class RuneContainerView: SKSpriteNode {
         let runeDetailView = RuneDetailView(viewModel: RuneDetailViewModel(rune: rune,
                                                                            progress: CGFloat(progress),
                                                                            confirmed: runeWasUsed,
-                                                                           canceled: runeUseWasCanceled,
-                                                                           mode: mode),
+                                                                           canceled: runeUseWasCanceled
+                                                                          ),
                                             size: size)
         runeDetailView.name = Constants.runeDetailViewName
+        runeDetailView.isUserInteractionEnabled = true
+//        runeDetailView.zPosition = 10_000_000
         addChild(runeDetailView)
         self.runeDetailView = runeDetailView
     }
@@ -167,7 +186,7 @@ class RuneContainerView: SKSpriteNode {
             let runeX = frame.minX + frame.width/CGFloat(8) + (frame.width/4.0 * CGFloat(index))
             
             runeSlotView.position = CGPoint(x: runeX, y: runeY)
-            runeSlotView.zPosition = Precedence.menu.rawValue
+            runeSlotView.zPosition = 200
             runeSlotView.name = Constants.runeName
             addChild(runeSlotView)
             runeSlotViews.append(runeSlotView)
@@ -178,6 +197,12 @@ class RuneContainerView: SKSpriteNode {
                 print(rune)
             }).store(in: &disposables)
 
+        }
+    }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        for runeSlotView in runeSlotViews {
+            runeSlotView.touchesEnded(touches, with: event)
         }
     }
 }

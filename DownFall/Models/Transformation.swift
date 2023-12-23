@@ -16,6 +16,16 @@ struct Transformation: Hashable {
     var newTiles: [TileTransformation]?
     var shiftDown: [TileTransformation]?
     var removedTilesContainGem: Bool?
+    var offers: [StoreOffer]?
+    var monstersDies: [MonsterDies]?
+    var pillarsTakeDamage: [PillarTakesDamage]?
+    
+    var poisonColumnAttacks: [[TileCoord]]?
+    var poisonRowAttacks: [[TileCoord]]?
+    
+    var playerTookDamage: [TileCoord]?
+    
+    
     
     init(transformation tileTransformation: [TileTransformation]? = nil,
          inputType: InputType? = nil,
@@ -23,7 +33,13 @@ struct Transformation: Hashable {
          removed: [TileTransformation]? = nil,
          newTiles: [TileTransformation]? = nil,
          shiftDown: [TileTransformation]? = nil,
-         removedTilesContainGem: Bool? = false
+         removedTilesContainGem: Bool? = false,
+         offers: [StoreOffer]? = nil,
+         monstersDies: [MonsterDies]? = nil,
+         pillarsTakeDamage: [PillarTakesDamage]? = nil,
+         poisonColumnAttacks: [[TileCoord]]? = nil,
+         poisonRowAttacks: [[TileCoord]]? = nil,
+         playerTookDamage: [TileCoord]? = nil
     ) {
         self.tileTransformation = tileTransformation
         self.inputType = inputType
@@ -32,6 +48,12 @@ struct Transformation: Hashable {
         self.newTiles = newTiles
         self.shiftDown = shiftDown
         self.removedTilesContainGem = removedTilesContainGem
+        self.offers = offers
+        self.monstersDies = monstersDies
+        self.pillarsTakeDamage = pillarsTakeDamage
+        self.poisonColumnAttacks = poisonColumnAttacks
+        self.poisonRowAttacks = poisonRowAttacks
+        self.playerTookDamage = playerTookDamage
     }
     
     static var zero : Transformation {

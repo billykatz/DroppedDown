@@ -43,6 +43,9 @@ enum CodexSections: String, CaseIterable, Identifiable {
     case playerUpgrades
     case misc
     
+    static var availableInRun: [CodexSections] = [.items, .runes]
+    static var permanentUpgrades: [CodexSections] = [.playerUpgrades, .misc]
+    
     var id: String {
         return self.rawValue
     }
@@ -51,8 +54,8 @@ enum CodexSections: String, CaseIterable, Identifiable {
         switch self {
         case .items: return "Items"
         case .runes: return "Runes"
-        case .playerUpgrades: return "Upgrades"
-        case .misc: return "Misc"
+        case .playerUpgrades: return "Stats"
+        case .misc: return "Pickaxe"
         }
     }
 }
@@ -60,6 +63,9 @@ enum CodexSections: String, CaseIterable, Identifiable {
 class CodexViewModel: ObservableObject {
     
     public let sections = CodexSections.allCases
+    
+    public let availableInRun = CodexSections.availableInRun
+    public let permanentUpgrades = CodexSections.permanentUpgrades
     
     @Published var unlockables: [Unlockable] = []
     @Published var gemAmount: Int = 0
@@ -95,7 +101,12 @@ class CodexViewModel: ObservableObject {
     }
     
     
-    //API
+    /// API
+    
+    func startRunPressed() {
+        codexCoordinator?.startRunPressed()
+    }
+    
     func unlockables(in section: CodexSections) -> [Unlockable] {
         var unlockablesInSection: [Unlockable] = []
         for unlockable in unlockables {
@@ -104,9 +115,13 @@ class CodexViewModel: ObservableObject {
                 if section == .playerUpgrades {
                     unlockablesInSection.append(unlockable)
                 }
+            case .luckyCat, .wingedBoots:
+                if section == .items {
+                    unlockablesInSection.append(unlockable)
+                }       
             case .rune where section == .runes:
                 unlockablesInSection.append(unlockable)
-            case .killMonsterPotion, .greaterHeal, .lesserHeal, .transmogrifyPotion, .plusTwoMaxHealth:
+            case .killMonsterPotion, .greaterHeal, .lesserHeal, .transmogrifyPotion, .plusTwoMaxHealth, .escape, .gemMagnet, .greaterRuneSpiritPotion, .infusion, .liquifyMonsters:
                 if section == .items {
                     unlockablesInSection.append(unlockable)
                 }
@@ -128,7 +143,7 @@ class CodexViewModel: ObservableObject {
     }
     
     
-    func relevantStatForUnlockable(_ unlockable: Unlockable) -> Statistics {
+    func relevantStatForUnlockable(_ unlockable: Unlockable) -> Statistics? {
         guard let stat = statData.first(where:
                                             { stat in
                                                 stat.statType == unlockable.stat.statType
@@ -136,51 +151,67 @@ class CodexViewModel: ObservableObject {
                                                     && stat.gemColor == unlockable.stat.gemColor
                                                     && stat.monsterType == unlockable.stat.monsterType
                                                     && stat.runeType == unlockable.stat.runeType
-                                            }) else { preconditionFailure() }
+                                            }) else { return nil }
         return stat
     }
     
+    func amountNeededToUnlock(_ unlockable: Unlockable) -> Int {
+        return relevantStatForUnlockable(unlockable)?.statAmount ?? 0
+    }
+    
     func unlockAt(_ unlockable: Unlockable) -> String {
-        let target = unlockable.stat.amount
+        let target = unlockable.stat.statAmount
         let relevantPlayerStat = relevantStatForUnlockable(unlockable)
-        let current = relevantPlayerStat.amount
+        let current = relevantPlayerStat?.statAmount ?? 0
         
         var value: String = ""
         var subject: String = ""
         
-        if let rockColor = relevantPlayerStat.rockColor {
+        if let rockColor = relevantPlayerStat?.rockColor {
             value += "Mine"
             subject = "\(rockColor) rocks"
-        } else if let gemColor = relevantPlayerStat.gemColor {
+        } else if let gemColor = relevantPlayerStat?.gemColor {
             value += "Collect"
             subject = "\(gemColor) gems"
-        } else if let monsterType = relevantPlayerStat.monsterType {
+        } else if let monsterType = relevantPlayerStat?.monsterType {
             value += "Kill"
             subject = "\(monsterType.humanReadable) monsters"
-        } else if let runeType = relevantPlayerStat.runeType {
+        } else if let runeType = relevantPlayerStat?.runeType {
             value += "Use \(runeType.humanReadable)"
             subject = "times"
-        } else if relevantPlayerStat.statType == .totalRocksDestroyed {
+        } else if let statType = relevantPlayerStat?.statType, statType == .totalRocksDestroyed {
             value += "Mine"
             subject = "rocks"
-        } else if relevantPlayerStat.statType == .totalGemsCollected {
+        } else if let statType = relevantPlayerStat?.statType, statType == .totalGemsCollected {
             value += "Collect"
             subject = "gems"
-        } else if relevantPlayerStat.statType == .totalMonstersKilled {
+        } else if let statType = relevantPlayerStat?.statType, statType == .totalMonstersKilled {
             value += "Kill"
             subject = "monsters"
-        } else if relevantPlayerStat.statType == .totalRuneUses {
+        } else if let statType = relevantPlayerStat?.statType, statType == .totalRuneUses {
             value += "Use runes"
             subject = "times"
-        } else if relevantPlayerStat.statType == .largestRockGroupDestroyed {
+        } else if let statType = relevantPlayerStat?.statType, statType == .largestRockGroupDestroyed {
             return "Mine a group of \(target) rocks to unlock this."
-        } else if relevantPlayerStat.statType == .lowestDepthReached {
+        } else if let statType = relevantPlayerStat?.statType, statType == .lowestDepthReached {
             return "Reach depth \(target) to unlock this."
+        } else if let statType = relevantPlayerStat?.statType, statType == .totalWins {
+            if target == 1 {
+                return "Defeat the boss on depth 10 to unlock this"
+            } else {
+                return "Defeat the boss \(target) times to unlock this"
+            }
+        } else if let statType = relevantPlayerStat?.statType, statType == .attacksDodged {
+            value += "Dodge"
+            subject = "attacks"
         }
         
         value += " \(target - current) more \(subject) to unlock this."
         return value
     }
     
+    func didTapOnCodexItem(at index: Int) {
+        codexCoordinator?.didTapOn(unlockables[index])
+    }
     
 }

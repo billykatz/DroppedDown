@@ -18,20 +18,23 @@ struct PlayState: GameState {
             return AnyGameState(WinState())
         case .gameLose:
             return AnyGameState(LoseState())
-        case .pause, .levelGoalDetail:
+        case .pause, .levelGoalDetail, .tutorialPhaseStart:
             return AnyGameState(PauseState())
         case .attack, .touch, .monsterDies,
              .rotateCounterClockwise, .rotateClockwise, .collectItem,
-             .touchBegan, .shuffleBoard, .unlockExit, .goalCompleted:
+             .touchBegan, .unlockExit, .goalCompleted,
+             .bossTurnStart, .bossPhaseStart:
             return AnyGameState(ComputingState())
         case .boardBuilt:
             return AnyGameState(PlayState())
         case .boardLoaded:
             return AnyGameState(ReffingState())
-        case .itemUseSelected:
+        case .runeUseSelected:
             return AnyGameState(TargetingState())
-        case .animationsFinished, .play, .transformation, .reffingFinished, .playAgain,. selectLevel, .newTurn, .visitStore, .itemUseCanceled, .itemCanBeUsed, .itemUsed, .decrementDynamites, .rotatePreview, .rotatePreviewFinish, .refillEmpty, .tileDetail, .runeReplacement,
-             .collectOffer, .runeReplaced, .foundRuneDiscarded:
+        case .animationsFinished, .play, .transformation, .reffingFinished, .playAgain,. selectLevel, .newTurn, .visitStore, .runeUseCanceled, .runeUsed, .decrementDynamites, .rotatePreview, .rotatePreviewFinish, .refillEmpty, .tileDetail, .runeReplacement,
+             .collectOffer, .runeReplaced, .foundRuneDiscarded, .loseAndGoToStore, .tutorialPhaseEnd,
+             .noMoreMoves, .noMoreMovesConfirm, .collectChestOffer
+            :
             return nil
         }
         

@@ -7,13 +7,22 @@
 //
 
 import Foundation
+import SwiftUI
 
 class Referee {
-    static func enterRules(_ tiles: [[Tile]]?) {
-        InputQueue.append(Referee.enforceRules(tiles))
+    
+    static var shared = Referee()
+    var winRule: Rule = NonBossWin()
+    
+    func setWinRule(_ winRule: Rule) {
+        self.winRule = winRule
     }
     
-    static func enforceRules(_ tiles: [[Tile]]?) -> Input {
+    func enterRules(_ tiles: [[Tile]]?) {
+        InputQueue.append(self.enforceRules(tiles))
+    }
+    
+    func enforceRules(_ tiles: [[Tile]]?) -> Input {
         guard let tiles = tiles, !tiles.isEmpty else { return Input(.reffingFinished(newTurn: false)) }
         
         func valid(neighbor: TileCoord?, for currCoord: TileCoord?) -> Bool {
@@ -81,20 +90,9 @@ class Referee {
         
         
         let playerPosition = getTilePosition(.player(.zero), tiles: tiles)
-        let exitPosition = getTilePosition(.exit(blocked: false), tiles: tiles)
+//        let exitPosition = getTilePosition(.exit(blocked: false), tiles: tiles)
         let dynamitePositions = getTilePositions(.dynamite(DynamiteFuse(count: 0, hasBeenDecremented: false)), tiles: tiles)
         
-        func boardHasMoreMoves() -> Bool {
-            guard let playerPosition = playerPosition else { return false }
-            for (i, row) in tiles.enumerated() {
-                for (j, _) in row.enumerated() {
-                    if findNeighbors(i, j).count > 2 || valid(neighbor: exitPosition, for: playerPosition) || playerHasPossibleAttack() {
-                        return true
-                    }
-                }
-            }
-            return false
-        }
         
         func calculateTargetSlope(in slopedDirection: AttackSlope, distance i: Int, from position: TileCoord) -> TileCoord {
             let (initialRow, initialCol) = position.tuple
@@ -257,13 +255,23 @@ class Referee {
                     
                     let (nonBlockedAttackedTiles, allAttackedTileArray) = attackedTiles(from: potentialMonsterPosition)
 
-                    for attackedTile in nonBlockedAttackedTiles {
+                    for attackedTile in nonBlockedAttackedTiles.sorted(by: { tileCoordA, tileCoordB in
+                        
+                        if case TileType.player = tiles[tileCoordA].type {
+                            return true
+                        } else if case TileType.player = tiles[tileCoordB].type {
+                            return false
+                        } else {
+                            return false
+                        }
+                    }) {
                         if case TileType.player = tiles[attackedTile].type {
                             return Input(.attack(attackType: monsterData.attack.type,
                                                  attacker: potentialMonsterPosition,
                                                  defender: attackedTile,
                                                  affectedTiles: nonBlockedAttackedTiles,
-                                                 dodged: false, attackerIsPlayer: false))
+                                                 dodged: false,
+                                                 attackerIsPlayer: false))
                         } else if case TileType.pillar = tiles[attackedTile].type,
                             allAttackedTileArray.contains(where: { (coord) -> Bool in
                                 if case TileType.player = tiles[coord].type {
@@ -302,7 +310,11 @@ class Referee {
                 for (j, _) in row.enumerated() {
                     if case TileType.monster(let data) = tiles[TileCoord(i,j)].type {
                         if data.hp <= 0 {
-                            return Input(.monsterDies(TileCoord(i,j), data.type))
+                            var deathBy: MonsterDeathType = .rune
+                            if case EntityModel.EntityType.player? = data.killedBy {
+                                deathBy = .player
+                            }
+                            return Input(.monsterDies(TileCoord(i,j), data.type, deathType: deathBy))
                         }
                     }
                 }
@@ -310,10 +322,11 @@ class Referee {
             return nil
         }
         
-        func playerIsDead() -> Bool {
+        func playerIsDead() -> Input? {
             guard let playerPosition = playerPosition,
-                case TileType.player(let playerCombat) = tiles[playerPosition].type else { return false }
-            return playerCombat.hp <= 0
+                case TileType.player(let playerCombat) = tiles[playerPosition].type,
+                playerCombat.isDead else { return nil }
+            return Input(.gameLose(killedBy: playerCombat.killedBy))
         }
         
         func playerCollectsItem() -> Input? {
@@ -337,7 +350,7 @@ class Referee {
             if case let StoreOfferType.rune(rune) = storeOffer.type,
                let pickaxe = data.pickaxe,
                pickaxe.runeSlots < pickaxe.runes.count + 1 {
-                return Input(.runeReplacement(pickaxe, rune))
+                return Input(.runeReplacement(pickaxe, rune, promptedByChest: false))
             } else {
                 return Input(.collectOffer(collectedCoord: playerPosition.rowBelow, collectedOffer: storeOffer, discardedCoord: .zero, discardedOffer: .zero))
             }
@@ -347,6 +360,20 @@ class Referee {
         func decrementDynamiteFuses() -> Input? {
             guard let dynamitePos = dynamitePositions else { return nil }
             return Input(.decrementDynamites(dynamitePos))
+        }
+        
+        var playerCoord: TileCoord {
+            return tileCoords(for: tiles, of: .player(.zero)).first!
+        }
+        
+        func noMoreMoves() -> Input? {
+            let hasMoreMoves = boardHasMoreMoves(tiles: tiles)
+            if hasMoreMoves {
+                return nil
+            } else {
+                return Input(.noMoreMoves)
+            }
+            
         }
         
         /// We need to refill if ever there is an empty tile with a non-empty and non-pillar tile above it
@@ -406,16 +433,15 @@ class Referee {
         // Game Win
         // Game Lose
         // Player attack
+        // Player collects gems or items
+        // Refill empty tiles
         // Monster attack
         // Monster Die
-        // Player collects gems
-        
-        let winRule = Rulebook.winRule
         
         if let input = winRule.apply(tiles) {
             return input
-        } else if playerIsDead() {
-            return Input(.gameLose("You ran out of health"))
+        } else if let gameLoseInput = playerIsDead() {
+            return gameLoseInput
         }
         
         
@@ -443,10 +469,14 @@ class Referee {
             return monsterAttack
         }
         
-        if let decrementDynamite = decrementDynamiteFuses() {
+        // We only ever want to decrement a dynamite if they player took a turn, not if the boss took a turn.
+        if let decrementDynamite = decrementDynamiteFuses(), TurnWatcher.shared.checkNewTurn() {
             return decrementDynamite
         }
         
+        if let noMoreMoves = noMoreMoves() {
+            return noMoreMoves
+        }
         
         let newTurn = TurnWatcher.shared.getNewTurnAndReset()
         return Input(.reffingFinished(newTurn: newTurn), tiles)

@@ -21,6 +21,15 @@ extension CGSize {
     static let buttonLarge = CGSize(width: 150, height: 75)
     static let buttonExtralarge = CGSize(width: 300, height: 150)
     
+    static let buttonMainMenu = CGSize(width: 410, height: 202.5)
+    
+    var fullScreenSize: CGSize {
+        let maxAspectRatio : CGFloat = 19.5/9.0
+        let fullWidth = height * maxAspectRatio
+        return CGSize(width: fullWidth, height: height)
+
+    }
+    
     var playableRect: CGRect {
         /// This is a special ratio based on the iPhoneX ratio.  However we also account for the safe areas so we dont show anything too close to the top or bottom of the screen.  The side safe areas are ignored because we dont put anything useful in those areas to begin with
         let maxAspectRatio : CGFloat = 19.5/9.0
@@ -39,4 +48,18 @@ extension CGSize {
     func scaleWidth(by coefficient: CGFloat) -> CGSize {
         return CGSize(width: width * coefficient, height: height)
     }
+    
+    init(widthHeight: CGFloat) {
+        self.init(width: widthHeight, height: widthHeight)
+    }
+}
+
+
+extension CGSize: Comparable {
+    // only good at comparing sizes with equal width and height
+    public static func < (lhs: CGSize, rhs: CGSize) -> Bool {
+        return lhs.width < rhs.width && lhs.height < rhs.height
+    }
+    
+    
 }

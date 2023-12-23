@@ -14,6 +14,7 @@ enum AnimationType: String, Codable {
     case dying
     case idle
     case fall
+    case dodge
     case projectileStart
     case projectileMid
     case projectileEnd

@@ -41,31 +41,47 @@ class DFTileSpriteNode: SKSpriteNode {
                 trackSprite.zPosition = Precedence.background.rawValue
                 addChild(trackSprite)
             }
-        case .offer(let offer):
-            if offer.hasSpriteSheet, let columns = offer.spriteSheetColumns {
-                let spriteSheet = SpriteSheet(texture: SKTexture(imageNamed: offer.textureName), rows: 1, columns: columns)
-                
-                let firstTexture = spriteSheet.firstTexture()
-                
-                let animation = SKAction.animate(with: spriteSheet.animationFrames(), timePerFrame: 0.1)
-                let repeatAction = SKAction.repeatForever(animation)
-                
-                super.init(texture: firstTexture,
-                           color: .clear,
-                           size: CGSize(width: width, height: height))
-                
-                self.run(repeatAction)
-            } else {
-                fallthrough
-            }
+        case .offer:
+            super.init(texture: SKTexture(imageNamed: type.textureString()),
+                       color: .clear,
+                       size: CGSize(width: width*0.75, height: height*0.75))
         default:
             super.init(texture: SKTexture(imageNamed: type.textureString()),
                        color: .clear,
                        size: CGSize(width: width, height: height))
         }
+        
+        addAnimatingLayer()
+    }
+    
+    let animatingLayerName = "animatingLayer"
+    
+    @discardableResult
+    private func addAnimatingLayer() -> SKSpriteNode {
+        var tileSize = self.size
+        if self.type.isPlayer {
+            tileSize = tileSize.scale(by: 1/3)
+        }
+        let animatingLayer = SKSpriteNode(color: .clear, size: tileSize)
+        animatingLayer.name = animatingLayerName
+        animatingLayer.zPosition = 100_000_000
+        self.addChild(animatingLayer)
+        return animatingLayer
+    }
+    
+    var animatingLayer: SKSpriteNode {
+        if let child = self.childNode(withName: animatingLayerName) as? SKSpriteNode {
+            return child
+        } else {
+            return addAnimatingLayer()
+        }
     }
     
     required init?(coder aDecoder: NSCoder) { fatalError("DFTileSpriteNode init?(coder:) is not implemented") }
+    
+    var isPlayerSprite: Bool {
+        return type == .player(.zero)
+    }
     
     func removeMinecart() {
         guard case TileType.exit = self.type else { return }
@@ -76,48 +92,41 @@ class DFTileSpriteNode: SKSpriteNode {
         }
     }
     
-    func indicateSpriteWillBeAttacked() {
-        let indicatorSprite = SKSpriteNode(color: .yellow, size: self.size)
-        indicatorSprite.zPosition = Precedence.background.rawValue
+    func showFuseTiming(_ fuseAmount: Int) {
+        self.removeChild(with: "dynamiteBackground")
+        self.removeChild(with: "dynamiteAmountLabel")
         
-        self.addChild(indicatorSprite)
+        let fontSize: CGFloat = 50
+        let amount = fuseAmount
+        let fontColor: UIColor = amount <= 1 ? .red : .black
+        let background = SKShapeNode(ellipseOf: CGSize(width: self.size.width/2, height: self.size.height/2))
+        background.color = .white
+        background.zPosition = 100
         
-        let wait = SKAction.wait(forDuration: 2.0)
-        let remove = SKAction.removeFromParent()
-        indicatorSprite.run(SKAction.sequence([wait, remove]))
+        let xAmountLabel = ParagraphNode(text: "\(amount)", fontSize: fontSize, fontColor: fontColor)
+        xAmountLabel.zPosition = 101
+        
+        background.position = CGPoint.position(background.frame, inside: self.frame, verticalAlign: .center, horizontalAnchor: .center)
+        
+        xAmountLabel.position = CGPoint.position(xAmountLabel.frame, inside: background.frame, verticalAlign: .center, horizontalAnchor: .center, translatedToBounds: true)
+        
+        background.name = "dynamiteBackground"
+        xAmountLabel.name = "dynamiteAmountLabel"
+        self.addChild(background)
+        self.addChild(xAmountLabel)
     }
     
+    let targetToEatIndicatorName = "TargetToEatIndicator"
     func indicateSpriteWillBeEaten() {
-        let indicatorSprite = SKSpriteNode(color: .red, size: self.size)
+        let indicatorSprite = SKSpriteNode(texture: SKTexture(imageNamed: "target-eat"), size: self.size)
         indicatorSprite.zPosition = Precedence.background.rawValue
-        
+        indicatorSprite.alpha = 0.5
+        indicatorSprite.name = targetToEatIndicatorName
         self.addChild(indicatorSprite)
-        
-        let wait = SKAction.wait(forDuration: 5.0)
-        let remove = SKAction.removeFromParent()
-        indicatorSprite.run(SKAction.sequence([wait, remove]))
     }
     
-    func indicateSpriteWillBeBossAttacked() {
-        let indicatorSprite = SKSpriteNode(color: .clayRed, size: self.size)
-        indicatorSprite.zPosition = Precedence.background.rawValue
-        
-        self.addChild(indicatorSprite)
-        
-        let wait = SKAction.wait(forDuration: 5.0)
-        let remove = SKAction.removeFromParent()
-        indicatorSprite.run(SKAction.sequence([wait, remove]))
-    }
-    
-    func indicateSpriteIsBossAttacked() {
-        let indicatorSprite = SKSpriteNode(color: .foregroundBlue, size: self.size)
-        indicatorSprite.zPosition = Precedence.background.rawValue
-        
-        self.addChild(indicatorSprite)
-        
-        let wait = SKAction.wait(forDuration: 5.0)
-        let remove = SKAction.removeFromParent()
-        indicatorSprite.run(SKAction.sequence([wait, remove]))
+    func removeTargetToEatIndicator() {
+        self.childNode(withName: targetToEatIndicatorName)?.removeFromParent()
     }
     
     /**
@@ -130,6 +139,11 @@ class DFTileSpriteNode: SKSpriteNode {
     
     func showAttackTiming(_ frequency: Int,
                           _ turns: Int) {
+        #if DEBUG
+        if UITestRunningChecker.shared.testsAreRunning {
+            return
+        }
+        #endif
         
         let size = CGSize(width: self.frame.width * 0.1, height: frame.height * 0.1)
         
@@ -148,16 +162,70 @@ class DFTileSpriteNode: SKSpriteNode {
         previousCircle?.strokeColor = color
         previousCircle?.position = CGPoint.position(previousCircle?.frame, inside: frame, verticalAlign: .bottom, horizontalAnchor: .right)
         previousCircle?.zPosition = Precedence.foreground.rawValue
+        previousCircle?.name = "attackIndicator"
         addOptionalChild(previousCircle)
+        
+    }
+    
+    func removeAttackIndicator() {
+        removeChild(with: "attackIndicator")
+    }
+    
+    func showAmount(_ amountToShow: Int? = nil) {
+        #if DEBUG
+        if UITestRunningChecker.shared.testsAreRunning {
+            return
+        }
+        #endif
+        var amount = amountToShow
+        
+        if case TileType.item(let item) = self.type {
+            amount = item.amount
+        }
+        guard let amount = amount, amount > 0 else { return }
+
+        let fontSize: CGFloat
+        let width: CGFloat
+        if amount < 10 {
+            fontSize = 50
+            width = self.size.width*0.45
+        } else if amount < 100 {
+            fontSize = 48
+            width = self.size.width*0.60
+        } else {
+            fontSize = 46
+            width = self.size.width*0.64
+        }
+        
+        let background = SKShapeNode(rectOf: CGSize(width: width, height: self.size.height*0.35), cornerRadius: 16.0)
+        background.color = .buttonGray
+        background.zPosition = 100
+        
+        let xAmountLabel = ParagraphNode(text: "x\(amount)", fontSize: fontSize, fontColor: .black)
+        xAmountLabel.zPosition = 101
+        
+        background.position = CGPoint.position(background.frame, inside: self.frame, verticalAlign: .bottom, horizontalAnchor: .right)
+        
+        xAmountLabel.position = CGPoint.position(xAmountLabel.frame, inside: background.frame, verticalAlign: .center, horizontalAnchor: .right, xOffset: 4, translatedToBounds: true)
+        
+        self.addChild(background)
+        self.addChild(xAmountLabel)
         
     }
     
     func showOfferTier(_ offer: StoreOffer) {
         let sprite = SKSpriteNode(imageNamed: "Reward\(offer.tier)Border")
         sprite.position = .zero
-        sprite.size = self.size
+        sprite.size = self.size.scale(by: 1.33)
+//        sprite.alpha = 0.5
+        sprite.name = "offerTierBorder"
+        sprite.zPosition = -10
         
         addChild(sprite)
+    }
+    
+    func hideOfferTier() {
+        self.removeChild(with: "offerTierBorder")
     }
     
     func showFinger() {
@@ -182,32 +250,14 @@ class DFTileSpriteNode: SKSpriteNode {
     func glow() -> (SKSpriteNode, SKAction)? {
         guard type == TileType.item(.gem)  else { return nil }
         let gemGlow = SKSpriteNode(texture: SKTexture(imageNamed: "crystalGlow"), color: .clear, size: self.size)
-        let spin = SKAction.rotate(byAngle: .pi*2.0, duration: AnimationSettings.Renderer.glowSpinSpeed)
-        let shrink = SKAction.scale(by: 0.8, duration: 1.0)
-        let grow = SKAction.scale(to: self.size, duration: 1.0)
-        let shrinkThenGrow = SKAction.sequence([shrink, grow])
-        let shrinkGrowForever = SKAction.repeatForever(shrinkThenGrow)
-        let spinIndefinitelyAction = SKAction.repeatForever(spin)
         gemGlow.zPosition = Precedence.underground.rawValue
-        return (gemGlow, SKAction.group([shrinkGrowForever, spinIndefinitelyAction]))
-    }
-    
-    func showGem() -> (SKSpriteNode, SKAction)? {
-        guard case TileType.rock(color: let color, holdsGem: let holdsGem) = self.type,
-              holdsGem
-        else { return nil }
-        let gem = TileType.item(Item(type: .gem, amount: 1, color: color))
-        let gemSprite = SKSpriteNode(texture: SKTexture(imageNamed: gem.textureString()), size: self.size)
-        let addGemAction = SKAction.run { [weak self] in
-            self?.addChild(gemSprite)
-        }
         
-        return (self, addGemAction)
+        return nil
     }
     
     func poof(_ removeFromParent: Bool = true) -> (SpriteAction)? {
         
-        let smokeAnimation = Animator().smokeAnimation()
+        let smokeAnimation = Animator().smokeAnimation
         let remove = SKAction.removeFromParent()
         let sequencedActions: [SKAction] = [smokeAnimation, remove]
         let sequence = SKAction.sequence(sequencedActions)
@@ -215,16 +265,44 @@ class DFTileSpriteNode: SKSpriteNode {
         return SpriteAction(sprite: self, action: sequence)
     }
     
-    func crumble(_ removeFromParent: Bool = true) -> (SpriteAction)? {
+    func pillarCrumble(_ removeFromParent: Bool = true, delayBefore: Double = 0.0) -> (SpriteAction)? {
         var animationFrames: [SKTexture] = []
         switch self.type {
-        case .rock(.brown, _):
+        case .pillar(let data):
+            let health = data.health
+            switch data.color {
+            case .blue, .purple, .red:
+                let textureName = "\(data.color.humanReadable.lowercased())Pillar\(health)HealthTakeDamage8"
+                animationFrames = SpriteSheet(textureName: textureName, columns: 8).animationFrames()
+                
+            default:
+                return nil
+            }
+        default:
+            return nil
+        }
+
+        let animateCrumble = SKAction.animate(with: animationFrames, timePerFrame: 0.07)
+        let remove = SKAction.removeFromParent()
+        let wait = SKAction.wait(forDuration: delayBefore)
+        let sequencedActions: [SKAction] = removeFromParent ? [wait, animateCrumble, remove] : [wait, animateCrumble]
+        let sequence = SKAction.sequence(sequencedActions)
+        
+        return SpriteAction(sprite: self, action: sequence)
+    
+    }
+
+    
+    func crumble(_ removeFromParent: Bool = true, delayBefore: Double = 0.0) -> (SpriteAction)? {
+        var animationFrames: [SKTexture] = []
+        switch self.type {
+        case .rock(.brown, _, _):
             animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.brownRockCrumble), rows: 1, columns: 4).animationFrames()
-        case .rock(.red, _):
+        case .rock(.red, _, _):
             animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.redRockCrumble), rows: 1, columns: 4).animationFrames()
-        case .rock(.blue, _):
+        case .rock(.blue, _, _):
             animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.blueRockCrumble), rows: 1, columns: 4).animationFrames()
-        case .rock(.purple, _):
+        case .rock(.purple, _, _):
             animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.purpleRockCrumble), rows: 1, columns: 4).animationFrames()
         default:
             return nil
@@ -232,27 +310,25 @@ class DFTileSpriteNode: SKSpriteNode {
         
         let animateCrumble = SKAction.animate(with: animationFrames, timePerFrame: 0.08)
         let remove = SKAction.removeFromParent()
-        let sequencedActions: [SKAction] = removeFromParent ? [animateCrumble, remove] : [animateCrumble]
+        let wait = SKAction.wait(forDuration: delayBefore)
+        let sequencedActions: [SKAction] = removeFromParent ? [wait, animateCrumble, remove] : [wait, animateCrumble]
         let sequence = SKAction.sequence(sequencedActions)
         
         return SpriteAction(sprite: self, action: sequence)
     }
     
     func sparkle() -> SKAction? {
+        
         var animationFrames: [SKTexture] = []
         switch self.type {
-        case .rock(.red, let withGem):
-            guard withGem else { return nil }
-            animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.redRockWithGem), rows: 1, columns: 11).animationFrames()
-        case .rock(.blue, let withGem):
-            guard withGem else { return nil }
-            animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.blueRockWithGem), rows: 1, columns: 13).animationFrames()
-        case .rock(.purple, let withGem):
-            guard withGem else { return nil }
-            animationFrames = SpriteSheet(texture: SKTexture(imageNamed: Identifiers.Sprite.Sheet.purpleRockWithGem), rows: 1, columns: 10).animationFrames()
+        case .rock(.red, _, _), .rock(.blue, _, _), .rock(.purple, _, _):
+            guard let spriteSheet = self.type.sparkleSheetName else { return nil }
+            animationFrames = spriteSheet.animationFrames()
         default:
             return nil
         }
+        
+        let amount = self.type.amountInGroup
         
         /// Wait for a random amount of time
         let waitAction = SKAction.wait(forDuration: TimeInterval(Int.random(lower: 2, upper: 10)),
@@ -266,7 +342,58 @@ class DFTileSpriteNode: SKSpriteNode {
         /// Repeat forever
         let repeatForever = SKAction.repeatForever(sequence)
         
+        
+        //debug
+        if amount > 0 && UserDefaults.standard.bool(forKey: UserDefaults.showGroupNumberKey) {
+            let fontSize: CGFloat
+            let width: CGFloat
+            if amount < 10 {
+                fontSize = 50
+                width = self.size.width*0.40
+            } else if amount < 100 {
+                fontSize = 48
+                width = self.size.width*0.50
+            } else {
+                fontSize = 46
+                width = self.size.width*0.56
+            }
+
+            let background = SKShapeNode(rectOf: CGSize(width: width, height: self.size.height*0.35), cornerRadius: 16.0)
+            background.color = .buttonGray
+            background.zPosition = 100
+
+            let xAmountLabel = ParagraphNode(text: "\(amount)", fontSize: fontSize, fontColor: .black)
+            xAmountLabel.zPosition = 101
+
+            background.position = CGPoint.position(background.frame, inside: self.frame, verticalAlign: .bottom, horizontalAnchor: .right)
+
+            xAmountLabel.position = CGPoint.position(xAmountLabel.frame, inside: background.frame, verticalAlign: .center, horizontalAnchor: .center, xOffset: 4, translatedToBounds: true)
+
+            self.addChild(background)
+            self.addChild(xAmountLabel)
+        }
+
         return repeatForever
+    }
+    
+    func dyingAnimation(durationWaitBefore: Double = 0.0) -> SpriteAction? {
+        switch self.type {
+        case .monster(let monsterData):
+            switch monsterData.type {
+            case .rat, .alamo, .bat, .dragon, .sally:
+                let animationModel = monsterData.animations.first { $0.animationType == .dying }
+                let animationFrames = animationModel?.animationTextures ?? []
+                let waitBefore = SKAction.wait(forDuration: durationWaitBefore)
+                let animation = SKAction.animate(with: animationFrames, timePerFrame: 0.07)
+                var spriteAction: SpriteAction = .init(self, SKAction.sequence([waitBefore, animation]))
+                spriteAction.duration = Double(animationFrames.count) * 0.07
+                return spriteAction
+            default:
+                return nil
+            }
+        default:
+            return nil
+        }
     }
     
 }

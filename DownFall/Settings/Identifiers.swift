@@ -10,6 +10,7 @@ import Foundation
 
 
 struct Identifiers {
+    static let depthLevelLabel = "depthLevelLabel"
     static let settings = "setting"
     static let header = "header"
     static let fullHeart = "fullHeart"
@@ -29,6 +30,7 @@ struct Identifiers {
     struct Sprite {
         static let redReticle = "redReticle"
         static let greenReticle = "greenReticle"
+        static let potentialTargetReticle = "potentialTargetReticle"
         
         struct Sheet {
             static let brownRockCrumble = "brownRockCrumble"
@@ -36,9 +38,6 @@ struct Identifiers {
             static let blueRockCrumble = "blueRockCrumble"
             static let purpleRockCrumble = "purpleRockCrumble"
             
-            static let redRockWithGem = "redRockWithGemSpriteSheet"
-            static let blueRockWithGem = "blueRockWithGemSpriteSheet"
-            static let purpleRockWithGem = "purpleRockWithGemSpriteSheet"
         
         }
     }

@@ -15,7 +15,7 @@ struct Style {
     
     struct LevelGoalKey {
         static let keyTextureSize = CGSize(width: 50, height: 50)
-        static let keyCircleRadius = CGFloat(25)
+        static let keyCircleRadius = CGFloat(15)
     }
     
     struct FillableBar {
@@ -24,6 +24,7 @@ struct Style {
     }
     
     struct DetailView {
+        static let playerSpriteSize = CGSize(width: 600.0, height: 600.0)
         static let spriteSize = CGSize(width: 200.0, height: 200.0)
         static let closeButtonSize = CGSize(width: 75.0, height: 75.0)
     }
@@ -143,5 +144,6 @@ struct Style {
         static let healthBarHeight = CGFloat(50.0)
         static let lanternSize = CGSize(width: 150.0, height: 150.0)
         static let settingsSize = CGSize(width: 75.0, height: 75.0)
+        static let settingsTapTargetSize = CGSize(width: 125.0, height: 125.0)
     }
 }

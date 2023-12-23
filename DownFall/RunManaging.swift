@@ -15,7 +15,7 @@ class RunModel: Codable, Equatable {
         return lhs.seed == rhs.seed
     }
     
-    static let zero = RunModel(player: .zero, seed: 0, savedTiles: nil, areas: [], goalTracking: [], stats: [], unlockables: [], startingUnlockables: [])
+    static let zero = RunModel(player: .zero, seed: 0, savedTiles: nil, areas: [], goalTracking: [], stats: [], startingUnlockables: [], isTutorial: { false })
     
     let seed: UInt64
     var player: EntityModel
@@ -29,8 +29,10 @@ class RunModel: Codable, Equatable {
     
     var stats: [Statistics] = []
     
-    var unlockables: [Unlockable]
     var startingUnlockables: [Unlockable]
+    
+    //tutorial
+    let isTutorial: Bool
     
     lazy var randomSource: GKLinearCongruentialRandomSource = {
         return GKLinearCongruentialRandomSource(seed: seed)
@@ -41,15 +43,15 @@ class RunModel: Codable, Equatable {
     }
     
     
-    init(player: EntityModel, seed: UInt64, savedTiles: [[Tile]]?, areas: [Area], goalTracking: [GoalTracking], stats: [Statistics], unlockables: [Unlockable], startingUnlockables: [Unlockable]) {
+    init(player: EntityModel, seed: UInt64, savedTiles: [[Tile]]?, areas: [Area], goalTracking: [GoalTracking], stats: [Statistics], startingUnlockables: [Unlockable], isTutorial: () -> Bool) {
         self.player = player
         self.seed = seed
         self.savedTiles = savedTiles
         self.areas = areas
         self.goalTracking = goalTracking
         self.stats = stats
-        self.unlockables = unlockables
         self.startingUnlockables = startingUnlockables
+        self.isTutorial = isTutorial()
     }
     
     func saveGoalTracking(_ goalTracking: [GoalTracking]) {
@@ -57,7 +59,8 @@ class RunModel: Codable, Equatable {
         
         /// update the last area with the goal tracking
         if let lastArea = areas.last,
-           case var AreaType.level(level) = lastArea.type {
+           let lastAreaIndex = areas.lastIndex(of: lastArea),
+           case let AreaType.level(level) = lastArea.type {
             
             /// save the goal progress
             level.goalProgress = goalTracking
@@ -65,20 +68,36 @@ class RunModel: Codable, Equatable {
             // wrap it in a AreaType
             let newAreaType = AreaType.level(level)
             
-            /// get rid of the last area
-            _ = areas.dropLast()
+            /// replace it with one with saved goal tracking
+            areas[lastAreaIndex] = Area(depth: lastArea.depth, type: newAreaType)
+            
+        }
+    }
+    
+    func saveBossPhase(_ phase: BossPhase) {
+        /// update the last area with the goal tracking
+        if let lastArea = areas.last,
+           let lastAreaIndex = areas.lastIndex(of: lastArea),
+           case let AreaType.level(level) = lastArea.type {
+            
+            /// save the goal progress
+            level.savedBossPhase = phase
+            
+            // wrap it in a AreaType
+            let newAreaType = AreaType.level(level)
             
             /// replace it with one with saved goal tracking
-            areas.append(Area(depth: lastArea.depth, type: newAreaType))
+            areas[lastAreaIndex] = Area(depth: lastArea.depth, type: newAreaType)
+            
         }
     }
     
     /// Return the level that corresponds with the depth
     /// If that level has not been built yet, then build it, append it to our private level store, and return the newly built level
-    func currentArea(updatedPlayerData: EntityModel) -> Area {
+    func currentArea(updatedPlayerData: EntityModel, unlockables: [Unlockable]) -> Area {
         self.player = updatedPlayerData
         guard areas.count > 0, let currentArea = areas.last else {
-            return nextArea(updatedPlayerData: updatedPlayerData)
+            return nextArea(updatedPlayerData: updatedPlayerData, unlockables: unlockables)
         }
         return currentArea
     }
@@ -87,14 +106,76 @@ class RunModel: Codable, Equatable {
     /// Creates a new area and appends to the internal array of Areas
     /// There is no more store so this always returns a level
     /// If there was no last level, it is a fresh run, so we return a store, for now.
-    func nextArea(updatedPlayerData: EntityModel) -> Area {
+    func nextArea(updatedPlayerData: EntityModel, unlockables: [Unlockable]) -> Area {
         self.player = updatedPlayerData
         let nextDepth: Int
         if let last = areas.last { nextDepth = last.depth + 1 }
-        else { nextDepth = 0 }
-        let nextLevel = LevelConstructor.buildLevel(depth: nextDepth, randomSource: randomSource, playerData: player, unlockables: unlockables, startingUnlockables: startingUnlockables)
+        else {
+            var nextDepthNumber = 0
+            #if DEBUG
+            if !UITestRunningChecker.shared.testsAreRunning {
+                nextDepthNumber = UserDefaults.standard.integer(forKey: UserDefaults.startingDepthLevelKey)
+            }
+            #endif
+            nextDepth = nextDepthNumber
+        }
+        let nextLevel = LevelConstructor.buildLevel(depth: nextDepth, randomSource: randomSource, playerData: player, unlockables: unlockables, startingUnlockables: startingUnlockables, isTutorial: isTutorial, randomSeed: randomSource.seed, runModel: self)
         let nextArea = Area(depth: nextDepth, type: .level(nextLevel))
         areas.append(nextArea)
         return nextArea
     }
+    
+    func numberOfBossWins() -> Int {
+        for stat in stats {
+            if stat.statType == .totalWins {
+                return stat.statAmount
+            }
+        }
+        return 0
+    }
+    
+    func lastLevelFeatures(currentDepth: Int) -> LevelFeatures? {
+        for area in areas {
+            if case AreaType.level(let level) = area.type,
+               level.depth == currentDepth - 1,
+               let features = level.levelFeatures {
+                return features
+            }
+        }
+        return nil
+    }
+    
+    func allPastLevelOffers(currentDepth: Int) -> [StoreOffer] {
+        var offers: [StoreOffer] = []
+        for area in areas {
+            if case AreaType.level(let level) = area.type,
+               level.depth != currentDepth {
+                offers.append(contentsOf: level.offers)
+            }
+        }
+        return offers
+    }
+
+    func lastLevelOffers(currentDepth: Int) -> [StoreOffer] {
+        var offers: [StoreOffer] = []
+        for area in areas {
+            if case AreaType.level(let level) = area.type,
+               level.depth == currentDepth - 1 {
+                offers.append(contentsOf: level.offers)
+            }
+        }
+        return offers
+    }
+    
+    func lastLevelGoals(currentDepth: Int) -> [LevelGoal] {
+        var goals: [LevelGoal] = []
+        for area in areas {
+            if case AreaType.level(let level) = area.type,
+               level.depth == currentDepth - 1 {
+                goals.append(contentsOf: level.goals)
+            }
+        }
+        return goals
+    }
+
 }

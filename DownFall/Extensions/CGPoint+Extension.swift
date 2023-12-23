@@ -66,6 +66,26 @@ extension CGPoint {
         return CGPoint.position(this, inside: that, verticalAlign: verticalAnchor, horizontalAnchor: horizontalAnchor, xOffset: padding, yOffset: padding)
     }
     
+    static func position(_ this: CGRect?,
+                         inside that: CGRect?,
+                         verticalAnchor: Verticality,
+                         yOffset: CGFloat = 0.0,
+                         horizontalAnchor: Anchor,
+                         xOffset: CGFloat = 0.0,
+                         translatedToBounds: Bool = false) -> CGPoint {
+        return position(this, inside: that, verticalAlign: verticalAnchor, horizontalAnchor: horizontalAnchor, xOffset: xOffset, yOffset: yOffset, translatedToBounds: translatedToBounds)
+    }
+    
+    static func position(_ this: CGRect?,
+                         inside that: CGRect?,
+                         verticalAnchor: Verticality,
+                         horizontalAnchor: Anchor,
+                         yOffset: CGFloat = 0.0,
+                         xOffset: CGFloat = 0.0,
+                         translatedToBounds: Bool = false) -> CGPoint {
+        return position(this, inside: that, verticalAlign: verticalAnchor, horizontalAnchor: horizontalAnchor, xOffset: xOffset, yOffset: yOffset, translatedToBounds: translatedToBounds)
+    }
+    
     /// Position a view insde relative to another view.
     /// The anchor is the horizontal align.
     /// Note: this does not translte to a parent coord system.  If 
@@ -93,7 +113,8 @@ extension CGPoint {
         case .left:
             x = -that.width/2 + this.width/2 + xOffset
         case .center:
-            x = 0.0
+            x = 0.0 + xOffset
+            
         case .right:
             x = that.width/2 - this.width/2 - xOffset
         }

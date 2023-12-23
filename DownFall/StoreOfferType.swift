@@ -7,69 +7,20 @@
 //
 
 enum StoreOfferType: Codable, Hashable, CaseIterable {
-    static var allCases: [StoreOfferType] = {
-        let runeCases = RuneType.allCases.map {
-            return StoreOfferType.rune(Rune.rune(for: $0))
-        }
-        var values: [StoreOfferType] = [
-            .greaterHeal,
-            .plusOneMaxHealth,
-            .plusTwoMaxHealth,
-            .runeSlot,
-            .killMonsterPotion,
-            .luck(amount: 5),
-            .dodge(amount: 5),
-            .gems(amount: 5),
-            .runeUpgrade,
-            .transmogrifyPotion,
-            .lesserHeal,
-        ]
-        
-        values.append(contentsOf: runeCases)
-        
-        return values
-    }()
     
-    static func ==(lhs: StoreOfferType, rhs: StoreOfferType) -> Bool {
-        switch (lhs, rhs) {
-        case (.plusOneMaxHealth, .plusOneMaxHealth): return true
-        case (.plusTwoMaxHealth, .plusTwoMaxHealth): return true
-            
-        case (.runeUpgrade, .runeUpgrade): return true
-        case (.runeSlot, .runeSlot): return true
-        case (.rune(let lhsRune), .rune(let rhsRune)): return lhsRune == rhsRune
-            
-        case (.gems(_), .gems(_)): return true
-        case (.dodge(_), .dodge(_)): return true
-        case (.luck(_), .luck(_)): return true
-            
-        case (.greaterHeal, .greaterHeal): return true
-        case (.lesserHeal, .lesserHeal): return true
-            
-        case (.killMonsterPotion, killMonsterPotion): return true
-        case (.transmogrifyPotion, .transmogrifyPotion): return true
-            
-        // default cases to catch and return false for any other comparisons
-        case (.plusOneMaxHealth, _): return false
-        case (.plusTwoMaxHealth, _): return false
-        case (.runeUpgrade, _): return false
-        case (.runeSlot, _): return false
-        case (.rune(_), _): return false
-        case (.gems(_), _): return false
-        case (.dodge(_), _): return false
-        case (.luck(_), _): return false
-        case (.greaterHeal, _): return false
-        case (.lesserHeal, _): return false
-        case (.killMonsterPotion,_): return false
-        case (.transmogrifyPotion, _): return false
-    
-        }
+    struct Constants {
+        static let sandalsDodgeAmount = 3
+        static let runningShoesDodgeAmount = 5
+        static let wingedBootsDodgeAmount = 10
+        
+        static let fourLeafCloverLuckAmount = 3
+        static let horseshoeLuckAMount = 7
+        static let luckyCatLuckAmount = 14
     }
     
     case plusTwoMaxHealth
     case plusOneMaxHealth
     case rune(Rune)
-    case runeUpgrade
     case runeSlot
     case gems(amount: Int)
     case dodge(amount: Int)
@@ -78,6 +29,19 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
     case greaterHeal
     case killMonsterPotion
     case transmogrifyPotion
+    case sandals
+    case runningShoes
+    case wingedBoots
+    case fourLeafClover
+    case horseshoe
+    case luckyCat
+    case gemMagnet
+    case infusion
+    case snakeEyes
+    case liquifyMonsters
+    case chest
+    case escape
+    case greaterRuneSpiritPotion
     
     enum CodingKeys: String, CodingKey {
         case base
@@ -90,7 +54,6 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
     private enum Base: String, Codable {
         case plusTwoMaxHealth
         case rune
-        case runeUpgrade
         case runeSlot
         case gems
         case dodge
@@ -100,6 +63,89 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
         case greaterHeal
         case killMonsterPotion
         case transmogrifyPotion
+        case sandals
+        case runningShoes
+        case wingedBoots
+        case fourLeafClover
+        case horseshoe
+        case luckyCat
+        case gemMagnet
+        case infusion
+        case snakeEyes
+        case liquifyMonsters
+        case chest
+        case escape
+        case greaterRuneSpiritPotion
+    }
+    
+    var luckAmount: Int {
+        switch self {
+        case .fourLeafClover:
+            return Constants.fourLeafCloverLuckAmount
+        case .horseshoe:
+            return Constants.horseshoeLuckAMount
+        case .luckyCat:
+            return Constants.luckyCatLuckAmount
+        case .luck(amount: let amt):
+            return amt
+        default:
+            return 0
+        }
+    }
+    
+    var dodgeAmount: Int {
+        switch self {
+        case .sandals:
+            return Constants.sandalsDodgeAmount
+        case .runningShoes:
+            return Constants.runningShoesDodgeAmount
+        case .wingedBoots:
+            return Constants.wingedBootsDodgeAmount
+        case .dodge(amount: let amt):
+            return amt
+        default:
+            return 0
+        }
+    }
+    
+    var healAmount: Int{
+        switch self {
+        case .greaterHeal:
+            return 3
+        case .lesserHeal:
+            return 2
+        default:
+            return 0
+        }
+    }
+    
+    var isAHealingOption: Bool {
+        switch self {
+        case .greaterHeal, .lesserHeal, .plusOneMaxHealth, .plusTwoMaxHealth:
+            return true
+        default:
+            return false
+        }
+    }
+    
+    var numberOfTargets: Int {
+        switch self {
+        case .liquifyMonsters:
+            return 3
+        default:
+            return 0
+        }
+    }
+    
+    var effectAmount: Int {
+        switch self {
+        case .liquifyMonsters:
+            return 15
+        case .transmogrifyPotion:
+            return 50
+        default:
+            return 0
+        }
     }
     
     init(from decoder: Decoder) throws {
@@ -112,8 +158,6 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
         case .rune:
             let data = try container.decode(Rune.self, forKey: .runeModel)
             self = .rune(data)
-        case .runeUpgrade:
-            self = .runeUpgrade
         case .runeSlot:
             self = .runeSlot
         case .gems:
@@ -135,6 +179,33 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
             self = .transmogrifyPotion
         case .killMonsterPotion:
             self = .killMonsterPotion
+        case .sandals:
+            self = .sandals
+        case .runningShoes:
+            self = .runningShoes
+        case .wingedBoots:
+            self = .wingedBoots
+        case .fourLeafClover:
+            self = .fourLeafClover
+        case .horseshoe:
+            self = .horseshoe
+        case .luckyCat:
+            self = .luckyCat
+        case .gemMagnet:
+            self = .gemMagnet
+        case .infusion:
+            self = .infusion
+        case .snakeEyes:
+            self = .snakeEyes
+        case .liquifyMonsters:
+            self = .liquifyMonsters
+        case .chest:
+            self = .chest
+        case .escape:
+            self = .escape
+        case .greaterRuneSpiritPotion:
+            self = .greaterRuneSpiritPotion
+
         }
     }
     
@@ -147,8 +218,6 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
         case .rune(let runeModel):
             try container.encode(Base.rune, forKey: .base)
             try container.encode(runeModel, forKey: .runeModel)
-        case .runeUpgrade:
-            try container.encode(Base.runeUpgrade, forKey: .base)
         case .runeSlot:
             try container.encode(Base.runeSlot, forKey: .base)
         case .gems(let amount):
@@ -170,7 +239,112 @@ enum StoreOfferType: Codable, Hashable, CaseIterable {
             try container.encode(Base.killMonsterPotion, forKey: .base)
         case .transmogrifyPotion:
             try container.encode(Base.transmogrifyPotion, forKey: .base)
+        case .sandals:
+            try container.encode(Base.sandals, forKey: .base)
+        case .runningShoes:
+            try container.encode(Base.runningShoes, forKey: .base)
+        case .wingedBoots:
+            try container.encode(Base.wingedBoots, forKey: .base)
+        case .fourLeafClover:
+            try container.encode(Base.fourLeafClover, forKey: .base)
+        case .horseshoe:
+            try container.encode(Base.horseshoe, forKey: .base)
+        case .luckyCat:
+            try container.encode(Base.luckyCat, forKey: .base)
+        case .gemMagnet:
+            try container.encode(Base.gemMagnet, forKey: .base)
+        case .infusion:
+            try container.encode(Base.infusion, forKey: .base)
+        case .snakeEyes:
+            try container.encode(Base.snakeEyes, forKey: .base)
+        case .liquifyMonsters:
+            try container.encode(Base.liquifyMonsters, forKey: .base)
+        case .chest:
+            try container.encode(Base.chest, forKey: .base)
+        case .escape:
+            try container.encode(Base.escape, forKey: .base)
+        case .greaterRuneSpiritPotion:
+            try container.encode(Base.greaterRuneSpiritPotion, forKey: .base)
         }
     }
     
+}
+
+extension StoreOfferType {
+    
+    static var allCases: [StoreOfferType] = {
+        let runeCases = RuneType.allCases.map {
+            return StoreOfferType.rune(Rune.rune(for: $0))
+        }
+        var values: [StoreOfferType] = [
+            .greaterHeal,
+            .plusOneMaxHealth,
+            .plusTwoMaxHealth,
+            .runeSlot,
+            .killMonsterPotion,
+            .luck(amount: 5),
+            .dodge(amount: 5),
+            .gems(amount: 5),
+            .transmogrifyPotion,
+            .lesserHeal,
+            .sandals,
+            .runningShoes,
+            .wingedBoots,
+            .fourLeafClover,
+            .horseshoe,
+            .luckyCat,
+            .gemMagnet,
+            .infusion,
+            .snakeEyes,
+            .liquifyMonsters,
+            .chest,
+            .escape,
+            .greaterRuneSpiritPotion
+            
+        ]
+        
+        values.append(contentsOf: runeCases)
+        
+        return values
+    }()
+    
+    static func ==(lhs: StoreOfferType, rhs: StoreOfferType) -> Bool {
+        switch (lhs, rhs) {
+        case (.plusOneMaxHealth, .plusOneMaxHealth): return true
+        case (.plusTwoMaxHealth, .plusTwoMaxHealth): return true
+            
+        case (.runeSlot, .runeSlot): return true
+        case (.rune(let lhsRune), .rune(let rhsRune)): return lhsRune == rhsRune
+            
+        case (.gems(_), .gems(_)): return true
+        case (.dodge(_), .dodge(_)): return true
+        case (.luck(_), .luck(_)): return true
+            
+        case (.greaterHeal, .greaterHeal): return true
+        case (.lesserHeal, .lesserHeal): return true
+            
+        case (.killMonsterPotion, killMonsterPotion): return true
+        case (.transmogrifyPotion, .transmogrifyPotion): return true
+            
+        case (.sandals, .sandals): return true
+        case (.runningShoes, .runningShoes): return true
+        case (.wingedBoots, .wingedBoots): return true
+        case (.fourLeafClover, .fourLeafClover): return true
+        case (.horseshoe, .horseshoe): return true
+        case (.luckyCat, .luckyCat): return true
+            
+        case (.gemMagnet, .gemMagnet): return true
+        case (.infusion, .infusion): return true
+        case (.snakeEyes, .snakeEyes): return true
+        case (.liquifyMonsters, .liquifyMonsters): return true
+        case (.chest, .chest): return true
+        case (.escape, .escape): return true
+        case (.greaterRuneSpiritPotion, .greaterRuneSpiritPotion): return true
+            
+        // default cases to catch and return false for any other comparisons
+        default:
+            return false
+    
+        }
+    }
 }

@@ -13,10 +13,15 @@ struct PauseState: GameState {
     
     func transitionState(given input: Input) -> AnyGameState? {
         switch input.type {
-        case .play, .selectLevel, .playAgain:
+        case .play, .selectLevel, .playAgain, .tutorialPhaseEnd:
             return AnyGameState(PlayState())
-        case .runeReplaced, .foundRuneDiscarded:
+        case .runeReplaced, .foundRuneDiscarded, .noMoreMovesConfirm:
             return AnyGameState(ComputingState())
+        case .gameWin:
+            #if DEBUG
+            return AnyGameState(WinState())
+            #endif
+            return nil
         default:
             return nil
         }

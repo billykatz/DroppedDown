@@ -25,9 +25,9 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
         return lhs == rhs
     }
     
-    
-    static var allCases: [InputType] = [.touchBegan(TileCoord(0,0), .rock(color: .red, holdsGem: false)),
-                                        .touch(TileCoord(0,0), .rock(color: .red, holdsGem: false)),
+    // leaving out tutorial cases from here
+    static var allCases: [InputType] = [.touchBegan(TileCoord(0,0), .rock(color: .red, holdsGem: false, groupCount: 0)),
+                                        .touch(TileCoord(0,0), .rock(color: .red, holdsGem: false, groupCount: 0)),
                                         .rotateCounterClockwise(preview: false),
                                         .rotateClockwise(preview: false),
                                         .attack(attackType: .targets,
@@ -37,20 +37,19 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
                                                 dodged: false,
                                                 attackerIsPlayer: false
                                         ),
-                                        .monsterDies(TileCoord(0,0), .wizard),
+                                        .monsterDies(TileCoord(0,0), .wizard, deathType: .player),
                                         .gameWin(0),
-                                        .gameLose(""),
+                                        .gameLose(killedBy: .alamo),
                                         .play,
                                         .pause,
                                         .animationsFinished(ref: true),
-                                        .playAgain,
+                                        .playAgain(didWin: false),
                                         .reffingFinished(newTurn: false),
                                         .collectItem(TileCoord(0,0), .zero, 0),
                                         .collectOffer(collectedCoord: .zero, collectedOffer: .zero, discardedCoord: .zero, discardedOffer: .zero),
-                                        .itemUseCanceled,
-                                        .itemUseSelected(.zero),
-                                        .itemCanBeUsed(false),
-                                        .itemUsed(.zero, []),
+                                        .runeUseCanceled,
+                                        .runeUseSelected(.zero),
+                                        .runeUsed(.zero, .init(targets: [], areLegal: false)),
                                         .decrementDynamites(Set<TileCoord>()),
                                         .rotatePreview([], .zero),
                                         .rotatePreviewFinish([], nil),
@@ -60,8 +59,12 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
                                         .unlockExit,
                                         .levelGoalDetail([]),
                                         .goalCompleted([], allGoalsCompleted: false),
-                                        .runeReplacement(Pickaxe(runeSlots: 0, runes: []), .zero),
-                                        .runeReplaced(Pickaxe(runeSlots: 0, runes: []), .zero)
+                                        .runeReplacement(Pickaxe(runeSlots: 0, runes: []), .zero, promptedByChest: false),
+                                        .runeReplaced(Pickaxe(runeSlots: 0, runes: []), replacedRune: .zero,  newRune: .zero, promptedByChest: false),
+                                        .bossTurnStart(BossPhase()),
+                                        .bossPhaseStart(BossPhase()),
+                                        .noMoreMoves,
+                                        .collectChestOffer(offer: .zero)
                                                                  
     ]
     
@@ -71,116 +74,160 @@ indirect enum InputType : Hashable, CaseIterable, CustomDebugStringConvertible{
     case touch(_ position: TileCoord, _ tileType: TileType)
     case rotateCounterClockwise(preview: Bool)
     case rotateClockwise(preview: Bool)
-    case monsterDies(TileCoord, EntityModel.EntityType)
+    case monsterDies(TileCoord, EntityModel.EntityType, deathType: MonsterDeathType)
     case attack(attackType: AttackType, attacker: TileCoord, defender: TileCoord?, affectedTiles: [TileCoord], dodged: Bool, attackerIsPlayer: Bool)
     case gameWin(_ goalsCompleted: Int)
-    case gameLose(String)
+    case gameLose(killedBy: EntityModel.EntityType?)
     case play
     case pause
     case animationsFinished(ref: Bool)
-    case playAgain
+    case playAgain(didWin: Bool)
     case transformation([Transformation])
     case reffingFinished(newTurn: Bool)
     case boardBuilt
     case boardLoaded
+    
     case collectItem(TileCoord, Item, Int)
     case collectOffer(collectedCoord: TileCoord, collectedOffer: StoreOffer, discardedCoord: TileCoord, discardedOffer: StoreOffer)
+    case collectChestOffer(offer: StoreOffer)
+    
     case selectLevel
     case newTurn
     case visitStore
-    case itemUseSelected(Rune)
-    case itemUseCanceled
-    case itemCanBeUsed(Bool)
-    case itemUsed(Rune, [TileCoord])
+    
+    /// Rune Use and Targeting inputs
+    case runeUseSelected(Rune)
+    case runeUseCanceled
+    case runeUsed(Rune, AllTarget)
+    
     case decrementDynamites(Set<TileCoord>)
     case rotatePreview([[DFTileSpriteNode]], Transformation)
     case rotatePreviewFinish([SpriteAction], Transformation?)
     case refillEmpty
     case tileDetail(TileType, [TileCoord])
-    case shuffleBoard
     case unlockExit
     case levelGoalDetail([GoalTracking])
     case goalCompleted([GoalTracking], allGoalsCompleted: Bool)
-    case runeReplacement(Pickaxe, Rune)
-    case runeReplaced(Pickaxe, Rune)
+    case runeReplacement(Pickaxe, Rune, promptedByChest: Bool)
+    case runeReplaced(Pickaxe, replacedRune: Rune, newRune: Rune, promptedByChest: Bool)
     case foundRuneDiscarded(Rune)
+    case loseAndGoToStore
+    
+    // tutorial ish
+    case tutorialPhaseStart(TutorialPhase)
+    case tutorialPhaseEnd(TutorialPhase)
+    
+    // boss input
+    case bossTurnStart(BossPhase)
+    case bossPhaseStart(BossPhase)
+    
+    // no more moves
+    case noMoreMoves
+    case noMoreMovesConfirm(payTwoHearts: Bool, pay25Percent: Bool)
     
     var debugDescription: String {
         switch self {
         case .transformation(let trans):
-            return "Transformation \(String(describing: trans.first?.inputType))"
+            if let firstInputType = trans.first?.inputType {
+                return "transformation \(String(describing: firstInputType))"
+            } else {
+                return "transformation"
+            }
         case .touch:
             return "Touch"
         case .rotateCounterClockwise:
-            return "Rotate Counter clockwise"
+            return "rotateCounterClockwise"
         case .rotateClockwise:
-            return "Rotate clockwise"
+            return "rotateClockwise"
         case .monsterDies:
-            return "Monster Dies"
+            return "monsterDies"
         case .gameWin:
-            return "Game Win"
+            return "gameWin"
         case .gameLose:
-            return "Game Lose"
+            return "gameLose"
         case .play:
-            return "Play"
+            return "play"
         case .pause:
-            return "Pause"
+            return "pause"
         case .animationsFinished:
-            return "Animations Finished"
+            return "animationsFinished"
         case .playAgain:
-            return "Play Again"
-        case .reffingFinished:
-            return "Reffing Finished"
+            return "playAgain"
+        case .reffingFinished(let newTurn):
+            return "reffingFinished. newTurn? \(newTurn)"
         case .attack(_, let attacker, let defender, _, _, _):
-            return "Attacked from \(attacker) to \(String(describing: defender))"
+            return "attack. Attacked from \(attacker) to \(String(describing: defender))"
         case .boardBuilt:
-            return "Board has been built"
+            return "boardBuilt"
         case .boardLoaded:
-            return "Board has been loaded"
+            return "boardLoaded"
+        
         case .collectItem:
-            return "Player collects an item"
+            return "collectItem"
+        case .collectChestOffer:
+            return "collectChestOffer"
+            
         case .selectLevel:
-            return "Select Level"
+            return "selectLevel"
         case .newTurn:
-            return "New Turn"
+            return "newTurn"
         case .touchBegan:
-            return "Touch began"
+            return "touchBegan"
         case .visitStore:
-            return "Visiting store between levels"
-        case .itemUseCanceled:
-            return "Item use canceled"
-        case .itemUseSelected:
-            return "Item use selected"
-        case .itemCanBeUsed(let used):
-            return "item can be used: \(used)"
-        case .itemUsed(let ability, let targets):
-            return "\(ability.textureName) used on targets \(targets)"
+            return "visitStore"
+        case .runeUseCanceled:
+            return "runeUseCanceled"
+        case .runeUseSelected:
+            return "runeUseSelected"
+        case .runeUsed(let ability, let targets):
+            return "\(ability.textureName) used on targets \(targets.allTargetCoords)"
         case .decrementDynamites:
-            return "Decrement the dynamite fuses"
+            return "decrementDynamites"
         case .rotatePreview:
-            return "Rotate preview"
+            return "rotatePreview"
         case .rotatePreviewFinish:
-            return "Rotate finish"
+            return "rotatePreviewFinish"
         case .refillEmpty:
-            return "Refill empty tiles"
+            return "refillEmpty"
         case .tileDetail:
-            return "Tile detail"
-        case .shuffleBoard:
-            return "Shuffle board"
+            return "tileDetail"
         case .unlockExit:
-            return "Unlock Exit"
+            return "unlockExit"
         case .levelGoalDetail:
-            return "Level Goal Detail"
+            return "levelGoalDetail"
         case .goalCompleted:
-            return "Goal was completed"
+            return "goalCompleted"
         case .collectOffer(_, let offer, _, _):
-            return "Player collects \(offer.textureName)"
-        case .runeReplacement(_, _):
-            return "Rune Replacement flow"
+            return "collectOffer. offer: \(offer.textureName)"
+        case .runeReplacement(_, _, let promptedByChest):
+            return "runeReplacement. promptedByChest? \(promptedByChest)"
         case .runeReplaced:
-            return "Rune replaced"
+            return "runeReplaced"
         case .foundRuneDiscarded:
-            return "Found rune discarded"
+            return "foundRuneDiscarded"
+        case .loseAndGoToStore:
+            return "loseAndGoToStore"
+            
+        // tutorial stuff
+        case .tutorialPhaseStart:
+            return "tutorialPhaseStart"
+        case .tutorialPhaseEnd:
+            return "tutorialPhaseEnd"
+            
+        // boss stuff
+        case .bossTurnStart(let phase):
+            return "bossTurnStart. Phase: \(phase.bossPhaseType.rawValue). State: \(String.init(describing: phase.bossState.stateType))"
+        case .bossPhaseStart(let phase):
+            return "bossPhaseStart. Phase: \(phase.bossPhaseType.rawValue). State: \(String.init(describing: phase.bossState.stateType))"
+            
+        // no more moves
+        case .noMoreMoves:
+            return "noMoreMoves"
+            
+        case  .noMoreMovesConfirm(let payTwoHearts, let pay25Percent):
+            return "noMoreMovesConfirm. Pay 2 hearts? \(payTwoHearts). Pay 25%? \(pay25Percent)."
+            
+            
         }
     }
 }

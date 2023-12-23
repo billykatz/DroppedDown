@@ -14,7 +14,7 @@ extension EntityModel {
     
     static func createPlayer(originalHp: Int = 3,
                              hp: Int = 3,
-                             name: String = "player2",
+                             name: String = "player",
                              attack: AttackModel = AttackModel.pickaxe,
                              type: EntityModel.EntityType = .player,
                              carry: CarryModel = .zero,
@@ -31,7 +31,8 @@ extension EntityModel {
                            animations: animations,
                            effects: effects,
                            dodge: dodge,
-                           luck: luck)
+                           luck: luck,
+                           killedBy: nil)
     }
     
     static func createMonster(originalHp: Int = 3,
@@ -53,7 +54,8 @@ extension EntityModel {
                            animations: animations,
                            effects: effects,
                            dodge: dodge,
-                           luck: luck)
+                           luck: luck,
+                           killedBy: nil)
     }
 
 }
@@ -61,7 +63,7 @@ extension EntityModel {
 class EntityModelTests: XCTestCase {
     
     func testEntityModelParsingFromData() {
-        guard let data = try! Data.data(from: "EntityTest") else {
+        guard let data = try! Data.data(from: "entities") else {
             XCTFail("Failed to json file");
             return
         }
@@ -123,7 +125,7 @@ class EntityModelTests: XCTestCase {
         let player = EntityModel.createPlayer()
         XCTAssertTrue(assertBasePlayerStats(player), "A base player has not yet attacked. A base player can attack at most once a turn.  A base player does not have any abilities")
         
-        let buffHealth = EffectModel(kind: .buff, stat: .maxHealth, amount: 2, duration: 1, offerTier: 1)
+        let buffHealth = EffectModel(kind: .buff, stat: .maxHealth, amount: 2, duration: 1)
         let playerGetsAbility = player.addEffect(buffHealth)
         
         XCTAssertTrue(playerGetsAbility.effects.contains(where: { $0 == buffHealth }), "After gaining an ability, it exists within the player's abilities array")
@@ -146,7 +148,7 @@ class EntityModelTests: XCTestCase {
     }
     
     func testEntityRemovesAbility() {
-         let buffHealth = EffectModel(kind: .buff, stat: .maxHealth, amount: 2, duration: 1, offerTier: 1)
+         let buffHealth = EffectModel(kind: .buff, stat: .maxHealth, amount: 2, duration: 1)
               
         let player = EntityModel.createPlayer(effects:[buffHealth])
         

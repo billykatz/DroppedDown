@@ -22,6 +22,7 @@ class ParagraphNode: SKSpriteNode {
     var fontSize: CGFloat
     var text: String
     var paragraphWidth: CGFloat
+    var textAlignment: NSTextAlignment
     
     func fontName(newValue: String) {
         self.fontName = newValue
@@ -49,16 +50,18 @@ class ParagraphNode: SKSpriteNode {
     }
     
     init(text: String,
-         paragraphWidth: CGFloat,
-         fontName: String = ParagraphNode.defaultFontName,
+         paragraphWidth: CGFloat = 2000,
          fontSize: CGFloat = ParagraphNode.defaultFontSize,
-         fontColor: UIColor = ParagraphNode.defaultFontColor
+         fontColor: UIColor = ParagraphNode.defaultFontColor,
+         fontType: UIFontType = UIFontType.legacy,
+         textAlignment: NSTextAlignment = NSTextAlignment.left
          ) {
-        self.fontName = fontName
+        self.fontName = fontType.rawValue
         self.text = text
         self.fontSize = fontSize
         self.fontColor = fontColor
         self.paragraphWidth = paragraphWidth - 2 * Style.paragraphPadding
+        self.textAlignment = textAlignment
         super.init(texture: nil, color: .clear, size: .zero)
         
         retexture()
@@ -72,42 +75,61 @@ class ParagraphNode: SKSpriteNode {
                           paragraphWidth: CGFloat,
                           fontName: String = ParagraphNode.defaultFontName,
                           fontSize: CGFloat = ParagraphNode.defaultFontSize,
-                          fontColor: UIColor = ParagraphNode.defaultFontColor
+                          fontColor: UIColor = ParagraphNode.defaultFontColor,
+                          fontType: UIFontType = UIFontType.legacy,
+                          textAlignment: NSTextAlignment = .left
                           ) -> ParagraphNode {
         return ParagraphNode(
             text: text,
             paragraphWidth: paragraphWidth,
-            fontName: fontName,
             fontSize: fontSize,
-            fontColor: fontColor
+            fontColor: fontColor,
+            fontType: fontType,
+            textAlignment: textAlignment
         )
     }
     
     func retexture() {
-        guard let image = imageFrom(text: self.text as NSString) else { return }
+        guard let image = imageFrom(text: self.text as NSString, textAlignment: self.textAlignment) else { return }
         let texture = SKTexture(image: image)
         self.texture = texture
         self.anchorPoint = CGPoint(x:0.5, y:0.5)
     }
     
-    func imageFrom(text: NSString) -> UIImage? {
-        
-        // paragraph styling
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.lineBreakMode = NSLineBreakMode.byWordWrapping
-        paragraphStyle.alignment = NSTextAlignment.left
-        paragraphStyle.lineSpacing = 1;
-
-        // attributes
-        var attributes: [NSAttributedString.Key: Any] = [:]
-        guard let customFont = UIFont(name: "Alterebro-Pixel-Font", size: fontSize) else {
+    lazy var customFont: UIFont = {
+        guard let customFont = UIFont(name: fontName, size: fontSize) else {
             fatalError("""
-                Failed to load the "pixel-font" font.
+                Failed to load the font with name \(fontName).
                 Make sure the font file is included in the project and the font name is spelled correctly.
                 """
             )
         }
+        return customFont
+        
+        /*
+         Stumped?  Look for the name of the font you are trying to load
+         for family in UIFont.familyNames
+         {
+            print("\(family)")
+            for names in UIFont.fontNames(forFamilyName: family)
+            {
+                print("== \(names)")
+            }
+         }
+         */
 
+    }()
+    
+    func imageFrom(text: NSString, textAlignment: NSTextAlignment) -> UIImage? {
+        
+        // paragraph styling
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineBreakMode = NSLineBreakMode.byWordWrapping
+        paragraphStyle.alignment = textAlignment
+        paragraphStyle.lineSpacing = 1;
+
+        // attributes
+        var attributes: [NSAttributedString.Key: Any] = [:]
         attributes[NSAttributedString.Key.font] = customFont
         attributes[NSAttributedString.Key.paragraphStyle] = paragraphStyle
         attributes[NSAttributedString.Key.foregroundColor] = fontColor

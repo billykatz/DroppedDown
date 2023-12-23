@@ -14,7 +14,7 @@ struct LoseState: GameState {
     
     func transitionState(given input: Input) -> AnyGameState? {
         switch input.type {
-        case .playAgain, .selectLevel:
+        case .playAgain, .selectLevel, .loseAndGoToStore:
             return AnyGameState(PlayState())
         default:
             return nil

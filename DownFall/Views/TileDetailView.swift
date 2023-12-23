@@ -8,6 +8,11 @@
 
 import SpriteKit
 
+enum TileDetailViewType {
+    case levelGoals
+    case tileDetail
+}
+
 class TileDetailView: SKSpriteNode {
     
     struct Constants {
@@ -18,7 +23,7 @@ class TileDetailView: SKSpriteNode {
         static let tileSize = CGFloat(75.0)
         static let boardSize = CGFloat(6)
         static let borderName = "border"
-        static let borderColor = UIColor(rgb: 0x92A3BE)
+        static let borderColor = UIColor(rgb: 0xC3D1EE)
         static let overlayName = "overlay"
     }
     
@@ -50,6 +55,39 @@ class TileDetailView: SKSpriteNode {
         }
     }
     
+    var fontColor: UIColor {
+        switch self.detailType {
+        case .levelGoals:
+            return .white
+        case .tileDetail:
+            return .black
+        }
+    }
+    
+    var backgroundColor: UIColor {
+        switch self.detailType {
+            
+        case .levelGoals:
+            return .gameRecapBlue
+        case .tileDetail:
+            return .tileDetailViewBackground
+        }
+    }
+    
+    var detailType: TileDetailViewType = .levelGoals {
+        didSet {
+            detailViewTemplate.color = backgroundColor
+        }
+    }
+    
+    private let fadeDuration = 0.15
+    private var menuFadeInAction: SKAction {
+        let fadeIn = SKAction.fadeIn(withDuration: fadeDuration)
+        fadeIn.timingMode = .easeInEaseOut
+        return fadeIn
+    }
+
+    
     init(foreground: SKNode, playableRect: CGRect, alignedTo: CGRect, levelSize: Int) {
         self.foreground = foreground
         contentView = SKSpriteNode(color: .clear, size: playableRect.size)
@@ -77,8 +115,8 @@ class TileDetailView: SKSpriteNode {
         /// Detail view
         
         let maxWidth = self.contentView.frame.width * Constants.widthCoefficient
-        let maxHeight = Constants.maxHeight// bottomLeft.y - playableRect.minY - tileSize/2 - Style.Padding.more
-        let detailView = SKSpriteNode(color: .foregroundBlue, size: CGSize(width: maxWidth, height: maxHeight))
+        let maxHeight = Constants.maxHeight
+        let detailView = SKSpriteNode(color: .gameRecapBlue, size: CGSize(width: maxWidth, height: maxHeight))
         
         detailView.position = CGPoint.position(detailView.frame, inside: playableRect, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: Style.Padding.most*8)
         detailView.zPosition = Precedence.flying.rawValue
@@ -103,16 +141,29 @@ class TileDetailView: SKSpriteNode {
         isUserInteractionEnabled = false
         
         Dispatch.shared.register { [weak self] input in
+            guard let self = self else { return }
             switch input.type {
             case .tileDetail(let tileType, let attacks):
-                self?.tileType = tileType
-                self?.tileAttacks = attacks
-                self?.isUserInteractionEnabled = true
-                self?.addChildSafely(self?.contentView)
+                self.detailType = .tileDetail
+                self.tileType = tileType
+                self.tileAttacks = attacks
+                self.isUserInteractionEnabled = true
+                self.contentView.alpha = 0
+                self.addChildSafely(self.contentView)
+                self.contentView.run(self.menuFadeInAction)
+                self.zPosition = 3_000_000
             case .levelGoalDetail(let updatedGoals):
-                self?.levelGoals = updatedGoals
-                self?.isUserInteractionEnabled = true
-                self?.addChildSafely(self?.contentView)
+                self.detailType = .levelGoals
+                self.levelGoals = updatedGoals
+                self.isUserInteractionEnabled = true
+                self.contentView.alpha = 0
+                self.addChildSafely(self.contentView)
+                self.contentView.run(self.menuFadeInAction)
+                self.zPosition = 3_000_000
+            case .tutorialPhaseEnd(let phase):
+                if phase == .theseAreLevelGoals {
+                    self.resetTileDetailView(completion: nil)
+                }
             default:
                 break
             }
@@ -125,21 +176,31 @@ class TileDetailView: SKSpriteNode {
     
     private func titleNode(tileType: TileType, nextTo: CGRect) -> ParagraphNode {
         let string = tileType.humanReadable
-        let title = ParagraphNode(text: string, paragraphWidth: detailViewTemplate.frame.width - nextTo.width, fontSize: .fontLargeSize)
+        let title = ParagraphNode(text: string, paragraphWidth: detailViewTemplate.frame.width - nextTo.width, fontSize: .fontLargeSize, fontColor: fontColor)
         title.position = CGPoint.alignVertically(title.frame, relativeTo: nextTo, horizontalAnchor: .right, verticalAlign: .top, horizontalPadding: Style.Padding.most, translatedToBounds: true)
         title.zPosition = Precedence.menu.rawValue
         return title
     }
     
     private func spriteNode(tileType: TileType) -> SKSpriteNode {
-        let sprite = SKSpriteNode(texture: SKTexture(imageNamed: tileType.textureString()), size: Style.DetailView.spriteSize)
-        sprite.position = CGPoint.position(sprite.frame, inside: detailViewTemplate.frame, verticalAlign: .top, horizontalAnchor: .left, xOffset: Style.Padding.normal)
+        let spriteSize: CGSize = Style.DetailView.spriteSize
+        let spriteName: String
+        if case TileType.player = tileType {
+            spriteName = "player-tile-detail"
+        } else {
+            spriteName = tileType.textureString()
+        }
+
+        
+        let sprite = SKSpriteNode(texture: SKTexture(imageNamed: spriteName), size: spriteSize)
+        sprite.position = CGPoint.position(sprite.frame, inside: detailViewTemplate.frame, verticalAlign: .top, horizontalAnchor: .left, xOffset: Style.Padding.normal, yOffset: Style.Padding.normal)
         sprite.zPosition = Precedence.menu.rawValue
         return sprite
     }
     
     private func animatedSprite(offer: StoreOffer) -> SKSpriteNode {
-        let potionAnimationFrames = SpriteSheet(texture: SKTexture(imageNamed: offer.textureName),
+        guard let spriteSheetName = offer.spriteSheetName else { return SKSpriteNode() }
+        let potionAnimationFrames = SpriteSheet(texture: SKTexture(imageNamed: spriteSheetName),
                                                 rows: 1,
                                                 columns: offer.spriteSheetColumns!)
         
@@ -153,7 +214,7 @@ class TileDetailView: SKSpriteNode {
     
     private func attackDescription(tileType: TileType, nextTo: CGRect) -> ParagraphNode? {
         guard case let TileType.monster(data) = tileType else { return nil }
-        let attackDesc = ParagraphNode(text: data.attack.humanReadable(), paragraphWidth: detailViewTemplate.frame.width - Style.DetailView.spriteSize.width, fontSize: .fontMediumSize)
+        let attackDesc = ParagraphNode(text: data.attack.humanReadable(), paragraphWidth: detailViewTemplate.frame.width - Style.DetailView.spriteSize.width, fontSize: .fontMediumSize, fontColor: fontColor)
         attackDesc.position = CGPoint.alignHorizontally(attackDesc.frame, relativeTo: nextTo, horizontalAnchor: .left, verticalAlign: .bottom, verticalPadding: Style.Padding.more, translatedToBounds: true)
         attackDesc.zPosition = Precedence.menu.rawValue
         return attackDesc
@@ -168,22 +229,39 @@ class TileDetailView: SKSpriteNode {
         \u{2022} takes damage from mining rocks next to it
         \u{2022} collapses when it reaches 0 health
         """
-        let pillarDesc = ParagraphNode(text: text, paragraphWidth: detailViewTemplate.frame.width - Style.DetailView.spriteSize.width, fontSize: .fontMediumSize)
+        let pillarDesc = ParagraphNode(text: text, paragraphWidth: detailViewTemplate.frame.width - Style.DetailView.spriteSize.width, fontSize: .fontMediumSize, fontColor: fontColor)
         pillarDesc.position = CGPoint.alignHorizontally(pillarDesc.frame, relativeTo: nextTo, horizontalAnchor: .left, verticalAlign: .bottom, verticalPadding: Style.Padding.more, translatedToBounds: true)
         pillarDesc.zPosition = Precedence.menu.rawValue
         return pillarDesc
         
     }
     
-    private func gemDescription(tileType: TileType, nextTo: CGRect) -> ParagraphNode? {
-        guard case TileType.item = tileType  else { return nil }
+    private func dynamiteDescription(tileType: TileType, nextTo: CGRect) -> ParagraphNode? {
+        guard case TileType.dynamite = tileType  else { return nil }
         let text =
         """
-        \u{2022} Valuable currency.
-        \u{2022} Larger groups of rocks are more likely to drop gems.
+        \u{2022} Explodes after 3 turns
+        \u{2022} Blows up orthogonal neighbors
+        \u{2022} Does 1 damage
+        """
+        let desc = ParagraphNode(text: text, paragraphWidth: detailViewTemplate.frame.width - Style.DetailView.spriteSize.width, fontSize: .fontMediumSize, fontColor: fontColor)
+        desc.position = CGPoint.alignHorizontally(desc.frame, relativeTo: nextTo, horizontalAnchor: .left, verticalAlign: .bottom, verticalPadding: Style.Padding.more, translatedToBounds: true)
+        desc.zPosition = Precedence.menu.rawValue
+        return desc
+        
+    }
+
+    
+    private func gemDescription(tileType: TileType, nextTo: CGRect) -> ParagraphNode? {
+        guard case TileType.item(let item) = tileType  else { return nil }
+        let text =
+        """
+        \u{2022} \(item.amount) \(item.color?.humanReadable ?? "") gems.
+        \u{2022} Mine less than 10 rocks to earn 1 gem per rock.
+        \u{2022} Mine 10 or more rocks to earn 2 gem per rock.
         \u{2022} There are only a few gems to find on each level.
         """
-        let gemDesc = ParagraphNode(text: text, paragraphWidth: detailViewTemplate.frame.width - Style.DetailView.spriteSize.width - Style.Padding.more, fontSize: .fontMediumSize)
+        let gemDesc = ParagraphNode(text: text, paragraphWidth: detailViewTemplate.frame.width - Style.DetailView.spriteSize.width - Style.Padding.more, fontSize: .fontMediumSize, fontColor: fontColor)
         gemDesc.position = CGPoint.alignHorizontally(gemDesc.frame, relativeTo: nextTo, horizontalAnchor: .left, verticalAlign: .bottom, verticalPadding: Style.Padding.more, translatedToBounds: true)
         gemDesc.zPosition = Precedence.menu.rawValue
         return gemDesc
@@ -194,10 +272,13 @@ class TileDetailView: SKSpriteNode {
         guard case TileType.player(let data) = tileType  else { return nil }
         let text =
         """
-        \u{2022} Dodge: \(data.dodge)
-        \u{2022} Luck:  \(data.luck)
+        \u{2022} This is you.
+        \u{2022} Stats:
+        \t\u{2022} HP: \(data.hp) / \(data.originalHp)
+        \t\u{2022} Dodge: \(data.dodge)
+        \t\u{2022} Luck:  \(data.luck)
         """
-        let playerDesc = ParagraphNode(text: text, paragraphWidth: detailViewTemplate.frame.width - Style.DetailView.spriteSize.width - Style.Padding.more, fontSize: .fontMediumSize)
+        let playerDesc = ParagraphNode(text: text, paragraphWidth: detailViewTemplate.frame.width - Style.DetailView.spriteSize.width - Style.Padding.more, fontSize: .fontMediumSize, fontColor: fontColor)
         playerDesc.position = CGPoint.alignHorizontally(playerDesc.frame, relativeTo: nextTo, horizontalAnchor: .left, verticalAlign: .bottom, verticalPadding: Style.Padding.more, translatedToBounds: true)
         playerDesc.zPosition = Precedence.menu.rawValue
         return playerDesc
@@ -215,7 +296,7 @@ class TileDetailView: SKSpriteNode {
             text = "Effects applied immediately."
         }
     
-        let offerDesc = ParagraphNode(text: text, paragraphWidth: detailViewTemplate.frame.width - Style.DetailView.spriteSize.width - Style.Padding.more, fontSize: .fontMediumSize)
+        let offerDesc = ParagraphNode(text: text, paragraphWidth: detailViewTemplate.frame.width - Style.DetailView.spriteSize.width - Style.Padding.more, fontSize: .fontMediumSize, fontColor: fontColor)
         offerDesc.position = CGPoint.alignHorizontally(offerDesc.frame, relativeTo: nextTo, horizontalAnchor: .left, verticalAlign: .bottom, verticalPadding: Style.Padding.more, translatedToBounds: true)
         offerDesc.zPosition = Precedence.menu.rawValue
         return offerDesc
@@ -231,7 +312,7 @@ class TileDetailView: SKSpriteNode {
             text = "Unblocked."
         }
     
-        let exitDescription = ParagraphNode(text: text, paragraphWidth: detailViewTemplate.frame.width - Style.DetailView.spriteSize.width - Style.Padding.more, fontSize: .fontMediumSize)
+        let exitDescription = ParagraphNode(text: text, paragraphWidth: detailViewTemplate.frame.width - Style.DetailView.spriteSize.width - Style.Padding.more, fontSize: .fontMediumSize, fontColor: fontColor)
         exitDescription.position = CGPoint.alignHorizontally(exitDescription.frame, relativeTo: nextTo, horizontalAnchor: .left, verticalAlign: .bottom, verticalPadding: Style.Padding.more, translatedToBounds: true)
         exitDescription.zPosition = Precedence.menu.rawValue
         return exitDescription
@@ -279,6 +360,8 @@ class TileDetailView: SKSpriteNode {
             detailViewTemplate.addChild(offerDescription)
         } else if let exitDescription = exitDescription(tileType: tileType, nextTo: title.frame) {
             detailViewTemplate.addChild(exitDescription)
+        } else if let dynamiteDescription = dynamiteDescription(tileType: tileType, nextTo: title.frame) {
+            detailViewTemplate.addChild(dynamiteDescription)
         }
         
         detailViewTemplate.position = CGPoint.position(this: detailViewTemplate.frame, centeredInBottomOf: self.contentView.frame, verticalPadding: 150.0)
@@ -288,9 +371,7 @@ class TileDetailView: SKSpriteNode {
 
         // add the border
         addBorder(toView: contentView)
-        
-        // add the background overlay
-        addBackgroundOverlay()
+    
     }
     
     func updateLevelGoals() {
@@ -299,6 +380,7 @@ class TileDetailView: SKSpriteNode {
             detailViewTemplate.removeFromParent()
             return
         }
+        
         for child in contentView.children {
             if child.name == Constants.borderName || child.name == Constants.overlayName {
                 child.removeFromParent()
@@ -306,7 +388,7 @@ class TileDetailView: SKSpriteNode {
         }
 
         
-        let subTitleNode = ParagraphNode(text: "Level Goals", paragraphWidth: detailViewTemplate.frame.width, fontSize: .fontExtraLargeSize)
+        let subTitleNode = ParagraphNode(text: "Level Goals", paragraphWidth: detailViewTemplate.frame.width, fontSize: 100.0, fontColor: fontColor)
         
         subTitleNode.position = CGPoint.position(subTitleNode.frame, inside: detailViewTemplate.frame, verticalAlign: .top, horizontalAnchor: .center, yOffset: Style.Padding.most)
         
@@ -317,27 +399,31 @@ class TileDetailView: SKSpriteNode {
         for (count, goal) in updatedGoals.enumerated() {
             let circleNode = SKShapeNode(circleOfRadius: Style.LevelGoalKey.keyCircleRadius)
             circleNode.color = goal.fillBarColor.1
-            
+            circleNode.strokeColor = .black
+            circleNode.lineWidth = 2
             circleNode.position = CGPoint.position(circleNode.frame,
                                                    inside: detailViewTemplate.frame,
                                                    verticalAlign: .top,
                                                    horizontalAnchor: .left,
                                                    xOffset: Style.Padding.most*2,
-                                                   yOffset: (CGFloat(count) * Style.LevelGoalKey.keyCircleRadius * 2) + (CGFloat(count) * 15) + textHeight + Style.Padding.more*3)
+                                                   yOffset: (CGFloat(count) * Style.LevelGoalKey.keyCircleRadius * 2) + (CGFloat(count) * 35) + textHeight + Style.Padding.more*3)
 
             detailViewTemplate.addChildSafely(circleNode)
             
-            
             // create the goal description
-            let descriptionLabel = ParagraphNode(text: "\(goal.description())", paragraphWidth: detailViewTemplate.frame.maxX - circleNode.frame.maxX, fontSize: .fontLargeSize)
+            let descProgressFontSize: CGFloat = 75.0
+            let descriptionLabel = ParagraphNode(text: "\(goal.description())", paragraphWidth: detailViewTemplate.frame.maxX - circleNode.frame.maxX, fontSize: descProgressFontSize, fontColor: fontColor)
             
-            descriptionLabel.position = CGPoint.alignVertically(descriptionLabel.frame, relativeTo: circleNode.frame, horizontalAnchor: .right, verticalAlign: .center, verticalPadding: Style.Padding.less, horizontalPadding: 100.0,  translatedToBounds: true)
+            let descriptionPosX = CGPoint.alignHorizontally(descriptionLabel.frame, relativeTo: subTitleNode.frame, horizontalAnchor: .center, verticalAlign: .bottom, verticalPadding: Style.Padding.less,  translatedToBounds: true).x
+            let descriptionPosY = CGPoint.alignVertically(descriptionLabel.frame, relativeTo: circleNode.frame, horizontalAnchor: .right, verticalAlign: .center, verticalPadding: Style.Padding.normal, translatedToBounds: true).y
+            
+            descriptionLabel.position = CGPoint(x: descriptionPosX, y: descriptionPosY)
             
             detailViewTemplate.addChildSafely(descriptionLabel)
     
             
             // Progress label  
-            let progressLabel = ParagraphNode(text: goal.progressDescription, paragraphWidth: detailViewTemplate.frame.maxX - circleNode.frame.maxX, fontSize: .fontLargeSize)
+            let progressLabel = ParagraphNode(text: goal.progressDescription, paragraphWidth: detailViewTemplate.frame.maxX - circleNode.frame.maxX, fontSize: 65.0, fontColor: fontColor)
             let x = CGPoint.position(progressLabel.frame, inside: detailViewTemplate.frame, verticalAlign: .center, horizontalAnchor: .right, xOffset: Style.Padding.most).x
             let y = CGPoint.alignVertically(progressLabel.frame, relativeTo: descriptionLabel.frame, horizontalAnchor: .right, verticalAlign: .center, translatedToBounds: true).y
             progressLabel.position = CGPoint(x: x, y: y)
@@ -352,13 +438,12 @@ class TileDetailView: SKSpriteNode {
         
         // add tap anywhere to continue
         let tapHelpText = "[Tap anywhere to continue]"
-        let tapHelpNode = ParagraphNode(text: tapHelpText, paragraphWidth: detailViewTemplate.frame.width, fontSize: .fontMediumSize)
+        let tapHelpNode = ParagraphNode(text: tapHelpText, paragraphWidth: detailViewTemplate.frame.width, fontSize: .fontMediumSize, fontColor: fontColor)
         tapHelpNode.position = CGPoint.position(tapHelpNode.frame, inside: detailViewTemplate.frame, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: 20, translatedToBounds: true)
         detailViewTemplate.addChildSafely(tapHelpNode)
         
         // add the border
         addBorder(toView: detailViewTemplate)
-        
         
         // add the background overlay
         addBackgroundOverlay()
@@ -367,8 +452,8 @@ class TileDetailView: SKSpriteNode {
     
     func addBorder(toView: SKSpriteNode) {
         // add the border
-        let border = SKShapeNode(rect: detailViewTemplate.frame)
-        border.lineWidth = 20.0
+        let border = SKShapeNode(rect: detailViewTemplate.frame, cornerRadius: 12.0)
+        border.lineWidth = 5.0
         border.zPosition = self.zPosition + 100
         border.position = .zero
         border.name = Constants.borderName
@@ -378,10 +463,9 @@ class TileDetailView: SKSpriteNode {
     
     func addBackgroundOverlay() {
         // set up the background
-        let overlay = SKShapeNode(rect: playableRect)
-        overlay.color = UIColor.white
-        overlay.alpha = 0.25
-        overlay.zPosition = -1
+        let overlay = SKSpriteNode(color: .black, size: CGSize(widthHeight: 5000.0))
+        overlay.alpha = 0.5
+        overlay.zPosition = -100
         overlay.position = .zero
         overlay.name = Constants.overlayName
         contentView.addChild(overlay)
@@ -421,12 +505,27 @@ extension TileDetailView {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         if touches.first != nil {
             // then dismiss the view
-            tileType = nil
-            tileAttacks = []
-            levelGoals = nil
-            InputQueue.append(Input(.play))
-            isUserInteractionEnabled = false
-            contentView.removeFromParent()
+            resetTileDetailView {
+                InputQueue.append(Input(.play))
+            }
+        }
+    }
+    
+    func resetTileDetailView(completion: (() -> ())?) {
+        let fadeOut = SKAction.fadeOut(withDuration: fadeDuration)
+        let removeCotentView = SKAction.run { [weak self] in
+            self?.contentView.removeFromParent()
+        }
+        let sequence = SKAction.sequence([fadeOut, removeCotentView])
+        sequence.timingMode = .easeIn
+        
+        Animator().animate([SpriteAction(sprite: contentView, action: sequence)]) { [weak self] in
+            self?.tileType = nil
+            self?.tileAttacks = []
+            self?.levelGoals = nil
+            self?.isUserInteractionEnabled = false
+            self?.zPosition = 1_000_000
+            completion?()
         }
     }
 }

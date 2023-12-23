@@ -13,6 +13,7 @@ import Foundation
 
 protocol GameSceneCoordinatingDelegate: AnyObject {
     func navigateToMainMenu(_ scene: SKScene, playerData: EntityModel)
+    func finishRunAfterGameLost(playerData: EntityModel)
     func goToNextArea(updatedPlayerData: EntityModel)
     func saveState()
 }
@@ -26,7 +27,6 @@ class GameScene: SKScene {
         
         static let tag = String(describing: GameScene.self)
     }
-    
     // only strong reference to the Board
     private var board: Board?
     
@@ -34,7 +34,7 @@ class GameScene: SKScene {
     private var boardSize: Int!
     
     //foreground
-    private var foreground: SKNode!
+    private(set) var foreground: SKNode!
     
     // delegate
     weak var gameSceneDelegate: GameSceneCoordinatingDelegate?
@@ -43,7 +43,7 @@ class GameScene: SKScene {
     private var renderer: Renderer?
     
     //Generator
-    private var generator: HapticGenerator?
+    private var generator: HapticGenerator = HapticGenerator.shared
     
     //swipe recognizer view
     private var swipeRecognizerView: SwipeRecognizerView?
@@ -55,8 +55,11 @@ class GameScene: SKScene {
     // stat tracker
     private var runStatTracker: RunStatTracker?
     
-    // audio listener
-    private var audioListener: AudioEventListener?
+    // tutorial
+    private var tutorialConductor: TutorialConductor?
+    
+    // boss controller
+    private var bossController: BossController?
     
     //touch state
     private var touchWasSwipe = false
@@ -67,26 +70,56 @@ class GameScene: SKScene {
     // rotate preview
     private var rotatePreview: RotatePreviewView?
     
+    // referee
+    private var referee: Referee?
+    
+    // profile view model
+    private var profileViewModel: ProfileViewModel?
+    
+    private var numberOfPreviousBossWins: Int = 0
+    
+    private var gameMusicManager: GameMusicManager?
+    
+    #if DEBUG
+    // screenshot helper
+    private var screenshotHelper: ScreenshotHelper?
+    #endif
     required init?(coder aDecoder: NSCoder) { super.init(coder: aDecoder) }
     
     /// Creates an instance of board and does preparation neccessary for didMove(to:) to be called
     public func commonInit(boardSize: Int,
                            entities: EntitiesModel,
                            difficulty: Difficulty = .normal,
-                           updatedEntity: EntityModel? = nil,
+                           updatedEntity: EntityModel,
                            level: Level,
                            randomSource: GKLinearCongruentialRandomSource?,
                            stats: [Statistics],
-                           loadedTiles: [[Tile]]? = []) {
+                           loadedTiles: [[Tile]]? = [],
+                           tutorialConductor: TutorialConductor,
+                           profileViewModel: ProfileViewModel?,
+                           numberOfPreviousBossWins: Int,
+                           gameMusicManager: GameMusicManager
+    ) {
+        self.profileViewModel = profileViewModel
+        
+        // create the tutorial conductor
+        self.tutorialConductor = tutorialConductor
+        
         // init our level
         self.level = level
-        self.levelGoalTracker = LevelGoalTracker(level: level)
-        self.runStatTracker = RunStatTracker(runStats: stats)
+        level.startLevel(playerData: updatedEntity, isTutorial: tutorialConductor.isTutorial)
+        
         
         //create the foreground node
         foreground = SKNode()
         foreground.position = .zero
         addChild(foreground)
+        
+        
+        self.levelGoalTracker = LevelGoalTracker(level: level, tutorialConductor: tutorialConductor)
+        self.runStatTracker = RunStatTracker(runStats: stats, level: level)
+        self.numberOfPreviousBossWins = numberOfPreviousBossWins
+        
         
         //init our tile creator
         let tileCreator = TileCreator(entities,
@@ -94,25 +127,44 @@ class GameScene: SKScene {
                                       updatedEntity: updatedEntity,
                                       level: level,
                                       randomSource: randomSource ?? GKLinearCongruentialRandomSource(),
-                                      loadedTiles: loadedTiles)
+                                      loadedTiles: loadedTiles,
+                                      tutorialConductor: tutorialConductor)
         
         //board
-        board = Board.build(tileCreator: tileCreator, difficulty: difficulty, level: level)
+        board = Board.build(tileCreator: tileCreator, difficulty: difficulty, level: level, tutorialConductor: tutorialConductor)
         self.boardSize = boardSize
         
-        // create haptic generator
-        generator = HapticGenerator()
+        // start the tutorial conductor
+        tutorialConductor.startHandlingInput()
         
-        // create the audio listener
-        let audioManager = AudioManager(sceneNode: foreground)
-        audioListener = AudioEventListener(audioManager: audioManager)
+        // create the bossController
+        bossController = BossController(level: level)
         
+        // referee
+        referee = Referee.shared
+        
+        if bossController?.isBossLevel ?? false {
+            referee?.setWinRule(BossWin())
+        } else {
+            referee?.setWinRule(NonBossWin())
+        }
+        
+        self.gameMusicManager = gameMusicManager
     }
     
     override func didMove(to view: SKView) {
         
+        isAccessibilityElement = false
+        
         // preview view
         self.rotatePreview = RotatePreviewView()
+        
+#if DEBUG
+        // screen shot helper
+        if UITestRunningChecker.shared.testsAreRunning {
+            self.screenshotHelper = ScreenshotHelper(rotatePreview: rotatePreview, foreground: foreground, playableRect: size.playableRect)
+        }
+#endif
     
         // create the renderer
         self.renderer = Renderer(playableRect: size.playableRect,
@@ -120,43 +172,94 @@ class GameScene: SKScene {
                                  boardSize: boardSize,
                                  precedence: Precedence.foreground,
                                  level: level!,
-                                 levelGoalTracker: levelGoalTracker!)
+                                 levelGoalTracker: levelGoalTracker!,
+                                 tutorialConductor: tutorialConductor,
+                                 runStatTracker: runStatTracker!,
+                                 numberOfPreviousBossWins:  numberOfPreviousBossWins,
+                                 scene: self)
         
         
         // Register for inputs we care about
         Dispatch.shared.register { [weak self] input in
-            if input.type == .playAgain {
-                guard let self = self,
-                      let board = self.board,
-                let playerIndex = tileIndices(of: .player(.zero), in: board.tiles).first
-                else { return }
-                
-                self.foreground.removeAllChildren()
-                if case let TileType.player(data) = board.tiles[playerIndex].type {
-                    self.removeFromParent()
-                    self.swipeRecognizerView?.removeFromSuperview()
-                    self.gameSceneDelegate?.navigateToMainMenu(self, playerData: data)
-                }
-            } else if case InputType.visitStore = input.type {
-                
-                guard let self = self,
-                      let board = self.board,
-                      let playerIndex = tileIndices(of: .player(.zero), in: board.tiles).first,
-                    case let TileType.player(data) = board.tiles[playerIndex].type else { return }
-                self.foreground.removeAllChildren()
-                self.removeFromParent()
-                self.swipeRecognizerView?.removeFromSuperview()
-                self.gameSceneDelegate?.goToNextArea(updatedPlayerData: data)
-            
-            } else if case InputType.gameWin(_) = input.type {
-                guard let self = self else { return }
-                // this is to save the state at the end of the level.  
-                self.gameSceneDelegate?.saveState()
-            }
+            self?.handleInput(input: input)
         }
 
         //Turn watcher
         TurnWatcher.shared.register()
+        // create haptic generator
+        generator.register()
+        gameMusicManager?.register()
+        
+        
+    }
+    
+    func handleInput(input: Input) {
+        if case InputType.playAgain = input.type {
+            guard let board = self.board,
+            let playerIndex = tileIndices(of: .player(.zero), in: board.tiles).first
+            else { return }
+            
+            // sets the tutorial flag if the player skips the tutorial from the pause menu
+            self.tutorialConductor?.setTutorialSkipped()
+            
+            self.foreground.removeAllChildren()
+            if case let TileType.player(data) = board.tiles[playerIndex].type {
+                self.removeFromParent()
+                self.swipeRecognizerView?.removeFromSuperview()
+                self.gameSceneDelegate?.navigateToMainMenu(self, playerData: data)
+            }
+        } else if case InputType.visitStore = input.type {
+            
+            guard let board = self.board,
+                  let playerIndex = tileIndices(of: .player(.zero), in: board.tiles).first,
+                case let TileType.player(data) = board.tiles[playerIndex].type else { return }
+            self.foreground.removeAllChildren()
+            self.removeFromParent()
+            self.swipeRecognizerView?.removeFromSuperview()
+            
+            self.gameSceneDelegate?.goToNextArea(updatedPlayerData: data)
+        
+        } else if case InputType.gameWin(_) = input.type {
+            // this is to save the state at the end of the level.
+            self.gameSceneDelegate?.saveState()
+            
+            self.tutorialConductor?.setTutorialCompleted(playerDied: false)
+            
+            guard let board = self.board,
+                  let playerIndex = tileIndices(of: .player(.zero), in: board.tiles).first,
+                case let TileType.player(data) = board.tiles[playerIndex].type else { return }
+
+            
+            // request the palyer's review if they just finish level 2 or 3 and they have a rune
+            if profileViewModel?.canShowReviewRequest() ?? false,
+               ((level?.depth ?? 0) == 2 || (level?.depth ?? 0) == 1),
+               !(data.pickaxe?.runes.isEmpty ?? false)
+            {
+                AppStoreReviewManager.requestReviewIfAppropriate()
+            }
+            // some lower skilled players might take longer to get there, but I still want them to review after 25 games
+            else if profileViewModel?.canShowReviewRequestLongTimePlayer() ?? false,
+                      (level?.depth ?? 0) > 0 {
+                AppStoreReviewManager.requestReviewIfAppropriate()
+            }
+        } else if case InputType.gameLose = input.type {
+            
+            self.tutorialConductor?.setTutorialCompleted(playerDied: true)
+            
+            // set this so the player sees the FTUE for dying
+            UserDefaults.standard.setValue(true, forKey: UserDefaults.shouldSeeDiedForTheFirstTimeKey)
+            
+            // finish up the run
+            guard let board = self.board,
+                  let playerIndex = tileIndices(of: .player(.zero), in: board.tiles).first,
+                case let TileType.player(data) = board.tiles[playerIndex].type else { return }
+            gameSceneDelegate?.finishRunAfterGameLost(playerData: data)
+            
+        } else if case InputType.transformation(let trans) = input.type {
+            if let offers = trans.first?.offers {
+                profileViewModel?.updateUnlockablesHaveSpawned(offers: offers)
+            }
+        }
     }
     
     public func prepareForReuse() {
@@ -164,28 +267,30 @@ class GameScene: SKScene {
         renderer = nil
         foreground = nil
         gameSceneDelegate = nil
-        generator = nil
         rotatePreview = nil
-        audioListener = nil
+        runStatTracker = nil
+        bossController = nil
         swipeRecognizerView?.removeFromSuperview()
+        gameMusicManager = nil
         InputQueue.reset()
         Dispatch.shared.reset()
         print("deiniting")
     }
     
     // public function that exposes all the data necessary to save the exact game state
-    public func saveAllState() -> (EntityModel, [GoalTracking], [[Tile]], [Statistics])? {
+    public func saveAllState() -> (EntityModel, [GoalTracking], [[Tile]], [Statistics], BossPhase)? {
         guard let board = self.board,
               let playerIndex = tileIndices(of: .player(.zero), in: board.tiles).first,
               case let TileType.player(data) = board.tiles[playerIndex].type,
               let levelGoalTracking = self.levelGoalTracker?.goalProgress,
-              let stats = self.runStatTracker?.runStats
+              let stats = self.runStatTracker?.runStats,
+              let bossPhase = bossController?.phase
               else {
             GameLogger.shared.log(prefix: Constants.tag, message: "Failure to gather all information to save the game")
             return nil
         }
         
-        return (data, levelGoalTracking, board.tiles, stats)
+        return (data, levelGoalTracking, board.tiles, stats, bossPhase)
     }
 }
 
@@ -230,13 +335,14 @@ extension GameScene {
         let preview = abs(currentPosition.y - lastPosition.y) > Constants.quickSwipeDistanceThreshold ? false : true
         
     
-        print("Preview?: \(preview) - \(abs(currentPosition.y - lastPosition.y))")
+//        print("Preview?: \(preview) - \(abs(currentPosition.y - lastPosition.y))")
         
         // deteremine the vector of the swipe
         let vector = currentPosition - lastPosition
         
         // set the swipe for the duration of this swipe gesture
         let touchIsOnRight = (view?.isOnRight(currentPosition) ?? false)
+        let touchIsOnTop = (view?.isOnTop(currentPosition) ?? false)
         
         if self.swipeDirection == nil {
             let swipeDirection = SwipeDirection(from: vector)
@@ -245,7 +351,7 @@ extension GameScene {
             self.swipeDirection = swipeDirection
             
             /// deteremine which clock rotation to apply
-            let rotateDir = RotateDirection(from: swipeDirection, isOnRight: touchIsOnRight)
+            let rotateDir = RotateDirection(from: swipeDirection, isOnRight: touchIsOnRight, isOnTop: touchIsOnTop)
             
             /// call functions that send rotate input
             switch rotateDir {
@@ -261,10 +367,23 @@ extension GameScene {
             guard let swipeDirection = swipeDirection else { return }
             var distance: CGFloat
             switch swipeDirection {
-            case .up, .down:
-                distance = vector.dy
+            case .up:
+                let dx = touchIsOnRight ? -vector.dx : vector.dx
+                distance = vector.dy + dx
+                distance *= (touchIsOnRight ? 1 : -1)
+            case .down:
+                let dx = touchIsOnRight ? vector.dx : -vector.dx
+                distance = vector.dy + dx
+                distance *= (touchIsOnRight ? 1 : -1)
+            case .left:
+                let dy = touchIsOnTop ? vector.dy : -vector.dy
+                distance = vector.dx + dy
+                distance *= (touchIsOnTop ? -1 : 1)
+            case .right:
+                let dy = touchIsOnTop ? -vector.dy : vector.dy
+                distance = vector.dx + dy
+                distance *= (touchIsOnTop ? -1 : 1)
             }
-            distance *= (touchIsOnRight ? 1 : -1)
             self.rotatePreview?.touchesMoved(distance: distance)
         }
         
@@ -280,9 +399,8 @@ extension GameScene {
             self.touchWasSwipe = false
         }
 
-        if touchWasSwipe {
-            self.rotatePreview?.touchesEnded()
-        }
+        // Note: it is ok to send ever tough end even to the Rotate Preview View.  It only sends input if we are expecting a rotate preview finish.
+        self.rotatePreview?.touchesEnded()
         
         if touchWasCanceled && !touchWasSwipe {
             touchWasCanceled = false
@@ -306,6 +424,7 @@ extension GameScene {
     /// We try to digest the top of the queue every frame
     override func update(_ currentTime: TimeInterval) {
         guard let input = InputQueue.pop() else { return }
+        print("Sending input \(input.type)")
         Dispatch.shared.send(input)
     }
 }

@@ -21,6 +21,8 @@ class BackpackView: SKSpriteNode {
     
     private struct Constants {
         static let tag = String(describing: BackpackView.self)
+        static let runeUseMaskSpriteName = "rune-use-mask"
+        static let runeReplacementName = "runeReplacement"
     }
     
     // view model
@@ -47,6 +49,13 @@ class BackpackView: SKSpriteNode {
     
     // dispose bag
     private var disposables = Set<AnyCancellable>()
+    
+    // targeting mask use
+    private lazy var runeUseMask: SKSpriteNode = {
+        let sprite = SKSpriteNode(texture: SKTexture(imageNamed: Constants.runeUseMaskSpriteName), size: CGSize(width: playableRect.width, height: playableRect.height))
+        sprite.zPosition = 100
+        return sprite
+    }()
     
     init(playableRect: CGRect, viewModel: TargetingViewModel, levelSize: Int) {
         self.playableRect = playableRect
@@ -102,18 +111,23 @@ class BackpackView: SKSpriteNode {
         
         /// bind to view model
         viewModel.runeReplacementPublisher.sink { [weak self, height] (value) in
-            let (pickaxe, rune) = value
-            let viewModel = RuneReplacementViewModel(newRune: rune, pickaxe: pickaxe, runeToSwap: nil)
+            let (pickaxe, rune, promptedByChest) = value
+            let viewModel = RuneReplacementViewModel(foundRune: rune, pickaxe: pickaxe, promptedByChest: promptedByChest, runeToSwap: nil)
             let view = RuneReplacementView(size: CGSize(width: playableRect.width, height: height),
                                            playableRect: playableRect,
                                            viewModel: viewModel)
-            view.zPosition = 20_000
-            view.position = .zero // centered 
-            view.name = "runeReplacement"
-            self?.removeChild(with: "runeReplacement")
+            view.zPosition = 40_000_000
+            view.position = .zero
+            view.name = Constants.runeReplacementName
+            self?.removeChild(with: Constants.runeReplacementName)
             self?.addChild(view)
             
         }.store(in: &disposables)
+        
+        viewModel.foundRuneDiscardedPublisher.sink { [weak self] in
+            self?.removeChild(with: Constants.runeReplacementName)
+        }.store(in: &disposables)
+        
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -134,8 +148,11 @@ class BackpackView: SKSpriteNode {
         /// else add the tareting area
         if viewModel.rune == nil {
             targetingArea.removeFromParent()
+            runeUseMask.removeFromParent()
         } else {
             addChildSafely(targetingArea)
+            runeUseMask.isUserInteractionEnabled = false
+            addChildSafely(runeUseMask)
         }
         
         targetingArea.removeAllChildren()
@@ -144,7 +161,16 @@ class BackpackView: SKSpriteNode {
             for coord in target.all {
                 let position = translateCoord(coord)
                 /// choose the reticle based on all targets legality and this individual target legality
-                let identifier: String = (target.isLegal || areLegal) ? Identifiers.Sprite.greenReticle : Identifiers.Sprite.redReticle
+                let identifier: String
+                if (target.isLegal && areLegal) {
+                    if let rune = viewModel.rune, rune.targetInput == .random {
+                        identifier = Identifiers.Sprite.potentialTargetReticle
+                    } else {
+                        identifier = Identifiers.Sprite.greenReticle
+                    }
+                } else {
+                    identifier = Identifiers.Sprite.redReticle
+                }
                 let reticle = SKSpriteNode(texture: SKTexture(imageNamed: identifier), size: CGSize(width: tileSize, height: tileSize))
                 reticle.position = position
                 reticle.zPosition = Precedence.menu.rawValue
@@ -152,11 +178,11 @@ class BackpackView: SKSpriteNode {
             }
         }
         
-        runeInventoryContainer?.enableButton(areLegal)
+        runeInventoryContainer?.enableButton(areLegal, targets: viewModel.currentTargets)
     }
     
     
-    //MARK: - private functions
+    // MARK: - private functions
     // TODO: should this be updated?
     private func runeSlotsUpdated(_ runeSlots: Int, _ runes: [Rune]) {
         
@@ -169,17 +195,16 @@ class BackpackView: SKSpriteNode {
         
         /// create the rune container view
         let runeContainer = RuneContainerView(viewModel: viewModel,
-                                              mode: .inventory,
                                               size: CGSize(width: playableRect.width,
                                                            height: Style.Backpack.runeInventorySize))
         
         /// name it so we can remove it later
         runeContainer.name = "runeContainer"
         
-        runeContainer.position = CGPoint.position(runeContainer.frame, inside: playableRect, verticalAnchor: .bottom, horizontalAnchor: .center, padding: Style.Padding.most*3)
+        runeContainer.position = CGPoint.position(runeContainer.frame, inside: playableRect, verticalAlign: .bottom, horizontalAnchor: .center, yOffset: Style.Padding.most*3)
         
         /// position it high up to catch user interaction
-        runeContainer.zPosition = 10_000
+        runeContainer.zPosition = 2_000_000
         
         /// remove the old rune container
         self.removeChild(with: "runeContainer")
@@ -226,6 +251,8 @@ extension BackpackView {
             if node.name == targetingAreaName && viewModel.rune != nil && !background.contains(position) {
                 let tileCoord = translatePoint(position)
                 viewModel.didTarget(tileCoord)
+            } else if node.name == Constants.runeReplacementName  {
+                self.childNode(withName: Constants.runeReplacementName)?.touchesEnded(touches, with: event)
             }
         }
     }

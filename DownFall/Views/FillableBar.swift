@@ -46,7 +46,7 @@ class FillableBar: SKSpriteNode {
     private lazy var barOutline: SKShapeNode = {
         var outline = SKShapeNode(rect: CGRect(origin: contentView.frame.origin, size: contentView.size), cornerRadius: Style.FillableBar.cornerRadius)
         outline.lineWidth = Style.FillableBar.lineWidth
-        outline.strokeColor = .storeBlack
+        outline.strokeColor = .black
         outline.position = .zero
         return outline
     }()

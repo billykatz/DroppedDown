@@ -31,11 +31,13 @@ struct CodexItemAnimatingView: View {
     var spriteSheet: some View {
         Image(storeOffer.textureName)
                 .saturation(unlockable.isPurchased ? 1.0 : 0.0)
-                .contrast(unlockable.isUnlocked ? 1.0: 0.0)
+                .contrast((unlockable.isPurchased || unlockable.isUnlocked) ? 1.0: 0.0)
     }
     
     var clippedSpriteSheet: some View {
-        spriteSheet
+        Image(storeOffer.spriteSheetName ?? "")
+            .saturation(unlockable.isPurchased ? 1.0 : 0.0)
+            .contrast((unlockable.isPurchased || unlockable.isUnlocked) ? 1.0: 0.0)
             .offset(x: initialOffset - offset, y: 0)
             .clipShape(
                 Square().path(in: CGRect(x: initialOffset, y: 0, width: dimension, height: dimension))
@@ -87,11 +89,11 @@ struct CodexItemAnimatingView_Previews: PreviewProvider {
     static var previews: some View {
         let testOffer = StoreOffer.offer(type: .greaterHeal, tier: 1)
         
-        let unlock = Unlockable(stat: .clockwiseRotations, item: testOffer, purchaseAmount: 50, isPurchased: false, isUnlocked:  false, applysToBasePlayer: false)
+        let unlock = Unlockable(stat: .clockwiseRotations, item: testOffer, purchaseAmount: 50, isPurchased: false, isUnlocked:  false, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false)
         
-        let unlock2 = Unlockable(stat: .clockwiseRotations, item: StoreOffer.offer(type: .killMonsterPotion, tier: 1), purchaseAmount: 50, isPurchased: false, isUnlocked:  true, applysToBasePlayer: false)
+        let unlock2 = Unlockable(stat: .clockwiseRotations, item: StoreOffer.offer(type: .killMonsterPotion, tier: 1), purchaseAmount: 50, isPurchased: false, isUnlocked:  true, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false)
         
-        let unlock3 = Unlockable(stat: .clockwiseRotations, item: StoreOffer.offer(type: .transmogrifyPotion, tier: 1), purchaseAmount: 50, isPurchased: true, isUnlocked:  true, applysToBasePlayer: false)
+        let unlock3 = Unlockable(stat: .clockwiseRotations, item: StoreOffer.offer(type: .transmogrifyPotion, tier: 1), purchaseAmount: 50, isPurchased: true, isUnlocked:  true, applysToBasePlayer: false, recentlyPurchasedAndHasntSpawnedYet: false, hasBeenTappedOnByPlayer: false)
         
         VStack(spacing: 100) {
             CodexItemAnimatingView(unlockable: unlock)

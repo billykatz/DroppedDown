@@ -32,7 +32,14 @@ class LoadingScene: SKScene {
     }
     
     func fadeOut(_ completion: @escaping (() -> ())) {
-        let fadeOut = SKAction.fadeOut(withDuration: 1.25)
-        loadingSprite?.run(fadeOut, completion: completion)
+        let target = CGPoint.position(loadingSprite?.frame,
+                               inside: size.playableRect,
+                               verticalAlign: .top,
+                               horizontalAnchor: .center,
+                               yOffset: 150.0)
+        let moveTo = SKAction.move(to: target, duration: 0.75)
+        let group = SKAction.group([moveTo])
+        group.timingMode = .easeInEaseOut
+        loadingSprite?.run(group, completion: completion)
     }
 }

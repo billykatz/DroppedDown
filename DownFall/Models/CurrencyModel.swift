@@ -26,13 +26,10 @@ enum Usage {
 }
 
 enum Currency: String, CaseIterable, Codable, Hashable  {
-    case gold
     case gem = "crystals"
     
     var itemType: Item.ItemType {
         switch self {
-        case .gold:
-            return Item.ItemType.gold
         case .gem:
             return Item.ItemType.gem
         }

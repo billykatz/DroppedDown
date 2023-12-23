@@ -34,6 +34,11 @@ class SpriteSheet {
         
     }
     
+    convenience init(textureName: String, columns: Int) {
+        let texture = SKTexture(imageNamed: textureName)
+        self.init(texture: texture, rows: 1, columns: columns, spacing: 0, margin: 0)
+    }
+    
     convenience init(texture: SKTexture, rows: Int, columns: Int) {
         self.init(texture: texture, rows: rows, columns: columns, spacing: 0, margin: 0)
     }

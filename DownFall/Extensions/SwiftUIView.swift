@@ -13,4 +13,12 @@ extension Font {
     static let buttonFont = Font(UIFont.buttonFont)
     static let titleCodexFont = Font(UIFont.titleCodexFont)
     static let bigTitleCodexFont = Font(UIFont.bigTitleCodexFont)
+    static let bigSubTitleCodexFont = Font(UIFont.bigSubtitleCodexFont)
+    
+    static let creditsTitleCodexFont = Font(UIFont.creditsTitleCodexFont)
+    static let creditsSubTitleCodexFont = Font(UIFont.creditsSubTitleCodexFont)
+    static let creditsNameCodexFont = Font(UIFont.creditsNameCodexFont)
+    static let creditsBigNameCodexFont = Font(UIFont.creditsBigNameCodexFont)
+    
+    static let statsStatFont = Font(UIFont.statsStatCodexFont)
 }

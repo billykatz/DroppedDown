@@ -13,6 +13,7 @@ protocol Dispatching {
 }
 
 class Dispatch: Dispatching {
+    // Dispatch.shared
     static let shared = Dispatch()
     
     var receivers: [(Input) -> ()] = []

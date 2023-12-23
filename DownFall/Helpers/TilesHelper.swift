@@ -6,6 +6,17 @@
 //  Copyright © 2019 William Katz LLC. All rights reserved.
 //
 
+func getTilePosition(_ type: TileType, sprites: [[DFTileSpriteNode]]) -> TileCoord? {
+    for i in 0..<sprites.count {
+        for j in 0..<sprites[i].count {
+            if sprites[i][j].type == type {
+                return TileCoord(i,j)
+            }
+        }
+    }
+    return nil
+}
+
 func getTilePosition(_ type: TileType, tiles: [[Tile]]) -> TileCoord? {
     for i in 0..<tiles.count {
         for j in 0..<tiles[i].count {

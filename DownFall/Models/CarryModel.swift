@@ -15,11 +15,7 @@ struct CarryModel: Codable, Equatable {
         return items.contains { $0.type == .gem }
     }
     
-    private var totalGold: Int {
-        return items.filter({ $0.type == .gold }).first?.amount ?? 0
-    }
-    
-    private var totalGem: Int {
+    var totalGem: Int {
         return items.filter({ $0.type == .gem }).first?.amount ?? 0
     }
     
@@ -27,14 +23,12 @@ struct CarryModel: Codable, Equatable {
         switch currency {
         case .gem:
             return totalGem
-        case .gold:
-            return totalGold
         }
     }
     
     func pay(_ price: Int, inCurrency currency: Currency) -> CarryModel {
-        guard price <= total(in: currency) else { fatalError("You need to make sure oyu have enough funds to pay before calling this") }
-        let itemType: Item.ItemType = currency == .gold ? .gold : .gem
+        guard price <= total(in: currency) else { fatalError("You need to make sure you have enough funds to pay before calling this") }
+        let itemType: Item.ItemType = .gem
         
         return CarryModel(items: items.map { item in
                 if item.type == itemType {
@@ -48,15 +42,26 @@ struct CarryModel: Codable, Equatable {
     }
     
     func earn(_ money: Int, inCurrency currency: Currency) -> CarryModel {
-        let itemType: Item.ItemType = currency == .gold ? .gold : .gem
+        let itemType: Item.ItemType = .gem
         
-        return CarryModel(items: items.map { item in
-            if item.type == itemType {
-                return Item(type: itemType, amount: item.amount + money)
-            } else {
-                return item
-            }
-        })
+        var newItems: [Item] = []
+        if let matchingItem = items.first(where: { $0.type == itemType }) {
+            let newItem = Item(type: itemType, amount: matchingItem.amount + money)
+            newItems.append(newItem)
+        } else {
+            let newItem = Item(type: itemType, amount: money)
+            newItems.append(newItem)
+        }
+        
+        return CarryModel(items: newItems)
+//
+//        return CarryModel(items: items.map { item in
+//            if item.type == itemType {
+//                return Item(type: itemType, amount: item.amount + money)
+//            } else {
+//                return item
+//            }
+//        })
     }
 
 }

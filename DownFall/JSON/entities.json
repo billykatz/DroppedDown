@@ -1,9 +1,9 @@
 {
     "entities": [
-        { "name": "player3",
+        { "name": "player",
             "type": "player",
-            "originalHp": 3,
-            "hp": 3,
+            "originalHp": 2,
+            "hp": 2,
             "attack": {
                 "type": "targets",
                 "frequency" : 1,
@@ -23,8 +23,8 @@
             "animations":
                 [
                     {
-                        "animationFilename": "playerAttack",
-                        "numberOfFrames": 10,
+                        "animationFilename": "player-attack-11",
+                        "numberOfFrames": 11,
                         "animationType": "attack"
                     },
                     {
@@ -40,11 +40,6 @@
                 ],
             "carry": {
                 "items": [
-                {
-                    "type": "gold",
-                    "amount": 15
-                    
-                },
                 {
                     "type": "gem",
                     "amount": 0
@@ -99,14 +94,15 @@
                     "numberOfFrames": 5,
                     "animationType": "projectileMid",
                     "keyframe": 1
+                },
+                {
+                    "animationFilename": "dragonDying",
+                    "numberOfFrames": 4,
+                    "animationType": "dying"
                 }
             ],
             "carry": {
-                "items": [{
-                    "type": "gold",
-                    "amount": 15
-                }]
-                
+                "items": []
             },
             "abilities": [],
             "effects": [],
@@ -160,12 +156,9 @@
                         "animationType": "idle"
                     }
                 ],
-            "carry": {
-                "items": [{
-                    "type": "gold",
-                    "amount": 15
-                }]
-            },
+                "carry": {
+                    "items": []
+                },
             "abilities": [],
             "effects": [],
             "dodge": 0,
@@ -220,16 +213,18 @@
                     "animationType": "idle"
                 },
                 {
+                    "animationFilename": "batDying",
+                    "numberOfFrames": 8,
+                    "animationType": "dying"
+                },
+                {
                     "animationFilename": "batProjectile",
                     "numberOfFrames": 4,
                     "animationType": "projectileStart"
                 }
             ],
             "carry": {
-                "items": [{
-                    "type": "gold",
-                    "amount": 15
-                }]
+                "items": []
             },
             "abilities": [],
             "effects": [],
@@ -273,13 +268,15 @@
                     "animationFilename": "alamoMid",
                     "numberOfFrames": 3,
                     "animationType": "projectileMid"
+                },
+                {
+                    "animationFilename": "alamoDying",
+                    "numberOfFrames": 5,
+                    "animationType": "dying"
                 }
             ],
             "carry": {
-                "items": [{
-                    "type": "gold",
-                    "amount": 15
-                }]
+                "items": []
             },
             "abilities": [],
             "effects": [],
@@ -332,13 +329,44 @@
                     "animationFilename": "sallyProjectileMid",
                     "numberOfFrames": 1,
                     "animationType": "projectileMid"
+                },
+                {
+                    "animationFilename": "sally-dead-10",
+                    "numberOfFrames": 10,
+                    "animationType": "dying"
                 }
             ],
             "carry": {
-                "items": [{
-                    "type": "gold",
-                    "amount": 15
-                }]
+                "items": []
+            },
+            "abilities": [],
+            "effects": [],
+            "dodge": 0,
+            "luck": 0
+        },
+        { "name": "spider-minion",
+            "type": "spider",
+            "originalHp": 1,
+            "hp": 1,
+            "attack": {
+                "type": "targets",
+                "frequency" : 3,
+                "damage": 1,
+                "range": {
+                    "lower": 1,
+                    "upper": 2
+                },
+                "attacksPerTurn": 1,
+                "attackSlope": [
+                    {
+                        "over": 0,
+                        "up": -1
+                    }
+                ]
+            },
+            "animations": [],
+            "carry": {
+                "items": []
             },
             "abilities": [],
             "effects": [],

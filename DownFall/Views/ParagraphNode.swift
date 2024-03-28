@@ -33,7 +33,7 @@ class ParagraphNode: SKSpriteNode {
         self.fontColor = newValue
         retexture()
     }
-
+    
     func text(newValue: String) {
         self.text = newValue
         retexture()
@@ -55,7 +55,7 @@ class ParagraphNode: SKSpriteNode {
          fontColor: UIColor = ParagraphNode.defaultFontColor,
          fontType: UIFontType = UIFontType.legacy,
          textAlignment: NSTextAlignment = NSTextAlignment.left
-         ) {
+    ) {
         self.fontName = fontType.rawValue
         self.text = text
         self.fontSize = fontSize
@@ -78,7 +78,7 @@ class ParagraphNode: SKSpriteNode {
                           fontColor: UIColor = ParagraphNode.defaultFontColor,
                           fontType: UIFontType = UIFontType.legacy,
                           textAlignment: NSTextAlignment = .left
-                          ) -> ParagraphNode {
+    ) -> ParagraphNode {
         return ParagraphNode(
             text: text,
             paragraphWidth: paragraphWidth,
@@ -110,14 +110,14 @@ class ParagraphNode: SKSpriteNode {
          Stumped?  Look for the name of the font you are trying to load
          for family in UIFont.familyNames
          {
-            print("\(family)")
-            for names in UIFont.fontNames(forFamilyName: family)
-            {
-                print("== \(names)")
-            }
+         print("\(family)")
+         for names in UIFont.fontNames(forFamilyName: family)
+         {
+         print("== \(names)")
+         }
          }
          */
-
+        
     }()
     
     func imageFrom(text: NSString, textAlignment: NSTextAlignment) -> UIImage? {
@@ -127,14 +127,14 @@ class ParagraphNode: SKSpriteNode {
         paragraphStyle.lineBreakMode = NSLineBreakMode.byWordWrapping
         paragraphStyle.alignment = textAlignment
         paragraphStyle.lineSpacing = 1;
-
+        
         // attributes
         var attributes: [NSAttributedString.Key: Any] = [:]
         attributes[NSAttributedString.Key.font] = customFont
         attributes[NSAttributedString.Key.paragraphStyle] = paragraphStyle
         attributes[NSAttributedString.Key.foregroundColor] = fontColor
-
-
+        
+        
         let size = CGSize(width: paragraphWidth, height: 2000.0)
         let textRect = text.boundingRect(with: size,
                                          options: NSStringDrawingOptions.usesLineFragmentOrigin,
@@ -145,15 +145,15 @@ class ParagraphNode: SKSpriteNode {
         self.size = textRect.size
         
         //draw the image
-        UIGraphicsBeginImageContextWithOptions(textRect.size, false, 0.0)
         
-        text.draw(in: textRect, withAttributes: attributes)
+        let renderer = UIGraphicsImageRenderer(size: textRect.size)
         
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        
-        UIGraphicsEndImageContext()
-        
-        return image
-        
+        return renderer.image { (context) in
+            text.draw(in: textRect, withAttributes: attributes)
+        }
     }
+    
 }
+
+
+
